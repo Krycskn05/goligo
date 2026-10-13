@@ -33,6 +33,8 @@ s_tests() {
     --module commonjs --moduleResolution node --target es2022 \
     --esModuleInterop --resolveJsonModule --skipLibCheck \
     --types node --lib es2023,dom,dom.iterable --noEmitOnError false || true
+  # Proje "type": "module" olduğu için derlenen klasörü CommonJS olarak işaretle.
+  echo '{"type":"commonjs"}' > .check/lib/package.json
   echo "Derlenen dosya sayisi: $(ls .check/lib 2>/dev/null | wc -l)"
   STUDY_CHECK_DIR="$PWD/.check/lib" node --test --test-reporter=spec tests/*.test.*
 }

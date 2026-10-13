@@ -1,0 +1,1014 @@
+{
+  "bad": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "brett": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "dach": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "dachboden": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "dusche": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "fenster": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "haustuer": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "heizung": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "herd": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "kamin": {
+    "src": "/objects/toon/atlas-01.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "keller": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "kueche": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "mauer": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "rohr": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "steckdose": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "stecker": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "treppe": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "waschbecken": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "wasserhahn": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "ziegelstein": {
+    "src": "/objects/toon/atlas-02.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "bett": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "bild": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "fernseher": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "hocker": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "kofferradio": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "kuehlschrank": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "lampe": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "matratze": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "plattenspieler": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "regal": {
+    "src": "/objects/toon/atlas-03.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "schrank": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "sessel": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "sofa": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "spiegel": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "stuhl": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "teppich": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "tisch": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "truhe": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "vorhang": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "waschmaschine": {
+    "src": "/objects/toon/atlas-04.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "leiter": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "eimer": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "pinsel": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "farbrolle": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "schaufel": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "schubkarre": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "saege": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "zementmischer": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "geruest": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "antenne": {
+    "src": "/objects/toon/atlas-05.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "dachziegel": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "schlauch": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "maurerkelle": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "karton": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "pflanze": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 0.0,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "besen": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 0.0,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "regenschirm": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 396.6,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "kissen": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 793.2,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "vogelkaefig": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1189.8,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "umzugswagen": {
+    "src": "/objects/toon/atlas-06.webp",
+    "width": 1983,
+    "height": 793,
+    "crop": {
+      "x": 1586.4,
+      "y": 396.5,
+      "width": 396.6,
+      "height": 396.5
+    }
+  },
+  "bilderrahmen": {
+    "src": "/objects/toon/moving-bilderrahmen.webp",
+    "width": 418,
+    "height": 400,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 400
+    }
+  },
+  "buegeleisen": {
+    "src": "/objects/toon/moving-buegeleisen.webp",
+    "width": 418,
+    "height": 400,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 400
+    }
+  },
+  "staubsauger": {
+    "src": "/objects/toon/moving-staubsauger.webp",
+    "width": 418,
+    "height": 400,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 400
+    }
+  },
+  "seil": {
+    "src": "/objects/toon/moving-seil.webp",
+    "width": 418,
+    "height": 398,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 398
+    }
+  },
+  "flasche": {
+    "src": "/objects/toon/moving-flasche.webp",
+    "width": 418,
+    "height": 398,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 398
+    }
+  },
+  "apfel": {
+    "src": "/objects/toon/moving-apfel.webp",
+    "width": 418,
+    "height": 398,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 398
+    }
+  },
+  "schirmstaender": {
+    "src": "/objects/toon/moving-schirmstaender.webp",
+    "width": 418,
+    "height": 456,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 456
+    }
+  },
+  "aquarium": {
+    "src": "/objects/toon/moving-aquarium.webp",
+    "width": 418,
+    "height": 456,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 456
+    }
+  },
+  "fisch": {
+    "src": "/objects/toon/moving-fisch.webp",
+    "width": 418,
+    "height": 456,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 456
+    }
+  },
+  "palme": {
+    "src": "/objects/toon/moving-palme.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "blumentopf": {
+    "src": "/objects/toon/moving-blumentopf.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "kaktus": {
+    "src": "/objects/toon/moving-kaktus.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "vogel": {
+    "src": "/objects/toon/moving-vogel.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "tasse": {
+    "src": "/objects/toon/moving-tasse.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "teekanne": {
+    "src": "/objects/toon/moving-teekanne.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "teller": {
+    "src": "/objects/toon/moving-teller.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "tischdecke": {
+    "src": "/objects/toon/moving-tischdecke.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "zeitschrift": {
+    "src": "/objects/toon/moving-zeitschrift.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "brille": {
+    "src": "/objects/toon/moving-brille.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "bogen": {
+    "src": "/objects/toon/moving-bogen.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "pfeil": {
+    "src": "/objects/toon/moving-pfeil.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "feder": {
+    "src": "/objects/toon/moving-feder.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "rad": {
+    "src": "/objects/toon/moving-rad.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "kette": {
+    "src": "/objects/toon/moving-kette.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "lastwagen": {
+    "src": "/objects/toon/moving-lastwagen.webp",
+    "width": 418,
+    "height": 418,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 418,
+      "height": 418
+    }
+  },
+  "nagel": {
+    "src": "/objects/toon/building-nagel.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  },
+  "dachfenster": {
+    "src": "/objects/toon/building-dachfenster.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  },
+  "regenrinne": {
+    "src": "/objects/toon/building-regenrinne.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  },
+  "fallrohr": {
+    "src": "/objects/toon/building-fallrohr.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  },
+  "zementsack": {
+    "src": "/objects/toon/building-zementsack.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  },
+  "kabel": {
+    "src": "/objects/toon/building-kabel.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  },
+  "schild": {
+    "src": "/objects/toon/building-schild.webp",
+    "width": 768,
+    "height": 768,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 768
+    }
+  }
+}

@@ -1,0 +1,408 @@
+{
+  "extraWords": [
+    {
+      "id": "leiter",
+      "de": "die Leiter",
+      "tr": "portatif merdiven",
+      "topic": "objects-building",
+      "description": "Sie ist tragbar. Du kannst sie an eine Wand stellen und hinaufsteigen.",
+      "descriptionTr": "Taşınabilir. Onu duvara dayayıp üzerine tırmanabilirsin.",
+      "image": "/objects/drawn/leiter.svg",
+      "extra": true,
+      "note": "Leiter taşınabilir merdivendir; Treppe sabit basamaklı merdivendir."
+    },
+    {
+      "id": "eimer",
+      "de": "der Eimer",
+      "tr": "kova",
+      "topic": "objects-building",
+      "description": "Er hat einen Henkel. Du kannst Wasser oder Farbe darin tragen.",
+      "descriptionTr": "Bir sapı vardır. İçinde su veya boya taşıyabilirsin.",
+      "image": "/objects/drawn/eimer.svg",
+      "extra": true
+    },
+    {
+      "id": "pinsel",
+      "de": "der Pinsel",
+      "tr": "boya fırçası",
+      "topic": "objects-building",
+      "description": "Er hat viele kleine Haare. Du streichst damit Farbe auf die Wand.",
+      "descriptionTr": "Çok sayıda küçük kılı vardır. Onunla duvara boya sürersin.",
+      "image": "/objects/drawn/pinsel.svg",
+      "extra": true
+    },
+    {
+      "id": "farbrolle",
+      "de": "die Farbrolle",
+      "tr": "boya rulosu",
+      "topic": "objects-building",
+      "description": "Du rollst sie über die Wand und malst die Wand an.",
+      "descriptionTr": "Onu duvarın üzerinde yuvarlayıp duvarı boyarsın.",
+      "image": "/objects/drawn/farbrolle.svg",
+      "extra": true,
+      "note": "Farbrolle boya rulosudur; Pinsel boya fırçasıdır."
+    },
+    {
+      "id": "schaufel",
+      "de": "die Schaufel",
+      "tr": "kürek",
+      "topic": "objects-building",
+      "description": "Sie hat einen langen Stiel. Du bewegst damit Erde oder Sand.",
+      "descriptionTr": "Uzun bir sapı vardır. Onunla toprak veya kum taşırsın.",
+      "image": "/objects/drawn/schaufel.svg",
+      "extra": true
+    },
+    {
+      "id": "schubkarre",
+      "de": "die Schubkarre",
+      "tr": "el arabası",
+      "topic": "objects-building",
+      "description": "Sie hat ein Rad und zwei Griffe. Du transportierst damit zum Beispiel Steine.",
+      "descriptionTr": "Bir tekerleği ve iki tutamağı vardır. Onunla örneğin taş taşırsın.",
+      "image": "/objects/drawn/schubkarre.svg",
+      "extra": true
+    },
+    {
+      "id": "saege",
+      "de": "die Säge",
+      "tr": "testere",
+      "topic": "objects-building",
+      "description": "Sie hat viele Zähne. Du schneidest damit ein Brett.",
+      "descriptionTr": "Çok sayıda dişi vardır. Onunla tahta kesersin.",
+      "image": "/objects/drawn/saege.svg",
+      "extra": true
+    },
+    {
+      "id": "zementmischer",
+      "de": "der Zementmischer",
+      "tr": "beton mikseri",
+      "topic": "objects-building",
+      "description": "Diese Maschine mischt Zement, Sand und Wasser.",
+      "descriptionTr": "Bu makine çimentoyu, kumu ve suyu karıştırır.",
+      "image": "/objects/drawn/zementmischer.svg",
+      "extra": true,
+      "note": "Zementmischer ve Betonmischer aynı beton karıştırma makinesi için kullanılır."
+    },
+    {
+      "id": "geruest",
+      "de": "das Gerüst",
+      "tr": "inşaat iskelesi",
+      "topic": "objects-building",
+      "description": "Es steht vor dem Haus. Arbeiter stehen darauf und arbeiten an der Hauswand.",
+      "descriptionTr": "Evin önünde durur. İşçiler üzerinde durup evin duvarında çalışır.",
+      "image": "/objects/drawn/geruest.svg",
+      "extra": true
+    },
+    {
+      "id": "antenne",
+      "de": "die Antenne",
+      "tr": "anten",
+      "topic": "objects-building",
+      "description": "Sie steht auf dem Dach. Sie empfängt Signale für den Fernseher.",
+      "descriptionTr": "Çatının üzerindedir. Televizyon için sinyal alır.",
+      "image": "/objects/drawn/antenne.svg",
+      "extra": true
+    },
+    {
+      "id": "dachziegel",
+      "de": "der Dachziegel",
+      "tr": "kiremit",
+      "topic": "objects-building",
+      "description": "Er liegt auf dem Dach. Viele solche Teile schützen das Haus vor Regen.",
+      "descriptionTr": "Çatının üzerindedir. Böyle çok sayıda parça evi yağmurdan korur.",
+      "image": "/objects/drawn/dachziegel.svg",
+      "extra": true,
+      "note": "Dachziegel = çatı kiremidi; Ziegelstein = tuğla."
+    },
+    {
+      "id": "schlauch",
+      "de": "der Schlauch",
+      "tr": "hortum",
+      "topic": "objects-building",
+      "description": "Er ist lang und biegsam. Wasser fließt durch ihn.",
+      "descriptionTr": "Uzundur ve bükülebilir. İçinden su akar.",
+      "image": "/objects/drawn/schlauch.svg",
+      "extra": true,
+      "note": "Schlauch bükülebilir hortumdur; Rohr borudur."
+    },
+    {
+      "id": "maurerkelle",
+      "de": "die Maurerkelle",
+      "tr": "duvarcı malası",
+      "topic": "objects-building",
+      "description": "Sie ist ein kleines Werkzeug. Du verteilst damit Mörtel zwischen Ziegelsteinen.",
+      "descriptionTr": "Küçük bir alettir. Onunla tuğlaların arasına harç yayarsın.",
+      "image": "/objects/drawn/maurerkelle.svg",
+      "extra": true
+    },
+    {
+      "id": "karton",
+      "de": "der Karton",
+      "tr": "karton kutu",
+      "topic": "objects-moving",
+      "description": "Er ist aus Pappe. Beim Umzug packst du Dinge hinein.",
+      "descriptionTr": "Mukavvadandır. Taşınırken içine eşyalar koyarsın.",
+      "image": "/objects/drawn/karton.svg",
+      "extra": true
+    },
+    {
+      "id": "pflanze",
+      "de": "die Pflanze",
+      "tr": "bitki",
+      "topic": "objects-moving",
+      "description": "Sie hat grüne Blätter und steht in einem Topf. Sie braucht Wasser und Licht.",
+      "descriptionTr": "Yeşil yaprakları vardır ve bir saksıda durur. Suya ve ışığa ihtiyaç duyar.",
+      "image": "/objects/drawn/pflanze.svg",
+      "extra": true
+    },
+    {
+      "id": "besen",
+      "de": "der Besen",
+      "tr": "süpürge",
+      "topic": "objects-moving",
+      "description": "Er hat einen langen Stiel. Du kehrst damit den Fußboden.",
+      "descriptionTr": "Uzun bir sapı vardır. Onunla yeri süpürürsün.",
+      "image": "/objects/drawn/besen.svg",
+      "extra": true
+    },
+    {
+      "id": "regenschirm",
+      "de": "der Regenschirm",
+      "tr": "şemsiye",
+      "topic": "objects-moving",
+      "description": "Du öffnest ihn, wenn es regnet. Er hält dich trocken.",
+      "descriptionTr": "Yağmur yağdığında onu açarsın. Kuru kalmanı sağlar.",
+      "image": "/objects/drawn/regenschirm.svg",
+      "extra": true
+    },
+    {
+      "id": "kissen",
+      "de": "das Kissen",
+      "tr": "yastık",
+      "topic": "objects-moving",
+      "description": "Es ist klein und weich. Du legst deinen Kopf darauf.",
+      "descriptionTr": "Küçüktür ve yumuşaktır. Başını üzerine koyarsın.",
+      "image": "/objects/drawn/kissen.svg",
+      "extra": true
+    },
+    {
+      "id": "vogelkaefig",
+      "de": "der Vogelkäfig",
+      "tr": "kuş kafesi",
+      "topic": "objects-moving",
+      "description": "Darin sitzt ein Vogel. Er hat dünne Metallstäbe.",
+      "descriptionTr": "İçinde bir kuş bulunur. İnce metal çubukları vardır.",
+      "image": "/objects/drawn/vogelkaefig.svg",
+      "extra": true
+    },
+    {
+      "id": "umzugswagen",
+      "de": "der Umzugswagen",
+      "tr": "taşınma kamyonu",
+      "topic": "objects-moving",
+      "description": "Er transportiert Möbel und Kartons von einer Wohnung zur anderen.",
+      "descriptionTr": "Mobilyaları ve karton kutuları bir evden diğerine taşır.",
+      "image": "/objects/drawn/umzugswagen.svg",
+      "extra": true
+    }
+  ],
+  "building": [
+    {
+      "id": "leiter",
+      "x": 76.4,
+      "y": 37.8
+    },
+    {
+      "id": "eimer",
+      "x": 33.8,
+      "y": 20.6
+    },
+    {
+      "id": "pinsel",
+      "x": 79.5,
+      "y": 30.0
+    },
+    {
+      "id": "farbrolle",
+      "x": 86.1,
+      "y": 57.0
+    },
+    {
+      "id": "schaufel",
+      "x": 48.8,
+      "y": 48.7
+    },
+    {
+      "id": "schubkarre",
+      "x": 22.2,
+      "y": 90.1
+    },
+    {
+      "id": "saege",
+      "x": 42.3,
+      "y": 18.5
+    },
+    {
+      "id": "zementmischer",
+      "x": 68.9,
+      "y": 84.4
+    },
+    {
+      "id": "geruest",
+      "x": 37.1,
+      "y": 66.4
+    },
+    {
+      "id": "antenne",
+      "x": 29.1,
+      "y": 11.0
+    },
+    {
+      "id": "dachziegel",
+      "x": 70.3,
+      "y": 50.9
+    },
+    {
+      "id": "schlauch",
+      "x": 57.0,
+      "y": 90.5
+    },
+    {
+      "id": "maurerkelle",
+      "x": 18.2,
+      "y": 42.8
+    },
+    {
+      "id": "dach",
+      "x": 70.6,
+      "y": 18.0
+    },
+    {
+      "id": "dachboden",
+      "x": 28.6,
+      "y": 24.1
+    },
+    {
+      "id": "kamin",
+      "x": 61.2,
+      "y": 8.8
+    },
+    {
+      "id": "fenster",
+      "x": 66.7,
+      "y": 41.2
+    },
+    {
+      "id": "mauer",
+      "x": 24.9,
+      "y": 39.2
+    },
+    {
+      "id": "rohr",
+      "x": 54.7,
+      "y": 48.8
+    },
+    {
+      "id": "wasserhahn",
+      "x": 56.7,
+      "y": 73.2
+    },
+    {
+      "id": "ziegelstein",
+      "x": 24.0,
+      "y": 88.9
+    },
+    {
+      "id": "brett",
+      "x": 32.7,
+      "y": 86.9
+    }
+  ],
+  "moving": [
+    {
+      "id": "karton",
+      "x": 69.2,
+      "y": 83.4
+    },
+    {
+      "id": "pflanze",
+      "x": 50.1,
+      "y": 70.4
+    },
+    {
+      "id": "besen",
+      "x": 60.3,
+      "y": 52.4
+    },
+    {
+      "id": "regenschirm",
+      "x": 37.6,
+      "y": 24.1
+    },
+    {
+      "id": "kissen",
+      "x": 40.7,
+      "y": 48.4
+    },
+    {
+      "id": "vogelkaefig",
+      "x": 73.0,
+      "y": 60.8
+    },
+    {
+      "id": "umzugswagen",
+      "x": 74.0,
+      "y": 48.7
+    },
+    {
+      "id": "schrank",
+      "x": 17.6,
+      "y": 40.3
+    },
+    {
+      "id": "spiegel",
+      "x": 37.8,
+      "y": 44.6
+    },
+    {
+      "id": "lampe",
+      "x": 22.4,
+      "y": 59.2
+    },
+    {
+      "id": "tisch",
+      "x": 24.3,
+      "y": 68.8
+    },
+    {
+      "id": "stuhl",
+      "x": 22.6,
+      "y": 80.5
+    },
+    {
+      "id": "hocker",
+      "x": 30.1,
+      "y": 77.4
+    },
+    {
+      "id": "teppich",
+      "x": 13.9,
+      "y": 95.0
+    },
+    {
+      "id": "sessel",
+      "x": 53.0,
+      "y": 80.9
+    },
+    {
+      "id": "bild",
+      "x": 32.1,
+      "y": 56.9
+    },
+    {
+      "id": "matratze",
+      "x": 68.8,
+      "y": 34.1
+    }
+  ]
+}

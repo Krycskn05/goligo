@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 260" fill="none" stroke="#3f4543" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><style>.fine{stroke-width:2.5}</style><rect width="360" height="260" rx="20" fill="#fbf8f0" stroke="none"/>
+<path d="M78 79l22-28h160l24 28v133H78z" fill="#ece7dc"/>
+<path d="M79 79h205"/>
+<ellipse cx="129" cy="65" rx="20" ry="8" fill="#6e7673"/>
+<ellipse cx="233" cy="65" rx="20" ry="8" fill="#6e7673"/>
+<ellipse cx="133" cy="54" rx="14" ry="5" fill="#6e7673"/>
+<ellipse cx="227" cy="54" rx="14" ry="5" fill="#6e7673"/>
+<path d="M81 112h200"/>
+<circle cx="107" cy="96" r="7" fill="#88a9bb"/>
+<circle cx="141" cy="96" r="7" fill="#88a9bb"/>
+<circle cx="223" cy="96" r="7" fill="#88a9bb"/>
+<circle cx="257" cy="96" r="7" fill="#88a9bb"/>
+<rect x="99" y="127" width="165" height="70" rx="4" fill="#596b6d"/>
+<path d="M117 143h131" stroke="#d5ab62" stroke-width="7"/>
+<path d="M111 185h141" stroke="#88a9bb" class="fine"/>
+<path d="M92 213v11M270 213v11" stroke-width="6"/>
+</svg>

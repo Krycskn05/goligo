@@ -1,0 +1,46 @@
+{
+  "sampleRate": 44100,
+  "format": "PCM WAV, mono, 16-bit",
+  "sounds": [
+    {
+      "id": "soft",
+      "file": "/sounds/soft.wav",
+      "durationSeconds": 0.48
+    },
+    {
+      "id": "beep",
+      "file": "/sounds/beep.wav",
+      "durationSeconds": 0.24
+    },
+    {
+      "id": "retro",
+      "file": "/sounds/retro.wav",
+      "durationSeconds": 0.58
+    },
+    {
+      "id": "low",
+      "file": "/sounds/low.wav",
+      "durationSeconds": 0.39
+    },
+    {
+      "id": "cartoon",
+      "file": "/sounds/cartoon.wav",
+      "durationSeconds": 0.62
+    },
+    {
+      "id": "tap",
+      "file": "/sounds/tap.wav",
+      "durationSeconds": 0.145
+    },
+    {
+      "id": "correct",
+      "file": "/sounds/correct.wav",
+      "durationSeconds": 0.64
+    },
+    {
+      "id": "complete",
+      "file": "/sounds/complete.wav",
+      "durationSeconds": 0.91
+    }
+  ]
+}

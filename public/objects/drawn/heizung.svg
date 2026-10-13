@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 260" fill="none" stroke="#3f4543" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><style>.fine{stroke-width:2.5}</style><rect width="360" height="260" rx="20" fill="#fbf8f0" stroke="none"/>
+<path d="M55 84h248v103H55z" fill="#ece7dc"/>
+<rect x="70" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<rect x="102" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<rect x="134" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<rect x="166" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<rect x="198" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<rect x="230" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<rect x="262" y="61" width="28" height="145" rx="10" fill="#fffdf8"/>
+<path d="M82 91v85M114 91v85M146 91v85M178 91v85M210 91v85M242 91v85M274 91v85" class="fine" stroke="#d3d8d4"/>
+<path d="M55 104H40v88h22" fill="none" stroke-width="8"/>
+<rect x="27" y="94" width="26" height="21" rx="5" fill="#d5ab62"/>
+<path d="M87 206v16M275 206v16" stroke-width="6"/>
+</svg>

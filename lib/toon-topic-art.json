@@ -1,0 +1,449 @@
+{
+  "hero": {
+    "src": "/toon/learning-hero.webp",
+    "width": 1774,
+    "height": 887
+  },
+  "units": {
+    "a11-01": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-02": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-03": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-04": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-05": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1586.4,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-06": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 0,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-07": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-08": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-09": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a11-10": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1586.4,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-01": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-02": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-03": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-04": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-05": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1586.4,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-06": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 0,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-07": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-08": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-09": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "a12-10": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1586.4,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-01": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-03": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-04": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-05": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 0,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-07": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-08": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-09": {
+      "src": "/toon/a11-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-11": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-13": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1189.8,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-15": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 396.6,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-16": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 1586.4,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-17": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 0,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-20": {
+      "src": "/toon/a12-topics.webp",
+      "width": 1983,
+      "height": 793,
+      "crop": {
+        "x": 793.2,
+        "y": 396.5,
+        "width": 396.6,
+        "height": 396.5
+      }
+    },
+    "book-02": {
+      "src": "/toon/textbook/berufe.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    },
+    "book-06": {
+      "src": "/toon/textbook/arbeitszeiten.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    },
+    "book-10": {
+      "src": "/toon/textbook/busbahn.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    },
+    "book-12": {
+      "src": "/toon/textbook/ausbildung.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    },
+    "book-14": {
+      "src": "/toon/textbook/krankschreibung.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    },
+    "book-18": {
+      "src": "/toon/textbook/amt.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    },
+    "book-19": {
+      "src": "/toon/textbook/unterwegs.webp",
+      "width": 768,
+      "height": 768,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 768
+      }
+    }
+  }
+}

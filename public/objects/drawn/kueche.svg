@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 260" fill="none" stroke="#3f4543" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><style>.fine{stroke-width:2.5}</style><rect width="360" height="260" rx="20" fill="#fbf8f0" stroke="none"/>
+<path d="M34 219V43h292v176" fill="#e9eeed"/>
+<rect x="53" y="60" width="101" height="65" rx="3" fill="#94a98e"/>
+<path d="M103 63v59M95 84v15M113 84v15" class="fine"/>
+<rect x="180" y="60" width="58" height="63" rx="2" fill="#a5bfcc"/>
+<path d="M208 62v59M182 90h53" class="fine"/>
+<rect x="52" y="155" width="256" height="63" fill="#d5ab62"/>
+<path d="M43 150h273v12H43z" fill="#ece7dc"/>
+<path d="M130 162v54M219 162v54M179 163v53"/>
+<rect x="227" y="174" width="72" height="35" rx="3" fill="#596b6d"/>
+<path d="M242 168h42" class="fine"/>
+<path d="M247 144h39" stroke-width="6"/>
+<ellipse cx="264" cy="140" rx="14" ry="5" fill="#596b6d"/>
+<ellipse cx="99" cy="147" rx="25" ry="6" fill="#a5bfcc"/>
+<path d="M102 140v-17c0-13 18-13 18 0v6" fill="none"/>
+<path d="M69 178h40M144 178h22M189 178h20" class="fine"/>
+</svg>

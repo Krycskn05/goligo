@@ -1,0 +1,14 @@
+{
+  "objects": {
+    "src": "/toon/objects-hero.webp",
+    "width": 1774,
+    "height": 887,
+    "alt": "Çatısı, kapısı ve penceresi görünen ev; içinde sandalye, masa, lamba, kanepe ve bitkiler, yanında taşınma kutuları ve boya araçları."
+  },
+  "course": {
+    "src": "/toon/learning-topics-hero.webp",
+    "width": 1774,
+    "height": 887,
+    "alt": "Açık kitap çevresinde ev, saat, alışveriş çantası, yiyecekler, valiz, tren, telefon ve konuşma balonları."
+  }
+}

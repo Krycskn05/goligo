@@ -1,0 +1,25 @@
+{
+  "mode": "built-in image_gen",
+  "image_calls": 3,
+  "variants_or_retries": 0,
+  "assets": [
+    {
+      "file": "public/unit-9/original/kolja.webp",
+      "width": 1000,
+      "height": 667,
+      "prompt": "Use case: illustration-story\nAsset type: original scene illustration for an adult A1 German study website.\nPrimary request: A sick adult man seated upright in bed beneath a duvet, pressing one hand gently to his forehead, looking unwell and tired. A clearly visible thermometer rests on the bedside table; the scene communicates that he needs a doctor.\nScene/backdrop: A simple bedroom against a warm cream background, bed and one bedside table only.\nStyle/medium: Modern friendly editorial flat raster illustration with clean ink navy outlines, restrained indigo, teal and coral accents, rounded shapes and simple flat color fills. Professional and adult, not childish.\nComposition/framing: Single landscape composition approximately 3:2. Show the man's face, hand on forehead, duvet, bed and thermometer clearly. Bold simple silhouettes readable at 320px width, with ample outer margins and uncluttered background.\nLighting/mood: Gentle calm visual tone; sympathetic illness expression.\nColor palette: Warm cream background, navy ink linework, indigo duvet, teal and small coral details.\nConstraints: One adult man only. Anatomically coherent hands. No writing, letters, numbers, logos, watermark, speech bubbles, copyrighted characters, photographic elements or reference images. Thermometer has no numeric markings. Do not create a collage or multiple panels."
+    },
+    {
+      "file": "public/unit-9/original/suri.webp",
+      "width": 1000,
+      "height": 667,
+      "prompt": "Use case: illustration-story\nAsset type: original scene illustration for an adult A1 German study website.\nPrimary request: A sleepy adult woman curled comfortably in bed beneath a duvet, her head resting on a pillow, eyes half closed, clearly reluctant to get up. A simple round analog alarm clock sits prominently on the bedside table.\nScene/backdrop: Simple bedroom against a warm cream background, bed and one bedside table.\nStyle/medium: Modern friendly editorial flat raster illustration, clean ink navy outlines, restrained indigo, teal and coral accents, rounded shapes, simple flat color fills. Professional adult editorial style, not childish.\nComposition/framing: Single landscape composition approximately 3:2. Show the woman's sleepy face, curled posture and alarm clock clearly. Bold simple silhouettes readable at 320px width, enough outer margin, uncluttered background.\nLighting/mood: Soft early morning atmosphere and peaceful sleepiness.\nColor palette: Warm cream background, navy ink outlines, indigo duvet, teal pillow, small coral details.\nConstraints: One adult woman only. Coherent natural anatomy. No writing, letters, numbers, logos, watermark, speech bubbles, copyrighted characters, photographic elements or reference images. Clock face has hands and simple tick marks only, no digits. Do not create a collage or multiple panels."
+    },
+    {
+      "file": "public/unit-9/original/germain.webp",
+      "width": 1000,
+      "height": 667,
+      "prompt": "Use case: illustration-story\nAsset type: original scene illustration for an adult A1 German study website.\nPrimary request: An adult man looking inside an open refrigerator that is obviously completely empty. His slight puzzled, disappointed expression and the bare interior communicate that he needs to go grocery shopping.\nScene/backdrop: Simple kitchen against a warm cream background. An upright refrigerator with door swung open and visible empty interior shelves, empty drawers and empty door compartments.\nSubject: One adult man wearing a plain teal shirt and dark indigo trousers, leaning slightly forward, one hand holding the open refrigerator door, gazing into its empty interior.\nStyle/medium: Modern friendly editorial flat raster illustration with clean ink navy outlines, restrained indigo, teal and coral accents, rounded shapes, simple flat color fills. Professional adult style, not childish.\nComposition/framing: Single landscape composition approximately 3:2. Three-quarter view makes the man's face and the entirely empty fridge simultaneously clear. Bold simple silhouettes readable at 320px width, generous outer margins, uncluttered background. Keep the entire refrigerator inside the frame.\nLighting/mood: Soft calm kitchen light, mild everyday frustration.\nColor palette: Warm cream background, navy ink linework, teal shirt, indigo trousers, subtle coral accent.\nConstraints: Refrigerator is completely empty: no food, bottles, packages or containers anywhere inside. One adult man only, natural coherent anatomy. No writing, letters, numbers, logos, watermark, speech bubbles, copyrighted characters, photographic elements or reference images. Do not create a collage or multiple panels."
+    }
+  ]
+}

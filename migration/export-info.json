@@ -1,0 +1,46 @@
+{
+  "project_id": "appgprj_6ac501b6fcfc8191ba67a3a0718bed93",
+  "title": "LernKoko",
+  "live_url": "https://lernkoko.koraycoskun05.chatgpt.site",
+  "version_number": 36,
+  "version_id": "appgprj_6ac501b6fcfc8191ba67a3a0718bed93~appgver_dfe27070b1f08191b46de4cd181797f0",
+  "source_commit": "a13884802cce48ea38a14ad775a272918c359330",
+  "exported_at": "2026-10-13T20:28:57.873Z",
+  "tracked_source_files": 354,
+  "source_unchanged": true,
+  "database": {
+    "binding": "DB",
+    "full_snapshot": false,
+    "tables": [
+      {
+        "table": "study_answers",
+        "rows": 762,
+        "read_complete": true,
+        "values_intact": true,
+        "truncated_values": 0
+      },
+      {
+        "table": "study_notes",
+        "rows": 1,
+        "read_complete": true,
+        "values_intact": true,
+        "truncated_values": 0
+      },
+      {
+        "table": "study_review",
+        "rows": 417,
+        "read_complete": true,
+        "values_intact": true,
+        "truncated_values": 0
+      },
+      {
+        "table": "study_sessions",
+        "rows": 122,
+        "read_complete": true,
+        "values_intact": false,
+        "truncated_values": 24
+      }
+    ]
+  },
+  "runtime_environment_variable_count": 0
+}

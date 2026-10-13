@@ -1,0 +1,3 @@
+# Kişisel çalışma kayıtları GitHub'a yüklenmez; sadece bu bilgisayarda kalır.
+*.json
+records-only.sql

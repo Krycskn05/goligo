@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 260" fill="none" stroke="#3f4543" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><style>.fine{stroke-width:2.5}</style><rect width="360" height="260" rx="20" fill="#fbf8f0" stroke="none"/>
+<rect x="36" y="67" width="180" height="124" rx="4" fill="#d5ab62"/>
+<path d="M216 105h63l41 48v40H216z" fill="#88a9bb"/>
+<path d="M231 119h42l29 35h-71z" fill="#b7cdd4"/>
+<path d="M249 119v35" class="fine"/>
+<path d="M229 166h17" class="fine"/>
+<path d="M30 187h295v17H30z" fill="#596b6d"/>
+<circle cx="89" cy="202" r="28" fill="#596b6d"/>
+<circle cx="89" cy="202" r="14" fill="#a5bfcc"/>
+<circle cx="278" cy="202" r="28" fill="#596b6d"/>
+<circle cx="278" cy="202" r="14" fill="#a5bfcc"/>
+<rect x="309" y="164" width="12" height="14" rx="2" fill="#e2bf80"/>
+<path d="M52 84v87M65 84v87M79 84v83" class="fine" stroke="#b58b48"/>
+<path d="M120 114l32-12 29 12v34l-31 13-30-14z" fill="#e2bf80" stroke-width="2.5"/>
+<path d="M120 114l30 12 31-12M150 126v35M136 108l31 12v12" class="fine" stroke="#b58b48"/>
+</svg>

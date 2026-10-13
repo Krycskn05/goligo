@@ -1,0 +1,114 @@
+[
+  {
+    "src": "/unit-9/original/market.svg",
+    "kind": "sign",
+    "name": "market",
+    "title": "Supermarkt",
+    "alt": "Öffnungszeiten: Montag bis Samstag von 7 bis 22 Uhr; Sonntag geschlossen."
+  },
+  {
+    "src": "/unit-9/original/salon.svg",
+    "kind": "sign",
+    "name": "salon",
+    "title": "Friseur",
+    "alt": "Öffnungszeiten: Dienstag bis Samstag von 8 bis 20 Uhr; Montag geschlossen."
+  },
+  {
+    "src": "/unit-9/original/doctor.svg",
+    "kind": "sign",
+    "name": "doctor",
+    "title": "Arztpraxis",
+    "alt": "Sprechzeiten: Montag bis Donnerstag von 9 bis 12 Uhr; Freitag von 9 bis 11 Uhr."
+  },
+  {
+    "src": "/unit-9/original/post.svg",
+    "kind": "sign",
+    "name": "post",
+    "title": "Post",
+    "alt": "Öffnungszeiten: Montag bis Freitag von 7:30 bis 18 Uhr; Samstag von 10 bis 12 Uhr; Sonntag geschlossen."
+  },
+  {
+    "src": "/unit-9/original/pharmacy.svg",
+    "kind": "sign",
+    "name": "pharmacy",
+    "title": "Apotheke",
+    "alt": "Öffnungszeiten: Montag bis Freitag von 9 bis 19 Uhr; Samstag von 9 bis 15 Uhr; Sonntag geschlossen."
+  },
+  {
+    "src": "/unit-9/original/office.svg",
+    "kind": "sign",
+    "name": "office",
+    "title": "Bürgerbüro",
+    "alt": "Öffnungszeiten: Montag, Mittwoch und Freitag von 9 bis 19 Uhr; Dienstag und Donnerstag von 11 bis 18 Uhr; Wochenende geschlossen."
+  },
+  {
+    "src": "/unit-9/original/termin.svg",
+    "kind": "diagram",
+    "name": "termin",
+    "title": "Termin oder Treffen?",
+    "alt": "Ein Termin ist offiziell; Treffen, Date und Verabredung sind privat."
+  },
+  {
+    "src": "/unit-9/original/zaman.svg",
+    "kind": "diagram",
+    "name": "zaman",
+    "title": "Zeitangaben",
+    "alt": "Merkhilfe für am, um, von … bis …, ab, bis und zwischen … und …."
+  },
+  {
+    "src": "/unit-9/original/muessen.svg",
+    "kind": "diagram",
+    "name": "muessen",
+    "title": "müssen",
+    "alt": "Konjugation von müssen für ich, du, er / sie / es, wir, ihr und sie / Sie."
+  },
+  {
+    "src": "/unit-9/original/satzklammer.svg",
+    "kind": "diagram",
+    "name": "satzklammer",
+    "title": "Satzklammer",
+    "alt": "Ich muss heute Abend kochen. Modalverb an Position 2, Infinitiv am Satzende."
+  },
+  {
+    "src": "/unit-9/original/artikel.svg",
+    "kind": "diagram",
+    "name": "artikel",
+    "title": "Artikeltabelle",
+    "alt": "Nominativ, Akkusativ und Dativ für Maskulinum, Femininum, Neutrum und Plural."
+  },
+  {
+    "src": "/unit-9/original/zum-kiosk.svg",
+    "kind": "diagram",
+    "name": "zum-kiosk",
+    "title": "zum und zur",
+    "alt": "zu dem wird zum; zu der wird zur. Ich gehe zum Kiosk."
+  },
+  {
+    "src": "/unit-9/original/kurumlar.svg",
+    "kind": "diagram",
+    "name": "kurumlar",
+    "title": "Ortsangaben",
+    "alt": "beim Arzt, bei der Bank und im Rathaus: Merkhilfe für Ortsangaben."
+  },
+  {
+    "src": "/unit-9/original/kolja.webp",
+    "kind": "scene",
+    "name": "kolja",
+    "title": "Kolja ist krank",
+    "alt": "Ein Mann sitzt krank im Bett und hält sich die Stirn."
+  },
+  {
+    "src": "/unit-9/original/suri.webp",
+    "kind": "scene",
+    "name": "suri",
+    "title": "Suri ist müde",
+    "alt": "Eine müde Frau liegt im Bett; ein Wecker steht daneben."
+  },
+  {
+    "src": "/unit-9/original/germain.webp",
+    "kind": "scene",
+    "name": "germain",
+    "title": "Der Kühlschrank ist leer",
+    "alt": "Ein Mann schaut in einen leeren Kühlschrank."
+  }
+]

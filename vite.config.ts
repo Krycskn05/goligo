@@ -1,6 +1,7 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
+import deployConfig from "./yayin.json";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
 import { connectorPreview } from "./build/connector-preview-plugin.mjs";
@@ -10,22 +11,34 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 
 const { d1, r2 } = hostingConfig;
 
+// Own Cloudflare hosting (yayin.json). ci/yayin.sh sets LERNKOKO_D1_ID to the
+// real D1 database of the user's account; local builds keep the placeholder.
+const productionDatabaseId = process.env.LERNKOKO_D1_ID?.trim();
+
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const managedLinux = readExecutionProfile() === "managed-linux";
 
 const localBindingConfig = {
+  name: deployConfig.workerName,
   main: "./build/sites-worker.ts",
   compatibility_flags: ["nodejs_compat"],
   d1_databases: d1
     ? [
         {
           binding: d1,
-          database_name: "site-creator-d1",
-          database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          database_name: productionDatabaseId
+            ? deployConfig.d1DatabaseName
+            : "site-creator-d1",
+          database_id: productionDatabaseId || SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
         },
       ]
     : [],
+  // Cloudflare Access settings read by lib/access-gate.ts (not secrets).
+  vars: {
+    TEAM_DOMAIN: deployConfig.accessTeamDomain,
+    POLICY_AUD: deployConfig.accessPolicyAud,
+  },
   r2_buckets: r2
     ? [
         {

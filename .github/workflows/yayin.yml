@@ -1,0 +1,31 @@
+# LernKoko'yu kendi Cloudflare hesabına yayınlar (adımlar ci/yayin.sh içinde).
+# Kurulum kontrolü başarılı olunca çalışır. ChatGPT Sites'a dokunmaz.
+name: Yayin
+on:
+  workflow_run:
+    workflows: ["Kurulum kontrolu"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: yayin
+  cancel-in-progress: false
+jobs:
+  yayin:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: bash ci/yayin.sh
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}

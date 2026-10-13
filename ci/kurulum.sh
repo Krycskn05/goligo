@@ -34,7 +34,7 @@ s_tests() {
     --esModuleInterop --resolveJsonModule --skipLibCheck \
     --types node --lib es2023,dom,dom.iterable --noEmitOnError false || true
   echo "Derlenen dosya sayisi: $(ls .check/lib 2>/dev/null | wc -l)"
-  STUDY_CHECK_DIR="$PWD/.check/lib" node --test --test-reporter=spec tests/
+  STUDY_CHECK_DIR="$PWD/.check/lib" node --test --test-reporter=spec tests/*.test.*
 }
 s_db() {
   node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js \

@@ -13,6 +13,27 @@ HATA=0
 export WRANGLER_SEND_METRICS=false CLOUDFLARE_CF_FETCH_ENABLED=false
 WORKER=$(node -p "require('./yayin.json').workerName")
 DBNAME=$(node -p "require('./yayin.json').d1DatabaseName")
+# Anahtarı temizle: baştaki/sondaki boşluk ve satır sonları; yanlışlıkla
+# Cloudflare'in "curl ... Authorization: Bearer <anahtar>" deneme metni
+# kopyalandıysa içindeki anahtar alınır. Anahtar hiçbir yere yazdırılmaz.
+TOKEN_NOTE="olduğu gibi"
+TOKEN_RAW="${CLOUDFLARE_API_TOKEN:-}"
+if [[ "$TOKEN_RAW" =~ Bearer[[:space:]]+([A-Za-z0-9._-]+) ]]; then
+  TOKEN_RAW="${BASH_REMATCH[1]}"; TOKEN_NOTE="curl metninden ayıklandı"
+fi
+TOKEN_CLEAN=$(printf '%s' "$TOKEN_RAW" | tr -d '[:space:]')
+if [ -n "$TOKEN_CLEAN" ]; then
+  [ "$TOKEN_CLEAN" != "${CLOUDFLARE_API_TOKEN:-}" ] && [ "$TOKEN_NOTE" = "olduğu gibi" ] && TOKEN_NOTE="boşluklar temizlendi"
+  echo "::add-mask::$TOKEN_CLEAN"
+  export CLOUDFLARE_API_TOKEN="$TOKEN_CLEAN"
+fi
+unset TOKEN_RAW
+anahtar_ozeti() { # Anahtarın kendisini değil, yalnızca biçimini yazar
+  local t="${CLOUDFLARE_API_TOKEN:-}" bicim="uygun"
+  [[ "$t" =~ ^[A-Za-z0-9._-]+$ ]] || bicim="UYGUN DEĞİL (izin verilmeyen karakter var)"
+  [[ "$t" =~ ^[0-9a-f]{32}$ ]] && bicim="UYGUN DEĞİL (Account ID'ye benziyor, anahtar değil)"
+  echo "Anahtar özeti: ${#t} karakter, biçim: $bicim, not: $TOKEN_NOTE"
+}
 DRY=0
 [ -z "${CLOUDFLARE_API_TOKEN:-}" ] && DRY=1
 
@@ -36,7 +57,7 @@ d1_id() { # D1 listesinden adı eşleşen veritabanının kimliği
 
 s_pnpm()    { node -v && corepack enable && corepack prepare pnpm@11.25.0 --activate && pnpm --version; }
 s_install() { pnpm install --frozen-lockfile; }
-s_hesap()   { wr whoami; }
+s_hesap()   { anahtar_ozeti; wr whoami; }
 s_d1() {
   local id
   id=$(d1_id)

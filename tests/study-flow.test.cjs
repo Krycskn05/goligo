@@ -15,7 +15,18 @@ function app(){
  const module={exports:{}};const context={module,exports:module.exports,Response,Request,URL,console,Date,require(name){if(name==='@/db')return{getRawDb:()=>db};if(name==='@/app/chatgpt-auth')return{getChatGPTUser:async()=>user?{userId:user}:null};if(name==='@/lib/course')return course;if(name==='@/lib/study')return study;throw Error(name);}};vm.runInNewContext(source,context);
  return {sql,api:module.exports,user(value){user=value;},async post(body){return module.exports.POST(new Request('https://study.test/api/study',{method:'POST',headers:{'content-type':'application/json',origin:'https://study.test'},body:JSON.stringify(body)}));},get(query=''){return module.exports.GET(new Request('https://study.test/api/study'+query));}};
 }
-test('every ready topic has questions and supported mode pools are nonempty',()=>{for(const topic of course.topics)assert(study.selectQuestions('mixed',topic.id,10,[]).length>0,topic.id);for(const topic of course.topics.filter(x=>x.unit===9))assert(practice.practicePool('mixed',9,topic.id).length>0,topic.id);assert.equal(practice.practicePool('visual',1).length,0);assert(practice.practicePool('visual',9).every(q=>q.image));assert(practice.practicePool('dictation',9).every(q=>q.audio===q.answer));assert(practice.practicePool('sentence',9).every(q=>q.audio!==q.answer));});
+test('every ready topic has questions and supported mode pools are nonempty',()=>{
+ // A1.1/A1.2 headings are catalogue-only; exercises exist only in Nesne Kasası and the requested A1.2 unit 11 (Ev ve Yaşam).
+ const {levelTopics}=require(path.join(compiled,'level-course.js'));const catalogueOnly=new Set(levelTopics.map(t=>t.id).filter(id=>id!=='book-11'));
+ const ready=course.topics.filter(t=>!catalogueOnly.has(t.id));assert(ready.length>0);
+ for(const topic of ready)assert(study.selectQuestions('mixed',topic.id,10,[]).length>0,topic.id);
+ for(const id of catalogueOnly)assert.equal(study.selectQuestions('mixed',id,10,[]).length,0,id);
+ for(const topic of course.topics.filter(x=>x.unit===11&&x.id!=='book-11'))assert(practice.practicePool('mixed',11,topic.id).length>0,topic.id);
+ assert.equal(practice.practicePool('visual',1).length,0);
+ const visual=practice.practicePool('visual',0);assert(visual.length>0&&visual.every(q=>q.image));
+ const dictation=practice.practicePool('dictation',0);assert(dictation.length>0&&dictation.every(q=>q.audio===q.answer));
+});
+
 test('start, wrong explanation, correct answer, finish, history and saved progress work end to end',async()=>{
  const a=app();const choice=course.questions.find(q=>q.kind==='choice'&&!q.audio),write=course.questions.find(q=>q.kind==='write'&&!q.audio);const id='test-session-first-1234';const started=await a.post({action:'start',id,mode:'mixed',topic:'all',count:2,onlyIds:[choice.id,write.id]});assert.equal(started.status,201);const {session}=await started.json();assert.equal(session.questions.length,2);
  const first=course.questionMap.get(session.questions[0].id);const wrong=first.options?.find(x=>x!==first.answer)??'falsch';const bad=await a.post({action:'answer',sessionId:id,questionId:first.id,answer:wrong});const result=await bad.json();assert.equal(result.result.correct,0);assert.equal(result.correctAnswer,first.answer);assert(result.explanation.trim());
@@ -40,31 +51,40 @@ test('question IDs, canonical answers, supported variants, audio and images stay
 test('retry identifiers change with practice configuration instead of resuming a different test',()=>{assert.notEqual(practice.retryKey('write','unit-9',10,['a']),practice.retryKey('visual','unit-9',10,['a']));assert.notEqual(practice.retryKey('write','unit-9',10,['a']),practice.retryKey('write','unit-9',20,['a']));assert.equal(practice.retryKey('write','unit-9',10,['a']),practice.retryKey('write','unit-9',10,['a']));});
 
 test('category rounds stay inside the chosen topic and automatically cover available activity types',()=>{
- const {groups,questionFamily}=require(path.join(compiled,'study-categories.js'));
- const grouped=groups.flatMap(g=>g.ids);assert.equal(new Set(grouped).size,course.topics.length);assert.deepEqual(new Set(grouped),new Set(course.topics.map(t=>t.id)));
- for(const topic of course.topics){const pool=course.questions.filter(q=>q.topic===topic.id);for(let trial=0;trial<8;trial++){const round=study.selectQuestions('mixed',topic.id,20,[]);assert.equal(round.length,Math.min(20,pool.length));assert(round.every(q=>q.topic===topic.id));assert.equal(new Set(round.map(q=>q.id)).size,round.length);assert.deepEqual(new Set(round.map(questionFamily)),new Set(pool.map(questionFamily)),topic.id);}}
+ // The old study-categories groups listed the removed unit lessons; rounds are now checked against the current topics.
+ const {questionFamily}=require(path.join(compiled,'study-categories.js'));const {inCourseUnit}=require(path.join(compiled,'course-levels.js'));
+ const {levelTopics}=require(path.join(compiled,'level-course.js'));const catalogueOnly=new Set(levelTopics.map(t=>t.id).filter(id=>id!=='book-11'));
+ const belongs=(q,id)=>inCourseUnit(q.topic,id)||(id==='objects-all'&&q.topic.startsWith('objects-'));
+ for(const topic of course.topics.filter(t=>!catalogueOnly.has(t.id))){const pool=course.questions.filter(q=>belongs(q,topic.id));assert(pool.length>0,topic.id);for(let trial=0;trial<8;trial++){const round=study.selectQuestions('mixed',topic.id,20,[]);assert.equal(round.length,Math.min(20,pool.length));assert(round.every(q=>belongs(q,topic.id)),topic.id);assert.equal(new Set(round.map(q=>q.id)).size,round.length);assert.deepEqual(new Set(round.map(questionFamily)),new Set(pool.map(questionFamily)),topic.id);}}
 });
+
 test('saved vocabulary and all listening or reading texts have meanings in each helper language',()=>{
+ // Nesne Kasası words use objectMeaning (all 12 vault languages) and passageTr; Ev ve Yaşam exercises carry their own meanings.
+ const objects=require(path.join(compiled,'object-course.js'));const {objectMeaning}=require(path.join(compiled,'object-translations.js'));const {vaultLanguages}=require(path.join(compiled,'object-vault-copy.js'));
+ for(const word of objects.objectVocabulary)for(const language of vaultLanguages)assert(objectMeaning(word.id,language.id).trim(),language.id+': '+word.de);
+ for(const q of course.questions.filter(q=>q.passage&&q.topic.startsWith('objects-')))assert(q.passageTr?.trim(),'tr: '+q.passage);
+ const housing=require(path.join(compiled,'housing-course.js'));const {studyLanguages,translate}=require(path.join(compiled,'study-languages.js'));
+ for(const q of housing.housingQuestions)for(const {id} of studyLanguages){if(id==='de')continue;assert(translate(q.meaning,id)?.trim(),id+': '+q.id);if(q.passage)assert(q.passageMeaning&&translate(q.passageMeaning,id)?.trim(),id+': '+q.passage);}
  const {lessonTranslation}=require(path.join(compiled,'lesson-translations.js'));
- const texts=[...new Set(course.questions.flatMap(q=>[q.audio,q.passage]).filter(Boolean))];
- for(const lang of ['tr','de','en','ar','uk','fr']){for(const text of texts)assert(lessonTranslation(text,lang),lang+': '+text);for(const word of course.words)assert(lessonTranslation(word.de,lang),lang+': '+word.de);const {answerSource}=require(path.join(compiled,'lesson-translations.js'));for(const q of course.questions.filter(q=>answerSource(q)==='de'))assert(lessonTranslation(q.answer,lang),lang+': '+q.answer);}
  assert.match(lessonTranslation('Ich habe zwischen drei und fünf Uhr Zeit.','en'),/between 3 and 5/);
  assert.match(lessonTranslation('Ich möchte nicht arbeiten.','tr'),/istemiyorum/);
  assert.match(lessonTranslation('Suri möchte nicht aufstehen.','en'),/does not want/);
  assert.equal(lessonTranslation('Ich muss morgen Pizza auf dem Mond fliegen.','tr'),null,'unknown free text must not be invented or substituted with the model answer');
 });
+
 test('feedback is specific to the question rather than an unrelated topic rule',()=>{
  const {explanationText}=require(path.join(compiled,'question-display.js'));
  for(const question of course.questions)assert.equal(explanationText(question,'tr'),question.explanation);
- const modal=course.questions.find(q=>/mastar.*son/.test(q.explanation));assert(modal);assert.match(explanationText(modal,'en'),/modal verb/);
- const source=fs.readFileSync('app/category-study.tsx','utf8');assert(!source.includes("'rememberRule'"));assert(source.includes('explanationText(question,language)'));assert(!source.includes("start('write'"));
+ // The unit-9 modal-verb lesson and the old category quiz were removed; the home page is now catalogue-only.
+ const source=fs.readFileSync('app/category-study.tsx','utf8');assert(!source.includes("'rememberRule'"));assert(!source.includes("start('write'"));
 });
 
 test('A1.1 and A1.2 contain only their twenty catalogue headings',()=>{
+ // Only the explicitly requested A1.2 unit 11 (Ev ve Yaşam, housing-11-*) has exercises.
  const {courseUnits,levelTopics,levelWords,levelQuestions}=require(path.join(compiled,'level-course.js'));
  assert.equal(courseUnits.length,20);assert.equal(levelWords.length,0);assert.equal(levelQuestions.length,0);
- for(const topic of levelTopics){assert.equal(topic.blocks.length,0);assert.equal(topic.lead,'');for(const mode of ['test','write','mixed'])assert.equal(study.selectQuestions(mode,topic.id,20,[]).length,0);}
- for(const level of ['a11-all','a12-all'])for(const mode of ['test','write','mixed'])assert.equal(study.selectQuestions(mode,level,20,[]).length,0);
+ for(const topic of levelTopics){assert.equal(topic.blocks.length,0);assert.equal(topic.lead,'');for(const mode of ['test','write','mixed']){const picked=study.selectQuestions(mode,topic.id,20,[]);if(topic.id==='book-11'){assert(picked.length>0);assert(picked.every(q=>q.id.startsWith('housing-11-')));}else assert.equal(picked.length,0,topic.id+' '+mode);}}
+ for(const mode of ['test','write','mixed']){assert.equal(study.selectQuestions(mode,'a11-all',20,[]).length,0);assert(study.selectQuestions(mode,'a12-all',20,[]).every(q=>q.id.startsWith('housing-11-')));}
 });
 
 test('written gap answers, incorrect answers, saved mode and continuation persist through the study API',async()=>{
@@ -87,7 +107,7 @@ test('object picture tests retain four choices and writing includes both names a
  const objects=require(path.join(compiled,'object-course.js'));const p=require(path.join(compiled,'object-practice.js'));
  for(const group of ['all',...objects.objectGroups.map(g=>g.id)]){
   const picture=p.pickPictureQuiz(group,'all',[]);assert(picture.every(q=>p.isObjectPictureQuestion(q)&&q.options.length===4));
-  const writing=p.pickObjectWritingQuiz(group,'all',[]);assert.equal(writing.length,picture.length*2);
+  const writing=p.pickObjectWritingQuiz(group,'all',[]);const plural=writing.filter(q=>q.articlePuzzle?.variant==='plural');assert.equal(writing.length-plural.length,picture.length*2);
   assert(writing.every(q=>p.isObjectWritingQuestion(q)&&!q.options));assert(writing.some(q=>q.gap));assert(writing.some(q=>!q.gap));
   const short=p.pickObjectWritingQuiz(group,5,[]);assert.equal(short.length,Math.min(5,writing.length));assert(short.some(q=>q.gap));assert(short.some(q=>!q.gap));
   for(const q of writing){assert(course.gradeAnswer(q,q.answer),q.id);if(q.gap)assert(['der','die','das'].includes(q.answer));}

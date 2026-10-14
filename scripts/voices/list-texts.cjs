@@ -1,6 +1,6 @@
 // Lists every German text the site speaks aloud, exactly as the pages pass it
 // to speech (Ev ve Yaşam answers/passages/lesson examples, Nesne Kasası
-// pronunciations and the voice preview). Needs the compiled lib (STUDY_CHECK_DIR).
+// pronunciations, Fiiller answers, heard forms and list rows, and the voice preview). Needs the compiled lib (STUDY_CHECK_DIR).
 const path=require('node:path');
 const dir=process.env.STUDY_CHECK_DIR;
 if(!dir)throw new Error('Set STUDY_CHECK_DIR to the compiled lib directory.');
@@ -23,4 +23,7 @@ for(const q of objects.objectQuestions){
  add(articles.isArticleChallenge(q)?articles.articleFullAnswer(q):word?word.de:q.answer);
  if(listening&&q.audio)add(q.audio);
 }
+const verbs=load('verb-course'),verbPractice=load('verb-practice');
+for(const q of verbs.verbQuestions){if(!verbPractice.isVerbExercise(q))continue;add(q.answer);if(q.audio)add(q.audio);}
+for(const verb of verbs.verbs)add(verbs.verbRowSpeech(verb));
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

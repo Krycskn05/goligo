@@ -237,28 +237,27 @@ for(const t of housingTraps){
  exercises.push({...choice,id:q.id+'-test',kind:'choice',options:[t.answer,...t.traps],cueDe:t.gap||passage?q.cueDe:'Welcher Satz ist richtig?'});
 }
 export const housingTrapIds=new Set(exercises.filter(q=>!!q.trap).map(q=>q.id));
-// Tuzaklı sorular ayrı bir set değil: her alt başlıkta normal sorularla dengeli biçimde karışır.
-const mixedOrder=new Map<string,number>();
-{
- const groups=new Map<string,{regular:HousingExercise[];trap:HousingExercise[]}>();
- for(const q of exercises){const key=q.section+':'+q.step+':'+(q.options?'test':'write');const group=groups.get(key)??{regular:[],trap:[]};(q.trap?group.trap:group.regular).push(q);groups.set(key,group);}
- for(const {regular,trap} of groups.values()){
-  let i=0,j=0;const merged:HousingExercise[]=[];
-  while(i<regular.length||j<trap.length){
-   const takeRegular=j>=trap.length||(i<regular.length&&(i+0.5)/regular.length<=(j+0.5)/trap.length);
-   merged.push(takeRegular?regular[i++]:trap[j++]);
-  }
-  merged.forEach((q,position)=>mixedOrder.set(q.id,position));
- }
-}
 export const housingQuestions=exercises;
 export const housingQuestionMap=new Map(housingQuestions.map(q=>[q.id,q]));
 export const housingTopics:Topic[]=housingSections.map(section=>({id:section.topic,title:section.id.toUpperCase()+' · '+section.title[0],de:section.de,unit:11,section:section.id.toUpperCase(),pages:section.pages,minutes:15,lead:section.title[0],blocks:[]}));
 export function housingPool(section:HousingSection|'all',mode:'write'|'test',step=0){return housingQuestions.filter(q=>(section==='all'||q.section===section)&&(!step||q.step===step)&&(mode==='write'?q.kind==='write':!!q.options));}
 export function housingMeaning(q:HousingExercise,language:StudyLanguage){return language==='de'?q.resultDe:translate(q.meaning,language);}
-export function pickHousingQuestions(section:HousingSection|'all',mode:'write'|'test',count:number|'all',reviews:Review[],step=0,reviewOnly=false,onlyIds?:string[]){
+/** The writing and test versions of one exercise share a star: ...-test → base id. */
+export const housingBaseId=(id:string)=>id.replace(/-test$/,'');
+export const isHousingMistake=(row:Review|undefined)=>!!row&&row.wrong_count>0&&row.streak<3;
+/** Answered correctly at least once and not waiting in the mistakes list. */
+export const isHousingSolved=(row:Review|undefined)=>!!row&&!isHousingMistake(row);
+/** A normal round shows unsolved questions in a new random order every time (trick
+ * questions included); solved ones come back only when nothing new is left. The review
+ * round shows mistakes and starred questions. */
+export function pickHousingQuestions(section:HousingSection|'all',mode:'write'|'test',count:number|'all',reviews:Review[],step=0,reviewOnly=false,onlyIds?:string[],starred:ReadonlySet<string>=new Set(),random:()=>number=Math.random){
  const review=new Map(reviews.map(row=>[row.question_id,row]));const only=onlyIds?new Set(onlyIds):null;
- const pool=housingPool(section,mode,step).filter(q=>(!only||only.has(q.id))&&(!reviewOnly||!!review.get(q.id)?.wrong_count&&review.get(q.id)!.streak<3));
- const rank=(q:HousingExercise)=>{const row=review.get(q.id);return row?.wrong_count&&row.streak<3?0:!row?1:row.due_at<=Date.now()?2:3;};
- return [...pool].sort((a,b)=>rank(a)-rank(b)||a.step-b.step||(mixedOrder.get(a.id)??0)-(mixedOrder.get(b.id)??0)||housingQuestions.indexOf(a)-housingQuestions.indexOf(b)).slice(0,count==='all'?pool.length:count);
+ const base=housingPool(section,mode,step).filter(q=>!only||only.has(q.id));
+ let pool:HousingExercise[];
+ if(reviewOnly)pool=base.filter(q=>isHousingMistake(review.get(q.id))||starred.has(housingBaseId(q.id)));
+ else if(only)pool=base;
+ else{const fresh=base.filter(q=>!isHousingSolved(review.get(q.id)));pool=fresh.length?fresh:base;}
+ const mixed=[...pool];
+ for(let i=mixed.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[mixed[i],mixed[j]]=[mixed[j],mixed[i]];}
+ return mixed.slice(0,count==='all'?mixed.length:count);
 }

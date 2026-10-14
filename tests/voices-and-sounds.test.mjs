@@ -39,6 +39,17 @@ test('site voice manifest: normalised lookup, default voice and safe parsing',()
  assert.match(voices.voiceGreeting(lena),/Lena/);
 });
 
+test('an old device-voice choice moves once to the natural site voice; later choices are kept',()=>{
+ assert.equal(voices.savedVoiceName({voiceName:'Helena',rate:'0.94'},'de'),'','a pre-site-voice choice falls back to automatic (Lena)');
+ assert.equal(voices.savedVoiceName({voiceName:'Helena',voices:voices.VOICE_PREFERENCE_VERSION},'de'),'Helena','a device voice chosen later stays');
+ assert.equal(voices.savedVoiceName({voiceName:'site:M2'},'de'),'site:M2');
+ assert.equal(voices.savedVoiceName({voiceName:'Samantha'},'en'),'Samantha','other courses are untouched');
+ assert.equal(voices.savedVoiceName(null,'de'),'');assert.equal(voices.savedVoiceName({voiceName:3},'de'),'');
+ const shared=readFileSync('app/study-shared.tsx','utf8');
+ assert.ok(shared.includes('savedVoiceName(saved,course)')&&shared.includes('voices:VOICE_PREFERENCE_VERSION'));
+ assert.ok(readFileSync('app/learning-effects.tsx','utf8').includes('const deviceVoice=savedDevice??chooseGermanVoice(speech.voices)'));
+});
+
 function setup(t,resolve){
  t.mock.timers.enable({apis:['setTimeout','Date']});
  const states=[];const utterances=[];const plays=[];let unlocks=0,stops=0;

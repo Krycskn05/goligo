@@ -10,7 +10,16 @@ export type ObjectCrop={x:number;y:number;width:number;height:number;sheetWidth:
 export type SceneKey='building'|'moving';
 export type ObjectWord={id:string;de:string;tr:string;topic:string;description:string;descriptionTr:string;note?:string;image:string;crop?:ObjectCrop;extra?:boolean};
 export type SceneMark={id:string;x:number;y:number};
-export const objectGroups=[{id:'objects-house',title:'Ev ve yapı',de:'Das Haus',subtitle:'20 temel kelime'},{id:'objects-furniture',title:'Mobilya ve ev eşyaları',de:'Die Einrichtung',subtitle:'20 temel kelime'},{id:'objects-building',title:'İnşaat sahnesindeki ek eşyalar',de:'Auf der Baustelle',subtitle:'Kalabalık resimden'},{id:'objects-moving',title:'Taşınma sahnesindeki ek eşyalar',de:'Beim Umzug',subtitle:'Kalabalık resimden'},{id:'objects-tools',title:'Tamir ve temizlik aletleri',de:'Werkzeug und Putzzeug',subtitle:'Ders kitabından 15 yeni nesne'}];
+export const objectGroups=[
+ {id:'objects-house',title:'Ev ve yapı',de:'Das Haus',subtitle:'Odalar, çatı, su ve elektrik'},
+ {id:'objects-furniture',title:'Mobilya ve ev eşyaları',de:'Die Einrichtung',subtitle:'Mobilya, dekorasyon ve elektronik'},
+ {id:'objects-kitchen',title:'Mutfak ve sofra',de:'Küche und Tisch',subtitle:'Mutfak aletleri ve sofra eşyaları'},
+ {id:'objects-cleaning',title:'Temizlik ve çamaşır',de:'Putzen und Wäsche',subtitle:'Temizlik ve çamaşır eşyaları'},
+ {id:'objects-tools',title:'Tamir ve boya aletleri',de:'Werkzeug und Malerbedarf',subtitle:'Aletler, vidalar ve boya'},
+ {id:'objects-building',title:'İnşaat alanı',de:'Auf der Baustelle',subtitle:'İnşaat makineleri ve malzemeleri'},
+ {id:'objects-nature',title:'Bitkiler ve hayvanlar',de:'Pflanzen und Tiere',subtitle:'Bitkiler, çiçekler ve hayvanlar'},
+ {id:'objects-moving',title:'Taşınma ve günlük eşyalar',de:'Umzug und Alltag',subtitle:'Taşınma ve günlük eşyalar'},
+];
 type Spec=[string,string,string,string,string,string?];
 const house:Spec[]=[
  ['bad','das Bad','banyo','In diesem Raum kannst du dich waschen und duschen.','Bu odada yıkanabilir ve duş alabilirsin.'],
@@ -57,7 +66,19 @@ const furniture:Spec[]=[
  ['waschmaschine','die Waschmaschine','çamaşır makinesi','Du wäschst deine Kleidung darin.','İçinde kıyafetlerini yıkarsın.'],
 ];
 function fromSpec(spec:Spec,topic:string):ObjectWord{const [id,de,tr,description,descriptionTr,note]=spec;return {id,de,tr,description,descriptionTr,note,topic,image:'/objects/drawn/'+id+'.svg'};}
-export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions];
+// Each object is shown in the category that matches its meaning. Object and question IDs
+// never change; only the category (topic) does, so saved answers, stars and mistakes stay.
+const objectCategory:Record<string,string>={
+ dachfenster:'objects-house',dachziegel:'objects-house',regenrinne:'objects-house',fallrohr:'objects-house',antenne:'objects-house',
+ bilderrahmen:'objects-furniture',kissen:'objects-furniture',
+ herd:'objects-kitchen',kuehlschrank:'objects-kitchen',tasse:'objects-kitchen',teekanne:'objects-kitchen',teller:'objects-kitchen',tischdecke:'objects-kitchen',flasche:'objects-kitchen',apfel:'objects-kitchen',
+ besen:'objects-cleaning',buerste:'objects-cleaning',kehrblech:'objects-cleaning',putzeimer:'objects-cleaning',staubsauger:'objects-cleaning',teppichklopfer:'objects-cleaning',buegeleisen:'objects-cleaning',waschmaschine:'objects-cleaning',
+ saege:'objects-tools',nagel:'objects-tools',pinsel:'objects-tools',farbrolle:'objects-tools',eimer:'objects-tools',
+ brett:'objects-building',
+ pflanze:'objects-nature',palme:'objects-nature',blumentopf:'objects-nature',kaktus:'objects-nature',vogel:'objects-nature',vogelkaefig:'objects-nature',feder:'objects-nature',fisch:'objects-nature',aquarium:'objects-nature',
+};
+export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions]
+ .map(word=>objectCategory[word.id]?{...word,topic:objectCategory[word.id]}:word);
 export const objectWordMap=new Map(objectVocabulary.map(w=>[w.id,w]));
 export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:number;height:number;marks:SceneMark[]}[]=[
  {key:'building',title:'Ev yenileme sahnesi',de:'Auf der Baustelle',src:'/objects/source/building.jpg',width:2048,height:1482,marks:sceneData.building as SceneMark[]},

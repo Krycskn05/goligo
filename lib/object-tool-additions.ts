@@ -40,7 +40,7 @@ const specs:ToolSpec[]=[
 ];
 
 export const toolObjectAdditions:ObjectWord[]=specs.map(([id,de,tr,description,descriptionTr,,note])=>({
- id,de,tr,description,descriptionTr,...(note?{note}:{}),topic:'objects-tools',image:'/objects/toon/tools-'+id+'.webp',extra:true,
+ id,de,tr,description,descriptionTr,...(note?{note}:{}),topic:'objects-tools',image:'/objects/toon/werkzeug-'+id+'.webp',extra:true,
 }));
 export const toolObjectMeanings:Record<string,readonly [en:string,ar:string,uk:string,fr:string]>=Object.fromEntries(
  specs.map(([id,,,,,meanings])=>[id,meanings.slice(0,4) as unknown as readonly [string,string,string,string]]),

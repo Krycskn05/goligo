@@ -111,9 +111,16 @@ for(const verb of verbs){
 export const verbQuestions:Question[]=verbBank;
 export const isVerbTopic=(topic:string)=>topic==='verbs-all'||verbGroups.some(group=>group.id===topic);
 export const inVerbTopic=(questionTopic:string,topic:string)=>topic==='verbs-all'?questionTopic.startsWith('verbs-'):questionTopic===topic;
-/** Keeps the given order but avoids asking about the same verb twice in a row. */
+/** Keeps the given order where it can, but never asks about the same verb twice in a row when that is avoidable. */
 export function spreadVerbRound<T extends {verbId?:string}>(items:readonly T[]):T[]{
- const rest=[...items];const result:T[]=[];
- while(rest.length){const last=result.at(-1)?.verbId;let at=rest.findIndex(item=>!last||item.verbId!==last);if(at<0)at=0;result.push(rest.splice(at,1)[0]);}
+ const rest=[...items];const result:T[]=[];const left=new Map<string,number>();
+ for(const item of rest)left.set(item.verbId??'',(left.get(item.verbId??'')??0)+1);
+ while(rest.length){
+  const last=result.at(-1)?.verbId;
+  // Take the verb with the most questions left (ties: the earliest one), so no verb is stuck at the end.
+  let at=-1;let most=-1;
+  rest.forEach((item,index)=>{if(last&&item.verbId===last)return;const count=left.get(item.verbId??'')??0;if(count>most){most=count;at=index;}});
+  if(at<0)at=0;const [item]=rest.splice(at,1);left.set(item.verbId??'',(left.get(item.verbId??'')??1)-1);result.push(item);
+ }
  return result;
 }

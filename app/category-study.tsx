@@ -8,7 +8,7 @@ import {englishCourseUnits} from '@/lib/english-course';
 import {c} from '@/lib/category-copy';
 import {vaultText} from '@/lib/object-vault-copy';
 import {t,translate,studyLanguages,isStudyLanguage,type StudyLanguage} from '@/lib/study-languages';
-import {learningText,readLearningLanguage,saveLearningLanguage,type LearningLanguage} from '@/lib/learning-language';
+import {ENGLISH_COURSE_ENABLED,activeLearningLanguage,learningText,saveLearningLanguage,type LearningLanguage} from '@/lib/learning-language';
 import {TopicArt,HeroArt} from './toon-art';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
@@ -19,11 +19,11 @@ export default function CategoryStudy(){
  const [language,setLanguage]=useState<StudyLanguage>('tr');
  const [course,setCourse]=useState<LearningLanguage>('de');
  const [loaded,setLoaded]=useState(false);
- useEffect(()=>{try{const saved=localStorage.getItem('german-study-language');if(saved&&isStudyLanguage(saved))setLanguage(saved);setCourse(readLearningLanguage(localStorage,window.location.search));}catch{}setLoaded(true);},[]);
+ useEffect(()=>{try{const saved=localStorage.getItem('german-study-language');if(saved&&isStudyLanguage(saved))setLanguage(saved);setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}setLoaded(true);},[]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=language==='ar'?'rtl':'ltr';try{localStorage.setItem('german-study-language',language);saveLearningLanguage(localStorage,course);}catch{}},[language,course,loaded]);
  function changeCourse(value:LearningLanguage){window.speechSynthesis?.cancel();setCourse(value);const url=new URL(window.location.href);url.searchParams.set('learn',value);window.history.replaceState(null,'',url);}
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <Workshop language={language} onLanguage={setLanguage} course={course} onCourse={changeCourse}/>;
+ return <Workshop language={language} onLanguage={setLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>;
 }
 export function Workshop({language,onLanguage,course='de',onCourse}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;course?:LearningLanguage;onCourse?:(value:LearningLanguage)=>void}){
  const [level,setLevel]=useState<CourseLevel>('A1.1');

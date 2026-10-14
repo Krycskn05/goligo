@@ -2,9 +2,11 @@
 // Polish, Italian and Portuguese. German answers retain their original articles.
 import {movingExtraMeanings} from './object-moving-additions';
 import {buildingExtraMeanings} from './object-building-additions';
+import {toolExtraMeanings} from './object-tool-additions';
 export const extraObjectMeanings:Record<string,readonly [es:string,ru:string,fa:string,pl:string,it:string,pt:string]>={
  ...movingExtraMeanings,
  ...buildingExtraMeanings,
+ ...toolExtraMeanings,
  bad:['baño','ванная комната','حمام','łazienka','bagno','banheiro'],
  brett:['tabla de madera','доска','تختهٔ چوبی','deska','tavola di legno','tábua de madeira'],
  dach:['tejado','крыша','بام','dach','tetto','telhado'],

@@ -1010,5 +1010,170 @@
       "width": 768,
       "height": 768
     }
+  },
+  "bohrmaschine": {
+    "src": "/objects/toon/tools-bohrmaschine.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "buerste": {
+    "src": "/objects/toon/tools-buerste.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "duebel": {
+    "src": "/objects/toon/tools-duebel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "haken": {
+    "src": "/objects/toon/tools-haken.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "hammer": {
+    "src": "/objects/toon/tools-hammer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kehrblech": {
+    "src": "/objects/toon/tools-kehrblech.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleber": {
+    "src": "/objects/toon/tools-kleber.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "putzeimer": {
+    "src": "/objects/toon/tools-putzeimer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schraube": {
+    "src": "/objects/toon/tools-schraube.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schraubenzieher": {
+    "src": "/objects/toon/tools-schraubenzieher.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tapete": {
+    "src": "/objects/toon/tools-tapete.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "teppichklopfer": {
+    "src": "/objects/toon/tools-teppichklopfer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "wasserwaage": {
+    "src": "/objects/toon/tools-wasserwaage.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zange": {
+    "src": "/objects/toon/tools-zange.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zollstock": {
+    "src": "/objects/toon/tools-zollstock.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
   }
 }

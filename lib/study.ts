@@ -3,12 +3,13 @@ import {curriculumTopicIds,courseUnitForTopic} from './course-levels';
 import {questions,topics,shuffle,type Question} from './course';
 import {englishQuestions,englishTopics,englishUnitContains} from './english-course';
 import {type LearningLanguage} from './learning-language';
+import type {StudyStats} from './progress';
 export type Review={question_id:string;wrong_count:number;streak:number;seen:number;last_answer:string;last_wrong:string;last_at:number;due_at:number};
 export type Answer={id:string;question_id:string;answer:string;correct:number;created_at:number};
 export type SessionQuestion={id:string;options?:string[]};
 export type Session={id:string;mode:string;topic:string;questions:SessionQuestion[];created_at:number;finished_at:number|null;answers:Answer[]};
 export type SessionSummary={id:string;mode:string;topic:string;created_at:number;finished_at:number|null;total:number;answered:number;correct:number};
-export type Snapshot={reviews:Review[];notes:Record<string,string>;sessions:SessionSummary[];activePictureSessionId?:string|null};
+export type Snapshot={reviews:Review[];notes:Record<string,string>;sessions:SessionSummary[];activePictureSessionId?:string|null;stats?:StudyStats};
 export function selectQuestions(mode:string,topic:string,count:number,reviews:Review[],onlyIds?:string[],course:LearningLanguage=topic.startsWith('en-')?'en':'de'):Question[]{
  const byId=new Map(reviews.map(r=>[r.question_id,r]));const only=onlyIds?new Set(onlyIds):null;const curriculum=curriculumTopicIds(topic);
  const source=course==='en'?englishQuestions:questions;const sourceTopics=course==='en'?englishTopics:topics;

@@ -716,6 +716,11 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 .housing-word-bank { margin:16px 0; color:#687568; }
 .housing-word-bank p { margin-top:6px; font-weight:650; line-height:1.8; }
 .housing-translation { font-size:18px; }
+.housing-star { display:inline-grid; place-items:center; width:40px; height:40px; flex-shrink:0; border:1px solid #e3d7b0; border-radius:50%; background:#fffdf5; color:#b9a46b; cursor:pointer; transition:transform .18s cubic-bezier(.34,1.56,.64,1), color .18s, background .18s; }
+.housing-star:hover { transform:scale(1.08); }
+.housing-star.active { color:#e0a100; background:#fff4cc; border-color:#f0cc5c; }
+.housing-star:disabled { opacity:.6; cursor:wait; }
+.housing-remaining { margin:14px 0 0; font-weight:600; color:#2f5a4f; }
 .housing-trap-why { margin:12px 0 0; padding:12px 14px; border-radius:12px; background:#fff6dc; border:1px solid #f0d58c; color:#5b4a17; line-height:1.6; }
 .housing-trap-why strong { display:block; margin-bottom:2px; color:#8a5a00; }
 .housing-result { padding:20px 0; border-bottom:1px solid #e2e6da; }

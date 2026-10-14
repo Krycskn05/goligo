@@ -1,4 +1,7 @@
 import {configureAudioSession} from './audio-session';
+import {isSiteVoice,type ClipPlayer} from './site-voices';
+/** Pre-rendered natural clips (site voices); resolve returns null when a text has no clip. */
+export type SpeechClips={player:ClipPlayer;resolve:(text:string,voiceName:string)=>string|null};
 export type SpeechPlayback = {
   status: 'idle' | 'loading' | 'speaking';
   text: string;
@@ -68,6 +71,7 @@ export function createGermanSpeechPlayer(
   onChange: (playback: SpeechPlayback) => void,
   language:'de'|'en'='de',
   engineOptions:{cancelDelayMs?:number}={},
+  clips?:SpeechClips,
 ) {
   let generation = 0;
   let playback = idlePlayback;
@@ -94,12 +98,15 @@ export function createGermanSpeechPlayer(
     generation++;
     clearTimer();
     current = null;
+    clips?.player.stop();
     if (needsCancel) cancelEngine();
     update({...idlePlayback, warning});
   }
 
   function prepare() {
     configureAudioSession();
+    // The natural-voice element is unlocked inside every tap as well.
+    try { clips?.player.unlock(); } catch {}
     if (prepared || current || synthesis.speaking || synthesis.pending) return;
     // iOS grants speech permission on the first speak() inside a user gesture.
     // An effect's later onended callback is outside that gesture. Unlock here
@@ -122,14 +129,55 @@ export function createGermanSpeechPlayer(
   function speak(text: string, options: {voiceName?: string; rate?: number} = {}) {
     configureAudioSession();
     stop();
-    const parts = splitSpeechText(text);
-    if (!parts.length) return;
-    const token = generation;
+    if (!text.trim()) return;
     const requestedRate=options.rate??defaultSpeechRate(language);
     const rate = Number.isFinite(requestedRate)?Math.max(0.5, Math.min(1.2, requestedRate)):defaultSpeechRate(language);
+    const clip = clips ? clips.resolve(text, options.voiceName ?? '') : null;
+    if (clip) playClip(text, clip, rate, options);
+    else speakWithEngine(text, rate, options.voiceName);
+  }
+
+  /** A natural site-voice clip; any failure before it starts falls back to the device voice. */
+  function playClip(text: string, url: string, rate: number, options: {voiceName?: string}) {
+    const token = generation;
+    let started = false;
+    update({status: 'loading', text, warning: ''});
+    const fallback = () => {
+      if (token !== generation || started) return;
+      clearTimer();
+      clips?.player.stop();
+      speakWithEngine(text, rate, isSiteVoice(options.voiceName) ? '' : options.voiceName);
+    };
+    clips!.player.play(url, rate, {
+      onStart: () => {
+        if (token !== generation) return;
+        started = true;
+        clearTimer();
+        update({status: 'speaking', text, warning: ''});
+        timer = setTimeout(() => { if (token === generation) stop('Dinleme kesildi. Dinle düğmesine yeniden dokun.'); }, 60000);
+      },
+      onEnd: () => {
+        if (token !== generation) return;
+        clearTimer();
+        update({...idlePlayback});
+      },
+      onError: () => {
+        if (token !== generation) return;
+        if (!started) { fallback(); return; }
+        clearTimer();
+        update({...idlePlayback});
+      },
+    });
+    if (token === generation && !started) timer = setTimeout(fallback, 4000);
+  }
+
+  function speakWithEngine(text: string, rate: number, voiceName?: string) {
+    const parts = splitSpeechText(text);
+    if (!parts.length) { update({...idlePlayback}); return; }
+    const token = generation;
     let index = 0;
     let retried = false;
-    let voice = chooseStudyVoice(synthesis.getVoices(), language,options.voiceName);
+    let voice = chooseStudyVoice(synthesis.getVoices(), language, isSiteVoice(voiceName) ? '' : voiceName ?? '');
     update({status: 'loading', text, warning: ''});
 
     function retryPart() {

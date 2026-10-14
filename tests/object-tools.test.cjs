@@ -20,9 +20,9 @@ test('the textbook tools page adds 15 new objects in their own Nesne Kasası cat
  assert(page.includes("'objects-tools':'groupTools'")&&page.includes("'objects-tools':'bohrmaschine'"));
 });
 
-test('every new tool has its own 512 px cartoon picture, meanings in all languages and a sub-topic',()=>{
+test('every new tool has its own 512 px picture, meanings in all languages and a sub-topic',()=>{
  for(const id of Object.keys(tools)){
-  const word=objects.objectWordMap.get(id);assert.equal(word.image,'/objects/toon/tools-'+id+'.webp');
+  const word=objects.objectWordMap.get(id);assert.equal(word.image,'/objects/toon/werkzeug-'+id+'.webp');
   assert.equal(art[id].src,word.image);assert.deepEqual(art[id].crop,{x:0,y:0,width:512,height:512});
   assert.deepEqual(webpSize(path.join('public',word.image)),[512,512],id);
   for(const language of languages)assert(translations.objectMeaning(id,language).trim(),id+' '+language);

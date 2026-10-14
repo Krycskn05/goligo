@@ -69,7 +69,9 @@ export async function POST(request:Request){
    if(row.finished_at)return json({error:'Bu test tamamlandı.'},409);
    const answered=await db.prepare('SELECT COUNT(*) AS n FROM study_answers WHERE session_id=? AND user_id=?').bind(sessionId,user).first<{n:number}>();
    if(order[answered?.n??0]?.id!==questionId)return json({error:'Test ilerlemesi değişti. Sayfayı yenileyerek devam et.'},409);
-   if(q.options&&!q.options.includes(answer))return json({error:'Geçerli bir şık seç.'},400);
+   // A saved round keeps the choices it was shown, even if the catalogue changed later.
+   const shown=order.find(item=>item.id===questionId)?.options??q.options;
+   if(shown&&!shown.includes(answer))return json({error:'Geçerli bir şık seç.'},400);
    const correct=gradeAnswer(q,answer)?1:0;
    // The insert and review update share one transaction. changes() prevents duplicate retries from inflating counts.
    const interval='CASE WHEN study_review.streak+1=1 THEN 86400000 WHEN study_review.streak+1=2 THEN 259200000 ELSE 604800000 END';

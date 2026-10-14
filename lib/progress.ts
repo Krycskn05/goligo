@@ -3,6 +3,8 @@ import type {Review} from './study';
 import {housingQuestions,type HousingSection} from './housing-course';
 import {objectQuestions} from './object-course';
 import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion} from './object-practice';
+import {verbQuestions,inVerbTopic} from './verb-course';
+import {isVerbExercise} from './verb-practice';
 
 /**
  * Learning progress shown in the interface. Everything here is derived from the
@@ -47,6 +49,11 @@ export function isVaultExercise(q:Question){return isObjectPictureQuestion(q)||i
 export function objectProgressIds(group:string){
  return objectQuestions.filter(q=>(group==='all'||q.topic===group)&&isVaultExercise(q)).map(q=>q.id);
 }
+/** Choice, writing and listening exercises of one Fiiller group (verbs-all = every verb). */
+export function verbProgressIds(topic:string){
+ return verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&isVerbExercise(q)).map(q=>q.id);
+}
+export function verbProgress(topic:string,reviews:readonly Review[]){return topicProgress(verbProgressIds(topic),reviews);}
 export function housingProgress(section:HousingSection|'all',reviews:readonly Review[]){return topicProgress(housingProgressIds(section),reviews);}
 export function objectProgress(group:string,reviews:readonly Review[]){return topicProgress(objectProgressIds(group),reviews);}
 

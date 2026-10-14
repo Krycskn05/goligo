@@ -49,4 +49,7 @@
  .verb-list-rows li { grid-template-columns:44px minmax(0,1fr); gap:6px 10px; }
  .verb-list-number { display:none; }
  .verb-list-forms { grid-column:2; }
+ /* Small cards on phones: smaller chips so every sample verb stays visible. */
+ .verb-chips { gap:5px; padding:8px; }
+ .verb-chip,.vault-category-card.featured .verb-chip { font-size:12px; padding:4px 8px; box-shadow:0 2px 0 #ece4d1; }
 }

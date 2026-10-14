@@ -25,6 +25,8 @@ import {isStudyLanguage} from '@/lib/study-languages';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
 import {EffectsSettingsButton} from './learning-effects';
+import {objectProgress} from '@/lib/progress';
+import {ProgressMeter,RoundReward} from './progress-ui';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-building':'groupBuilding','objects-moving':'groupMoving'};
@@ -146,7 +148,8 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  function answerMeaning(question:Question,word:ObjectWord){return question.articlePuzzle?<span className="object-answer-meaning"><strong lang="de" dir="ltr">{articleFullAnswer(question)}</strong><span className="object-answer-translation" lang={language}>{objectMeaning(word.id,language)} · {text('pluralLabel')}</span></span>:<ObjectAnswerMeaning word={word} language={language} course={course}/>;}
  function hearQuestion(slow=false){if(!q?.audio||busy||cueBusy)return;setHeardQuestionId(q.id);speech.speak(q.audio,slow);}
  const modeLabels={test:text('testPractice'),write:text('writePractice'),listen:text('listenPractice'),testDetail:text('testDetail'),writeDetail:text('writeDetail'),listenDetail:text('listenDetail')};
- function categoryCard(id:string,title:string,featured=false){const total=id==='all'?objectVocabulary.length:objectVocabulary.filter(word=>word.topic===id).length;return <article key={id} className={'vault-category-card vault-mode-card '+(featured?'featured':'')} data-vault-category={id}><button type="button" className="vault-category-open" disabled={busy} onClick={()=>chooseCategory(id)}><div className="vault-category-art"><CategoryArt group={id} title={title}/></div><div className="vault-category-label"><h3>{title}</h3><p>{text('objectsCount',{n:total})}</p><ArrowRight size={19} className="vault-direction-icon"/></div></button><PracticeModes labels={modeLabels} topicLabel={title} compact disabled={busy} onChoose={mode=>chooseCategory(id,mode)}/></article>;}
+ const showProgress=ready&&course==='de';
+ function categoryCard(id:string,title:string,featured=false){const total=id==='all'?objectVocabulary.length:objectVocabulary.filter(word=>word.topic===id).length;return <article key={id} className={'vault-category-card vault-mode-card '+(featured?'featured':'')} data-vault-category={id}><button type="button" className="vault-category-open" disabled={busy} onClick={()=>chooseCategory(id)}><div className="vault-category-art"><CategoryArt group={id} title={title}/></div><div className="vault-category-label"><h3>{title}</h3><p>{text('objectsCount',{n:total})}</p>{showProgress&&<ProgressMeter progress={objectProgress(id,snapshot.reviews)} language={language} label={title} compact/>}<ArrowRight size={19} className="vault-direction-icon"/></div></button><PracticeModes labels={modeLabels} topicLabel={title} compact disabled={busy} onChoose={mode=>chooseCategory(id,mode)}/></article>;}
 
  return <div className="category-app object-app toon-app picture-quiz-app vault-app" lang={language} dir={vaultDirection(language)}>
   <a className="skip-link" href="#object-main">{text('skipContent')}</a>
@@ -159,6 +162,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:text('audioWarning')}</p>}
    {session?finished?<section className="object-results panel">
     <h1 id="object-question-heading" tabIndex={-1}>{text(session.mode==='write'?'puzzlesDone':'resultsTitle')}</h1><p className="vault-result-score">{text('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>
+    <RoundReward answers={session.answers} progress={showProgress?objectProgress(group,snapshot.reviews):null} language={language} label={categoryName(group,language)}/>
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!session.answers.some(a=>!a.correct)} onClick={()=>void start(false,session.answers.filter(a=>!a.correct).map(a=>a.question_id))}><RotateCcw size={18}/>{text(session.mode==='write'?'reviewPuzzleMistakes':'reviewRoundMistakes')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{text('categories')}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=questionMap.get(a.question_id);const word=item?.objectId?objectWordMap.get(item.objectId):undefined;return word?<div className="object-result-row" key={a.id}><ObjectPicture word={word} language={language} small/><div>{item&&answerMeaning(item,word)}<small>{text(session.mode==='write'?'yourAnswer':'yourChoice')}: <span lang={course} dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&currentWord?<section className="object-practice picture-quiz-practice">

@@ -4,12 +4,13 @@ import type {Topic,Word} from './lessons';
 import sceneData from './object-scenes.json';
 import {movingObjectAdditions} from './object-moving-additions';
 import {buildingObjectAdditions} from './object-building-additions';
+import {toolObjectAdditions} from './object-tool-additions';
 
 export type ObjectCrop={x:number;y:number;width:number;height:number;sheetWidth:number;sheetHeight:number};
 export type SceneKey='building'|'moving';
 export type ObjectWord={id:string;de:string;tr:string;topic:string;description:string;descriptionTr:string;note?:string;image:string;crop?:ObjectCrop;extra?:boolean};
 export type SceneMark={id:string;x:number;y:number};
-export const objectGroups=[{id:'objects-house',title:'Ev ve yapı',de:'Das Haus',subtitle:'20 temel kelime'},{id:'objects-furniture',title:'Mobilya ve ev eşyaları',de:'Die Einrichtung',subtitle:'20 temel kelime'},{id:'objects-building',title:'İnşaat sahnesindeki ek eşyalar',de:'Auf der Baustelle',subtitle:'Kalabalık resimden'},{id:'objects-moving',title:'Taşınma sahnesindeki ek eşyalar',de:'Beim Umzug',subtitle:'Kalabalık resimden'}];
+export const objectGroups=[{id:'objects-house',title:'Ev ve yapı',de:'Das Haus',subtitle:'20 temel kelime'},{id:'objects-furniture',title:'Mobilya ve ev eşyaları',de:'Die Einrichtung',subtitle:'20 temel kelime'},{id:'objects-building',title:'İnşaat sahnesindeki ek eşyalar',de:'Auf der Baustelle',subtitle:'Kalabalık resimden'},{id:'objects-moving',title:'Taşınma sahnesindeki ek eşyalar',de:'Beim Umzug',subtitle:'Kalabalık resimden'},{id:'objects-tools',title:'Tamir ve temizlik aletleri',de:'Werkzeug und Putzzeug',subtitle:'Ders kitabından 15 yeni nesne'}];
 type Spec=[string,string,string,string,string,string?];
 const house:Spec[]=[
  ['bad','das Bad','banyo','In diesem Raum kannst du dich waschen und duschen.','Bu odada yıkanabilir ve duş alabilirsin.'],
@@ -56,7 +57,7 @@ const furniture:Spec[]=[
  ['waschmaschine','die Waschmaschine','çamaşır makinesi','Du wäschst deine Kleidung darin.','İçinde kıyafetlerini yıkarsın.'],
 ];
 function fromSpec(spec:Spec,topic:string):ObjectWord{const [id,de,tr,description,descriptionTr,note]=spec;return {id,de,tr,description,descriptionTr,note,topic,image:'/objects/drawn/'+id+'.svg'};}
-export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions];
+export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions];
 export const objectWordMap=new Map(objectVocabulary.map(w=>[w.id,w]));
 export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:number;height:number;marks:SceneMark[]}[]=[
  {key:'building',title:'Ev yenileme sahnesi',de:'Auf der Baustelle',src:'/objects/source/building.jpg',width:2048,height:1482,marks:sceneData.building as SceneMark[]},

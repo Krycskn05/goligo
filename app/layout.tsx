@@ -3,6 +3,7 @@ import { SITE_NAME } from "@/lib/site-brand";
 import "./globals.css";
 import "./learning-effects.css";
 import "./progress.css";
+import "./verbs.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

@@ -2,7 +2,7 @@
 import {Crown,Flame,Sparkles,Star,Target,Trophy} from 'lucide-react';
 import type {Review} from '@/lib/study';
 import type {VaultLanguage} from '@/lib/object-vault-copy';
-import {progressSummary,roundXp,topicProgress,housingProgress,objectProgress,housingProgressIds,objectProgressIds,type StudyStats,type TopicProgress} from '@/lib/progress';
+import {progressSummary,roundXp,topicProgress,housingProgress,objectProgress,verbProgress,housingProgressIds,objectProgressIds,verbProgressIds,type StudyStats,type TopicProgress} from '@/lib/progress';
 import {progressText,stageText,formatPercent,type ProgressCopyKey} from '@/lib/progress-copy';
 
 function Stars({count}:{count:number}){
@@ -22,12 +22,12 @@ function GoalRing({percent}:{percent:number}){
  const radius=19,circle=2*Math.PI*radius;
  return <span className="progress-ring" aria-hidden="true"><svg className="progress-ring-svg" viewBox="0 0 46 46"><circle cx="23" cy="23" r={radius} className="progress-ring-bg"/><circle cx="23" cy="23" r={radius} className="progress-ring-fill" strokeDasharray={circle} strokeDashoffset={circle*(1-percent/100)}/></svg><Target size={18}/></span>;
 }
-/** Home page summary: level and XP, day streak, daily goal and the two active areas. */
-export function ProgressSummaryPanel({stats,reviews,language,housingLabel,vaultLabel}:{stats:StudyStats;reviews:Review[];language:VaultLanguage;housingLabel:string;vaultLabel:string}){
+/** Home page summary: level and XP, day streak, daily goal and the active areas (Ev ve Yaşam, Nesne Kasası, Fiiller). */
+export function ProgressSummaryPanel({stats,reviews,language,housingLabel,vaultLabel,verbsLabel}:{stats:StudyStats;reviews:Review[];language:VaultLanguage;housingLabel:string;vaultLabel:string;verbsLabel?:string}){
  const p=(key:ProgressCopyKey,params?:Record<string,string|number>)=>progressText(language,key,params);
  const summary=progressSummary(stats);const level=summary.level;const goalDone=summary.goalPercent>=100;
- const housing=housingProgress('all',reviews);const objects=objectProgress('all',reviews);
- const overall=topicProgress([...housingProgressIds('all'),...objectProgressIds('all')],reviews);
+ const housing=housingProgress('all',reviews);const objects=objectProgress('all',reviews);const verbsDone=verbProgress('verbs-all',reviews);
+ const overall=topicProgress([...housingProgressIds('all'),...objectProgressIds('all'),...(verbsLabel?verbProgressIds('verbs-all'):[])],reviews);
  return <section className="progress-summary" aria-labelledby="progress-heading" data-progress-summary="">
   <div className="progress-summary-head"><h2 id="progress-heading"><Sparkles size={21} aria-hidden="true"/>{p('title')}</h2><span className="progress-overall">{p('overall')}: <strong>{formatPercent(overall.percent,language)}</strong></span></div>
   <div className="progress-stats">
@@ -35,9 +35,10 @@ export function ProgressSummaryPanel({stats,reviews,language,housingLabel,vaultL
    <div className={'progress-stat progress-streak'+(summary.practisedToday?' lit':'')}><span className="progress-stat-icon"><Flame size={22} aria-hidden="true"/></span><div><strong>{p('streak',{n:summary.streak})}</strong><small>{p(summary.practisedToday?'streakDone':summary.streak?'streakKeep':'streakStart')}</small></div></div>
    <div className={'progress-stat progress-goal'+(goalDone?' done':'')}><GoalRing percent={summary.goalPercent}/><div><strong>{p('dailyGoal')}</strong><small>{goalDone?p('goalDone')+' · ':''}{p('dailyCount',{n:summary.todayAnswers,goal:summary.dailyGoal})}</small></div></div>
   </div>
-  <div className="progress-topics">
+  <div className={'progress-topics'+(verbsLabel?' three':'')}>
    <a className="progress-topic" href="/a1-2/ev-ve-yasam"><span className="progress-topic-name">{housingLabel}</span><ProgressMeter progress={housing} language={language} label={housingLabel}/></a>
    <a className="progress-topic" href="/ev-esyalar?learn=de"><span className="progress-topic-name">{vaultLabel}</span><ProgressMeter progress={objects} language={language} label={vaultLabel}/></a>
+   {verbsLabel&&<a className="progress-topic" href="/fiiller"><span className="progress-topic-name">{verbsLabel}</span><ProgressMeter progress={verbsDone} language={language} label={verbsLabel}/></a>}
   </div>
   <p className="progress-help">{p('correctTotal',{n:summary.correct})} · {p('howItWorks')}</p>
  </section>;

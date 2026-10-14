@@ -27,7 +27,8 @@ test('both catalogues keep twenty units; only the requested German housing chapt
   if(unit.id==='en-book-11'){assert(german.length>0);assert(german.every(q=>q.id.startsWith('housing-11-')));}
   else assert.equal(german.length,0);
  }
- assert.equal(new Set(course.questionMap.keys()).size,course.questions.length+english.englishQuestions.length);
+ // Fiiller questions have their own page, so they are in questionMap but not in the A1 question list.
+ assert.equal(new Set(course.questionMap.keys()).size,course.questions.length+english.englishQuestions.length+require(path.join(compiled,'verb-course.js')).verbQuestions.length);
  assert.equal(course.questions.some(q=>q.id.startsWith('en-')),false);
  for(const q of english.englishQuestions){
   assert(course.gradeAnswer(q,q.answer),q.id);

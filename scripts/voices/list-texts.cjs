@@ -25,5 +25,6 @@ for(const q of objects.objectQuestions){
 }
 const verbs=load('verb-course'),verbPractice=load('verb-practice');
 for(const q of verbs.verbQuestions){if(!verbPractice.isVerbExercise(q))continue;add(q.answer);if(q.audio)add(q.audio);}
-for(const verb of verbs.verbs)add(verbs.verbRowSpeech(verb));
+const verbLogic=load('verb-logic');
+for(const verb of verbs.verbs){add(verbs.verbRowSpeech(verb));add(verb.participle);add(verbLogic.sentenceText(verb,'praesens'));add(verbLogic.sentenceText(verb,'perfekt'));}
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

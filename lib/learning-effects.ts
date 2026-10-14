@@ -1,4 +1,14 @@
 import {soundRecipes,soundDuration,wrongSoundIds,type SoundId,type WrongSoundId} from './effect-sounds';
+
+/** Generated at build time by scripts/sounds/make-sounds.mjs. */
+export const SOUND_FOLDER='/sfx/';
+export function soundUrl(id:SoundId){return SOUND_FOLDER+id+'.wav';}
+let warmed=false;
+/** Fetch every effect once (after the first tap) so later sounds start instantly. */
+export function warmEffects(){
+ if(warmed||typeof window==='undefined'||typeof fetch!=='function')return;warmed=true;
+ for(const id of Object.keys(soundRecipes) as SoundId[])void fetch(soundUrl(id)).catch(()=>{});
+}
 import {configureAudioSession} from './audio-session';
 
 export const EFFECTS_KEY = 'lernkoko-effects-v1';
@@ -93,7 +103,7 @@ export function playLearningSound(id:SoundId,after?:()=>void,preview=false):()=>
  // of a Web Audio context suspended by the app, silent mode or tab switching.
  if(typeof window.Audio==='function'){
   try{
-   media=new window.Audio('/sounds/'+id+'.wav');media.preload='auto';media.volume=preferences.volume;
+   media=new window.Audio(soundUrl(id));media.preload='auto';media.volume=preferences.volume;
    const playing=()=>{if(finished||toneStarted)return;if(timer!==undefined)clearTimeout(timer);timer=setTimeout(()=>finish(true),soundDuration(id)*1000+1200);};
    media.onplaying=playing;media.onended=()=>finish(true);media.onerror=fallback;
    timer=setTimeout(fallback,1800);

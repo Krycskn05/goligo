@@ -4,7 +4,7 @@ import {englishObjectQuestions} from './english-objects';
 
 // Match the current German catalogue: headings and art only.
 export const englishCourseUnits:CourseUnit[]=courseUnits.map(unit=>({...unit,id:'en-'+unit.id,de:unit.names[2],legacyTopics:[]}));
-export const englishTopics:Topic[]=[...englishCourseUnits.map(unit=>({id:unit.id,title:unit.title,de:unit.de,unit:unit.number,section:unit.level,pages:'',minutes:0,lead:'',blocks:[]})),...['objects-house','objects-furniture','objects-building','objects-moving','objects-tools','objects-all','a11-all','a12-all','all'].map(id=>({id:'en-'+id,title:id,de:id,unit:0,section:'',pages:'',minutes:0,lead:'',blocks:[]}))];
+export const englishTopics:Topic[]=[...englishCourseUnits.map(unit=>({id:unit.id,title:unit.title,de:unit.de,unit:unit.number,section:unit.level,pages:'',minutes:0,lead:'',blocks:[]})),...['objects-house','objects-furniture','objects-building','objects-moving','objects-tools','objects-kitchen','objects-cleaning','objects-nature','objects-all','a11-all','a12-all','all'].map(id=>({id:'en-'+id,title:id,de:id,unit:0,section:'',pages:'',minutes:0,lead:'',blocks:[]}))];
 export const englishQuestions=englishObjectQuestions;
 export function englishUnitContains(topic:string,unit:string){
  if(unit==='en-all')return true;

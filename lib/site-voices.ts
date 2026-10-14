@@ -18,6 +18,8 @@ export const siteVoices:readonly SiteVoice[]=[
  {id:'site:M5',style:'M5',name:'Max',gender:'male'},
 ];
 export const DEFAULT_SITE_VOICE='site:F1';
+/** Each site voice introduces itself when it is chosen in the settings. */
+export function voiceGreeting(voice:Pick<SiteVoice,'name'>){return `Hallo, ich bin ${voice.name}. Lass uns zusammen Deutsch lernen!`;}
 /** Clips are rendered at a calm pace; the "comfortable" speed plays them unchanged. */
 export const SITE_CLIP_BASE_RATE=0.94;
 

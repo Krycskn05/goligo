@@ -3,9 +3,10 @@ import type {Topic} from './lessons';
 import type {Translations,StudyLanguage} from './study-languages';
 import {translate} from './study-languages';
 import type {Review} from './study';
+import {housingTraps,trapPassages,trapReasons,type TrapReason} from './housing-traps';
 
 export type HousingSection='a'|'b'|'c'|'d';
-export type HousingExercise=Question&{section:HousingSection;step:number;meaning:Translations;cueDe:string;resultDe:string;rule:HousingRule;art?:string;passageMeaning?:Translations};
+export type HousingExercise=Question&{section:HousingSection;step:number;meaning:Translations;cueDe:string;resultDe:string;rule:HousingRule;art?:string;passageMeaning?:Translations;trap?:TrapReason};
 const tx=(tr:string,en:string,ar:string,uk:string,fr:string,de=''):Translations=>[tr,de,en,ar,uk,fr];
 export const housingSections=[
  {id:'a' as const,topic:'book-11-a',de:'Das ist unsere Wohnung.',title:tx('Evimiz, odalar ve eşyalar','Our home, rooms and furniture','بيتنا والغرف والأثاث','Наш дім, кімнати й меблі','Notre logement, les pièces et les meubles','Unsere Wohnung, Zimmer und Möbel'),pages:'98–99',art:'tisch',steps:['Hier ist unser Wohnzimmer.','Die Lampe ist super!','Das ist unsere Wohnung.']},
@@ -36,10 +37,12 @@ export const housingNotes:Record<HousingSection,{step:number;rule:HousingRule;ex
 };
 
 const exercises:HousingExercise[]=[];
-function add(section:HousingSection,step:number,id:string,answer:string,meaning:Translations,rule:HousingRule,extra:Partial<HousingExercise>={}){
+function make(section:HousingSection,step:number,id:string,answer:string,meaning:Translations,rule:HousingRule,extra:Partial<HousingExercise>={}):HousingExercise{
  const gap=extra.gap;const resultDe=extra.resultDe??(gap?gap.replace('___',answer):answer);
- const q:HousingExercise={id:'housing-11-'+section+'-'+id,topic:'book-11-'+section,section,step,kind:'write',writingTask:gap?'gap':'sentence',prompt:gap?'Boşluğu Almanca yazarak tamamla.':'Anlamı verilen ifadeyi Almanca yaz.',answer,answerTr:meaning[0],meaning,cueDe:'Ergänze den Satz.',resultDe,rule,explanation:resultDe+' = '+meaning[0]+' '+housingRules[rule][0],...extra};
- exercises.push(q);
+ return {id:'housing-11-'+section+'-'+id,topic:'book-11-'+section,section,step,kind:'write',writingTask:gap?'gap':'sentence',prompt:gap?'Boşluğu Almanca yazarak tamamla.':'Anlamı verilen ifadeyi Almanca yaz.',answer,answerTr:meaning[0],meaning,cueDe:'Ergänze den Satz.',resultDe,rule,explanation:resultDe+' = '+meaning[0]+' '+housingRules[rule][0],...extra};
+}
+function add(section:HousingSection,step:number,id:string,answer:string,meaning:Translations,rule:HousingRule,extra:Partial<HousingExercise>={}){
+ const q=make(section,step,id,answer,meaning,rule,extra);exercises.push(q);return q;
 }
 function words(section:HousingSection,step:number,rows:string){
  const parsed=rows.trim().split('\n').map(line=>line.split('|'));
@@ -213,6 +216,27 @@ for(const q of gapQuestions){
  const options=[q.answer,...[...new Set(wrong)].filter(option=>option.toLocaleLowerCase('de')!==q.answer.toLocaleLowerCase('de')).slice(0,3)];
  if(options.length===4)exercises.push({...q,id:q.id+'-test',kind:'choice',options});
 }
+// Tuzaklı alıştırmalar: yanlış şıklar sık yapılan hataları taklit eder. Yazma
+// sürümü (varsa) aynı tuzağı ipucusuz da sorar; ID'ler yalnızca eklenir.
+function wordOrder(words:string[],seed:string){
+ let state=0;for(const character of seed)state=(Math.imul(state,31)+character.charCodeAt(0))>>>0;
+ const result=[...words];for(let i=result.length-1;i>0;i--){state=(Math.imul(state,1103515245)+12345)>>>0;const j=state%(i+1);[result[i],result[j]]=[result[j],result[i]];}
+ return result.join(' ')===words.join(' ')?[...words].reverse():result;
+}
+for(const t of housingTraps){
+ const id='trap-'+t.id;const passage=t.passage?trapPassages[t.passage]:undefined;
+ const resultDe=t.gap?t.gap.replace('___',t.answer).replace(/\s*\([^)]*\)$/,''):t.answer;
+ const words=t.answer.replace(/[.!?]/g,'').split(' ');
+ const extra:Partial<HousingExercise>={trap:t.why,resultDe,...(t.art?{art:t.art}:{}),...(t.strictCase?{strictCase:true}:{}),...(t.accepted?{accepted:t.accepted}:{}),
+  ...(t.gap?{gap:t.gap,cueDe:t.gap}:{cueDe:t.lower?'Schreibe den Satz richtig – achte auf Groß- und Kleinschreibung.':'Bilde einen Satz aus den Wörtern.',wordBank:wordOrder(t.lower?words.map(word=>word.toLocaleLowerCase('de-DE')):words,id)}),
+  ...(passage?{passage:passage.de,passageTr:passage.meaning[0],passageMeaning:passage.meaning,cueDe:'Lies den Text und ergänze den Satz.'}:{})};
+ const q=make(t.section,t.step,id,t.answer,t.meaning,t.rule,extra);
+ q.explanation=resultDe+' = '+t.meaning[0]+' '+trapReasons[t.why][0];
+ if(t.write!==false)exercises.push(q);
+ const {wordBank:_wordBank,accepted:_accepted,strictCase:_strict,...choice}=q;
+ exercises.push({...choice,id:q.id+'-test',kind:'choice',options:[t.answer,...t.traps],cueDe:t.gap||passage?q.cueDe:'Welcher Satz ist richtig?'});
+}
+export const housingTrapIds=new Set(exercises.filter(q=>!!q.trap).map(q=>q.id));
 export const housingQuestions=exercises;
 export const housingQuestionMap=new Map(housingQuestions.map(q=>[q.id,q]));
 export const housingTopics:Topic[]=housingSections.map(section=>({id:section.topic,title:section.id.toUpperCase()+' · '+section.title[0],de:section.de,unit:11,section:section.id.toUpperCase(),pages:section.pages,minutes:15,lead:section.title[0],blocks:[]}));

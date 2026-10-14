@@ -2,12 +2,12 @@
 import {SITE_NAME} from '@/lib/site-brand';
 import {SiteLogo} from './site-logo';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,ChevronRight,Headphones,House,Loader2,RotateCcw,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,ChevronRight,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {objectGroups,objectVocabulary,objectWordMap,type ObjectWord} from '@/lib/object-course';
 import {objectSubgroups,subgroupName,inObjectSubgroup} from '@/lib/object-subgroups';
-import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,pickObjectListeningQuiz,pickObjectWritingQuiz,pickPictureQuiz,type PictureQuizSize} from '@/lib/object-practice';
-import type {Answer,Session,Snapshot} from '@/lib/study';
+import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake,isObjectSolved,pickObjectListeningQuiz,pickObjectWritingQuiz,pickPictureQuiz,type ObjectPickOptions,type PictureQuizSize} from '@/lib/object-practice';
+import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {GermanSpeechSettings} from './german-speech-settings';
 import {ObjectArt,HeroArt} from './toon-art';
@@ -56,9 +56,9 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const isWriting=course==='en'?isEnglishObjectWritingQuestion:isObjectWritingQuestion;
  const isListening=course==='en'?isEnglishObjectListeningQuestion:isObjectListeningQuestion;
  const modePredicate=(mode:string)=>mode==='write'?isWriting:mode==='listen'?isListening:isPicture;
- const pickPicture=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[])=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds):pickPictureQuiz;
- const pickWriting=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[])=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds,true):pickObjectWritingQuiz;
- const pickListening=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[])=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds,false,true):pickObjectListeningQuiz;
+ const pickPicture=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[],_options?:ObjectPickOptions)=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds):pickPictureQuiz;
+ const pickWriting=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[],_options?:ObjectPickOptions)=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds,true):pickObjectWritingQuiz;
+ const pickListening=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[],_options?:ObjectPickOptions)=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds,false,true):pickObjectListeningQuiz;
  const topicPrefix=course==='en'?'en-objects-':'objects-';
  const [snapshot,setSnapshot]=useState<Snapshot>(blank);
  const [ready,setReady]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState<VaultCopyKey|null>(null);const [signIn,setSignIn]=useState(false);
@@ -68,7 +68,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const [requestedResume,setRequestedResume]=useState<string|null>(null);
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);
  const [feedback,setFeedback]=useState<Answer|null>(null);const [selected,setSelected]=useState('');
- const [heardQuestionId,setHeardQuestionId]=useState<string|null>(null);
+ const [heardQuestionId,setHeardQuestionId]=useState<string|null>(null);const [starBusy,setStarBusy]=useState(false);
  const speech=useGermanSpeech(course);const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
  const mutation=useRef(false);const mounted=useRef(true);
  const pendingStart=useRef<{key:string;id:string;ids:string[];topic:string}|null>(null);
@@ -86,7 +86,10 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const scopedQuestions=Array.from(questionMap.values()).filter(item=>modePredicate(practiceMode)(item)&&(group==='all'||item.topic===(course==='en'?'en-':'')+group)&&inObjectSubgroup(item,subgroup));
  const availableCount=scopedQuestions.length;
  const selectedSubgroup=objectSubgroups.find(item=>item.id===subgroup);
- const groupMistakes=reviews.filter(r=>r.wrong_count>0&&r.streak<3&&(group==='all'||questionMap.get(r.question_id)?.topic===(course==='en'?'en-':'')+group)&&inObjectSubgroup(questionMap.get(r.question_id),subgroup));
+ // Review = mistakes plus starred questions; a normal round skips what is already solved.
+ const starred=course==='de'?starredQuestionIds(snapshot.notes):new Set<string>();const reviewRows=new Map(reviews.map(r=>[r.question_id,r]));
+ const marked=scopedQuestions.filter(item=>isObjectMistake(reviewRows.get(item.id))||starred.has(item.id));
+ const unsolved=scopedQuestions.filter(item=>!isObjectSolved(reviewRows.get(item.id))).length;
  function fail(e:unknown,fallback:VaultCopyKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
   try{const next=await api(undefined,'',course);if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
@@ -107,7 +110,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
   const eligibleIds=subgroup==='all'?onlyIds:scopedQuestions.filter(item=>!onlyIds||onlyIds.includes(item.id)).map(item=>item.id);
   const key=JSON.stringify([course,practiceMode,group,subgroup,count,reviewOnly,eligibleIds??null]);const topic=(course==='en'?'en-':'')+(group==='all'?'objects-all':group);
-  if(pendingStart.current?.key!==key){const picked=(practiceMode==='write'?pickWriting:practiceMode==='listen'?pickListening:pickPicture)(group,count,reviews,reviewOnly,eligibleIds);pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(x=>x.id),topic};}
+  if(pendingStart.current?.key!==key){const picked=(practiceMode==='write'?pickWriting:practiceMode==='listen'?pickListening:pickPicture)(group,count,reviews,reviewOnly,eligibleIds,{starred,fresh:!reviewOnly&&!onlyIds});pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(x=>x.id),topic};}
   const request=pendingStart.current;
   if(!request.ids.length){setError(reviewOnly?'emptyReview':'emptyQuestions');mutation.current=false;setBusy(false);return;}
   try{
@@ -115,6 +118,13 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
    if(!mounted.current)return;setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;setRequestedResume(null);focus();
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
+ }
+ async function toggleStar(id:string){
+  if(starBusy)return;const key=starNoteKey(id);const value=snapshot.notes[key]==='1'?'':'1';
+  setStarBusy(true);setSnapshot(previous=>({...previous,notes:{...previous.notes,[key]:value}}));
+  try{await api({action:'note',key,value},'',course);}
+  catch(e){if(mounted.current){setSnapshot(previous=>({...previous,notes:{...previous.notes,[key]:value?'':'1'}}));fail(e,'starError');}}
+  finally{if(mounted.current)setStarBusy(false);}
  }
  async function resume(id:string){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
@@ -165,7 +175,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!session.answers.some(a=>!a.correct)} onClick={()=>void start(false,session.answers.filter(a=>!a.correct).map(a=>a.question_id))}><RotateCcw size={18}/>{text(session.mode==='write'?'reviewPuzzleMistakes':'reviewRoundMistakes')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{text('categories')}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=questionMap.get(a.question_id);const word=item?.objectId?objectWordMap.get(item.objectId):undefined;return word?<div className="object-result-row" key={a.id}><ObjectPicture word={word} language={language} small/><div>{item&&answerMeaning(item,word)}<small>{text(session.mode==='write'?'yourAnswer':'yourChoice')}: <span lang={course} dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&currentWord?<section className="object-practice picture-quiz-practice">
-    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span><span>{text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:index+1,total:session.questions.length})}</span><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={text('exitTest')}><X size={20}/></button></div>
+    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span><span>{text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:index+1,total:session.questions.length})}</span>{course==='de'&&<button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={text(starred.has(q.id)?'unstar':'star')} title={text(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={text('exitTest')}><X size={20}/></button></div>
     <progress max={session.questions.length} value={index} aria-label={text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:index+1,total:session.questions.length})}/>
     <article className="object-question panel">
      <h1 id="object-question-heading" tabIndex={-1}>{text(session.mode==='write'?(articleQuestion?'articleTask':'puzzlePrompt'):session.mode==='listen'?'listenPrompt':'questionPrompt')}</h1>{session.mode!=='listen'&&<ObjectPicture word={currentWord} language={language} concealed={!feedback}/>}
@@ -183,7 +193,8 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
     <button type="button" className="text-button vault-back-categories" disabled={busy} onClick={overview}><ArrowLeft size={18} className="vault-direction-icon"/>{text('backCategories')}</button>
     <div className="vault-config-heading"><div className="vault-config-art"><CategoryArt group={group} title={categoryName(group,language)}/></div><div><h1 id="vault-config-heading" tabIndex={-1}>{categoryName(group,language)}</h1>{selectedSubgroup&&<p className="vault-selected-subtopic">{subgroupName(selectedSubgroup,language)}</p>}<p>{text(practiceMode==='write'?'puzzleCount':'objectsCount',{n:availableCount})}</p></div></div>
     <PracticeModes labels={modeLabels} topicLabel={categoryName(group,language)} active={practiceMode} disabled={busy} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;}}/>
-    <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready} onClick={()=>void start()}>{text(practiceMode==='write'?'startPuzzles':practiceMode==='listen'?'startListening':'startTest')}<ArrowRight size={18} className="vault-direction-icon"/></button><button type="button" className="btn secondary" disabled={busy||!ready||!groupMistakes.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{text('reviewMistakes')}{groupMistakes.length>0&&<span className="object-count">{groupMistakes.length}</span>}</button></div>
+    <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready} onClick={()=>void start()}>{text(practiceMode==='write'?'startPuzzles':practiceMode==='listen'?'startListening':'startTest')}<ArrowRight size={18} className="vault-direction-icon"/></button><button type="button" className="btn secondary" disabled={busy||!ready||!marked.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{text(course==='de'?'reviewMarked':'reviewMistakes')}{marked.length>0&&<span className="object-count">{marked.length}</span>}</button></div>
+    {ready&&<p className="housing-remaining">{unsolved?text('remaining',{n:unsolved}):text('allSolved')}</p>}{course==='de'&&<p className="housing-tip">{text('starTip')}</p>}
    </section>:<section className="vault-categories" aria-labelledby="vault-heading">
     <h1 id="vault-heading" tabIndex={-1}>{text('vaultTitle')}</h1>
     <div className="vault-feature-grid">

@@ -7,13 +7,16 @@ const models=require(path.resolve('art/werkzeug/models.cjs'));const tools=requir
 function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).toString(),'RIFF');assert.equal(b.slice(8,12).toString(),'WEBP');const kind=b.slice(12,16).toString();
  if(kind==='VP8X')return [b.readUIntLE(24,3)+1,b.readUIntLE(27,3)+1];if(kind==='VP8 ')return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];throw Error(file+' '+kind);}
 
-test('every Nesne Kasası object has its own 512 px 3D picture in the same style',()=>{
+test('every Nesne Kasası object has a picture: the classic pictures and the new tool pictures',()=>{
  const ids=objects.objectVocabulary.map(word=>word.id);assert.equal(ids.length,107);
  assert.deepEqual(Object.keys(art).sort(),[...ids].sort());
  for(const id of ids){
-  const src='/objects/toon/'+(tools[id]?'tools-':'3d-')+id+'.webp';
-  assert.deepEqual(art[id],{src,width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
-  assert.deepEqual(webpSize(path.join('public',src)),[512,512],id);
+  const entry=art[id];const file=path.join('public',entry.src);assert.ok(fs.existsSync(file),id);
+  assert.deepEqual(webpSize(file),[entry.width,entry.height],id);
+  assert.ok(entry.crop.x>=0&&entry.crop.y>=0&&entry.crop.x+entry.crop.width<=entry.width+0.5&&entry.crop.y+entry.crop.height<=entry.height+0.5,id);
+  // The 15 tools use the learner's new pictures; the other objects keep the classic pictures they liked.
+  if(tools[id])assert.deepEqual(entry,{src:'/objects/toon/werkzeug-'+id+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
+  else assert.match(entry.src,/^\/objects\/toon\/(atlas-0[1-6]|moving-[a-z]+|building-[a-z]+)\.webp$/,id);
  }
 });
 

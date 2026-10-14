@@ -3,7 +3,7 @@ import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {Check,Mic,Play,RotateCcw,Smartphone,Sparkles,Square,Star,Trophy,Volume2,VolumeX,X} from 'lucide-react';
 import {wrongSoundIds,nextTapSound,type SoundId} from '@/lib/effect-sounds';
 import {chooseGermanVoice,germanSpeechPreview} from '@/lib/german-speech';
-import {DEFAULT_SITE_VOICE,voiceGreeting} from '@/lib/site-voices';
+import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGreeting} from '@/lib/site-voices';
 import {useGermanSpeech} from './study-shared';
 import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
 import {isVaultLanguage,type VaultLanguage} from '@/lib/object-vault-copy';
@@ -30,7 +30,9 @@ export default function LearningEffects() {
  const sequence=useRef(0);
  const text=(key:EffectsCopyKey)=>effectsText(language,key);
  const speech=useGermanSpeech('de');
- const deviceVoice=chooseGermanVoice(speech.voices);
+ // A device voice the learner picked earlier stays visible as the device choice.
+ const savedDevice=speech.voiceName&&!isSiteVoice(speech.voiceName)?speech.voices.find(voice=>voice.name===speech.voiceName):undefined;
+ const deviceVoice=savedDevice??chooseGermanVoice(speech.voices);
  const currentVoice=speech.voiceName||(speech.siteVoices.length?DEFAULT_SITE_VOICE:'');
  function chooseVoice(id:string,sample:string){stopAllEffects();previewStop.current?.();setPlaying(null);speech.setVoiceName(id);speech.speak(sample,false,id);setMessage('saved');}
  useEffect(()=>{

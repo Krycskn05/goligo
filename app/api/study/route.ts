@@ -1,7 +1,7 @@
 import {getRawDb} from '@/db';
 import {getChatGPTUser} from '@/app/chatgpt-auth';
 import {gradeAnswer,questionMap,modeLabels,learningTopics as topics,shuffle} from '@/lib/course';
-import {selectQuestions,type Review,type SessionQuestion} from '@/lib/study';
+import {selectQuestions,STAR_NOTE_PREFIX,type Review,type SessionQuestion} from '@/lib/study';
 
 export const dynamic='force-dynamic';
 const noCache={'Cache-Control':'no-store'};
@@ -83,7 +83,9 @@ export async function POST(request:Request){
   }
   if(body.action==='note'){
    const key=String(body.key??'');const value=typeof body.value==='string'?body.value:'';
-   if(!(key==='profile'||(key.startsWith('lesson:')&&topics.some(t=>'lesson:'+t.id===key)))||value.length>10000)return json({error:'Geçersiz çalışma kaydı.'},400);
+   const starred=key.startsWith(STAR_NOTE_PREFIX)?key.slice(STAR_NOTE_PREFIX.length):'';
+   const star=!!starred&&(questionMap.has(starred)||questionMap.has(starred+'-test'))&&(value===''||value==='1');
+   if(!(key==='profile'||star||(key.startsWith('lesson:')&&topics.some(t=>'lesson:'+t.id===key)))||value.length>10000)return json({error:'Geçersiz çalışma kaydı.'},400);
    await db.prepare('INSERT INTO study_notes (user_id,key,value,updated_at) VALUES (?,?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind(user,key,value,now).run();
    return json({saved:true});
   }

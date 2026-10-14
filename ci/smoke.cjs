@@ -78,12 +78,19 @@ async function visit(page, url, shot, errors) {
       s ? `cevaplanan ${s.answered}/${s.total}` : "oturum bulunamadi");
   }
 
+  await visit(page, "/fiiller", "06-fiiller.png", errors);
+  const verbCards = await page.locator("[data-verb-category]").count();
+  record("Fiiller sayfasinda gruplar ve devam karti var", verbCards === 6, `kart ${verbCards}`);
+
   const phone = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const p2 = await phone.newPage();
   await p2.goto(BASE + "/", { waitUntil: "networkidle", timeout: 90000 });
   await p2.waitForTimeout(1500);
   await p2.screenshot({ path: path.join(OUT, "05-telefon-ana-sayfa.png") });
   record("Telefon gorunumu acildi", true, "");
+  await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
+  await p2.waitForTimeout(1500);
+  await p2.screenshot({ path: path.join(OUT, "07-telefon-fiiller.png"), fullPage: true });
 
   await browser.close();
   fs.writeFileSync(path.join(path.dirname(OUT), "smoke-results.json"), JSON.stringify(results, null, 2));

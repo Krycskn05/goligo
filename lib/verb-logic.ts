@@ -83,7 +83,7 @@ export function praesensWrongPieces(verb:Verb){return [...(logic[verb.id].psWron
 export function auxReason(verb:Verb){return logic[verb.id].aux;}
 
 // Pictures made for the learner (ChatGPT sheets). aus|ziehen waits for a "moving out" picture.
-const pictureless=new Set(['ausziehen']);
+const pictureless=new Set<string>();
 export function verbPicture(verb:Verb){return pictureless.has(verb.id)?null:'/verbs/'+verb.id.replace('ß','ss')+'.webp';}
 export const verbsHeroPicture='/verbs/fiiller-genel.webp';
 

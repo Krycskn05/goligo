@@ -2,11 +2,14 @@
 import {SITE_NAME} from '@/lib/site-brand';
 import {SiteLogo} from './site-logo';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,ChevronRight,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,Bookmark,CheckCircle2,ChevronRight,Headphones,House,LayoutGrid,Loader2,MessageCircle,Play,RotateCcw,Sparkles,Star,Target,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbGroups,verbMeaning,perfektLabel,verbRowSpeech,inVerbTopic,type Verb} from '@/lib/verb-course';
 import {isVerbMistake,isVerbSolved,pickVerbRound,verbModePredicate,verbPool,verbPracticeMode,verbSessionMode} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
+import {verbPicture,verbsHeroPicture,sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,separablePrefixes,type VerbTense} from '@/lib/verb-logic';
+import {gameIds,type GameId} from '@/lib/verb-games';
+import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -31,6 +34,20 @@ function VerbChips({topic}:{topic:string}){
  const list=groupVerbs(topic);const sample=topic==='verbs-all'?list.filter((_,i)=>i%9===0):list.slice(0,4);
  return <div className="verb-chips" aria-hidden="true">{sample.map((verb,i)=><span key={verb.id} className={'verb-chip tone-'+(i%4)} lang="de" dir="ltr">{verb.display}</span>)}</div>;
 }
+/** Card art: the general Fiiller picture for all verbs, four verb pictures for a group. */
+function VerbCardArt({topic,title}:{topic:string;title:string}){
+ if(topic==='verbs-all')return <img className="verb-hero-picture" src={verbsHeroPicture} alt={title} width={1200} height={800} loading="lazy" decoding="async"/>;
+ const pictured=groupVerbs(topic).filter(verb=>verbPicture(verb)).slice(0,4);
+ return pictured.length===4?<div className="verb-card-collage" aria-hidden="true">{pictured.map(verb=><img key={verb.id} src={verbPicture(verb)!} alt="" width={256} height={256} loading="lazy" decoding="async"/>)}</div>:<VerbChips topic={topic}/>;
+}
+/** Wrong prefixes offered next to the right one when a separable verb is written in a sentence. */
+function prefixOptions(verb:Verb){
+ const own=verbPrefix(verb);let hash=0;for(const c of verb.id)hash=(hash*31+c.charCodeAt(0))>>>0;
+ const others=separablePrefixes.filter(item=>item!==own);const turned=[...others.slice(hash%others.length),...others.slice(0,hash%others.length)].slice(0,3);
+ return [...turned.slice(0,hash%4),own,...turned.slice(hash%4)];
+}
+const gameIcons={sentence:MessageCircle,aux:Target,build:LayoutGrid,match:Bookmark};
+const gameKeys:Record<GameId,{title:VerbCopyKey;detail:VerbCopyKey}>={sentence:{title:'gameSentence',detail:'gameSentenceDetail'},aux:{title:'gameAux',detail:'gameAuxDetail'},build:{title:'gameBuild',detail:'gameBuildDetail'},match:{title:'gameMatch',detail:'gameMatchDetail'}};
 export default function VerbStudy(){
  const [language,setLanguage]=useState<VaultLanguage>('tr');const [ready,setReady]=useState(false);
  useEffect(()=>{try{setLanguage(readVaultLanguage(localStorage));}catch{}setReady(true);},[]);
@@ -51,6 +68,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const [feedback,setFeedback]=useState<Answer|null>(null);const [selected,setSelected]=useState('');
  const [heardQuestionId,setHeardQuestionId]=useState<string|null>(null);const [starBusy,setStarBusy]=useState(false);
  const [aux,setAux]=useState<''|'hat'|'ist'>('');const [auxWarning,setAuxWarning]=useState(false);
+ const [prefix,setPrefix]=useState('');const [prefixWarning,setPrefixWarning]=useState(false);
+ const [game,setGame]=useState<GameId|null>(null);const [gameTopic,setGameTopic]=useState('verbs-all');
  const speech=useGermanSpeech('de');const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
  const mutation=useRef(false);const mounted=useRef(true);
  const pendingStart=useRef<{key:string;id:string;ids:string[]}|null>(null);
@@ -85,8 +104,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=dir;document.title=verbText(language,'verbsTitle')+' · '+SITE_NAME;stopFeedback();},[language]);
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
- function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setAux('');setAuxWarning(false);pendingAnswer.current=null;}
- function overview(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('categories');setError(null);setRequestedResume(null);void refresh();focus('vault-heading');}
+ function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setAux('');setAuxWarning(false);setPrefix('');setPrefixWarning(false);pendingAnswer.current=null;}
+ function overview(){if(mutation.current)return;stopFeedback();setSession(null);setGame(null);clearAnswer();setView('categories');setError(null);setRequestedResume(null);void refresh();focus('vault-heading');}
  function chooseCategory(id:string,mode:PracticeMode=practiceMode){if(mutation.current)return;stopFeedback();setGroup(id);setPracticeMode(mode);setView('configure');setError(null);pendingStart.current=null;focus('vault-config-heading');}
  async function start(reviewOnly=false,onlyIds?:string[]){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
@@ -157,18 +176,37 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function heading(question:Question){
   const task=question.verbTask;
-  return task==='meaning'?t('promptMeaning'):task==='word'?t('promptWord'):task==='praesens'?t('promptPraesens'):task==='perfekt'?t('promptPerfekt'):task==='write'?t('writeInfinitive'):task==='write-praesens'?t('writePraesens'):task==='write-perfekt'?t('writePerfekt'):task==='hear'?t('listenMeaning'):t('listenVerb');
+  return task==='meaning'?t('promptMeaning'):task==='word'?t('promptWord'):task==='praesens'?t('promptPraesens'):task==='perfekt'?t('promptPerfekt'):task==='write'?t('writeInfinitive'):task==='write-praesens'?t('gapPraesens'):task==='write-perfekt'?t('gapPerfekt'):task==='hear'?t('listenMeaning'):t('listenVerb');
+ }
+ /** The example sentence with gaps where the verb goes; filled in after the answer. */
+ function sentenceLine(question:Question,item:Verb){
+  const task=question.verbTask;const tense:VerbTense=task==='perfekt'||task==='write-perfekt'?'perfekt':'praesens';
+  const live=task==='write-praesens'?{verb:selected||'',prefix}:task==='write-perfekt'?{aux,participle:selected||''}:{};
+  return <p className="verb-sentence" lang="de" dir="ltr">{sentenceChunks(item,tense).map((chunk,i)=>{
+   if(chunk.role==='subject'||chunk.role==='middle')return <span key={i} className="verb-chunk">{chunk.text}</span>;
+   const value=feedback?chunk.text:(live as Record<string,string|undefined>)[chunk.role]||'';
+   return <span key={i} className={'verb-chunk gap '+chunk.role+(value?' filled':'')}>{value||'___'}</span>;
+  })}.</p>;
  }
  function promptCard(question:Question,item:Verb){
   const task=question.verbTask;
-  if(task==='word'||task==='write')return <div className="verb-card"><p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
-  const frame=task==='praesens'||task==='write-praesens'?item.subject+' ___':task==='perfekt'||task==='write-perfekt'?item.subject+' ___ ___':'';
-  return <div className="verb-card"><p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{task!=='meaning'&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}{frame&&<p className="verb-frame" lang="de" dir="ltr">{frame}</p>}</div>;
+  // The picture would give the meaning away in these tasks, so it appears with the feedback.
+  const showPicture=task!=='meaning'||!!feedback;
+  if(task==='word'||task==='write')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
+  const sentence=task==='praesens'||task==='perfekt'||task==='write-praesens'||task==='write-perfekt';
+  return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{task!=='meaning'&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}{sentence&&sentenceLine(question,item)}</div>;
+ }
+ /** Rule lines for the feedback: the tense the question was about, or two example sentences. */
+ function feedbackRules(question:Question,item:Verb){
+  const task=question.verbTask??'';
+  if(task==='praesens'||task==='write-praesens'||task==='hear-praesens')return verbRules(item,'praesens',language);
+  if(task==='perfekt'||task==='write-perfekt'||task==='hear-perfekt')return verbRules(item,'perfekt',language);
+  return [sentenceText(item,'praesens'),sentenceText(item,'perfekt')];
  }
  const modeLabels={test:v('testPractice'),write:v('writePractice'),listen:v('listenPractice'),testDetail:t('testDetail'),writeDetail:t('writeDetail'),listenDetail:t('listenDetail')};
  const counts=(topic:string)=>({test:verbPool('test',topic).length,write:verbPool('write',topic).length,listen:verbPool('listen',topic).length});
  const errorText=(key:ErrorKey)=>key==='verbLegacy'?t('legacyError'):v(key);
- function categoryCard(id:string,featured=false){const title=categoryName(id);return <article key={id} className={'vault-category-card vault-mode-card verb-category-card '+(featured?'featured':'')} data-verb-category={id}><button type="button" className="vault-category-open" disabled={busy} onClick={()=>chooseCategory(id)}><div className="vault-category-art verb-category-art"><VerbChips topic={id}/></div><div className="vault-category-label"><h3>{title}</h3><p><span lang="de" dir="ltr">{rangeLabel(id)}</span> · {t('verbsCount',{n:groupVerbs(id).length})}</p>{ready&&<ProgressMeter progress={verbProgress(id,snapshot.reviews)} language={language} label={title} compact/>}<ArrowRight size={19} className="vault-direction-icon"/></div></button><PracticeModes labels={modeLabels} topicLabel={title} compact disabled={busy} onChoose={mode=>chooseCategory(id,mode)}/></article>;}
+ function categoryCard(id:string,featured=false){const title=categoryName(id);return <article key={id} className={'vault-category-card vault-mode-card verb-category-card '+(featured?'featured':'')} data-verb-category={id}><button type="button" className="vault-category-open" disabled={busy} onClick={()=>chooseCategory(id)}><div className="vault-category-art verb-category-art"><VerbCardArt topic={id} title={title}/></div><div className="vault-category-label"><h3>{title}</h3><p><span lang="de" dir="ltr">{rangeLabel(id)}</span> · {t('verbsCount',{n:groupVerbs(id).length})}</p>{ready&&<ProgressMeter progress={verbProgress(id,snapshot.reviews)} language={language} label={title} compact/>}<ArrowRight size={19} className="vault-direction-icon"/></div></button><PracticeModes labels={modeLabels} topicLabel={title} compact disabled={busy} onChoose={mode=>chooseCategory(id,mode)}/></article>;}
  const writing=session?.mode==='write';
 
  return <div className="category-app object-app toon-app picture-quiz-app vault-app verb-app" lang={language} dir={dir}>
@@ -192,28 +230,35 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      {session.mode==='listen'&&<div className="vault-listen-player"><Headphones size={32} aria-hidden="true"/><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===q.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div><p role="status">{speech.busy?v('listenPlaying'):heardQuestionId===q.id?t('listenChoose'):t('listenFirst')}</p></div>}
      {writing?<>
       {task==='write-perfekt'&&<div className="verb-aux"><span className="verb-aux-label">{t('helperVerb')}</span><div className="article-bank" role="group" aria-label={t('helperVerb')} dir="ltr" lang="de">{(['hat','ist'] as const).map(value=>{const right=value===verb.aux||(verb.alsoIst&&value==='ist');return <button type="button" key={value} className={'article-choice verb-aux-choice '+(aux===value?'selected ':'')+(feedback?(right&&(aux===value||!feedback.correct)?'right':aux===value?'wrong':''):'')} aria-pressed={aux===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setAux(value);setAuxWarning(false);}}>{value}</button>;})}</div>{auxWarning&&!aux&&<p className="verb-aux-warning" role="alert">{t('helperMissing')}</p>}</div>}
-      <LetterPuzzle key={session.id+':'+q.id} answer={task==='write-perfekt'?verb.participle:q.answer} storageKey={'lernkoko-puzzle:'+session.id+':'+q.id} language={language} course="de" onChange={setSelected} onSubmit={answer=>{if(task==='write-perfekt'){if(!aux){setAuxWarning(true);return;}void submit(aux+' '+answer);}else void submit(answer);}} busy={actionDisabled} locked={!!feedback||!!pendingAnswer.current} result={feedback?!!feedback.correct:undefined} strictCase={q.strictCase}/>
+      {task==='write-praesens'&&verbPrefix(verb)&&<div className="verb-aux"><span className="verb-aux-label">{t('prefixChoice')}</span><div className="article-bank" role="group" aria-label={t('prefixChoice')} dir="ltr" lang="de">{prefixOptions(verb).map(value=>{const right=value===verbPrefix(verb);return <button type="button" key={value} className={'article-choice verb-aux-choice '+(prefix===value?'selected ':'')+(feedback?(right&&(prefix===value||!feedback.correct)?'right':prefix===value?'wrong':''):'')} aria-pressed={prefix===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setPrefix(value);setPrefixWarning(false);}}>{value}</button>;})}</div>{prefixWarning&&!prefix&&<p className="verb-aux-warning" role="alert">{t('prefixMissing')}</p>}</div>}
+      <LetterPuzzle key={session.id+':'+q.id} answer={task==='write-perfekt'?verb.participle:task==='write-praesens'?praesensStem(verb):task==='write'?verb.display:q.answer} storageKey={'lernkoko-puzzle:'+session.id+':'+q.id} language={language} course="de" onChange={setSelected} onSubmit={answer=>{
+       if(task==='write-perfekt'){if(!aux){setAuxWarning(true);return;}void submit(aux+' '+answer);}
+       else if(task==='write-praesens'&&verbPrefix(verb)){if(!prefix){setPrefixWarning(true);return;}void submit(answer+' '+prefix);}
+       else void submit(answer.replace('|',''));
+      }} busy={actionDisabled} locked={!!feedback||!!pendingAnswer.current} result={feedback?!!feedback.correct:undefined} strictCase={q.strictCase}/>
      </>:<div className={'object-options picture-word-options verb-options'+(session.mode==='listen'?' verb-listen-options':'')} role="group" aria-labelledby="object-question-heading">{options.map((option,i)=><button key={option} type="button" className={'object-option '+(feedback&&option===q.answer?'right ':'')+(feedback&&!feedback.correct&&feedback.answer===option?'wrong ':'')+(!feedback&&selected===option?'selected':'')} disabled={!!feedback||actionDisabled||!!pendingAnswer.current||(session.mode==='listen'&&heardQuestionId!==q.id)} onClick={()=>void submit(option)}><span className="object-option-number">{String.fromCharCode(65+i)}</span>{optionLabel(q,option)}{feedback&&option===q.answer&&<CheckCircle2 size={20}/>}</button>)}</div>}
      {busy&&!feedback&&<p className="picture-quiz-saving" role="status"><Loader2 size={16} className="spinner"/>{v('savingAnswer')}</p>}
      {feedback&&<div id="object-feedback" tabIndex={-1} className={'object-feedback '+(feedback.correct?'success':'retry')} role="status" aria-live="polite">
       <h2>{feedback.correct?<CheckCircle2 size={23}/>:<X size={23}/>} {v(feedback.correct?'correct':writing?'wrongAnswer':'wrong')}</h2>
       <p>{v('correctAnswer')}: <strong lang="de" dir="ltr">{correctLabel(q,verb)}</strong></p>
       {writing&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
-      <p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb)}</p>
+      <div className="verb-feedback-main">{session.mode==='listen'&&<VerbPicture verb={verb} language={language} small/>}<p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb)}</p></div>
+      <RuleBox lines={feedbackRules(q,verb)} language={language}/>
       {verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
       <button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{v('repeatAudio')}</button>
       <button type="button" className="btn object-next" disabled={busy} onClick={next}>{v(index+1===session.questions.length?'viewResults':writing?'nextPuzzle':session.mode==='listen'?'nextListening':'nextQuestion')}<ArrowRight size={18} className="vault-direction-icon"/></button>
      </div>}
     </article>
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{v('categories')}</button></p>:
+   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus('vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy}}/>:
    view==='configure'?<section className="vault-config panel verb-config">
     <button type="button" className="text-button vault-back-categories" disabled={busy} onClick={overview}><ArrowLeft size={18} className="vault-direction-icon"/>{v('backCategories')}</button>
-    <div className="vault-config-heading"><div className="vault-config-art verb-category-art"><VerbChips topic={group}/></div><div><h1 id="vault-config-heading" tabIndex={-1}>{categoryName(group)}</h1><p><span lang="de" dir="ltr">{rangeLabel(group)}</span> · {t('verbsCount',{n:groupVerbs(group).length})}</p><p>{v('practiceCount',{n:scopedQuestions.length})}</p></div></div>
+    <div className="vault-config-heading"><div className="vault-config-art verb-category-art"><VerbCardArt topic={group} title={categoryName(group)}/></div><div><h1 id="vault-config-heading" tabIndex={-1}>{categoryName(group)}</h1><p><span lang="de" dir="ltr">{rangeLabel(group)}</span> · {t('verbsCount',{n:groupVerbs(group).length})}</p><p>{v('practiceCount',{n:scopedQuestions.length})}</p></div></div>
     <PracticeModes labels={modeLabels} topicLabel={categoryName(group)} active={practiceMode} counts={counts(group)} disabled={busy} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;}}/>
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready} onClick={()=>void start()}>{v(practiceMode==='write'?'startPuzzles':practiceMode==='listen'?'startListening':'startTest')}<ArrowRight size={18} className="vault-direction-icon"/></button><button type="button" className="btn secondary" disabled={busy||!ready||!marked.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{v('reviewMarked')}{marked.length>0&&<span className="object-count">{marked.length}</span>}</button></div>
     {ready&&<p className="housing-remaining">{unsolved?v('remaining',{n:unsolved}):v('allSolved')}</p>}<p className="housing-tip">{v('starTip')}</p>
     <details className="verb-list" open><summary>{t('verbList')} · {groupVerbs(group).length}</summary>
-     <ol className="verb-list-rows">{groupVerbs(group).map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr">{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
+     <ol className="verb-list-rows">{groupVerbs(group).map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr">{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
     </details>
    </section>:<section className="vault-categories verb-categories" aria-labelledby="vault-heading">
     <h1 id="vault-heading" tabIndex={-1}>{t('verbsTitle')}</h1>
@@ -223,6 +268,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      <article className={'vault-category-card vault-mode-card featured resume '+(busy||!ready||!resumeId?'unavailable':'')} data-verb-category="resume"><button type="button" className="vault-category-open" disabled={busy||!ready||!resumeId} onClick={()=>{if(resumeId)void resume(resumeId);}}><div className="vault-category-art verb-resume-art"><RotateCcw size={58} aria-hidden="true"/></div><div className="vault-category-label"><h3>{v('resume')}</h3>{initializing?<p>{v('loading')}</p>:resumeSummary?<p>{v('progress',{n:resumeSummary.answered,total:resumeSummary.total})}</p>:<p>{v('noSavedTest')}</p>}<ArrowRight size={22} className="vault-direction-icon"/></div></button><div className="vault-resume-controls"><button type="button" className="btn secondary vault-resume-action" disabled={busy||!ready||!resumeId} onClick={()=>{if(resumeId)void resume(resumeId);}}><RotateCcw size={18}/>{v('resume')}<ArrowRight size={18} className="vault-direction-icon"/></button></div></article>
     </div>
     <h2 className="vault-category-section-title">{v('categories')}</h2><div className="vault-category-grid">{verbGroups.map(item=>categoryCard(item.id))}</div>
+    <h2 className="vault-category-section-title verb-games-title"><Sparkles size={22} aria-hidden="true"/>{t('gamesTitle')}</h2><p className="verbs-lead">{t('gamesLead')}</p>
+    <div className="verb-game-grid">{gameIds.map(id=>{const Icon=gameIcons[id];return <button type="button" key={id} className={'verb-game-card '+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><span className="verb-game-icon"><Icon size={26} aria-hidden="true"/></span><strong>{t(gameKeys[id].title)}</strong><small>{t(gameKeys[id].detail)}</small><span className="verb-game-play"><Play size={16} aria-hidden="true"/>{t('play')}</span></button>;})}</div>
    </section>}
   </main><SiteFooter/>
  </div>;

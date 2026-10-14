@@ -121,7 +121,7 @@ test('rounds follow the chosen group and mode, solved questions wait and the sam
 
 test('every text of the page exists in all twelve languages',()=>{
  for(const key of Object.keys(copy.verbCopy))for(const language of languages){
-  const text=copy.verbText(language,key,{n:7,verb:'ab|fahren'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
+  const text=copy.verbText(language,key,{n:7,verb:'ab|fahren',total:9,t:'Präsens'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
  }
  assert.equal(copy.verbText('tr','groupTitle',{n:2}),'2. grup');
 });
@@ -167,4 +167,49 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  const texts=new Set(JSON.parse(execFileSync(process.execPath,['scripts/voices/list-texts.cjs'],{encoding:'utf8',env:{...process.env,STUDY_CHECK_DIR:compiled}})));
  for(const q of verbs.verbQuestions){assert.ok(texts.has(q.answer),q.id);if(q.audio)assert.ok(texts.has(q.audio),q.id);}
  for(const verb of verbs.verbs)assert.ok(texts.has(verbs.verbRowSpeech(verb)),verb.id);
+});
+
+test('sentences, form pieces and rules explain every verb',()=>{
+ const logic=load('verb-logic');const games=load('verb-games');
+ for(const verb of verbs.verbs){
+  assert.equal(logic.participlePieces(verb).join(''),verb.participle,verb.id);
+  const ps=logic.praesensPieces(verb);if(ps)assert.equal(ps.join(''),logic.praesensStem(verb),verb.id);
+  for(const piece of [...logic.participleWrongPieces(verb),...logic.praesensWrongPieces(verb)])assert.ok(piece.length>0,verb.id);
+  for(const tense of ['praesens','perfekt']){
+   const chunks=logic.sentenceChunks(verb,tense);const text=logic.sentenceText(verb,tense);
+   assert.ok(/^[A-ZÄÖÜ„]/.test(text)&&text.endsWith('.'),verb.id+' '+text);
+   if(tense==='praesens'){assert.ok(text.includes(' '+logic.praesensStem(verb)+' '),text);assert.equal(chunks[1].role,'verb',text);if(logic.verbPrefix(verb))assert.equal(chunks.at(-1).text,logic.verbPrefix(verb),text);}
+   else{assert.equal(chunks[1].text,verb.aux,text);assert.equal(chunks.at(-1).text,verb.participle,text);}
+   // the tempting wrong part is never part of the right sentence
+   assert.ok(!chunks.some(chunk=>chunk.text===logic.sentenceDistractor(verb,tense)),verb.id+' '+tense);
+   for(const language of languages)for(const line of logic.verbRules(verb,tense,language))assert.ok(line.trim()&&!/\{[a-z]+\}/.test(line),verb.id+' '+language+' '+line);
+  }
+ }
+ assert.equal(logic.sentenceText(verbs.verbMap.get('abfahren'),'praesens'),'Der Zug fährt um acht Uhr ab.');
+ assert.equal(logic.sentenceText(verbs.verbMap.get('abfahren'),'perfekt'),'Der Zug ist pünktlich abgefahren.');
+ assert.equal(logic.sentenceText(verbs.verbMap.get('leidtun'),'praesens'),'Es tut mir leid.');
+ assert.equal(logic.auxReason(verbs.verbMap.get('bleiben')),'bleiben');
+ assert.equal(logic.verbPicture(verbs.verbMap.get('ausziehen')),'/verbs/ausziehen.webp');
+ for(const verb of verbs.verbs)assert.ok(logic.verbPicture(verb),verb.id);
+ for(const verb of verbs.verbs){const src=logic.verbPicture(verb);if(src)assert.ok(fs.existsSync(path.join('public',src)),src);}
+ assert.ok(fs.existsSync(path.join('public',logic.verbsHeroPicture)));
+ let seed=1;const random=()=>((seed=(seed*16807)%2147483647)/2147483647);
+ for(const topic of ['verbs-all','verbs-4']){
+  const s=games.sentenceRound(topic,10,random);assert.equal(s.length,topic==='verbs-all'?10:8);
+  for(const task of s){assert.equal(task.tiles.length,task.chunks.length+1);assert.ok(games.sentenceCorrect(task,task.chunks.map(c=>c.text)));assert.ok(!games.sentenceCorrect(task,[...task.chunks.map(c=>c.text)].reverse()));}
+  const b=games.buildRound(topic,10,random);assert.equal(b.length,10);
+  for(const task of b){assert.ok(games.buildCorrect(task,task.pieces));assert.ok(task.tiles.length>task.pieces.length);}
+  for(const kind of games.matchKinds(topic)){const cards=games.matchRound(topic,kind,'tr',6,random);assert.equal(cards.length,12);assert.equal(new Set(cards.map(c=>c.pair)).size,6);}
+ }
+ const liegen=verbs.verbMap.get('liegen');assert.ok(games.auxCorrect(liegen,'hat')&&games.auxCorrect(liegen,'ist'));
+ assert.ok(!games.auxCorrect(verbs.verbMap.get('fahren'),'hat'));
+});
+
+test('the writing puzzles use sentences, the prefix choice and the | mark of separable verbs',()=>{
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert.ok(page.includes("task==='write'?verb.display"),'separable verbs are written with the | mark');
+ assert.ok(page.includes("answer.replace('|','')"),'the | mark is not part of the saved answer');
+ assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+' '+prefix)"));
+ assert.ok(page.includes('<VerbGame ')&&page.includes('gameIds.map'));
+ const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
 });

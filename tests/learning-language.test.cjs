@@ -38,7 +38,8 @@ test('both catalogues keep twenty units; only the requested German housing chapt
 test('English picture and writing pools preserve categories and four test lengths',()=>{
  const all=objects.pickEnglishObjectQuiz('all','all',[]);
  const count=course.questions.filter(q=>q.id.startsWith('obj-picture-')).length;assert.equal(all.length,count);assert.equal(objects.englishObjectWritingPool().length,count*2);
- for(const count of [5,10,20,'all']){const q=objects.pickEnglishObjectQuiz('objects-house',count,[]);assert.equal(q.length,count==='all'?20:count);assert(q.every(item=>item.topic==='en-objects-house'));}
+ const houseCount=course.questions.filter(q=>q.id.startsWith('obj-picture-')&&q.topic==='objects-house').length;assert.equal(houseCount,23);
+ for(const count of [5,10,20,'all']){const q=objects.pickEnglishObjectQuiz('objects-house',count,[]);assert.equal(q.length,count==='all'?houseCount:count);assert(q.every(item=>item.topic==='en-objects-house'));}
  assert(all.every(q=>q.id.startsWith('en-obj-picture-')&&q.options.length===4));
  const first=all[0];const reviews=[{question_id:first.id,wrong_count:1,streak:0,seen:1,due_at:0}];
  assert.deepEqual(objects.pickEnglishObjectQuiz('all','all',reviews,true).map(q=>q.id),[first.id]);

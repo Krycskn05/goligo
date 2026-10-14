@@ -2,6 +2,7 @@ import {matchesPracticeMode,writingFamily} from './writing-practice';
 import {curriculumTopicIds,courseUnitForTopic} from './course-levels';
 import {questions,topics,shuffle,type Question} from './course';
 import {englishQuestions,englishTopics,englishUnitContains} from './english-course';
+import {verbQuestions,isVerbTopic,inVerbTopic,spreadVerbRound} from './verb-course';
 import {type LearningLanguage} from './learning-language';
 import type {StudyStats} from './progress';
 /** Stars the learner puts on questions are kept as study notes: star:<question id> = '1'. */
@@ -15,10 +16,20 @@ export type Answer={id:string;question_id:string;answer:string;correct:number;cr
 export type SessionQuestion={id:string;options?:string[]};
 export type Session={id:string;mode:string;topic:string;questions:SessionQuestion[];created_at:number;finished_at:number|null;answers:Answer[]};
 export type SessionSummary={id:string;mode:string;topic:string;created_at:number;finished_at:number|null;total:number;answered:number;correct:number};
-export type Snapshot={reviews:Review[];notes:Record<string,string>;sessions:SessionSummary[];activePictureSessionId?:string|null;stats?:StudyStats};
+export type Snapshot={reviews:Review[];notes:Record<string,string>;sessions:SessionSummary[];activePictureSessionId?:string|null;activeVerbSessionId?:string|null;stats?:StudyStats};
 export function selectQuestions(mode:string,topic:string,count:number,reviews:Review[],onlyIds?:string[],course:LearningLanguage=topic.startsWith('en-')?'en':'de'):Question[]{
  const byId=new Map(reviews.map(r=>[r.question_id,r]));const only=onlyIds?new Set(onlyIds):null;const curriculum=curriculumTopicIds(topic);
  const source=course==='en'?englishQuestions:questions;const sourceTopics=course==='en'?englishTopics:topics;
+ const rank=(q:Question)=>{const r=byId.get(q.id);if(!r)return 100;if(r.wrong_count&&r.streak<3)return 200+r.wrong_count*5-r.streak*5;if(r.due_at<=Date.now())return 80;return 20-r.seen;};
+ // Fiiller rounds: open mistakes first, then new and due questions; never the same verb twice in a row.
+ if(isVerbTopic(topic)){
+  let verbPool=verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&(!only||only.has(q.id)));
+  if(mode==='review')verbPool=verbPool.filter(q=>{const r=byId.get(q.id);return r&&r.wrong_count>0&&r.streak<3;});
+  else if(mode==='test'||mode==='write')verbPool=verbPool.filter(q=>matchesPracticeMode(q,mode));
+  else if(mode==='listen')verbPool=verbPool.filter(q=>!!q.audio);
+  else if(mode!=='mixed')verbPool=verbPool.filter(q=>q.kind===mode);
+  return spreadVerbRound(shuffle(verbPool).sort((a,b)=>rank(b)-rank(a))).slice(0,count);
+ }
  let pool=source.filter(q=>(topic==='all'||q.topic===topic||(course==='en'?englishUnitContains(q.topic,topic):!!curriculum?.includes(q.topic)||(topic==='objects-all'&&q.topic.startsWith('objects-'))||(topic.startsWith('unit-')&&(topics.find(t=>t.id===q.topic)?.unit??1)===Number(topic.slice(5)))))&&(!only||only.has(q.id)));
  if(mode==='review')pool=pool.filter(q=>{const r=byId.get(q.id);return r&&r.wrong_count>0&&r.streak<3;});
  else if(mode==='test'||mode==='write')pool=pool.filter(q=>matchesPracticeMode(q,mode));
@@ -27,7 +38,6 @@ export function selectQuestions(mode:string,topic:string,count:number,reviews:Re
  else if(mode==='sentence')pool=pool.filter(q=>q.practice==='sentence');
  else if(mode==='visual')pool=pool.filter(q=>!!q.image);
  else if(mode!=='mixed')pool=pool.filter(q=>q.kind===mode);
- const rank=(q:Question)=>{const r=byId.get(q.id);if(!r)return 100;if(r.wrong_count&&r.streak<3)return 200+r.wrong_count*5-r.streak*5;if(r.due_at<=Date.now())return 80;return 20-r.seen;};
  pool=shuffle(pool).sort((a,b)=>rank(b)-rank(a));
  const result:Question[]=[];const used=new Set<string>();
  const take=(q:Question)=>{if(!used.has(q.id)&&result.length<count){result.push(q);used.add(q.id);}};

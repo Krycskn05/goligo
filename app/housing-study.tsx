@@ -1,14 +1,14 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,House,Loader2,RotateCcw,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
-import {housingSections,housingRules,housingQuestionMap,housingPool,housingMeaning,pickHousingQuestions,type HousingSection} from '@/lib/housing-course';
+import {housingSections,housingRules,housingQuestionMap,housingPool,housingMeaning,pickHousingQuestions,housingBaseId,isHousingMistake,isHousingSolved,type HousingSection} from '@/lib/housing-course';
 import {trapReasons} from '@/lib/housing-traps';
 import {housingText,type HousingCopyKey} from '@/lib/housing-copy';
 import {gradeAnswer} from '@/lib/course';
 import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib/study-languages';
 import {vaultText,type VaultCopyKey} from '@/lib/object-vault-copy';
-import type {Session,Snapshot,Answer} from '@/lib/study';
+import {starNoteKey,starredQuestionIds,type Session,type Snapshot,type Answer} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {LetterPuzzle} from './letter-puzzle';
 import {TopicArt,RasterArt} from './toon-art';
@@ -47,7 +47,11 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
  const name=info?info.id.toUpperCase()+' · '+translate(info.title,language):h('all');
  const available=housingPool(section,mode,step).length;
  const relevantIds=new Set(housingPool(section,mode,step).map(item=>item.id));
- const mistakes=snapshot.reviews.filter(row=>relevantIds.has(row.question_id)&&row.wrong_count>0&&row.streak<3);
+ // Review = mistakes plus starred questions; a normal round skips what is already solved.
+ const starred=starredQuestionIds(snapshot.notes);const reviewRows=new Map(snapshot.reviews.map(row=>[row.question_id,row]));
+ const marked=[...relevantIds].filter(id=>isHousingMistake(reviewRows.get(id))||starred.has(housingBaseId(id)));
+ const unsolved=[...relevantIds].filter(id=>!isHousingSolved(reviewRows.get(id))).length;
+ const [starBusy,setStarBusy]=useState(false);
  const saved=snapshot.sessions.find(item=>(item.topic==='book-11'||housingSections.some(s=>s.topic===item.topic))&&(item.mode==='write'||item.mode==='test')&&!item.finished_at);
  const resumeId=requestedResume??saved?.id;
  const resultSection=session?housingSections.find(item=>item.topic===session.topic):undefined;
@@ -65,11 +69,18 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
  async function start(reviewOnly=false,onlyIds?:string[]){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stop();
   const key=JSON.stringify([section,step,mode,count,reviewOnly,onlyIds??null]);
-  if(pendingStart.current?.key!==key){const picked=pickHousingQuestions(section,mode,count,snapshot.reviews,step,reviewOnly,onlyIds);pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(item=>item.id),topic:info?.topic??'book-11',reviewOnly,onlyIds};}
+  if(pendingStart.current?.key!==key){const picked=pickHousingQuestions(section,mode,count,snapshot.reviews,step,reviewOnly,onlyIds,starred);pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(item=>item.id),topic:info?.topic??'book-11',reviewOnly,onlyIds};}
   const request=pendingStart.current;
   if(!request.ids.length){setError('empty');mutation.current=false;setBusy(false);return;}
   try{const data=await api<{session:Session}>({action:'start',course:'de',id:request.id,mode,topic:request.topic,count:request.ids.length,onlyIds:request.ids});if(!mounted.current)return;setSession(data.session);setIndex(data.session.answers.length);setFeedback(null);setSelected('');pendingAnswer.current=null;pendingStart.current=null;setRequestedResume(null);focus();}
   catch(reason){fail(reason);}finally{mutation.current=false;if(mounted.current)setBusy(false);}
+ }
+ async function toggleStar(id:string){
+  if(starBusy)return;const key=starNoteKey(housingBaseId(id));const value=snapshot.notes[key]==='1'?'':'1';
+  setStarBusy(true);setSnapshot(previous=>({...previous,notes:{...previous.notes,[key]:value}}));
+  try{await api({action:'note',key,value});}
+  catch(reason){if(mounted.current){setSnapshot(previous=>({...previous,notes:{...previous.notes,[key]:value?'':'1'}}));fail(reason);}}
+  finally{if(mounted.current)setStarBusy(false);}
  }
  async function resume(id:string){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stop();
@@ -100,7 +111,7 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
    {error&&<div className="object-alert" role="alert"><p>{signIn?v('signInError'):h(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{if(pendingAnswer.current)void submit(pendingAnswer.current.answer);else if(pendingStart.current)void start(pendingStart.current.reviewOnly,pendingStart.current.onlyIds);else void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}
    {session?finished?<section className="object-results panel"><h1 id="housing-heading" tabIndex={-1}>{h('completed')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p><RoundReward answers={session.answers} progress={ready?housingProgress(resultSection?.id??'all',snapshot.reviews):null} language={language} label={resultSection?resultSection.id.toUpperCase()+' · '+translate(resultSection.title,language):h('all')}/><div className="object-actions"><button type="button" className="btn" disabled={busy||!session.answers.some(a=>!a.correct)} onClick={()=>void start(false,session.answers.filter(a=>!a.correct).map(a=>a.question_id))}><RotateCcw size={18}/>{v('reviewRoundMistakes')}</button><button type="button" className="btn secondary" onClick={overview}>{v('categories')}</button></div>{session.answers.filter(a=>!a.correct).map(answer=>{const item=housingQuestionMap.get(answer.question_id);return item?<article className="housing-result" key={answer.id}><p lang="de" dir="ltr"><strong>{item.resultDe}</strong></p><p>{housingMeaning(item,language)}</p><p><small>{v('yourAnswer')}: <span lang="de" dir="ltr">{answer.answer}</span></small></p></article>:null;})}</section>:q?<section className="object-practice housing-practice">
-    <div className="object-practice-top"><span className="object-pill">{q.section.toUpperCase()} · {v(session.mode==='write'?'writePractice':'testPractice')}</span><span>{h('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className="object-exit" aria-label={v('exitTest')} disabled={busy} onClick={overview}><X size={20}/></button></div>
+    <div className="object-practice-top"><span className="object-pill">{q.section.toUpperCase()} · {v(session.mode==='write'?'writePractice':'testPractice')}</span><span>{h('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className={'housing-star'+(starred.has(housingBaseId(q.id))?' active':'')} aria-pressed={starred.has(housingBaseId(q.id))} aria-label={h(starred.has(housingBaseId(q.id))?'unstar':'star')} title={h(starred.has(housingBaseId(q.id))?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(housingBaseId(q.id))?'currentColor':'none'}/></button><button type="button" className="object-exit" aria-label={v('exitTest')} disabled={busy} onClick={overview}><X size={20}/></button></div>
     <progress max={session.questions.length} value={index} aria-label={h('progress',{n:index+1,total:session.questions.length})}/>
     <article className="object-question panel">
      <h1 id="housing-heading" tabIndex={-1}>{session.mode==='test'?v('testDetail'):h(q.gap?'gap':q.writingTask==='word'?'word':'sentence')}</h1>
@@ -118,7 +129,7 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
    </section>:<p role="alert">{h('invalid')} <button className="text-button" onClick={overview}>{v('categories')}</button></p>:view==='lesson'?<HousingLessonNotes section={lessonSection} language={language} onBack={overview} onContinue={afterLesson} onSpeak={text=>speech.speak(text)} speaking={speech.busy} hasNext={section==='all'&&lessonSection!=='d'}/>:view==='configure'?<section className="vault-config panel">
     <button type="button" className="text-button vault-back-categories" onClick={overview}><ArrowLeft size={18}/>{v('backCategories')}</button><div className="housing-config-heading"><div><span className="eyebrow">A1.2 · 11</span><h1 id="housing-heading" tabIndex={-1}>{name}</h1>{info&&<p lang="de" dir="ltr">{info.de}</p>}<p>{h('exercises',{n:available})}</p></div>{info&&<div className="housing-config-art"><RasterArt art={housingSceneArt[housingSectionScene[info.id]]} title={translate(info.title,language)}/></div>}</div>
     <PracticeModes labels={modeLabels} active={mode} counts={{test:housingPool(section,'test',step).length,write:housingPool(section,'write',step).length}} disabled={busy} onChoose={value=>{if(value==='listen')return;stop();setMode(value);pendingStart.current=null;}}/>
-    <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!available} onClick={()=>void start()}>{h('start')}<ArrowRight size={18}/></button><button type="button" className="btn secondary" disabled={busy||!ready||!mistakes.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{v('reviewMistakes')} {mistakes.length||''}</button></div><p className="housing-tip">{h('tip')}</p>
+    <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!available} onClick={()=>void start()}>{h('start')}<ArrowRight size={18}/></button><button type="button" className="btn secondary" disabled={busy||!ready||!marked.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{h('reviewMarked')} {marked.length||''}</button></div>{ready&&<p className="housing-remaining">{unsolved?h('remaining',{n:unsolved}):h('allSolved')}</p>}<p className="housing-tip">{h('tip')}</p>
    </section>:<section aria-labelledby="housing-heading">
     <div className="toon-hero housing-hero"><div><span className="eyebrow">A1.2 · 11 · Wohnen</span><h1 id="housing-heading" tabIndex={-1}>{h('title')}</h1></div><div className="toon-hero-art"><TopicArt id="book-11" title={h('title')}/></div></div>
     <div className="housing-feature-grid"><button type="button" className="housing-feature panel" disabled={busy} onClick={()=>choose('all')}><span className="housing-letter">A–D</span><div><h2>{h('all')}</h2><p>{h('exercises',{n:housingPool('all','write').length})}</p>{ready&&<ProgressMeter progress={housingProgress('all',snapshot.reviews)} language={language} label={h('all')} compact/>}</div><ArrowRight size={20}/></button><button type="button" className="housing-feature panel" disabled={busy||!ready||!resumeId} onClick={()=>{if(resumeId)void resume(resumeId);}}><RotateCcw size={24}/><div><h2>{v('resume')}</h2><p>{saved?h('progress',{n:saved.answered,total:saved.total}):!ready?v('loading'):v('noSavedTest')}</p></div><ArrowRight size={20}/></button></div>

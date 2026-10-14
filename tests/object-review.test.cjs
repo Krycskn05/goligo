@@ -69,3 +69,12 @@ test('the Nesne Kasası page shows the star, the combined review button and the 
  assert.match(copy.vaultText('tr','remaining',{n:7}),/^7 /);
  assert.equal(copy.vaultText('tr','reviewMarked'),'Yanlışları ve yıldızlıları tekrar et');
 });
+
+test('Nesne Kasası has no separate voice panel; voice and speed live in the top settings button on every page',()=>{
+ const vault=fs.readFileSync('app/object-study.tsx','utf8');
+ assert(!vault.includes('GermanSpeechSettings')&&!vault.includes('vault-speech-settings'),'the in-page Ses ve dinleme panel is gone');
+ assert(!fs.existsSync('app/german-speech-settings.tsx'));
+ for(const file of ['app/object-study.tsx','app/housing-study.tsx','app/category-study.tsx'])assert(fs.readFileSync(file,'utf8').includes('<EffectsSettingsButton'),file);
+ const dialog=fs.readFileSync('app/learning-effects.tsx','utf8');
+ assert(dialog.includes('speech.setVoiceName(id)')&&dialog.includes('speech.setRate(value)')&&dialog.includes('germanSpeechPreview'),'the top dialog chooses the voice, the speed and plays a sample');
+});

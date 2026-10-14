@@ -48,6 +48,7 @@
 .progress-goal.done .progress-ring { color:#ec9414; }
 .progress-goal.done .progress-ring-fill { stroke:#ec9414; }
 .progress-topics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px; }
+.progress-topics.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .progress-topic { display:block; padding:14px 16px; border-radius:18px; background:#fffefa; border:1px solid #e5e8dc; color:inherit; text-decoration:none; transition:transform .18s,box-shadow .18s; }
 .progress-topic:hover { transform:translateY(-2px); box-shadow:0 5px 0 #e3e8d7; }
 .progress-topic:focus-visible { outline:3px solid #31878b; outline-offset:3px; }
@@ -71,7 +72,7 @@
 @media (max-width:760px) {
  .progress-summary { padding:18px 16px; border-radius:20px; }
  .progress-summary h2 { font-size:19px; }
- .progress-stats,.progress-topics { grid-template-columns:1fr; }
+ .progress-stats,.progress-topics,.progress-topics.three { grid-template-columns:1fr; }
 }
 @media (prefers-reduced-motion:reduce) {
  .progress-tried,.progress-fill,.progress-ring-fill { transition:none; }

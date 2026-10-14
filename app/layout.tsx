@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME } from "@/lib/site-brand";
 import "./globals.css";
 import "./learning-effects.css";
+import "./progress.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

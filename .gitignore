@@ -44,3 +44,10 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+
+# generated sounds and site voices (see scripts/sounds and scripts/voices)
+/public/sfx/
+/public/voices/
+/.voices/
+/.voices-log/
+/.voice-texts.json

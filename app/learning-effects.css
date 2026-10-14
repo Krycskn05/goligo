@@ -31,3 +31,31 @@ html[data-lernkoko-motion=full] .object-options .object-option.right{animation:l
 html[data-lernkoko-motion=reduced] .toon-app *,html[data-lernkoko-motion=reduced] .lk-effects-button,html[data-lernkoko-motion=reduced] .lk-effects-dialog{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 html[data-lernkoko-motion=reduced] .toon-topic-card:hover,html[data-lernkoko-motion=reduced] .toon-topic-card:hover .toon-topic-art .toon-art,html[data-lernkoko-motion=reduced] .lk-effects-button:hover{transform:none}
 @media(prefers-reduced-motion:reduce){.lk-reaction-layer{display:none}.lk-effects-dialog,.lk-effects-button,.lk-tap-pop{animation:none!important;transition:none!important}}
+/* Konuşan ses seçimi ve Pixar tadında zıplama */
+.lk-voice-section{padding:2px 0 16px;margin-bottom:16px;border-bottom:1px solid #e0e9d9}
+.lk-voice-section h3,.lk-effects-subtitle{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:15px;color:#2f5a4f}
+.lk-effects-subtitle{margin-bottom:12px}
+.lk-voice-section h3 svg,.lk-effects-subtitle svg{color:#d58a1c;flex-shrink:0}
+.lk-voice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:10px 0 12px}
+.lk-voice-chip{display:flex;align-items:center;gap:9px;min-height:52px;padding:7px 9px;border:1px solid #dbe5d4;border-radius:14px;background:#fffefa;color:inherit;font:inherit;text-align:start;cursor:pointer;box-shadow:0 3px 0 #e4ebdc;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,background .18s}
+.lk-voice-chip:hover{transform:translateY(-2px);box-shadow:0 5px 0 #dfe7d6}
+.lk-voice-chip:active{transform:translateY(1px) scale(.98);box-shadow:0 1px 0 #dfe7d6}
+.lk-voice-chip.selected{background:#eaf5ee;border-color:#9fcab0;box-shadow:0 3px 0 #b9d8c4}
+.lk-voice-chip strong{display:block;font-size:13px;line-height:1.25}
+.lk-voice-chip small{display:block;font-size:11px;color:#6b7f74;overflow-wrap:anywhere}
+.lk-voice-avatar{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;border-radius:50%;font-weight:800;font-size:14px;color:#fff;background:#6aa58c}
+.lk-voice-chip.female .lk-voice-avatar{background:linear-gradient(135deg,#f2a3b3,#e07a8e)}
+.lk-voice-chip.male .lk-voice-avatar{background:linear-gradient(135deg,#8cc0e6,#5b93c9)}
+.lk-voice-chip.device .lk-voice-avatar{background:#9aa79f}
+.lk-voice-chip.selected .lk-voice-avatar{animation:lk-voice-wiggle .5s cubic-bezier(.34,1.56,.64,1)}
+.lk-voice-speed{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px}
+.lk-voice-speed>span{margin-inline-end:4px}
+.lk-voice-speed button{min-height:38px;padding:6px 12px;border:1px solid #d6e2d0;border-radius:999px;background:#fffefa;color:#3f6a5c;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.lk-voice-speed button.active{background:#39847a;border-color:#39847a;color:#fff}
+.lk-voice-preview{margin-top:6px}
+@keyframes lk-voice-wiggle{0%{transform:scale(1)}35%{transform:scale(1.18,.86)}60%{transform:scale(.92,1.1)}80%{transform:scale(1.04,.97)}100%{transform:scale(1)}}
+/* Squash and stretch on taps: a little anticipation, a bounce and a settle. */
+.lk-tap-pop{animation:lk-tap-squash .42s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes lk-tap-squash{0%{scale:1}22%{scale:1.05 .9}48%{scale:.96 1.05}70%{scale:1.02 .98}100%{scale:1}}
+@media (prefers-reduced-motion:reduce){.lk-voice-chip,.lk-voice-chip.selected .lk-voice-avatar,.lk-tap-pop{animation:none!important;transition:none!important}}
+html[data-lernkoko-motion=reduced] .lk-voice-chip.selected .lk-voice-avatar{animation:none}

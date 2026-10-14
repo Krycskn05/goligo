@@ -10,6 +10,7 @@ const practice=load('object-practice'),articles=load('article-challenges'),speec
 const texts=new Set();
 const add=value=>{const text=voices.normalizeSpeechText(String(value??''));if(text)texts.add(text);};
 add(speech.germanSpeechPreview);
+for(const voice of voices.siteVoices)add(voices.voiceGreeting(voice));
 for(const q of housing.housingQuestions){if(q.kind==='write'||q.options){add(q.answer);if(q.passage)add(q.passage);}}
 for(const lesson of Object.values(lessons.housingLessons)){
  for(const example of lesson.examples)add(example.de);

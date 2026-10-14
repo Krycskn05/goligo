@@ -16,7 +16,7 @@ test('every section gets a solid set of trick questions with an explanation in e
   for(const language of languages)assert(translate(text,language)?.trim(),key+' '+language);
  }
  for(const passage of Object.values(traps.trapPassages)){assert(passage.de.length>100);for(const language of languages.filter(l=>l!=='de'))assert(translate(passage.meaning,language).trim());}
- for(const key of ['setLabel','setAll','setTrap','trapHint','trapWhy'])for(const language of languages)assert(copy.housingText(language,key,{n:3}).trim(),key+' '+language);
+ for(const language of languages)assert(copy.housingText(language,'trapWhy').trim(),'trapWhy '+language);
 });
 
 test('existing exercise IDs stay untouched and the new ones only add to the catalogue',()=>{
@@ -57,16 +57,18 @@ test('writing traps can be solved with the letter puzzle and respect capital let
  assert(letter.wordBank.every(word=>word===word.toLocaleLowerCase('de')),'the learner restores the capitals');
 });
 
-test('the study API and the trick-question filter pick only trap exercises',()=>{
+test('trick questions are mixed into the normal test and writing rounds, not a separate set',()=>{
  for(const section of housing.housingSections){
   const ids=[...housing.housingTrapIds].filter(id=>id.startsWith('housing-11-'+section.id+'-'));
   for(const mode of ['test','write']){
    const picked=study.selectQuestions(mode,section.topic,2000,[],ids);assert(picked.length>0);assert(picked.every(q=>housing.housingTrapIds.has(q.id)),section.id+' '+mode);
-   const local=housing.pickHousingQuestions(section.id,mode,10,[],0,false,[...housing.housingTrapIds]);assert.equal(local.length,10);assert(local.every(q=>q.trap));
+   const round=housing.pickHousingQuestions(section.id,mode,10,[]);assert.equal(round.length,10);
+   const traps=round.filter(q=>q.trap).length;assert(traps>=2&&traps<=8,section.id+' '+mode+' mixes '+traps+' trick questions into a fresh round');
   }
  }
  const page=fs.readFileSync('app/housing-study.tsx','utf8');
- assert(page.includes("questionSet==='trap'?[...housingTrapIds]:undefined")&&page.includes("h('trapWhy')")&&page.includes('trapReasons[q.trap]'));
+ assert(page.includes("h('trapWhy')")&&page.includes('trapReasons[q.trap]'));
+ assert(!page.includes('questionSet')&&!page.includes('housing-set'),'no separate trick-question category');
 });
 
 test('new answers are queued for the natural site voices and lesson notes show the new pitfalls',()=>{

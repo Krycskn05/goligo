@@ -716,10 +716,6 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 .housing-word-bank { margin:16px 0; color:#687568; }
 .housing-word-bank p { margin-top:6px; font-weight:650; line-height:1.8; }
 .housing-translation { font-size:18px; }
-.housing-set { margin-top:18px; }
-.housing-set > span { display:block; font-size:13px; font-weight:700; color:#3b6458; }
-.housing-set .housing-format { margin-top:8px; }
-.housing-set .housing-tip { margin-top:12px; }
 .housing-trap-why { margin:12px 0 0; padding:12px 14px; border-radius:12px; background:#fff6dc; border:1px solid #f0d58c; color:#5b4a17; line-height:1.6; }
 .housing-trap-why strong { display:block; margin-bottom:2px; color:#8a5a00; }
 .housing-result { padding:20px 0; border-bottom:1px solid #e2e6da; }

@@ -63,7 +63,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const [ready,setReady]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState<VaultCopyKey|null>(null);const [signIn,setSignIn]=useState(false);
  const [initializing,setInitializing]=useState(true);
  const [practiceMode,setPracticeMode]=useState<PracticeMode>('test');
- const [view,setView]=useState<'categories'|'configure'>('categories');const [group,setGroup]=useState('all');const [subgroup,setSubgroup]=useState('all');const [count,setCount]=useState<PictureQuizSize>(10);
+ const [view,setView]=useState<'categories'|'configure'>('categories');const [group,setGroup]=useState('all');const [subgroup,setSubgroup]=useState('all');const [count]=useState<PictureQuizSize>('all');
  const [requestedResume,setRequestedResume]=useState<string|null>(null);
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);
  const [feedback,setFeedback]=useState<Answer|null>(null);const [selected,setSelected]=useState('');
@@ -130,7 +130,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   try{
    const data=await api<{session:Session}>(undefined,'?session='+encodeURIComponent(id),course);
    if(!data.session.topic.startsWith(topicPrefix)||!['visual','write','listen'].includes(data.session.mode)||!data.session.questions.every(item=>modePredicate(data.session.mode)(questionMap.get(item.id)))){setError('legacyError');return;}
-   if(!mounted.current)return;const restored=data.session.topic.replace(/^en-/,'');setPracticeMode(data.session.mode==='write'?'write':data.session.mode==='listen'?'listen':'test');setGroup(restored==='objects-all'?'all':restored);setSubgroup('all');setCount(([5,10,20].includes(data.session.questions.length)?data.session.questions.length:'all') as PictureQuizSize);setSession(data.session);setIndex(data.session.answers.length);clearAnswer();focus();
+   if(!mounted.current)return;const restored=data.session.topic.replace(/^en-/,'');setPracticeMode(data.session.mode==='write'?'write':data.session.mode==='listen'?'listen':'test');setGroup(restored==='objects-all'?'all':restored);setSubgroup('all');setSession(data.session);setIndex(data.session.answers.length);clearAnswer();focus();
   }catch(e){fail(e,'sessionError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }

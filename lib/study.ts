@@ -4,6 +4,12 @@ import {questions,topics,shuffle,type Question} from './course';
 import {englishQuestions,englishTopics,englishUnitContains} from './english-course';
 import {type LearningLanguage} from './learning-language';
 import type {StudyStats} from './progress';
+/** Stars the learner puts on questions are kept as study notes: star:<question id> = '1'. */
+export const STAR_NOTE_PREFIX='star:';
+export const starNoteKey=(questionId:string)=>STAR_NOTE_PREFIX+questionId;
+export function starredQuestionIds(notes:Record<string,string>):Set<string>{
+ return new Set(Object.entries(notes).filter(([key,value])=>key.startsWith(STAR_NOTE_PREFIX)&&value==='1').map(([key])=>key.slice(STAR_NOTE_PREFIX.length)));
+}
 export type Review={question_id:string;wrong_count:number;streak:number;seen:number;last_answer:string;last_wrong:string;last_at:number;due_at:number};
 export type Answer={id:string;question_id:string;answer:string;correct:number;created_at:number};
 export type SessionQuestion={id:string;options?:string[]};

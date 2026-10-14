@@ -1,0 +1,30 @@
+# Doğal site seslerini üretir (adımlar scripts/voices/build.sh içinde).
+# Ses dosyaları "sesler" dalında tutulur; yayın sırasında siteye eklenir.
+name: Ses dosyalari
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['lib/**', 'scripts/voices/**', '.github/workflows/sesler.yml']
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: sesler
+  cancel-in-progress: false
+jobs:
+  sesler:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: bash scripts/voices/build.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}

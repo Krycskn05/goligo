@@ -61,6 +61,37 @@ vec2 U(vec2 a,vec2 b){return a.x<b.x?a:b;}
 #define M_PINK 20.0
 #define M_LIME 21.0
 #define M_CLOTH 22.0
+// shared palette for the other vault objects (plain colours, toy-like finish)
+#define M_GREEN 23.0
+#define M_LEAF 24.0
+#define M_TERRA 25.0
+#define M_BRICK 26.0
+#define M_CREAM 27.0
+#define M_BROWN 28.0
+#define M_SKY 29.0
+#define M_NAVY 30.0
+#define M_PURPLE 31.0
+#define M_SOIL 32.0
+#define M_SAND 33.0
+#define M_MINT 34.0
+#define M_CORAL 35.0
+#define M_CHARCOAL 36.0
+#define M_SAGE 37.0
+#define M_VELVET 38.0
+#define M_ROPE 39.0
+#define M_SKIN 40.0
+#define M_DARKWOOD 41.0
+#define M_CONCRETE 42.0
+#define M_GOLDFISH 43.0
+#define M_LAVENDER 44.0
+#define M_PEACH 45.0
+// see-through materials: the ray continues behind them (glass, water)
+#define M_CLEAR 50.0
+#define M_CLEARWATER 51.0
+
+struct Mat{vec3 alb;float rough;float metal;float spec;float sss;};
+// objects that draw glass hide it from the second ray and from shadows with this flag
+bool gNoGlass=false;
 
 // object-specific code is injected here
 //__OBJECT__
@@ -82,8 +113,10 @@ vec2 map(vec3 p){return objectMap(p);}
 vec3 calcNormal(vec3 p){const float h=0.0007;const vec2 k=vec2(1,-1);
  return normalize(k.xyy*map(p+k.xyy*h).x+k.yyx*map(p+k.yyx*h).x+k.yxy*map(p+k.yxy*h).x+k.xxx*map(p+k.xxx*h).x);}
 float softshadow(vec3 ro,vec3 rd,float mint,float maxt,float w){
+ bool keep=gNoGlass;gNoGlass=true; // glass and water cast no shadow
  float res=1.0,t=mint;
  for(int i=0;i<90&&t<maxt;i++){float h=map(ro+rd*t).x;res=min(res,h/(w*t));t+=clamp(h,0.006,0.25);if(res<-1.0)break;}
+ gNoGlass=keep;
  res=max(res,-1.0);return 0.25*(1.0+res)*(1.0+res)*(2.0-res);}
 float calcAO(vec3 p,vec3 n){float occ=0.0,sca=1.0;for(int i=0;i<6;i++){float h=0.01+0.09*float(i)/5.0;float d=map(p+h*n).x;occ+=(h-d)*sca;sca*=0.85;}return clamp(1.0-2.2*occ,0.0,1.0);}
 
@@ -95,9 +128,11 @@ vec3 env(vec3 r){ // simple studio
  c+=vec3(0.9)*smoothstep(0.90,0.99,dot(r,normalize(vec3(0.7,0.35,0.6))));
  return c;}
 
-struct Mat{vec3 alb;float rough;float metal;float spec;float sss;};
 Mat getMat(float m,vec3 p,vec3 n){
  Mat t;t.alb=vec3(0.8);t.rough=0.5;t.metal=0.0;t.spec=0.4;t.sss=0.0;
+#ifdef HAS_MAT
+ if(objectMat(m,p,n,t))return t;
+#endif
  if(m==M_WOOD){vec3 q=objectWoodSpace(p);float g=fbm(vec3(q.x*28.0,q.y*1.2,q.z*28.0));float ring=0.5+0.5*sin(q.x*70.0+q.z*35.0+g*7.0);
   t.alb=mix(srgb2lin(vec3(0.86,0.60,0.33)),srgb2lin(vec3(0.66,0.40,0.19)),smoothstep(0.25,0.95,ring*0.55+g*0.55));t.rough=0.45;t.spec=0.35;}
  else if(m==M_STEEL){t.alb=srgb2lin(vec3(0.86,0.89,0.94));t.metal=1.0;t.rough=0.22;}
@@ -121,6 +156,31 @@ Mat getMat(float m,vec3 p,vec3 n){
  else if(m==M_PINK){t.alb=srgb2lin(vec3(0.98,0.55,0.65));t.rough=0.3;t.spec=0.6;}
  else if(m==M_LIME){t.alb=srgb2lin(vec3(0.55,0.82,0.20));t.rough=0.3;t.spec=0.6;}
  else if(m==M_CLOTH){float s=0.5+0.5*sin(p.x*90.0)*sin(p.z*90.0+p.y*90.0);t.alb=srgb2lin(mix(vec3(0.98,0.80,0.25),vec3(0.95,0.70,0.15),s));t.rough=0.85;t.spec=0.08;t.sss=0.2;}
+ else if(m==M_GREEN){t.alb=srgb2lin(vec3(0.33,0.70,0.27));t.rough=0.35;t.spec=0.5;t.sss=0.15;}
+ else if(m==M_LEAF){t.alb=srgb2lin(vec3(0.13,0.48,0.20));t.rough=0.35;t.spec=0.5;t.sss=0.15;}
+ else if(m==M_TERRA){t.alb=srgb2lin(vec3(0.86,0.43,0.22));t.rough=0.55;t.spec=0.3;}
+ else if(m==M_BRICK){t.alb=srgb2lin(vec3(0.74,0.30,0.20));t.rough=0.7;t.spec=0.2;}
+ else if(m==M_CREAM){t.alb=srgb2lin(vec3(0.97,0.92,0.80));t.rough=0.35;t.spec=0.5;}
+ else if(m==M_BROWN){t.alb=srgb2lin(vec3(0.50,0.30,0.16));t.rough=0.5;t.spec=0.3;}
+ else if(m==M_SKY){t.alb=srgb2lin(vec3(0.60,0.84,0.98));t.rough=0.08;t.spec=1.0;}
+ else if(m==M_NAVY){t.alb=srgb2lin(vec3(0.14,0.22,0.45));t.rough=0.35;t.spec=0.5;}
+ else if(m==M_PURPLE){t.alb=srgb2lin(vec3(0.56,0.36,0.82));t.rough=0.3;t.spec=0.6;}
+ else if(m==M_SOIL){float s=fbm(p*25.0);t.alb=srgb2lin(mix(vec3(0.36,0.23,0.14),vec3(0.24,0.15,0.09),s));t.rough=0.9;t.spec=0.1;}
+ else if(m==M_SAND){t.alb=srgb2lin(vec3(0.91,0.79,0.58));t.rough=0.6;t.spec=0.25;}
+ else if(m==M_MINT){t.alb=srgb2lin(vec3(0.56,0.88,0.76));t.rough=0.3;t.spec=0.6;}
+ else if(m==M_CORAL){t.alb=srgb2lin(vec3(1.0,0.46,0.38));t.rough=0.3;t.spec=0.6;}
+ else if(m==M_CHARCOAL){t.alb=srgb2lin(vec3(0.30,0.31,0.34));t.rough=0.45;t.spec=0.4;}
+ else if(m==M_SAGE){float s=0.5+0.5*sin(p.x*120.0)*sin(p.y*120.0+p.z*120.0);t.alb=srgb2lin(mix(vec3(0.58,0.70,0.46),vec3(0.52,0.64,0.41),s));t.rough=0.85;t.spec=0.08;t.sss=0.2;}
+ else if(m==M_VELVET){float s=0.5+0.5*sin(p.x*120.0)*sin(p.y*120.0+p.z*120.0);t.alb=srgb2lin(mix(vec3(0.10,0.52,0.58),vec3(0.08,0.46,0.52),s));t.rough=0.85;t.spec=0.1;t.sss=0.2;}
+ else if(m==M_ROPE){t.alb=srgb2lin(vec3(0.86,0.71,0.47));t.rough=0.8;t.spec=0.1;t.sss=0.1;}
+ else if(m==M_SKIN){t.alb=srgb2lin(vec3(0.98,0.80,0.66));t.rough=0.45;t.spec=0.3;t.sss=0.3;}
+ else if(m==M_DARKWOOD){vec3 q=objectWoodSpace(p);float g=fbm(vec3(q.x*28.0,q.y*1.2,q.z*28.0));float ring=0.5+0.5*sin(q.x*70.0+q.z*35.0+g*7.0);
+  t.alb=mix(srgb2lin(vec3(0.58,0.36,0.20)),srgb2lin(vec3(0.42,0.24,0.12)),smoothstep(0.25,0.95,ring*0.55+g*0.55));t.rough=0.45;t.spec=0.35;}
+ else if(m==M_CONCRETE){float s=fbm(p*18.0);t.alb=srgb2lin(mix(vec3(0.74,0.73,0.70),vec3(0.62,0.61,0.58),s));t.rough=0.85;t.spec=0.15;}
+ else if(m==M_GOLDFISH){t.alb=srgb2lin(vec3(1.0,0.58,0.12));t.rough=0.25;t.spec=0.7;t.sss=0.3;}
+ else if(m==M_LAVENDER){t.alb=srgb2lin(vec3(0.76,0.70,0.95));t.rough=0.35;t.spec=0.5;}
+ else if(m==M_PEACH){t.alb=srgb2lin(vec3(1.0,0.76,0.56));t.rough=0.35;t.spec=0.5;}
+ else if(m==M_CLEAR||m==M_CLEARWATER){t.alb=vec3(0.9);t.rough=0.05;t.spec=1.0;}
  return t;}
 
 vec3 shade(vec3 p,vec3 n,vec3 rd,float m){
@@ -156,39 +216,56 @@ vec3 shade(vec3 p,vec3 n,vec3 rd,float m){
 
 vec3 aces(vec3 x){const float a=2.51,b=0.03,c=2.43,d=0.59,e=0.14;return clamp((x*(a*x+b))/(x*(c*x+d)+e),0.0,1.0);}
 
+// the cream background with the soft ground shadow of the object
+vec3 backdrop(vec3 ro,vec3 rd){
+ vec3 bg=vec3(0.988,0.980,0.929);vec3 col=bg;
+ float tg=(uGround-ro.y)/rd.y;
+ if(rd.y<0.0&&tg>0.0){
+  vec3 g=ro+rd*tg;
+  vec3 L=normalize(vec3(-0.55,0.95,0.55));
+  float sh=softshadow(g+vec3(0,0.001,0),L,0.02,3.0,0.12);
+  float d=map(g).x;
+  float contact=1.0-clamp(d/0.18,0.0,1.0);
+  float ao=1.0-0.45*contact*contact;
+  float shade=mix(0.80,1.0,sh)*ao;
+  // fade the shadow catcher towards the edges
+  col=bg*mix(1.0,shade,smoothstep(3.5,1.2,length(g.xz-uTarget.xz)));
+ }
+ return col;}
+vec3 surfaceColor(vec3 p,vec3 rd,float m){vec3 n=calcNormal(p);vec3 col=shade(p,n,rd,m);col=aces(col*0.62);return pow(col,vec3(1.0/2.2));}
+
 void main(){
  vec2 uv=(2.0*gl_FragCoord.xy-uRes)/uRes.y;
  vec3 ww=normalize(uTarget-uCam);vec3 uu=normalize(cross(ww,vec3(0,1,0)));vec3 vv=cross(uu,ww);
  float fl=1.0/tan(radians(uFov)*0.5);
  vec3 rd=normalize(uv.x*uu+uv.y*vv+fl*ww);vec3 ro=uCam;
  if(uProbe>0.5){ro=vec3(uv*2.5,12.0);rd=vec3(0,0,-1);float tt=0.0;bool hh=false;for(int i=0;i<300;i++){float d=map(ro+rd*tt).x;if(d<0.0005){hh=true;break;}tt+=d*0.9;if(tt>30.0)break;}outColor=vec4(hh?1.0:0.0,0,0,1);return;}
- // background: warm cream like the vault art, very soft vignette
- vec3 bg=vec3(0.988,0.980,0.929);
 
  float t=0.0;float m=-1.0;bool hit=false;float tmax=30.0;
  for(int i=0;i<220;i++){vec2 h=map(ro+rd*t);if(h.x<0.0004*t){m=h.y;hit=true;break;}t+=h.x*0.85;if(t>tmax)break;}
  vec3 col;
- // ground shadow (shadow catcher on plane y=uGround)
  float tg=(uGround-ro.y)/rd.y;
  bool groundFirst=rd.y<0.0&&tg>0.0&&(!hit||tg<t);
- if(hit&&!groundFirst){
+ if(hit&&!groundFirst&&(m==M_CLEAR||m==M_CLEARWATER)){
+  // glass or water: look through it with a second ray that ignores glass, then add tint, reflection and highlight
   vec3 p=ro+rd*t;vec3 n=calcNormal(p);
-  col=shade(p,n,rd,m);
-  col=aces(col*0.62);
-  col=pow(col,vec3(1.0/2.2));
+  gNoGlass=true;
+  vec3 ro2=p+rd*0.003;float t2=0.0;float m2=-1.0;bool hit2=false;
+  for(int i=0;i<220;i++){vec2 h=map(ro2+rd*t2);if(h.x<0.0004*(t+t2)){m2=h.y;hit2=true;break;}t2+=h.x*0.85;if(t2>tmax)break;}
+  float tg2=(uGround-ro2.y)/rd.y;
+  bool ground2=rd.y<0.0&&tg2>0.0&&(!hit2||tg2<t2);
+  vec3 behind=(hit2&&!ground2)?surfaceColor(ro2+rd*t2,rd,m2):backdrop(ro2,rd);
+  vec3 tint=m==M_CLEAR?vec3(0.95,0.985,1.0):vec3(0.80,0.93,1.0);
+  float fre=pow(clamp(1.0+dot(n,rd),0.0,1.0),2.5);
+  vec3 L=normalize(vec3(-0.55,0.95,0.55));
+  float spe=pow(clamp(dot(n,normalize(L-rd)),0.0,1.0),160.0);
+  vec3 refl=pow(aces(env(reflect(rd,n))*0.62),vec3(1.0/2.2));
+  col=mix(behind*tint,refl*vec3(0.92,0.96,1.0),clamp(0.06+fre*0.65,0.0,0.8));
+  col=min(col+vec3(spe*1.2),vec3(1.0));
+ }else if(hit&&!groundFirst){
+  col=surfaceColor(ro+rd*t,rd,m);
  }else{
-  col=bg;
-  if(rd.y<0.0&&tg>0.0){
-   vec3 g=ro+rd*tg;
-   vec3 L=normalize(vec3(-0.55,0.95,0.55));
-   float sh=softshadow(g+vec3(0,0.001,0),L,0.02,3.0,0.12);
-   float d=map(g).x;
-   float contact=1.0-clamp(d/0.18,0.0,1.0);
-   float ao=1.0-0.45*contact*contact;
-   float shade=mix(0.80,1.0,sh)*ao;
-   // fade the shadow catcher towards the edges
-   col=bg*mix(1.0,shade,smoothstep(3.5,1.2,length(g.xz-uTarget.xz)));
-  }
+  col=backdrop(ro,rd);
  }
  outColor=vec4(col,1.0);
 }

@@ -4,6 +4,7 @@ import {Mic,Square} from 'lucide-react';
 import {t,type StudyLanguage} from '@/lib/study-languages';
 import type {Snapshot} from '@/lib/study';
 import {createGermanSpeechPlayer,studyVoices,idlePlayback,defaultSpeechRate,type SpeechPlayback} from '@/lib/german-speech';
+import {availableSiteVoices,createClipPlayer,loadVoiceManifest,onVoiceManifest,resolveSiteVoice,siteClipUrl,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
 import {createAnswerFeedbackPlayer} from '@/lib/answer-feedback';
 import type {LearningLanguage} from '@/lib/learning-language';
 import {prepareEffects,readEffects,playLearningSound,learningReaction} from '@/lib/learning-effects';
@@ -44,20 +45,44 @@ export async function api<T=Snapshot>(body?:Record<string,unknown>,query='',cour
  let data:T&{error?:string;signIn?:boolean};try{data=await res.json() as T&{error?:string;signIn?:boolean};}catch{throw new Error('Bağlantı kurulamadı. Biraz sonra yeniden dene.');}
  if(!res.ok){const e=new Error(data.error??'Kayıt başarısız. Yeniden dene.') as Error&{signIn?:boolean};e.signIn=!!data.signIn;throw e;}return data;
 }
+export const SPEECH_CHANGED='lernkoko-speech-changed';
+function readSpeechPreference(course:LearningLanguage){
+ let voiceName='',rate=String(defaultSpeechRate(course));
+ try{const saved=JSON.parse(localStorage.getItem('lernkoko-speech:'+course)??'null');if(saved&&typeof saved.voiceName==='string')voiceName=saved.voiceName;const savedRate=Number(saved?.rate);if(Number.isFinite(savedRate)&&savedRate>=0.5&&savedRate<=1.2)rate=String(savedRate);}catch{}
+ return {voiceName,rate};
+}
+function saveSpeechPreference(course:LearningLanguage,value:{voiceName:string;rate:string}){
+ try{localStorage.setItem('lernkoko-speech:'+course,JSON.stringify(value));}catch{}
+ window.dispatchEvent(new CustomEvent(SPEECH_CHANGED,{detail:course}));
+}
 export function useGermanSpeech(course:LearningLanguage='de'){
  const [playback,setPlayback]=useState<SpeechPlayback>(idlePlayback);const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]);const [voiceName,setVoiceName]=useState('');const [rate,setRate]=useState(String(defaultSpeechRate(course)));const player=useRef<ReturnType<typeof createGermanSpeechPlayer>|null>(null);
+ const [siteVoices,setSiteVoices]=useState<SiteVoice[]>([]);
+ const [siteVoicesState,setSiteVoicesState]=useState<'loading'|'ready'|'unavailable'>('loading');
  const preferenceCourse=useRef<LearningLanguage|null>(null);
  useEffect(()=>{
-  let nextVoice='',nextRate=String(defaultSpeechRate(course));
-  try{const saved=JSON.parse(localStorage.getItem('lernkoko-speech:'+course)??'null');if(saved&&typeof saved.voiceName==='string')nextVoice=saved.voiceName;const savedRate=Number(saved?.rate);if(Number.isFinite(savedRate)&&savedRate>=0.5&&savedRate<=1.2)nextRate=String(savedRate);}catch{}
-  setVoiceName(nextVoice);setRate(nextRate);preferenceCourse.current=course;
+  const load=()=>{const next=readSpeechPreference(course);setVoiceName(next.voiceName);setRate(next.rate);preferenceCourse.current=course;};
+  load();
+  const changed=(event:Event)=>{if((event as CustomEvent<LearningLanguage>).detail===course)load();};
+  const storage=(event:StorageEvent)=>{if(event.key==='lernkoko-speech:'+course)load();};
+  window.addEventListener(SPEECH_CHANGED,changed);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(SPEECH_CHANGED,changed);window.removeEventListener('storage',storage);};
  },[course]);
- const changeVoice=useCallback((value:string)=>{player.current?.stop();setVoiceName(value);try{localStorage.setItem('lernkoko-speech:'+course,JSON.stringify({voiceName:value,rate}));}catch{}},[course,rate]);
- const changeRate=useCallback((value:string)=>{const number=Number(value);if(!Number.isFinite(number)||number<0.5||number>1.2)return;player.current?.stop();setRate(value);try{localStorage.setItem('lernkoko-speech:'+course,JSON.stringify({voiceName,rate:value}));}catch{}},[course,voiceName]);
+ // Natural site voices are pre-rendered clips; without them the device voice is used.
+ useEffect(()=>{
+  if(course!=='de'){setSiteVoices([]);setSiteVoicesState('unavailable');return;}
+  let alive=true;
+  const apply=(value:VoiceManifest|null)=>{if(!alive)return;const list=availableSiteVoices(value);setSiteVoices(list);setSiteVoicesState(list.length?'ready':'unavailable');};
+  const off=onVoiceManifest(apply);void loadVoiceManifest().then(apply);
+  return()=>{alive=false;off();};
+ },[course]);
+ const changeVoice=useCallback((value:string)=>{player.current?.stop();setVoiceName(value);saveSpeechPreference(course,{voiceName:value,rate});},[course,rate]);
+ const changeRate=useCallback((value:string)=>{const number=Number(value);if(!Number.isFinite(number)||number<0.5||number>1.2)return;player.current?.stop();setRate(value);saveSpeechPreference(course,{voiceName,rate:value});},[course,voiceName]);
  useEffect(()=>{
   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){setPlayback({...idlePlayback,warning:'Bu tarayıcı sesli okumayı desteklemiyor. Safari, Chrome veya Edge ile açabilirsin.'});return;}
   const synth=window.speechSynthesis;let mounted=true;
-  const controller=createGermanSpeechPlayer(synth,text=>new SpeechSynthesisUtterance(text),next=>{if(mounted)setPlayback(next);},course,{cancelDelayMs:100});player.current=controller;
+  const clips=course==='de'&&typeof window.Audio==='function'?{player:createClipPlayer(),resolve:(text:string,name:string)=>{const voice=resolveSiteVoice(name);return voice?siteClipUrl(voice,text):null;}}:undefined;
+  const controller=createGermanSpeechPlayer(synth,text=>new SpeechSynthesisUtterance(text),next=>{if(mounted)setPlayback(next);},course,{cancelDelayMs:100},clips);player.current=controller;
   const update=()=>setVoices(studyVoices(synth.getVoices(),course));const visibility=()=>{if(document.hidden){controller.stop();controller.resetPreparation();}};
   update();synth.addEventListener('voiceschanged',update);document.addEventListener('visibilitychange',visibility);
   return()=>{mounted=false;synth.removeEventListener('voiceschanged',update);document.removeEventListener('visibilitychange',visibility);controller.stop();player.current=null;};
@@ -65,8 +90,8 @@ export function useGermanSpeech(course:LearningLanguage='de'){
  const stop=useCallback(()=>player.current?.stop(),[]);
  const prepare=useCallback(()=>player.current?.prepare(),[]);
  const isActive=useCallback(()=>player.current?.isActive()??false,[]);
- const speak=useCallback((text:string,slow=false)=>{if(!player.current){setPlayback({...idlePlayback,warning:'Ses desteği bulunamadı. Güncel Safari veya Chrome ile aç.'});return;}player.current.speak(text,{voiceName:preferenceCourse.current===course?voiceName:'',rate:slow?0.65:preferenceCourse.current===course?Number(rate):defaultSpeechRate(course)});},[voiceName,rate,course]);
- return {speaking:playback.status==='speaking',loading:playback.status==='loading',busy:playback.status!=='idle',activeText:playback.text,warning:playback.warning,voices,voiceName,setVoiceName:changeVoice,rate,setRate:changeRate,prepare,speak,stop,isActive};
+ const speak=useCallback((text:string,slow=false,voiceOverride?:string)=>{if(!player.current){setPlayback({...idlePlayback,warning:'Ses desteği bulunamadı. Güncel Safari veya Chrome ile aç.'});return;}player.current.speak(text,{voiceName:voiceOverride??(preferenceCourse.current===course?voiceName:''),rate:slow?0.65:preferenceCourse.current===course?Number(rate):defaultSpeechRate(course)});},[voiceName,rate,course]);
+ return {speaking:playback.status==='speaking',loading:playback.status==='loading',busy:playback.status!=='idle',activeText:playback.text,warning:playback.warning,voices,siteVoices,siteVoicesState,voiceName,setVoiceName:changeVoice,rate,setRate:changeRate,prepare,speak,stop,isActive};
 }export function Recorder({language="tr"}:{language?:StudyLanguage}){
  const [recording,setRecording]=useState(false);const [starting,setStarting]=useState(false);const [url,setUrl]=useState('');const [error,setError]=useState('');
  const recorder=useRef<MediaRecorder|null>(null);const stream=useRef<MediaStream|null>(null);const blobUrl=useRef('');const timer=useRef<ReturnType<typeof setTimeout>|null>(null);const mounted=useRef(true);const requesting=useRef(false);

@@ -34,7 +34,7 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
  const [snapshot,setSnapshot]=useState<Snapshot>(blank);const [ready,setReady]=useState(false);const [busy,setBusy]=useState(false);
  const [error,setError]=useState<'error'|'empty'|'invalid'|null>(null);const [signIn,setSignIn]=useState(false);
  const [view,setView]=useState<'categories'|'lesson'|'configure'>('categories');const [section,setSection]=useState<HousingSection|'all'>('a');const [lessonSection,setLessonSection]=useState<HousingSection>('a');const [step,setStep]=useState(0);
- const [mode,setMode]=useState<'write'|'test'>('write');const [count]=useState<number|'all'>(10);const [format,setFormat]=useState<'clue'|'free'>('clue');
+ const [mode,setMode]=useState<'write'|'test'>('write');const [count]=useState<number|'all'>('all');const [format,setFormat]=useState<'clue'|'free'>('clue');
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);const [feedback,setFeedback]=useState<Answer|null>(null);
  const [selected,setSelected]=useState('');const [freeText,setFreeText]=useState('');const [requestedResume,setRequestedResume]=useState<string|null>(null);
  const mounted=useRef(true);const mutation=useRef(false);

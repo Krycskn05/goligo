@@ -4,7 +4,7 @@ import {Mic,Square} from 'lucide-react';
 import {t,type StudyLanguage} from '@/lib/study-languages';
 import type {Snapshot} from '@/lib/study';
 import {createGermanSpeechPlayer,studyVoices,idlePlayback,defaultSpeechRate,type SpeechPlayback} from '@/lib/german-speech';
-import {availableSiteVoices,createClipPlayer,loadVoiceManifest,onVoiceManifest,resolveSiteVoice,siteClipUrl,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
+import {availableSiteVoices,createClipPlayer,loadVoiceManifest,onVoiceManifest,resolveSiteVoice,savedVoiceName,siteClipUrl,VOICE_PREFERENCE_VERSION,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
 import {createAnswerFeedbackPlayer} from '@/lib/answer-feedback';
 import type {LearningLanguage} from '@/lib/learning-language';
 import {prepareEffects,readEffects,playLearningSound,learningReaction} from '@/lib/learning-effects';
@@ -48,11 +48,11 @@ export async function api<T=Snapshot>(body?:Record<string,unknown>,query='',cour
 export const SPEECH_CHANGED='lernkoko-speech-changed';
 function readSpeechPreference(course:LearningLanguage){
  let voiceName='',rate=String(defaultSpeechRate(course));
- try{const saved=JSON.parse(localStorage.getItem('lernkoko-speech:'+course)??'null');if(saved&&typeof saved.voiceName==='string')voiceName=saved.voiceName;const savedRate=Number(saved?.rate);if(Number.isFinite(savedRate)&&savedRate>=0.5&&savedRate<=1.2)rate=String(savedRate);}catch{}
+ try{const saved=JSON.parse(localStorage.getItem('lernkoko-speech:'+course)??'null');voiceName=savedVoiceName(saved,course);const savedRate=Number(saved?.rate);if(Number.isFinite(savedRate)&&savedRate>=0.5&&savedRate<=1.2)rate=String(savedRate);}catch{}
  return {voiceName,rate};
 }
 function saveSpeechPreference(course:LearningLanguage,value:{voiceName:string;rate:string}){
- try{localStorage.setItem('lernkoko-speech:'+course,JSON.stringify(value));}catch{}
+ try{localStorage.setItem('lernkoko-speech:'+course,JSON.stringify({...value,voices:VOICE_PREFERENCE_VERSION}));}catch{}
  window.dispatchEvent(new CustomEvent(SPEECH_CHANGED,{detail:course}));
 }
 export function useGermanSpeech(course:LearningLanguage='de'){

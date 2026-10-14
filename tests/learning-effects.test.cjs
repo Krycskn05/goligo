@@ -56,7 +56,7 @@ test('saved choices survive re-reading and malformed preferences use safe defaul
 
 test('uploaded audio clips start directly on the tap and finish pronunciation exactly once',async t=>{
  const {effects,contexts,clips}=setup(t,{media:true});let done=0;
- effects.playLearningSound('correct',()=>done++);assert.equal(clips[0].src,'/sounds/correct.wav');assert(clips[0].played);assert.equal(contexts.length,0);
+ effects.playLearningSound('correct',()=>done++);assert.equal(clips[0].src,'/sfx/correct.wav');assert(clips[0].played);assert.equal(contexts.length,0);
  await Promise.resolve();const end=clips[0].onended;end();end();t.mock.timers.tick(4000);assert.equal(done,1);assert(clips[0].paused);
 });
 

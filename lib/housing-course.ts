@@ -237,6 +237,20 @@ for(const t of housingTraps){
  exercises.push({...choice,id:q.id+'-test',kind:'choice',options:[t.answer,...t.traps],cueDe:t.gap||passage?q.cueDe:'Welcher Satz ist richtig?'});
 }
 export const housingTrapIds=new Set(exercises.filter(q=>!!q.trap).map(q=>q.id));
+// Tuzaklı sorular ayrı bir set değil: her alt başlıkta normal sorularla dengeli biçimde karışır.
+const mixedOrder=new Map<string,number>();
+{
+ const groups=new Map<string,{regular:HousingExercise[];trap:HousingExercise[]}>();
+ for(const q of exercises){const key=q.section+':'+q.step+':'+(q.options?'test':'write');const group=groups.get(key)??{regular:[],trap:[]};(q.trap?group.trap:group.regular).push(q);groups.set(key,group);}
+ for(const {regular,trap} of groups.values()){
+  let i=0,j=0;const merged:HousingExercise[]=[];
+  while(i<regular.length||j<trap.length){
+   const takeRegular=j>=trap.length||(i<regular.length&&(i+0.5)/regular.length<=(j+0.5)/trap.length);
+   merged.push(takeRegular?regular[i++]:trap[j++]);
+  }
+  merged.forEach((q,position)=>mixedOrder.set(q.id,position));
+ }
+}
 export const housingQuestions=exercises;
 export const housingQuestionMap=new Map(housingQuestions.map(q=>[q.id,q]));
 export const housingTopics:Topic[]=housingSections.map(section=>({id:section.topic,title:section.id.toUpperCase()+' · '+section.title[0],de:section.de,unit:11,section:section.id.toUpperCase(),pages:section.pages,minutes:15,lead:section.title[0],blocks:[]}));
@@ -246,5 +260,5 @@ export function pickHousingQuestions(section:HousingSection|'all',mode:'write'|'
  const review=new Map(reviews.map(row=>[row.question_id,row]));const only=onlyIds?new Set(onlyIds):null;
  const pool=housingPool(section,mode,step).filter(q=>(!only||only.has(q.id))&&(!reviewOnly||!!review.get(q.id)?.wrong_count&&review.get(q.id)!.streak<3));
  const rank=(q:HousingExercise)=>{const row=review.get(q.id);return row?.wrong_count&&row.streak<3?0:!row?1:row.due_at<=Date.now()?2:3;};
- return [...pool].sort((a,b)=>rank(a)-rank(b)||a.step-b.step||housingQuestions.indexOf(a)-housingQuestions.indexOf(b)).slice(0,count==='all'?pool.length:count);
+ return [...pool].sort((a,b)=>rank(a)-rank(b)||a.step-b.step||(mixedOrder.get(a.id)??0)-(mixedOrder.get(b.id)??0)||housingQuestions.indexOf(a)-housingQuestions.indexOf(b)).slice(0,count==='all'?pool.length:count);
 }

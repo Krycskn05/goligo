@@ -79,6 +79,17 @@ s_build() {
       compatibility_flags:c.compatibility_flags,d1_databases:c.d1_databases,vars:c.vars,
       assets:c.assets,workers_dev:c.workers_dev,routes:c.routes},null,1));'
 }
+s_sesler() { # Doğal site seslerini ("sesler" dalı) siteye ekler; yoksa cihaz sesi kullanılır.
+  rm -rf public/voices && mkdir -p public/voices
+  if git fetch -q --depth 1 origin sesler 2>/dev/null; then
+    git archive FETCH_HEAD | tar -x -C public/voices
+    rm -f public/voices/report.json
+    echo "Site sesleri: $(find public/voices -name '*.mp3' | wc -l) dosya"
+  else
+    echo "Ses dalı yok; cihaz sesleri kullanılacak."
+  fi
+  return 0
+}
 s_deneme() { wr deploy --dry-run --config dist/server/wrangler.json --outdir /tmp/yayin-deneme; }
 s_sema() {
   local out
@@ -108,11 +119,12 @@ adim "1-pnpm" 01-pnpm.log s_pnpm
 adim "2-kurulum" 02-install.log s_install
 if [ "$DRY" -eq 1 ]; then
   echo "mod=DENEME (CLOUDFLARE_API_TOKEN yok; yayin yapilmadi)" >> "$OUT/DURUM.txt"
-  adim "3-derleme" 03-build.log s_build && adim "4-deneme-paketi" 04-dry-run.log s_deneme
+  adim "3-sesler" 03-voices.log s_sesler; adim "3-derleme" 03-build.log s_build && adim "4-deneme-paketi" 04-dry-run.log s_deneme
 else
   echo "mod=YAYIN (worker: $WORKER, d1: $DBNAME)" >> "$OUT/DURUM.txt"
   adim "3-hesap" 03-account.log s_hesap \
     && adim "4-d1" 04-d1.log s_d1 \
+    && adim "5-sesler" 05-voices.log s_sesler \
     && adim "5-derleme" 05-build.log s_build \
     && adim "6-sema" 06-schema.log s_sema \
     && adim "7-yayin" 07-deploy.log s_yayin \

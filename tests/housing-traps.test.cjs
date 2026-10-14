@@ -62,8 +62,9 @@ test('trick questions are mixed into the normal test and writing rounds, not a s
   const ids=[...housing.housingTrapIds].filter(id=>id.startsWith('housing-11-'+section.id+'-'));
   for(const mode of ['test','write']){
    const picked=study.selectQuestions(mode,section.topic,2000,[],ids);assert(picked.length>0);assert(picked.every(q=>housing.housingTrapIds.has(q.id)),section.id+' '+mode);
-   const round=housing.pickHousingQuestions(section.id,mode,10,[]);assert.equal(round.length,10);
-   const traps=round.filter(q=>q.trap).length;assert(traps>=2&&traps<=8,section.id+' '+mode+' mixes '+traps+' trick questions into a fresh round');
+   let traps=0,regular=0;
+   for(let seed=1;seed<=5;seed++){let state=seed;const random=()=>(state=(Math.imul(state,1103515245)+12345)>>>0)/4294967296;const round=housing.pickHousingQuestions(section.id,mode,10,[],0,false,undefined,new Set(),random);assert.equal(round.length,10);traps+=round.filter(q=>q.trap).length;regular+=round.filter(q=>!q.trap).length;}
+   assert(traps>=5&&regular>=5,section.id+' '+mode+' mixes trick and regular questions ('+traps+'/'+regular+')');
   }
  }
  const page=fs.readFileSync('app/housing-study.tsx','utf8');

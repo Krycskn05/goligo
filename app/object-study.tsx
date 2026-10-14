@@ -28,8 +28,8 @@ import {objectProgress} from '@/lib/progress';
 import {ProgressMeter,RoundReward} from './progress-ui';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
-const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-building':'groupBuilding','objects-moving':'groupMoving'};
-const groupImages:Record<string,string>={'objects-house':'dach','objects-furniture':'sessel','objects-building':'schubkarre','objects-moving':'karton'};
+const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-building':'groupBuilding','objects-moving':'groupMoving','objects-tools':'groupTools'};
+const groupImages:Record<string,string>={'objects-house':'dach','objects-furniture':'sessel','objects-building':'schubkarre','objects-moving':'karton','objects-tools':'bohrmaschine'};
 function categoryName(group:string,language:VaultLanguage){return group==='all'?vaultText(language,'allObjects'):groupKeys[group]?vaultText(language,groupKeys[group]):objectGroups.find(item=>item.id===group)?.title??group;}
 function CategoryArt({group,title}:{group:string;title:string}){
  if(group==='all'||group==='resume')return <HeroArt variant={group==='all'?'objects':'course'} alt={title}/>;

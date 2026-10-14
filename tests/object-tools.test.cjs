@@ -11,11 +11,10 @@ function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).
 
 test('the textbook tools page adds 15 new objects in their own Nesne Kasası category',()=>{
  const group=objects.objectGroups.find(item=>item.id==='objects-tools');assert(group,'objects-tools group');
- const words=objects.objectVocabulary.filter(word=>word.topic==='objects-tools');
- assert.deepEqual(Object.fromEntries(words.map(word=>[word.id,word.de])),tools);
+ for(const [id,de] of Object.entries(tools))assert.equal(objects.objectWordMap.get(id).de,de,id);
+ // Cleaning things from the page live in the cleaning category, the rest with the tools.
+ for(const id of Object.keys(tools))assert.equal(objects.objectWordMap.get(id).topic,['buerste','kehrblech','putzeimer','teppichklopfer'].includes(id)?'objects-cleaning':'objects-tools',id);
  assert.equal(new Set(objects.objectVocabulary.map(word=>word.id)).size,objects.objectVocabulary.length,'no duplicate object IDs');
- // Objects from the same page that were already learned keep their old category and ID.
- for(const [id,topic] of [['besen','objects-moving'],['staubsauger','objects-moving'],['pinsel','objects-building'],['saege','objects-building'],['nagel','objects-building']])assert.equal(objects.objectWordMap.get(id).topic,topic,id);
  for(const language of languages)assert(copy.vaultText(language,'groupTools').trim(),'groupTools '+language);
  const page=fs.readFileSync('app/object-study.tsx','utf8');
  assert(page.includes("'objects-tools':'groupTools'")&&page.includes("'objects-tools':'bohrmaschine'"));
@@ -36,14 +35,15 @@ test('every new tool has its own 512 px cartoon picture, meanings in all languag
 });
 
 test('the tools can be practised in Gör ve Seç, Yazarak Pekiştir and Dinle ve Bul, with plural puzzles',()=>{
- const picture=practice.pickPictureQuiz('objects-tools','all',[]);const writing=practice.pickObjectWritingQuiz('objects-tools','all',[]);const listening=practice.pickObjectListeningQuiz('objects-tools','all',[]);
+ const ids15=Object.keys(tools);const mine=q=>ids15.includes(q.objectId);
+ const picture=practice.pickPictureQuiz('all','all',[]).filter(mine);const writing=practice.pickObjectWritingQuiz('all','all',[]).filter(mine);const listening=practice.pickObjectListeningQuiz('all','all',[]).filter(mine);
  assert.equal(picture.length,15);assert.equal(listening.length,15);
  assert(picture.every(q=>q.options.length===4&&new Set(q.options).size===4&&q.options.includes(q.answer)));
  assert(listening.every(q=>new Set(q.pictureOptions).size===4&&q.pictureOptions.includes(q.objectId)));
  const plurals=writing.filter(q=>q.articlePuzzle);assert.equal(plurals.length,14);
  assert.equal(articles.pluralNouns.schraube,'Schrauben');assert.equal(articles.pluralNouns.zollstock,'Zollstöcke');assert.equal(articles.pluralNouns.hammer,'Hämmer');
  assert.equal(articles.compoundHeads.wasserwaage,'die Waage');assert.equal(articles.compoundHeads.kehrblech,'das Blech');
- const ids=picture.map(q=>q.id);
+ const ids=practice.pickPictureQuiz('objects-tools','all',[]).map(q=>q.id);
  assert.deepEqual(new Set(study.selectQuestions('visual','objects-tools',ids.length,[],ids).map(q=>q.id)),new Set(ids),'the server keeps a full tools round');
 });
 

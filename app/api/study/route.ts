@@ -8,6 +8,16 @@ const noCache={'Cache-Control':'no-store'};
 function json(data:unknown,status=200){return Response.json(data,{status,headers:noCache});}
 function failure(error:unknown){console.error('Study persistence failed',error);return json({error:'Kayıtlarına şu anda ulaşılamıyor. Cevabını koruduk; biraz sonra yeniden dene.'},503);}
 async function identity(){const user=await getChatGPTUser();return user?.userId??null;}
+// Study totals for XP, level, daily goal and day streak. tz is Date#getTimezoneOffset() in minutes.
+async function loadStats(db:D1Database,user:string,english:boolean,rawOffset:string|null){
+ const parsed=Number(rawOffset??0);const offset=Number.isInteger(parsed)&&Math.abs(parsed)<=840?parsed:0;const shift=offset*60000;const now=Date.now();
+ const course="((?=1 AND question_id LIKE 'en-%') OR (?=0 AND question_id NOT LIKE 'en-%'))";const flag=english?1:0;
+ const [totals,days]=await Promise.all([
+  db.prepare('SELECT COUNT(*) AS answers,COALESCE(SUM(correct),0) AS correct FROM study_answers WHERE user_id=? AND '+course).bind(user,flag,flag).first<{answers:number;correct:number}>(),
+  db.prepare('SELECT CAST((created_at-?)/86400000 AS INTEGER) AS day,COUNT(*) AS answers,COALESCE(SUM(correct),0) AS correct FROM study_answers WHERE user_id=? AND created_at>=? AND '+course+' GROUP BY day ORDER BY day DESC LIMIT 400').bind(shift,user,now-400*86400000,flag,flag).all<{day:number;answers:number;correct:number}>()
+ ]);
+ return {answers:Number(totals?.answers??0),correct:Number(totals?.correct??0),days:days.results.map(row=>({day:Number(row.day),answers:Number(row.answers),correct:Number(row.correct)})),today:Math.floor((now-shift)/86400000)};
+}
 async function loadSession(db:D1Database,user:string,id:string){
  const row=await db.prepare('SELECT * FROM study_sessions WHERE id=? AND user_id=?').bind(id,user).first<Record<string,unknown>>();
  if(!row)return null;
@@ -25,7 +35,8 @@ export async function GET(request:Request){
    db.prepare("SELECT s.id,s.mode,s.topic,s.created_at,s.finished_at,s.questions,COUNT(a.id) AS answered,COALESCE(SUM(a.correct),0) AS correct FROM study_sessions s LEFT JOIN study_answers a ON a.session_id=s.id AND a.user_id=s.user_id WHERE s.user_id=? AND ((?=1 AND s.topic LIKE 'en-%') OR (?=0 AND s.topic NOT LIKE 'en-%')) GROUP BY s.id ORDER BY s.created_at DESC LIMIT 40").bind(user,english?1:0,english?1:0).all<Record<string,unknown>>(),
    db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode IN ('visual','write','listen') AND topic LIKE ? AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user,english?'en-objects-%':'objects-%').first<{id:string}>()
   ]);
-  return json({reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,sessions:sessions.results.map(s=>({...s,questions:undefined,total:JSON.parse(s.questions as string).length}))});
+  const stats=url.searchParams.get('stats')==='1'?await loadStats(db,user,english,url.searchParams.get('tz')):undefined;
+  return json({stats,reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,sessions:sessions.results.map(s=>({...s,questions:undefined,total:JSON.parse(s.questions as string).length}))});
  }catch(error){return failure(error);}
 }
 export async function POST(request:Request){

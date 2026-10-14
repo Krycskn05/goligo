@@ -14,6 +14,10 @@ import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
 import {EffectsSettingsButton} from './learning-effects';
 import {housingText} from '@/lib/housing-copy';
+import type {Snapshot} from '@/lib/study';
+import {api} from './study-shared';
+import {housingProgress} from '@/lib/progress';
+import {ProgressMeter,ProgressSummaryPanel} from './progress-ui';
 
 export default function CategoryStudy(){
  const [language,setLanguage]=useState<StudyLanguage>('tr');
@@ -28,6 +32,9 @@ export default function CategoryStudy(){
 export function Workshop({language,onLanguage,course='de',onCourse}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;course?:LearningLanguage;onCourse?:(value:LearningLanguage)=>void}){
  const [level,setLevel]=useState<CourseLevel>('A1.1');
  useEffect(()=>{if(new URLSearchParams(window.location.search).get('level')==='A1.2')setLevel('A1.2');},[]);
+ const [snapshot,setSnapshot]=useState<Snapshot|null>(null);
+ // Progress is read from the signed-in learner's saved answers; it stays hidden if they cannot be loaded.
+ useEffect(()=>{if(course!=='de'){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={language==='ar'?'rtl':'ltr'} lang={language}>
@@ -37,8 +44,9 @@ export function Workshop({language,onLanguage,course='de',onCourse}:{language:St
    <main id="main" className="work-main" tabIndex={-1}>
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}
     <section className="toon-hero"><div><span className="eyebrow">{learningText(language,course)}</span><h1 id="work-heading" tabIndex={-1}>{c(language,'catalogTitle')}</h1><p>{c(language,'catalogHint')}</p></div><div className="toon-hero-art"><HeroArt/></div></section>
+    {course==='de'&&snapshot?.stats&&<ProgressSummaryPanel stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')}/>}
     <div className="toon-level-switch" role="group" aria-label={c(language,'levelLabel')}>{(['A1.1','A1.2'] as const).map(value=><button type="button" key={value} className={level===value?'active':''} aria-pressed={level===value} onClick={()=>setLevel(value)}><strong>{value}</strong><span>{c(language,'categories')}</span></button>)}</div>
-    <section id="curriculum" aria-labelledby="curriculum-heading"><div className="toon-curriculum-head"><h2 id="curriculum-heading">{level} · {c(language,'categories')}</h2></div><div className="category-grid toon-topic-grid">{units.map(unit=>{const title=translate(unit.names,language);return <article className="category-card toon-topic-card catalog-topic-card" key={unit.id} data-unit={unit.id}><div className="catalog-topic-content"><div className="toon-topic-art"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/><span className="toon-card-number">{String(unit.number).padStart(2,'0')}</span></div><h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}{course==='de'&&unit.id==='book-11'&&<a className="btn small housing-open" href="/a1-2/ev-ve-yasam">{housingText(language,'open')}</a>}</div></article>;})}</div></section>
+    <section id="curriculum" aria-labelledby="curriculum-heading"><div className="toon-curriculum-head"><h2 id="curriculum-heading">{level} · {c(language,'categories')}</h2></div><div className="category-grid toon-topic-grid">{units.map(unit=>{const title=translate(unit.names,language);return <article className="category-card toon-topic-card catalog-topic-card" key={unit.id} data-unit={unit.id}><div className="catalog-topic-content"><div className="toon-topic-art"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/><span className="toon-card-number">{String(unit.number).padStart(2,'0')}</span></div><h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}{course==='de'&&unit.id==='book-11'&&snapshot&&<ProgressMeter progress={housingProgress('all',snapshot.reviews)} language={language} label={title} compact/>}{course==='de'&&unit.id==='book-11'&&<a className="btn small housing-open" href="/a1-2/ev-ve-yasam">{housingText(language,'open')}</a>}</div></article>;})}</div></section>
    </main>
   </div><SiteFooter/>
  </div>;

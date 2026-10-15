@@ -247,19 +247,27 @@ test('Fiil Atölyesi: five parts cover every verb once, the path has seven steps
  assert.ok(workshop.workshopProgress({answered:266,total:266}).finished);
  assert.equal(workshop.findWorkshop([{id:'a',mode:'mixed',topic:'verbs-all',finished_at:1},{id:'b',mode:'workshop',topic:'verbs-all',finished_at:null},{id:'c',mode:'workshop',topic:'verbs-all',finished_at:2}]).id,'b');
  assert.ok(workshop.isCurrentPath({mode:'workshop',questions}));assert.ok(!workshop.isCurrentPath({mode:'workshop',questions:questions.slice(1)}));
- // Sentence questions: four verbs that cannot be confused, all separable or all not, the picture stays even in Karma sınav.
+ // Sentence task: the verb is shown, the answer is its form for the subject, the wrong options are the other persons (du, ich, wir, ihr), the prefix at the end.
  for(const verb of verbs.verbs){
   const fit=course.questionMap.get('verb-fit-'+verb.id);assert.equal(fit.kind,'choice');assert.equal(fit.options.length,4);assert.equal(new Set(fit.options).size,4);
-  for(const option of fit.options)assert.equal(byId(option).display.includes('|'),verb.display.includes('|'),verb.id+' '+option);
-  assert.ok(!fit.options.some(option=>option!==verb.id&&[['anfangen','beginnen'],['geben','abgeben'],['bringen','mitbringen'],['kommen','ankommen','mitkommen'],['gehen','laufen','fahren'],['fahren','abfahren'],['abfahren','aufstehen']].some(set=>set.includes(option)&&set.includes(verb.id))),verb.id);
+  assert.equal(fit.answer,verb.praesens);assert.equal(fit.options[0],verb.praesens);assert.ok(fit.prompt.startsWith(verb.display+' · '));
+  const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';
+  for(const option of fit.options)assert.ok(prefix?option.endsWith(' '+prefix):!option.includes(' '),verb.id+' '+option);
  }
+ const fitOptions=id=>course.questionMap.get('verb-fit-'+id).options;
+ assert.deepEqual(fitOptions('fahren'),['fährt','fährst','fahre','fahren']);
+ assert.deepEqual(fitOptions('essen'),['isst','esse','essen','esst']);
+ assert.deepEqual(fitOptions('finden'),['findet','findest','finde','finden']);
+ assert.deepEqual(fitOptions('gelten'),['gilt','giltst','gelte','gelten']);
+ assert.deepEqual(fitOptions('einladen'),['lädt ein','lädst ein','lade ein','laden ein']);
+ assert.deepEqual(fitOptions('aufstehen'),['steht auf','stehst auf','stehe auf','stehen auf']);
+ assert.deepEqual(fitOptions('leidtun'),['tut leid','tust leid','tue leid','tun leid']);
+ assert.deepEqual(verbs.seededOptions(['a','b','c','d'],'x'),verbs.seededOptions(['a','b','c','d'],'x'));
  assert.ok(!workshop.karmaHidesPicture('fit')&&workshop.karmaHidesPicture('word'));
- // The sentence task answers with the form that fits the subject: four different Präsens forms, the prefix shown at the end.
- for(const verb of verbs.verbs){const forms=course.questionMap.get('verb-fit-'+verb.id).options.map(option=>logic.praesensForm(byId(option)));assert.equal(new Set(forms).size,4,verb.id);}
  assert.equal(logic.praesensForm(byId('fahren')),'fährt');assert.equal(logic.praesensForm(byId('aufstehen')),'steht … auf');assert.equal(logic.praesensForm(byId('leidtun')),'tut … leid');
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
  assert.ok(!page.includes("v('resume')"),'no resume card on the page');
  assert.ok(page.includes('<SiteHeader ')&&page.includes('<ChapterCard ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
- assert.ok(page.includes("kind==='fit')return {text:praesensForm(target)")&&page.includes("task==='fit'&&verb?verb.praesens"),'sentence options and the spoken answer use the Präsens form');
+ assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
  for(const key of ['workshopTitle','workshopLead','workshopEnter','karmaTitle','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
 });

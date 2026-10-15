@@ -1,17 +1,17 @@
 'use client';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
-import {verbFamilies,verbFamilyOf,familyTitle} from '@/lib/verb-families';
+import {verbFamilies,verbFamilyOf,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper,AnswerResult} from './verb-workshop';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,partProgress,verbStatus,findWorkshop,isCurrentPath,learnStage} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,roundEnd,learnStage} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -66,14 +66,18 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const task=q?.verbTask;
  // Only the correct answer is spoken after the effect, never the question. The sentence task answers with the Präsens form.
  const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';
- const finished=!!session&&index>=session.questions.length;
+ // An older round of the whole path ends after part 1; every other round at its last question.
+ const end=session?roundEnd(session):0;
+ const finished=!!session&&index>=end;
  const workshop=session?.mode===WORKSHOP_MODE;
  const place=workshop&&session?pathPlace(session.questions,index,lookup):null;
  const overlay=place&&place.chapterStart&&!dismissed.has('c:'+index)?'chapter':place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
  const starred=starredQuestionIds(snapshot.notes);
- const savedWorkshop=findWorkshop(snapshot.sessions);const path=workshopProgress(savedWorkshop);
+ // No part is locked: every part has its own round; the hero continues the part practised last.
+ const parts=partsStatus(snapshot.sessions);const path=currentPart(snapshot.sessions);
  const nextVerb=verbMap.get(path.nextVerbId)??workshopVerbs[0];
- const stickers=verbStatus(path.answered);
+ const stickers=verbStatus(snapshot.sessions);
+ const roundFamily:VerbFamily=(session&&verbFamilyOf(lookup(session.questions[0]?.id??'')?.verbId??''))||verbFamilies[0];
  function fail(e:unknown,fallback:ErrorKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
   try{const next=await api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de');if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
@@ -94,17 +98,17 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  /** Phones: every step fills the screen from the top of the practice area (the site header scrolls away), so nothing needs dragging. */
  function toPractice(){const box=document.querySelector('.verb-practice');if(box&&window.matchMedia('(max-width: 760px)').matches)box.scrollIntoView({block:'start',behavior:'instant'});else window.scrollTo({top:0,behavior:'instant'});}
  function openSession(restored:Session){setSession(restored);setIndex(restored.answers.length);setDismissed(new Set());clearAnswer();focusCurrent();}
- /** Enter the workshop: continue the saved path, or start a new one. */
- async function enterWorkshop(restart=false){
+ /** Enter a part (none is locked): continue its saved round, or start a new one. */
+ async function enterPart(family:VerbFamily,restart=false){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
   try{
-   const saved=!restart&&savedWorkshop&&!savedWorkshop.finished_at?savedWorkshop.id:null;
-   if(saved){
-    const data=await api<{session:Session}>(undefined,'session='+encodeURIComponent(saved),'de');
+   const saved=!restart?findPartSession(snapshot.sessions,family):null;
+   if(saved&&!saved.finished_at){
+    const data=await api<{session:Session}>(undefined,'session='+encodeURIComponent(saved.id),'de');
     if(!mounted.current)return;
-    if(isCurrentPath(data.session)&&data.session.answers.length<data.session.questions.length){openSession(data.session);return;}
+    if(isPartRound(data.session,family)&&data.session.answers.length<roundEnd(data.session)){openSession(data.session);return;}
    }
-   const ids=workshopIds();
+   const ids=partIds(family);
    const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
    if(!mounted.current)return;openSession(data.session);
   }catch(e){fail(e,'startError');}
@@ -135,7 +139,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function next(){
   if(mutation.current||!session||!feedback)return;stopFeedback();const upcoming=index+1;setIndex(upcoming);clearAnswer();focusCurrent();
-  if(upcoming>=session.questions.length){answerAudio.complete();void refresh();}
+  if(upcoming>=end){answerAudio.complete();void refresh();}
  }
  function dismiss(kind:'c'|'l'){setDismissed(previous=>new Set(previous).add(kind+':'+index));focusCurrent();}
  // A saved round keeps the choices it was shown; if the catalogue changed since (the sentence task once offered verbs, now forms), the fresh choices are used in a fixed order.
@@ -220,19 +224,19 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    {error&&<div className="object-alert" role="alert"><p>{errorText(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{v('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}
    {session?finished?<section className="object-results panel verb-results">
-    <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('pathDone'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>
+    <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('partDone',{n:roundFamily.number,total:roundFamily.verbs.length}):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:end})}</p>
     <RoundReward answers={session.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
-    <div className="object-actions"><button type="button" className="btn" disabled={busy} onClick={()=>void enterWorkshop(true)}><RotateCcw size={18}/>{t('workshopRestart')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
+    <div className="object-actions"><button type="button" className="btn" disabled={busy} onClick={()=>void enterPart(roundFamily,true)}><RotateCcw size={18}/>{t('workshopRestart')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
-    <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
-    <progress max={session.questions.length} value={index} aria-label={v('progress',{n:index+1,total:session.questions.length})}/>
+    <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:end})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
+    <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
     {place&&<PathStepper place={place} language={language}/>}
     {overlay==='chapter'&&place?<ChapterCard family={place.family} stage={place.stage} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
     overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
     <article className={'object-question panel verb-question'+(answered?' answered':'')}>
      <h1 id="object-question-heading" tabIndex={-1} className={answered?'verb-hidden-heading':undefined}>{heading(q)}</h1>
-     {answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} correct={!!feedback.correct} status={v(feedback.correct?'correct':'wrong')} chosen={feedback.correct?undefined:<>{v('yourChoice')}: {optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} nextLabel={v(index+1===session.questions.length?'viewResults':listening?'nextListening':'nextQuestion')} onNext={next} busy={busy}/>:<>
+     {answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} correct={!!feedback.correct} status={v(feedback.correct?'correct':'wrong')} chosen={feedback.correct?undefined:<>{v('yourChoice')}: {optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} nextLabel={v(index+1===end?'viewResults':listening?'nextListening':'nextQuestion')} onNext={next} busy={busy}/>:<>
      {!listening&&promptCard(q,verb)}
      {listening&&<div className="vault-listen-player"><Headphones size={32} aria-hidden="true"/><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===q.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div><p role="status">{speech.busy?v('listenPlaying'):heardQuestionId===q.id?t('listenChoose'):t('listenFirst')}</p></div>}
      {writing?<>
@@ -251,7 +255,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       {!feedback.correct&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
       {!feedback.correct&&<RuleBox lines={feedbackRules(q,verb)} language={language}/>}
       {verb.alsoIst&&learnStage(q.verbTask)==='perfekt'&&<p className="verb-note">{t('liegenNote')}</p>}
-      <button type="button" className="btn object-next" disabled={busy} onClick={next}>{v(index+1===session.questions.length?'viewResults':'nextPuzzle')}<ArrowRight size={18} className="vault-direction-icon"/></button>
+      <button type="button" className="btn object-next" disabled={busy} onClick={next}>{v(index+1===end?'viewResults':'nextPuzzle')}<ArrowRight size={18} className="vault-direction-icon"/></button>
      </div>}
      </>}
     </article>}
@@ -263,7 +267,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
       <p className="verb-hero-lead">{t('workshopLead')}</p>
       <div className="verb-hero-cta">
-       <button type="button" className="btn verb-path-enter" disabled={busy||!ready} onClick={()=>void enterWorkshop()}><Play size={20} fill="currentColor" aria-hidden="true"/>{path.finished||!savedWorkshop?t(path.finished?'workshopRestart':'workshopStart'):t('workshopEnter')}</button>
+       <button type="button" className="btn verb-path-enter" disabled={busy||!ready} onClick={()=>void enterPart(path.family,path.finished)}><Play size={20} fill="currentColor" aria-hidden="true"/>{t(path.finished?'workshopRestart':path.started?'workshopEnter':'workshopStart')}</button>
       </div>
      </div>
      <div className="verb-polaroid">
@@ -276,28 +280,29 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      <div className="verb-avatar"><VerbPicture verb={nextVerb} language={language} small/></div>
      <div className="verb-path-status">
       <p className="verb-path-title"><span className="n">{path.finished?path.stageVerbs:path.stageVerbsDone}</span> / {path.stageVerbs} {t('verbsWord')}</p>
-      <div className="verb-energy" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={WORKSHOP_TOTAL} aria-valuenow={path.answered} aria-valuetext={path.percent+'%'}><span className="verb-energy-fill" style={{width:Math.max(3,path.percent)+'%'}}/><span className="verb-energy-ticks"/></div>
+      <div className="verb-energy" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={path.count} aria-valuenow={path.done} aria-valuetext={path.percent+'%'}><span className="verb-energy-fill" style={{width:Math.max(3,path.percent)+'%'}}/><span className="verb-energy-ticks"/></div>
       {initializing?<p className="verb-path-note">{v('loading')}</p>:path.finished?<p className="verb-path-note verb-path-done"><CheckCircle2 size={16} aria-hidden="true"/>{t('workshopDone')}</p>:<p className="verb-path-note">{t('chapterOf',{n:nextFamily.number})} · <span lang="de" dir="ltr">{familyTitle(nextFamily,language)}</span> · {path.stage==='perfekt'?t('stepPerfekt'):t('stageMeanings')}</p>}
-      {savedWorkshop&&!path.finished&&path.answered>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterWorkshop(true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
+      {path.session&&!path.finished&&path.done>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterPart(path.family,true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
      </div>
      {!path.finished&&<div className="verb-bubble">{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</div>}
     </article>
     <section className="verb-map" aria-labelledby="verb-map-heading">
      <h2 id="verb-map-heading" className="verb-map-title">{t('mapTitle')}</h2>
      <svg className="verb-map-path" viewBox="0 0 1130 1180" preserveAspectRatio="none" aria-hidden="true"><path d="M200 120 C 500 160, 700 180, 820 300 S 300 520, 310 640 S 900 820, 830 960 S 420 1100, 300 1140" fill="none" stroke="#fff" strokeWidth="14" strokeLinecap="round" strokeDasharray="2 30" opacity=".9"/></svg>
-     {verbFamilies.map(family=>{
-      const part=partProgress(family,path.answered);
-      const state=part.state==='done'?'done':part.state==='current'&&!path.finished?'current':part.state==='locked'?'locked':'';
+     {parts.map(part=>{
+      const family=part.family;
+      // Every part is open: the one in progress is marked, finished parts get a check, none has a lock.
+      const state=part.finished?'done':family.id===path.family.id&&!path.finished?'current':'';
       const members=family.verbs.map(id=>verbMap.get(id)!);
       return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state} style={{'--p':part.percent} as CSSProperties} data-verb-island={family.id}>
        {state==='current'&&<span className="verb-here"><Compass size={15} aria-hidden="true"/>{t('hereBadge')}</span>}
-       {state==='locked'&&<span className="verb-lock" aria-hidden="true"><Lock size={18}/></span>}
        {state==='done'&&<span className="verb-lock done" aria-hidden="true"><CheckCircle2 size={20}/></span>}
        <span className="verb-island-number">{family.number}</span>
        <div className="verb-island-text">
         <h3 lang="de" dir="ltr">{familyTitle(family,language)}</h3>
         <p>{t('verbsCount',{n:family.verbs.length})} · {t('stageMeanings')} {part.meaningDone}/{family.verbs.length} · {t('stepPerfekt')} {part.perfektDone}/{family.verbs.length}</p>
         <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
+        <button type="button" className="verb-island-go" disabled={busy||!ready} onClick={()=>void enterPart(family,part.finished)} data-verb-island-go={family.id}>{t(part.finished?'chapterAgain':part.started?'chapterContinue':'chapterStart')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
        </div>
        <span className="verb-ring" data-v={part.percent+'%'}/>
       </article>;

@@ -3,15 +3,15 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
-import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb} from '@/lib/verb-course';
+import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
-import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
+import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper} from './verb-workshop';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,partProgress,verbStatus,findWorkshop,isCurrentPath} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,partProgress,verbStatus,findWorkshop,isCurrentPath,learnStage} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -163,8 +163,10 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
   const kind=question.verbTask??'';
   return kind==='praesens'||kind==='write-praesens'||kind==='perfekt'||kind==='write-perfekt'?item.subject+' '+question.answer:kind==='fit'?praesensForm(item):item.display;
  }
- function verbForms(item:Verb){
-  return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong> — {item.subject} {item.praesens} — {item.subject} {perfektLabel(item)}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;
+ /** The forms shown after an answer: only what the stage teaches (meaning: the verb; Perfekt: sie/er hat/ist …). */
+ function verbForms(item:Verb,task?:VerbTask){
+  const stage=learnStage(task);
+  return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong>{stage==='perfekt'&&<> — {item.subject} {perfektLabel(item)}</>}{stage==='praesens'&&<> — {item.subject} {item.praesens}</>}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;
  }
  function heading(question:Question){
   const kind=question.verbTask;
@@ -194,7 +196,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
   const kind=question.verbTask??'';
   if(kind==='praesens'||kind==='write-praesens'||kind==='hear-praesens')return verbRules(item,'praesens',language);
   if(kind==='perfekt'||kind==='write-perfekt'||kind==='hear-perfekt')return verbRules(item,'perfekt',language);
-  return [sentenceText(item,'praesens'),sentenceText(item,'perfekt')];
+  // Meaning questions: no conjugated example sentences, only the word and its meaning.
+  return [];
  }
  const errorText=(key:ErrorKey)=>key==='verbLegacy'?t('legacyError'):v(key);
  const writing=q?.kind==='write';const listening=q?.kind==='listen';
@@ -216,7 +219,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('pathDone'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>
     <RoundReward answers={session.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
     <div className="object-actions"><button type="button" className="btn" disabled={busy} onClick={()=>void enterWorkshop(true)}><RotateCcw size={18}/>{t('workshopRestart')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
-    {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:null;})}
+    {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
     <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     <progress max={session.questions.length} value={index} aria-label={v('progress',{n:index+1,total:session.questions.length})}/>
@@ -241,7 +244,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       <h2>{feedback.correct?<CheckCircle2 size={23}/>:<X size={23}/>} {v(feedback.correct?'correct':writing?'wrongAnswer':'wrong')}</h2>
       <p>{v('correctAnswer')}: <strong lang="de" dir="ltr">{correctLabel(q,verb)}</strong></p>
       {writing&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
-      <div className="verb-feedback-main">{listening&&<VerbPicture verb={verb} language={language} small/>}<p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb)}</p></div>
+      <div className="verb-feedback-main">{listening&&<VerbPicture verb={verb} language={language} small/>}<p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb,q.verbTask)}</p></div>
       <RuleBox lines={feedbackRules(q,verb)} language={language}/>
       {verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
       <button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{v('repeatAudio')}</button>

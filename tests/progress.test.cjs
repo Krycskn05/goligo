@@ -121,7 +121,15 @@ test('the study API returns answer totals and local practice days only when aske
 
 test('home, Ev ve Yaşam and Nesne Kasası show the progress interface',()=>{
  const home=fs.readFileSync('app/category-study.tsx','utf8');
- assert(home.includes('<ProgressSummaryPanel')&&home.includes("'stats=1&tz='+new Date().getTimezoneOffset()"));
+ assert(home.includes("'stats=1&tz='+new Date().getTimezoneOffset()"));
+ // The progress sits at the bottom of the left menu (after Üniteler ve konular, Nesne Kasası, Fiiller), not in the main column or the header.
+ const aside=home.slice(home.indexOf('<aside className="work-sidebar">'),home.indexOf('</aside>'));
+ assert(aside.indexOf('</nav>')<aside.indexOf('<SidebarProgress '),'progress under the menu');
+ const main=home.slice(home.indexOf('<main id="main"'),home.indexOf('</main>'));
+ assert(!main.includes('<SidebarProgress')&&!home.includes('<ProgressSummaryPanel'),'no progress panel in the main column');
+ const header=fs.readFileSync('app/site-header.tsx','utf8');
+ assert(!header.includes('site-progress')&&!home.includes('stats={course'),'no progress bar in the header');
+ assert(fs.readFileSync('app/progress.css','utf8').includes('.sidebar-progress { position:sticky; bottom:16px; margin-top:auto;'));
  const page=fs.readFileSync('app/housing-study.tsx','utf8');
  assert(page.includes('housingProgress(item.id,snapshot.reviews)')&&page.includes("housingProgress('all',snapshot.reviews)")&&page.includes('<RoundReward'));
  const vault=fs.readFileSync('app/object-study.tsx','utf8');

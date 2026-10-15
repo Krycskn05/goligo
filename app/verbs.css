@@ -291,3 +291,19 @@
  .verb-stepper-steps li { font-size:10px; }
  .verb-chapter h1 { font-size:24px; }
 }
+/* After an answer: one example sentence for every person (ich … Sie); tap a row to hear it. */
+.verb-persons { display:grid; gap:8px; margin:14px 0; padding:12px 14px; border-radius:18px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
+.verb-persons > small { color:#2f7fd6; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.verb-persons ul { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.verb-person-row { position:relative; display:grid; grid-template-columns:64px minmax(0,1fr); align-items:center; gap:10px; width:100%; min-height:44px; padding:7px 34px 7px 12px; border-radius:12px; background:#fff; border:1px solid #d8e6f3; color:#1f3b5c; text-align:start; font:inherit; cursor:pointer; }
+.verb-person-row:hover:enabled { border-color:#9ccbff; background:#f8fbff; }
+.verb-person-row:disabled { opacity:.7; cursor:default; }
+.verb-person-pronoun { display:flex; flex-direction:column; font-size:14px; font-weight:700; color:#7f95ad; line-height:1.2; }
+.verb-person-pronoun small { font-size:11px; font-weight:600; color:#98a9ba; overflow-wrap:anywhere; }
+.verb-person-text { font-size:16px; line-height:1.4; font-weight:500; color:#1f3b5c; }
+.verb-person-text .mark { font-weight:800; }
+.verb-person-text .mark.verb,.verb-person-text .mark.person { color:#2f7fd6; }
+.verb-person-text .mark.end { color:#e26a1c; }
+.verb-person-row svg { position:absolute; top:50%; right:11px; transform:translateY(-50%); color:#2f7fd6; }
+.verb-persons-note { margin:0; font-size:13.5px; line-height:1.5; color:#4f6478; }
+@media (max-width:420px) { .verb-persons { padding:10px 8px; } .verb-person-row { grid-template-columns:46px minmax(0,1fr); gap:6px; min-height:40px; padding:6px 26px 6px 9px; } .verb-person-pronoun small { font-size:10.5px; } .verb-person-text { font-size:15px; line-height:1.35; } .verb-person-row svg { right:7px; } }

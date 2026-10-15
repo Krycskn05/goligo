@@ -291,19 +291,105 @@
  .verb-stepper-steps li { font-size:10px; }
  .verb-chapter h1 { font-size:24px; }
 }
-/* After an answer: one example sentence for every person (ich … Sie); tap a row to hear it. */
-.verb-persons { display:grid; gap:8px; margin:14px 0; padding:12px 14px; border-radius:18px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
-.verb-persons > small { color:#2f7fd6; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
-.verb-persons ul { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
-.verb-person-row { position:relative; display:grid; grid-template-columns:64px minmax(0,1fr); align-items:center; gap:10px; width:100%; min-height:44px; padding:7px 34px 7px 12px; border-radius:12px; background:#fff; border:1px solid #d8e6f3; color:#1f3b5c; text-align:start; font:inherit; cursor:pointer; }
+/* Example sentences for every person (ich … Sie): one short line each; tap a row to hear it. */
+.verb-persons { display:grid; gap:4px; margin:10px 0; padding:6px; border-radius:16px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
+.verb-persons > small { padding:0 4px; color:#2f7fd6; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.verb-persons ul { list-style:none; margin:0; padding:0; display:grid; gap:1px; }
+.verb-person-row { position:relative; display:grid; grid-template-columns:40px minmax(0,1fr); align-items:center; gap:4px; width:100%; min-height:24px; padding:2px 22px 2px 8px; border-radius:10px; background:#fff; border:1px solid #d8e6f3; color:#1f3b5c; text-align:start; font:inherit; cursor:pointer; }
 .verb-person-row:hover:enabled { border-color:#9ccbff; background:#f8fbff; }
 .verb-person-row:disabled { opacity:.7; cursor:default; }
-.verb-person-pronoun { display:flex; flex-direction:column; font-size:14px; font-weight:700; color:#7f95ad; line-height:1.2; }
-.verb-person-pronoun small { font-size:11px; font-weight:600; color:#98a9ba; overflow-wrap:anywhere; }
-.verb-person-text { font-size:16px; line-height:1.4; font-weight:500; color:#1f3b5c; }
+.verb-person-pronoun { display:flex; flex-direction:column; justify-content:center; align-self:stretch; font-size:13px; font-weight:700; color:#7f95ad; line-height:1.05; }
+.verb-person-pronoun small { font-size:9.5px; font-weight:600; color:#98a9ba; overflow-wrap:anywhere; }
+.verb-person-text { font-size:14px; line-height:1.3; font-weight:500; color:#1f3b5c; }
 .verb-person-text .mark { font-weight:800; }
 .verb-person-text .mark.verb,.verb-person-text .mark.person { color:#2f7fd6; }
 .verb-person-text .mark.end { color:#e26a1c; }
-.verb-person-row svg { position:absolute; top:50%; right:11px; transform:translateY(-50%); color:#2f7fd6; }
-.verb-persons-note { margin:0; font-size:13.5px; line-height:1.5; color:#4f6478; }
-@media (max-width:420px) { .verb-persons { padding:10px 8px; } .verb-person-row { grid-template-columns:46px minmax(0,1fr); gap:6px; min-height:40px; padding:6px 26px 6px 9px; } .verb-person-pronoun small { font-size:10.5px; } .verb-person-text { font-size:15px; line-height:1.35; } .verb-person-row svg { right:7px; } }
+.verb-person-row svg { position:absolute; top:50%; right:6px; transform:translateY(-50%); width:12px; height:12px; color:#2f7fd6; }
+.verb-persons-note { margin:0; padding:0 4px; font-size:12.5px; line-height:1.4; color:#4f6478; }
+
+/* Learning card: picture on top, the verb with a speaker button, the meaning, then the forms. */
+.verb-learn-title { display:flex; align-items:center; gap:10px; }
+.verb-learn-title .verb-learn-form { min-width:0; }
+.verb-learn-speak { display:inline-grid; place-items:center; width:40px; height:40px; flex-shrink:0; border-radius:50%; border:2px solid #cfe2f5; background:#fff; color:#2f7fd6; cursor:pointer; box-shadow:0 3px 10px rgba(28,82,130,.12); }
+.verb-learn-speak:disabled,.verb-result-speak:disabled { opacity:.6; cursor:default; }
+
+/* After a test answer: one result card (picture and verb on top, right or wrong, sentences, next). */
+.verb-hidden-heading { position:absolute !important; width:1px; height:1px; margin:0 !important; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.verb-result { display:grid; gap:10px; outline:none; }
+.verb-result-head { display:grid; grid-template-columns:110px minmax(0,1fr); gap:14px; align-items:center; padding:10px; border-radius:18px; background:#eafbe4; border:2px solid #fff; }
+.verb-result.retry .verb-result-head { background:#fff0f4; }
+.verb-result-head .verb-picture { width:110px; max-width:110px; border-radius:16px; border-width:3px; }
+.verb-result-text { display:grid; gap:3px; min-width:0; justify-items:start; }
+.verb-result-status { display:inline-flex; align-items:center; gap:5px; margin:0; font-size:14px; font-weight:800; }
+.verb-result-status.right { color:#2e7d22; }
+.verb-result-status.wrong { color:#b23a5b; }
+.verb-result-title { display:flex; align-items:center; gap:8px; max-width:100%; }
+.verb-result-title strong { min-width:0; font-size:26px; line-height:1.15; font-weight:800; color:#1f3b5c; overflow-wrap:anywhere; }
+.verb-result-speak { display:inline-grid; place-items:center; width:34px; height:34px; flex-shrink:0; border-radius:50%; border:1px solid #cfe2f5; background:#fff; color:#2f7fd6; cursor:pointer; vertical-align:middle; }
+.verb-result-meaning { font-size:15px; line-height:1.3; font-weight:600; color:#3d5a7a; }
+.verb-result-meaning b { color:#1f3b5c; }
+.verb-result-chosen { font-size:13px; line-height:1.3; color:#8c2a47; }
+.verb-result .verb-persons,.verb-result .verb-note { margin:0; }
+.verb-result-next { width:100%; justify-content:center; margin:0 !important; }
+.verb-write-answer { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+
+/* Phones: every step fits one screen from the top of the practice area. */
+@media (max-width:760px) {
+ .verb-practice { margin-inline:-4px; }
+ .verb-practice .object-practice-top { gap:10px; margin-bottom:4px; }
+ .verb-practice .object-practice-top .object-pill { display:none; }
+ .verb-practice .object-practice-top .housing-star,.verb-practice .object-exit { width:32px; height:32px; }
+ /* The stepper shows where the learner is; the long bar is not needed on a phone. */
+ .verb-practice progress { display:none; }
+ .verb-practice .btn { min-height:46px; padding-block:10px; }
+ .verb-stepper { margin:0 0 6px; padding:6px 10px; border-radius:14px; }
+ .verb-stepper-head { margin-bottom:3px; }
+ .verb-stepper-verb { font-size:15px; }
+ .verb-stepper-count { font-size:11.5px; }
+ .verb-stepper-steps li { gap:1px; font-size:9.5px; }
+ .verb-stepper-dot { height:5px; }
+ .verb-learn { gap:8px; padding:12px; }
+ .verb-learn .verb-learn-kicker { display:none; }
+ .verb-learn-body { gap:4px; }
+ .verb-learn .verb-picture { max-width:112px; border-radius:16px; }
+ .verb-learn-text { gap:2px; }
+ .verb-learn-title { justify-content:center; gap:8px; }
+ .verb-learn-form { font-size:26px; }
+ .verb-learn-infinitive { font-size:14px; }
+ .verb-learn-meaning { font-size:16px; }
+ .verb-learn-note { margin:2px 0 0; padding:2px 8px; font-size:12px; border-radius:10px; }
+ .verb-learn .verb-rules { margin:0; padding:8px 10px; font-size:13px; line-height:1.4; }
+ .verb-learn .verb-rules ul { gap:2px; padding-inline-start:14px; }
+ .verb-learn.stage-perfekt .verb-learn-form { font-size:22px; }
+ .verb-practice:has(.verb-stepper) .verb-learn-infinitive { display:none; }
+ .verb-conj { gap:5px; padding:8px; border-radius:14px; }
+ .verb-conj small { font-size:11px; }
+ .verb-conj-grid { gap:5px; }
+ .verb-conj-cell { min-height:0; padding:3px 22px 3px 9px; border-radius:10px; }
+ .verb-conj-pronoun { font-size:11.5px; line-height:1.15; }
+ .verb-conj-form { font-size:15.5px; line-height:1.2; }
+ .verb-conj-cell svg { top:6px; right:7px; width:13px; height:13px; }
+ .verb-practice .verb-question { padding:12px; }
+ .verb-practice .verb-question h1 { font-size:18px; margin-bottom:8px; }
+ .verb-question .verb-card { padding:10px 12px; margin-bottom:10px; }
+ /* Picture beside the meaning: room for the letters below. */
+ .verb-question .verb-card.with-picture:has(.verb-picture) { grid-template-columns:84px minmax(0,1fr); justify-items:start; align-items:center; text-align:start; gap:12px; }
+ .verb-question .verb-card.with-picture .verb-picture { width:84px; max-width:84px; margin:0; border-radius:14px; }
+ .verb-question .puzzle-hint { margin-bottom:6px; font-size:11.5px; line-height:1.4; }
+ .verb-question .letter-puzzle { margin-top:8px; }
+ .verb-question .puzzle-meta { margin:6px 0 4px; }
+ .verb-question .letter-bank-heading { display:none; }
+ .verb-question.answered { padding:8px; }
+ .verb-result { gap:8px; }
+ .verb-result-head { grid-template-columns:76px minmax(0,1fr); gap:10px; padding:6px; }
+ .verb-result-head .verb-picture { width:76px; max-width:76px; border-radius:14px; }
+ .verb-result-title strong { font-size:21px; }
+ .verb-result-meaning { font-size:14px; }
+ /* The stepper above already names the verb. */
+ .verb-practice:has(.verb-stepper) .verb-result-infinitive { display:none; }
+ .verb-learn .verb-note { margin:0; padding:6px 10px; font-size:12.5px; }
+ .verb-write-feedback { margin-top:10px; padding:10px 12px; }
+ .verb-result .verb-note { padding:6px 10px; font-size:12.5px; }
+ .verb-write-feedback h2 { margin:0 0 4px; }
+ .verb-write-feedback p { margin:0 0 6px; }
+}

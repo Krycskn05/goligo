@@ -235,6 +235,16 @@
 .verb-learn-meaning { margin:0; font-size:19px; color:#3d5a7a; font-weight:700; }
 .verb-learn-note { margin:4px 0 0; font-size:14px; font-weight:700; color:#6a4400; background:#fff6c7; border:2px solid #ffe08a; border-radius:12px; padding:6px 10px; }
 .verb-learn-next { justify-self:start; }
+.verb-conj { display:grid; gap:8px; padding:12px 14px; border-radius:18px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
+.verb-conj small { color:#2f7fd6; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.verb-conj-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(3,auto); grid-auto-flow:column; gap:8px; }
+.verb-conj-cell { position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:1px; min-height:56px; padding:8px 30px 8px 12px; border-radius:14px; background:#fff; border:1px solid #d8e6f3; color:#1f3b5c; text-align:start; font:inherit; cursor:pointer; }
+.verb-conj-cell:hover:enabled { border-color:#9ccbff; background:#f8fbff; }
+.verb-conj-cell:disabled { opacity:.7; cursor:default; }
+.verb-conj-pronoun { font-size:13px; font-weight:600; color:#7f95ad; }
+.verb-conj-form { font-size:18px; line-height:1.25; font-weight:800; color:#1f3b5c; }
+.verb-conj-cell svg { position:absolute; top:9px; right:10px; color:#2f7fd6; }
+@media (max-width:420px) { .verb-conj-cell { padding:7px 26px 7px 10px; } .verb-conj-form { font-size:16px; } .verb-conj-cell svg { right:8px; } }
 .verb-example { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:4px 12px; padding:12px 16px; border-radius:18px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
 .verb-example small { grid-column:1 / -1; color:#2f7fd6; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
 .verb-example p { margin:0; font-size:19px; line-height:1.6; font-weight:700; color:#1f3b5c; }

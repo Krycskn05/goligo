@@ -11,7 +11,7 @@ import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,praesensFo
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper} from './verb-workshop';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,findWorkshop,isCurrentPath} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,partProgress,verbStatus,findWorkshop,isCurrentPath} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -72,7 +72,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const overlay=place&&place.chapterStart&&!dismissed.has('c:'+index)?'chapter':place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
  const starred=starredQuestionIds(snapshot.notes);
  const savedWorkshop=findWorkshop(snapshot.sessions);const path=workshopProgress(savedWorkshop);
- const nextVerb=workshopVerbs[Math.min(path.verbsDone,workshopVerbs.length-1)];
+ const nextVerb=verbMap.get(path.nextVerbId)??workshopVerbs[0];
+ const stickers=verbStatus(path.answered);
  function fail(e:unknown,fallback:ErrorKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
   try{const next=await api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de');if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
@@ -181,8 +182,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function promptCard(question:Question,item:Verb){
   const kind=question.verbTask;
-  // Pictures give the meaning away: hidden until the answer for the meaning and listening questions.
-  const showPicture=(kind!=='meaning'&&kind!=='hear')||!!feedback;
+  // Pictures give the answer away: hidden until the answer for the meaning and listening questions.
+  const showPicture=(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback;
   if(kind==='word'||kind==='write')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
   if(kind==='fit')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{sentenceLine(question,item)}{feedback&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}</div>;
   const sentence=kind==='praesens'||kind==='perfekt'||kind==='write-praesens'||kind==='write-perfekt';
@@ -199,7 +200,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const writing=q?.kind==='write';const listening=q?.kind==='listen';
  const chapterVerbs=place?workshopVerbs.filter(item=>verbFamilyOf(item.id)?.id===place.family.id):[];
  const overall=ready?verbProgress('verbs-all',snapshot.reviews):null;
- const nextFamily=verbFamilyOf(nextVerb.id)!;
+ const nextFamily=path.family;
  const nextLabel=t('nextUp',{verb:'\u2063'}).split('\u2063');
  // "Fiil Atölyesi" → first word plain, the rest in the accent colour.
  const titleWords=(()=>{const words=t('workshopTitle').split(' ');return {head:words[0],tail:words.slice(1).join(' ')};})();
@@ -219,8 +220,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
     <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     <progress max={session.questions.length} value={index} aria-label={v('progress',{n:index+1,total:session.questions.length})}/>
-    {place&&<PathStepper place={place} total={workshopVerbs.length} language={language}/>}
-    {overlay==='chapter'&&place?<ChapterCard family={place.family} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
+    {place&&<PathStepper place={place} language={language}/>}
+    {overlay==='chapter'&&place?<ChapterCard family={place.family} stage={place.stage} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
     overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
     <article className="object-question panel verb-question">
      <h1 id="object-question-heading" tabIndex={-1}>{heading(q)}</h1>
@@ -267,9 +268,9 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     <article className="panel verb-path-panel" data-verb-workshop="">
      <div className="verb-avatar"><VerbPicture verb={nextVerb} language={language} small/></div>
      <div className="verb-path-status">
-      <p className="verb-path-title"><span className="n">{path.verbsDone}</span> / {workshopVerbs.length} {t('verbsWord')}</p>
-      <div className="verb-energy" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={WORKSHOP_TOTAL} aria-valuenow={path.answered} aria-valuetext={t('verbsDone',{n:path.verbsDone,total:workshopVerbs.length})}><span className="verb-energy-fill" style={{width:Math.max(3,path.percent)+'%'}}/><span className="verb-energy-ticks"/></div>
-      {initializing?<p className="verb-path-note">{v('loading')}</p>:path.finished?<p className="verb-path-note verb-path-done"><CheckCircle2 size={16} aria-hidden="true"/>{t('workshopDone')}</p>:<p className="verb-path-note">{t('chapterOf',{n:nextFamily.number})} · {familyTitle(nextFamily,language)}</p>}
+      <p className="verb-path-title"><span className="n">{path.finished?path.stageVerbs:path.stageVerbsDone}</span> / {path.stageVerbs} {t('verbsWord')}</p>
+      <div className="verb-energy" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={WORKSHOP_TOTAL} aria-valuenow={path.answered} aria-valuetext={path.percent+'%'}><span className="verb-energy-fill" style={{width:Math.max(3,path.percent)+'%'}}/><span className="verb-energy-ticks"/></div>
+      {initializing?<p className="verb-path-note">{v('loading')}</p>:path.finished?<p className="verb-path-note verb-path-done"><CheckCircle2 size={16} aria-hidden="true"/>{t('workshopDone')}</p>:<p className="verb-path-note">{t('chapterOf',{n:nextFamily.number})} · <span lang="de" dir="ltr">{familyTitle(nextFamily,language)}</span> · {path.stage==='perfekt'?t('stepPerfekt'):t('stageMeanings')}</p>}
       {savedWorkshop&&!path.finished&&path.answered>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterWorkshop(true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
      </div>
      {!path.finished&&<div className="verb-bubble">{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</div>}
@@ -278,28 +279,26 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      <h2 id="verb-map-heading" className="verb-map-title">{t('mapTitle')}</h2>
      <svg className="verb-map-path" viewBox="0 0 1130 1180" preserveAspectRatio="none" aria-hidden="true"><path d="M200 120 C 500 160, 700 180, 820 300 S 300 520, 310 640 S 900 820, 830 960 S 420 1100, 300 1140" fill="none" stroke="#fff" strokeWidth="14" strokeLinecap="round" strokeDasharray="2 30" opacity=".9"/></svg>
      {verbFamilies.map(family=>{
-      const verbsBefore=workshopVerbs.findIndex(item=>verbFamilyOf(item.id)?.id===family.id);
-      const done=Math.max(0,Math.min(family.verbs.length,path.verbsDone-verbsBefore));
-      const inside=path.verbsDone>=verbsBefore&&path.verbsDone<verbsBefore+family.verbs.length;
-      const state=done>=family.verbs.length?'done':inside&&!path.finished?'current':path.verbsDone<verbsBefore?'locked':'';
+      const part=partProgress(family,path.answered);
+      const state=part.state==='done'?'done':part.state==='current'&&!path.finished?'current':part.state==='locked'?'locked':'';
       const members=family.verbs.map(id=>verbMap.get(id)!);
-      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state} style={{'--p':Math.round(done/family.verbs.length*100)} as CSSProperties} data-verb-island={family.id}>
+      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state} style={{'--p':part.percent} as CSSProperties} data-verb-island={family.id}>
        {state==='current'&&<span className="verb-here"><Compass size={15} aria-hidden="true"/>{t('hereBadge')}</span>}
        {state==='locked'&&<span className="verb-lock" aria-hidden="true"><Lock size={18}/></span>}
        {state==='done'&&<span className="verb-lock done" aria-hidden="true"><CheckCircle2 size={20}/></span>}
        <span className="verb-island-number">{family.number}</span>
        <div className="verb-island-text">
-        <h3>{familyTitle(family,language)}</h3>
-        <p><span lang="de" dir="ltr">{members.slice(0,3).map(item=>item.display).join(', ')}…</span> · {t('verbsCount',{n:family.verbs.length})}</p>
+        <h3 lang="de" dir="ltr">{familyTitle(family,language)}</h3>
+        <p>{t('verbsCount',{n:family.verbs.length})} · {t('stageMeanings')} {part.meaningDone}/{family.verbs.length} · {t('stepPerfekt')} {part.perfektDone}/{family.verbs.length}</p>
         <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
        </div>
-       <span className="verb-ring" data-v={done+'/'+family.verbs.length}/>
+       <span className="verb-ring" data-v={part.percent+'%'}/>
       </article>;
      })}
     </section>
     <article className="panel verb-collection">
      <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}{overall&&<> · {progressText(language,'learned',{n:overall.learned,total:overall.total})}</>}</p>
-     <div className="verb-stickers">{workshopVerbs.map((item,i)=><img key={item.id} className={i<path.verbsDone?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display} width={96} height={96} loading="lazy" decoding="async"/>)}</div>
+     <div className="verb-stickers">{workshopVerbs.map(item=>{const done=stickers.get(item.id);return <img key={item.id} className={done?.perfekt?'got full':done?.meaning?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display+(done?.perfekt?' · '+perfektLabel(item):'')} width={96} height={96} loading="lazy" decoding="async"/>;})}</div>
     </article>
     <details className="verb-list"><summary>{t('verbList')} · {verbs.length}</summary>
      <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr">{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>

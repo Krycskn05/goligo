@@ -173,6 +173,17 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  const texts=new Set(JSON.parse(execFileSync(process.execPath,['scripts/voices/list-texts.cjs'],{encoding:'utf8',env:{...process.env,STUDY_CHECK_DIR:compiled}})));
  for(const q of verbs.verbQuestions){assert.ok(texts.has(q.answer),q.id);if(q.audio)assert.ok(texts.has(q.audio),q.id);}
  for(const verb of verbs.verbs)assert.ok(texts.has(verbs.verbRowSpeech(verb)),verb.id);
+ // Everything the workshop cards read aloud (speaker button, Präsens table, sentences for every person) has a natural clip.
+ const persons=load('verb-persons');const spoken=persons.workshopSpeechTexts();
+ for(const text of spoken)assert.ok(texts.has(text),text);
+ const fahren=verbs.verbMap.get('einladen');
+ assert.deepEqual(persons.conjugationRows(fahren).map(row=>row.spoken),['ich lade ein','du lädst ein','er lädt ein','wir laden ein','ihr ladet ein','sie laden ein']);
+ assert.equal(persons.learnSpeech(fahren,'meaning'),'einladen');assert.equal(persons.learnSpeech(fahren,'perfekt'),'er hat eingeladen');
+ const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
+ assert.ok(cards.includes('const rows=conjugationRows(verb);')&&cards.includes('onClick={()=>speech.speak(spoken)}')&&cards.includes('const spoken=learnSpeech(verb,stage);')&&cards.includes('onClick={()=>speech.speak(row.text)}'),'the cards speak exactly these texts');
+ // Long voice runs stop in time and continue in a new run.
+ assert.match(fs.readFileSync('scripts/voices/make-voices.py','utf8'),/VOICE_BUDGET_MIN/);
+ assert.match(fs.readFileSync('scripts/voices/build.sh','utf8'),/gh workflow run sesler\.yml/);
 });
 
 test('sentences, form pieces and rules explain every verb',()=>{
@@ -282,7 +293,7 @@ test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, ca
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const learnCard=cards.slice(cards.indexOf('export function LearnCard'),cards.indexOf('export function ChapterCard'));
  assert.ok(!learnCard.includes('<ExampleSentence'),'learning cards show no example sentence');
  // The meaning card shows the Präsens forms for ich, du, er/sie/es, wir, ihr, sie/Sie instead.
- assert.ok(learnCard.includes("stage==='meaning'?<ConjugationTable")&&cards.includes("['sie/Sie',forms.wir,'sie']"));
+ assert.ok(learnCard.includes("stage==='meaning'?<ConjugationTable")&&cards.includes('const rows=conjugationRows(verb);'));
  const persons=id=>{const f=verbs.praesensPersons(byId(id));return [f.ich,f.du,f.er,f.wir,f.ihr];};
  assert.deepEqual(persons('fahren'),['fahre','fährst','fährt','fahren','fahrt']);
  assert.deepEqual(persons('abfahren'),['fahre ab','fährst ab','fährt ab','fahren ab','fahrt ab']);

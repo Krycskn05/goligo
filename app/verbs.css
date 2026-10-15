@@ -211,6 +211,7 @@
 .verb-stickers img { width:66px; height:66px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); background:#fff; }
 .verb-stickers img:nth-child(odd) { transform:rotate(-5deg); } .verb-stickers img:nth-child(even) { transform:rotate(4deg); }
 .verb-stickers img.missing { filter:grayscale(1); opacity:.35; box-shadow:none; border:3px dashed #c9dbec; }
+.verb-stickers img.full { border-color:#ffd54a; box-shadow:0 0 0 2px #ffd54a,0 2px 6px rgba(28,82,130,.15); }
 .verb-games-row summary { font-size:15px; }
 .verb-game-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
 /* Inside the workshop: stepper, part cards, learning cards */
@@ -244,6 +245,7 @@
 .verb-chapter-rule { margin:0; font-size:17px; line-height:1.6; font-weight:700; color:#1f3b5c; padding:14px 16px; border-radius:18px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
 .verb-chapter-verbs { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px; }
 .verb-chapter-verbs li { display:grid; justify-items:center; gap:6px; font-size:14px; font-weight:800; text-align:center; color:#1f3b5c; }
+.verb-chapter-verbs small { font-size:12px; font-weight:600; color:#3d5a7a; }
 .verb-chapter-verbs img { width:72px; height:72px; border-radius:50%; object-fit:cover; border:4px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); background:#fff; }
 .verb-chapter.tone-teal .verb-chapter-rule { background:#e6f9f8; } .verb-chapter.tone-amber .verb-chapter-rule { background:#fff6dc; } .verb-chapter.tone-violet .verb-chapter-rule { background:#f1ecff; } .verb-chapter.tone-rose .verb-chapter-rule { background:#ffeef2; } .verb-chapter.tone-blue .verb-chapter-rule { background:#eaf4ff; }
 @media (max-width:1000px) { .verb-island { width:min(560px,100%); } }

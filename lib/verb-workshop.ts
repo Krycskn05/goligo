@@ -8,17 +8,17 @@ import {isVerbExercise} from './verb-practice';
  * Fiil Atölyesi: one path through all 38 verbs in two parts (the textbook order, split at
  * the learner's line). Each part has two stages: first the meanings of all its verbs, then
  * their Perfekt forms. Every verb gets a learning card before its steps of a stage:
- * meanings → choose the meaning, choose the verb, spell it, hear it;
- * Perfekt → choose the form, write it, hear it.
+ * meanings → choose the meaning, choose the verb, spell it;
+ * Perfekt → choose the form, write it. (No listening questions on the path.)
  * The path is one saved session (mode `workshop`); leaving and coming back continues it.
  */
 export const WORKSHOP_TOPIC='verbs-all';
 export const WORKSHOP_MODE='workshop';
 export type LearnStage='meaning'|'praesens'|'perfekt';
 export const pathStages:readonly LearnStage[]=['meaning','perfekt'];
-export type WorkshopStep='meaning'|'word'|'write'|'hear'|'perfekt'|'write-perfekt'|'hear-perfekt';
-export const meaningSteps:readonly WorkshopStep[]=['meaning','word','write','hear'];
-export const perfektSteps:readonly WorkshopStep[]=['perfekt','write-perfekt','hear-perfekt'];
+export type WorkshopStep='meaning'|'word'|'write'|'perfekt'|'write-perfekt';
+export const meaningSteps:readonly WorkshopStep[]=['meaning','word','write'];
+export const perfektSteps:readonly WorkshopStep[]=['perfekt','write-perfekt'];
 export const stageSteps=(stage:LearnStage):readonly WorkshopStep[]=>stage==='perfekt'?perfektSteps:meaningSteps;
 /** The verbs in path order: part 1 first, then part 2. */
 export const workshopVerbs:Verb[]=verbFamilies.flatMap(family=>family.verbs.map(id=>verbMap.get(id)!));
@@ -73,9 +73,9 @@ export function partProgress(family:VerbFamily,answered:number){
  const stageDone=(stage:LearnStage)=>{const segment=segments.find(item=>item.stage===stage);if(!segment)return 0;return Math.max(0,Math.min(family.verbs.length,Math.floor((answered-segment.start)/stageSteps(stage).length)));};
  return {done,count,percent:Math.round(done/Math.max(1,count)*100),state:done>=count?'done':answered>=start?'current':'locked',meaningDone:stageDone('meaning'),perfektDone:stageDone('perfekt')};
 }
-/** The saved path to continue: the newest unfinished workshop session, else the newest finished one. */
+/** The saved path to continue: the newest unfinished workshop session, else the newest finished one. Rounds of an older path (another length) are left out. */
 export function findWorkshop(sessions:readonly SessionSummary[]){
- const mine=sessions.filter(s=>s.mode===WORKSHOP_MODE&&s.topic.startsWith('verbs-'));
+ const mine=sessions.filter(s=>s.mode===WORKSHOP_MODE&&s.topic.startsWith('verbs-')&&s.total===WORKSHOP_TOTAL);
  return mine.find(s=>!s.finished_at)??mine.find(s=>!!s.finished_at)??null;
 }
 /** Only a saved workshop with the current path can be continued; anything else starts fresh. */

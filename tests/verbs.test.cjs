@@ -280,6 +280,23 @@ test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, ca
  // No conjugated example sentences while learning: not on the learning cards, not after a meaning question.
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const learnCard=cards.slice(cards.indexOf('export function LearnCard'),cards.indexOf('export function ChapterCard'));
  assert.ok(!learnCard.includes('<ExampleSentence'),'learning cards show no example sentence');
+ // The meaning card shows the Präsens forms for ich, du, er/sie/es, wir, ihr, sie/Sie instead.
+ assert.ok(learnCard.includes("stage==='meaning'?<ConjugationTable")&&cards.includes("['sie/Sie',forms.wir,'sie']"));
+ const persons=id=>{const f=verbs.praesensPersons(byId(id));return [f.ich,f.du,f.er,f.wir,f.ihr];};
+ assert.deepEqual(persons('fahren'),['fahre','fährst','fährt','fahren','fahrt']);
+ assert.deepEqual(persons('abfahren'),['fahre ab','fährst ab','fährt ab','fahren ab','fahrt ab']);
+ assert.deepEqual(persons('essen'),['esse','isst','isst','essen','esst']);
+ assert.deepEqual(persons('lesen'),['lese','liest','liest','lesen','lest']);
+ assert.deepEqual(persons('heißen'),['heiße','heißt','heißt','heißen','heißt']);
+ assert.deepEqual(persons('finden'),['finde','findest','findet','finden','findet']);
+ assert.deepEqual(persons('anbieten'),['biete an','bietest an','bietet an','bieten an','bietet an']);
+ assert.deepEqual(persons('gelten'),['gelte','giltst','gilt','gelten','geltet']);
+ assert.deepEqual(persons('einladen'),['lade ein','lädst ein','lädt ein','laden ein','ladet ein']);
+ assert.deepEqual(persons('empfehlen'),['empfehle','empfiehlst','empfiehlt','empfehlen','empfehlt']);
+ assert.deepEqual(persons('gefallen'),['gefalle','gefällst','gefällt','gefallen','gefallt']);
+ assert.deepEqual(persons('leidtun'),['tue leid','tust leid','tut leid','tun leid','tut leid']);
+ for(const verb of verbs.verbs){const f=verbs.praesensPersons(verb);assert.equal(f.er,verb.praesens,verb.id);assert.equal(new Set([f.ich,f.wir]).size,2,verb.id);}
+ for(const language of languages)assert.ok(copy.verbText(language,'conjugationTitle').includes('Präsens'));
  assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no example sentences');
  assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
 });

@@ -43,6 +43,22 @@ export function ProgressSummaryPanel({stats,reviews,language,housingLabel,vaultL
   <p className="progress-help">{p('correctTotal',{n:summary.correct})} · {p('howItWorks')}</p>
  </section>;
 }
+/** Home page, at the bottom of the left menu (Üniteler ve konular, Nesne Kasası, Fiiller): the level and XP,
+ * the day streak, the daily goal and the three areas, small and stacked. On a computer it stays in the
+ * bottom-left corner while the page scrolls; on a phone it sits under the menu buttons. */
+export function SidebarProgress({stats,reviews,language,housingLabel,vaultLabel,verbsLabel}:{stats:StudyStats;reviews:Review[];language:VaultLanguage;housingLabel:string;vaultLabel:string;verbsLabel?:string}){
+ const p=(key:ProgressCopyKey,params?:Record<string,string|number>)=>progressText(language,key,params);
+ const summary=progressSummary(stats);const level=summary.level;const goalDone=summary.goalPercent>=100;
+ const areas=[{href:'/a1-2/ev-ve-yasam',label:housingLabel,progress:housingProgress('all',reviews)},{href:'/ev-esyalar?learn=de',label:vaultLabel,progress:objectProgress('all',reviews)},...(verbsLabel?[{href:'/fiiller',label:verbsLabel,progress:verbProgress('verbs-all',reviews)}]:[])];
+ return <section className="sidebar-progress" aria-labelledby="progress-heading" data-progress-summary="">
+  <h2 id="progress-heading"><Sparkles size={16} aria-hidden="true"/>{p('title')}</h2>
+  <div className="sidebar-progress-level"><span className="sidebar-progress-badge"><Trophy size={14} aria-hidden="true"/>{p('level',{n:level.level})}</span><span className={'sidebar-progress-streak'+(summary.practisedToday?' lit':'')} title={p('streak',{n:summary.streak})} aria-label={p('streak',{n:summary.streak})}><Flame size={15} aria-hidden="true"/>{summary.streak}</span></div>
+  <div className="progress-track xp" role="progressbar" aria-label={p('level',{n:level.level})} aria-valuemin={0} aria-valuemax={level.span} aria-valuenow={level.intoLevel} aria-valuetext={level.xp+' XP'}><span className="progress-fill" style={{width:level.percent+'%'}}/></div>
+  <small className="sidebar-progress-xp">{level.xp} XP · {p('toNext',{n:level.toNext})}</small>
+  <p className={'sidebar-progress-goal'+(goalDone?' done':'')}><Target size={14} aria-hidden="true"/>{p('dailyGoal')}: {p('dailyCount',{n:summary.todayAnswers,goal:summary.dailyGoal})}</p>
+  <ul className="sidebar-progress-areas">{areas.map(area=><li key={area.href}><a href={area.href}><span>{area.label}</span><strong>{formatPercent(area.progress.percent,language)}</strong></a><div className="progress-track" role="progressbar" aria-label={area.label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={area.progress.percent}><span className="progress-tried" style={{width:area.progress.triedPercent+'%'}}/><span className="progress-fill" style={{width:area.progress.percent+'%'}}/></div></li>)}</ul>
+ </section>;
+}
 /** Result screen reward: XP from this round and the topic's updated percentage. */
 export function RoundReward({answers,progress,language,label}:{answers:readonly {correct:number|boolean}[];progress?:TopicProgress|null;language:VaultLanguage;label:string}){
  return <div className="round-reward" data-round-reward="">

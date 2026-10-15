@@ -17,7 +17,7 @@ import {housingText} from '@/lib/housing-copy';
 import type {Snapshot} from '@/lib/study';
 import {api} from './study-shared';
 import {housingProgress} from '@/lib/progress';
-import {ProgressMeter,ProgressSummaryPanel} from './progress-ui';
+import {ProgressMeter,SidebarProgress} from './progress-ui';
 
 export default function CategoryStudy(){
  const [language,setLanguage]=useState<StudyLanguage>('tr');
@@ -39,12 +39,11 @@ export function Workshop({language,onLanguage,course='de',onCourse}:{language:St
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={language==='ar'?'rtl':'ltr'} lang={language}>
   <a className="skip-link" href="#main">{t(language,'skip')}</a>
-  <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref={'/?learn='+course} homeLabel={t(language,'home')} stats={course==='de'?snapshot?.stats:null} showHome={false}/>
-  <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}><a className="work-nav active" href="#curriculum" aria-current="page"><BookOpen size={18}/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><ImageIcon size={18}/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><PenLine size={18}/>{verbText(language,'verbsTitle')}</a>}</nav></aside>
+  <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref={'/?learn='+course} homeLabel={t(language,'home')} showHome={false}/>
+  <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}><a className="work-nav active" href="#curriculum" aria-current="page"><BookOpen size={18}/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><ImageIcon size={18}/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><PenLine size={18}/>{verbText(language,'verbsTitle')}</a>}</nav>{course==='de'&&snapshot?.stats&&<SidebarProgress stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}</aside>
    <main id="main" className="work-main" tabIndex={-1}>
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}
     <section className="toon-hero"><div><span className="eyebrow">{learningText(language,course)}</span><h1 id="work-heading" tabIndex={-1}>{c(language,'catalogTitle')}</h1></div><div className="toon-hero-art"><HeroArt/></div></section>
-    {course==='de'&&snapshot?.stats&&<ProgressSummaryPanel stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}
     <div className="toon-level-switch" role="group" aria-label={c(language,'levelLabel')}>{(['A1.1','A1.2'] as const).map(value=><button type="button" key={value} className={level===value?'active':''} aria-pressed={level===value} onClick={()=>setLevel(value)}><strong>{value}</strong><span>{c(language,'categories')}</span></button>)}</div>
     <section id="curriculum" aria-labelledby="curriculum-heading"><div className="toon-curriculum-head"><h2 id="curriculum-heading">{level} · {c(language,'categories')}</h2></div><div className="category-grid toon-topic-grid">{units.map(unit=>{const title=translate(unit.names,language);return <article className="category-card toon-topic-card catalog-topic-card" key={unit.id} data-unit={unit.id}><div className="catalog-topic-content"><div className="toon-topic-art"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/><span className="toon-card-number">{String(unit.number).padStart(2,'0')}</span></div><h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}{course==='de'&&unit.id==='book-11'&&snapshot&&<ProgressMeter progress={housingProgress('all',snapshot.reviews)} language={language} label={title} compact/>}{course==='de'&&unit.id==='book-11'&&<a className="btn small housing-open" href="/a1-2/ev-ve-yasam">{housingText(language,'open')}</a>}</div></article>;})}</div></section>
    </main>

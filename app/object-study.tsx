@@ -1,6 +1,5 @@
 'use client';
 import {SITE_NAME} from '@/lib/site-brand';
-import {SiteLogo} from './site-logo';
 import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronRight,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
@@ -23,7 +22,7 @@ import {ENGLISH_COURSE_ENABLED,activeLearningLanguage,learningText,saveLearningL
 import {isStudyLanguage} from '@/lib/study-languages';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
-import {EffectsSettingsButton} from './learning-effects';
+import {SiteHeader} from './site-header';
 import {objectProgress} from '@/lib/progress';
 import {ProgressMeter,RoundReward} from './progress-ui';
 import {articleRule,articleRuleText,puzzleText} from '@/lib/article-logic';
@@ -93,7 +92,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const unsolved=scopedQuestions.filter(item=>!isObjectSolved(reviewRows.get(item.id))).length;
  function fail(e:unknown,fallback:VaultCopyKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
-  try{const next=await api(undefined,'',course);if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
+  try{const next=await api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),course);if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
   catch(e){if(mounted.current)setReady(false);fail(e,'loadError');}
  }
  useEffect(()=>{
@@ -166,7 +165,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
 
  return <div className="category-app object-app toon-app picture-quiz-app vault-app" lang={language} dir={vaultDirection(language)}>
   <a className="skip-link" href="#object-main">{text('skipContent')}</a>
-  <header className="work-header logo-header"><a className="work-brand site-logo-brand" href={'/?learn='+course} aria-label={SITE_NAME+' · '+text('home')}><SiteLogo/></a><label className="language-picker picture-vault-language-picker">{text('language')}<select value={language} aria-label={text('language')} onChange={e=>{if(isVaultLanguage(e.target.value)){stopFeedback();onLanguage(e.target.value);}}}>{vaultLanguages.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label><a className="object-back" href={'/?learn='+course}><House size={17}/>{text('home')}</a><EffectsSettingsButton language={language}/></header>
+  <SiteHeader language={language} languages={vaultLanguages} onLanguage={value=>{if(isVaultLanguage(value)){stopFeedback();onLanguage(value);}}} homeHref={'/?learn='+course} homeLabel={text('home')} stats={snapshot.stats}/>
   <main id="object-main" className="object-page">
    {onCourse&&<CourseSelector course={course} language={isStudyLanguage(language)?language:'en'} disabled={busy} onChange={onCourse}/>}
    <div className="object-breadcrumb"><a href={'/?learn='+course}>{text('home')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{text('vaultTitle')}</span></div>

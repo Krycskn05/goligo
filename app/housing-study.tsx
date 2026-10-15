@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {housingSections,housingRules,housingQuestionMap,housingPool,housingMeaning,pickHousingQuestions,housingBaseId,isHousingMistake,isHousingSolved,type HousingSection} from '@/lib/housing-course';
 import {trapReasons} from '@/lib/housing-traps';
@@ -14,9 +14,8 @@ import {LetterPuzzle} from './letter-puzzle';
 import {TopicArt,RasterArt} from './toon-art';
 import {housingIllustration,housingSceneArt,housingSectionScene} from '@/lib/housing-illustrations';
 import {PracticeModes} from './practice-modes';
-import {SiteLogo} from './site-logo';
 import {SiteFooter} from './site-footer';
-import {EffectsSettingsButton} from './learning-effects';
+import {SiteHeader} from './site-header';
 import {HousingLessonNotes} from './housing-lesson';
 import {housingProgress} from '@/lib/progress';
 import {ProgressMeter,RoundReward} from './progress-ui';
@@ -59,7 +58,7 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
  function stop(){answerAudio.stop();}
  function focus(id='housing-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
  function fail(reason:unknown){if(!mounted.current)return;setError('error');setSignIn(!!(reason as {signIn?:boolean})?.signIn);}
- async function refresh(){try{const next=await api();if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}catch(reason){if(mounted.current)setReady(false);fail(reason);}}
+ async function refresh(){try{const next=await api(undefined,'stats=1&tz='+new Date().getTimezoneOffset());if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}catch(reason){if(mounted.current)setReady(false);fail(reason);}}
  useEffect(()=>{mounted.current=true;setRequestedResume(new URLSearchParams(window.location.search).get('session'));void refresh();return()=>{mounted.current=false;};},[]);
  useEffect(()=>{stop();},[language]);
  useEffect(()=>{try{setFreeText(draftKey?localStorage.getItem(draftKey)??'':'');}catch{setFreeText('');}},[draftKey]);
@@ -105,7 +104,7 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
  const modeLabels={test:v('testPractice'),write:v('writePractice'),testDetail:v('testDetail'),writeDetail:v('puzzleHint')};
  return <div className="category-app toon-app housing-app" lang={language} dir={language==='ar'?'rtl':'ltr'}>
   <a className="skip-link" href="#housing-main">{v('home')}</a>
-  <header className="work-header logo-header"><a className="work-brand site-logo-brand" href="/?learn=de" aria-label={SITE_NAME+' · '+v('home')}><SiteLogo/></a><label className="language-picker">{v('language')}<select value={language} onChange={event=>{if(isStudyLanguage(event.target.value))onLanguage(event.target.value);}}>{studyLanguages.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label><a className="object-back" href="/?learn=de&level=A1.2"><House size={18}/>{h('back')}</a><EffectsSettingsButton language={language}/></header>
+  <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref="/?learn=de&level=A1.2" homeLabel={h('back')} stats={snapshot.stats}/>
   <main id="housing-main" className="object-page housing-page">
    <div className="object-breadcrumb"><a href="/?learn=de&level=A1.2">A1.2</a><span aria-hidden="true">›</span><span>{h('title')}</span></div>
    {error&&<div className="object-alert" role="alert"><p>{signIn?v('signInError'):h(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{if(pendingAnswer.current)void submit(pendingAnswer.current.answer);else if(pendingStart.current)void start(pendingStart.current.reviewOnly,pendingStart.current.onlyIds);else void refresh();}}>{v('retry')}</button>}</div>}

@@ -1,6 +1,6 @@
 // Lists every German text the site speaks aloud, exactly as the pages pass it
 // to speech (Ev ve Yaşam answers/passages/lesson examples, Nesne Kasası
-// pronunciations, Fiiller answers, heard forms and list rows, and the voice preview). Needs the compiled lib (STUDY_CHECK_DIR).
+// pronunciations, Fiiller answers, heard forms, list rows and workshop cards, and the voice preview). Needs the compiled lib (STUDY_CHECK_DIR).
 const path=require('node:path');
 const dir=process.env.STUDY_CHECK_DIR;
 if(!dir)throw new Error('Set STUDY_CHECK_DIR to the compiled lib directory.');
@@ -27,4 +27,6 @@ const verbs=load('verb-course'),verbPractice=load('verb-practice');
 for(const q of verbs.verbQuestions){if(!verbPractice.isVerbExercise(q))continue;add(q.answer);if(q.audio)add(q.audio);}
 const verbLogic=load('verb-logic');
 for(const verb of verbs.verbs){add(verbs.verbRowSpeech(verb));add(verb.participle);add(verbLogic.sentenceText(verb,'praesens'));add(verbLogic.sentenceText(verb,'perfekt'));}
+// Fiil Atölyesi cards: the speaker button, the Präsens table and the sentences for every person.
+for(const text of load('verb-persons').workshopSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

@@ -24,6 +24,8 @@ export function selectQuestions(mode:string,topic:string,count:number,reviews:Re
  // Fiiller rounds: open mistakes first, then new and due questions; never the same verb twice in a row.
  if(isVerbTopic(topic)){
   let verbPool=verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&(!only||only.has(q.id)));
+  // Fiil Atölyesi: the learner walks the verbs in a fixed order, so the requested order is kept as it is.
+  if(mode==='workshop'&&onlyIds){const byQuestion=new Map(verbPool.map(q=>[q.id,q]));return onlyIds.map(id=>byQuestion.get(id)).filter((q):q is Question=>!!q).slice(0,count);}
   if(mode==='review')verbPool=verbPool.filter(q=>{const r=byId.get(q.id);return r&&r.wrong_count>0&&r.streak<3;});
   else if(mode==='test'||mode==='write')verbPool=verbPool.filter(q=>matchesPracticeMode(q,mode));
   else if(mode==='listen')verbPool=verbPool.filter(q=>!!q.audio);

@@ -1,7 +1,7 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const {DatabaseSync}=require('node:sqlite');const fs=require('node:fs');const path=require('node:path');const vm=require('node:vm');const ts=require('typescript');const {execFileSync}=require('node:child_process');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR to compiled lib directory.');
 const load=name=>require(path.join(compiled,name+'.js'));
-const course=load('course'),study=load('study'),verbs=load('verb-course'),practice=load('verb-practice'),copy=load('verb-copy'),progress=load('progress');
+const course=load('course'),study=load('study'),verbs=load('verb-course'),practice=load('verb-practice'),copy=load('verb-copy'),progress=load('progress'),workshop=load('verb-workshop'),families=load('verb-families');
 const languages=['tr','de','en','ar','uk','fr','es','ru','fa','pl','it','pt'];
 
 // The learner's textbook page: infinitive – sie/er (es) Präsens – Perfekt.
@@ -61,7 +61,7 @@ test('Fiiller keeps the 38 verbs of the page with Präsens, Perfekt and a meanin
 });
 
 test('every verb has choice, writing and listening exercises with new IDs only',()=>{
- const kinds=['meaning','word','praesens','perfekt','write','write-praesens','write-perfekt','hear','hear-praesens','hear-perfekt'];
+ const kinds=['meaning','word','fit','praesens','perfekt','write','write-praesens','write-perfekt','hear','hear-praesens','hear-perfekt'];
  assert.equal(verbs.verbQuestions.length,38*kinds.length);
  assert.equal(new Set(verbs.verbQuestions.map(q=>q.id)).size,verbs.verbQuestions.length);
  for(const verb of verbs.verbs)for(const task of kinds){
@@ -106,22 +106,22 @@ test('rounds follow the chosen group and mode, solved questions wait and the sam
   assert.ok(picked.every(q=>practice.verbModePredicate(mode)(q)&&(topic==='verbs-all'||q.topic===topic)));
   for(let i=1;i<picked.length;i++)assert.notEqual(picked[i].verbId,picked[i-1].verbId,mode+topic+' '+i);
  }
- assert.equal(practice.verbPool('test','verbs-1').length,40);assert.equal(practice.verbPool('write','verbs-4').length,24);
+ assert.equal(practice.verbPool('test','verbs-1').length,50);assert.equal(practice.verbPool('write','verbs-4').length,24);
  const ids=practice.verbPool('test','verbs-1').map(q=>q.id);
  const reviews=[{question_id:ids[0],wrong_count:1,streak:0,seen:1,last_answer:'x',last_wrong:'x',last_at:1,due_at:1},{question_id:ids[1],wrong_count:0,streak:1,seen:1,last_answer:'y',last_wrong:null,last_at:1,due_at:1}];
  const fresh=practice.pickVerbRound('test','verbs-1',reviews,false,undefined,{fresh:true}).map(q=>q.id);
- assert.ok(fresh.includes(ids[0])&&!fresh.includes(ids[1]));assert.equal(fresh.length,39);
+ assert.ok(fresh.includes(ids[0])&&!fresh.includes(ids[1]));assert.equal(fresh.length,49);
  const review=practice.pickVerbRound('test','verbs-1',reviews,true,undefined,{starred:new Set([ids[2]])}).map(q=>q.id).sort();
  assert.deepEqual(review,[ids[0],ids[2]].sort());
- assert.equal(study.selectQuestions('test','verbs-1',40,reviews,ids)[0].id,ids[0],'open mistakes come first');
- assert.equal(progress.verbProgressIds('verbs-all').length,380);
+ assert.equal(study.selectQuestions('test','verbs-1',50,reviews,ids)[0].id,ids[0],'open mistakes come first');
+ assert.equal(progress.verbProgressIds('verbs-all').length,418);
  assert.ok(progress.verbProgressIds('verbs-3').every(id=>course.questionMap.get(id).topic==='verbs-3'));
  assert.equal(progress.verbProgress('verbs-1',reviews).learned,1);
 });
 
 test('every text of the page exists in all twelve languages',()=>{
  for(const key of Object.keys(copy.verbCopy))for(const language of languages){
-  const text=copy.verbText(language,key,{n:7,verb:'ab|fahren',total:9,t:'Präsens'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
+  const text=copy.verbText(language,key,{n:7,verb:'ab|fahren',total:9,t:'Präsens',p:'ab'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
  }
  assert.equal(copy.verbText('tr','groupTitle',{n:2}),'2. grup');
 });
@@ -139,7 +139,7 @@ test('a Fiiller round starts, saves answers and stars, resumes and finishes thro
  const {session}=await started.json();assert.equal(session.topic,'verbs-4');assert.equal(session.questions.length,24);
  const first=course.questionMap.get(session.questions[0].id);
  const wrong=await (await a.post({action:'answer',sessionId:id,questionId:first.id,answer:'falsch'})).json();assert.equal(wrong.result.correct,0);
- let open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,id);assert.equal(open.activePictureSessionId,null);
+ let open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,null,'only the workshop path is picked up again');assert.equal(open.activePictureSessionId,null);
  assert.equal((await a.post({action:'note',key:'star:'+first.id,value:'1'})).status,200);
  open=await (await a.get()).json();assert.equal(open.notes['star:'+first.id],'1');
  const resumed=(await (await a.get('?session='+id)).json()).session;assert.equal(resumed.answers.length,1);
@@ -151,6 +151,12 @@ test('a Fiiller round starts, saves answers and stars, resumes and finishes thro
  const listenSession=(await choice.json()).session;const q=course.questionMap.get(listenSession.questions[0].id);assert.ok(q.audio);
  assert.deepEqual([...listenSession.questions[0].options].sort(),[...q.options].sort());
  assert.equal((await a.post({action:'start',id:'verb-bad-topic-000001',mode:'test',topic:'verbs-9',count:1})).status,400);
+ // Fiil Atölyesi: the whole path is one session in the requested order; it is the session to continue.
+ const path=workshop.workshopIds();const started2=await a.post({action:'start',id:'verb-workshop-session-01',mode:'workshop',topic:'verbs-all',count:path.length,onlyIds:path});assert.equal(started2.status,201);
+ const ws=(await started2.json()).session;assert.deepEqual(ws.questions.map(item=>item.id),path);assert.equal(ws.mode,'workshop');
+ open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,'verb-workshop-session-01');
+ const other=await a.post({action:'start',id:'verb-other-session-00001',mode:'test',topic:'verbs-1',count:5});assert.equal(other.status,201);
+ open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,'verb-workshop-session-01','another open round never replaces the path');
 });
 
 test('the page is linked from home, only the correct answer is spoken, and verb audio is in the voice list',()=>{
@@ -159,7 +165,7 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  assert.match(fs.readFileSync('app/progress-ui.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/layout.tsx','utf8'),/verbs\.css/);
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(page.includes('const pronunciation=q?.answer??\'\';'));
+ assert.ok(page.includes("const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';"));
  assert.ok(page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'));
  // The question audio is played only from the listen buttons.
  assert.equal((page.match(/speech\.speak\(q\.audio/g)||[]).length,1);
@@ -167,6 +173,17 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  const texts=new Set(JSON.parse(execFileSync(process.execPath,['scripts/voices/list-texts.cjs'],{encoding:'utf8',env:{...process.env,STUDY_CHECK_DIR:compiled}})));
  for(const q of verbs.verbQuestions){assert.ok(texts.has(q.answer),q.id);if(q.audio)assert.ok(texts.has(q.audio),q.id);}
  for(const verb of verbs.verbs)assert.ok(texts.has(verbs.verbRowSpeech(verb)),verb.id);
+ // Everything the workshop cards read aloud (speaker button, Präsens table, sentences for every person) has a natural clip.
+ const persons=load('verb-persons');const spoken=persons.workshopSpeechTexts();
+ for(const text of spoken)assert.ok(texts.has(text),text);
+ const fahren=verbs.verbMap.get('einladen');
+ assert.deepEqual(persons.conjugationRows(fahren).map(row=>row.spoken),['ich lade ein','du lädst ein','er lädt ein','wir laden ein','ihr ladet ein','sie laden ein']);
+ assert.equal(persons.learnSpeech(fahren,'meaning'),'einladen');assert.equal(persons.learnSpeech(fahren,'perfekt'),'er hat eingeladen');
+ const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
+ assert.ok(cards.includes('const rows=conjugationRows(verb);')&&cards.includes('onClick={()=>speech.speak(spoken)}')&&cards.includes('const spoken=learnSpeech(verb,stage);')&&cards.includes('onClick={()=>speech.speak(row.text)}'),'the cards speak exactly these texts');
+ // Long voice runs stop in time and continue in a new run.
+ assert.match(fs.readFileSync('scripts/voices/make-voices.py','utf8'),/VOICE_BUDGET_MIN/);
+ assert.match(fs.readFileSync('scripts/voices/build.sh','utf8'),/gh workflow run sesler\.yml/);
 });
 
 test('sentences, form pieces and rules explain every verb',()=>{
@@ -212,4 +229,133 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+' '+prefix)"));
  assert.ok(page.includes('<VerbGame ')&&page.includes('gameIds.map'));
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
+});
+
+test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, cards open every stage',()=>{
+ const all=families.verbFamilies.flatMap(f=>f.verbs);assert.equal(all.length,38);assert.equal(new Set(all).size,38);
+ for(const verb of verbs.verbs)assert.ok(families.verbFamilyOf(verb.id),verb.id);
+ for(const family of families.verbFamilies)for(const language of languages){assert.ok(families.familyTitle(family,language).trim());assert.ok(families.familyRule(family,language).length>20);}
+ // Part 1 runs from ab|fahren to essen (the learner's line), part 2 from fahren to mit|kommen, both in the book's order.
+ const byId=id=>verbs.verbMap.get(id);const logic=load('verb-logic');
+ assert.equal(families.verbFamilies.length,2);assert.deepEqual(families.verbFamilies.map(f=>f.id),['verbs-w1','verbs-w2']);
+ assert.deepEqual(families.verbFamilies.map(f=>f.verbs.length),[19,19]);
+ assert.deepEqual(families.verbFamilies[0].verbs,verbs.verbs.slice(0,19).map(v=>v.id));assert.deepEqual(families.verbFamilies[1].verbs,verbs.verbs.slice(19).map(v=>v.id));
+ assert.equal(families.verbFamilies[0].verbs[18],'essen');assert.equal(families.verbFamilies[1].verbs[0],'fahren');
+ const ids=workshop.workshopIds();assert.equal(ids.length,38*4,'every verb: one test and one spelling for its meaning, the same for its Perfekt');assert.equal(new Set(ids).size,ids.length);
+ for(const id of ids)assert.ok(practice.isVerbExercise(course.questionMap.get(id)),id);
+ assert.deepEqual(ids.slice(0,2).map(id=>course.questionMap.get(id).verbTask),['meaning','write']);
+ assert.ok(!ids.some(id=>course.questionMap.get(id).verbTask==='word'),'one test per verb: no second choice question');
+ assert.ok(!ids.some(id=>course.questionMap.get(id).kind==='listen'),'no listening questions on the path');
+ assert.deepEqual(ids.slice(38,40).map(id=>course.questionMap.get(id).verbTask),['perfekt','write-perfekt']);
+ assert.equal(course.questionMap.get(ids[38]).verbId,'abfahren');assert.equal(course.questionMap.get(ids[76]).verbId,'fahren');
+ const questions=ids.map(id=>({id}));const lookup=id=>course.questionMap.get(id);
+ const first=workshop.pathPlace(questions,0,lookup);assert.equal(first.verb.id,'abfahren');assert.ok(first.chapterStart&&first.stageStart);assert.equal(first.stage,'meaning');assert.equal(first.verbNumber,1);assert.equal(first.steps.length,2);
+ for(const i of [1]){const later=workshop.pathPlace(questions,i,lookup);assert.ok(!later.stageStart&&!later.chapterStart);assert.equal(later.step,i);}
+ const second=workshop.pathPlace(questions,2,lookup);assert.equal(second.verb.id,'abgeben');assert.ok(second.stageStart&&!second.chapterStart);assert.equal(second.verbNumber,2);
+ const perfekt=workshop.pathPlace(questions,38,lookup);assert.equal(perfekt.verb.id,'abfahren');assert.equal(perfekt.stage,'perfekt');assert.ok(perfekt.chapterStart&&perfekt.stageStart);assert.equal(perfekt.steps.length,2);assert.equal(perfekt.verbNumber,1);
+ const part2=workshop.pathPlace(questions,76,lookup);assert.equal(part2.family.number,2);assert.equal(part2.stage,'meaning');assert.ok(part2.chapterStart);assert.equal(part2.verb.id,'fahren');
+ assert.deepEqual(study.selectQuestions('workshop','verbs-all',ids.length,[],ids).map(q=>q.id),ids,'the path keeps its order');
+ assert.ok(practice.verbModePredicate('workshop')(course.questionMap.get('verb-hear-essen'))&&practice.verbModePredicate('workshop')(course.questionMap.get('verb-write-perfekt-essen')));
+ const p9=workshop.workshopProgress({answered:6,total:152});assert.equal(p9.stage,'meaning');assert.equal(p9.stageVerbsDone,3);assert.equal(p9.nextVerbId,'anfangen');assert.equal(p9.family.number,1);assert.ok(!p9.finished);
+ const p57=workshop.workshopProgress({answered:38,total:152});assert.equal(p57.stage,'perfekt');assert.equal(p57.stageVerbsDone,0);assert.equal(p57.nextVerbId,'abfahren');assert.equal(p57.stageVerbs,19);
+ const p95=workshop.workshopProgress({answered:76,total:152});assert.equal(p95.family.number,2);assert.equal(p95.stage,'meaning');assert.equal(p95.nextVerbId,'fahren');
+ assert.ok(workshop.workshopProgress({answered:152,total:152}).finished);
+ const part1=workshop.partProgress(families.verbFamilies[0],40);assert.equal(part1.meaningDone,19);assert.equal(part1.perfektDone,1);assert.equal(part1.state,'current');
+ assert.equal(workshop.partProgress(families.verbFamilies[1],40).state,'locked');assert.equal(workshop.partProgress(families.verbFamilies[0],76).state,'done');
+ const status=workshop.verbStatus(40);assert.deepEqual(status.get('abfahren'),{meaning:true,perfekt:true});assert.deepEqual(status.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(status.get('fahren'),{meaning:false,perfekt:false});
+ const T=workshop.WORKSHOP_TOTAL;assert.equal(T,152);
+ assert.equal(workshop.findWorkshop([{id:'a',mode:'mixed',topic:'verbs-all',finished_at:1,total:30},{id:'old',mode:'workshop',topic:'verbs-all',finished_at:null,total:266},{id:'older',mode:'workshop',topic:'verbs-all',finished_at:null,total:190},{id:'b',mode:'workshop',topic:'verbs-all',finished_at:null,total:T},{id:'c',mode:'workshop',topic:'verbs-all',finished_at:2,total:T}]).id,'b','a round of an older, longer path is not continued');
+ assert.ok(workshop.isCurrentPath({mode:'workshop',questions}));assert.ok(!workshop.isCurrentPath({mode:'workshop',questions:questions.slice(1)}));
+ // Sentence task: the verb is shown, the answer is its form for the subject, the wrong options are the other persons (du, ich, wir, ihr), the prefix at the end.
+ for(const verb of verbs.verbs){
+  const fit=course.questionMap.get('verb-fit-'+verb.id);assert.equal(fit.kind,'choice');assert.equal(fit.options.length,4);assert.equal(new Set(fit.options).size,4);
+  assert.equal(fit.answer,verb.praesens);assert.equal(fit.options[0],verb.praesens);assert.ok(fit.prompt.startsWith(verb.display+' · '));
+  const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';
+  for(const option of fit.options)assert.ok(prefix?option.endsWith(' '+prefix):!option.includes(' '),verb.id+' '+option);
+ }
+ const fitOptions=id=>course.questionMap.get('verb-fit-'+id).options;
+ assert.deepEqual(fitOptions('fahren'),['fährt','fährst','fahre','fahren']);
+ assert.deepEqual(fitOptions('essen'),['isst','esse','essen','esst']);
+ assert.deepEqual(fitOptions('finden'),['findet','findest','finde','finden']);
+ assert.deepEqual(fitOptions('gelten'),['gilt','giltst','gelte','gelten']);
+ assert.deepEqual(fitOptions('einladen'),['lädt ein','lädst ein','lade ein','laden ein']);
+ assert.deepEqual(fitOptions('aufstehen'),['steht auf','stehst auf','stehe auf','stehen auf']);
+ assert.deepEqual(fitOptions('leidtun'),['tut leid','tust leid','tue leid','tun leid']);
+ assert.deepEqual(verbs.seededOptions(['a','b','c','d'],'x'),verbs.seededOptions(['a','b','c','d'],'x'));
+ assert.equal(logic.praesensForm(byId('fahren')),'fährt');assert.equal(logic.praesensForm(byId('aufstehen')),'steht … auf');assert.equal(logic.praesensForm(byId('leidtun')),'tut … leid');
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert.ok(!page.includes("v('resume')"),'no resume card on the page');
+ assert.ok(page.includes('<SiteHeader ')&&page.includes('<ChapterCard ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
+ assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
+ for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','stageMeanings','perfektChapter','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
+ assert.ok(!page.includes('startKarma')&&!page.includes('data-verb-karma'),'no Karma sınav on the page');
+ // No single example sentence on the learning cards (the meaning card shows the conjugation table); after an answer: one sentence per person (next test).
+ const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const learnCard=cards.slice(cards.indexOf('export function LearnCard'),cards.indexOf('export function ChapterCard'));
+ assert.ok(!learnCard.includes('<ExampleSentence'),'learning cards show no example sentence');
+ // The meaning card shows the Präsens forms for ich, du, er/sie/es, wir, ihr, sie/Sie instead.
+ assert.ok(learnCard.includes("stage==='meaning'?<ConjugationTable")&&cards.includes('const rows=conjugationRows(verb);'));
+ const persons=id=>{const f=verbs.praesensPersons(byId(id));return [f.ich,f.du,f.er,f.wir,f.ihr];};
+ assert.deepEqual(persons('fahren'),['fahre','fährst','fährt','fahren','fahrt']);
+ assert.deepEqual(persons('abfahren'),['fahre ab','fährst ab','fährt ab','fahren ab','fahrt ab']);
+ assert.deepEqual(persons('essen'),['esse','isst','isst','essen','esst']);
+ assert.deepEqual(persons('lesen'),['lese','liest','liest','lesen','lest']);
+ assert.deepEqual(persons('heißen'),['heiße','heißt','heißt','heißen','heißt']);
+ assert.deepEqual(persons('finden'),['finde','findest','findet','finden','findet']);
+ assert.deepEqual(persons('anbieten'),['biete an','bietest an','bietet an','bieten an','bietet an']);
+ assert.deepEqual(persons('gelten'),['gelte','giltst','gilt','gelten','geltet']);
+ assert.deepEqual(persons('einladen'),['lade ein','lädst ein','lädt ein','laden ein','ladet ein']);
+ assert.deepEqual(persons('empfehlen'),['empfehle','empfiehlst','empfiehlt','empfehlen','empfehlt']);
+ assert.deepEqual(persons('gefallen'),['gefalle','gefällst','gefällt','gefallen','gefallt']);
+ assert.deepEqual(persons('leidtun'),['tue leid','tust leid','tut leid','tun leid','tut leid']);
+ for(const verb of verbs.verbs){const f=verbs.praesensPersons(verb);assert.equal(f.er,verb.praesens,verb.id);assert.equal(new Set([f.ich,f.wir]).size,2,verb.id);}
+ for(const language of languages)assert.ok(copy.verbText(language,'conjugationTitle').includes('Präsens'));
+ assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no single sie/er sentence');
+ assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
+});
+test('after an answer every person gets an example sentence: Präsens after meanings, Perfekt after Perfekt',()=>{
+ const persons=load('verb-persons');const byId=id=>verbs.verbMap.get(id);
+ assert.deepEqual([...persons.personKeys],['ich','du','er','sie','es','wir','ihr','sie-plural','Sie']);
+ assert.deepEqual([...persons.personSentenceVerbs].sort(),verbs.verbs.map(v=>v.id).sort());
+ const helper={hat:['habe','hast','hat','hat','hat','haben','habt','haben','haben'],ist:['bin','bist','ist','ist','ist','sind','seid','sind','sind']};
+ for(const verb of verbs.verbs)for(const tense of ['praesens','perfekt']){
+  const rows=persons.personSentences(verb,tense);assert.equal(rows.length,9,verb.id+' '+tense);
+  for(const row of rows){assert.match(row.text,/^[A-ZÄÖÜ][^.]*[a-zäöüß]\.$/,row.text);assert.ok(!/\s\s|\{X\}|undefined/.test(row.text),row.text);assert.equal(row.parts.map(p=>p.text).join(' ')+'.',row.text);}
+  if(persons.personMode(verb)!=='subject')continue;
+  // Subject first (Ich, Du, Er, Sie, Es, Wir, Ihr, Sie, Sie), then the verb form of that person.
+  assert.deepEqual(rows.map(r=>r.text.split(' ')[0]),['Ich','Du','Er','Sie','Es','Wir','Ihr','Sie','Sie'],verb.id);
+  const f=verbs.praesensPersons(verb);const forms=[f.ich,f.du,f.er,f.er,f.er,f.wir,f.ihr,f.wir,f.wir];const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';
+  rows.forEach((row,i)=>{
+   if(tense==='praesens'){const finite=prefix?forms[i].slice(0,-(prefix.length+1)):forms[i];assert.equal(row.parts[1].text,finite,row.text);if(prefix)assert.ok(row.text.endsWith(' '+prefix+'.'),row.text);}
+   else{assert.equal(row.parts[1].text,helper[verb.aux][i],row.text);assert.ok(row.text.endsWith(' '+verb.participle+'.'),row.text);}
+  });
+ }
+ const text=(id,tense)=>persons.personSentences(byId(id),tense).map(row=>row.text);
+ assert.deepEqual(text('ankommen','praesens'),['Ich komme in Berlin an.','Du kommst in Berlin an.','Er kommt in Berlin an.','Sie kommt in Berlin an.','Es kommt in Berlin an.','Wir kommen in Berlin an.','Ihr kommt in Berlin an.','Sie kommen in Berlin an.','Sie kommen in Berlin an.']);
+ assert.deepEqual(text('ankommen','perfekt'),['Ich bin in Berlin angekommen.','Du bist in Berlin angekommen.','Er ist in Berlin angekommen.','Sie ist in Berlin angekommen.','Es ist in Berlin angekommen.','Wir sind in Berlin angekommen.','Ihr seid in Berlin angekommen.','Sie sind in Berlin angekommen.','Sie sind in Berlin angekommen.']);
+ // Short sentences: each one fits on one line of a phone.
+ for(const verb of verbs.verbs)for(const tense of ['praesens','perfekt'])for(const row of persons.personSentences(verb,tense))assert.ok(row.text.length<=34,row.text);
+ assert.deepEqual(text('essen','praesens').slice(0,3),['Ich esse gern Salat.','Du isst gern Salat.','Er isst gern Salat.']);
+ assert.equal(text('einladen','praesens')[6],'Ihr ladet Freunde ein.');
+ assert.equal(text('empfehlen','praesens')[1],'Du empfiehlst das Buch.');
+ assert.equal(text('helfen','perfekt')[5],'Wir haben Oma geholfen.');
+ // gefallen and leid|tun: the person in the dative; gelten: für + accusative.
+ assert.deepEqual(text('gefallen','praesens'),['Die Stadt gefällt mir.','Die Stadt gefällt dir.','Die Stadt gefällt ihm.','Die Stadt gefällt ihr.','Die Stadt gefällt ihm.','Die Stadt gefällt uns.','Die Stadt gefällt euch.','Die Stadt gefällt ihnen.','Die Stadt gefällt Ihnen.']);
+ assert.deepEqual(text('leidtun','perfekt').slice(0,2),['Es hat mir leidgetan.','Es hat dir leidgetan.']);
+ assert.deepEqual(text('gelten','praesens').slice(0,3),['Die Regel gilt für mich.','Die Regel gilt für dich.','Die Regel gilt für ihn.']);
+ assert.deepEqual(['gefallen','leidtun','gelten'].map(id=>persons.personMode(byId(id))),['dative','dative','fuer']);
+ for(const language of languages){
+  assert.ok(copy.verbText(language,'examplesTitle',{t:'Präsens'}).includes('Präsens'),language);
+  for(const key of ['pronounPlural','pronounFormal'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
+  assert.ok(copy.verbText(language,'personDative').length<60,language);assert.ok(copy.verbText(language,'personFuer').includes('für mich')&&copy.verbText(language,'personFuer').length<70,language);
+ }
+ // After a test answer the result card shows them: Präsens after the meaning test, Perfekt after the Perfekt test; tapping a row reads it.
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
+ const result=cards.slice(cards.indexOf('export function AnswerResult'),cards.indexOf('export function ChapterCard'));
+ assert.ok(result.includes("<PersonSentences verb={verb} tense={stage==='perfekt'?'perfekt':'praesens'}")&&result.includes('<VerbPicture verb={verb}'),'picture on top, examples below');
+ assert.ok(page.includes("const answered=!!feedback&&!writing;")&&page.includes('{answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)}'),'a test answer opens the result card');
+ assert.ok(page.includes('spoken={pronunciation}')&&page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'),'after the effect only the correct answer is spoken');
+ assert.ok(!page.includes('<PersonSentences'),'no example sentences after spelling');
+ // Phones: each step starts at the top of the practice area, so the card fits without dragging.
+ assert.ok(page.includes("box.scrollIntoView({block:'start',behavior:'instant'})")&&page.includes("focus({preventScroll:true});toPractice();"));
+ assert.ok(cards.includes('onClick={()=>speech.speak(row.text)}'),'a sentence is read only when tapped');
 });

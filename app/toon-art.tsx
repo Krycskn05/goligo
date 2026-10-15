@@ -3,9 +3,20 @@ import topicArt from '@/lib/toon-topic-art.json';
 import objectArt from '@/lib/object-toon-art.json';
 import heroArt from '@/lib/toon-hero-art.json';
 export type RasterSprite={src:string;width:number;height:number;crop:{x:number;y:number;width:number;height:number}};
+/**
+ * A cropped picture that fills its box like one image: the picture is shown whole ("meet"),
+ * and the strips beside it extend the picture's own edge colours, so no second background shows.
+ */
 export function RasterArt({art,title,className=''}:{art:RasterSprite;title:string;className?:string}){
- const clipId=useId();
- return <svg className={'toon-art '+className} role="img" aria-label={title} focusable="false" width="400" height="280" viewBox={[art.crop.x,art.crop.y,art.crop.width,art.crop.height].join(' ')} preserveAspectRatio="xMidYMid meet"><defs><clipPath id={clipId} clipPathUnits="userSpaceOnUse"><rect x={art.crop.x} y={art.crop.y} width={art.crop.width} height={art.crop.height}/></clipPath></defs><image href={art.src} x="0" y="0" width={art.width} height={art.height} clipPath={'url(#'+clipId+')'}/></svg>;
+ const clipId=useId();const c=art.crop;const far=4000;const edge=3;
+ const box=[c.x,c.y,c.width,c.height].join(' ');
+ const strip=(key:string,x:number,y:number,width:number,height:number,view:number[])=><svg key={key} x={x} y={y} width={width} height={height} viewBox={view.join(' ')} preserveAspectRatio="none" aria-hidden="true"><image href={art.src} x="0" y="0" width={art.width} height={art.height}/></svg>;
+ return <svg className={'toon-art '+className} role="img" aria-label={title} focusable="false" width="400" height="280" viewBox={box} preserveAspectRatio="xMidYMid meet"><defs><clipPath id={clipId} clipPathUnits="userSpaceOnUse"><rect x={c.x} y={c.y} width={c.width} height={c.height}/></clipPath></defs>
+  {strip('l',c.x-far,c.y-far,far,c.height+2*far,[c.x,c.y,edge,c.height])}
+  {strip('r',c.x+c.width,c.y-far,far,c.height+2*far,[c.x+c.width-edge,c.y,edge,c.height])}
+  {strip('t',c.x,c.y-far,c.width,far,[c.x,c.y,c.width,edge])}
+  {strip('b',c.x,c.y+c.height,c.width,far,[c.x,c.y+c.height-edge,c.width,edge])}
+  <image href={art.src} x="0" y="0" width={art.width} height={art.height} clipPath={'url(#'+clipId+')'}/></svg>;
 }
 export function TopicArt({id,title}:{id:string;title:string}){
  const art=(topicArt.units as Record<string,RasterSprite>)[id];return art?<RasterArt art={art} title={title}/>:null;

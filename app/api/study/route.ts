@@ -34,7 +34,7 @@ export async function GET(request:Request){
    db.prepare('SELECT key,value FROM study_notes WHERE user_id=?').bind(user).all<{key:string;value:string}>(),
    db.prepare("SELECT s.id,s.mode,s.topic,s.created_at,s.finished_at,s.questions,COUNT(a.id) AS answered,COALESCE(SUM(a.correct),0) AS correct FROM study_sessions s LEFT JOIN study_answers a ON a.session_id=s.id AND a.user_id=s.user_id WHERE s.user_id=? AND ((?=1 AND s.topic LIKE 'en-%') OR (?=0 AND s.topic NOT LIKE 'en-%')) GROUP BY s.id ORDER BY s.created_at DESC LIMIT 40").bind(user,english?1:0,english?1:0).all<Record<string,unknown>>(),
    db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode IN ('visual','write','listen') AND topic LIKE ? AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user,english?'en-objects-%':'objects-%').first<{id:string}>(),
-   english?Promise.resolve(null):db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode IN ('test','write','listen') AND topic LIKE 'verbs-%' AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user).first<{id:string}>()
+   english?Promise.resolve(null):db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode='workshop' AND topic LIKE 'verbs-%' AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user).first<{id:string}>()
   ]);
   const stats=url.searchParams.get('stats')==='1'?await loadStats(db,user,english,url.searchParams.get('tz')):undefined;
   return json({stats,reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,activeVerbSessionId:activeVerb?.id??null,sessions:sessions.results.map(s=>({...s,questions:undefined,total:JSON.parse(s.questions as string).length}))});
@@ -70,8 +70,9 @@ export async function POST(request:Request){
    if(row.finished_at)return json({error:'Bu test tamamlandı.'},409);
    const answered=await db.prepare('SELECT COUNT(*) AS n FROM study_answers WHERE session_id=? AND user_id=?').bind(sessionId,user).first<{n:number}>();
    if(order[answered?.n??0]?.id!==questionId)return json({error:'Test ilerlemesi değişti. Sayfayı yenileyerek devam et.'},409);
-   // A saved round keeps the choices it was shown, even if the catalogue changed later.
-   const shown=order.find(item=>item.id===questionId)?.options??q.options;
+   // A saved round keeps the choices it was shown; when the catalogue changed so much that the answer is not among them, the fresh choices count.
+   const stored=order.find(item=>item.id===questionId)?.options;
+   const shown=stored&&stored.includes(q.answer)?stored:q.options;
    if(shown&&!shown.includes(answer))return json({error:'Geçerli bir şık seç.'},400);
    const correct=gradeAnswer(q,answer)?1:0;
    // The insert and review update share one transaction. changes() prevents duplicate retries from inflating counts.

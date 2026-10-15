@@ -79,8 +79,9 @@ async function visit(page, url, shot, errors) {
   }
 
   await visit(page, "/fiiller", "06-fiiller.png", errors);
-  const verbCards = await page.locator("[data-verb-category]").count();
-  record("Fiiller sayfasinda gruplar ve devam karti var", verbCards === 6, `kart ${verbCards}`);
+  const workshopPanels = await page.locator("[data-verb-workshop]").count();
+  const islands = await page.locator("[data-verb-island]").count();
+  record("Fiil Atolyesi sayfasinda yol paneli ve iki bolum var", workshopPanels === 1 && islands === 2, `yol ${workshopPanels}, bolum ${islands}`);
 
   const phone = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const p2 = await phone.newPage();
@@ -91,6 +92,41 @@ async function visit(page, url, shot, errors) {
   await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
   await p2.waitForTimeout(1500);
   await p2.screenshot({ path: path.join(OUT, "07-telefon-fiiller.png"), fullPage: true });
+
+  // Telefonda Fiil Atolyesi: giris yap, yolu baslat, her adimin fotografini cek ve kartin
+  // tek ekrana sigip sigmadigini olc (asagi kaydirmadan). Bilgi amaclidir; yayini durdurmaz.
+  const info = (name, ok, detail) => console.log(`${ok ? "BILGI " : "UYARI "} ${name}${detail ? " — " + detail : ""}`);
+  try {
+    await p2.goto(BASE + "/signin-with-chatgpt?return_to=%2Ffiiller", { waitUntil: "networkidle", timeout: 90000 });
+    await p2.waitForTimeout(1500);
+    await p2.locator(".verb-path-enter").first().click();
+    await p2.waitForSelector("#verb-chapter-heading, #verb-learn-heading, #object-question-heading", { timeout: 20000 });
+    const shot = async (file) => {
+      await p2.waitForTimeout(700);
+      await p2.screenshot({ path: path.join(OUT, file) });
+      return p2.evaluate(() => {
+        const card = document.querySelector(".verb-practice article");
+        const r = card && card.getBoundingClientRect();
+        return r ? { top: Math.round(r.top), bottom: Math.round(r.bottom), vh: innerHeight } : null;
+      });
+    };
+    const fit = (label, m) => info(`Telefon: ${label} tek ekrana sigiyor`, !!m && m.top >= 0 && m.bottom <= m.vh, m ? `ust ${m.top}, alt ${m.bottom}, ekran ${m.vh}` : "kart yok");
+    if (await p2.locator("#verb-chapter-heading").count()) {
+      await shot("08-telefon-bolum.png");
+      await p2.locator(".verb-chapter .verb-learn-next").click();
+    }
+    fit("ogrenme karti (resim, anlam, cekim)", await shot("09-telefon-kart.png"));
+    await p2.locator(".verb-learn .verb-learn-next").click();
+    fit("test sorusu", await shot("10-telefon-soru.png"));
+    await p2.locator(".verb-options .object-option").first().click();
+    await p2.waitForSelector(".verb-result", { timeout: 20000 });
+    fit("test sonucu ve ornek cumleler", await shot("11-telefon-sonuc.png"));
+    await p2.locator(".verb-result-next").click();
+    await p2.waitForSelector(".letter-puzzle", { timeout: 20000 });
+    fit("yazim", await shot("12-telefon-yazim.png"));
+  } catch (e) {
+    info("Telefon: atolye adimlari", false, String(e && e.message || e).slice(0, 200));
+  }
 
   await browser.close();
   fs.writeFileSync(path.join(path.dirname(OUT), "smoke-results.json"), JSON.stringify(results, null, 2));

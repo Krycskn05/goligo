@@ -107,7 +107,7 @@ for(const verb of verbs){
  const add=(id:string,task:VerbTask,question:Omit<Question,'id'|'topic'|'explanation'>)=>verbBank.push({id,...shared,verbTask:task,...question});
  add('verb-meaning-'+verb.id,'meaning',{kind:'choice',prompt:verb.display+' ne demek?',answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'meaning-'+verb.id)]});
  add('verb-word-'+verb.id,'word',{kind:'choice',prompt:'“'+meaning+'” anlamındaki Almanca fiil hangisi?',answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'word-'+verb.id)]});
- add('verb-fit-'+verb.id,'fit',{kind:'choice',prompt:'Resme ve cümleye uyan fiil hangisi?',answer:verb.infinitive,options:[verb.infinitive,...fitDistractors(verb,'fit-'+verb.id)]});
+ add('verb-fit-'+verb.id,'fit',{kind:'choice',prompt:'Özneye göre boşluğa uyan fiil biçimi hangisi?',answer:verb.infinitive,options:[verb.infinitive,...fitDistractors(verb,'fit-'+verb.id)]});
  add('verb-praesens-'+verb.id,'praesens',{kind:'choice',prompt:verb.display+' · Präsens: '+subject+' …',answer:verb.praesens,options:[verb.praesens,...verb.praesensWrong]});
  add('verb-perfekt-'+verb.id,'perfekt',{kind:'choice',prompt:verb.display+' · Perfekt: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...verb.perfektWrong]});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});

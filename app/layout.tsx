@@ -4,6 +4,7 @@ import "./globals.css";
 import "./learning-effects.css";
 import "./progress.css";
 import "./verbs.css";
+import "./apple.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

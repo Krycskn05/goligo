@@ -256,16 +256,35 @@ test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, ca
  const part2=workshop.pathPlace(questions,76,lookup);assert.equal(part2.family.number,2);assert.equal(part2.stage,'meaning');assert.ok(part2.chapterStart);assert.equal(part2.verb.id,'fahren');
  assert.deepEqual(study.selectQuestions('workshop','verbs-all',ids.length,[],ids).map(q=>q.id),ids,'the path keeps its order');
  assert.ok(practice.verbModePredicate('workshop')(course.questionMap.get('verb-hear-essen'))&&practice.verbModePredicate('workshop')(course.questionMap.get('verb-write-perfekt-essen')));
- const p9=workshop.workshopProgress({answered:6,total:152});assert.equal(p9.stage,'meaning');assert.equal(p9.stageVerbsDone,3);assert.equal(p9.nextVerbId,'anfangen');assert.equal(p9.family.number,1);assert.ok(!p9.finished);
- const p57=workshop.workshopProgress({answered:38,total:152});assert.equal(p57.stage,'perfekt');assert.equal(p57.stageVerbsDone,0);assert.equal(p57.nextVerbId,'abfahren');assert.equal(p57.stageVerbs,19);
- const p95=workshop.workshopProgress({answered:76,total:152});assert.equal(p95.family.number,2);assert.equal(p95.stage,'meaning');assert.equal(p95.nextVerbId,'fahren');
- assert.ok(workshop.workshopProgress({answered:152,total:152}).finished);
- const part1=workshop.partProgress(families.verbFamilies[0],40);assert.equal(part1.meaningDone,19);assert.equal(part1.perfektDone,1);assert.equal(part1.state,'current');
- assert.equal(workshop.partProgress(families.verbFamilies[1],40).state,'locked');assert.equal(workshop.partProgress(families.verbFamilies[0],76).state,'done');
- const status=workshop.verbStatus(40);assert.deepEqual(status.get('abfahren'),{meaning:true,perfekt:true});assert.deepEqual(status.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(status.get('fahren'),{meaning:false,perfekt:false});
+ // No part is locked: each part is its own round (meanings, then Perfekt), 76 questions for 19 verbs.
+ const [w1,w2]=families.verbFamilies;const P=workshop.partTotal(w1);assert.equal(P,76);assert.equal(workshop.partTotal(w2),76);
+ assert.deepEqual(workshop.partIds(w1),ids.slice(0,76));assert.deepEqual(workshop.partIds(w2),ids.slice(76));
+ const p6=workshop.partProgress(w1,6);assert.equal(p6.stage,'meaning');assert.equal(p6.stageVerbsDone,3);assert.equal(p6.nextVerbId,'anfangen');assert.ok(p6.started&&!p6.finished);
+ const p38=workshop.partProgress(w1,38);assert.equal(p38.stage,'perfekt');assert.equal(p38.stageVerbsDone,0);assert.equal(p38.nextVerbId,'abfahren');assert.equal(p38.meaningDone,19);
+ const fresh2=workshop.partProgress(w2,0);assert.equal(fresh2.nextVerbId,'fahren');assert.ok(!fresh2.started);
+ assert.ok(workshop.partProgress(w1,76).finished);assert.equal(workshop.partProgress(w1,40).perfektDone,1);
+ // Rounds: a part round is known by its first question; an older whole-path round (152) counts for part 1 and ends after it.
+ const round=(id,first,total,answered,finished_at=null)=>({id,mode:'workshop',topic:'verbs-all',first,total,answered,finished_at});
+ const legacy=round('old',ids[0],152,33);const round2=round('p2',workshop.partIds(w2)[0],76,10);const other={id:'x',mode:'mixed',topic:'verbs-all',total:30,answered:3,finished_at:null};
+ assert.equal(workshop.sessionPart(legacy).id,'verbs-w1');assert.equal(workshop.sessionPart(round2).id,'verbs-w2');assert.equal(workshop.sessionPart(other),undefined);
+ const sessions=[round2,legacy,other];
+ assert.equal(workshop.findPartSession(sessions,w1).id,'old');assert.equal(workshop.findPartSession(sessions,w2).id,'p2');
+ const parts=workshop.partsStatus(sessions);assert.deepEqual(parts.map(p=>p.done),[33,10]);
+ assert.equal(workshop.currentPart(sessions).family.id,'verbs-w2','the part practised last is continued');
+ assert.equal(workshop.currentPart([]).family.id,'verbs-w1');
+ assert.equal(workshop.currentPart([round('a',ids[0],76,76,5)]).family.id,'verbs-w2','a finished part moves on to the next one');
+ assert.equal(workshop.partsStatus([round('old',ids[0],152,90)])[0].done,76,'an old round past part 1 counts as part 1 done');
+ const status=workshop.verbStatus([round('a',ids[0],76,40),round('b',workshop.partIds(w2)[0],76,2)]);
+ assert.deepEqual(status.get('abfahren'),{meaning:true,perfekt:true});assert.deepEqual(status.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(status.get('fahren'),{meaning:true,perfekt:false});assert.deepEqual(status.get('finden'),{meaning:false,perfekt:false});
  const T=workshop.WORKSHOP_TOTAL;assert.equal(T,152);
- assert.equal(workshop.findWorkshop([{id:'a',mode:'mixed',topic:'verbs-all',finished_at:1,total:30},{id:'old',mode:'workshop',topic:'verbs-all',finished_at:null,total:266},{id:'older',mode:'workshop',topic:'verbs-all',finished_at:null,total:190},{id:'b',mode:'workshop',topic:'verbs-all',finished_at:null,total:T},{id:'c',mode:'workshop',topic:'verbs-all',finished_at:2,total:T}]).id,'b','a round of an older, longer path is not continued');
- assert.ok(workshop.isCurrentPath({mode:'workshop',questions}));assert.ok(!workshop.isCurrentPath({mode:'workshop',questions:questions.slice(1)}));
+ assert.ok(workshop.isPartRound({mode:'workshop',questions},w1),'an old whole-path round continues as part 1');
+ assert.ok(workshop.isPartRound({mode:'workshop',questions:workshop.partIds(w2).map(id=>({id}))},w2));assert.ok(!workshop.isPartRound({mode:'workshop',questions:workshop.partIds(w2).map(id=>({id}))},w1));
+ assert.equal(workshop.roundEnd({mode:'workshop',questions}),76);assert.equal(workshop.roundEnd({mode:'workshop',questions:questions.slice(0,76)}),76);
+ // The page: islands start or continue their part; no lock is shown.
+ const pageSrc=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert.ok(pageSrc.includes('onClick={()=>void enterPart(family,part.finished)}')&&!pageSrc.includes('<Lock')&&!pageSrc.includes("'locked'"),'every part opens from the map');
+ for(const language of languages)for(const key of ['chapterContinue','chapterAgain'])assert.ok(copy.verbText(language,key).trim(),key);
+ for(const language of languages)assert.ok(copy.verbText(language,'partDone',{n:2,total:19}).includes('19'),language);
  // Sentence task: the verb is shown, the answer is its form for the subject, the wrong options are the other persons (du, ich, wir, ihr), the prefix at the end.
  for(const verb of verbs.verbs){
   const fit=course.questionMap.get('verb-fit-'+verb.id);assert.equal(fit.kind,'choice');assert.equal(fit.options.length,4);assert.equal(new Set(fit.options).size,4);

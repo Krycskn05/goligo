@@ -9,7 +9,7 @@ import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',hear:'stepListen',perfekt:'stepPerfekt','write-perfekt':'stepSpelling','hear-perfekt':'stepListen'};
+const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',perfekt:'stepPerfekt','write-perfekt':'stepSpelling'};
 
 /** One example sentence with the verb parts highlighted and a speaker button. */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){

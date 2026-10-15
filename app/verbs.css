@@ -146,3 +146,77 @@
 .vault-hint { margin:8px 0 12px; padding:10px 14px; border-radius:12px; background:#fff8e3; color:#5d4b1c; font-size:15px; display:grid; gap:4px; }
 .vault-hint span { color:#7a6a3c; font-size:14px; }
 .vault-article-choice { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin:6px 0 8px; }
+/* Fiil Atölyesi: one path, learning cards, stepper */
+.verb-home h1 { margin-bottom:8px; }
+.verb-path-panel { display:grid; gap:18px; padding:22px 24px; }
+.verb-path-head { display:flex; align-items:center; gap:18px; }
+.verb-path-status { flex:1; min-width:0; display:grid; gap:8px; }
+.verb-path-status strong { font-size:21px; letter-spacing:-.02em; }
+.verb-path-status small { color:#6e6e73; font-size:14px; }
+.verb-path-status .verb-path-done { display:inline-flex; align-items:center; gap:6px; color:#1f8a4c; font-weight:600; }
+.verb-path-head .verb-picture.small { width:84px; height:84px; max-width:84px; border-radius:18px; }
+.verb-path-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin:0; }
+.verb-path-enter { min-width:220px; font-size:17px; }
+.verb-path-restart { display:inline-flex; align-items:center; gap:6px; color:#6e6e73; font-size:14px; }
+.verb-chapters { list-style:none; margin:4px 0 0; padding:0; display:grid; gap:6px; }
+.verb-chapters li { display:grid; grid-template-columns:30px minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:#f5f5f7; color:#1d1d1f; font-size:15px; }
+.verb-chapters li.done { color:#6e6e73; }
+.verb-chapters li.current { background:#e8f1fb; }
+.verb-chapter-number { width:26px; height:26px; display:grid; place-items:center; border-radius:999px; background:#fff; font-weight:700; font-size:13px; color:#1d1d1f; box-shadow:inset 0 0 0 1px #d2d2d7; }
+.verb-chapters li.done .verb-chapter-number { background:#1f8a4c; color:#fff; box-shadow:none; }
+.verb-chapters li.current .verb-chapter-number { background:#0071e3; color:#fff; box-shadow:none; }
+.verb-chapter-title { font-weight:600; }
+.verb-chapter-count { font-variant-numeric:tabular-nums; color:#6e6e73; font-size:14px; }
+.verb-karma-panel { display:flex; align-items:center; gap:22px; padding:22px 24px; margin-top:16px; }
+.verb-karma-text { flex:1; min-width:0; }
+.verb-karma-text h2 { display:flex; align-items:center; gap:8px; margin:0 0 6px; font-size:21px; }
+.verb-karma-text p { margin:0; color:#515154; font-size:15px; }
+.verb-karma-text small { display:block; margin-top:8px; color:#6e6e73; font-size:14px; }
+.verb-karma-side { display:grid; gap:10px; min-width:220px; }
+.verb-games-row summary { font-size:15px; }
+.verb-game-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.verb-stepper { margin:12px 0 16px; }
+.verb-stepper-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:8px; }
+.verb-stepper-verb { font-size:19px; font-weight:700; letter-spacing:-.01em; }
+.verb-stepper-count { color:#6e6e73; font-size:14px; font-variant-numeric:tabular-nums; }
+.verb-stepper-steps { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; }
+.verb-stepper-steps li { display:grid; justify-items:center; gap:5px; font-size:11px; color:#86868b; text-align:center; }
+.verb-stepper-dot { width:100%; height:6px; border-radius:999px; background:#e5e5ea; }
+.verb-stepper-steps li.done .verb-stepper-dot { background:#1f8a4c; }
+.verb-stepper-steps li.current .verb-stepper-dot { background:#0071e3; }
+.verb-stepper-steps li.current { color:#1d1d1f; font-weight:600; }
+.verb-learn,.verb-chapter { display:grid; gap:16px; padding:24px; }
+.verb-learn-kicker { margin:0; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#6e6e73; }
+.verb-learn-body { display:grid; grid-template-columns:minmax(0,220px) minmax(0,1fr); gap:22px; align-items:center; }
+.verb-learn-text { display:grid; gap:8px; justify-items:start; }
+.verb-learn-infinitive { margin:0; color:#6e6e73; font-size:16px; }
+.verb-learn-form { margin:0; font-size:34px; line-height:1.15; letter-spacing:-.025em; }
+.verb-learn-subject { color:#6e6e73; font-weight:500; }
+.verb-learn-meaning { margin:0; font-size:19px; color:#1d1d1f; }
+.verb-learn-note { margin:4px 0 0; font-size:14px; color:#515154; background:#f5f5f7; border-radius:10px; padding:6px 10px; }
+.verb-learn-next { justify-self:start; }
+.verb-example { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:4px 12px; padding:12px 16px; border-radius:14px; background:#f5f5f7; }
+.verb-example small { grid-column:1 / -1; color:#6e6e73; font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+.verb-example p { margin:0; font-size:19px; line-height:1.6; }
+.verb-example .verb-chunk.mark { font-weight:700; }
+.verb-example .verb-chunk.mark.verb,.verb-example .verb-chunk.mark.aux { color:#0a66c2; }
+.verb-example .verb-chunk.mark.prefix,.verb-example .verb-chunk.mark.participle { color:#c2410c; }
+.verb-chapter h1 { margin:0; font-size:30px; }
+.verb-chapter-rule { margin:0; font-size:17px; line-height:1.6; color:#1d1d1f; padding:14px 16px; border-radius:14px; background:#f5f5f7; }
+.verb-chapter-verbs { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px; }
+.verb-chapter-verbs li { display:grid; justify-items:center; gap:6px; font-size:14px; font-weight:600; text-align:center; }
+.verb-chapter-verbs img { width:72px; height:72px; border-radius:16px; object-fit:cover; }
+.verb-chapter.tone-teal .verb-chapter-rule { background:#e6f4f1; } .verb-chapter.tone-amber .verb-chapter-rule { background:#fdf3e2; } .verb-chapter.tone-violet .verb-chapter-rule { background:#efeafb; } .verb-chapter.tone-rose .verb-chapter-rule { background:#fdecf1; } .verb-chapter.tone-blue .verb-chapter-rule { background:#e8f1fb; }
+@media (max-width:760px) {
+ .verb-path-panel,.verb-karma-panel,.verb-learn,.verb-chapter { padding:18px; }
+ .verb-path-head .verb-picture.small { width:64px; height:64px; max-width:64px; }
+ .verb-path-enter { width:100%; }
+ .verb-karma-panel { flex-direction:column; align-items:stretch; }
+ .verb-karma-side { min-width:0; }
+ .verb-learn-body { grid-template-columns:1fr; justify-items:center; text-align:center; }
+ .verb-learn-text { justify-items:center; }
+ .verb-learn-form { font-size:28px; }
+ .verb-learn-next { justify-self:stretch; }
+ .verb-stepper-steps li { font-size:10px; }
+ .verb-chapter h1 { font-size:24px; }
+}

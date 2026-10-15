@@ -31,6 +31,12 @@ test('site voice manifest: normalised lookup, default voice and safe parsing',()
  const lena=voices.siteVoiceById('site:F1');
  assert.equal(voices.siteClipUrl(lena,'das   Haus',manifest),'/voices/F1/0123456789abcdef.mp3');
  assert.equal(voices.siteClipUrl(lena,'die Küche',manifest),null);
+ // While a voice is still missing a new clip, the default voice and one more voice of the same kind are tried next.
+ const full=voices.parseVoiceManifest({version:4,voices:['F1','F2','M1','M2'],clips:{'das Haus':'0123456789abcdef'}});
+ assert.deepEqual(voices.siteClipUrls('site:M2','das Haus',full),['/voices/M2/0123456789abcdef.mp3','/voices/F1/0123456789abcdef.mp3','/voices/M1/0123456789abcdef.mp3']);
+ assert.deepEqual(voices.siteClipUrls('','das Haus',full),['/voices/F1/0123456789abcdef.mp3','/voices/F2/0123456789abcdef.mp3']);
+ assert.deepEqual(voices.siteClipUrls('Anna','das Haus',full),[],'a chosen device voice stays a device voice');
+ assert.deepEqual(voices.siteClipUrls('','die Küche',full),[]);
  assert.equal(voices.clipPlaybackRate(0.94),1);
  assert.ok(Math.abs(voices.clipPlaybackRate(0.65)-0.65/0.94)<1e-9);
  assert.equal(voices.clipPlaybackRate(5),1.3);
@@ -78,6 +84,19 @@ test('a natural clip plays when available and the device voice is the fallback',
  const before=s.plays.length;s.controller.speak('das Bad',{voiceName:'Anna'});
  assert.equal(s.plays.length,before);assert.equal(s.utterances.at(-1).text,'das Bad');
  s.controller.stop();assert.ok(s.counts().stops>0);
+});
+
+test('when the chosen voice has no clip yet, another natural voice plays it before the device voice',t=>{
+ const s=setup(t,()=>['/voices/M2/a.mp3','/voices/F1/a.mp3']);
+ s.controller.speak('ich lade ein',{voiceName:'site:M2'});
+ assert.equal(s.plays.length,1);assert.equal(s.plays[0].url,'/voices/M2/a.mp3');
+ s.plays[0].events.onError();
+ assert.equal(s.plays.length,2);assert.equal(s.plays[1].url,'/voices/F1/a.mp3');assert.equal(s.utterances.length,0,'no device voice while a natural clip can play');
+ s.plays[1].events.onStart();assert.equal(s.states.at(-1).status,'speaking');s.plays[1].events.onEnd();assert.equal(s.controller.isActive(),false);
+ // A clip that never starts moves on after a short wait; when every clip fails the device voice speaks.
+ s.controller.speak('du lädst ein',{voiceName:'site:M2'});t.mock.timers.tick(4100);
+ assert.equal(s.plays.at(-1).url,'/voices/F1/a.mp3');s.plays.at(-1).events.onError();
+ assert.equal(s.utterances.at(-1).text,'du lädst ein');
 });
 
 test('late clip events after stop or a newer request are ignored',t=>{

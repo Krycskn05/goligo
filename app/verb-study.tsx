@@ -3,7 +3,7 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Sparkles,Star,Trophy,Volume2,X,Zap} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
-import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,type Verb} from '@/lib/verb-course';
+import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
@@ -145,15 +145,22 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
   if(upcoming>=session.questions.length){answerAudio.complete();void refresh();}
  }
  function dismiss(kind:'c'|'l'){setDismissed(previous=>new Set(previous).add(kind+':'+index));focusCurrent();}
- const options=q?(session?.questions[index]?.options??q.options??[]):[];
+ // A saved round keeps the choices it was shown; if the catalogue changed since (the sentence task once offered verbs, now forms), the fresh choices are used in a fixed order.
+ const stored=session?.questions[index]?.options;
+ const options=q?(stored&&stored.includes(q.answer)?stored:q.options?seededOptions(q.options,(session?.id??'')+':'+q.id):[]):[];
  const actionDisabled=busy||cueBusy||speech.busy;
  function hearQuestion(slow=false){if(!q?.audio||busy||cueBusy)return;setHeardQuestionId(q.id);speech.speak(q.audio,slow);}
+ /** "fährt ab" → "fährt … ab": the prefix of a separable verb stands at the end of the sentence. */
+ function formWithGap(form:string,question:Question){
+  const item=question.verbId?verbMap.get(question.verbId):undefined;const prefix=item?verbPrefix(item):'';
+  return prefix&&form.endsWith(' '+prefix)?form.slice(0,-(prefix.length+1))+' … '+prefix:form;
+ }
  /** How an answer option is shown: a meaning in the chosen language, a verb, or a German form. */
  function optionText(question:Question,option:string):{text:string;german:boolean}{
   const target=verbMap.get(option);const kind=question.verbTask??'';
   if(target&&meaningOptionTasks.has(kind))return {text:verbMeaning(target,language),german:false};
-  // The sentence task offers the forms that fit the subject ("fährt", "steht … auf"), not the infinitives.
-  if(target&&kind==='fit')return {text:praesensForm(target),german:true};
+  // The sentence task offers forms of the verb ("fährt", "fährst", "fahre" …); a prefix is shown where it goes, at the end.
+  if(kind==='fit')return {text:formWithGap(option,question),german:true};
   if(target&&verbOptionTasks.has(kind))return {text:target.display,german:true};
   return {text:option,german:true};
  }
@@ -187,7 +194,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
   // Pictures give the meaning away: hidden for meaning questions, and in Karma sınav for everything but the sentence task.
   const showPicture=(kind!=='meaning'&&!(karma&&karmaHidesPicture(kind)))||!!feedback;
   if(kind==='word'||kind==='write')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
-  if(kind==='fit')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}{sentenceLine(question,item)}{feedback&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}</div>;
+  if(kind==='fit')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{sentenceLine(question,item)}{feedback&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}</div>;
   const sentence=kind==='praesens'||kind==='perfekt'||kind==='write-praesens'||kind==='write-perfekt';
   return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{kind!=='meaning'&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}{sentence&&sentenceLine(question,item)}</div>;
  }

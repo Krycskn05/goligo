@@ -4,6 +4,7 @@ import {verbMeaning,perfektLabel,spokenSubject,praesensPersons,type Verb} from '
 import {familyRule,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {sentenceChunks,sentenceText,verbRules,verbPrefix,verbPicture,type VerbTense} from '@/lib/verb-logic';
 import {type LearnStage,type PathPlace,type WorkshopStep} from '@/lib/verb-workshop';
+import {personSentences,personMode,personLabel,type PersonKey,type PersonTense} from '@/lib/verb-persons';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
@@ -23,6 +24,21 @@ export function ConjugationTable({verb,language,speech}:{verb:Verb;language:Vaul
  return <div className="verb-conj" data-verb-conjugation={verb.id}>
   <small lang={language} dir={vaultDirection(language)}>{verbText(language,'conjugationTitle')}</small>
   <div className="verb-conj-grid" lang="de" dir="ltr">{rows.map(([pronoun,form,spoken])=><button type="button" key={pronoun} className="verb-conj-cell" disabled={speech.busy} aria-label={spoken+' '+form} onClick={()=>speech.speak(spoken+' '+form)}><span className="verb-conj-pronoun">{pronoun}</span><span className="verb-conj-form">{form}</span><Volume2 size={15} aria-hidden="true"/></button>)}</div>
+ </div>;
+}
+/** After an answer: one example sentence for every person (ich … Sie), Präsens or Perfekt; tap a sentence to hear it. */
+export function PersonSentences({verb,tense,language,speech}:{verb:Verb;tense:PersonTense;language:VaultLanguage;speech:Speech}){
+ const rows=personSentences(verb,tense);const mode=personMode(verb);const dir=vaultDirection(language);
+ if(!rows.length)return null;
+ const hint=(person:PersonKey)=>person==='sie-plural'?verbText(language,'pronounPlural'):person==='Sie'?verbText(language,'pronounFormal'):'';
+ return <div className="verb-persons" data-verb-persons={verb.id+':'+tense}>
+  <small lang={language} dir={dir}>{verbText(language,'examplesTitle',{t:tense==='perfekt'?'Perfekt':'Präsens'})}</small>
+  <ul lang="de" dir="ltr">{rows.map(row=><li key={row.person}><button type="button" className="verb-person-row" disabled={speech.busy} aria-label={row.text} onClick={()=>speech.speak(row.text)}>
+   <span className="verb-person-pronoun">{personLabel(row.person)}{hint(row.person)&&<small lang={language} dir={dir}>{hint(row.person)}</small>}</span>
+   <span className="verb-person-text">{row.parts.flatMap((part,i)=>[i?' ':null,<span key={i} className={part.role==='plain'?undefined:'mark '+part.role}>{part.text}</span>])}.</span>
+   <Volume2 size={15} aria-hidden="true"/>
+  </button></li>)}</ul>
+  {mode!=='subject'&&<p className="verb-persons-note" lang={language} dir={dir}>{verbText(language,mode==='dative'?'personDative':'personFuer')}</p>}
  </div>;
 }
 /** The card shown before the questions of a stage: meaning, Präsens or Perfekt of one verb. */

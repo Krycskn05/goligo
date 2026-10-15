@@ -167,7 +167,7 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  assert.match(fs.readFileSync('app/progress-ui.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/layout.tsx','utf8'),/verbs\.css/);
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(page.includes('const pronunciation=q?.answer??\'\';'));
+ assert.ok(page.includes("const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';"));
  assert.ok(page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'));
  // The question audio is played only from the listen buttons.
  assert.equal((page.match(/speech\.speak\(q\.audio/g)||[]).length,1);
@@ -227,7 +227,7 @@ test('Fiil Atölyesi: five parts cover every verb once, the path has seven steps
  for(const verb of verbs.verbs)assert.ok(families.verbFamilyOf(verb.id),verb.id);
  for(const family of families.verbFamilies)for(const language of languages){assert.ok(families.familyTitle(family,language).trim());assert.ok(families.familyRule(family,language).length>20);}
  // Each part follows its rule: 1 and 5 take ist, 4 takes hat, 4 and 5 are separable, 2 changes its vowel.
- const byId=id=>verbs.verbMap.get(id);
+ const byId=id=>verbs.verbMap.get(id);const logic=load('verb-logic');
  assert.ok(families.verbFamilies[0].verbs.every(id=>byId(id).aux==='ist'&&!byId(id).display.includes('|')));
  assert.ok(families.verbFamilies[1].verbs.every(id=>byId(id).aux==='hat'&&byId(id).praesens!==byId(id).infinitive.slice(0,-2)+'t'));
  assert.ok(families.verbFamilies[3].verbs.every(id=>byId(id).aux==='hat'&&byId(id).display.includes('|')));
@@ -254,8 +254,12 @@ test('Fiil Atölyesi: five parts cover every verb once, the path has seven steps
   assert.ok(!fit.options.some(option=>option!==verb.id&&[['anfangen','beginnen'],['geben','abgeben'],['bringen','mitbringen'],['kommen','ankommen','mitkommen'],['gehen','laufen','fahren'],['fahren','abfahren'],['abfahren','aufstehen']].some(set=>set.includes(option)&&set.includes(verb.id))),verb.id);
  }
  assert.ok(!workshop.karmaHidesPicture('fit')&&workshop.karmaHidesPicture('word'));
+ // The sentence task answers with the form that fits the subject: four different Präsens forms, the prefix shown at the end.
+ for(const verb of verbs.verbs){const forms=course.questionMap.get('verb-fit-'+verb.id).options.map(option=>logic.praesensForm(byId(option)));assert.equal(new Set(forms).size,4,verb.id);}
+ assert.equal(logic.praesensForm(byId('fahren')),'fährt');assert.equal(logic.praesensForm(byId('aufstehen')),'steht … auf');assert.equal(logic.praesensForm(byId('leidtun')),'tut … leid');
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
  assert.ok(!page.includes("v('resume')"),'no resume card on the page');
  assert.ok(page.includes('<SiteHeader ')&&page.includes('<ChapterCard ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
+ assert.ok(page.includes("kind==='fit')return {text:praesensForm(target)")&&page.includes("task==='fit'&&verb?verb.praesens"),'sentence options and the spoken answer use the Präsens form');
  for(const key of ['workshopTitle','workshopLead','workshopEnter','karmaTitle','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
 });

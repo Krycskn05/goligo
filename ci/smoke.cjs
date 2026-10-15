@@ -79,8 +79,9 @@ async function visit(page, url, shot, errors) {
   }
 
   await visit(page, "/fiiller", "06-fiiller.png", errors);
-  const verbCards = await page.locator("[data-verb-category]").count();
-  record("Fiiller sayfasinda gruplar ve devam karti var", verbCards === 6, `kart ${verbCards}`);
+  const workshopPanels = await page.locator("[data-verb-workshop]").count();
+  const karmaPanels = await page.locator("[data-verb-karma]").count();
+  record("Fiil Atolyesi sayfasinda yol ve karma sinav paneli var", workshopPanels === 1 && karmaPanels === 1, `yol ${workshopPanels}, karma ${karmaPanels}`);
 
   const phone = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const p2 = await phone.newPage();

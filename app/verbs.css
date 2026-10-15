@@ -159,8 +159,8 @@
 .verb-polaroid-photo { display:block; width:min(460px,100%); height:auto; border-radius:28px; border:10px solid #fff; box-shadow:0 14px 0 #cfe3f5,0 30px 60px rgba(28,82,130,.3); }
 .verb-polaroid-sticker { position:absolute; right:-28px; top:-34px; display:grid; place-items:center; width:112px; height:112px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#fff3a8 0,#ffd43b 45%,#f0a000 100%); border:5px solid #fff; box-shadow:0 8px 0 #c57f05,0 14px 24px rgba(0,0,0,.2); transform:rotate(12deg); font-weight:900; color:#7a4b00; text-align:center; line-height:1; font-size:15px; }
 .verb-polaroid-sticker b { display:block; font-size:34px; color:#5b3600; }
-/* Koko peeks from the corner: the mascot part of the logo, cropped with background-position. */
-.verb-koko { position:absolute; left:-86px; bottom:-54px; width:200px; height:176px; background:url('/branding/lernkoko-logo.png') no-repeat; background-size:496px auto; background-position:-6px -78px; transform:rotate(6deg); filter:drop-shadow(0 12px 14px rgba(0,0,0,.25)); animation:koko-float 4s ease-in-out infinite reverse; }
+/* Koko peeks from the corner of the picture (the mascot cut out of the logo). */
+.verb-koko { position:absolute; left:-80px; bottom:-50px; width:210px; height:168px; background:url('/branding/koko-mascot.png') no-repeat center / contain; transform:rotate(6deg); filter:drop-shadow(0 12px 14px rgba(0,0,0,.25)); animation:koko-float 4s ease-in-out infinite reverse; }
 .verb-path-panel { display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center; padding:26px 30px; }
 .verb-avatar .verb-picture.small { width:110px; height:110px; max-width:110px; border:6px solid #fff; box-shadow:0 8px 0 #cfe3f5,0 0 0 6px #5ab0ff; }
 .verb-path-status { min-width:0; }
@@ -253,7 +253,7 @@
  .verb-hero-cta .btn { width:100%; }
  .verb-polaroid { order:-1; margin:14px 10px 24px 14px; }
  .verb-polaroid-sticker { width:92px; height:92px; right:-8px; top:-22px; font-size:13px; } .verb-polaroid-sticker b { font-size:28px; }
- .verb-koko { width:140px; height:124px; background-size:348px auto; background-position:-4px -55px; left:-26px; bottom:-34px; }
+ .verb-koko { width:140px; height:112px; left:-22px; bottom:-30px; }
  .verb-path-panel { grid-template-columns:auto 1fr; gap:16px; padding:20px; }
  .verb-avatar .verb-picture.small { width:84px; height:84px; max-width:84px; }
  .verb-path-title { font-size:24px; }

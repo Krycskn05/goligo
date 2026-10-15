@@ -10,7 +10,7 @@ import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
-import {LearnCard,ChapterCard,PathStepper} from './verb-workshop';
+import {LearnCard,ChapterCard,PathStepper,PersonSentences} from './verb-workshop';
 import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,partProgress,verbStatus,findWorkshop,isCurrentPath,learnStage} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
@@ -245,6 +245,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       <p>{v('correctAnswer')}: <strong lang="de" dir="ltr">{correctLabel(q,verb)}</strong></p>
       {writing&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
       <div className="verb-feedback-main">{listening&&<VerbPicture verb={verb} language={language} small/>}<p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb,q.verbTask)}</p></div>
+      <PersonSentences verb={verb} tense={learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}}/>
       <RuleBox lines={feedbackRules(q,verb)} language={language}/>
       {verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
       <button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{v('repeatAudio')}</button>

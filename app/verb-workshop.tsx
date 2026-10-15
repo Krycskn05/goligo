@@ -1,11 +1,11 @@
 'use client';
 import type {ReactNode} from 'react';
 import {ArrowRight,CheckCircle2,Volume2,X} from 'lucide-react';
-import {verbMeaning,perfektLabel,spokenSubject,praesensPersons,type Verb} from '@/lib/verb-course';
+import {verbMeaning,perfektLabel,type Verb} from '@/lib/verb-course';
 import {familyRule,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {sentenceChunks,sentenceText,verbRules,verbPrefix,verbPicture,type VerbTense} from '@/lib/verb-logic';
 import {type LearnStage,type PathPlace,type WorkshopStep} from '@/lib/verb-workshop';
-import {personSentences,personMode,personLabel,type PersonKey,type PersonTense} from '@/lib/verb-persons';
+import {personSentences,personMode,personLabel,conjugationRows,learnSpeech,type PersonKey,type PersonTense} from '@/lib/verb-persons';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
@@ -20,11 +20,11 @@ export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbT
 }
 /** The Präsens forms of the verb for every person, singular on the left, plural on the right; tap a form to hear it. */
 export function ConjugationTable({verb,language,speech}:{verb:Verb;language:VaultLanguage;speech:Speech}){
- const forms=praesensPersons(verb);
- const rows:[string,string,string][]=[['ich',forms.ich,'ich'],['du',forms.du,'du'],['er/sie/es',forms.er,verb.subject==='es'?'es':'er'],['wir',forms.wir,'wir'],['ihr',forms.ihr,'ihr'],['sie/Sie',forms.wir,'sie']];
+ // The spoken texts come from the lib, so each one has a natural site-voice clip.
+ const rows=conjugationRows(verb);
  return <div className="verb-conj" data-verb-conjugation={verb.id}>
   <small lang={language} dir={vaultDirection(language)}>{verbText(language,'conjugationTitle')}</small>
-  <div className="verb-conj-grid" lang="de" dir="ltr">{rows.map(([pronoun,form,spoken])=><button type="button" key={pronoun} className="verb-conj-cell" disabled={speech.busy} aria-label={spoken+' '+form} onClick={()=>speech.speak(spoken+' '+form)}><span className="verb-conj-pronoun">{pronoun}</span><span className="verb-conj-form">{form}</span><Volume2 size={15} aria-hidden="true"/></button>)}</div>
+  <div className="verb-conj-grid" lang="de" dir="ltr">{rows.map(({pronoun,form,spoken})=><button type="button" key={pronoun} className="verb-conj-cell" disabled={speech.busy} aria-label={spoken} onClick={()=>speech.speak(spoken)}><span className="verb-conj-pronoun">{pronoun}</span><span className="verb-conj-form">{form}</span><Volume2 size={15} aria-hidden="true"/></button>)}</div>
  </div>;
 }
 /** After an answer: one example sentence for every person (ich … Sie), Präsens or Perfekt; tap a sentence to hear it. */
@@ -45,9 +45,9 @@ export function PersonSentences({verb,tense,language,speech}:{verb:Verb;tense:Pe
 /** The card shown before the questions of a stage: meaning, Präsens or Perfekt of one verb. */
 export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;onContinue:()=>void}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- const dir=vaultDirection(language);const prefix=verbPrefix(verb);const subject=spokenSubject(verb);
+ const dir=vaultDirection(language);const prefix=verbPrefix(verb);
  const form=stage==='praesens'?verb.praesens:stage==='perfekt'?perfektLabel(verb):verb.display;
- const spoken=stage==='praesens'?subject+' '+verb.praesens:stage==='perfekt'?subject+' '+verb.perfekt:verb.infinitive;
+ const spoken=learnSpeech(verb,stage);
  const title=stage==='meaning'?t('learnNew'):stage==='praesens'?t('stepPraesens'):t('stepPerfekt');
  return <article className={'verb-learn panel stage-'+stage} aria-labelledby="verb-learn-heading" data-verb-learn={stage}>
   <p className="verb-learn-kicker">{title}</p>

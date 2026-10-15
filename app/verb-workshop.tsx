@@ -11,7 +11,7 @@ import {VerbPicture,RuleBox} from './verb-games';
 type Speech={speak:(text:string)=>void;busy:boolean};
 const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',perfekt:'stepPerfekt','write-perfekt':'stepSpelling'};
 
-/** One example sentence with the verb parts highlighted and a speaker button. */
+/** One example sentence with the verb parts highlighted and a speaker button (kept for the later sentence practice). */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
  const text=sentenceText(verb,tense);
  return <div className="verb-example">{label&&<small>{label}</small>}<p lang="de" dir="ltr">{sentenceChunks(verb,tense).map((chunk,i)=><span key={i} className={'verb-chunk '+(chunk.role==='subject'||chunk.role==='middle'?'':'mark '+chunk.role)}>{chunk.text}</span>)}.</p><button type="button" className="verb-speak" disabled={speech.busy} aria-label={text} title={text} onClick={()=>speech.speak(text)}><Volume2 size={17}/></button></div>;
@@ -35,10 +35,8 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
     {stage==='meaning'&&prefix&&<p className="verb-learn-note">{t('separableNote',{p:prefix})}</p>}
    </div>
   </div>
-  {stage==='meaning'?<ExampleSentence verb={verb} tense="praesens" speech={speech} label={t('exampleTitle')}/>:<>
-   <RuleBox lines={verbRules(verb,stage,language)} language={language}/>
-   <ExampleSentence verb={verb} tense={stage} speech={speech} label={t('exampleTitle')}/>
-  </>}
+  {/* No conjugated example sentences while learning meanings and forms; sentences come later. */}
+  {stage!=='meaning'&&<RuleBox lines={verbRules(verb,stage,language)} language={language}/>}
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }

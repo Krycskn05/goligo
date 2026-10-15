@@ -77,6 +77,16 @@ export function siteClipUrl(voice:SiteVoice,text:string,value:VoiceManifest|null
  const id=value?.clips[normalizeSpeechText(text)];
  return id&&value?.voices.includes(voice.style)?`/voices/${voice.style}/${id}.mp3`:null;
 }
+/** The clips to try for a text, in order: the chosen voice, then the default voice and one more voice of
+ * the same kind. New texts are rendered voice by voice, so while one voice is still missing a clip another
+ * natural voice plays it; the device voice (silent on some phones) is only the very last fallback. */
+export function siteClipUrls(preference:string,text:string,value:VoiceManifest|null=manifest):string[]{
+ const voice=resolveSiteVoice(preference,value);const id=value?.clips[normalizeSpeechText(text)];
+ if(!voice||!id||!value)return [];
+ const others=availableSiteVoices(value).filter(other=>other.id!==voice.id);
+ const backups=[others.find(other=>other.id===DEFAULT_SITE_VOICE),others.find(other=>other.id!==DEFAULT_SITE_VOICE&&other.gender===voice.gender)];
+ return [voice,...backups.filter((item):item is SiteVoice=>!!item)].map(item=>`/voices/${item.style}/${id}.mp3`);
+}
 export function clipPlaybackRate(rate:number){
  const value=rate/SITE_CLIP_BASE_RATE;
  return Number.isFinite(value)?Math.max(0.5,Math.min(1.3,value)):1;

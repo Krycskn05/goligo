@@ -220,27 +220,36 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
 });
 
-test('Fiil Atölyesi: four parts cover every verb once, the path has four meaning steps per verb and a card opens each verb',()=>{
+test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, cards open every stage',()=>{
  const all=families.verbFamilies.flatMap(f=>f.verbs);assert.equal(all.length,38);assert.equal(new Set(all).size,38);
  for(const verb of verbs.verbs)assert.ok(families.verbFamilyOf(verb.id),verb.id);
  for(const family of families.verbFamilies)for(const language of languages){assert.ok(families.familyTitle(family,language).trim());assert.ok(families.familyRule(family,language).length>20);}
- // Four parts by meaning: movement first, every part named and described in every language.
+ // Part 1 runs from ab|fahren to essen (the learner's line), part 2 from fahren to mit|kommen, both in the book's order.
  const byId=id=>verbs.verbMap.get(id);const logic=load('verb-logic');
- assert.equal(families.verbFamilies.length,4);assert.deepEqual(families.verbFamilies.map(f=>f.id),['verbs-w1','verbs-w2','verbs-w3','verbs-w4']);
- assert.ok(families.verbFamilies[0].verbs.includes('gehen')&&families.verbFamilies[0].verbs.includes('kommen')&&families.verbFamilies[0].verbs.includes('fahren'));
- assert.equal(families.familyTitle(families.verbFamilies[0],'tr'),'Hareket');
- const ids=workshop.workshopIds();assert.equal(ids.length,38*4);assert.equal(new Set(ids).size,ids.length);
+ assert.equal(families.verbFamilies.length,2);assert.deepEqual(families.verbFamilies.map(f=>f.id),['verbs-w1','verbs-w2']);
+ assert.deepEqual(families.verbFamilies.map(f=>f.verbs.length),[19,19]);
+ assert.deepEqual(families.verbFamilies[0].verbs,verbs.verbs.slice(0,19).map(v=>v.id));assert.deepEqual(families.verbFamilies[1].verbs,verbs.verbs.slice(19).map(v=>v.id));
+ assert.equal(families.verbFamilies[0].verbs[18],'essen');assert.equal(families.verbFamilies[1].verbs[0],'fahren');
+ const ids=workshop.workshopIds();assert.equal(ids.length,38*7);assert.equal(new Set(ids).size,ids.length);
  for(const id of ids)assert.ok(practice.isVerbExercise(course.questionMap.get(id)),id);
  assert.deepEqual(ids.slice(0,4).map(id=>course.questionMap.get(id).verbTask),['meaning','word','write','hear']);
+ assert.deepEqual(ids.slice(76,79).map(id=>course.questionMap.get(id).verbTask),['perfekt','write-perfekt','hear-perfekt']);
+ assert.equal(course.questionMap.get(ids[76]).verbId,'abfahren');assert.equal(course.questionMap.get(ids[133]).verbId,'fahren');
  const questions=ids.map(id=>({id}));const lookup=id=>course.questionMap.get(id);
- const first=workshop.pathPlace(questions,0,lookup);assert.equal(first.verb.id,'gehen');assert.ok(first.chapterStart&&first.stageStart);assert.equal(first.stage,'meaning');assert.equal(first.verbNumber,1);
- for(const i of [1,2,3]){const later=workshop.pathPlace(questions,i,lookup);assert.ok(!later.stageStart&&!later.chapterStart);assert.equal(later.step,i);assert.equal(later.stage,'meaning');}
- const second=workshop.pathPlace(questions,4,lookup);assert.equal(second.verb.id,'kommen');assert.ok(second.stageStart&&!second.chapterStart);assert.equal(second.verbNumber,2);
- const part2=workshop.pathPlace(questions,11*4,lookup);assert.equal(part2.family.number,2);assert.ok(part2.chapterStart);assert.equal(part2.verb.id,'essen');
+ const first=workshop.pathPlace(questions,0,lookup);assert.equal(first.verb.id,'abfahren');assert.ok(first.chapterStart&&first.stageStart);assert.equal(first.stage,'meaning');assert.equal(first.verbNumber,1);assert.equal(first.steps.length,4);
+ for(const i of [1,2,3]){const later=workshop.pathPlace(questions,i,lookup);assert.ok(!later.stageStart&&!later.chapterStart);assert.equal(later.step,i);}
+ const second=workshop.pathPlace(questions,4,lookup);assert.equal(second.verb.id,'abgeben');assert.ok(second.stageStart&&!second.chapterStart);assert.equal(second.verbNumber,2);
+ const perfekt=workshop.pathPlace(questions,76,lookup);assert.equal(perfekt.verb.id,'abfahren');assert.equal(perfekt.stage,'perfekt');assert.ok(perfekt.chapterStart&&perfekt.stageStart);assert.equal(perfekt.steps.length,3);assert.equal(perfekt.verbNumber,1);
+ const part2=workshop.pathPlace(questions,133,lookup);assert.equal(part2.family.number,2);assert.equal(part2.stage,'meaning');assert.ok(part2.chapterStart);assert.equal(part2.verb.id,'fahren');
  assert.deepEqual(study.selectQuestions('workshop','verbs-all',ids.length,[],ids).map(q=>q.id),ids,'the path keeps its order');
- assert.ok(practice.verbModePredicate('workshop')(course.questionMap.get('verb-hear-essen'))&&practice.verbModePredicate('workshop')(course.questionMap.get('verb-write-essen')));
- const progress1=workshop.workshopProgress({answered:9,total:152});assert.equal(progress1.verbsDone,2);assert.ok(!progress1.finished);
- assert.ok(workshop.workshopProgress({answered:152,total:152}).finished);
+ assert.ok(practice.verbModePredicate('workshop')(course.questionMap.get('verb-hear-essen'))&&practice.verbModePredicate('workshop')(course.questionMap.get('verb-write-perfekt-essen')));
+ const p9=workshop.workshopProgress({answered:9,total:266});assert.equal(p9.stage,'meaning');assert.equal(p9.stageVerbsDone,2);assert.equal(p9.nextVerbId,'anbieten');assert.equal(p9.family.number,1);assert.ok(!p9.finished);
+ const p76=workshop.workshopProgress({answered:76,total:266});assert.equal(p76.stage,'perfekt');assert.equal(p76.stageVerbsDone,0);assert.equal(p76.nextVerbId,'abfahren');assert.equal(p76.stageVerbs,19);
+ const p133=workshop.workshopProgress({answered:133,total:266});assert.equal(p133.family.number,2);assert.equal(p133.stage,'meaning');assert.equal(p133.nextVerbId,'fahren');
+ assert.ok(workshop.workshopProgress({answered:266,total:266}).finished);
+ const part1=workshop.partProgress(families.verbFamilies[0],80);assert.equal(part1.meaningDone,19);assert.equal(part1.perfektDone,1);assert.equal(part1.state,'current');
+ assert.equal(workshop.partProgress(families.verbFamilies[1],80).state,'locked');assert.equal(workshop.partProgress(families.verbFamilies[0],133).state,'done');
+ const status=workshop.verbStatus(80);assert.deepEqual(status.get('abfahren'),{meaning:true,perfekt:true});assert.deepEqual(status.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(status.get('fahren'),{meaning:false,perfekt:false});
  assert.equal(workshop.findWorkshop([{id:'a',mode:'mixed',topic:'verbs-all',finished_at:1},{id:'b',mode:'workshop',topic:'verbs-all',finished_at:null},{id:'c',mode:'workshop',topic:'verbs-all',finished_at:2}]).id,'b');
  assert.ok(workshop.isCurrentPath({mode:'workshop',questions}));assert.ok(!workshop.isCurrentPath({mode:'workshop',questions:questions.slice(1)}));
  // Sentence task: the verb is shown, the answer is its form for the subject, the wrong options are the other persons (du, ich, wir, ihr), the prefix at the end.
@@ -264,7 +273,7 @@ test('Fiil Atölyesi: four parts cover every verb once, the path has four meanin
  assert.ok(!page.includes("v('resume')"),'no resume card on the page');
  assert.ok(page.includes('<SiteHeader ')&&page.includes('<ChapterCard ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
  assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
- for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
+ for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','stageMeanings','perfektChapter','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
  assert.ok(!page.includes('startKarma')&&!page.includes('data-verb-karma'),'no Karma sınav on the page');
- assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear')||!!feedback"),'pictures hidden for meaning and listening questions');
+ assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
 });

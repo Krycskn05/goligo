@@ -13,7 +13,7 @@ export const questions:Question[]=[...objectQuestions,...housingQuestions];
 // Fiiller (verbs-*) has its own page; it stays out of the A1 catalogue topics.
 export const learningTopics=[...topics,...englishTopics,...verbTopics];
 export const questionMap=new Map([...questions,...englishQuestions,...verbQuestions].map(q=>[q.id,q]));
-export const modeLabels:Record<string,string>={mixed:'Karma tekrar',test:'Test',choice:'Test',listen:'Hören · Dinleme',read:'Lesen · Okuma',write:'Yazarak Pekiştir · Schreiben',dictation:'Diktat',sentence:'Günlük cümle kurma',visual:'Görselli test',review:'Yanlışları tekrar et'};
+export const modeLabels:Record<string,string>={mixed:'Karma tekrar',workshop:'Fiil Atölyesi',test:'Test',choice:'Test',listen:'Hören · Dinleme',read:'Lesen · Okuma',write:'Yazarak Pekiştir · Schreiben',dictation:'Diktat',sentence:'Günlük cümle kurma',visual:'Görselli test',review:'Yanlışları tekrar et'};
 export function normalizeAnswer(value:string,strictCase=false){
  let s=value.normalize('NFC').replace(/[’‘]/g,"'").trim().replace(/[.!?]+$/,'').replace(/\s+/g,' ');
  if(!strictCase)s=s.toLocaleLowerCase('de-DE');

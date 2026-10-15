@@ -1,7 +1,6 @@
 import type {Question} from './course';
 import type {Topic} from './lessons';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
-import {verbFamilyOf} from './verb-families';
 
 /**
  * Fiiller: the 38 verbs from the learner's textbook page (infinitive, 3rd person
@@ -92,13 +91,23 @@ function formDistractors(verb:Verb,seed:string){
  return [...seeded(near,seed),...rest].slice(0,3);
 }
 
-/** Verbs that fit a sentence question as wrong options: same workshop first (so the blank count gives nothing away), never a confusable meaning. */
-function fitDistractors(verb:Verb,seed:string){
- const blocked=conflicts(verb.id);const family=verbFamilyOf(verb.id);const separable=verb.display.includes('|');
- const near=verbs.filter(other=>!blocked.has(other.id)&&family?.verbs.includes(other.id)).map(other=>other.id);
- const rest=verbs.filter(other=>!blocked.has(other.id)&&!near.includes(other.id)&&other.display.includes('|')===separable).map(other=>other.id);
- return [...seeded(near,seed),...seeded(rest,seed)].slice(0,3);
+/** Präsens forms of the other persons (du, ich, wir, ihr), the prefix at the end: the wrong options of the sentence task. */
+export function praesensPersons(verb:Verb){
+ const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';const tail=prefix?' '+prefix:'';
+ const er=prefix?verb.praesens.slice(0,-(prefix.length+1)):verb.praesens;
+ const base=verb.infinitive.slice(prefix.length);const stem=base.replace(/e?n$/,'');
+ // du: isst/liest keep the er form; findet/bietet → findest; gilt (stem gelt-) → giltst; lädt → lädst; otherwise fährt → fährst.
+ const du=/[sßzx]t$/.test(er)?er:/[dt]$/.test(stem)&&er.endsWith('et')?er.slice(0,-2)+'est':stem.endsWith('t')?er+'st':er.slice(0,-1)+'st';
+ return {er:er+tail,du:du+tail,ich:stem+'e'+tail,wir:base+tail,ihr:stem+(/[dt]$/.test(stem)?'et':'t')+tail};
 }
+/** Three forms that do not fit the subject: the other persons first, then the old spelling traps when a person form repeats. */
+function personDistractors(verb:Verb){
+ const forms=praesensPersons(verb);const seen=new Set([verb.praesens]);const result:string[]=[];
+ for(const form of [forms.du,forms.ich,forms.wir,forms.ihr,...verb.praesensWrong]){if(seen.has(form))continue;seen.add(form);result.push(form);if(result.length===3)break;}
+ return result;
+}
+/** Shuffle a question's options the same way for one round, so a saved round keeps its order without the server. */
+export function seededOptions(options:readonly string[],seed:string){return seeded(options,seed);}
 const verbBank:Question[]=[];
 for(const verb of verbs){
  const meaning=verb.meanings[0];const subject=verb.subject;
@@ -107,7 +116,7 @@ for(const verb of verbs){
  const add=(id:string,task:VerbTask,question:Omit<Question,'id'|'topic'|'explanation'>)=>verbBank.push({id,...shared,verbTask:task,...question});
  add('verb-meaning-'+verb.id,'meaning',{kind:'choice',prompt:verb.display+' ne demek?',answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'meaning-'+verb.id)]});
  add('verb-word-'+verb.id,'word',{kind:'choice',prompt:'“'+meaning+'” anlamındaki Almanca fiil hangisi?',answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'word-'+verb.id)]});
- add('verb-fit-'+verb.id,'fit',{kind:'choice',prompt:'Özneye göre boşluğa uyan fiil biçimi hangisi?',answer:verb.infinitive,options:[verb.infinitive,...fitDistractors(verb,'fit-'+verb.id)]});
+ add('verb-fit-'+verb.id,'fit',{kind:'choice',prompt:verb.display+' · Özneye göre boşluğa uyan biçim hangisi?',answer:verb.praesens,options:[verb.praesens,...personDistractors(verb)]});
  add('verb-praesens-'+verb.id,'praesens',{kind:'choice',prompt:verb.display+' · Präsens: '+subject+' …',answer:verb.praesens,options:[verb.praesens,...verb.praesensWrong]});
  add('verb-perfekt-'+verb.id,'perfekt',{kind:'choice',prompt:verb.display+' · Perfekt: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...verb.perfektWrong]});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});

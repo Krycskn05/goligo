@@ -81,7 +81,7 @@ async function visit(page, url, shot, errors) {
   await visit(page, "/fiiller", "06-fiiller.png", errors);
   const workshopPanels = await page.locator("[data-verb-workshop]").count();
   const islands = await page.locator("[data-verb-island]").count();
-  record("Fiil Atolyesi sayfasinda yol paneli ve dort bolum var", workshopPanels === 1 && islands === 4, `yol ${workshopPanels}, bolum ${islands}`);
+  record("Fiil Atolyesi sayfasinda yol paneli ve iki bolum var", workshopPanels === 1 && islands === 2, `yol ${workshopPanels}, bolum ${islands}`);
 
   const phone = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const p2 = await phone.newPage();

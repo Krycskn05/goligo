@@ -1,5 +1,6 @@
 'use client';
-import {ArrowRight,Volume2} from 'lucide-react';
+import type {ReactNode} from 'react';
+import {ArrowRight,CheckCircle2,Volume2,X} from 'lucide-react';
 import {verbMeaning,perfektLabel,spokenSubject,praesensPersons,type Verb} from '@/lib/verb-course';
 import {familyRule,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {sentenceChunks,sentenceText,verbRules,verbPrefix,verbPicture,type VerbTense} from '@/lib/verb-logic';
@@ -10,7 +11,7 @@ import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',perfekt:'stepPerfekt','write-perfekt':'stepSpelling'};
+const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling',perfekt:'stepPerfekt','write-perfekt':'stepSpelling'};
 
 /** One example sentence with the verb parts highlighted and a speaker button (kept for the later sentence practice). */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
@@ -54,16 +55,35 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
    <VerbPicture verb={verb} language={language}/>
    <div className="verb-learn-text">
     {stage!=='meaning'&&<p className="verb-learn-infinitive" lang="de" dir="ltr">{verb.display}</p>}
-    <h1 id="verb-learn-heading" tabIndex={-1} className="verb-learn-form" lang="de" dir="ltr">{stage==='meaning'?verb.display:<><span className="verb-learn-subject">{verb.subject}</span> {form}</>}</h1>
+    <div className="verb-learn-title"><h1 id="verb-learn-heading" tabIndex={-1} className="verb-learn-form" lang="de" dir="ltr">{stage==='meaning'?verb.display:<><span className="verb-learn-subject">{verb.subject}</span> {form}</>}</h1><button type="button" className="verb-learn-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={20}/></button></div>
     <p className="verb-learn-meaning" lang={language} dir={dir}>{verbMeaning(verb,language)}</p>
-    <button type="button" className="btn secondary small verb-learn-speak" disabled={speech.busy} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/>{spoken}</button>
     {stage==='meaning'&&prefix&&<p className="verb-learn-note">{t('separableNote',{p:prefix})}</p>}
    </div>
   </div>
   {/* No example sentences while learning; the meaning card shows the Präsens forms for every person instead. */}
   {stage==='meaning'?<ConjugationTable verb={verb} language={language} speech={speech}/>:<RuleBox lines={verbRules(verb,stage,language)} language={language}/>}
+  {stage==='perfekt'&&verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
+}
+/** After a test answer, in one card that fits a phone screen: the picture and the verb at the top (tap the speaker to hear it again), right or wrong, then one example sentence per person. */
+export function AnswerResult({verb,stage,language,speech,correct,status,chosen,spoken,note,nextLabel,onNext,busy}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;correct:boolean;status:string;chosen?:ReactNode;spoken:string;note?:string;nextLabel:string;onNext:()=>void;busy:boolean}){
+ const dir=vaultDirection(language);
+ const form=stage==='perfekt'?verb.subject+' '+perfektLabel(verb):stage==='praesens'?verb.subject+' '+verb.praesens:'';
+ return <div id="object-feedback" tabIndex={-1} className={'verb-result '+(correct?'success':'retry')} role="status" aria-live="polite" data-verb-result={stage}>
+  <div className="verb-result-head">
+   <VerbPicture verb={verb} language={language}/>
+   <div className="verb-result-text">
+    <p className={'verb-result-status '+(correct?'right':'wrong')}>{correct?<CheckCircle2 size={18}/>:<X size={18}/>}{status}</p>
+    <div className="verb-result-title"><strong lang="de" dir="ltr">{form||verb.display}</strong><button type="button" className="verb-result-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/></button></div>
+    <span className="verb-result-meaning">{form&&<b className="verb-result-infinitive" lang="de" dir="ltr">{verb.display} · </b>}<span lang={language} dir={dir}>{verbMeaning(verb,language)}</span></span>
+    {chosen&&<span className="verb-result-chosen">{chosen}</span>}
+   </div>
+  </div>
+  <PersonSentences verb={verb} tense={stage==='perfekt'?'perfekt':'praesens'} language={language} speech={speech}/>
+  {note&&<p className="verb-note">{note}</p>}
+  <button type="button" className="btn object-next verb-result-next" disabled={busy} onClick={onNext}>{nextLabel}<ArrowRight size={18} className="vault-direction-icon"/></button>
+ </div>;
 }
 /** The card that opens a stage of a part: what comes now (the meanings, or the Perfekt forms) and the verbs that follow. */
 export function ChapterCard({family,stage,verbs,language,onContinue}:{family:VerbFamily;stage:LearnStage;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){

@@ -1,6 +1,7 @@
 import type {Question} from './course';
 import type {Topic} from './lessons';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
+import {verbFamilyOf} from './verb-families';
 
 /**
  * Fiiller: the 38 verbs from the learner's textbook page (infinitive, 3rd person
@@ -8,7 +9,7 @@ import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
  * questions `verb-*`. Answer options stay German; meanings follow the interface language.
  */
 export type VerbAux='hat'|'ist';
-export type VerbTask='meaning'|'word'|'praesens'|'perfekt'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
+export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
 export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
 
 type Spec=readonly [display:string,praesens:string,perfekt:string,praesensWrong:readonly [string,string,string],perfektWrong:readonly [string,string,string],meanings:VaultTranslations];
@@ -91,6 +92,13 @@ function formDistractors(verb:Verb,seed:string){
  return [...seeded(near,seed),...rest].slice(0,3);
 }
 
+/** Verbs that fit a sentence question as wrong options: same workshop first (so the blank count gives nothing away), never a confusable meaning. */
+function fitDistractors(verb:Verb,seed:string){
+ const blocked=conflicts(verb.id);const family=verbFamilyOf(verb.id);const separable=verb.display.includes('|');
+ const near=verbs.filter(other=>!blocked.has(other.id)&&family?.verbs.includes(other.id)).map(other=>other.id);
+ const rest=verbs.filter(other=>!blocked.has(other.id)&&!near.includes(other.id)&&other.display.includes('|')===separable).map(other=>other.id);
+ return [...seeded(near,seed),...seeded(rest,seed)].slice(0,3);
+}
 const verbBank:Question[]=[];
 for(const verb of verbs){
  const meaning=verb.meanings[0];const subject=verb.subject;
@@ -99,6 +107,7 @@ for(const verb of verbs){
  const add=(id:string,task:VerbTask,question:Omit<Question,'id'|'topic'|'explanation'>)=>verbBank.push({id,...shared,verbTask:task,...question});
  add('verb-meaning-'+verb.id,'meaning',{kind:'choice',prompt:verb.display+' ne demek?',answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'meaning-'+verb.id)]});
  add('verb-word-'+verb.id,'word',{kind:'choice',prompt:'“'+meaning+'” anlamındaki Almanca fiil hangisi?',answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'word-'+verb.id)]});
+ add('verb-fit-'+verb.id,'fit',{kind:'choice',prompt:'Resme ve cümleye uyan fiil hangisi?',answer:verb.infinitive,options:[verb.infinitive,...fitDistractors(verb,'fit-'+verb.id)]});
  add('verb-praesens-'+verb.id,'praesens',{kind:'choice',prompt:verb.display+' · Präsens: '+subject+' …',answer:verb.praesens,options:[verb.praesens,...verb.praesensWrong]});
  add('verb-perfekt-'+verb.id,'perfekt',{kind:'choice',prompt:verb.display+' · Perfekt: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...verb.perfektWrong]});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});

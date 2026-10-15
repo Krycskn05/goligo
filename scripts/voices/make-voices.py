@@ -6,6 +6,10 @@ Usage: make-voices.py TEXTS.json OUTPUT_DIR
 OUTPUT_DIR holds the previous "sesler" branch. Only missing clips are rendered,
 clips that are no longer needed are removed, and manifest.json + RAPOR.md are
 rewritten. OUTPUT_DIR/.changed receives the number of added/removed files.
+
+A run stops rendering after VOICE_BUDGET_MIN minutes (default 90) so the job never hits
+its time limit; what is done is kept, and OUTPUT_DIR/.more tells build.sh to start the
+workflow again for the rest. Voices are rendered one after the other (F1 first).
 """
 import difflib
 import hashlib
@@ -183,6 +187,9 @@ def main():
     os.makedirs(out, exist_ok=True)
     report = {'started': time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime()), 'settings': SETTINGS,
               'texts': len(texts), 'voices': {}, 'errors': []}
+    began_run = time.time()
+    budget = float(os.environ.get('VOICE_BUDGET_MIN', '90')) * 60
+    more = False
     clips = {text: clip_id(text) for text in texts}
     wanted = set(clips.values())
     changed = 0
@@ -217,7 +224,13 @@ def main():
             began = time.time()
             stats = report['voices'].setdefault(voice, {})
             samples_for_pitch = None
+            done = 0
             for index, text in enumerate(todo):
+                if time.time() - began_run > budget:
+                    more = True
+                    log(f'{voice}: time budget reached after {done} clips; the next run continues')
+                    break
+                done += 1
                 try:
                     wav = synth(text, voice, style)
                     samples, rate = to_samples(tts, wav)
@@ -233,22 +246,18 @@ def main():
                     report['errors'].append(f'{voice}: {text[:40]!r}: {error!r}')
                 if index % 50 == 0:
                     log(f'{voice}: {index + 1}/{len(todo)}')
-            stats['rendered'] = len(todo)
+            stats['rendered'] = done
             stats['seconds'] = round(time.time() - began, 1)
             if samples_for_pitch is not None:
                 stats['median_pitch_hz'] = median_pitch(samples_for_pitch, stats.get('rate', 44100))
             sample_texts = rng.sample(todo, min(3, len(todo)))
             checks[voice] = [(t, os.path.join(out, voice, clips[t] + '.mp3')) for t in sample_texts
                              if os.path.exists(os.path.join(out, voice, clips[t] + '.mp3'))]
+            if more:
+                break
         if os.environ.get('VOICE_ASR', '1') == '1':
             check_with_whisper(checks, report)
 
-    ready = []
-    for voice in VOICES:
-        have = sum(1 for i in clips.values() if os.path.exists(os.path.join(out, voice, i + '.mp3')))
-        report['voices'].setdefault(voice, {})['available'] = have
-        if texts and have >= 0.95 * len(texts):
-            ready.append(voice)
     previous = {}
     manifest_path = os.path.join(out, 'manifest.json')
     if os.path.exists(manifest_path):
@@ -256,6 +265,17 @@ def main():
             previous = json.load(open(manifest_path, encoding='utf-8'))
         except Exception:  # noqa: BLE001
             previous = {}
+    # A voice stays ready while new texts are still being rendered: it keeps the clips of the
+    # texts it already had (a text without a clip yet plays with the device voice, as before).
+    was_ready = set(previous.get('voices') or [])
+    kept = [clips[t] for t in (previous.get('clips') or {}) if t in clips]
+    ready = []
+    for voice in VOICES:
+        have = sum(1 for i in clips.values() if os.path.exists(os.path.join(out, voice, i + '.mp3')))
+        report['voices'].setdefault(voice, {})['available'] = have
+        had = sum(1 for i in kept if os.path.exists(os.path.join(out, voice, i + '.mp3')))
+        if texts and (have >= 0.95 * len(texts) or (voice in was_ready and kept and had >= 0.95 * len(kept))):
+            ready.append(voice)
     manifest = {'version': int(time.time()), 'settings': SETTINGS, 'voices': ready, 'clips': clips}
     if previous.get('clips') != clips or previous.get('voices') != ready:
         changed += 1
@@ -270,6 +290,10 @@ def main():
             json.dump(report, handle, ensure_ascii=False, indent=1)
     with open(os.path.join(out, '.changed'), 'w') as handle:
         handle.write(str(changed))
+    report['more'] = more
+    if more:
+        with open(os.path.join(out, '.more'), 'w') as handle:
+            handle.write('1')
     log(json.dumps({k: v for k, v in report.items() if k != 'voices'}, ensure_ascii=False)[:2000])
     for voice, stats in report['voices'].items():
         log(voice, json.dumps({k: v for k, v in stats.items() if k != 'asr'}))

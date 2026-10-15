@@ -57,6 +57,8 @@ export const separablePrefixes=['ab','an','auf','aus','ein','herunter','leid','m
 export function verbPrefix(verb:Verb){return verb.display.includes('|')?verb.display.split('|')[0]:'';}
 /** The Präsens verb form without the prefix that goes to the end ("fährt" of "fährt ab"). */
 export function praesensStem(verb:Verb){const prefix=verbPrefix(verb);return prefix?verb.praesens.slice(0,-(prefix.length+1)):verb.praesens;}
+/** The Präsens form as an answer option: "fährt", or "steht … auf" when the prefix goes to the end. */
+export function praesensForm(verb:Verb){const prefix=verbPrefix(verb);return prefix?praesensStem(verb)+' … '+prefix:verb.praesens;}
 
 export type SentenceChunk={text:string;role:'subject'|'middle'|'verb'|'prefix'|'aux'|'participle'};
 /** The example sentence as ordered chunks; the verb chunks carry their role. */

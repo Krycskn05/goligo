@@ -31,6 +31,11 @@ STEPS = 10
 BITRATE = 64
 
 
+def speakable(text):
+    """The text the model reads: quotation marks it cannot read are left out (the clip id keeps the full text)."""
+    return re.sub(r'[„“”‚‘’«»"]', '', text).strip()
+
+
 def clip_id(text):
     return hashlib.sha1(f'{SETTINGS}|{text}'.encode('utf-8')).hexdigest()[:16]
 
@@ -232,7 +237,7 @@ def main():
                     break
                 done += 1
                 try:
-                    wav = synth(text, voice, style)
+                    wav = synth(speakable(text), voice, style)
                     samples, rate = to_samples(tts, wav)
                     samples = tidy(samples, rate)
                     path = os.path.join(out, voice, clips[text] + '.mp3')

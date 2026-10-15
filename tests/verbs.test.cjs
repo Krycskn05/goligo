@@ -277,7 +277,7 @@ test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, ca
  assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
  for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','stageMeanings','perfektChapter','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
  assert.ok(!page.includes('startKarma')&&!page.includes('data-verb-karma'),'no Karma sınav on the page');
- // No conjugated example sentences while learning: not on the learning cards, not after a meaning question.
+ // No single example sentence on the learning cards (the meaning card shows the conjugation table); after an answer: one sentence per person (next test).
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const learnCard=cards.slice(cards.indexOf('export function LearnCard'),cards.indexOf('export function ChapterCard'));
  assert.ok(!learnCard.includes('<ExampleSentence'),'learning cards show no example sentence');
  // The meaning card shows the Präsens forms for ich, du, er/sie/es, wir, ihr, sie/Sie instead.
@@ -297,6 +297,45 @@ test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, ca
  assert.deepEqual(persons('leidtun'),['tue leid','tust leid','tut leid','tun leid','tut leid']);
  for(const verb of verbs.verbs){const f=verbs.praesensPersons(verb);assert.equal(f.er,verb.praesens,verb.id);assert.equal(new Set([f.ich,f.wir]).size,2,verb.id);}
  for(const language of languages)assert.ok(copy.verbText(language,'conjugationTitle').includes('Präsens'));
- assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no example sentences');
+ assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no single sie/er sentence');
  assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
+});
+test('after an answer every person gets an example sentence: Präsens after meanings, Perfekt after Perfekt',()=>{
+ const persons=load('verb-persons');const byId=id=>verbs.verbMap.get(id);
+ assert.deepEqual([...persons.personKeys],['ich','du','er','sie','es','wir','ihr','sie-plural','Sie']);
+ assert.deepEqual([...persons.personSentenceVerbs].sort(),verbs.verbs.map(v=>v.id).sort());
+ const helper={hat:['habe','hast','hat','hat','hat','haben','habt','haben','haben'],ist:['bin','bist','ist','ist','ist','sind','seid','sind','sind']};
+ for(const verb of verbs.verbs)for(const tense of ['praesens','perfekt']){
+  const rows=persons.personSentences(verb,tense);assert.equal(rows.length,9,verb.id+' '+tense);
+  for(const row of rows){assert.match(row.text,/^[A-ZÄÖÜ][^.]*[a-zäöüß]\.$/,row.text);assert.ok(!/\s\s|\{X\}|undefined/.test(row.text),row.text);assert.equal(row.parts.map(p=>p.text).join(' ')+'.',row.text);}
+  if(persons.personMode(verb)!=='subject')continue;
+  // Subject first (Ich, Du, Er, Sie, Es, Wir, Ihr, Sie, Sie), then the verb form of that person.
+  assert.deepEqual(rows.map(r=>r.text.split(' ')[0]),['Ich','Du','Er','Sie','Es','Wir','Ihr','Sie','Sie'],verb.id);
+  const f=verbs.praesensPersons(verb);const forms=[f.ich,f.du,f.er,f.er,f.er,f.wir,f.ihr,f.wir,f.wir];const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';
+  rows.forEach((row,i)=>{
+   if(tense==='praesens'){const finite=prefix?forms[i].slice(0,-(prefix.length+1)):forms[i];assert.equal(row.parts[1].text,finite,row.text);if(prefix)assert.ok(row.text.endsWith(' '+prefix+'.'),row.text);}
+   else{assert.equal(row.parts[1].text,helper[verb.aux][i],row.text);assert.ok(row.text.endsWith(' '+verb.participle+'.'),row.text);}
+  });
+ }
+ const text=(id,tense)=>persons.personSentences(byId(id),tense).map(row=>row.text);
+ assert.deepEqual(text('ankommen','praesens'),['Ich komme heute Abend in Berlin an.','Du kommst heute Abend in Berlin an.','Er kommt heute Abend in Berlin an.','Sie kommt heute Abend in Berlin an.','Es kommt heute Abend in Berlin an.','Wir kommen heute Abend in Berlin an.','Ihr kommt heute Abend in Berlin an.','Sie kommen heute Abend in Berlin an.','Sie kommen heute Abend in Berlin an.']);
+ assert.deepEqual(text('ankommen','perfekt'),['Ich bin gestern Abend in Berlin angekommen.','Du bist gestern Abend in Berlin angekommen.','Er ist gestern Abend in Berlin angekommen.','Sie ist gestern Abend in Berlin angekommen.','Es ist gestern Abend in Berlin angekommen.','Wir sind gestern Abend in Berlin angekommen.','Ihr seid gestern Abend in Berlin angekommen.','Sie sind gestern Abend in Berlin angekommen.','Sie sind gestern Abend in Berlin angekommen.']);
+ assert.deepEqual(text('essen','praesens').slice(0,3),['Ich esse gern Salat.','Du isst gern Salat.','Er isst gern Salat.']);
+ assert.equal(text('einladen','praesens')[6],'Ihr ladet Freunde zur Party ein.');
+ assert.equal(text('empfehlen','praesens')[1],'Du empfiehlst Anna das Buch.');
+ assert.equal(text('helfen','perfekt')[5],'Wir haben der Nachbarin geholfen.');
+ // gefallen and leid|tun: the person in the dative; gelten: für + accusative.
+ assert.deepEqual(text('gefallen','praesens'),['Die Stadt gefällt mir.','Die Stadt gefällt dir.','Die Stadt gefällt ihm.','Die Stadt gefällt ihr.','Die Stadt gefällt ihm.','Die Stadt gefällt uns.','Die Stadt gefällt euch.','Die Stadt gefällt ihnen.','Die Stadt gefällt Ihnen.']);
+ assert.deepEqual(text('leidtun','perfekt').slice(0,2),['Es hat mir leidgetan.','Es hat dir leidgetan.']);
+ assert.deepEqual(text('gelten','praesens').slice(0,3),['Die Regel gilt auch für mich.','Die Regel gilt auch für dich.','Die Regel gilt auch für ihn.']);
+ assert.deepEqual(['gefallen','leidtun','gelten'].map(id=>persons.personMode(byId(id))),['dative','dative','fuer']);
+ for(const language of languages){
+  assert.ok(copy.verbText(language,'examplesTitle',{t:'Präsens'}).includes('Präsens'),language);
+  for(const key of ['pronounPlural','pronounFormal'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
+  assert.ok(copy.verbText(language,'personDative').includes('mir, dir, ihm'),language);assert.ok(copy.verbText(language,'personFuer').includes('für mich'),language);
+ }
+ // The answer panel shows them under the forms: Präsens after the meaning questions, Perfekt after the Perfekt questions; tapping a row reads it.
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
+ assert.ok(page.includes("<PersonSentences verb={verb} tense={learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'}"));
+ assert.ok(cards.includes('onClick={()=>speech.speak(row.text)}'),'a sentence is read only when tapped');
 });

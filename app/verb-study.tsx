@@ -1,7 +1,7 @@
 'use client';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Sparkles,Star,Trophy,Volume2,X,Zap} from 'lucide-react';
+import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle} from '@/lib/verb-families';
@@ -11,7 +11,7 @@ import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,praesensFo
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper} from './verb-workshop';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,KARMA_MODE,KARMA_COUNT,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,findWorkshop,lastKarma,isCurrentPath,karmaHidesPicture} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,WORKSHOP_MODE,WORKSHOP_TOTAL,workshopVerbs,workshopIds,pathPlace,workshopProgress,findWorkshop,isCurrentPath} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -67,12 +67,11 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  // Only the correct answer is spoken after the effect, never the question. The sentence task answers with the Präsens form.
  const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';
  const finished=!!session&&index>=session.questions.length;
- const workshop=session?.mode===WORKSHOP_MODE;const karma=session?.mode===KARMA_MODE;
+ const workshop=session?.mode===WORKSHOP_MODE;
  const place=workshop&&session?pathPlace(session.questions,index,lookup):null;
  const overlay=place&&place.chapterStart&&!dismissed.has('c:'+index)?'chapter':place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
  const starred=starredQuestionIds(snapshot.notes);
  const savedWorkshop=findWorkshop(snapshot.sessions);const path=workshopProgress(savedWorkshop);
- const karmaDone=lastKarma(snapshot.sessions);
  const nextVerb=workshopVerbs[Math.min(path.verbsDone,workshopVerbs.length-1)];
  function fail(e:unknown,fallback:ErrorKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
@@ -104,15 +103,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    }
    const ids=workshopIds();
    const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
-   if(!mounted.current)return;openSession(data.session);
-  }catch(e){fail(e,'startError');}
-  finally{mutation.current=false;if(mounted.current)setBusy(false);}
- }
- /** Karma sınav: a new hard round every time; mistakes rank first on the server. */
- async function startKarma(){
-  if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
-  try{
-   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:KARMA_MODE,topic:WORKSHOP_TOPIC,count:KARMA_COUNT},'','de');
    if(!mounted.current)return;openSession(data.session);
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
@@ -191,8 +181,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function promptCard(question:Question,item:Verb){
   const kind=question.verbTask;
-  // Pictures give the meaning away: hidden for meaning questions, and in Karma sınav for everything but the sentence task.
-  const showPicture=(kind!=='meaning'&&!(karma&&karmaHidesPicture(kind)))||!!feedback;
+  // Pictures give the meaning away: hidden until the answer for the meaning and listening questions.
+  const showPicture=(kind!=='meaning'&&kind!=='hear')||!!feedback;
   if(kind==='word'||kind==='write')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
   if(kind==='fit')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{sentenceLine(question,item)}{feedback&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}</div>;
   const sentence=kind==='praesens'||kind==='perfekt'||kind==='write-praesens'||kind==='write-perfekt';
@@ -224,10 +214,10 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    {session?finished?<section className="object-results panel verb-results">
     <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('pathDone'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>
     <RoundReward answers={session.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
-    <div className="object-actions">{workshop?<button type="button" className="btn" disabled={busy} onClick={()=>void startKarma()}><Sparkles size={18}/>{t('toKarma')}</button>:<button type="button" className="btn" disabled={busy} onClick={()=>void startKarma()}><RotateCcw size={18}/>{t('playAgain')}</button>}<button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
+    <div className="object-actions"><button type="button" className="btn" disabled={busy} onClick={()=>void enterWorkshop(true)}><RotateCcw size={18}/>{t('workshopRestart')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
-    <div className="object-practice-top"><span className="object-pill">{karma?t('karmaPill'):t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
+    <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:session.questions.length})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     <progress max={session.questions.length} value={index} aria-label={v('progress',{n:index+1,total:session.questions.length})}/>
     {place&&<PathStepper place={place} total={workshopVerbs.length} language={language}/>}
     {overlay==='chapter'&&place?<ChapterCard family={place.family} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
@@ -250,7 +240,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       <h2>{feedback.correct?<CheckCircle2 size={23}/>:<X size={23}/>} {v(feedback.correct?'correct':writing?'wrongAnswer':'wrong')}</h2>
       <p>{v('correctAnswer')}: <strong lang="de" dir="ltr">{correctLabel(q,verb)}</strong></p>
       {writing&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
-      <div className="verb-feedback-main">{(listening||karma)&&<VerbPicture verb={verb} language={language} small/>}<p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb)}</p></div>
+      <div className="verb-feedback-main">{listening&&<VerbPicture verb={verb} language={language} small/>}<p className="verb-feedback-forms"><small>{t('verbForms')}</small>{verbForms(verb)}</p></div>
       <RuleBox lines={feedbackRules(q,verb)} language={language}/>
       {verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
       <button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{v('repeatAudio')}</button>
@@ -266,7 +256,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       <p className="verb-hero-lead">{t('workshopLead')}</p>
       <div className="verb-hero-cta">
        <button type="button" className="btn verb-path-enter" disabled={busy||!ready} onClick={()=>void enterWorkshop()}><Play size={20} fill="currentColor" aria-hidden="true"/>{path.finished||!savedWorkshop?t(path.finished?'workshopRestart':'workshopStart'):t('workshopEnter')}</button>
-       <button type="button" className="btn orange small" disabled={busy||!ready} onClick={()=>void startKarma()}><Zap size={17} fill="currentColor" aria-hidden="true"/>{t('karmaTitle')}</button>
       </div>
      </div>
      <div className="verb-polaroid">
@@ -308,11 +297,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       </article>;
      })}
     </section>
-    <article className="verb-karma" data-verb-karma="">
-     <span className="verb-karma-chest" aria-hidden="true"><Trophy size={54}/></span>
-     <div className="verb-karma-text"><h2>{t('karmaTitle')} <span className="verb-hard-tag">{t('hardTag')}</span></h2><p>{t('karmaLead')}</p><small>{karmaDone?t('karmaLast',{n:karmaDone.correct,total:karmaDone.total}):t('karmaTreasure')}</small></div>
-     <button type="button" className="btn orange" disabled={busy||!ready} onClick={()=>void startKarma()}><Zap size={18} fill="currentColor" aria-hidden="true"/>{t('karmaStart')}</button>
-    </article>
     <article className="panel verb-collection">
      <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}{overall&&<> · {progressText(language,'learned',{n:overall.learned,total:overall.total})}</>}</p>
      <div className="verb-stickers">{workshopVerbs.map((item,i)=><img key={item.id} className={i<path.verbsDone?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display} width={96} height={96} loading="lazy" decoding="async"/>)}</div>

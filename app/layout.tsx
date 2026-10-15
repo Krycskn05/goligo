@@ -4,7 +4,7 @@ import "./globals.css";
 import "./learning-effects.css";
 import "./progress.css";
 import "./verbs.css";
-import "./apple.css";
+import "./koko-theme.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {
@@ -24,6 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+      </head>
       <body className="antialiased">{children}<LearningEffects/></body>
     </html>
   );

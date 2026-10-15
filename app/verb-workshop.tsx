@@ -3,13 +3,13 @@ import {ArrowRight,Volume2} from 'lucide-react';
 import {verbMeaning,perfektLabel,spokenSubject,type Verb} from '@/lib/verb-course';
 import {familyRule,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {sentenceChunks,sentenceText,verbRules,verbPrefix,verbPicture,type VerbTense} from '@/lib/verb-logic';
-import {workshopSteps,type LearnStage,type PathPlace} from '@/lib/verb-workshop';
+import {type LearnStage,type PathPlace,type WorkshopStep} from '@/lib/verb-workshop';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<(typeof workshopSteps)[number],VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',hear:'stepListen'};
+const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',hear:'stepListen',perfekt:'stepPerfekt','write-perfekt':'stepSpelling','hear-perfekt':'stepListen'};
 
 /** One example sentence with the verb parts highlighted and a speaker button. */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
@@ -42,22 +42,23 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
-/** The card that opens a part: what its verbs are about and the verbs that follow. */
-export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamily;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
+/** The card that opens a stage of a part: what comes now (the meanings, or the Perfekt forms) and the verbs that follow. */
+export function ChapterCard({family,stage,verbs,language,onContinue}:{family:VerbFamily;stage:LearnStage;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id}>
+ const perfekt=stage==='perfekt';
+ return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id} data-verb-stage={stage}>
   <p className="verb-learn-kicker">{t('chapterOf',{n:family.number})} · {t('verbsCount',{n:verbs.length})}</p>
-  <h1 id="verb-chapter-heading" tabIndex={-1}>{familyTitle(family,language)}</h1>
-  <p className="verb-chapter-rule">{familyRule(family,language)}</p>
-  <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr">{verb.display}</span></li>)}</ul>
+  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang="de" dir="ltr">{familyTitle(family,language)}</span> · {perfekt?t('stepPerfekt'):t('stageMeanings')}</h1>
+  <p className="verb-chapter-rule">{perfekt?t('perfektChapter'):familyRule(family,language)}</p>
+  <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr">{verb.display}</span>{perfekt&&<small lang="de" dir="ltr">{verb.subject} {perfektLabel(verb)}</small>}</li>)}</ul>
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('chapterStart')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
-/** Where the learner is on the path: the verb and its seven steps. */
-export function PathStepper({place,total,language}:{place:PathPlace;total:number;language:VaultLanguage}){
+/** Where the learner is on the path: the verb and the steps of its current stage. */
+export function PathStepper({place,language}:{place:PathPlace;language:VaultLanguage}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- return <div className="verb-stepper" data-verb-step={place.step}>
-  <div className="verb-stepper-head"><span className="verb-stepper-verb" lang="de" dir="ltr">{place.verb.display}</span><span className="verb-stepper-count">{t('verbOf',{n:place.verbNumber,total})}</span></div>
-  <ol className="verb-stepper-steps">{workshopSteps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}><span className="verb-stepper-dot"/><span className="verb-stepper-label">{t(stepLabels[step])}</span></li>)}</ol>
+ return <div className="verb-stepper" data-verb-step={place.step} data-verb-stage={place.stage}>
+  <div className="verb-stepper-head"><span className="verb-stepper-verb" lang="de" dir="ltr">{place.verb.display}</span><span className="verb-stepper-count">{place.stage==='perfekt'?t('stepPerfekt'):t('stageMeanings')} · {t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})}</span></div>
+  <ol className="verb-stepper-steps" style={{gridTemplateColumns:'repeat('+place.steps.length+',minmax(0,1fr))'}}>{place.steps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}><span className="verb-stepper-dot"/><span className="verb-stepper-label">{t(stepLabels[step])}</span></li>)}</ol>
  </div>;
 }

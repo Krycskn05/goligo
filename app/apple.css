@@ -133,3 +133,23 @@ strong { font-weight:600; }
  .site-home { padding:8px; }
 }
 @media (prefers-reduced-motion:reduce) { .site-progress-fill { transition:none; } }
+/* Second pass: the warm gradients that remained on the vault, the alerts and the home switches */
+.vault-category-card.featured,.vault-category-card.resume,.vault-category-card.resume.unavailable { background:var(--ap-surface); }
+.vault-category-card.featured .vault-category-art { background:#fff; }
+.object-alert { background:var(--ap-blue-soft); color:var(--ap-text); border:1px solid #c7ddf5; border-radius:14px; font-size:15px; }
+.toon-level-switch button { box-shadow:none; transition:background .15s; }
+.toon-level-switch button.active { background:var(--ap-text); color:#fff; border-color:var(--ap-text); box-shadow:none; }
+.toon-level-switch button.active span { color:#d2d2d7; }
+.toon-level-switch button:hover:enabled { transform:none; }
+.toon-app .work-nav.active { background:var(--ap-surface); color:var(--ap-text); box-shadow:none; }
+.toon-app .work-nav:hover { background:var(--ap-surface); }
+.toon-topic-art { border:1px solid var(--ap-hair); background:#fff; }
+.toon-card-number { background:#fff; color:var(--ap-text-2); border:1px solid var(--ap-hair); box-shadow:none; }
+.housing-star { color:var(--ap-text-4); }
+.housing-star.active { color:#f5a524; }
+.object-exit { color:var(--ap-text-3); }
+.vault-listen-player { background:var(--ap-surface); border:1px solid transparent; color:var(--ap-text); }
+.picture-quiz-saving { color:var(--ap-text-3); }
+.object-results .vault-result-score { color:var(--ap-text); }
+.round-reward,.round-progress { background:var(--ap-surface); border-color:transparent; box-shadow:none; }
+.round-xp { background:#fff4d6; color:#8a5a00; border-color:transparent; box-shadow:none; }

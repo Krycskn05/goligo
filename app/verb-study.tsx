@@ -7,7 +7,7 @@ import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,type Verb} from '@/
 import {verbFamilies,verbFamilyOf,familyTitle} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
-import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
+import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper} from './verb-workshop';
@@ -64,8 +64,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const q=verbModePredicate(session?.mode??WORKSHOP_MODE)(candidate)?candidate:undefined;
  const verb=q?.verbId?verbMap.get(q.verbId):undefined;
  const task=q?.verbTask;
- // Only the correct answer is spoken after the effect, never the question.
- const pronunciation=q?.answer??'';
+ // Only the correct answer is spoken after the effect, never the question. The sentence task answers with the Präsens form.
+ const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';
  const finished=!!session&&index>=session.questions.length;
  const workshop=session?.mode===WORKSHOP_MODE;const karma=session?.mode===KARMA_MODE;
  const place=workshop&&session?pathPlace(session.questions,index,lookup):null;
@@ -152,6 +152,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  function optionText(question:Question,option:string):{text:string;german:boolean}{
   const target=verbMap.get(option);const kind=question.verbTask??'';
   if(target&&meaningOptionTasks.has(kind))return {text:verbMeaning(target,language),german:false};
+  // The sentence task offers the forms that fit the subject ("fährt", "steht … auf"), not the infinitives.
+  if(target&&kind==='fit')return {text:praesensForm(target),german:true};
   if(target&&verbOptionTasks.has(kind))return {text:target.display,german:true};
   return {text:option,german:true};
  }
@@ -161,7 +163,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function correctLabel(question:Question,item:Verb){
   const kind=question.verbTask??'';
-  return kind==='praesens'||kind==='write-praesens'||kind==='perfekt'||kind==='write-perfekt'?item.subject+' '+question.answer:item.display;
+  return kind==='praesens'||kind==='write-praesens'||kind==='perfekt'||kind==='write-perfekt'?item.subject+' '+question.answer:kind==='fit'?praesensForm(item):item.display;
  }
  function verbForms(item:Verb){
   return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong> — {item.subject} {item.praesens} — {item.subject} {perfektLabel(item)}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;

@@ -277,5 +277,9 @@ test('Fiil Atölyesi: two parts in book order, meanings then Perfekt in each, ca
  assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
  for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','stageMeanings','perfektChapter','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
  assert.ok(!page.includes('startKarma')&&!page.includes('data-verb-karma'),'no Karma sınav on the page');
+ // No conjugated example sentences while learning: not on the learning cards, not after a meaning question.
+ const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const learnCard=cards.slice(cards.indexOf('export function LearnCard'),cards.indexOf('export function ChapterCard'));
+ assert.ok(!learnCard.includes('<ExampleSentence'),'learning cards show no example sentence');
+ assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no example sentences');
  assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
 });

@@ -1,7 +1,7 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const {DatabaseSync}=require('node:sqlite');const fs=require('node:fs');const path=require('node:path');const vm=require('node:vm');const ts=require('typescript');const {execFileSync}=require('node:child_process');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR to compiled lib directory.');
 const load=name=>require(path.join(compiled,name+'.js'));
-const course=load('course'),study=load('study'),verbs=load('verb-course'),practice=load('verb-practice'),copy=load('verb-copy'),progress=load('progress');
+const course=load('course'),study=load('study'),verbs=load('verb-course'),practice=load('verb-practice'),copy=load('verb-copy'),progress=load('progress'),workshop=load('verb-workshop'),families=load('verb-families');
 const languages=['tr','de','en','ar','uk','fr','es','ru','fa','pl','it','pt'];
 
 // The learner's textbook page: infinitive – sie/er (es) Präsens – Perfekt.
@@ -61,7 +61,7 @@ test('Fiiller keeps the 38 verbs of the page with Präsens, Perfekt and a meanin
 });
 
 test('every verb has choice, writing and listening exercises with new IDs only',()=>{
- const kinds=['meaning','word','praesens','perfekt','write','write-praesens','write-perfekt','hear','hear-praesens','hear-perfekt'];
+ const kinds=['meaning','word','fit','praesens','perfekt','write','write-praesens','write-perfekt','hear','hear-praesens','hear-perfekt'];
  assert.equal(verbs.verbQuestions.length,38*kinds.length);
  assert.equal(new Set(verbs.verbQuestions.map(q=>q.id)).size,verbs.verbQuestions.length);
  for(const verb of verbs.verbs)for(const task of kinds){
@@ -106,22 +106,22 @@ test('rounds follow the chosen group and mode, solved questions wait and the sam
   assert.ok(picked.every(q=>practice.verbModePredicate(mode)(q)&&(topic==='verbs-all'||q.topic===topic)));
   for(let i=1;i<picked.length;i++)assert.notEqual(picked[i].verbId,picked[i-1].verbId,mode+topic+' '+i);
  }
- assert.equal(practice.verbPool('test','verbs-1').length,40);assert.equal(practice.verbPool('write','verbs-4').length,24);
+ assert.equal(practice.verbPool('test','verbs-1').length,50);assert.equal(practice.verbPool('write','verbs-4').length,24);
  const ids=practice.verbPool('test','verbs-1').map(q=>q.id);
  const reviews=[{question_id:ids[0],wrong_count:1,streak:0,seen:1,last_answer:'x',last_wrong:'x',last_at:1,due_at:1},{question_id:ids[1],wrong_count:0,streak:1,seen:1,last_answer:'y',last_wrong:null,last_at:1,due_at:1}];
  const fresh=practice.pickVerbRound('test','verbs-1',reviews,false,undefined,{fresh:true}).map(q=>q.id);
- assert.ok(fresh.includes(ids[0])&&!fresh.includes(ids[1]));assert.equal(fresh.length,39);
+ assert.ok(fresh.includes(ids[0])&&!fresh.includes(ids[1]));assert.equal(fresh.length,49);
  const review=practice.pickVerbRound('test','verbs-1',reviews,true,undefined,{starred:new Set([ids[2]])}).map(q=>q.id).sort();
  assert.deepEqual(review,[ids[0],ids[2]].sort());
- assert.equal(study.selectQuestions('test','verbs-1',40,reviews,ids)[0].id,ids[0],'open mistakes come first');
- assert.equal(progress.verbProgressIds('verbs-all').length,380);
+ assert.equal(study.selectQuestions('test','verbs-1',50,reviews,ids)[0].id,ids[0],'open mistakes come first');
+ assert.equal(progress.verbProgressIds('verbs-all').length,418);
  assert.ok(progress.verbProgressIds('verbs-3').every(id=>course.questionMap.get(id).topic==='verbs-3'));
  assert.equal(progress.verbProgress('verbs-1',reviews).learned,1);
 });
 
 test('every text of the page exists in all twelve languages',()=>{
  for(const key of Object.keys(copy.verbCopy))for(const language of languages){
-  const text=copy.verbText(language,key,{n:7,verb:'ab|fahren',total:9,t:'Präsens'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
+  const text=copy.verbText(language,key,{n:7,verb:'ab|fahren',total:9,t:'Präsens',p:'ab'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
  }
  assert.equal(copy.verbText('tr','groupTitle',{n:2}),'2. grup');
 });
@@ -139,7 +139,7 @@ test('a Fiiller round starts, saves answers and stars, resumes and finishes thro
  const {session}=await started.json();assert.equal(session.topic,'verbs-4');assert.equal(session.questions.length,24);
  const first=course.questionMap.get(session.questions[0].id);
  const wrong=await (await a.post({action:'answer',sessionId:id,questionId:first.id,answer:'falsch'})).json();assert.equal(wrong.result.correct,0);
- let open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,id);assert.equal(open.activePictureSessionId,null);
+ let open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,null,'only the workshop path is picked up again');assert.equal(open.activePictureSessionId,null);
  assert.equal((await a.post({action:'note',key:'star:'+first.id,value:'1'})).status,200);
  open=await (await a.get()).json();assert.equal(open.notes['star:'+first.id],'1');
  const resumed=(await (await a.get('?session='+id)).json()).session;assert.equal(resumed.answers.length,1);
@@ -151,6 +151,14 @@ test('a Fiiller round starts, saves answers and stars, resumes and finishes thro
  const listenSession=(await choice.json()).session;const q=course.questionMap.get(listenSession.questions[0].id);assert.ok(q.audio);
  assert.deepEqual([...listenSession.questions[0].options].sort(),[...q.options].sort());
  assert.equal((await a.post({action:'start',id:'verb-bad-topic-000001',mode:'test',topic:'verbs-9',count:1})).status,400);
+ // Fiil Atölyesi: the whole path is one session in the requested order; it is the session to continue.
+ const path=workshop.workshopIds();const started2=await a.post({action:'start',id:'verb-workshop-session-01',mode:'workshop',topic:'verbs-all',count:path.length,onlyIds:path});assert.equal(started2.status,201);
+ const ws=(await started2.json()).session;assert.deepEqual(ws.questions.map(item=>item.id),path);assert.equal(ws.mode,'workshop');
+ open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,'verb-workshop-session-01');
+ const karma=await a.post({action:'start',id:'verb-karma-session-0001',mode:'mixed',topic:'verbs-all',count:30});assert.equal(karma.status,201);
+ const ks=(await karma.json()).session;assert.equal(ks.questions.length,30);assert.ok(ks.questions.every(item=>practice.isVerbExercise(course.questionMap.get(item.id))));
+ assert.ok(new Set(ks.questions.map(item=>course.questionMap.get(item.id).kind)).size>=2,'karma mixes question kinds');
+ open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,'verb-workshop-session-01','an open karma round never replaces the path');
 });
 
 test('the page is linked from home, only the correct answer is spoken, and verb audio is in the voice list',()=>{
@@ -212,4 +220,42 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+' '+prefix)"));
  assert.ok(page.includes('<VerbGame ')&&page.includes('gameIds.map'));
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
+});
+
+test('Fiil Atölyesi: five parts cover every verb once, the path has seven steps per verb and cards open each stage',()=>{
+ const all=families.verbFamilies.flatMap(f=>f.verbs);assert.equal(all.length,38);assert.equal(new Set(all).size,38);
+ for(const verb of verbs.verbs)assert.ok(families.verbFamilyOf(verb.id),verb.id);
+ for(const family of families.verbFamilies)for(const language of languages){assert.ok(families.familyTitle(family,language).trim());assert.ok(families.familyRule(family,language).length>20);}
+ // Each part follows its rule: 1 and 5 take ist, 4 takes hat, 4 and 5 are separable, 2 changes its vowel.
+ const byId=id=>verbs.verbMap.get(id);
+ assert.ok(families.verbFamilies[0].verbs.every(id=>byId(id).aux==='ist'&&!byId(id).display.includes('|')));
+ assert.ok(families.verbFamilies[1].verbs.every(id=>byId(id).aux==='hat'&&byId(id).praesens!==byId(id).infinitive.slice(0,-2)+'t'));
+ assert.ok(families.verbFamilies[3].verbs.every(id=>byId(id).aux==='hat'&&byId(id).display.includes('|')));
+ assert.ok(families.verbFamilies[4].verbs.every(id=>byId(id).aux==='ist'&&byId(id).display.includes('|')));
+ const ids=workshop.workshopIds();assert.equal(ids.length,38*7);assert.equal(new Set(ids).size,ids.length);
+ for(const id of ids)assert.ok(practice.isVerbExercise(course.questionMap.get(id)),id);
+ assert.deepEqual(ids.slice(0,7).map(id=>course.questionMap.get(id).verbTask),['word','fit','write','praesens','write-praesens','perfekt','write-perfekt']);
+ const questions=ids.map(id=>({id}));const lookup=id=>course.questionMap.get(id);
+ const first=workshop.pathPlace(questions,0,lookup);assert.equal(first.verb.id,'bleiben');assert.ok(first.chapterStart&&first.stageStart);assert.equal(first.stage,'meaning');assert.equal(first.verbNumber,1);
+ assert.ok(!workshop.pathPlace(questions,1,lookup).stageStart);
+ const praesens=workshop.pathPlace(questions,3,lookup);assert.ok(praesens.stageStart&&!praesens.chapterStart);assert.equal(praesens.stage,'praesens');assert.equal(praesens.step,3);
+ const second=workshop.pathPlace(questions,7,lookup);assert.equal(second.verb.id,'fahren');assert.ok(second.stageStart&&!second.chapterStart);assert.equal(second.verbNumber,2);
+ const part2=workshop.pathPlace(questions,6*7,lookup);assert.equal(part2.family.number,2);assert.ok(part2.chapterStart);
+ assert.deepEqual(study.selectQuestions('workshop','verbs-all',ids.length,[],ids).map(q=>q.id),ids,'the path keeps its order');
+ assert.ok(practice.verbModePredicate('workshop')(course.questionMap.get('verb-hear-essen'))&&practice.verbModePredicate('mixed')(course.questionMap.get('verb-write-essen')));
+ const progress1=workshop.workshopProgress({answered:16,total:266});assert.equal(progress1.verbsDone,2);assert.ok(!progress1.finished);
+ assert.ok(workshop.workshopProgress({answered:266,total:266}).finished);
+ assert.equal(workshop.findWorkshop([{id:'a',mode:'mixed',topic:'verbs-all',finished_at:1},{id:'b',mode:'workshop',topic:'verbs-all',finished_at:null},{id:'c',mode:'workshop',topic:'verbs-all',finished_at:2}]).id,'b');
+ assert.ok(workshop.isCurrentPath({mode:'workshop',questions}));assert.ok(!workshop.isCurrentPath({mode:'workshop',questions:questions.slice(1)}));
+ // Sentence questions: four verbs that cannot be confused, all separable or all not, the picture stays even in Karma sınav.
+ for(const verb of verbs.verbs){
+  const fit=course.questionMap.get('verb-fit-'+verb.id);assert.equal(fit.kind,'choice');assert.equal(fit.options.length,4);assert.equal(new Set(fit.options).size,4);
+  for(const option of fit.options)assert.equal(byId(option).display.includes('|'),verb.display.includes('|'),verb.id+' '+option);
+  assert.ok(!fit.options.some(option=>option!==verb.id&&[['anfangen','beginnen'],['geben','abgeben'],['bringen','mitbringen'],['kommen','ankommen','mitkommen'],['gehen','laufen','fahren'],['fahren','abfahren'],['abfahren','aufstehen']].some(set=>set.includes(option)&&set.includes(verb.id))),verb.id);
+ }
+ assert.ok(!workshop.karmaHidesPicture('fit')&&workshop.karmaHidesPicture('word'));
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert.ok(!page.includes("v('resume')"),'no resume card on the page');
+ assert.ok(page.includes('<SiteHeader ')&&page.includes('<ChapterCard ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
+ for(const key of ['workshopTitle','workshopLead','workshopEnter','karmaTitle','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
 });

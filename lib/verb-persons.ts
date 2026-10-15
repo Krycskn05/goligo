@@ -1,4 +1,4 @@
-import {praesensPersons,type Verb} from './verb-course';
+import {verbs,praesensPersons,spokenSubject,type Verb} from './verb-course';
 import {verbPrefix} from './verb-logic';
 
 /**
@@ -85,3 +85,25 @@ export function personSentences(verb:Verb,tense:PersonTense):PersonSentence[]{
  return personKeys.map(person=>{const parts=sentence(verb,person,tense);return {person,parts,text:parts.map(part=>part.text).join(' ')+'.'};});
 }
 export const personSentenceVerbs=Object.keys(middles);
+/** The Präsens table of the learning card: the label, the form, and what is read aloud (pronoun + form). */
+export function conjugationRows(verb:Verb):{pronoun:string;form:string;spoken:string}[]{
+ const f=praesensPersons(verb);const third=spokenSubject(verb);
+ return [{pronoun:'ich',form:f.ich,spoken:'ich '+f.ich},{pronoun:'du',form:f.du,spoken:'du '+f.du},{pronoun:'er/sie/es',form:f.er,spoken:third+' '+f.er},
+  {pronoun:'wir',form:f.wir,spoken:'wir '+f.wir},{pronoun:'ihr',form:f.ihr,spoken:'ihr '+f.ihr},{pronoun:'sie/Sie',form:f.wir,spoken:'sie '+f.wir}];
+}
+/** What the speaker button of a learning card reads: the infinitive, or er/es with the Präsens or Perfekt. */
+export function learnSpeech(verb:Verb,stage:'meaning'|'praesens'|'perfekt'){
+ const subject=spokenSubject(verb);
+ return stage==='praesens'?subject+' '+verb.praesens:stage==='perfekt'?subject+' '+verb.perfekt:verb.infinitive;
+}
+/** Every German text the Fiil Atölyesi cards read aloud. The voice list renders a natural clip for each,
+ * so they play on every phone (the device voice is only the fallback). */
+export function workshopSpeechTexts():string[]{
+ const texts=new Set<string>();
+ for(const verb of verbs){
+  for(const stage of ['meaning','praesens','perfekt'] as const)texts.add(learnSpeech(verb,stage));
+  for(const row of conjugationRows(verb))texts.add(row.spoken);
+  for(const tense of ['praesens','perfekt'] as const)for(const row of personSentences(verb,tense))texts.add(row.text);
+ }
+ return [...texts];
+}

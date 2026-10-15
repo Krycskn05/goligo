@@ -1,7 +1,7 @@
 import {configureAudioSession} from './audio-session';
 import {isSiteVoice,type ClipPlayer} from './site-voices';
-/** Pre-rendered natural clips (site voices); resolve returns null when a text has no clip. */
-export type SpeechClips={player:ClipPlayer;resolve:(text:string,voiceName:string)=>string|null};
+/** Pre-rendered natural clips (site voices); resolve gives the clip URLs to try in order (none: no clip). */
+export type SpeechClips={player:ClipPlayer;resolve:(text:string,voiceName:string)=>string|readonly string[]|null};
 export type SpeechPlayback = {
   status: 'idle' | 'loading' | 'speaking';
   text: string;
@@ -132,23 +132,27 @@ export function createGermanSpeechPlayer(
     if (!text.trim()) return;
     const requestedRate=options.rate??defaultSpeechRate(language);
     const rate = Number.isFinite(requestedRate)?Math.max(0.5, Math.min(1.2, requestedRate)):defaultSpeechRate(language);
-    const clip = clips ? clips.resolve(text, options.voiceName ?? '') : null;
-    if (clip) playClip(text, clip, rate, options);
+    const found = clips ? clips.resolve(text, options.voiceName ?? '') : null;
+    const urls = found == null ? [] : typeof found === 'string' ? [found] : found.filter(Boolean);
+    if (urls.length) playClip(text, urls, rate, options);
     else speakWithEngine(text, rate, options.voiceName);
   }
 
-  /** A natural site-voice clip; any failure before it starts falls back to the device voice. */
-  function playClip(text: string, url: string, rate: number, options: {voiceName?: string}) {
+  /** Natural site-voice clips: when one fails before it starts the next voice is tried; the device voice comes last. */
+  function playClip(text: string, urls: readonly string[], rate: number, options: {voiceName?: string}) {
     const token = generation;
     let started = false;
+    let attempt = 0;
     update({status: 'loading', text, warning: ''});
     const fallback = () => {
       if (token !== generation || started) return;
       clearTimer();
       clips?.player.stop();
+      if (attempt + 1 < urls.length) { attempt++; tryClip(); return; }
       speakWithEngine(text, rate, isSiteVoice(options.voiceName) ? '' : options.voiceName);
     };
-    clips!.player.play(url, rate, {
+    const tryClip = () => {
+    clips!.player.play(urls[attempt], rate, {
       onStart: () => {
         if (token !== generation) return;
         started = true;
@@ -169,6 +173,8 @@ export function createGermanSpeechPlayer(
       },
     });
     if (token === generation && !started) timer = setTimeout(fallback, 4000);
+    };
+    tryClip();
   }
 
   function speakWithEngine(text: string, rate: number, voiceName?: string) {

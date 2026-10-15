@@ -197,6 +197,12 @@
 .verb-island.done { background:#f3fff0; }
 .verb-lock { position:absolute; right:-8px; top:-12px; width:42px; height:42px; border-radius:50%; background:#fff; display:grid; place-items:center; color:#7f95ad; border:2px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); }
 .verb-lock.done { color:#1f8a4c; }
+/* Every part is open: the button starts or continues it, and the whole island is clickable. */
+.verb-island-go { display:inline-flex; align-items:center; gap:6px; margin-top:12px; padding:8px 16px; min-height:40px; border:2px solid #fff; border-radius:999px; background:linear-gradient(180deg,var(--c1),var(--c2)); color:#fff; font:inherit; font-size:14px; font-weight:800; cursor:pointer; box-shadow:0 4px 12px rgba(28,82,130,.15); }
+.verb-island-go::after { content:''; position:absolute; inset:0; border-radius:30px; }
+.verb-island-go:disabled { opacity:.6; cursor:default; }
+.verb-island:has(.verb-island-go:enabled):hover { transform:translateY(-2px); box-shadow:0 10px 26px rgba(28,82,130,.16); }
+.verb-island-go:focus-visible { outline:3px solid #2f7fd6; outline-offset:3px; }
 .verb-here { position:absolute; right:-12px; top:-26px; display:inline-flex; align-items:center; gap:8px; background:#ffd54a; border:3px solid #fff; border-radius:999px; padding:7px 13px; font-weight:800; color:#5b3600; box-shadow:0 4px 12px rgba(0,0,0,.12); transform:rotate(-5deg); font-size:14px; animation:koko-float 3s ease-in-out infinite; }
 .verb-karma { position:relative; display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center; padding:24px 28px; margin-top:8px; border-radius:24px; background:linear-gradient(135deg,#6b4a2e,#8a5f3a); border:3px solid #f3d79a; box-shadow:0 10px 26px rgba(61,38,18,.2); color:#f4e8d3; }
 .verb-karma-chest { display:grid; place-items:center; width:84px; height:84px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#fff3b0 0,#ffd45a 50%,#f0a82a 100%); border:4px solid #fff; box-shadow:0 4px 10px rgba(0,0,0,.2); color:#7a4b00; }

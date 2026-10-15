@@ -57,11 +57,30 @@ s_site() {
   LOGS="$OUT" NODE_PATH=/tmp/pw/node_modules node ci/smoke.cjs
 }
 
+s_sesler_kontrol() { # Okunan her metnin doğal sesi var mı? Eksik varsa "Ses dosyalari" iş akışını başlatır.
+  [ -d .check/lib ] || { echo "Derlenmiş lib yok; atlandı."; return 0; }
+  STUDY_CHECK_DIR="$PWD/.check/lib" node scripts/voices/list-texts.cjs > "$OUT/voice-texts.json" || { echo "Metin listesi alınamadı."; return 0; }
+  : > "$OUT/voice-files.txt"; echo '{}' > "$OUT/voice-manifest.json"
+  if git fetch -q --depth 1 --filter=blob:none origin sesler 2>/dev/null; then
+    git ls-tree -r --name-only FETCH_HEAD > "$OUT/voice-files.txt"
+    git show FETCH_HEAD:manifest.json > "$OUT/voice-manifest.json" 2>/dev/null || echo '{}' > "$OUT/voice-manifest.json"
+  fi
+  local eksik
+  eksik="$(VOICE_MISSING_LIST=1 node scripts/voices/missing.cjs "$OUT/voice-texts.json" "$OUT/voice-manifest.json" "$OUT/voice-files.txt")" || eksik=0
+  echo "Doğal sesi eksik metin: $eksik"
+  if [ "$eksik" != "0" ] && [ -n "${GH_TOKEN:-}" ] && [ -n "${REPO:-}" ]; then
+    gh workflow run sesler.yml --ref main -R "$REPO" && echo "Ses iş akışı başlatıldı (eksik sesler üretilecek)."
+  fi
+  rm -f "$OUT/voice-files.txt" "$OUT/voice-manifest.json" "$OUT/voice-texts.json"
+  return 0
+}
+
 adim "1-pnpm"       01-pnpm.log       s_pnpm
 adim "2-kurulum"    02-install.log    s_install && KURULDU=1 || KURULDU=0
 adim "3-derleme"    03-build.log      s_build   && DERLENDI=1 || DERLENDI=0
 adim "4-typescript" 04-typescript.log s_ts
 adim "5-testler"    05-tests.log      s_tests
+adim "5-sesler"     05-voices.log     s_sesler_kontrol
 if [ "$DERLENDI" -eq 1 ]; then adim "6-veritabani" 06-db.log s_db; else echo "6-veritabani=atlandi(derleme yok)" >> "$OUT/DURUM.txt"; fi
 if [ "$KURULDU" -eq 1 ]; then adim "7-site" 08-smoke.log s_site; else echo "7-site=atlandi(kurulum yok)" >> "$OUT/DURUM.txt"; fi
 

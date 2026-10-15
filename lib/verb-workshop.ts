@@ -7,17 +7,17 @@ import {isVerbExercise} from './verb-practice';
 /**
  * Fiil Atölyesi: one path through all 38 verbs in two parts (the textbook order, split at
  * the learner's line). Each part has two stages: first the meanings of all its verbs, then
- * their Perfekt forms. Every verb gets a learning card before its steps of a stage:
- * meanings → choose the meaning, choose the verb, spell it;
- * Perfekt → choose the form, write it. (No listening questions on the path.)
+ * their Perfekt forms. Every verb gets a learning card before its steps of a stage, and each
+ * step comes once: meanings → one test (choose the meaning), then spell it;
+ * Perfekt → one test (choose the form), then write it. (No listening questions on the path.)
  * The path is one saved session (mode `workshop`); leaving and coming back continues it.
  */
 export const WORKSHOP_TOPIC='verbs-all';
 export const WORKSHOP_MODE='workshop';
 export type LearnStage='meaning'|'praesens'|'perfekt';
 export const pathStages:readonly LearnStage[]=['meaning','perfekt'];
-export type WorkshopStep='meaning'|'word'|'write'|'perfekt'|'write-perfekt';
-export const meaningSteps:readonly WorkshopStep[]=['meaning','word','write'];
+export type WorkshopStep='meaning'|'write'|'perfekt'|'write-perfekt';
+export const meaningSteps:readonly WorkshopStep[]=['meaning','write'];
 export const perfektSteps:readonly WorkshopStep[]=['perfekt','write-perfekt'];
 export const stageSteps=(stage:LearnStage):readonly WorkshopStep[]=>stage==='perfekt'?perfektSteps:meaningSteps;
 /** The verbs in path order: part 1 first, then part 2. */

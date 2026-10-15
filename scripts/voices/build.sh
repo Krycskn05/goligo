@@ -51,7 +51,8 @@ python scripts/voices/make-voices.py "$ROOT/.voice-texts.json" "$WORK" 2>&1 | te
 if [ "${PIPESTATUS[0]}" -ne 0 ]; then publish_log "HATA-uretim"; exit 1; fi
 
 CHANGED="$(cat "$WORK/.changed" 2>/dev/null || echo 0)"
-rm -f "$WORK/.changed"
+MORE="$(cat "$WORK/.more" 2>/dev/null || echo 0)"
+rm -f "$WORK/.changed" "$WORK/.more"
 if [ "$CHANGED" != "0" ] || [ "$BRANCH_EXISTS" = "0" ]; then
   (cd "$WORK" && git init -q -b sesler && git config user.name "github-actions[bot]" \
     && git config user.email "41898282+github-actions[bot]@users.noreply.github.com" \
@@ -59,7 +60,14 @@ if [ "$CHANGED" != "0" ] || [ "$BRANCH_EXISTS" = "0" ]; then
     && git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" sesler) || { publish_log "HATA-gonderim"; exit 1; }
   echo "Sesler güncellendi ($CHANGED değişiklik); yayın başlatılıyor." | tee -a "$LOGS/04-uretim.log"
   gh workflow run yayin.yml --ref main -R "$REPO" 2>&1 | tee -a "$LOGS/04-uretim.log" || true
-  publish_log "basarili-guncellendi"
+  if [ "$MORE" = "1" ]; then
+    # Süre doldu: kalan sesler için iş akışı yeniden başlar (biri bitince sıradaki çalışır).
+    echo "Kalan sesler için iş akışı yeniden başlatılıyor." | tee -a "$LOGS/04-uretim.log"
+    gh workflow run sesler.yml --ref main -R "$REPO" 2>&1 | tee -a "$LOGS/04-uretim.log" || true
+    publish_log "basarili-devam-ediyor"
+  else
+    publish_log "basarili-guncellendi"
+  fi
 else
   echo "Yeni ses yok; dal değişmedi." | tee -a "$LOGS/04-uretim.log"
   publish_log "basarili-degisiklik-yok"

@@ -2,7 +2,6 @@
 import {useEffect,useState} from 'react';
 import {BookOpen,Image as ImageIcon,PenLine} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
-import {SiteLogo} from './site-logo';
 import {courseUnits,type CourseLevel} from '@/lib/textbook-curriculum';
 import {englishCourseUnits} from '@/lib/english-course';
 import {c} from '@/lib/category-copy';
@@ -13,7 +12,7 @@ import {ENGLISH_COURSE_ENABLED,activeLearningLanguage,learningText,saveLearningL
 import {TopicArt,HeroArt} from './toon-art';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
-import {EffectsSettingsButton} from './learning-effects';
+import {SiteHeader} from './site-header';
 import {housingText} from '@/lib/housing-copy';
 import type {Snapshot} from '@/lib/study';
 import {api} from './study-shared';
@@ -40,7 +39,7 @@ export function Workshop({language,onLanguage,course='de',onCourse}:{language:St
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={language==='ar'?'rtl':'ltr'} lang={language}>
   <a className="skip-link" href="#main">{t(language,'skip')}</a>
-  <header className="work-header logo-header"><a className="work-brand site-logo-brand" href={'/?learn='+course} aria-label={SITE_NAME+' · '+t(language,'home')}><SiteLogo/></a><label className="language-picker">{learningText(language,'helper')}<select value={language} onChange={event=>{if(isStudyLanguage(event.target.value))onLanguage(event.target.value);}}>{studyLanguages.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label><EffectsSettingsButton language={language}/></header>
+  <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref={'/?learn='+course} homeLabel={t(language,'home')} stats={course==='de'?snapshot?.stats:null} showHome={false}/>
   <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}><a className="work-nav active" href="#curriculum" aria-current="page"><BookOpen size={18}/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><ImageIcon size={18}/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><PenLine size={18}/>{verbText(language,'verbsTitle')}</a>}</nav></aside>
    <main id="main" className="work-main" tabIndex={-1}>
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}

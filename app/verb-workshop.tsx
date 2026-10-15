@@ -9,7 +9,7 @@ import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<(typeof workshopSteps)[number],VerbCopyKey>={word:'stepMeaning',fit:'stepSentence',write:'stepSpelling',praesens:'stepPraesens','write-praesens':'stepSentence',perfekt:'stepPerfekt','write-perfekt':'stepSentence'};
+const stepLabels:Record<(typeof workshopSteps)[number],VerbCopyKey>={meaning:'stepMeaning',word:'stepPick',write:'stepSpelling',hear:'stepListen'};
 
 /** One example sentence with the verb parts highlighted and a speaker button. */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
@@ -42,7 +42,7 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
-/** The card that opens a workshop part: its rule and the verbs that follow it. */
+/** The card that opens a part: what its verbs are about and the verbs that follow. */
 export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamily;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id}>

@@ -4,7 +4,7 @@ import {Mic,Square} from 'lucide-react';
 import {t,type StudyLanguage} from '@/lib/study-languages';
 import type {Snapshot} from '@/lib/study';
 import {createGermanSpeechPlayer,studyVoices,idlePlayback,defaultSpeechRate,type SpeechPlayback} from '@/lib/german-speech';
-import {availableSiteVoices,createClipPlayer,loadVoiceManifest,onVoiceManifest,resolveSiteVoice,savedVoiceName,siteClipUrl,VOICE_PREFERENCE_VERSION,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
+import {availableSiteVoices,createClipPlayer,loadVoiceManifest,onVoiceManifest,savedVoiceName,siteClipUrls,VOICE_PREFERENCE_VERSION,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
 import {createAnswerFeedbackPlayer} from '@/lib/answer-feedback';
 import type {LearningLanguage} from '@/lib/learning-language';
 import {prepareEffects,readEffects,playLearningSound,learningReaction} from '@/lib/learning-effects';
@@ -81,7 +81,7 @@ export function useGermanSpeech(course:LearningLanguage='de'){
  useEffect(()=>{
   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){setPlayback({...idlePlayback,warning:'Bu tarayıcı sesli okumayı desteklemiyor. Safari, Chrome veya Edge ile açabilirsin.'});return;}
   const synth=window.speechSynthesis;let mounted=true;
-  const clips=course==='de'&&typeof window.Audio==='function'?{player:createClipPlayer(),resolve:(text:string,name:string)=>{const voice=resolveSiteVoice(name);return voice?siteClipUrl(voice,text):null;}}:undefined;
+  const clips=course==='de'&&typeof window.Audio==='function'?{player:createClipPlayer(),resolve:(text:string,name:string)=>siteClipUrls(name,text)}:undefined;
   const controller=createGermanSpeechPlayer(synth,text=>new SpeechSynthesisUtterance(text),next=>{if(mounted)setPlayback(next);},course,{cancelDelayMs:100},clips);player.current=controller;
   const update=()=>setVoices(studyVoices(synth.getVoices(),course));const visibility=()=>{if(document.hidden){controller.stop();controller.resetPreparation();}};
   update();synth.addEventListener('voiceschanged',update);document.addEventListener('visibilitychange',visibility);

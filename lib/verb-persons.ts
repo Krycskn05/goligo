@@ -4,9 +4,9 @@ import {verbPrefix} from './verb-logic';
 /**
  * Example sentences for every person (ich, du, er, sie, es, wir, ihr, sie, Sie), shown after an
  * answer: Präsens after the meaning questions, Perfekt after the Perfekt questions.
- * Every verb has one middle part that fits all persons (no sein/ihr, no mich/dich), so only the
- * subject and the verb change. gefallen and leid|tun are said with the person in the dative
- * (Die Stadt gefällt mir …), gelten with für + accusative (Die Regel gilt auch für mich …).
+ * Every verb has one short middle part that fits all persons (no sein/ihr, no mich/dich), so only the
+ * subject and the verb change, and each sentence fits on one line of a phone. gefallen and leid|tun are said with the person in the dative
+ * (Die Stadt gefällt mir …), gelten with für + accusative (Die Regel gilt für mich …).
  */
 export type PersonKey='ich'|'du'|'er'|'sie'|'es'|'wir'|'ihr'|'sie-plural'|'Sie';
 export const personKeys:readonly PersonKey[]=['ich','du','er','sie','es','wir','ihr','sie-plural','Sie'];
@@ -16,44 +16,44 @@ type Plain={pr:string;pf:string};
 /** {X} is replaced by the person in the dative or with für + accusative; the subject stays the same. */
 type WithObject={mode:'dative'|'fuer';pr:string;pf:string};
 const middles:Record<string,Plain|WithObject>={
- abfahren:{pr:'um acht Uhr',pf:'um acht Uhr'},
- abgeben:{pr:'das Heft bei der Lehrerin',pf:'das Heft bei der Lehrerin'},
- anbieten:{pr:'Anna einen Apfel',pf:'Anna einen Apfel'},
- anfangen:{pr:'heute mit dem Deutschkurs',pf:'gestern mit dem Deutschkurs'},
- ankommen:{pr:'heute Abend in Berlin',pf:'gestern Abend in Berlin'},
- anrufen:{pr:'heute Abend Anna',pf:'gestern Abend Anna'},
- anziehen:{pr:'heute eine warme Jacke',pf:'gestern eine warme Jacke'},
- aufstehen:{pr:'jeden Tag um sieben Uhr',pf:'heute um sieben Uhr'},
- aussehen:{pr:'heute sehr müde',pf:'gestern sehr müde'},
- aussteigen:{pr:'an der nächsten Haltestelle',pf:'am Bahnhof'},
- ausziehen:{pr:'nächsten Monat',pf:'letzte Woche'},
- beginnen:{pr:'um acht Uhr mit der Arbeit',pf:'um acht Uhr mit der Arbeit'},
- bekommen:{pr:'heute ein Paket',pf:'gestern ein Paket'},
- bleiben:{pr:'heute zu Hause',pf:'gestern zu Hause'},
- bringen:{pr:'den Kuchen zur Party',pf:'den Kuchen zur Party'},
- denken:{pr:'an die Prüfung',pf:'an die Prüfung'},
- einladen:{pr:'Freunde zur Party',pf:'Freunde zur Party'},
- empfehlen:{pr:'Anna das Buch',pf:'Anna das Buch'},
- essen:{pr:'gern Salat',pf:'gestern Salat'},
- fahren:{pr:'mit dem Bus zur Arbeit',pf:'mit dem Bus zur Arbeit'},
- finden:{pr:'den Schlüssel unter dem Sofa',pf:'den Schlüssel unter dem Sofa'},
- fliegen:{pr:'morgen nach Berlin',pf:'letzte Woche nach Berlin'},
- geben:{pr:'Jan einen Apfel',pf:'Jan einen Apfel'},
+ abfahren:{pr:'um acht',pf:'um acht'},
+ abgeben:{pr:'das Heft',pf:'das Heft'},
+ anbieten:{pr:'Tee',pf:'Tee'},
+ anfangen:{pr:'heute',pf:'gestern'},
+ ankommen:{pr:'in Berlin',pf:'in Berlin'},
+ anrufen:{pr:'Anna',pf:'Anna'},
+ anziehen:{pr:'eine Jacke',pf:'eine Jacke'},
+ aufstehen:{pr:'um sieben',pf:'um sieben'},
+ aussehen:{pr:'müde',pf:'müde'},
+ aussteigen:{pr:'hier',pf:'hier'},
+ ausziehen:{pr:'bald',pf:'gestern'},
+ beginnen:{pr:'um acht',pf:'um acht'},
+ bekommen:{pr:'ein Paket',pf:'ein Paket'},
+ bleiben:{pr:'zu Hause',pf:'zu Hause'},
+ bringen:{pr:'den Kuchen',pf:'den Kuchen'},
+ denken:{pr:'oft an Oma',pf:'oft an Oma'},
+ einladen:{pr:'Freunde',pf:'Freunde'},
+ empfehlen:{pr:'das Buch',pf:'das Buch'},
+ essen:{pr:'gern Salat',pf:'Salat'},
+ fahren:{pr:'mit dem Bus',pf:'mit dem Bus'},
+ finden:{pr:'das Handy',pf:'das Handy'},
+ fliegen:{pr:'nach Berlin',pf:'nach Berlin'},
+ geben:{pr:'Jan das Buch',pf:'Jan das Buch'},
  gefallen:{mode:'dative',pr:'Die Stadt gefällt {X}',pf:'Die Stadt hat {X} gefallen'},
- gehen:{pr:'zu Fuß nach Hause',pf:'zu Fuß nach Hause'},
- gelten:{mode:'fuer',pr:'Die Regel gilt auch für {X}',pf:'Die Regel hat auch für {X} gegolten'},
+ gehen:{pr:'nach Hause',pf:'nach Hause'},
+ gelten:{mode:'fuer',pr:'Die Regel gilt für {X}',pf:'Die Regel hat für {X} gegolten'},
  heißen:{pr:'Müller',pf:'früher Müller'},
- herunterladen:{pr:'eine App',pf:'eine App'},
- helfen:{pr:'der Nachbarin',pf:'der Nachbarin'},
- kennen:{pr:'die Stadt gut',pf:'die Stadt gut'},
- kommen:{pr:'heute zu spät',pf:'gestern zu spät'},
- laufen:{pr:'jeden Morgen im Park',pf:'heute im Park'},
+ herunterladen:{pr:'Apps',pf:'Apps'},
+ helfen:{pr:'Oma',pf:'Oma'},
+ kennen:{pr:'die Stadt',pf:'die Stadt'},
+ kommen:{pr:'zu spät',pf:'zu spät'},
+ laufen:{pr:'im Park',pf:'im Park'},
  leidtun:{mode:'dative',pr:'Es tut {X} leid',pf:'Es hat {X} leidgetan'},
- leihen:{pr:'Max das Fahrrad',pf:'Max das Fahrrad'},
- lesen:{pr:'gern Bücher',pf:'gestern ein Buch'},
- liegen:{pr:'auf dem Sofa',pf:'den ganzen Tag auf dem Sofa'},
+ leihen:{pr:'Max das Rad',pf:'Max das Rad'},
+ lesen:{pr:'gern Bücher',pf:'ein Buch'},
+ liegen:{pr:'im Bett',pf:'im Bett'},
  mitbringen:{pr:'Blumen',pf:'Blumen'},
- mitkommen:{pr:'heute Abend',pf:'gestern Abend'},
+ mitkommen:{pr:'heute',pf:'gestern'},
 };
 const subjects:Record<PersonKey,string>={ich:'Ich',du:'Du',er:'Er',sie:'Sie',es:'Es',wir:'Wir',ihr:'Ihr','sie-plural':'Sie',Sie:'Sie'};
 const datives:Record<PersonKey,string>={ich:'mir',du:'dir',er:'ihm',sie:'ihr',es:'ihm',wir:'uns',ihr:'euch','sie-plural':'ihnen',Sie:'Ihnen'};

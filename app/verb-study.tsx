@@ -1,13 +1,13 @@
 'use client';
 import {SITE_NAME} from '@/lib/site-brand';
-import {useEffect,useRef,useState} from 'react';
-import {ArrowRight,CheckCircle2,ChevronRight,Headphones,Loader2,RotateCcw,Sparkles,Star,Volume2,X} from 'lucide-react';
+import {useEffect,useRef,useState,type CSSProperties} from 'react';
+import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Sparkles,Star,Trophy,Volume2,X,Zap} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,type Verb} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
-import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,separablePrefixes,type VerbTense} from '@/lib/verb-logic';
+import {sentenceChunks,sentenceText,verbRules,verbPrefix,praesensStem,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper} from './verb-workshop';
@@ -20,7 +20,8 @@ import {LetterPuzzle} from './letter-puzzle';
 import {SiteFooter} from './site-footer';
 import {SiteHeader} from './site-header';
 import {verbProgress} from '@/lib/progress';
-import {ProgressMeter,RoundReward} from './progress-ui';
+import {RoundReward} from './progress-ui';
+import {progressText} from '@/lib/progress-copy';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 type ErrorKey=VaultCopyKey|'verbLegacy';
@@ -199,6 +200,10 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const writing=q?.kind==='write';const listening=q?.kind==='listen';
  const chapterVerbs=place?workshopVerbs.filter(item=>verbFamilyOf(item.id)?.id===place.family.id):[];
  const overall=ready?verbProgress('verbs-all',snapshot.reviews):null;
+ const nextFamily=verbFamilyOf(nextVerb.id)!;
+ const nextLabel=t('nextUp',{verb:'\u2063'}).split('\u2063');
+ // "Fiil Atölyesi" → first word plain, the rest in the accent colour.
+ const titleWords=(()=>{const words=t('workshopTitle').split(' ');return {head:words[0],tail:words.slice(1).join(' ')};})();
 
  return <div className="category-app object-app toon-app picture-quiz-app vault-app verb-app" lang={language} dir={dir}>
   <a className="skip-link" href="#object-main">{v('skipContent')}</a>
@@ -246,26 +251,62 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
    game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus('vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy}}/>:
    <section className="verb-home" aria-labelledby="vault-heading">
-    <h1 id="vault-heading" tabIndex={-1}>{t('workshopTitle')}</h1>
-    <p className="verbs-lead">{t('workshopLead')}</p>
-    <article className="panel verb-path-panel" data-verb-workshop="">
-     <div className="verb-path-head">
-      <div className="verb-path-status">
-       <strong>{t('verbsDone',{n:path.verbsDone,total:workshopVerbs.length})}</strong>
-       <div className="progress-track" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={WORKSHOP_TOTAL} aria-valuenow={path.answered}><span className="progress-fill" style={{width:path.percent+'%'}}/></div>
-       {initializing?<small>{v('loading')}</small>:path.finished?<small className="verb-path-done"><CheckCircle2 size={15} aria-hidden="true"/>{t('workshopDone')}</small>:<small>{t('nextUp',{verb:nextVerb.display})} · {t('chapterOf',{n:verbFamilyOf(nextVerb.id)!.number})} {familyTitle(verbFamilyOf(nextVerb.id)!,language)}</small>}
+    <div className="verb-hero">
+     <div className="verb-hero-text">
+      <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
+      <p className="verb-hero-lead">{t('workshopLead')}</p>
+      <div className="verb-hero-cta">
+       <button type="button" className="btn verb-path-enter" disabled={busy||!ready} onClick={()=>void enterWorkshop()}><Play size={20} fill="currentColor" aria-hidden="true"/>{path.finished||!savedWorkshop?t(path.finished?'workshopRestart':'workshopStart'):t('workshopEnter')}</button>
+       <button type="button" className="btn orange small" disabled={busy||!ready} onClick={()=>void startKarma()}><Zap size={17} fill="currentColor" aria-hidden="true"/>{t('karmaTitle')}</button>
       </div>
-      <VerbPicture verb={nextVerb} language={language} small/>
      </div>
-     <div className="object-actions verb-path-actions">
-      <button type="button" className="btn verb-path-enter" disabled={busy||!ready} onClick={()=>void enterWorkshop()}>{path.finished||!savedWorkshop?t(path.finished?'workshopRestart':'workshopStart'):t('workshopEnter')}<ArrowRight size={18} className="vault-direction-icon"/></button>
-      {savedWorkshop&&!path.finished&&path.answered>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterWorkshop(true)}><RotateCcw size={16}/>{t('workshopRestart')}</button>}
+     <div className="verb-polaroid">
+      <img className="verb-polaroid-photo" src={verbsHeroPicture} alt="" width={1200} height={800} decoding="async"/>
+      <div className="verb-polaroid-sticker" aria-hidden="true"><b>{verbs.length}</b>{t('verbsWord')}</div>
+      <span className="verb-koko" aria-hidden="true"/>
      </div>
-     <ol className="verb-chapters" aria-label={t('chapters')}>{verbFamilies.map(family=>{const verbsBefore=workshopVerbs.findIndex(item=>verbFamilyOf(item.id)?.id===family.id);const done=Math.max(0,Math.min(family.verbs.length,path.verbsDone-verbsBefore));const inside=path.verbsDone>=verbsBefore&&path.verbsDone<verbsBefore+family.verbs.length;const state=done>=family.verbs.length?'done':inside&&path.answered>0&&!path.finished?'current':'';return <li key={family.id} className={'tone-'+family.tone+' '+state}><span className="verb-chapter-number">{family.number}</span><span className="verb-chapter-title">{familyTitle(family,language)}</span><span className="verb-chapter-count">{done}/{family.verbs.length}</span></li>;})}</ol>
+    </div>
+    <article className="panel verb-path-panel" data-verb-workshop="">
+     <div className="verb-avatar"><VerbPicture verb={nextVerb} language={language} small/></div>
+     <div className="verb-path-status">
+      <p className="verb-path-title"><span className="n">{path.verbsDone}</span> / {workshopVerbs.length} {t('verbsWord')}</p>
+      <div className="verb-energy" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={WORKSHOP_TOTAL} aria-valuenow={path.answered} aria-valuetext={t('verbsDone',{n:path.verbsDone,total:workshopVerbs.length})}><span className="verb-energy-fill" style={{width:Math.max(3,path.percent)+'%'}}/><span className="verb-energy-ticks"/></div>
+      {initializing?<p className="verb-path-note">{v('loading')}</p>:path.finished?<p className="verb-path-note verb-path-done"><CheckCircle2 size={16} aria-hidden="true"/>{t('workshopDone')}</p>:<p className="verb-path-note">{t('chapterOf',{n:nextFamily.number})} · {familyTitle(nextFamily,language)}</p>}
+      {savedWorkshop&&!path.finished&&path.answered>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterWorkshop(true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
+     </div>
+     {!path.finished&&<div className="verb-bubble">{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</div>}
     </article>
-    <article className="panel verb-karma-panel" data-verb-karma="">
-     <div className="verb-karma-text"><h2><Sparkles size={20} aria-hidden="true"/>{t('karmaTitle')}</h2><p>{t('karmaLead')}</p>{karmaDone?<small>{t('karmaLast',{n:karmaDone.correct,total:karmaDone.total})}</small>:!path.finished&&<small>{t('karmaHint')}</small>}</div>
-     <div className="verb-karma-side">{overall&&<ProgressMeter progress={overall} language={language} label={t('workshopTitle')} compact/>}<button type="button" className="btn secondary" disabled={busy||!ready} onClick={()=>void startKarma()}>{t('karmaStart')}<ArrowRight size={18} className="vault-direction-icon"/></button></div>
+    <section className="verb-map" aria-labelledby="verb-map-heading">
+     <h2 id="verb-map-heading" className="verb-map-title">{t('mapTitle')}</h2>
+     <svg className="verb-map-path" viewBox="0 0 1130 1180" preserveAspectRatio="none" aria-hidden="true"><path d="M200 120 C 500 160, 700 180, 820 300 S 300 520, 310 640 S 900 820, 830 960 S 420 1100, 300 1140" fill="none" stroke="#fff" strokeWidth="14" strokeLinecap="round" strokeDasharray="2 30" opacity=".9"/></svg>
+     {verbFamilies.map(family=>{
+      const verbsBefore=workshopVerbs.findIndex(item=>verbFamilyOf(item.id)?.id===family.id);
+      const done=Math.max(0,Math.min(family.verbs.length,path.verbsDone-verbsBefore));
+      const inside=path.verbsDone>=verbsBefore&&path.verbsDone<verbsBefore+family.verbs.length;
+      const state=done>=family.verbs.length?'done':inside&&!path.finished?'current':path.verbsDone<verbsBefore?'locked':'';
+      const members=family.verbs.map(id=>verbMap.get(id)!);
+      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state} style={{'--p':Math.round(done/family.verbs.length*100)} as CSSProperties} data-verb-island={family.id}>
+       {state==='current'&&<span className="verb-here"><Compass size={15} aria-hidden="true"/>{t('hereBadge')}</span>}
+       {state==='locked'&&<span className="verb-lock" aria-hidden="true"><Lock size={18}/></span>}
+       {state==='done'&&<span className="verb-lock done" aria-hidden="true"><CheckCircle2 size={20}/></span>}
+       <span className="verb-island-number">{family.number}</span>
+       <div className="verb-island-text">
+        <h3>{familyTitle(family,language)}</h3>
+        <p><span lang="de" dir="ltr">{members.slice(0,3).map(item=>item.display).join(', ')}…</span> · {t('verbsCount',{n:family.verbs.length})}</p>
+        <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
+       </div>
+       <span className="verb-ring" data-v={done+'/'+family.verbs.length}/>
+      </article>;
+     })}
+    </section>
+    <article className="verb-karma" data-verb-karma="">
+     <span className="verb-karma-chest" aria-hidden="true"><Trophy size={54}/></span>
+     <div className="verb-karma-text"><h2>{t('karmaTitle')} <span className="verb-hard-tag">{t('hardTag')}</span></h2><p>{t('karmaLead')}</p><small>{karmaDone?t('karmaLast',{n:karmaDone.correct,total:karmaDone.total}):t('karmaTreasure')}</small></div>
+     <button type="button" className="btn orange" disabled={busy||!ready} onClick={()=>void startKarma()}><Zap size={18} fill="currentColor" aria-hidden="true"/>{t('karmaStart')}</button>
+    </article>
+    <article className="panel verb-collection">
+     <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}{overall&&<> · {progressText(language,'learned',{n:overall.learned,total:overall.total})}</>}</p>
+     <div className="verb-stickers">{workshopVerbs.map((item,i)=><img key={item.id} className={i<path.verbsDone?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display} width={96} height={96} loading="lazy" decoding="async"/>)}</div>
     </article>
     <details className="verb-list"><summary>{t('verbList')} · {verbs.length}</summary>
      <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr">{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>

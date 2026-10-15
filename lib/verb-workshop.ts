@@ -10,7 +10,9 @@ import {isVerbExercise} from './verb-practice';
  * their Perfekt forms. Every verb gets a learning card before its steps of a stage, and each
  * step comes once: meanings → one test (choose the meaning), then spell it;
  * Perfekt → one test (choose the form), then write it. (No listening questions on the path.)
- * The path is one saved session (mode `workshop`); leaving and coming back continues it.
+ * No part is locked: each part is its own saved round (mode `workshop`), so the learner can start
+ * or continue any part; leaving and coming back continues it. An older round of the whole path
+ * (all 152 questions, part 1 first) still counts for part 1 and stops at its end.
  */
 export const WORKSHOP_TOPIC='verbs-all';
 export const WORKSHOP_MODE='workshop';
@@ -49,38 +51,63 @@ export function pathPlace(questions:readonly {id:string}[],index:number,lookup:(
  const chapterStart=!previous||!previous.verbId||verbFamilyOf(previous.verbId)?.id!==family.id||previousStage!==stage;
  return {verb,family,verbNumber:family.verbs.indexOf(verb.id)+1,step:stepIndex(q.verbTask),steps:stageSteps(stage),chapterStart,stageStart,stage};
 }
-/** Where the learner is on the path: the current part and stage, the verbs done in that stage and the next verb. */
-export function workshopProgress(session:Pick<SessionSummary,'answered'|'total'>|null|undefined){
- const answered=session?.answered??0;const total=session?.total??WORKSHOP_TOTAL;
- const segments=pathSegments();const current=segments.find(segment=>answered<segment.start+segment.count)??segments[segments.length-1];
- const perVerb=stageSteps(current.stage).length;const within=Math.max(0,Math.min(answered,current.start+current.count)-current.start);
- const stageVerbsDone=Math.floor(within/perVerb);const stageVerbs=current.family.verbs.length;
- const nextVerbId=current.family.verbs[Math.min(stageVerbs-1,stageVerbsDone)];
- const finished=answered>=total&&total>0;
- return {answered,total,percent:Math.round(answered/Math.max(1,total)*100),finished,family:current.family,stage:current.stage,stageVerbsDone,stageVerbs,nextVerbId};
+/** One part's questions in order: its meanings, then its Perfekt; segment starts count from the part's first question. */
+export function partSegments(family:VerbFamily):PathSegment[]{
+ let start=0;return pathStages.map(stage=>{const count=family.verbs.length*stageSteps(stage).length;const segment={family,stage,start,count};start+=count;return segment;});
+}
+export function partIds(family:VerbFamily){return partSegments(family).flatMap(segment=>family.verbs.flatMap(id=>stageSteps(segment.stage).map(step=>questionId(step,id))));}
+export function partTotal(family:VerbFamily){return partSegments(family).reduce((n,segment)=>n+segment.count,0);}
+/** How far one part is from the questions answered in it: the stage, the verbs done in it and the next verb. */
+export function partProgress(family:VerbFamily,answered:number){
+ const segments=partSegments(family);const count=partTotal(family);const done=Math.max(0,Math.min(count,answered));
+ const current=segments.find(segment=>done<segment.start+segment.count)??segments[segments.length-1];
+ const perVerb=stageSteps(current.stage).length;const within=Math.max(0,Math.min(done,current.start+current.count)-current.start);
+ const stageVerbs=family.verbs.length;const stageVerbsDone=Math.min(stageVerbs,Math.floor(within/perVerb));
+ const stageDone=(stage:LearnStage)=>{const segment=segments.find(item=>item.stage===stage);if(!segment)return 0;return Math.max(0,Math.min(stageVerbs,Math.floor((done-segment.start)/stageSteps(stage).length)));};
+ return {done,count,percent:Math.round(done/Math.max(1,count)*100),finished:done>=count,started:done>0,stage:current.stage,stageVerbsDone,stageVerbs,nextVerbId:family.verbs[Math.min(stageVerbs-1,stageVerbsDone)],meaningDone:stageDone('meaning'),perfektDone:stageDone('perfekt')};
+}
+type RoundSummary=Pick<SessionSummary,'id'|'mode'|'topic'|'total'|'answered'|'finished_at'>&{first?:string|null};
+/** The part a saved workshop round belongs to: a part round (by its first question), or an older round of the whole path (part 1). */
+export function sessionPart(session:RoundSummary):VerbFamily|undefined{
+ if(session.mode!==WORKSHOP_MODE||!session.topic.startsWith('verbs-'))return undefined;
+ if(session.total===WORKSHOP_TOTAL)return verbFamilies[0];
+ return verbFamilies.find(family=>session.total===partTotal(family)&&session.first===partIds(family)[0]);
+}
+/** Questions answered in a part (an older whole-path round counts only up to part 1's end). */
+export function partAnswered(session:RoundSummary|null|undefined,family:VerbFamily){return session?Math.min(session.answered,partTotal(family)):0;}
+/** The saved round of a part: the newest one still open, else the newest one. */
+export function findPartSession<T extends RoundSummary>(sessions:readonly T[],family:VerbFamily):T|null{
+ const mine=sessions.filter(session=>sessionPart(session)?.id===family.id);
+ return mine.find(session=>!session.finished_at&&partAnswered(session,family)<partTotal(family))??mine[0]??null;
+}
+/** Every part with its saved round and progress. */
+export function partsStatus<T extends RoundSummary>(sessions:readonly T[]){
+ return verbFamilies.map(family=>{const session=findPartSession(sessions,family);return {family,session,...partProgress(family,partAnswered(session,family))};});
+}
+/** The part to continue: the open part practised last, else the first part not finished, else part 1. */
+export function currentPart<T extends RoundSummary>(sessions:readonly T[]){
+ const parts=partsStatus(sessions);
+ for(const session of sessions){const part=parts.find(item=>item.session?.id===session.id);if(part&&!part.finished)return part;}
+ return parts.find(part=>!part.finished)??parts[0];
 }
 /** For every verb: whether its meanings and its Perfekt are done (for the sticker collection). */
-export function verbStatus(answered:number){
+export function verbStatus<T extends RoundSummary>(sessions:readonly T[]){
  const status=new Map<string,{meaning:boolean;perfekt:boolean}>();
- for(const segment of pathSegments()){const perVerb=stageSteps(segment.stage).length;segment.family.verbs.forEach((id,i)=>{const entry=status.get(id)??{meaning:false,perfekt:false};if(segment.stage==='perfekt')entry.perfekt=answered>=segment.start+(i+1)*perVerb;else entry.meaning=answered>=segment.start+(i+1)*perVerb;status.set(id,entry);});}
+ for(const part of partsStatus(sessions)){
+  const [meaning,perfekt]=partSegments(part.family);
+  part.family.verbs.forEach((id,i)=>status.set(id,{meaning:part.done>=meaning.start+(i+1)*meaningSteps.length,perfekt:part.done>=perfekt.start+(i+1)*perfektSteps.length}));
+ }
  return status;
 }
-/** How far one part is: its questions done, and the verbs done in each of its stages. */
-export function partProgress(family:VerbFamily,answered:number){
- const segments=pathSegments().filter(segment=>segment.family.id===family.id);
- const start=segments[0]?.start??0;const count=segments.reduce((n,segment)=>n+segment.count,0);
- const done=Math.max(0,Math.min(count,answered-start));
- const stageDone=(stage:LearnStage)=>{const segment=segments.find(item=>item.stage===stage);if(!segment)return 0;return Math.max(0,Math.min(family.verbs.length,Math.floor((answered-segment.start)/stageSteps(stage).length)));};
- return {done,count,percent:Math.round(done/Math.max(1,count)*100),state:done>=count?'done':answered>=start?'current':'locked',meaningDone:stageDone('meaning'),perfektDone:stageDone('perfekt')};
+/** Only a saved round of this part can be continued (an older whole-path round counts for part 1). */
+export function isPartRound(session:Pick<Session,'mode'|'questions'>,family:VerbFamily){
+ if(session.mode!==WORKSHOP_MODE)return false;
+ const ids=session.questions.length===WORKSHOP_TOTAL&&family.id===verbFamilies[0].id?workshopIds():partIds(family);
+ return session.questions.length===ids.length&&session.questions.every((item,index)=>item.id===ids[index]);
 }
-/** The saved path to continue: the newest unfinished workshop session, else the newest finished one. Rounds of an older path (another length) are left out. */
-export function findWorkshop(sessions:readonly SessionSummary[]){
- const mine=sessions.filter(s=>s.mode===WORKSHOP_MODE&&s.topic.startsWith('verbs-')&&s.total===WORKSHOP_TOTAL);
- return mine.find(s=>!s.finished_at)??mine.find(s=>!!s.finished_at)??null;
-}
-/** Only a saved workshop with the current path can be continued; anything else starts fresh. */
-export function isCurrentPath(session:Pick<Session,'mode'|'questions'>){
- const ids=workshopIds();return session.mode===WORKSHOP_MODE&&session.questions.length===ids.length&&session.questions.every((item,index)=>item.id===ids[index]);
+/** Where a round ends: an older whole-path round stops after part 1; other rounds at their last question. */
+export function roundEnd(session:Pick<Session,'mode'|'questions'>){
+ return session.mode===WORKSHOP_MODE&&session.questions.length===WORKSHOP_TOTAL?partTotal(verbFamilies[0]):session.questions.length;
 }
 export function exerciseCount(){return verbQuestions.filter(isVerbExercise).length;}
 export function workshopMistakes(session:Pick<Session,'answers'>,lookup:(id:string)=>Question|undefined){

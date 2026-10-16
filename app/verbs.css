@@ -312,6 +312,12 @@
 .verb-person-text .mark.end { color:#e26a1c; }
 .verb-person-row svg { position:absolute; top:50%; right:6px; transform:translateY(-50%); width:12px; height:12px; color:#2f7fd6; }
 .verb-persons-note { margin:0; padding:0 4px; font-size:12.5px; line-height:1.4; color:#4f6478; }
+/* Each example sentence has its meaning below it, in the learner's language. */
+.verb-person-body { display:flex; flex-direction:column; min-width:0; padding:1px 0; }
+.verb-person-meaning { font-size:12px; line-height:1.25; font-weight:500; color:#6b8097; overflow-wrap:anywhere; }
+.verb-person-meaning[dir="rtl"] { text-align:right; }
+/* The example list can be longer than a phone screen: the next button stays at the bottom. */
+.verb-result .verb-result-next { position:sticky; bottom:10px; z-index:2; box-shadow:0 6px 18px rgba(28,82,130,.22); }
 
 /* Learning card: picture on top, the verb with a speaker button, the meaning, then the forms. */
 .verb-learn-title { display:flex; align-items:center; gap:10px; }
@@ -398,4 +404,82 @@
  .verb-result .verb-note { padding:6px 10px; font-size:12.5px; }
  .verb-write-feedback h2 { margin:0 0 4px; }
  .verb-write-feedback p { margin:0 0 6px; }
+}
+
+/* Regular, irregular or modal: a badge on the cards; irregular verb names and the irregular forms are violet. */
+.verb-kind { display:inline-flex; flex-wrap:wrap; align-items:center; gap:3px 8px; }
+.verb-kind-badge { display:inline-flex; align-items:center; padding:1px 9px; border-radius:999px; border:1.5px solid; font-size:12px; font-weight:800; line-height:1.45; white-space:nowrap; }
+.verb-kind.kind-irregular .verb-kind-badge { color:#7a2fc0; background:#f5edff; border-color:#d6b8f5; }
+.verb-kind.kind-regular .verb-kind-badge { color:#23743a; background:#ecf9ef; border-color:#a9dcb5; }
+.verb-kind.kind-modal .verb-kind-badge { color:#0f6e86; background:#e7f7fb; border-color:#9fd8e6; }
+.verb-kind-note { font-size:12px; line-height:1.35; font-weight:600; color:#5b6f86; }
+.verb-learn-form.kind-irregular,.verb-result-title strong.kind-irregular,.verb-chapter-verbs .kind-irregular,.verb-list-word strong.kind-irregular,.verb-part-word strong.kind-irregular,.verb-irregular-form { color:#7a2fc0; }
+.verb-learn-form.kind-modal,.verb-part-word strong.kind-modal,.verb-list-word strong.kind-modal { color:#0f6e86; }
+.verb-conj-cell.irregular { border-color:#d6b8f5; background:#fbf7ff; }
+.verb-conj-cell.irregular .verb-conj-form { color:#7a2fc0; }
+.verb-result-line { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+.verb-result-line .verb-kind-badge { font-size:11px; padding:0 7px; }
+
+/* Inside a part: the verbs with what is done; a tap opens the verb's card. */
+.verb-part-view,.verb-detail { position:relative; display:grid; gap:12px; width:min(760px,100%); margin:0 auto 28px; padding:20px 22px; border-radius:26px; }
+.verb-part-view { --c1:#8fcaff; --c2:#2f7fd6; }
+.verb-part-view.tone-teal { --c1:#7fdcd8; --c2:#2aa5a2; } .verb-part-view.tone-amber { --c1:#ffd968; --c2:#d8961a; } .verb-part-view.tone-violet { --c1:#c4b0ff; --c2:#7c5ce0; } .verb-part-view.tone-rose { --c1:#ffb3c6; --c2:#e05c80; }
+.verb-back { display:inline-flex; align-items:center; gap:6px; justify-self:start; min-height:36px; color:#2f7fd6; font-size:14px; font-weight:700; }
+.verb-part-head { display:flex; align-items:center; gap:14px; }
+.verb-part-head .verb-island-number { flex:none; width:58px; height:58px; font-size:26px; }
+.verb-part-head h1 { margin:2px 0 0; font-size:26px; line-height:1.15; font-weight:800; color:#1f3b5c; }
+.verb-part-progress { margin:4px 0 0; font-size:14px; font-weight:600; color:#3d5a7a; }
+.verb-part-view .verb-energy { margin-top:0; }
+.verb-part-actions { display:flex; flex-wrap:wrap; align-items:center; gap:6px 16px; }
+.verb-part-start { min-height:48px; padding-inline:22px; }
+.verb-part-actions .verb-path-restart { margin-top:0; }
+.verb-part-list-title { margin:8px 0 0; font-size:19px; font-weight:800; color:#1f3b5c; }
+.verb-part-lead { margin:-6px 0 0; font-size:13.5px; color:#5b6f86; }
+.verb-part-list { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.verb-part-row { display:grid; grid-template-columns:26px 48px minmax(0,1fr) auto; align-items:center; gap:10px; width:100%; padding:6px 10px 6px 8px; border-radius:16px; border:2px solid #e3edf7; background:#fff; color:#1f3b5c; text-align:start; font:inherit; cursor:pointer; }
+.verb-part-row:hover { border-color:#9ccbff; background:#f8fbff; }
+.verb-part-row:focus-visible { outline:3px solid #2f7fd6; outline-offset:2px; }
+.verb-part-row.half { border-color:#cfe8d3; }
+.verb-part-row.full { border-color:#8fd19b; background:#f4fbf5; }
+.verb-part-number { display:grid; place-items:center; width:26px; height:26px; border-radius:50%; background:#eef4fa; color:#6b8097; font-size:12px; font-weight:800; }
+.verb-part-row.full .verb-part-number { background:#4aa84f; color:#fff; }
+.verb-part-row img,.verb-part-noimg { width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); background:#eef4fa; }
+.verb-part-word { display:grid; min-width:0; }
+.verb-part-word strong { font-size:17px; font-weight:800; line-height:1.2; }
+.verb-part-word span { font-size:13px; color:#5b6f86; line-height:1.3; overflow-wrap:anywhere; }
+.verb-done-marks { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:4px; }
+.verb-done-mark { display:inline-flex; align-items:center; gap:3px; padding:1px 8px; border-radius:999px; border:1.5px dashed #c9dbec; color:#98a9ba; font-size:11.5px; font-weight:700; white-space:nowrap; }
+.verb-done-mark.on { border:1.5px solid #8fd19b; background:#ecf9ef; color:#23743a; }
+@media (max-width:560px) {
+ .verb-part-view,.verb-detail { padding:14px; border-radius:22px; }
+ .verb-part-head h1 { font-size:21px; }
+ .verb-part-row { grid-template-columns:22px 40px minmax(0,1fr); gap:8px; padding:6px 8px; }
+ .verb-part-row img,.verb-part-noimg { width:40px; height:40px; }
+ .verb-part-number { width:22px; height:22px; font-size:11px; }
+ .verb-part-row .verb-done-marks { grid-column:3; justify-content:flex-start; }
+ .verb-part-start { width:100%; justify-content:center; }
+}
+
+/* One verb's card: navigation, the forms, and the example sentences for Präsens or Perfekt. */
+.verb-detail-nav { display:flex; align-items:center; gap:10px; }
+.verb-detail-count { margin-inline-start:auto; font-size:13px; font-weight:700; color:#7f95ad; font-variant-numeric:tabular-nums; }
+.verb-detail-arrows { display:inline-flex; gap:6px; }
+.verb-detail-arrow { display:grid; place-items:center; width:38px; height:38px; border-radius:50%; border:2px solid #d8e6f3; background:#fff; color:#2f7fd6; cursor:pointer; }
+.verb-detail-arrow:disabled { opacity:.35; cursor:default; }
+.verb-detail .verb-learn-text { gap:6px; }
+.verb-detail .verb-done-marks { justify-content:flex-start; }
+.verb-detail-perfekt { position:relative; display:flex; align-items:center; gap:10px; width:100%; padding:10px 34px 10px 14px; border-radius:14px; border:1px solid #d8e6f3; background:#fff; color:#1f3b5c; text-align:start; font:inherit; font-size:18px; font-weight:800; cursor:pointer; }
+.verb-detail-perfekt small { font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#2f7fd6; }
+.verb-detail-perfekt svg { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#2f7fd6; }
+.verb-detail-tabs { display:inline-flex; justify-self:start; gap:4px; padding:4px; border-radius:999px; background:#eef4fa; }
+.verb-detail-tab { min-height:34px; padding:4px 16px; border-radius:999px; border:0; background:transparent; color:#3d5a7a; font:inherit; font-size:14px; font-weight:800; cursor:pointer; }
+.verb-detail-tab.active { background:#fff; color:#1f3b5c; box-shadow:0 2px 6px rgba(28,82,130,.15); }
+.verb-detail .verb-persons { margin:0; }
+@media (max-width:760px) {
+ .verb-learn .verb-kind { justify-content:center; }
+ .verb-detail .verb-learn-body { grid-template-columns:96px minmax(0,1fr); justify-items:start; text-align:start; gap:12px; }
+ .verb-detail .verb-learn-text { justify-items:start; }
+ .verb-detail .verb-learn-title { justify-content:flex-start; }
+ .verb-detail .verb-learn-form { font-size:24px; }
+ .verb-detail .verb-learn-meaning { font-size:15px; }
 }

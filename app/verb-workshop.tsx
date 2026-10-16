@@ -4,7 +4,7 @@ import {ArrowLeft,ArrowRight,Check,CheckCircle2,ChevronLeft,ChevronRight,Play,Ro
 import {verbMeaning,perfektLabel,praesensPersons,type Verb} from '@/lib/verb-course';
 import {familyRule,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {sentenceChunks,sentenceText,verbRules,verbPrefix,verbPicture,type VerbTense} from '@/lib/verb-logic';
-import {type LearnStage,type PathPlace,type WorkshopStep} from '@/lib/verb-workshop';
+import {type LearnStage,type PathPlace,type VerbMarks,type WorkshopStep} from '@/lib/verb-workshop';
 import {personSentences,personMode,personLabel,conjugationRows,learnSpeech,type PersonKey,type PersonTense} from '@/lib/verb-persons';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {verbKindInfo} from '@/lib/verb-kind';
@@ -117,15 +117,16 @@ export function AnswerResult({verb,stage,language,speech,correct,status,chosen,s
   <button type="button" className="btn object-next verb-result-next" disabled={busy} onClick={onNext}>{nextLabel}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </div>;
 }
-/** The card that opens a stage of a part: what comes now (the meanings, or the Perfekt forms) and the verbs that follow. */
-export function ChapterCard({family,stage,verbs,language,onContinue}:{family:VerbFamily;stage:LearnStage;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
+/** The card that opens a part: its verbs, each done whole (meaning, then at once its Perfekt). In an older staged round it opens each stage: the meanings, or the Perfekt forms. */
+export function ChapterCard({family,stage,both,verbs,language,onContinue}:{family:VerbFamily;stage:LearnStage;both?:boolean;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- const perfekt=stage==='perfekt';
- return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id} data-verb-stage={stage}>
+ const perfekt=stage==='perfekt'&&!both;
+ return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id} data-verb-stage={both?'both':stage}>
   <p className="verb-learn-kicker">{t('chapterOf',{n:family.number})} · {t('verbsCount',{n:verbs.length})}</p>
-  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang="de" dir="ltr">{familyTitle(family,language)}</span> · {perfekt?t('stepPerfekt'):t('stageMeanings')}</h1>
+  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang="de" dir="ltr">{familyTitle(family,language)}</span> · {both?t('stageBoth'):perfekt?t('stepPerfekt'):t('stageMeanings')}</h1>
   <p className="verb-chapter-rule">{perfekt?t('perfektChapter'):familyRule(family,language)}</p>
-  <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr" className={kindClass(verb)}>{verb.display}</span>{perfekt&&<small lang="de" dir="ltr">{verb.subject} <VerbForm verb={verb} stage="perfekt"/></small>}</li>)}</ul>
+  {both&&<p className="verb-chapter-rule verb-chapter-flow">{t('verbFlow')}</p>}
+  <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr" className={kindClass(verb)}>{verb.display}</span>{(perfekt||both)&&<small lang="de" dir="ltr">{verb.subject} <VerbForm verb={verb} stage="perfekt"/></small>}</li>)}</ul>
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('chapterStart')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
@@ -137,7 +138,6 @@ export function PathStepper({place,language}:{place:PathPlace;language:VaultLang
   <ol className="verb-stepper-steps" style={{gridTemplateColumns:'repeat('+place.steps.length+',minmax(0,1fr))'}}>{place.steps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}><span className="verb-stepper-dot"/><span className="verb-stepper-label">{t(stepLabels[step])}</span></li>)}</ol>
  </div>;
 }
-type VerbMarks={meaning:boolean;perfekt:boolean};
 type PartState={done:number;count:number;percent:number;finished:boolean;started:boolean;meaningDone:number;perfektDone:number};
 /** Done or not, for one verb: the meaning and the Perfekt, each with a tick. */
 function DoneMarks({marks,language}:{marks?:VerbMarks;language:VaultLanguage}){

@@ -320,10 +320,10 @@ test('Fiil Atölyesi: two parts in book order, each verb in turn: card, meaning 
  for(const list of [workshop.partIds(w1),stagedIds,verbByVerb,legacyPart,left])assert.ok(workshop.isPartRound({mode:'workshop',questions:asQuestions(list)},w1)&&!workshop.isPartRound({mode:'workshop',questions:asQuestions(list)},w2));
  assert.ok(!workshop.isPartRound({mode:'mixed',questions:asQuestions(left)},w1)&&!workshop.isPartRound({mode:'workshop',questions:[]},w1));
  assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(oldIds)}),76);assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(workshop.partIds(w1))}),57);assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(left)}),47);
- // The page: the past form asks for the Partizip II with the infinitive shown; its result shows infinitive → Partizip II, no example sentences.
+ // The page: the past form asks for the Partizip II with the infinitive shown; its result shows infinitive → Partizip II and the past-tense example sentences.
  const pageText=fs.readFileSync('app/verb-study.tsx','utf8');const cardSrc=fs.readFileSync('app/verb-workshop.tsx','utf8');
  assert.ok(pageText.includes("kind==='partizip'?t('promptPartizip')")&&pageText.includes("past={q.verbTask==='partizip'}")&&!pageText.includes('meaning-perfekt'),'the past form on the page');
- assert.ok(cardSrc.includes("{examples&&!past&&<PersonSentences")&&cardSrc.includes("{verb.participle}</span></>"),'the result of the past form');
+ assert.ok(cardSrc.includes("{examples&&<PersonSentences verb={verb} tense={past||stage==='perfekt'?'perfekt':'praesens'}")&&cardSrc.includes("{verb.participle}</span></>"),'the result of the past form');
  assert.ok(pageText.includes("if(!isOlderRound(data.session.questions)){openSession(data.session);return;}")&&pageText.includes("ids=continuationIds(family,data.session);"),'an older round goes on in the new order');
  assert.ok(pageText.includes("<ChapterCard family={place.family} verbs={chapterVerbs} language={language}")&&!cardSrc.includes("<VerbForm verb={verb} stage=\"perfekt\"/></small>"),'the part card shows the verbs only');
  for(const language of languages)for(const key of ['stageBoth','verbFlow','stepPartizip','promptPartizip'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
@@ -438,7 +438,7 @@ test('after an answer every person gets an example sentence: Präsens after mean
  // After a test answer the result card shows them: Präsens after the meaning test, Perfekt after the Perfekt test; tapping a row reads it.
  const page=fs.readFileSync('app/verb-study.tsx','utf8');const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
  const result=cards.slice(cards.indexOf('export function AnswerResult'),cards.indexOf('export function ChapterCard'));
- assert.ok(result.includes("<PersonSentences verb={verb} tense={stage==='perfekt'?'perfekt':'praesens'}")&&result.includes('<VerbPicture verb={verb}'),'picture on top, examples below');
+ assert.ok(result.includes("<PersonSentences verb={verb} tense={past||stage==='perfekt'?'perfekt':'praesens'}")&&result.includes('<VerbPicture verb={verb}'),'picture on top, examples below');
  assert.ok(page.includes("const answered=!!feedback&&!writing;")&&page.includes('{answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)}'),'a test answer opens the result card');
  assert.ok(page.includes('spoken={pronunciation}')&&page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'),'after the effect only the correct answer is spoken');
  assert.ok(!page.includes('<PersonSentences'),'no example sentences after spelling');

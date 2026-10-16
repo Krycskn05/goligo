@@ -26,7 +26,7 @@ async function loadSession(db:D1Database,user:string,id:string){
 }
 export async function GET(request:Request){
  try{
-  const user=await identity();if(!user)return json({error:'Kayıtlarını görmek için ChatGPT hesabınla giriş yap.',signIn:true},401);
+  const user=await identity();if(!user)return json({error:'Kayıtlarını görmek için giriş yap.',signIn:true},401);
   const db=getRawDb();const url=new URL(request.url);const id=url.searchParams.get('session');const english=url.searchParams.get('learn')==='en';
   if(id){const session=await loadSession(db,user,id);return session&&String(session.topic).startsWith('en-')===english?json({session}):json({error:'Test bulunamadı.'},404);}
   const [reviews,notes,sessions,activePicture,activeVerb]=await Promise.all([
@@ -42,7 +42,7 @@ export async function GET(request:Request){
 }
 export async function POST(request:Request){
  try{
-  const user=await identity();if(!user)return json({error:'İlerlemeni kaydetmek için ChatGPT hesabınla giriş yap.',signIn:true},401);
+  const user=await identity();if(!user)return json({error:'İlerlemeni kaydetmek için giriş yap.',signIn:true},401);
   const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return json({error:'Geçersiz istek.'},403);
   if(Number(request.headers.get('content-length')??0)>24000)return json({error:'Metin çok uzun.'},413);
   const body=await request.json() as Record<string,unknown>;const db=getRawDb();const now=Date.now();

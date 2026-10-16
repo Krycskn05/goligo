@@ -4,6 +4,7 @@
 #
 # CLOUDFLARE_API_TOKEN yoksa yalnızca DENEME yapar: paket hazırlanır, yayın yapılmaz.
 # Varsa: D1 veritabanını bulur/oluşturur, şemayı (yalnızca ilk kez) uygular,
+# üyelik tablolarını (her seferinde, var olanlara dokunmadan) kurar,
 # Worker'ı yayınlar ve adresi kontrol eder. Sonuçlar "yayin-sonuclari" dalına yazılır.
 set -u
 OUT="$PWD/.yayin-out"
@@ -102,6 +103,13 @@ s_sema() {
     wr d1 execute "$DBNAME" --remote --file migration/database/schema.sql || return 1
   fi
 }
+s_uyelik() { # Üyelik tabloları: her yayında; IF NOT EXISTS ile var olan kayıtlara dokunmaz.
+  echo "Üyelik tabloları kontrol ediliyor (migration/database/members.sql)..."
+  # Açıklama satırları çıkarılıp tek komut olarak gönderilir (dosya içe aktarma akışına gerek yok).
+  wr d1 execute "$DBNAME" --remote --command "$(grep -v '^[[:space:]]*--' migration/database/members.sql)" || return 1
+  wr d1 execute "$DBNAME" --remote --json \
+    --command "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('members','member_sessions','auth_attempts') ORDER BY name"
+}
 s_yayin() { wr deploy --config dist/server/wrangler.json; }
 s_kontrol() {
   local url
@@ -110,7 +118,7 @@ s_kontrol() {
   echo "$url" > "$OUT/ADRES.txt"
   echo "Adres: $url"
   sleep 10
-  for path in / /api/study /ev-esyalar; do
+  for path in / /giris /api/study /ev-esyalar; do
     curl -s -o /dev/null -w "$path -> HTTP %{http_code} %{redirect_url}\n" "$url$path"
   done
 }
@@ -127,6 +135,7 @@ else
     && adim "5-sesler" 05-voices.log s_sesler \
     && adim "5-derleme" 05-build.log s_build \
     && adim "6-sema" 06-schema.log s_sema \
+    && adim "6-uyelik" 06-members.log s_uyelik \
     && adim "7-yayin" 07-deploy.log s_yayin \
     && adim "8-kontrol" 08-check.log s_kontrol
 fi

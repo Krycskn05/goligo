@@ -1,19 +1,18 @@
 import handler from "vinext/server/fetch-handler";
 import { runWithConnectorBinding } from "../lib/connector-context";
-import { accessGate } from "../lib/access-gate";
+import { siteGate } from "../lib/site-gate";
 import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 
 export default {
   async fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
-    // Production: Cloudflare Access replaces the ChatGPT Sites dispatch layer.
-    // Client-sent identity headers are always discarded; only a verified Access
-    // token signs a user in. Without Access settings the site stays closed.
-    // Local development keeps the mock sign-in from build/sites-vite-plugin.ts.
-    if (!import.meta.env.DEV) {
-      const gated = await accessGate(request, env);
-      if (gated instanceof Response) return gated;
-      request = gated;
-    }
+    // Membership gate (lib/site-gate.ts), in production and locally alike.
+    // Client-sent identity headers are always discarded; a user is signed in only
+    // by a member session verified in D1 (or, during the move away from Cloudflare
+    // Access, by a verified Access token). Local development additionally keeps the
+    // mock sign-in from build/sites-vite-plugin.ts; production builds never trust it.
+    const gated = await siteGate(request, env, { devIdentity: import.meta.env.DEV });
+    if (gated instanceof Response) return gated;
+    request = gated;
     let binding = ctx.props?.CONNECTORS;
     // Local preview emulates the same request-scoped capability. This branch and
     // the auxiliary service binding are absent from production builds.

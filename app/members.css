@@ -1,0 +1,101 @@
+/* Üyelik: tanıtım sayfası, giriş / üye ol formları, Hesabım ve yasal metinler.
+ * Renkler koko-theme.css'teki değişkenlerden gelir. */
+.lk-public { min-height:100vh; display:flex; flex-direction:column; color:var(--ink); }
+.lk-public-main { width:min(1120px,100%); margin:0 auto; padding:28px 18px 56px; flex:1; }
+.lk-public-main.narrow { width:min(720px,100%); }
+.lk-public-nav { display:flex; gap:10px; margin-inline-start:auto; flex-wrap:wrap; justify-content:flex-end; }
+.lk-public-nav .btn { text-decoration:none; }
+
+/* Tanıtım */
+.lk-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:28px; align-items:center; background:#fff; border-radius:32px; box-shadow:var(--soft); padding:34px; overflow:hidden; }
+.lk-eyebrow { margin:0 0 8px; color:var(--green-3); font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:14px; }
+.lk-hero h1 { font-size:clamp(30px,4.6vw,50px); line-height:1.08; margin:0 0 16px; color:var(--ink); }
+.lk-lead { font-size:clamp(17px,1.8vw,20px); color:var(--ink-2); margin:0 0 22px; max-width:34em; }
+.lk-hero-actions { display:flex; flex-wrap:wrap; gap:12px; }
+.lk-hero-actions.center { justify-content:center; margin-top:22px; }
+.lk-hero-actions .btn { text-decoration:none; }
+.lk-hero-note { display:flex; align-items:center; gap:8px; margin:16px 0 0; color:var(--ink-2); font-weight:600; font-size:15px; }
+.lk-hero-note svg { color:var(--green-2); }
+.lk-hero-art img { width:100%; height:auto; border-radius:24px; display:block; }
+.lk-section { margin-top:40px; }
+.lk-section > h2 { font-size:clamp(24px,3vw,32px); margin:0 0 18px; text-align:center; }
+.lk-features { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.lk-feature { background:#fff; border-radius:24px; box-shadow:var(--soft); overflow:hidden; display:flex; flex-direction:column; }
+.lk-feature img { width:100%; aspect-ratio:16/10; object-fit:cover; background:var(--sky-1); display:block; }
+.lk-feature div { padding:18px 20px 22px; }
+.lk-feature h3 { margin:0 0 6px; font-size:21px; }
+.lk-feature p { margin:0; color:var(--ink-2); }
+.lk-perks ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.lk-perks li { display:flex; gap:12px; align-items:flex-start; background:#fff; border-radius:18px; box-shadow:var(--soft-2); padding:16px 18px; font-weight:600; color:var(--ink-2); }
+.lk-perks svg { color:var(--blue-2); flex-shrink:0; margin-top:1px; }
+.lk-steps ol { list-style:none; margin:0 auto; padding:0; display:grid; gap:12px; max-width:640px; }
+.lk-steps li { display:flex; gap:14px; align-items:center; background:#fff; border-radius:18px; box-shadow:var(--soft-2); padding:14px 18px; font-weight:600; }
+.lk-step-number { display:grid; place-items:center; width:38px; height:38px; flex-shrink:0; border-radius:50%; background:var(--green); color:#fff; font-weight:800; }
+
+/* Formlar */
+.lk-auth-card,.lk-account-card,.lk-legal,.lk-account-head { background:#fff; border-radius:28px; box-shadow:var(--soft); padding:30px; }
+.lk-auth-card h1,.lk-legal h1,.lk-account-head h1 { margin:0 0 6px; font-size:clamp(26px,3.4vw,34px); }
+.lk-auth-lead { margin:0 0 20px; color:var(--ink-2); }
+.lk-auth-form { display:grid; gap:16px; }
+.lk-field { display:grid; gap:6px; font-weight:700; color:var(--ink); }
+.lk-field > span,.lk-field > label { font-weight:700; }
+.lk-field small { color:var(--ink-3); font-weight:500; font-size:14px; }
+.lk-field input,.lk-password input { width:100%; min-height:50px; padding:10px 14px; font-size:17px; color:var(--ink); background:#fff; border:2px solid var(--toy-line-2); border-radius:14px; font-family:inherit; }
+.lk-field input:focus-visible,.lk-password input:focus-visible { outline:3px solid var(--blue-2); outline-offset:1px; border-color:var(--blue-2); }
+.lk-field input[aria-invalid="true"],.lk-check input[aria-invalid="true"] { border-color:var(--rose-2); }
+.lk-password { position:relative; }
+.lk-password input { padding-inline-end:54px; }
+.lk-password-toggle { position:absolute; inset-block:3px; inset-inline-end:3px; width:46px; display:grid; place-items:center; border:0; background:transparent; color:var(--blue-2); border-radius:12px; cursor:pointer; }
+.lk-password-toggle:hover { background:var(--sky-2); }
+.lk-check { display:flex; gap:12px; align-items:flex-start; font-weight:500; color:var(--ink-2); line-height:1.45; }
+.lk-check input { width:24px; height:24px; flex-shrink:0; margin-top:1px; accent-color:var(--green-2); }
+.lk-check a,.lk-auth-switch a,.lk-legal a,.lk-forgot a,.site-footer-links a { color:var(--blue-2); font-weight:700; }
+.lk-form-error { margin:0; padding:12px 14px; border-radius:14px; background:#fff0f3; color:#8a1f3c; font-weight:700; }
+.lk-form-done { margin:0; padding:12px 14px; border-radius:14px; background:#e8f7e9; color:#1f6a26; font-weight:700; }
+.lk-submit { width:100%; margin-top:4px; }
+.lk-auth-switch { margin:20px 0 0; text-align:center; color:var(--ink-2); }
+.lk-forgot { margin-top:14px; color:var(--ink-2); text-align:center; }
+.lk-forgot summary { cursor:pointer; color:var(--blue-2); font-weight:700; min-height:44px; display:inline-flex; align-items:center; }
+.lk-forgot p { margin:6px 0 0; }
+.lk-spin { animation:lk-spin 1s linear infinite; }
+@keyframes lk-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce) { .lk-spin { animation:none; } }
+
+/* Hesabım */
+.lk-account { display:grid; gap:18px; }
+.lk-account-head p { display:grid; gap:2px; margin:6px 0 16px; }
+.lk-account-head strong { font-size:20px; }
+.lk-account-head span { color:var(--ink-2); overflow-wrap:anywhere; }
+.lk-account-head small { color:var(--ink-3); }
+.lk-account-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.lk-account-actions .btn,.lk-account-card .btn { text-decoration:none; justify-self:start; }
+.lk-account-card h2 { display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:21px; }
+.lk-account-card h2 svg { color:var(--blue-2); }
+.lk-account-card p { color:var(--ink-2); margin:0 0 14px; }
+.lk-danger summary { cursor:pointer; color:#a3284a; font-weight:800; min-height:44px; display:inline-flex; align-items:center; }
+.lk-danger[open] summary { margin-bottom:8px; }
+.btn.lk-danger-button { background:linear-gradient(180deg,#ef6b8b 0,#d2456a 100%); box-shadow:0 3px 0 #9c2848,0 6px 14px rgba(156,40,72,.2); }
+
+/* Yasal metinler */
+.lk-legal h2 { font-size:22px; margin:28px 0 8px; }
+.lk-legal p,.lk-legal li { color:var(--ink-2); }
+.lk-legal ul { padding-inline-start:22px; display:grid; gap:8px; }
+.lk-legal strong { color:var(--ink); }
+.lk-legal-date { color:var(--ink-3) !important; font-size:15px; margin:0 0 18px; }
+.lk-legal code { background:var(--sky-1); padding:1px 6px; border-radius:6px; font-size:.92em; }
+.site-footer-links { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+
+@media (max-width:860px) {
+ .lk-hero { grid-template-columns:1fr; padding:24px 20px; border-radius:26px; }
+ .lk-hero-art { order:-1; }
+ .lk-features { grid-template-columns:1fr; }
+ .lk-perks ul { grid-template-columns:1fr; }
+}
+@media (max-width:560px) {
+ .lk-public-main { padding:18px 14px 44px; }
+ .lk-public-header { border-radius:26px; margin:10px 10px 0; }
+ .lk-public-nav { gap:8px; }
+ .lk-public-nav .btn.small { padding:8px 14px; font-size:14px; min-height:40px; }
+ .lk-hero-actions .btn { flex:1 1 100%; }
+ .lk-auth-card,.lk-account-card,.lk-legal,.lk-account-head { padding:22px 18px; border-radius:22px; }
+}

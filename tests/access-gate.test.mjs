@@ -3,7 +3,11 @@ import {test} from 'node:test';
 import {createRequire} from 'node:module';
 const compiled=process.env.STUDY_CHECK_DIR;
 assert.ok(compiled,'Set STUDY_CHECK_DIR to compiled lib directory.');
-const {accessGate,verifyAccessJwt,normalizeTeamDomain,withoutClientIdentity}=createRequire(import.meta.url)(compiled+'/access-gate.js');
+const load=createRequire(import.meta.url);
+const {verifyAccessJwt,normalizeTeamDomain,withoutClientIdentity}=load(compiled+'/access-gate.js');
+// The site now opens with membership (lib/site-gate.ts); a verified Access token is still
+// accepted while Cloudflare Access is being switched off, so old progress can be linked.
+const {siteGate}=load(compiled+'/site-gate.js');
 
 const AUD='aud-lernkoko-test';
 const b64url=bytes=>Buffer.from(bytes).toString('base64url');
@@ -34,20 +38,16 @@ test('team domain accepts a name, a host or a full address',()=>{
  assert.equal(normalizeTeamDomain(''),null);assert.equal(normalizeTeamDomain(undefined),null);assert.equal(normalizeTeamDomain('bad host!'),null);
 });
 
-test('the site stays closed until Access settings exist',async()=>{
- for(const settings of [{},{TEAM_DOMAIN:'koray'},{POLICY_AUD:AUD}]){const r=await accessGate(req('/'),settings);assert(r instanceof Response);assert.equal(r.status,503);}
-});
-
-test('requests without a valid Access token are rejected',async()=>{
+test('without a valid Access token nobody is signed in; client identity headers alone never count',async()=>{
  const t=await makeTeam();const settings={TEAM_DOMAIN:t.team,POLICY_AUD:AUD};
- const none=await accessGate(req('/api/study'),settings,t.fetcher);assert.equal(none.status,403);
- const spoofed=await accessGate(req('/api/study',{headers:{'oai-authenticated-user-id':'someone-else','oai-authenticated-user-email':'x@y.z'}}),settings,t.fetcher);
- assert(spoofed instanceof Response);assert.equal(spoofed.status,403,'client identity headers alone must never sign anyone in');
+ const none=await siteGate(req('/api/study'),settings,{fetcher:t.fetcher});assert(none instanceof Request);assert.equal(none.headers.get('oai-authenticated-user-id'),null);
+ const spoofed=await siteGate(req('/fiiller',{headers:{'oai-authenticated-user-id':'someone-else','oai-authenticated-user-email':'x@y.z'}}),settings,{fetcher:t.fetcher});
+ assert(spoofed instanceof Response);assert.equal(spoofed.status,302,'client identity headers alone must never sign anyone in');assert.equal(spoofed.headers.get('location'),'/giris?return_to=%2Ffiiller');
 });
 
 test('a valid token signs the user in and replaces any client-supplied identity',async()=>{
  const t=await makeTeam();const settings={TEAM_DOMAIN:t.team,POLICY_AUD:AUD};
- const out=await accessGate(req('/api/study',{headers:{'cf-access-jwt-assertion':await t.token(),'oai-authenticated-user-id':'attacker','OAI-Authenticated-User-Full-Name':'Fake'}}),settings,t.fetcher);
+ const out=await siteGate(req('/api/study',{headers:{'cf-access-jwt-assertion':await t.token(),'oai-authenticated-user-id':'attacker','OAI-Authenticated-User-Full-Name':'Fake'}}),settings,{fetcher:t.fetcher});
  assert(out instanceof Request);
  assert.equal(out.headers.get('oai-authenticated-user-id'),'cf-access:user-123');
  assert.equal(out.headers.get('oai-authenticated-user-email'),'koray@example.com');
@@ -57,7 +57,7 @@ test('a valid token signs the user in and replaces any client-supplied identity'
 test('POST bodies survive the gate unchanged',async()=>{
  const t=await makeTeam();const settings={TEAM_DOMAIN:t.team,POLICY_AUD:AUD};
  const body=JSON.stringify({action:'note',key:'profile',value:'merhaba'});
- const out=await accessGate(req('/api/study',{method:'POST',body,headers:{'content-type':'application/json','cf-access-jwt-assertion':await t.token()}}),settings,t.fetcher);
+ const out=await siteGate(req('/api/study',{method:'POST',body,headers:{'content-type':'application/json','cf-access-jwt-assertion':await t.token()}}),settings,{fetcher:t.fetcher});
  assert(out instanceof Request);assert.equal(out.method,'POST');assert.equal(await out.text(),body);
 });
 
@@ -89,25 +89,27 @@ test('signing keys are cached and refreshed when Access rotates them',async()=>{
  const after=t.calls.length;await verifyAccessJwt(await t.token(),t.team,AUD,t.fetcher);assert.equal(t.calls.length,after,'known keys come from the cache');
 });
 
-test('an unreachable Access key service fails closed',async()=>{
+test('an unreachable Access key service signs nobody in through Access',async()=>{
  const t=await makeTeam();const token=await t.token();
  const down=async()=>new Response('down',{status:500});
- const r=await accessGate(req('/',{headers:{'cf-access-jwt-assertion':token}}),{TEAM_DOMAIN:t.team,POLICY_AUD:AUD},down);
- assert(r instanceof Response);assert.equal(r.status,503);
+ const error=console.error;console.error=()=>{};
+ try{const r=await siteGate(req('/fiiller',{headers:{'cf-access-jwt-assertion':token}}),{TEAM_DOMAIN:t.team,POLICY_AUD:AUD},{fetcher:down});assert(r instanceof Response);assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/giris?return_to=%2Ffiiller');}
+ finally{console.error=error;}
 });
 
-test('old ChatGPT sign-in and sign-out addresses are handled safely',async()=>{
- const t=await makeTeam();const settings={TEAM_DOMAIN:t.team,POLICY_AUD:AUD};const auth={'cf-access-jwt-assertion':await t.token()};
- const go=async(path,headers={})=>{const r=await accessGate(req(path,{headers:{...auth,...headers}}),settings,t.fetcher);assert(r instanceof Response);assert.equal(r.status,302);return r.headers.get('location');};
- assert.equal(await go('/signin-with-chatgpt?return_to=%2Fev-esyalar'),'/ev-esyalar');
- assert.equal(await go('/signin-with-chatgpt?return_to=%2F%2Fevil.example'),'/');
- assert.equal(await go('/auth/login',{referer:'https://lernkoko.example.workers.dev/a1-2/ev-ve-yasam'}),'/a1-2/ev-ve-yasam');
- assert.equal(await go('/auth/login',{referer:'https://evil.example/steal'}),'/');
- assert.equal(await go('/signout-with-chatgpt?return_to=%2F'),'/cdn-cgi/access/logout');
+test('old ChatGPT and Access sign-in and sign-out addresses lead to the member pages',async()=>{
+ const t=await makeTeam();const settings={TEAM_DOMAIN:t.team,POLICY_AUD:AUD};
+ const go=async(path,headers={})=>{const r=await siteGate(req(path,{headers}),settings,{fetcher:t.fetcher});assert(r instanceof Response);assert.equal(r.status,302);return r.headers.get('location');};
+ assert.equal(await go('/signin-with-chatgpt?return_to=%2Fev-esyalar'),'/giris?return_to=%2Fev-esyalar');
+ assert.equal(await go('/signin-with-chatgpt?return_to=%2F%2Fevil.example'),'/giris');
+ assert.equal(await go('/auth/login',{referer:'https://lernkoko.example.workers.dev/a1-2/ev-ve-yasam'}),'/giris?return_to=%2Fa1-2%2Fev-ve-yasam');
+ assert.equal(await go('/auth/login',{referer:'https://evil.example/steal'}),'/giris');
+ assert.equal(await go('/signout-with-chatgpt?return_to=%2F'),'/');
+ assert.equal(await go('/auth/logout'),'/');
  assert.equal(await go('/callback'),'/');
 });
 
 test('header cleanup removes every identity header regardless of case',()=>{
- const h=withoutClientIdentity(new Headers({'OAI-Authenticated-User-Id':'a','oai-authenticated-user-email':'b','accept':'text/html'}));
- assert.equal(h.get('oai-authenticated-user-id'),null);assert.equal(h.get('oai-authenticated-user-email'),null);assert.equal(h.get('accept'),'text/html');
+ const h=withoutClientIdentity(new Headers({'OAI-Authenticated-User-Id':'a','oai-authenticated-user-email':'b','LK-Verified-Access-Id':'cf-access:x','accept':'text/html'}));
+ assert.equal(h.get('oai-authenticated-user-id'),null);assert.equal(h.get('oai-authenticated-user-email'),null);assert.equal(h.get('lk-verified-access-id'),null);assert.equal(h.get('accept'),'text/html');
 });

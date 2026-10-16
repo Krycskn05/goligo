@@ -1,5 +1,6 @@
 // LernKoko duman testi: yerel geliştirme sunucusunu (http://localhost:5173)
-// gerçek bir tarayıcıyla açar, ekran görüntüsü alır ve kayıt API'sini
+// gerçek bir tarayıcıyla açar, ekran görüntüsü alır; üyelik akışını (üye ol, çıkış,
+// giriş, Hesabım, hesabı silme) yerel bir deneme hesabıyla dener ve kayıt API'sini
 // yerel giriş taklidiyle (local_seedy) dener. Yalnızca yerel veritabanına yazar.
 const { chromium, devices } = require("playwright");
 const fs = require("node:fs");
@@ -30,6 +31,89 @@ async function visit(page, url, shot, errors) {
     `HTTP ${status}, baslik "${title}", hata ${errors.length}${errors.length ? " (" + errors.slice(0, 2).join(" | ") + ")" : ""}, metin: ${text}`);
 }
 
+// Uyelik akisi (yalniz yerel veritabani, her calismada yeni bir deneme hesabi):
+// uye ol -> Hesabim -> cikis -> yanlis sifre -> giris -> hesabi sil.
+async function memberFlow(browser) {
+  const ctx = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
+  const m = await ctx.newPage();
+  const crashes = [];
+  m.on("pageerror", (e) => crashes.push(e.message));
+  const email = `deneme-${Date.now()}@example.test`;
+  const password = "Koko-" + Math.random().toString(36).slice(2, 10) + "-9";
+  const step = async (name, fn) => {
+    try { const [ok, detail] = await fn(); record(name, !!ok, detail || ""); return !!ok; }
+    catch (e) { record(name, false, String((e && e.message) || e).slice(0, 200)); return false; }
+  };
+  const go = (url) => m.goto(BASE + url, { waitUntil: "networkidle", timeout: 90000 });
+  const errorText = async () => ((await m.locator(".lk-form-error").first().textContent({ timeout: 15000 })) || "").trim();
+  await step("Uyelik: kosullar onaylanmadan hesap acilmiyor", async () => {
+    await go("/uye-ol?return_to=%2Ffiiller");
+    await m.fill('input[name="name"]', "Deneme Öğrenci");
+    await m.fill('input[name="email"]', email);
+    await m.fill('input[name="password"]', password);
+    await m.screenshot({ path: path.join(OUT, "20-telefon-uye-ol.png") });
+    await m.click('button[type="submit"]');
+    const text = await errorText();
+    return [/kabul/.test(text) && new URL(m.url()).pathname === "/uye-ol", text];
+  });
+  const joined = await step("Uyelik: uye olunca istenen sayfaya donuluyor (/fiiller)", async () => {
+    await m.check('input[name="accept"]');
+    await Promise.all([m.waitForURL((u) => new URL(u).pathname === "/fiiller", { timeout: 30000 }), m.click('button[type="submit"]')]);
+    await m.waitForTimeout(1500);
+    await m.screenshot({ path: path.join(OUT, "21-telefon-uye-olduktan-sonra.png") });
+    return [(await m.locator("[data-verb-workshop]").count()) === 1, m.url()];
+  });
+  if (!joined) { await ctx.close(); return; }
+  await step("Uyelik: oturum cerezi HttpOnly ve SameSite=Lax", async () => {
+    const c = (await ctx.cookies()).find((x) => x.name === "lk_session");
+    return [!!c && c.httpOnly && c.sameSite === "Lax", c ? `httpOnly ${c.httpOnly}, sameSite ${c.sameSite}` : "cerez yok"];
+  });
+  await step("Uyelik: uye kendi kayitlarini okuyabiliyor", async () => {
+    const r = await m.request.get(BASE + "/api/study");
+    return [r.status() === 200, `HTTP ${r.status()}`];
+  });
+  await step("Uyelik: Hesabim sayfasi ad ve e-postayi gosteriyor", async () => {
+    await go("/hesabim");
+    await m.screenshot({ path: path.join(OUT, "22-telefon-hesabim.png"), fullPage: true });
+    const shown = ((await m.locator("[data-account-email]").textContent()) || "").trim();
+    const name = ((await m.locator("[data-account-name]").textContent()) || "").trim();
+    return [shown === email && name === "Deneme Öğrenci", `${name} · ${shown}`];
+  });
+  await step("Uyelik: cikis yapinca tanitim sayfasi ve kayitlar kapali", async () => {
+    await Promise.all([m.waitForURL((u) => new URL(u).pathname === "/", { timeout: 30000 }), m.click("[data-account-logout]")]);
+    await m.waitForLoadState("networkidle");
+    const landing = await m.locator("[data-landing]").count();
+    const r = await m.request.get(BASE + "/api/study");
+    return [landing === 1 && r.status() === 401, `tanitim ${landing}, kayitlar HTTP ${r.status()}`];
+  });
+  await step("Uyelik: yanlis sifreyle giris olmuyor", async () => {
+    await go("/giris?return_to=%2Fhesabim");
+    await m.fill('input[name="email"]', email.toUpperCase());
+    await m.fill('input[name="password"]', password + "x");
+    await m.click('button[type="submit"]');
+    const text = await errorText();
+    await m.screenshot({ path: path.join(OUT, "23-telefon-giris-hatasi.png") });
+    return [/yanlış/.test(text) && new URL(m.url()).pathname === "/giris", text];
+  });
+  await step("Uyelik: dogru sifreyle giris yapinca istenen sayfaya donuluyor", async () => {
+    await m.fill('input[name="password"]', password);
+    await Promise.all([m.waitForURL((u) => new URL(u).pathname === "/hesabim", { timeout: 30000 }), m.click('button[type="submit"]')]);
+    await m.waitForLoadState("networkidle");
+    return [(await m.locator("[data-account]").count()) === 1, m.url()];
+  });
+  await step("Uyelik: hesap silinince kayitlar gidiyor ve giris artik olmuyor", async () => {
+    await m.locator(".lk-danger summary").click();
+    await m.fill('[data-account-delete] input[name="current"]', password);
+    await m.check('[data-account-delete] input[name="confirm"]');
+    await m.screenshot({ path: path.join(OUT, "24-telefon-hesabi-sil.png"), fullPage: true });
+    await Promise.all([m.waitForURL((u) => new URL(u).pathname === "/", { timeout: 30000 }), m.click('[data-account-delete] button[type="submit"]')]);
+    const r = await m.request.post(BASE + "/api/auth", { headers: { origin: BASE, "content-type": "application/json" }, data: { action: "login", email, password } });
+    return [r.status() === 401, `silindikten sonra giris HTTP ${r.status()}`];
+  });
+  record("Uyelik sayfalarinda betik hatasi yok", crashes.length === 0, crashes.slice(0, 2).join(" | "));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "tr-TR" });
@@ -38,17 +122,35 @@ async function visit(page, url, shot, errors) {
   page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
   page.on("console", (m) => { if (m.type() === "error") errors.push("console: " + m.text()); });
 
-  await visit(page, "/", "01-ana-sayfa.png", errors);
-  await visit(page, "/ev-esyalar", "02-nesne-kasasi.png", errors);
-  await visit(page, "/a1-2/ev-ve-yasam", "03-ev-ve-yasam.png", errors);
+  // Girissiz ziyaretci: tanitim sayfasini ve yasal sayfalari gorur; ders sayfalari giris sayfasina yonlenir.
+  await visit(page, "/", "01-tanitim.png", errors);
+  record("Girissiz ana sayfada tanitim ve uye ol dugmesi var",
+    (await page.locator("[data-landing]").count()) === 1 && (await page.locator("[data-landing-register]").count()) === 1, "");
+  for (const target of ["/ev-esyalar", "/fiiller", "/a1-2/ev-ve-yasam", "/hesabim"]) {
+    await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
+    const at = new URL(page.url());
+    record(`Girissiz ${target} giris sayfasina yonleniyor`, at.pathname === "/giris" && at.searchParams.get("return_to") === target, page.url());
+  }
+  await visit(page, "/giris", "01b-giris.png", errors);
+  await visit(page, "/uye-ol", "01c-uye-ol.png", errors);
+  await visit(page, "/gizlilik", "01d-gizlilik.png", errors);
+  await visit(page, "/kullanim-kosullari", "01e-kullanim-kosullari.png", errors);
 
   const anon = await page.request.get(BASE + "/api/study");
   record("Girissiz kayit istegi reddediliyor (401 beklenir)", anon.status() === 401, `HTTP ${anon.status()}`);
+  const spoofed = await page.request.get(BASE + "/api/study", { headers: { "oai-authenticated-user-id": "local_seedy", "oai-authenticated-user-email": "seedy@sites.test" } });
+  record("Sahte kimlik basligi ise yaramiyor (401 beklenir)", spoofed.status() === 401, `HTTP ${spoofed.status()}`);
+
+  await memberFlow(browser);
 
   await page.goto(BASE + "/signin-with-chatgpt?return_to=%2Fev-esyalar", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(OUT, "04-yerel-giris-sonrasi.png") });
   record("Yerel giris taklidi", new URL(page.url()).pathname === "/ev-esyalar", `son adres ${page.url()}`);
+  await visit(page, "/ev-esyalar", "02-nesne-kasasi.png", errors);
+  await visit(page, "/a1-2/ev-ve-yasam", "03-ev-ve-yasam.png", errors);
+  await visit(page, "/", "01-ana-sayfa.png", errors);
+  record("Giris yapinca ana sayfada dersler var (tanitim yok)", (await page.locator("[data-landing]").count()) === 0, "");
 
   const headers = { origin: BASE, "content-type": "application/json" };
   const snap0 = await page.request.get(BASE + "/api/study");
@@ -87,11 +189,13 @@ async function visit(page, url, shot, errors) {
   const p2 = await phone.newPage();
   await p2.goto(BASE + "/", { waitUntil: "networkidle", timeout: 90000 });
   await p2.waitForTimeout(1500);
-  await p2.screenshot({ path: path.join(OUT, "05-telefon-ana-sayfa.png") });
-  record("Telefon gorunumu acildi", true, "");
+  await p2.screenshot({ path: path.join(OUT, "05-telefon-tanitim.png") });
+  await p2.screenshot({ path: path.join(OUT, "05b-telefon-tanitim-tamami.png"), fullPage: true });
+  const overflow = await p2.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  record("Telefonda tanitim sayfasi yana tasmiyor", overflow <= 1, `fazla genislik ${overflow}px`);
   await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
   await p2.waitForTimeout(1500);
-  await p2.screenshot({ path: path.join(OUT, "07-telefon-fiiller.png"), fullPage: true });
+  await p2.screenshot({ path: path.join(OUT, "07-telefon-giris-sayfasi.png"), fullPage: true });
 
   // Telefonda Fiil Atolyesi: giris yap, yolu baslat, her adimin fotografini cek ve kartin
   // tek ekrana sigip sigmadigini olc (asagi kaydirmadan). Bilgi amaclidir; yayini durdurmaz.

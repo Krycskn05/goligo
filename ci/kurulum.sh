@@ -39,9 +39,13 @@ s_tests() {
   STUDY_CHECK_DIR="$PWD/.check/lib" node --test --test-reporter=spec tests/*.test.*
 }
 s_db() {
-  node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js \
-    d1 execute DB --local --config dist/server/wrangler.json \
-    --persist-to .wrangler/state --file migration/database/schema.sql
+  local f
+  for f in migration/database/schema.sql migration/database/members.sql; do
+    echo "Yerel veritabanı: $f"
+    node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js \
+      d1 execute DB --local --config dist/server/wrangler.json \
+      --persist-to .wrangler/state --file "$f" || return 1
+  done
 }
 s_site() {
   (pnpm run dev > "$OUT/07-dev-server.log" 2>&1 &)

@@ -12,6 +12,7 @@ import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
+import {learnSpeech} from '@/lib/verb-persons';
 import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,continuationIds,roundEnd,learnStage} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
@@ -75,6 +76,14 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const workshop=session?.mode===WORKSHOP_MODE;
  const place=workshop&&session?pathPlace(session.questions,index,lookup):null;
  const overlay=place&&place.chapterStart&&!dismissed.has('c:'+index)?'chapter':place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
+ // A new verb: its card says the verb aloud once by itself (only the German verb — never the question, the meaning or an explanation).
+ const spokenCard=useRef('');
+ useEffect(()=>{
+  if(overlay!=='learn'||!place||!session)return;
+  const key=session.id+':'+index;if(spokenCard.current===key)return;spokenCard.current=key;
+  speech.speak(learnSpeech(place.verb,place.stage==='perfekt'?'perfekt':place.stage==='praesens'?'praesens':'meaning'));
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[overlay,index,session?.id]);
  const starred=starredQuestionIds(snapshot.notes);
  // No part is locked: every part has its own round; the hero continues the part practised last.
  const parts=partsStatus(snapshot.sessions);const path=currentPart(snapshot.sessions);
@@ -110,7 +119,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  /** Enter a part (none is locked): continue its saved round, or start a new one. A round saved in the older order
   * (all meanings first, or Perfekt with hat/ist) is not continued as it was: the part goes on verb by verb with the questions still left. */
  async function enterPart(family:VerbFamily,restart=false){
-  if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
+  if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();speech.prepare();
   try{
    let ids=partIds(family);
    const saved=!restart?findPartSession(snapshot.sessions,family):null;
@@ -151,10 +160,11 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
  function next(){
-  if(mutation.current||!session||!feedback)return;stopFeedback();const upcoming=index+1;setIndex(upcoming);clearAnswer();focusCurrent();
+  if(mutation.current||!session||!feedback)return;stopFeedback();speech.prepare();const upcoming=index+1;setIndex(upcoming);clearAnswer();focusCurrent();
   if(upcoming>=end){answerAudio.complete();void refresh();}
  }
- function dismiss(kind:'c'|'l'){setDismissed(previous=>new Set(previous).add(kind+':'+index));focusCurrent();}
+ // Leaving a verb's card stops its voice, so the question can start at once; the part card's button readies the voice for the verb's card.
+ function dismiss(kind:'c'|'l'){if(kind==='l')speech.stop();else speech.prepare();setDismissed(previous=>new Set(previous).add(kind+':'+index));focusCurrent();}
  // A saved round keeps the choices it was shown; if the catalogue changed since (the sentence task once offered verbs, now forms), the fresh choices are used in a fixed order.
  const stored=session?.questions[index]?.options;
  const options=q?(stored&&stored.includes(q.answer)?stored:q.options?seededOptions(q.options,(session?.id??'')+':'+q.id):[]):[];

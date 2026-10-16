@@ -12,7 +12,7 @@ import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,roundEnd,learnStage} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isStagedRound,continuationIds,roundEnd,learnStage} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -107,17 +107,21 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  /** Phones: every step fills the screen from the top of the practice area (the site header scrolls away), so nothing needs dragging. */
  function toPractice(){const box=document.querySelector('.verb-practice');if(box&&window.matchMedia('(max-width: 760px)').matches)box.scrollIntoView({block:'start',behavior:'instant'});else window.scrollTo({top:0,behavior:'instant'});}
  function openSession(restored:Session){setSession(restored);setIndex(restored.answers.length);setDismissed(new Set());clearAnswer();focusCurrent();}
- /** Enter a part (none is locked): continue its saved round, or start a new one. */
+ /** Enter a part (none is locked): continue its saved round, or start a new one. A round saved in the older order
+  * (all meanings first) is not continued as it was: the part goes on verb by verb with the questions still left. */
  async function enterPart(family:VerbFamily,restart=false){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
   try{
+   let ids=partIds(family);
    const saved=!restart?findPartSession(snapshot.sessions,family):null;
    if(saved&&!saved.finished_at){
     const data=await api<{session:Session}>(undefined,'session='+encodeURIComponent(saved.id),'de');
     if(!mounted.current)return;
-    if(isPartRound(data.session,family)&&data.session.answers.length<roundEnd(data.session)){openSession(data.session);return;}
+    if(isPartRound(data.session,family)&&data.session.answers.length<roundEnd(data.session)){
+     if(!isStagedRound(data.session.questions)){openSession(data.session);return;}
+     ids=continuationIds(family,data.session);
+    }
    }
-   const ids=partIds(family);
    const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
    if(!mounted.current)return;openSession(data.session);
   }catch(e){fail(e,'startError');}

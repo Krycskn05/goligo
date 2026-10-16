@@ -853,3 +853,24 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 }
 .housing-question-art { max-width:440px; height:230px; border:1px solid #e6e7dd; border-radius:16px; overflow:hidden; background:#fbf6ec; }
 @media(max-width:650px) { .housing-question-art { height:180px; } }
+
+/* Letter puzzles: a right letter pops in, a wrong one shakes and goes back, hint letters glow, a full word waves. */
+.puzzle-empty { position:relative; }
+.puzzle-empty.filled { color:#1f6b4a; background:#effaf3; border-color:#8fcca8; animation:puzzle-pop .32s cubic-bezier(.3,1.6,.5,1) both; }
+.puzzle-empty.filled.hinted { color:#8a5a00; background:#fff7dc; border-color:#f0c75a; }
+.puzzle-empty.shake { color:#b3261e; background:#fff1ef; border-color:#e88b80; animation:puzzle-shake .45s ease both; }
+.puzzle-empty.missed::after { content:''; position:absolute; top:-4px; inset-inline-end:-4px; width:9px; height:9px; border-radius:50%; background:#f08a3c; border:2px solid #fff; }
+.letter-bank-puzzle.complete .puzzle-empty.filled { animation:puzzle-wave .55s ease both; }
+.puzzle-hint-button { display:inline-flex; align-items:center; gap:5px; min-height:32px; padding:4px 8px 4px 10px; border-radius:999px; border:2px solid #f0c75a; background:#fff8e1; color:#8a5a00; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+.puzzle-hint-button:hover:enabled { background:#ffefb8; }
+.puzzle-hint-button:disabled { opacity:.45; cursor:default; }
+.puzzle-hint-count { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 4px; border-radius:9px; background:#f0c75a; color:#4a3200; font-size:11px; }
+.puzzle-mistakes { color:#c0552a; font-weight:700; }
+.puzzle-mistake-note { margin:0 0 6px; font-size:12px; line-height:1.35; color:#b3471f; }
+.letter-tile { transition:transform .12s ease; }
+.letter-tile:active:enabled { transform:scale(.88); }
+@keyframes puzzle-pop { 0% { transform:scale(.55); } 70% { transform:scale(1.14); } 100% { transform:scale(1); } }
+@keyframes puzzle-shake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px) rotate(-5deg); } 40% { transform:translateX(5px) rotate(5deg); } 60% { transform:translateX(-4px); } 80% { transform:translateX(3px); } }
+@keyframes puzzle-wave { 0%,100% { transform:translateY(0); } 45% { transform:translateY(-8px) scale(1.08); } }
+html[data-lernkoko-motion="reduced"] .puzzle-empty.filled,html[data-lernkoko-motion="reduced"] .puzzle-empty.shake,html[data-lernkoko-motion="reduced"] .letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; }
+@media (prefers-reduced-motion:reduce) { .puzzle-empty.filled,.puzzle-empty.shake,.letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; } }

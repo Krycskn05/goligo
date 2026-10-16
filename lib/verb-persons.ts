@@ -1,90 +1,77 @@
 import {verbs,praesensPersons,spokenSubject,type Verb} from './verb-course';
 import {verbPrefix} from './verb-logic';
+import examples from './verb-examples.json';
 
 /**
  * Example sentences for every person (ich, du, er, sie, es, wir, ihr, sie, Sie), shown after an
  * answer: Präsens after the meaning questions, Perfekt after the Perfekt questions.
- * Every verb has one short middle part that fits all persons (no sein/ihr, no mich/dich), so only the
- * subject and the verb change, and each sentence fits on one line of a phone. gefallen and leid|tun are said with the person in the dative
- * (Die Stadt gefällt mir …), gelten with für + accusative (Die Regel gilt für mich …).
+ * Every person has its own short A1 sentence (statements, questions, negations, time words first),
+ * kept in verb-examples.json; the meanings in the helper languages are in verb-examples.<language>.json
+ * and are loaded only for the language the learner reads (verb-example-meanings.ts).
+ * gefallen and leid|tun are said with the person in the dative (Die Stadt gefällt mir …),
+ * gelten with für + accusative (Das Ticket gilt für mich …).
  */
 export type PersonKey='ich'|'du'|'er'|'sie'|'es'|'wir'|'ihr'|'sie-plural'|'Sie';
 export const personKeys:readonly PersonKey[]=['ich','du','er','sie','es','wir','ihr','sie-plural','Sie'];
 export type PersonTense='praesens'|'perfekt';
-/** pr/pf: the part between the verb and the prefix (Präsens) or the Partizip (Perfekt). */
-type Plain={pr:string;pf:string};
-/** {X} is replaced by the person in the dative or with für + accusative; the subject stays the same. */
-type WithObject={mode:'dative'|'fuer';pr:string;pf:string};
-const middles:Record<string,Plain|WithObject>={
- abfahren:{pr:'um acht',pf:'um acht'},
- abgeben:{pr:'das Heft',pf:'das Heft'},
- anbieten:{pr:'Tee',pf:'Tee'},
- anfangen:{pr:'heute',pf:'gestern'},
- ankommen:{pr:'in Berlin',pf:'in Berlin'},
- anrufen:{pr:'Anna',pf:'Anna'},
- anziehen:{pr:'eine Jacke',pf:'eine Jacke'},
- aufstehen:{pr:'um sieben',pf:'um sieben'},
- aussehen:{pr:'müde',pf:'müde'},
- aussteigen:{pr:'hier',pf:'hier'},
- ausziehen:{pr:'bald',pf:'gestern'},
- beginnen:{pr:'um acht',pf:'um acht'},
- bekommen:{pr:'ein Paket',pf:'ein Paket'},
- bleiben:{pr:'zu Hause',pf:'zu Hause'},
- bringen:{pr:'den Kuchen',pf:'den Kuchen'},
- denken:{pr:'oft an Oma',pf:'oft an Oma'},
- einladen:{pr:'Freunde',pf:'Freunde'},
- empfehlen:{pr:'das Buch',pf:'das Buch'},
- essen:{pr:'gern Salat',pf:'Salat'},
- fahren:{pr:'mit dem Bus',pf:'mit dem Bus'},
- finden:{pr:'das Handy',pf:'das Handy'},
- fliegen:{pr:'nach Berlin',pf:'nach Berlin'},
- geben:{pr:'Jan das Buch',pf:'Jan das Buch'},
- gefallen:{mode:'dative',pr:'Die Stadt gefällt {X}',pf:'Die Stadt hat {X} gefallen'},
- gehen:{pr:'nach Hause',pf:'nach Hause'},
- gelten:{mode:'fuer',pr:'Die Regel gilt für {X}',pf:'Die Regel hat für {X} gegolten'},
- heißen:{pr:'Müller',pf:'früher Müller'},
- herunterladen:{pr:'Apps',pf:'Apps'},
- helfen:{pr:'Oma',pf:'Oma'},
- kennen:{pr:'die Stadt',pf:'die Stadt'},
- kommen:{pr:'zu spät',pf:'zu spät'},
- laufen:{pr:'im Park',pf:'im Park'},
- leidtun:{mode:'dative',pr:'Es tut {X} leid',pf:'Es hat {X} leidgetan'},
- leihen:{pr:'Max das Rad',pf:'Max das Rad'},
- lesen:{pr:'gern Bücher',pf:'ein Buch'},
- liegen:{pr:'im Bett',pf:'im Bett'},
- mitbringen:{pr:'Blumen',pf:'Blumen'},
- mitkommen:{pr:'heute',pf:'gestern'},
-};
-const subjects:Record<PersonKey,string>={ich:'Ich',du:'Du',er:'Er',sie:'Sie',es:'Es',wir:'Wir',ihr:'Ihr','sie-plural':'Sie',Sie:'Sie'};
-const datives:Record<PersonKey,string>={ich:'mir',du:'dir',er:'ihm',sie:'ihr',es:'ihm',wir:'uns',ihr:'euch','sie-plural':'ihnen',Sie:'Ihnen'};
-const accusatives:Record<PersonKey,string>={ich:'mich',du:'dich',er:'ihn',sie:'sie',es:'es',wir:'uns',ihr:'euch','sie-plural':'sie',Sie:'Sie'};
+type ExampleSet=readonly [praesens:readonly string[],perfekt:readonly string[]];
+const exampleSets=examples as unknown as Record<string,ExampleSet>;
+/** The person as an object instead of the subject: gefallen, leid|tun (dative), gelten (für + accusative). */
+const objectModes:Record<string,'dative'|'fuer'>={gefallen:'dative',leidtun:'dative',gelten:'fuer'};
+const datives:Record<PersonKey,readonly string[]>={ich:['mir'],du:['dir'],er:['ihm'],sie:['ihr'],es:['ihm','dem'],wir:['uns'],ihr:['euch'],'sie-plural':['ihnen'],Sie:['Ihnen']};
+const accusatives:Record<PersonKey,readonly string[]>={ich:['mich'],du:['dich'],er:['ihn'],sie:['sie'],es:['es','das'],wir:['uns'],ihr:['euch'],'sie-plural':['sie'],Sie:['Sie']};
 /** Which form of the verb a person takes: er/sie/es share one, wir/sie/Sie share one. */
 const formOf:Record<PersonKey,'ich'|'du'|'er'|'wir'|'ihr'>={ich:'ich',du:'du',er:'er',sie:'er',es:'er',wir:'wir',ihr:'ihr','sie-plural':'wir',Sie:'wir'};
 const helpers={hat:{ich:'habe',du:'hast',er:'hat',wir:'haben',ihr:'habt'},ist:{ich:'bin',du:'bist',er:'ist',wir:'sind',ihr:'seid'}} as const;
+/** The finite verb of the object verbs: it agrees with the thing (gefällt/gefallen), not with the person. */
+const objectFinite:Record<string,readonly string[]>={gefallen:['gefällt','gefallen'],leidtun:['tut','tun'],gelten:['gilt','gelten']};
 /** The label of the row: the pronoun as the learner says it (sie-plural shows as "sie"). */
 export const personLabel=(key:PersonKey)=>key==='sie-plural'?'sie':key;
 /** plain text, the finite verb or helper (verb), the prefix or Partizip at the end (end), or the person as an object (person). */
 export type SentencePart={text:string;role:'plain'|'verb'|'end'|'person'};
-export type PersonSentence={person:PersonKey;parts:SentencePart[];text:string};
+/** One sentence: its words (joined with spaces, then the mark . ? !), the whole text, and its place in the meaning files. */
+export type PersonSentence={person:PersonKey;parts:SentencePart[];mark:string;text:string;index:number};
 /** Whether the person is the subject (most verbs) or an object (gefallen, leid|tun: dative; gelten: für + accusative). */
-export function personMode(verb:Verb):'subject'|'dative'|'fuer'{const spec=middles[verb.id];return spec&&'mode' in spec?spec.mode:'subject';}
-function sentence(verb:Verb,person:PersonKey,tense:PersonTense):SentencePart[]{
- const spec=middles[verb.id];
- if('mode' in spec){
-  const word=(spec.mode==='dative'?datives:accusatives)[person];const [before,after]=(tense==='praesens'?spec.pr:spec.pf).split('{X}');
-  return [{text:before.trimEnd(),role:'plain'},{text:word,role:'person'},...(after.trim()?[{text:after.trim(),role:'plain'} as SentencePart]:[])];
+export function personMode(verb:Verb):'subject'|'dative'|'fuer'{return objectModes[verb.id]??'subject';}
+const lower=(word:string)=>word.toLocaleLowerCase('de');
+/** Marks the verb, the end (prefix or Partizip) and, for the object verbs, the person in a written sentence. */
+function sentenceParts(verb:Verb,person:PersonKey,tense:PersonTense,sentence:string):{parts:SentencePart[];mark:string}{
+ const mark=/[.?!]$/.test(sentence)?sentence.slice(-1):'';
+ const words=sentence.slice(0,mark?-1:undefined).trim().split(/\s+/);
+ const roles:SentencePart['role'][]=words.map(()=>'plain');
+ const markFirst=(role:SentencePart['role'],matches:(word:string,i:number)=>boolean)=>{const at=words.findIndex((word,i)=>roles[i]==='plain'&&matches(word,i));if(at>=0)roles[at]=role;return at;};
+ const last=words.length-1;
+ const mode=personMode(verb);
+ if(mode==='subject'){
+  const form=formOf[person];
+  if(tense==='praesens'){
+   const [finite,prefix]=praesensPersons(verb)[form].split(' ');
+   if(prefix&&lower(words[last])===lower(prefix))roles[last]='end';
+   markFirst('verb',word=>lower(word)===lower(finite));
+  }else{
+   if(lower(words[last])===lower(verb.participle))roles[last]='end';
+   const aux:readonly string[]=[helpers[verb.aux][form],...(verb.alsoIst?[helpers.ist[form]]:[])];
+   markFirst('verb',word=>aux.includes(lower(word)));
+  }
+ }else{
+  if(tense==='praesens'){const prefix=verbPrefix(verb);if(prefix&&lower(words[last])===prefix)roles[last]='end';markFirst('verb',word=>objectFinite[verb.id].includes(lower(word)));}
+  else{if(lower(words[last])===lower(verb.participle))roles[last]='end';markFirst('verb',word=>['hat','haben'].includes(lower(word)));}
+  const objects=(mode==='dative'?datives:accusatives)[person];
+  const at=mode==='dative'?markFirst('person',word=>objects.includes(word)):markFirst('person',(word,i)=>i>0&&lower(words[i-1])==='für'&&objects.includes(word));
+  // "dem Kind" / "für das Kind": the noun belongs to the person too.
+  if(at>=0&&(words[at]==='dem'||words[at]==='das')&&roles[at+1]==='plain')roles[at+1]='person';
  }
- const form=formOf[person];const middle=tense==='praesens'?spec.pr:spec.pf;
- if(tense==='perfekt')return [{text:subjects[person],role:'plain'},{text:helpers[verb.aux][form],role:'verb'},{text:middle,role:'plain'},{text:verb.participle,role:'end'}];
- const prefix=verbPrefix(verb);const finite=praesensPersons(verb)[form].slice(0,prefix?-(prefix.length+1):undefined);
- return [{text:subjects[person],role:'plain'},{text:finite,role:'verb'},{text:middle,role:'plain'},...(prefix?[{text:prefix,role:'end'} as SentencePart]:[])];
+ const parts:SentencePart[]=[];
+ words.forEach((word,i)=>{const previous=parts[parts.length-1];if(previous&&previous.role===roles[i])previous.text+=' '+word;else parts.push({text:word,role:roles[i]});});
+ return {parts,mark};
 }
-/** Nine sentences, one for each person, in the order ich, du, er, sie, es, wir, ihr, sie, Sie. */
+/** Nine sentences, one for each person, in the order ich, du, er, sie, es, wir, ihr, sie, Sie; each one says something different. */
 export function personSentences(verb:Verb,tense:PersonTense):PersonSentence[]{
- if(!middles[verb.id])return [];
- return personKeys.map(person=>{const parts=sentence(verb,person,tense);return {person,parts,text:parts.map(part=>part.text).join(' ')+'.'};});
+ const set=exampleSets[verb.id];if(!set)return [];
+ const list=set[tense==='praesens'?0:1];
+ return personKeys.map((person,index)=>{const text=list[index];return {person,index,text,...sentenceParts(verb,person,tense,text)};});
 }
-export const personSentenceVerbs=Object.keys(middles);
+export const personSentenceVerbs=Object.keys(exampleSets);
 /** The Präsens table of the learning card: the label, the form, and what is read aloud (pronoun + form). */
 export function conjugationRows(verb:Verb):{pronoun:string;form:string;spoken:string}[]{
  const f=praesensPersons(verb);const third=spokenSubject(verb);

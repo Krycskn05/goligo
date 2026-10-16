@@ -1,19 +1,19 @@
-// Cloudflare Access kimlik katmanı — ChatGPT Sites'ın "dispatch" katmanının yerini alır.
+// Cloudflare Access yardımcıları. Site artık üyelikle açılır (lib/site-gate.ts);
+// Access belgesi (JWT) yalnızca geçiş döneminde doğrulanır: Access açıkken siteye
+// girmiş kişinin eski kayıtları, üye olduğunda yeni hesabına bağlanabilsin diye.
 //
-// Üretimde (Cloudflare Worker) her istekte çalışır:
-// 1. İstemciden gelen `oai-authenticated-user-*` başlıklarını HER ZAMAN siler;
-//    böylece kimse bu başlıkları kendisi yazarak başka biri gibi davranamaz.
-// 2. Cloudflare Access'in eklediği `Cf-Access-Jwt-Assertion` belgesini (JWT)
-//    Access'in açık anahtarlarıyla doğrular (imza, aud, iss, süre).
-// 3. Doğrulanan kullanıcıyı uygulamanın zaten beklediği başlıklarla iletir
-//    (app/chatgpt-auth.ts değişmeden çalışır).
-// 4. Access ayarları (TEAM_DOMAIN, POLICY_AUD) yoksa siteyi kapalı tutar.
+// - İstemciden gelen `oai-authenticated-user-*` başlıkları HER ZAMAN silinir;
+//   böylece kimse bu başlıkları kendisi yazarak başka biri gibi davranamaz.
+// - `Cf-Access-Jwt-Assertion` belgesi Access'in açık anahtarlarıyla doğrulanır
+//   (imza, aud, iss, süre).
 
 export type AccessSettings = { TEAM_DOMAIN?: string; POLICY_AUD?: string };
 export type AccessClaims = { sub: string; email: string };
 type Jwks = { keys?: (JsonWebKey & { kid?: string })[] };
 
 const IDENTITY_HEADER_PREFIX = "oai-authenticated-user-";
+/** Kapının uygulamaya ilettiği iç başlıklar (doğrulanmış Access kimliği); istemci yazamaz. */
+export const INTERNAL_HEADER_PREFIX = "lk-verified-";
 const JWKS_TTL_MS = 60 * 60 * 1000;
 const CLOCK_SKEW_S = 60;
 const keyCache = new Map<string, { expires: number; keys: Map<string, CryptoKey> }>();
@@ -28,13 +28,14 @@ export function normalizeTeamDomain(value: string | undefined): string | null {
   return `https://${full.toLowerCase()}`;
 }
 
-/** İstemcinin gönderdiği kimlik başlıklarını silinmiş bir kopya döndürür. */
+/** İstemcinin gönderdiği kimlik (ve iç) başlıklarını silinmiş bir kopya döndürür. */
 export function withoutClientIdentity(headers: Headers): Headers {
   const copy = new Headers(headers);
   const names: string[] = [];
   copy.forEach((_value, name) => names.push(name));
   for (const name of names) {
-    if (name.toLowerCase().startsWith(IDENTITY_HEADER_PREFIX)) copy.delete(name);
+    const lower = name.toLowerCase();
+    if (lower.startsWith(IDENTITY_HEADER_PREFIX) || lower.startsWith(INTERNAL_HEADER_PREFIX)) copy.delete(name);
   }
   return copy;
 }
@@ -116,67 +117,4 @@ export async function verifyAccessJwt(
   if (typeof payload.sub !== "string" || !payload.sub) return null;
   if (typeof payload.email !== "string" || !payload.email.includes("@")) return null;
   return { sub: payload.sub, email: payload.email };
-}
-
-function safeReturnPath(url: URL, request: Request): string {
-  const fromQuery = url.searchParams.get("return_to");
-  if (fromQuery && fromQuery.startsWith("/") && !fromQuery.startsWith("//")) return fromQuery;
-  const referer = request.headers.get("referer");
-  if (referer) {
-    try {
-      const ref = new URL(referer);
-      if (ref.origin === url.origin && !ref.pathname.startsWith("/auth/")) return ref.pathname + ref.search;
-    } catch {
-      // geçersiz referer: ana sayfaya dön
-    }
-  }
-  return "/";
-}
-
-function html(status: number, title: string, message: string): Response {
-  const body = `<!doctype html><html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><body style="font-family:system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 1rem;color:#24414b"><h1 style="font-size:1.5rem">${title}</h1><p>${message}</p></body></html>`;
-  return new Response(body, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
-}
-
-function redirect(location: string): Response {
-  return new Response(null, { status: 302, headers: { location, "cache-control": "no-store" } });
-}
-
-/**
- * Üretim isteğini kapıdan geçirir. Ya uygulamaya iletilecek (kimliği eklenmiş)
- * yeni bir Request ya da doğrudan döndürülecek bir Response verir.
- */
-export async function accessGate(
-  request: Request,
-  settings: AccessSettings,
-  fetcher: typeof fetch = fetch,
-): Promise<Request | Response> {
-  const teamDomain = normalizeTeamDomain(settings.TEAM_DOMAIN);
-  const audience = settings.POLICY_AUD?.trim();
-  if (!teamDomain || !audience) {
-    return html(503, "LernKoko hazırlanıyor", "Giriş kapısı henüz açılmadı. Kurulum bitince bu adres açılacak.");
-  }
-
-  const token = request.headers.get("cf-access-jwt-assertion");
-  let claims: AccessClaims | null = null;
-  if (token) {
-    try {
-      claims = await verifyAccessJwt(token, teamDomain, audience, fetcher);
-    } catch (error) {
-      console.error("Access doğrulaması yapılamadı", error);
-      return html(503, "Giriş doğrulanamadı", "Giriş servisine şu anda ulaşılamıyor. Biraz sonra yeniden dene.");
-    }
-  }
-  if (!claims) return html(403, "Giriş gerekli", "Bu siteyi görmek için Cloudflare girişinden geçmen gerekiyor.");
-
-  const url = new URL(request.url);
-  // ChatGPT Sites'ın yönettiği eski giriş/çıkış adresleri artık burada karşılanır.
-  if (url.pathname === "/signin-with-chatgpt" || url.pathname === "/auth/login") return redirect(safeReturnPath(url, request));
-  if (url.pathname === "/signout-with-chatgpt" || url.pathname === "/auth/logout") return redirect("/cdn-cgi/access/logout");
-  if (url.pathname === "/callback") return redirect("/");
-
-  const headers = withoutClientIdentity(request.headers);
-  headers.set("oai-authenticated-user-id", `cf-access:${claims.sub}`);
-  headers.set("oai-authenticated-user-email", claims.email);
-  return new Request(request, { headers });
 }

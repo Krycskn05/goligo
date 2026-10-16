@@ -5,6 +5,7 @@ import "./learning-effects.css";
 import "./progress.css";
 import "./verbs.css";
 import "./koko-theme.css";
+import "./members.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

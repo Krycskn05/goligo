@@ -4,8 +4,9 @@ import type {PracticeMode} from './writing-practice';
 import {verbQuestions,inVerbTopic,type VerbTask} from './verb-course';
 
 /** Fiiller has three practice modes, like Nesne Kasası: choose, write (letter puzzles), listen. */
-const testTasks:readonly VerbTask[]=['meaning','word','fit','praesens','perfekt'];
-const writeTasks:readonly VerbTask[]=['write','write-praesens','write-perfekt'];
+// meaning-perfekt (the Perfekt among other verbs' forms) is no longer asked: it mixed the verbs up. Its questions stay in the bank for old rounds.
+const testTasks:readonly VerbTask[]=['meaning','word','fit','praesens','perfekt','partizip'];
+const writeTasks:readonly VerbTask[]=['write','write-praesens','write-perfekt','write-partizip'];
 const listenTasks:readonly VerbTask[]=['hear','hear-praesens','hear-perfekt'];
 const fourChoices=(q:Question)=>q.options?.length===4&&new Set(q.options).size===4&&q.options.includes(q.answer);
 
@@ -19,8 +20,8 @@ export function isVerbListeningQuestion(q:Question|undefined):q is Question{
  return !!q&&q.id.startsWith('verb-')&&!!q.verbId&&q.kind==='listen'&&!!q.verbTask&&listenTasks.includes(q.verbTask)&&!!q.audio&&fourChoices(q);
 }
 export function isVerbExercise(q:Question|undefined):q is Question{return isVerbTestQuestion(q)||isVerbWritingQuestion(q)||isVerbListeningQuestion(q);}
-/** Fiil Atölyesi (workshop) and Karma sınav (mixed) rounds use every kind of exercise. */
-export function verbModePredicate(mode:string){return mode==='write'?isVerbWritingQuestion:mode==='listen'?isVerbListeningQuestion:mode==='workshop'||mode==='mixed'?isVerbExercise:isVerbTestQuestion;}
+/** Fiil Atölyesi (workshop), its mistakes round (review) and Karma sınav (mixed) use every kind of exercise. */
+export function verbModePredicate(mode:string){return mode==='write'?isVerbWritingQuestion:mode==='listen'?isVerbListeningQuestion:mode==='workshop'||mode==='mixed'||mode==='review'?isVerbExercise:isVerbTestQuestion;}
 /** Session mode stored on the server for each practice mode. */
 export function verbSessionMode(mode:PracticeMode){return mode==='write'?'write':mode==='listen'?'listen':'test';}
 export function verbPracticeMode(sessionMode:string):PracticeMode{return sessionMode==='write'?'write':sessionMode==='listen'?'listen':'test';}

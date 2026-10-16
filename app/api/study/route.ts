@@ -26,7 +26,7 @@ async function loadSession(db:D1Database,user:string,id:string){
 }
 export async function GET(request:Request){
  try{
-  const user=await identity();if(!user)return json({error:'Kayıtlarını görmek için ChatGPT hesabınla giriş yap.',signIn:true},401);
+  const user=await identity();if(!user)return json({error:'Kayıtlarını görmek için giriş yap.',signIn:true},401);
   const db=getRawDb();const url=new URL(request.url);const id=url.searchParams.get('session');const english=url.searchParams.get('learn')==='en';
   if(id){const session=await loadSession(db,user,id);return session&&String(session.topic).startsWith('en-')===english?json({session}):json({error:'Test bulunamadı.'},404);}
   const [reviews,notes,sessions,activePicture,activeVerb]=await Promise.all([
@@ -37,12 +37,12 @@ export async function GET(request:Request){
    english?Promise.resolve(null):db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode='workshop' AND topic LIKE 'verbs-%' AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user).first<{id:string}>()
   ]);
   const stats=url.searchParams.get('stats')==='1'?await loadStats(db,user,english,url.searchParams.get('tz')):undefined;
-  return json({stats,reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,activeVerbSessionId:activeVerb?.id??null,sessions:sessions.results.map(s=>{const list=JSON.parse(s.questions as string) as {id?:string}[];return {...s,questions:undefined,total:list.length,first:list[0]?.id??null};})});
+  return json({stats,reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,activeVerbSessionId:activeVerb?.id??null,sessions:sessions.results.map(s=>{const list=JSON.parse(s.questions as string) as {id?:string}[];return {...s,questions:undefined,total:list.length,first:list[0]?.id??null,ids:s.mode==='workshop'&&!s.finished_at?list.map(q=>q.id??''):undefined};})});
  }catch(error){return failure(error);}
 }
 export async function POST(request:Request){
  try{
-  const user=await identity();if(!user)return json({error:'İlerlemeni kaydetmek için ChatGPT hesabınla giriş yap.',signIn:true},401);
+  const user=await identity();if(!user)return json({error:'İlerlemeni kaydetmek için giriş yap.',signIn:true},401);
   const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return json({error:'Geçersiz istek.'},403);
   if(Number(request.headers.get('content-length')??0)>24000)return json({error:'Metin çok uzun.'},413);
   const body=await request.json() as Record<string,unknown>;const db=getRawDb();const now=Date.now();

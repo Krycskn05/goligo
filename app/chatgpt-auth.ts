@@ -14,8 +14,9 @@ const USER_FULL_NAME_HEADER = "oai-authenticated-user-full-name";
 const USER_FULL_NAME_ENCODING_HEADER =
   "oai-authenticated-user-full-name-encoding";
 const PERCENT_ENCODED_UTF8 = "percent-encoded-utf-8";
-const SIGN_IN_PATH = "/signin-with-chatgpt";
-const SIGN_OUT_PATH = "/signout-with-chatgpt";
+// Üyelik sayfaları (lib/site-gate.ts eski "ChatGPT ile giriş" adreslerini buraya yönlendirir).
+const SIGN_IN_PATH = "/giris";
+const SIGN_OUT_PATH = "/cikis";
 const CALLBACK_PATH = "/callback";
 
 export async function getChatGPTUser(): Promise<ChatGPTUser | null> {

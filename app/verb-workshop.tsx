@@ -13,7 +13,7 @@ import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling',perfekt:'stepPerfekt','write-perfekt':'stepSpelling','meaning-perfekt':'stepMeaningPerfekt'};
+const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling',partizip:'stepPartizip'};
 
 /** One example sentence with the verb parts highlighted and a speaker button (kept for the later sentence practice). */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
@@ -99,34 +99,34 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
 }
 /** After a test answer, in one card that fits a phone screen: the picture and the verb at the top (tap the speaker to hear it again), right or wrong,
  * then one example sentence per person (not after the last Perfekt step: the learner has just seen them). */
-export function AnswerResult({verb,stage,language,speech,correct,status,chosen,spoken,note,nextLabel,onNext,busy,examples=true}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;correct:boolean;status:string;chosen?:ReactNode;spoken:string;note?:string;nextLabel:string;onNext:()=>void;busy:boolean;examples?:boolean}){
+/** The card after a test answer. `past`: the past-form question — the infinitive → its Partizip II, without example sentences (no hat/ist). */
+export function AnswerResult({verb,stage,language,speech,correct,status,chosen,spoken,note,nextLabel,onNext,busy,examples=true,past=false}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;correct:boolean;status:string;chosen?:ReactNode;spoken:string;note?:string;nextLabel:string;onNext:()=>void;busy:boolean;examples?:boolean;past?:boolean}){
  const dir=vaultDirection(language);
- const form=stage==='perfekt'?verb.subject+' '+perfektLabel(verb):stage==='praesens'?verb.subject+' '+verb.praesens:'';
+ const form=past?'':stage==='perfekt'?verb.subject+' '+perfektLabel(verb):stage==='praesens'?verb.subject+' '+verb.praesens:'';
  return <div id="object-feedback" tabIndex={-1} className={'verb-result '+(correct?'success':'retry')} role="status" aria-live="polite" data-verb-result={stage}>
   <div className="verb-result-head">
    <VerbPicture verb={verb} language={language}/>
    <div className="verb-result-text">
     <div className="verb-result-line"><p className={'verb-result-status '+(correct?'right':'wrong')}>{correct?<CheckCircle2 size={18}/>:<X size={18}/>}{status}</p><VerbKindBadge verb={verb} language={language}/></div>
-    <div className="verb-result-title"><strong lang="de" dir="ltr" className={stage==='meaning'?kindClass(verb):undefined}>{stage==='meaning'?verb.display:<>{verb.subject} <VerbForm verb={verb} stage={stage}/></>}</strong><button type="button" className="verb-result-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/></button></div>
+    <div className="verb-result-title"><strong lang="de" dir="ltr" className={stage==='meaning'&&!past?kindClass(verb):undefined}>{past?<><span className={kindClass(verb)}>{verb.display}</span> → <span className={verbKindInfo(verb).irregularPartizip?'verb-irregular-form':undefined}>{verb.participle}</span></>:stage==='meaning'?verb.display:<>{verb.subject} <VerbForm verb={verb} stage={stage}/></>}</strong><button type="button" className="verb-result-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/></button></div>
     <span className="verb-result-meaning">{form&&<b className="verb-result-infinitive" lang="de" dir="ltr">{verb.display} · </b>}<span lang={language} dir={dir}>{verbMeaning(verb,language)}</span></span>
     {chosen&&<span className="verb-result-chosen">{chosen}</span>}
    </div>
   </div>
-  {examples&&<PersonSentences verb={verb} tense={stage==='perfekt'?'perfekt':'praesens'} language={language} speech={speech}/>}
+  {examples&&!past&&<PersonSentences verb={verb} tense={stage==='perfekt'?'perfekt':'praesens'} language={language} speech={speech}/>}
   {note&&<p className="verb-note">{note}</p>}
   <button type="button" className="btn object-next verb-result-next" disabled={busy} onClick={onNext}>{nextLabel}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </div>;
 }
-/** The card that opens a part: its verbs, each done whole (meaning, then at once its Perfekt). In an older staged round it opens each stage: the meanings, or the Perfekt forms. */
-export function ChapterCard({family,stage,both,verbs,language,onContinue}:{family:VerbFamily;stage:LearnStage;both?:boolean;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
+/** The card that opens a part: its verbs and what each verb brings, one verb after the other (card, meaning test, spelling, past form). */
+export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamily;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- const perfekt=stage==='perfekt'&&!both;
- return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id} data-verb-stage={both?'both':stage}>
+ return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id}>
   <p className="verb-learn-kicker">{t('chapterOf',{n:family.number})} · {t('verbsCount',{n:verbs.length})}</p>
-  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang="de" dir="ltr">{familyTitle(family,language)}</span> · {both?t('stageBoth'):perfekt?t('stepPerfekt'):t('stageMeanings')}</h1>
-  <p className="verb-chapter-rule">{perfekt?t('perfektChapter'):familyRule(family,language)}</p>
-  {both&&<p className="verb-chapter-rule verb-chapter-flow">{t('verbFlow')}</p>}
-  <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr" className={kindClass(verb)}>{verb.display}</span>{(perfekt||both)&&<small lang="de" dir="ltr">{verb.subject} <VerbForm verb={verb} stage="perfekt"/></small>}</li>)}</ul>
+  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang="de" dir="ltr">{familyTitle(family,language)}</span> · {t('stageBoth')}</h1>
+  <p className="verb-chapter-rule">{familyRule(family,language)}</p>
+  <p className="verb-chapter-rule verb-chapter-flow">{t('verbFlow')}</p>
+  <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr" className={kindClass(verb)}>{verb.display}</span></li>)}</ul>
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('chapterStart')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
@@ -134,7 +134,7 @@ export function ChapterCard({family,stage,both,verbs,language,onContinue}:{famil
 export function PathStepper({place,language}:{place:PathPlace;language:VaultLanguage}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  return <div className="verb-stepper" data-verb-step={place.step} data-verb-stage={place.stage}>
-  <div className="verb-stepper-head"><span className="verb-stepper-verb" lang="de" dir="ltr">{place.verb.display}</span><span className="verb-stepper-count">{place.stage==='perfekt'?t('stepPerfekt'):t('stageMeanings')} · {t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})}</span></div>
+  <div className="verb-stepper-head"><span className="verb-stepper-verb" lang="de" dir="ltr">{place.verb.display}</span><span className="verb-stepper-count">{t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})}</span></div>
   <ol className="verb-stepper-steps" style={{gridTemplateColumns:'repeat('+place.steps.length+',minmax(0,1fr))'}}>{place.steps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}><span className="verb-stepper-dot"/><span className="verb-stepper-label">{t(stepLabels[step])}</span></li>)}</ol>
  </div>;
 }

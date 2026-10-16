@@ -15,8 +15,8 @@ export type Review={question_id:string;wrong_count:number;streak:number;seen:num
 export type Answer={id:string;question_id:string;answer:string;correct:number;created_at:number};
 export type SessionQuestion={id:string;options?:string[]};
 export type Session={id:string;mode:string;topic:string;questions:SessionQuestion[];created_at:number;finished_at:number|null;answers:Answer[]};
-/** first: the round's first question (tells which Fiil Atölyesi part a round belongs to); third: its third question (tells how the round orders its verbs). */
-export type SessionSummary={id:string;mode:string;topic:string;created_at:number;finished_at:number|null;total:number;answered:number;correct:number;first?:string|null;third?:string|null};
+/** first: the round's first question (tells which Fiil Atölyesi part a round belongs to); ids: the questions of an open Fiil Atölyesi round in order (how far each verb is). */
+export type SessionSummary={id:string;mode:string;topic:string;created_at:number;finished_at:number|null;total:number;answered:number;correct:number;first?:string|null;ids?:string[]|null};
 export type Snapshot={reviews:Review[];notes:Record<string,string>;sessions:SessionSummary[];activePictureSessionId?:string|null;activeVerbSessionId?:string|null;stats?:StudyStats};
 export function selectQuestions(mode:string,topic:string,count:number,reviews:Review[],onlyIds?:string[],course:LearningLanguage=topic.startsWith('en-')?'en':'de'):Question[]{
  const byId=new Map(reviews.map(r=>[r.question_id,r]));const only=onlyIds?new Set(onlyIds):null;const curriculum=curriculumTopicIds(topic);

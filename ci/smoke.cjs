@@ -154,6 +154,16 @@ async function visit(page, url, shot, errors) {
     const pastOptions = await p2.locator(".verb-options .object-option .picture-option-word").allTextContents();
     const heading = ((await p2.locator("#object-question-heading").first().textContent()) || "").trim();
     info("Telefon: yazimdan sonra gecmis hali sorusu (hat/ist yok)", /Partizip/.test(heading) && pastOptions.length === 4 && pastOptions.every((o) => !/\s/.test(o.trim())), `${heading} · ${pastOptions.join(", ")}`);
+    // Gecmis hali testinden sonra ayni fiilin gecmis halini harflerle yazma: hat/ist olmadan, yalniz Partizip II.
+    const right = p2.locator(".verb-options .object-option", { hasText: /^[A-D]?\s*abgefahren\s*$/ });
+    await ((await right.count()) ? right.first() : p2.locator(".verb-options .object-option").first()).click();
+    await p2.waitForSelector(".verb-result", { timeout: 20000 });
+    await p2.locator(".verb-result-next").click();
+    await p2.waitForSelector(".letter-puzzle", { timeout: 20000 });
+    await shot("17-telefon-gecmis-yazim.png");
+    const writeHeading = ((await p2.locator("#object-question-heading").first().textContent()) || "").trim();
+    const writeStep = ((await p2.locator(".verb-stepper-steps .current").first().textContent()) || "").trim();
+    info("Telefon: gecmis hali testinden sonra gecmis hali yazimi", /Partizip/.test(writeHeading) && (await p2.locator(".puzzle-board").count()) === 1, `${writeHeading} · adim: ${writeStep}`);
     // Bolume tiklayinca fiil listesi, fiile tiklayinca fiil karti (anlamli ornek cumlelerle). Bilgi amaclidir.
     await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForTimeout(1200);

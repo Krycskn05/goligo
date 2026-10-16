@@ -171,6 +171,37 @@ test('a Fiiller round starts, saves answers and stars, resumes and finishes thro
  open=await (await a.get()).json();assert.equal(open.activeVerbSessionId,'verb-workshop-session-01','another open round never replaces the path');
 });
 
+test('Yanlışlarım: the workshop mistakes make their own round, and a right answer takes a question off the list',async()=>{
+ const a=app();const [w1]=families.verbFamilies;const part=workshop.partIds(w1);
+ const started=await a.post({action:'start',id:'verb-workshop-mistakes-01',mode:'workshop',topic:'verbs-all',count:part.length,onlyIds:part});assert.equal(started.status,201);
+ // Wrong: the meaning of abfahren and the past form of abgeben; right: the rest of the first two verbs.
+ const wrongIds=new Set(['verb-meaning-abfahren','verb-partizip-abgeben']);
+ for(const id of part.slice(0,8)){const q=course.questionMap.get(id);const answer=wrongIds.has(id)?(q.options?q.options.find(o=>o!==q.answer):'falsch'):q.answer;const r=await (await a.post({action:'answer',sessionId:'verb-workshop-mistakes-01',questionId:id,answer})).json();assert.equal(r.result.correct,wrongIds.has(id)?0:1,id);}
+ let open=await (await a.get()).json();
+ const mistakes=workshop.workshopMistakeIds(open.reviews);assert.deepEqual(mistakes,['verb-meaning-abfahren','verb-partizip-abgeben'],'in path order');
+ assert.deepEqual(workshop.mistakeVerbs(mistakes).map(v=>v.id),['abfahren','abgeben']);
+ // The mistakes round is stored with the review mode: it is never taken for a part, and the part keeps its own round.
+ const round=await a.post({action:'start',id:'verb-mistakes-round-0001',mode:workshop.MISTAKES_MODE,topic:'verbs-all',count:mistakes.length,onlyIds:mistakes});assert.equal(round.status,201);
+ const review=(await round.json()).session;assert.equal(review.mode,'review');assert.deepEqual(review.questions.map(q=>q.id).sort(),[...mistakes].sort());
+ for(const item of review.questions)assert.ok(practice.verbModePredicate('review')(course.questionMap.get(item.id)),item.id);
+ assert.ok(practice.verbModePredicate('review')(course.questionMap.get('verb-write-partizip-abfahren')),'spelling questions are shown in a mistakes round');
+ open=await (await a.get()).json();
+ const listed=open.sessions.find(item=>item.id==='verb-mistakes-round-0001');assert.equal(workshop.sessionPart(listed),undefined);
+ assert.equal(workshop.findPartSession(open.sessions,w1).id,'verb-workshop-mistakes-01');assert.equal(open.activeVerbSessionId,'verb-workshop-mistakes-01');
+ // Right once: off the list. Wrong again: it stays.
+ const [first,second]=review.questions.map(q=>course.questionMap.get(q.id));
+ await a.post({action:'answer',sessionId:'verb-mistakes-round-0001',questionId:first.id,answer:first.answer});
+ await a.post({action:'answer',sessionId:'verb-mistakes-round-0001',questionId:second.id,answer:second.options?second.options.find(o=>o!==second.answer):'falsch'});
+ open=await (await a.get()).json();assert.deepEqual(workshop.workshopMistakeIds(open.reviews),[second.id]);
+ // Older Perfekt questions with hat/ist are not on the list; only the questions of the path count.
+ assert.deepEqual(workshop.workshopMistakeIds([{question_id:'verb-perfekt-abfahren',wrong_count:1,streak:0,seen:1,last_answer:'x',last_wrong:'x',last_at:1,due_at:1}]),[]);
+ // The page: the panel on the workshop page, the round in the review mode, and its result buttons.
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert.ok(page.includes('const mistakeIds=ready?workshopMistakeIds(snapshot.reviews):[];')&&page.includes("mode:MISTAKES_MODE,topic:WORKSHOP_TOPIC,count:mistakeIds.length,onlyIds:mistakeIds"),'the mistakes round');
+ assert.ok(page.includes('data-verb-mistakes={mistakeIds.length}')&&page.includes("onClick={()=>void startMistakes()} data-verb-mistakes-start")&&page.includes("t('mistakesLeft',{n:mistakeIds.length})")&&page.includes("t('mistakesAllDone')"),'the panel and the result buttons');
+ for(const language of languages)for(const key of ['mistakesTitle','mistakesLead','mistakesNone','mistakesStart','mistakesLeft','mistakesAllDone'])assert.ok(copy.verbText(language,key,{n:3}).trim(),language+' '+key);
+});
+
 test('the page is linked from home, only the correct answer is spoken, and verb audio is in the voice list',()=>{
  assert.match(fs.readFileSync('app/fiiller/page.tsx','utf8'),/VerbStudy/);
  assert.match(fs.readFileSync('app/category-study.tsx','utf8'),/href="\/fiiller"/);

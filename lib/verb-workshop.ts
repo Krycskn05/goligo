@@ -8,29 +8,29 @@ import {isVerbExercise} from './verb-practice';
  * Fiil Atölyesi: one path through all 38 verbs in two parts (the textbook order, split at
  * the learner's line). Each verb is finished in one go before the next one: its card with the
  * meaning, then the meaning test, then spelling it with letters, then its past form: the infinitive
- * is shown and the Partizip II is chosen (abfahren → abgefahren; no hat/ist, no other verbs).
+ * is shown and the Partizip II is chosen (abfahren → abgefahren; no hat/ist, no other verbs), then spelled.
  * No part is locked: each part is its own saved round (mode `workshop`), so the learner can start
  * or continue any part; leaving and coming back continues it.
- * Rounds saved in an earlier order (all meanings first, or Perfekt steps with hat/ist) still count
+ * Rounds saved in an earlier order (all meanings first, Perfekt steps with hat/ist, or before a step was added) still count
  * from their own list of questions; they are not continued as they were: the part goes on in a new
  * round with the questions still left (`continuationIds`), and what that round leaves out counts as done.
  */
 export const WORKSHOP_TOPIC='verbs-all';
 export const WORKSHOP_MODE='workshop';
 export type LearnStage='meaning'|'praesens'|'perfekt';
-export type WorkshopStep='meaning'|'write'|'partizip';
+export type WorkshopStep='meaning'|'write'|'partizip'|'write-partizip';
 export const meaningSteps:readonly WorkshopStep[]=['meaning','write'];
-/** All steps of one verb: the meaning test, spelling, the past form. */
-export const verbSteps:readonly WorkshopStep[]=['meaning','write','partizip'];
+/** All steps of one verb: the meaning test, spelling, the past form, spelling the past form. */
+export const verbSteps:readonly WorkshopStep[]=['meaning','write','partizip','write-partizip'];
 /** Tasks that asked the past form, in this path or in older rounds. */
-const pastTasks:readonly VerbTask[]=['partizip','perfekt','write-perfekt','meaning-perfekt'];
+const pastTasks:readonly VerbTask[]=['partizip','write-partizip','perfekt','write-perfekt','meaning-perfekt'];
 /** Every task a workshop round has ever held. */
 const workshopTasks=new Set<string>([...verbSteps,...pastTasks]);
 /** The verbs in path order: part 1 first, then part 2. */
 export const workshopVerbs:Verb[]=verbFamilies.flatMap(family=>family.verbs.map(id=>verbMap.get(id)!));
 export const questionId=(step:string,verbId:string)=>'verb-'+step+'-'+verbId;
 const questionById=new Map(verbQuestions.map(q=>[q.id,q]));
-/** One part's questions in order: verb by verb, each with its three steps. */
+/** One part's questions in order: verb by verb, each with its four steps. */
 export function partIds(family:VerbFamily){return family.verbs.flatMap(id=>verbSteps.map(step=>questionId(step,id)));}
 export function partTotal(family:VerbFamily){return partIds(family).length;}
 /** Every question of the path in order: part 1, then part 2. */
@@ -48,13 +48,16 @@ export function learnStage(task:VerbTask|undefined):LearnStage{
 type RoundQuestions=readonly {id?:string}[];
 const idsOf=(questions:RoundQuestions)=>questions.map(q=>q.id??'');
 const sameIds=(a:readonly string[],b:readonly string[])=>a.length===b.length&&a.every((id,i)=>id===b[i]);
-/** Whether a saved round was made in an earlier order (it holds Perfekt questions with hat/ist, or all meanings come first). */
+/** Whether a saved round was made in an earlier order: it holds Perfekt questions with hat/ist, all meanings come first,
+ * or a verb in it stops before the last step (the round was made before that step was added). */
 export function isOlderRound(questions:RoundQuestions){
  const ids=idsOf(questions);
  if(ids.some(id=>!verbSteps.includes(questionById.get(id)?.verbTask as WorkshopStep)))return true;
  const family=roundFamily(questions);if(!family)return true;
  const order=new Map(partIds(family).map((id,i)=>[id,i]));
- return ids.some((id,i)=>i>0&&(order.get(id)??-1)<(order.get(ids[i-1])??-1));
+ if(ids.some((id,i)=>i>0&&(order.get(id)??-1)<(order.get(ids[i-1])??-1)))return true;
+ const held=new Set(ids);const last=verbSteps[verbSteps.length-1];
+ return [...new Set(ids.map(id=>questionById.get(id)?.verbId??''))].some(verbId=>!held.has(questionId(last,verbId)));
 }
 /** The part of a round: the part of its first verb (the older whole path starts with part 1). */
 export function roundFamily(questions:RoundQuestions):VerbFamily|undefined{
@@ -97,7 +100,7 @@ const summaryAnswered=(session:RoundSummary)=>session.finished_at?Number.MAX_SAF
 /** How far one part is from the questions of its round and the count answered: what is done for every verb
  * (a question the round does not hold counts as done), and the verb of the next question. */
 export function partProgress(family:VerbFamily,ids:readonly string[],answered:number){
- const count=ids.length===LEGACY_WORKSHOP_TOTAL?LEGACY_PART_END:ids.length;const done=Math.max(0,Math.min(count,answered));
+ const count=sameIds(ids,legacyWorkshopIds)?LEGACY_PART_END:ids.length;const done=Math.max(0,Math.min(count,answered));
  const held=new Set(ids.slice(0,count));const finishedIds=new Set(ids.slice(0,done));
  const isDone=(id:string)=>!held.has(id)||finishedIds.has(id);
  const marks:VerbMarks[]=family.verbs.map(id=>({meaning:meaningSteps.every(step=>isDone(questionId(step,id))),perfekt:pastTasks.every(task=>isDone(questionId(task,id)))}));

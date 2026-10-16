@@ -10,7 +10,8 @@ import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
-import {LearnCard,ChapterCard,PathStepper,AnswerResult} from './verb-workshop';
+import {LearnCard,ChapterCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
+import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,roundEnd,learnStage} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
@@ -57,6 +58,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const [prefix,setPrefix]=useState('');const [prefixWarning,setPrefixWarning]=useState(false);
  const [dismissed,setDismissed]=useState<Set<string>>(new Set());
  const [game,setGame]=useState<GameId|null>(null);const [gameTopic,setGameTopic]=useState('verbs-all');
+ // A part opened from the map (its verb list), and optionally one verb's card inside it.
+ const [view,setView]=useState<{family:VerbFamily;verbId?:string}|null>(null);
  const speech=useGermanSpeech('de');const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
  const mutation=useRef(false);const mounted=useRef(true);
  const pendingAnswer=useRef<{questionId:string;answer:string}|null>(null);
@@ -89,10 +92,16 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
   return()=>{mounted.current=false;};
  },[]);
  useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=dir;document.title=verbText(language,'workshopTitle')+' · '+SITE_NAME;stopFeedback();},[language]);
+ // The meanings of the example sentences come in a small file per language; load it before the first answer.
+ useEffect(()=>{void loadExampleMeanings(language);},[language]);
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
  function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setAux('');setAuxWarning(false);setPrefix('');setPrefixWarning(false);pendingAnswer.current=null;}
- function overview(){if(mutation.current)return;stopFeedback();setSession(null);setGame(null);clearAnswer();setError(null);void refresh();focus('vault-heading');}
+ function overview(){if(mutation.current)return;stopFeedback();setSession(null);setGame(null);clearAnswer();setError(null);void refresh();focus(view?view.verbId?'verb-detail-heading':'verb-part-heading':'vault-heading');}
+ /** Opens a part from the map: its verbs with what is done, and the button to start or continue it. */
+ function openPart(family:VerbFamily){stopFeedback();setView({family});focus('verb-part-heading');}
+ function openVerb(family:VerbFamily,id:string){stopFeedback();setView({family,verbId:id});focus('verb-detail-heading');}
+ function closeView(){stopFeedback();setView(null);focus('vault-heading');}
  /** Moves focus to whichever card is on screen: the part card, the learning card or the question. */
  function focusCurrent(){requestAnimationFrame(()=>{(document.getElementById('verb-chapter-heading')??document.getElementById('verb-learn-heading')??document.getElementById('object-question-heading'))?.focus({preventScroll:true});toPractice();});}
  /** Phones: every step fills the screen from the top of the practice area (the site header scrolls away), so nothing needs dragging. */
@@ -176,7 +185,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function heading(question:Question){
   const kind=question.verbTask;
-  return kind==='meaning'?t('promptMeaning'):kind==='word'?t('promptWord'):kind==='fit'?t('promptFit'):kind==='praesens'?t('promptPraesens'):kind==='perfekt'?t('promptPerfekt'):kind==='write'?t('writeInfinitive'):kind==='write-praesens'?t('gapPraesens'):kind==='write-perfekt'?t('gapPerfekt'):kind==='hear'?t('listenMeaning'):t('listenVerb');
+  return kind==='meaning'?t('promptMeaning'):kind==='word'?t('promptWord'):kind==='meaning-perfekt'?t('promptMeaningPerfekt'):kind==='fit'?t('promptFit'):kind==='praesens'?t('promptPraesens'):kind==='perfekt'?t('promptPerfekt'):kind==='write'?t('writeInfinitive'):kind==='write-praesens'?t('gapPraesens'):kind==='write-perfekt'?t('gapPerfekt'):kind==='hear'?t('listenMeaning'):t('listenVerb');
  }
  /** The example sentence with gaps where the verb goes; filled in after the answer. */
  function sentenceLine(question:Question,item:Verb){
@@ -190,9 +199,9 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function promptCard(question:Question,item:Verb){
   const kind=question.verbTask;
-  // Pictures give the answer away: hidden until the answer for the meaning and listening questions.
-  const showPicture=(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback;
-  if(kind==='word'||kind==='write')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
+  // Pictures give the answer away: hidden until the answer for the meaning, meaning → Perfekt and listening questions.
+  const showPicture=(kind!=='meaning'&&kind!=='meaning-perfekt'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback;
+  if(kind==='word'||kind==='write'||kind==='meaning-perfekt')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
   if(kind==='fit')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{sentenceLine(question,item)}{feedback&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}</div>;
   const sentence=kind==='praesens'||kind==='perfekt'||kind==='write-praesens'||kind==='write-perfekt';
   return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main" lang="de" dir="ltr">{item.display}</p>{kind!=='meaning'&&<p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>}{sentence&&sentenceLine(question,item)}</div>;
@@ -236,12 +245,12 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
     <article className={'object-question panel verb-question'+(answered?' answered':'')}>
      <h1 id="object-question-heading" tabIndex={-1} className={answered?'verb-hidden-heading':undefined}>{heading(q)}</h1>
-     {answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} correct={!!feedback.correct} status={v(feedback.correct?'correct':'wrong')} chosen={feedback.correct?undefined:<>{v('yourChoice')}: {optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} nextLabel={v(index+1===end?'viewResults':listening?'nextListening':'nextQuestion')} onNext={next} busy={busy}/>:<>
+     {answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} correct={!!feedback.correct} status={v(feedback.correct?'correct':'wrong')} chosen={feedback.correct?undefined:<>{v('yourChoice')}: {optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} nextLabel={v(index+1===end?'viewResults':listening?'nextListening':'nextQuestion')} onNext={next} busy={busy} examples={q.verbTask!=='meaning-perfekt'}/>:<>
      {!listening&&promptCard(q,verb)}
      {listening&&<div className="vault-listen-player"><Headphones size={32} aria-hidden="true"/><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===q.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div><p role="status">{speech.busy?v('listenPlaying'):heardQuestionId===q.id?t('listenChoose'):t('listenFirst')}</p></div>}
      {writing?<>
-      {task==='write-perfekt'&&<div className="verb-aux"><span className="verb-aux-label">{t('helperVerb')}</span><div className="article-bank" role="group" aria-label={t('helperVerb')} dir="ltr" lang="de">{(['hat','ist'] as const).map(value=>{const right=value===verb.aux||(verb.alsoIst&&value==='ist');return <button type="button" key={value} className={'article-choice verb-aux-choice '+(aux===value?'selected ':'')+(feedback?(right&&(aux===value||!feedback.correct)?'right':aux===value?'wrong':''):'')} aria-pressed={aux===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setAux(value);setAuxWarning(false);}}>{value}</button>;})}</div>{auxWarning&&!aux&&<p className="verb-aux-warning" role="alert">{t('helperMissing')}</p>}</div>}
-      {task==='write-praesens'&&verbPrefix(verb)&&<div className="verb-aux"><span className="verb-aux-label">{t('prefixChoice')}</span><div className="article-bank" role="group" aria-label={t('prefixChoice')} dir="ltr" lang="de">{prefixOptions(verb).map(value=>{const right=value===verbPrefix(verb);return <button type="button" key={value} className={'article-choice verb-aux-choice '+(prefix===value?'selected ':'')+(feedback?(right&&(prefix===value||!feedback.correct)?'right':prefix===value?'wrong':''):'')} aria-pressed={prefix===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setPrefix(value);setPrefixWarning(false);}}>{value}</button>;})}</div>{prefixWarning&&!prefix&&<p className="verb-aux-warning" role="alert">{t('prefixMissing')}</p>}</div>}
+      {task==='write-perfekt'&&<div className="verb-aux"><span className="verb-aux-label">{t('helperVerb')}</span><div className="article-bank" role="group" aria-label={t('helperVerb')} dir="ltr" lang="de">{(['hat','ist'] as const).map(value=>{const right=value===verb.aux||(verb.alsoIst&&value==='ist');return <button type="button" key={value} className={'article-choice verb-aux-choice '+(aux===value?'selected ':'')+(feedback?(right&&(aux===value||!feedback.correct)?'right':aux===value?'wrong':''):'')} aria-pressed={aux===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setAux(value);setAuxWarning(false);if(selected&&!feedback)void submit(value+' '+selected);}}>{value}</button>;})}</div>{auxWarning&&!aux&&<p className="verb-aux-warning" role="alert">{t('helperMissing')}</p>}</div>}
+      {task==='write-praesens'&&verbPrefix(verb)&&<div className="verb-aux"><span className="verb-aux-label">{t('prefixChoice')}</span><div className="article-bank" role="group" aria-label={t('prefixChoice')} dir="ltr" lang="de">{prefixOptions(verb).map(value=>{const right=value===verbPrefix(verb);return <button type="button" key={value} className={'article-choice verb-aux-choice '+(prefix===value?'selected ':'')+(feedback?(right&&(prefix===value||!feedback.correct)?'right':prefix===value?'wrong':''):'')} aria-pressed={prefix===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setPrefix(value);setPrefixWarning(false);if(selected&&!feedback)void submit(selected+' '+value);}}>{value}</button>;})}</div>{prefixWarning&&!prefix&&<p className="verb-aux-warning" role="alert">{t('prefixMissing')}</p>}</div>}
       <LetterPuzzle key={session.id+':'+q.id} answer={task==='write-perfekt'?verb.participle:task==='write-praesens'?praesensStem(verb):task==='write'?verb.display:q.answer} storageKey={'lernkoko-puzzle:'+session.id+':'+q.id} language={language} course="de" onChange={setSelected} onSubmit={answer=>{
        if(task==='write-perfekt'){if(!aux){setAuxWarning(true);return;}void submit(aux+' '+answer);}
        else if(task==='write-praesens'&&verbPrefix(verb)){if(!prefix){setPrefixWarning(true);return;}void submit(answer+' '+prefix);}
@@ -261,6 +270,12 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     </article>}
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
    game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus('vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy}}/>:
+   view?(()=>{
+    const part=parts.find(item=>item.family.id===view.family.id)??parts[0];const members=part.family.verbs.map(id=>verbMap.get(id)!);
+    const at=view.verbId?members.findIndex(item=>item.id===view.verbId):-1;
+    if(at>=0){const item=members[at];return <VerbDetail verb={item} family={part.family} position={at+1} total={members.length} marks={stickers.get(item.id)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={()=>openPart(part.family)} onPrev={at>0?()=>openVerb(part.family,members[at-1].id):undefined} onNext={at<members.length-1?()=>openVerb(part.family,members[at+1].id):undefined}/>;}
+    return <PartVerbs family={part.family} part={part} verbs={members} marks={stickers} language={language} disabled={busy||!ready} onStart={restart=>void enterPart(part.family,restart)} onOpen={item=>openVerb(part.family,item.id)} onBack={closeView}/>;
+   })():
    <section className="verb-home" aria-labelledby="vault-heading">
     <div className="verb-hero">
      <div className="verb-hero-text">
@@ -302,7 +317,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
         <h3 lang="de" dir="ltr">{familyTitle(family,language)}</h3>
         <p>{t('verbsCount',{n:family.verbs.length})} · {t('stageMeanings')} {part.meaningDone}/{family.verbs.length} · {t('stepPerfekt')} {part.perfektDone}/{family.verbs.length}</p>
         <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
-        <button type="button" className="verb-island-go" disabled={busy||!ready} onClick={()=>void enterPart(family,part.finished)} data-verb-island-go={family.id}>{t(part.finished?'chapterAgain':part.started?'chapterContinue':'chapterStart')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
+        <button type="button" className="verb-island-go" onClick={()=>openPart(family)} data-verb-island-go={family.id}>{t('partOpen',{n:family.number})}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
        </div>
        <span className="verb-ring" data-v={part.percent+'%'}/>
       </article>;
@@ -313,7 +328,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      <div className="verb-stickers">{workshopVerbs.map(item=>{const done=stickers.get(item.id);return <img key={item.id} className={done?.perfekt?'got full':done?.meaning?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display+(done?.perfekt?' · '+perfektLabel(item):'')} width={96} height={96} loading="lazy" decoding="async"/>;})}</div>
     </article>
     <details className="verb-list"><summary>{t('verbList')} · {verbs.length}</summary>
-     <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr">{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
+     <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr" className={kindClass(item)}>{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
     </details>
     <details className="verb-list verb-games-row"><summary>{t('gamesTitle')}</summary>
      <div className="verb-game-chips">{gameIds.map(id=><button type="button" key={id} className="btn secondary small" data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}>{t(gameKeys[id])}</button>)}</div>

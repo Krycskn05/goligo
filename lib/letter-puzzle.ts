@@ -58,5 +58,36 @@ export function remainingLetterChoices(bank:LetterToken[],placements:LetterPlace
 }
 export function placedLetters(placements:LetterPlacements,bank:LetterToken[]):PuzzleLetters{const byId=new Map(bank.map(token=>[token.id,token.letter]));return Object.fromEntries(Object.entries(placements).flatMap(([index,id])=>byId.has(id)?[[index,byId.get(id)!]]:[]));}
 export function readLetterBankDraft(puzzle:LetterPuzzleModel,bank:LetterToken[],key:string):LetterPlacements{
- try{const data=JSON.parse(localStorage.getItem(key)??'{}');const slots=data?.version===2?data.slots:null;const result:LetterPlacements={};const used=new Set<string>();for(const index of puzzle.editable){const token=slots?bank.find(item=>item.id===slots[index]):bank.find(item=>item.letter.toLocaleLowerCase('de')===String(data?.[index]??'').toLocaleLowerCase('de')&&!used.has(item.id));if(token&&!used.has(token.id)){result[index]=token.id;used.add(token.id);}}return result;}catch{return {};}
+ try{const data=JSON.parse(localStorage.getItem(key)??'{}');const slots=data?.version===2||data?.version===3?data.slots:null;const result:LetterPlacements={};const used=new Set<string>();for(const index of puzzle.editable){const token=slots?bank.find(item=>item.id===slots[index]):bank.find(item=>item.letter.toLocaleLowerCase('de')===String(data?.[index]??'').toLocaleLowerCase('de')&&!used.has(item.id));if(token&&!used.has(token.id)){result[index]=token.id;used.add(token.id);}}return result;}catch{return {};}
+}
+
+/** Whether a letter belongs in a box (case only counts when the answer is case-strict). */
+export function letterFits(puzzle:LetterPuzzleModel,index:number,letter:string,strictCase=false,course:'de'|'en'='de'){
+ const target=puzzle.parts[index]?.character??'';
+ return strictCase?letter===target:letter.toLocaleLowerCase(course)===target.toLocaleLowerCase(course);
+}
+/** The tile to place for a letter: the exact letter first, then the same letter in the other case. */
+export function tileForLetter(choices:readonly LetterChoice[],letter:string,course:'de'|'en'='de'):LetterChoice|undefined{
+ return choices.find(choice=>choice.letter===letter)??choices.find(choice=>choice.letter.toLocaleLowerCase(course)===letter.toLocaleLowerCase(course));
+}
+/** A wrong letter goes back at once, but the answer that is checked keeps the first wrong letter, so the question counts as a mistake. */
+export type PuzzleMistakes={count:number;first:{index:number;letter:string}|null;boxes:number[]};
+export const noMistakes:PuzzleMistakes={count:0,first:null,boxes:[]};
+export function scoredLetterAnswer(puzzle:LetterPuzzleModel,letters:PuzzleLetters,mistakes:PuzzleMistakes){
+ return puzzle.parts.map(part=>mistakes.first&&part.index===mistakes.first.index?mistakes.first.letter:part.editable?(letters[part.index]??''):part.character).join('');
+}
+/** Hints place the next right letter; about a third of the boxes (at least one) can be helped. */
+export function hintLimit(puzzle:LetterPuzzleModel){return Math.max(1,Math.floor(puzzle.editable.length/3));}
+export type PuzzleHints={used:number;boxes:number[]};
+export const noHints:PuzzleHints={used:0,boxes:[]};
+/** Mistakes and hints saved with the draft, so leaving and coming back keeps them. */
+export function readPuzzleExtras(puzzle:LetterPuzzleModel,key:string):{mistakes:PuzzleMistakes;hints:PuzzleHints}{
+ try{
+  const data=JSON.parse(localStorage.getItem(key)??'{}');if(data?.version!==3)return {mistakes:noMistakes,hints:noHints};
+  const inPuzzle=(value:unknown):value is number=>typeof value==='number'&&puzzle.editable.includes(value);
+  const m=data.mistakes??{};const first=m.first&&inPuzzle(m.first.index)&&typeof m.first.letter==='string'&&puzzleCharacter(m.first.letter).length===1?{index:m.first.index,letter:puzzleCharacter(m.first.letter)[0]}:null;
+  const mistakes={count:first?Math.max(1,Number(m.count)||1):0,first,boxes:Array.isArray(m.boxes)?m.boxes.filter(inPuzzle):[]};
+  const h=data.hints??{};const hints={used:Math.min(hintLimit(puzzle),Math.max(0,Number(h.used)||0)),boxes:Array.isArray(h.boxes)?h.boxes.filter(inPuzzle):[]};
+  return {mistakes,hints};
+ }catch{return {mistakes:noMistakes,hints:noHints};}
 }

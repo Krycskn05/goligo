@@ -4,7 +4,7 @@ import type {PracticeMode} from './writing-practice';
 import {verbQuestions,inVerbTopic,type VerbTask} from './verb-course';
 
 /** Fiiller has three practice modes, like Nesne Kasası: choose, write (letter puzzles), listen. */
-const testTasks:readonly VerbTask[]=['meaning','word','fit','praesens','perfekt'];
+const testTasks:readonly VerbTask[]=['meaning','word','fit','praesens','perfekt','meaning-perfekt'];
 const writeTasks:readonly VerbTask[]=['write','write-praesens','write-perfekt'];
 const listenTasks:readonly VerbTask[]=['hear','hear-praesens','hear-perfekt'];
 const fourChoices=(q:Question)=>q.options?.length===4&&new Set(q.options).size===4&&q.options.includes(q.answer);

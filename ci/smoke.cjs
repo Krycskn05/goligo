@@ -124,6 +124,23 @@ async function visit(page, url, shot, errors) {
     await p2.locator(".verb-result-next").click();
     await p2.waitForSelector(".letter-puzzle", { timeout: 20000 });
     fit("yazim", await shot("12-telefon-yazim.png"));
+    // Harfleri dogru sirayla koy, hicbir dugmeye basma: kutular dolunca kendisi kontrol etmeli.
+    const word = ((await p2.locator(".verb-stepper-verb").first().textContent()) || "").trim();
+    const boxes = await p2.locator(".puzzle-board [data-puzzle-index]").evaluateAll((list) => list.map((b) => Number(b.getAttribute("data-puzzle-index"))));
+    for (const i of boxes) {
+      await p2.locator(`.letter-tile[data-letter="${word[i]}"]`).first().click();
+      await p2.waitForTimeout(150);
+    }
+    const auto = await p2.waitForSelector(".verb-write-feedback", { timeout: 8000 }).then(() => true).catch(() => false);
+    info("Telefon: yazim dolunca dugmeye basmadan kontrol ediliyor", auto, `${word} · ${boxes.length} kutu`);
+    await shot("15-telefon-yazim-sonuc.png");
+    // Yazimdan sonra ayni fiilin gecmis hali sorusu: siklarda hat/ist yok.
+    await p2.locator(".verb-write-feedback .object-next").click();
+    await p2.waitForSelector(".verb-options .object-option", { timeout: 20000 });
+    await shot("16-telefon-gecmis-hali.png");
+    const pastOptions = await p2.locator(".verb-options .object-option .picture-option-word").allTextContents();
+    const heading = ((await p2.locator("#object-question-heading").first().textContent()) || "").trim();
+    info("Telefon: yazimdan sonra gecmis hali sorusu (hat/ist yok)", /Partizip/.test(heading) && pastOptions.length === 4 && pastOptions.every((o) => !/\s/.test(o.trim())), `${heading} · ${pastOptions.join(", ")}`);
     // Bolume tiklayinca fiil listesi, fiile tiklayinca fiil karti (anlamli ornek cumlelerle). Bilgi amaclidir.
     await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForTimeout(1200);

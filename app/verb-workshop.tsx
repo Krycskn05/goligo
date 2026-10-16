@@ -99,7 +99,7 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
 }
 /** After a test answer, in one card that fits a phone screen: the picture and the verb at the top (tap the speaker to hear it again), right or wrong,
  * then one example sentence per person (not after the last Perfekt step: the learner has just seen them). */
-/** The card after a test answer. `past`: the past-form question — the infinitive → its Partizip II, without example sentences (no hat/ist). */
+/** The card after a test answer. `past`: the past-form question — the infinitive → its Partizip II, with the past-tense example sentences. */
 export function AnswerResult({verb,stage,language,speech,correct,status,chosen,spoken,note,nextLabel,onNext,busy,examples=true,past=false}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;correct:boolean;status:string;chosen?:ReactNode;spoken:string;note?:string;nextLabel:string;onNext:()=>void;busy:boolean;examples?:boolean;past?:boolean}){
  const dir=vaultDirection(language);
  const form=past?'':stage==='perfekt'?verb.subject+' '+perfektLabel(verb):stage==='praesens'?verb.subject+' '+verb.praesens:'';
@@ -113,7 +113,7 @@ export function AnswerResult({verb,stage,language,speech,correct,status,chosen,s
     {chosen&&<span className="verb-result-chosen">{chosen}</span>}
    </div>
   </div>
-  {examples&&!past&&<PersonSentences verb={verb} tense={stage==='perfekt'?'perfekt':'praesens'} language={language} speech={speech}/>}
+  {examples&&<PersonSentences verb={verb} tense={past||stage==='perfekt'?'perfekt':'praesens'} language={language} speech={speech}/>}
   {note&&<p className="verb-note">{note}</p>}
   <button type="button" className="btn object-next verb-result-next" disabled={busy} onClick={onNext}>{nextLabel}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </div>;

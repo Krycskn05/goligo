@@ -491,7 +491,9 @@ test('letter puzzles: a wrong letter goes back and counts, hints help, a full wo
  const ui=fs.readFileSync('app/letter-puzzle.tsx','utf8');
  assert.ok(ui.includes("window.addEventListener('keydown',listener)")&&ui.includes('typeLetter(event.key)'));
  assert.ok(ui.includes('onClick={()=>giveBack(part.index)}'),'a filled box sends its letter back');
- assert.ok(ui.includes('const timer=setTimeout(()=>{sent.current=true;submitLatest.current();},520);'),'a full word is checked by itself');
+ assert.ok(ui.includes('const first=setTimeout(()=>{sent.current=true;submitLatest.current();},350);')&&ui.includes('submitLatest.current();},1200);'),'a full word is checked by itself, and tried again while the page is not ready');
+ assert.ok(!ui.includes('type="submit"')&&!ui.includes("text('checkAnswer')"),'no button to press for checking');
+ for(const language of languages)assert.ok(load('object-vault-copy').vaultText(language,'letterBankHint').split(/[.!。]\s*/).filter(Boolean).length>=3,language+' the hint says it checks by itself');
  assert.ok(ui.includes("if(letterFits(puzzle,index,token.letter,strictCase,course))place(index,tokenId);else miss(index,token.letter);"),'right letters go in, wrong ones shake');
  assert.ok(ui.includes('onClick={hint}'),'hint button');
  for(const language of languages)for(const key of ['puzzleHintButton','puzzleHintAria','puzzleMistakes','puzzleMistakeNote','letterBankHint'])assert.ok(load('object-vault-copy').vaultText(language,key,{n:2}).trim(),language+' '+key);

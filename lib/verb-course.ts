@@ -8,7 +8,7 @@ import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
  * questions `verb-*`. Answer options stay German; meanings follow the interface language.
  */
 export type VerbAux='hat'|'ist';
-export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'partizip'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
+export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'partizip'|'write'|'write-praesens'|'write-perfekt'|'write-partizip'|'hear'|'hear-praesens'|'hear-perfekt';
 export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
 
 type Spec=readonly [display:string,praesens:string,perfekt:string,praesensWrong:readonly [string,string,string],perfektWrong:readonly [string,string,string],meanings:VaultTranslations];
@@ -138,6 +138,8 @@ for(const verb of verbs){
  add('verb-meaning-perfekt-'+verb.id,'meaning-perfekt',{kind:'choice',prompt:'“'+meaning+'” anlamındaki fiilin Perfekt biçimi: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...perfektDistractors(verb,'meaning-perfekt-'+verb.id)]});
  // The past form of the verb alone: the infinitive is shown, the Partizip II is chosen (no hat/ist, no other verbs).
  add('verb-partizip-'+verb.id,'partizip',{kind:'choice',prompt:verb.display+' · geçmiş hali (Partizip II) hangisi?',answer:verb.participle,options:[verb.participle,...partizipDistractors(verb)]});
+ // The past form spelled with letters: the infinitive is shown, the Partizip II is written (no hat/ist).
+ add('verb-write-partizip-'+verb.id,'write-partizip',{kind:'write',writingTask:'word',prompt:verb.display+' · geçmiş halini (Partizip II) yaz.',answer:verb.participle});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});
  add('verb-write-praesens-'+verb.id,'write-praesens',{kind:'write',writingTask:'gap',prompt:verb.display+' · Präsens yaz.',gap:subject+' ___',answer:verb.praesens});
  add('verb-write-perfekt-'+verb.id,'write-perfekt',{kind:'write',writingTask:'gap',prompt:verb.display+' · Perfekt yaz.',gap:subject+' ___ ___',answer:verb.perfekt,...(verb.alsoIst?{accepted:['ist '+verb.participle]}:{})});

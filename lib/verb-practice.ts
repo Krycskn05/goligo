@@ -6,7 +6,7 @@ import {verbQuestions,inVerbTopic,type VerbTask} from './verb-course';
 /** Fiiller has three practice modes, like Nesne Kasası: choose, write (letter puzzles), listen. */
 // meaning-perfekt (the Perfekt among other verbs' forms) is no longer asked: it mixed the verbs up. Its questions stay in the bank for old rounds.
 const testTasks:readonly VerbTask[]=['meaning','word','fit','praesens','perfekt','partizip'];
-const writeTasks:readonly VerbTask[]=['write','write-praesens','write-perfekt'];
+const writeTasks:readonly VerbTask[]=['write','write-praesens','write-perfekt','write-partizip'];
 const listenTasks:readonly VerbTask[]=['hear','hear-praesens','hear-perfekt'];
 const fourChoices=(q:Question)=>q.options?.length===4&&new Set(q.options).size===4&&q.options.includes(q.answer);
 

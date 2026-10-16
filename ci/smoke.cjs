@@ -97,6 +97,14 @@ async function visit(page, url, shot, errors) {
   // tek ekrana sigip sigmadigini olc (asagi kaydirmadan). Bilgi amaclidir; yayini durdurmaz.
   const info = (name, ok, detail) => console.log(`${ok ? "BILGI " : "UYARI "} ${name}${detail ? " — " + detail : ""}`);
   try {
+    // Calinan sesleri kaydet (dogal ses dosyasi ya da cihaz sesi): yeni fiilin karti acilinca fiil okunuyor mu?
+    await p2.addInitScript(() => {
+      window.__played = [];
+      const play = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function () { window.__played.push(this.currentSrc || this.src || ""); return play.apply(this, arguments); };
+      try { if (window.speechSynthesis) { const speak = window.speechSynthesis.speak.bind(window.speechSynthesis); window.speechSynthesis.speak = (u) => { if (u && u.text) window.__played.push("tts:" + u.text); return speak(u); }; } } catch (e) {}
+    });
+    const played = () => p2.evaluate(() => (window.__played || []).filter((x) => x && !x.startsWith("data:")));
     await p2.goto(BASE + "/signin-with-chatgpt?return_to=%2Ffiiller", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForTimeout(1500);
     await p2.locator(".verb-path-enter").first().click();
@@ -111,11 +119,16 @@ async function visit(page, url, shot, errors) {
       });
     };
     const fit = (label, m) => info(`Telefon: ${label} tek ekrana sigiyor`, !!m && m.top >= 0 && m.bottom <= m.vh, m ? `ust ${m.top}, alt ${m.bottom}, ekran ${m.vh}` : "kart yok");
+    let heardBefore = 0;
     if (await p2.locator("#verb-chapter-heading").count()) {
       await shot("08-telefon-bolum.png");
+      heardBefore = (await played()).length;
       await p2.locator(".verb-chapter .verb-learn-next").click();
     }
     fit("ogrenme karti (resim, anlam, cekim)", await shot("09-telefon-kart.png"));
+    await p2.waitForTimeout(1500);
+    const heard = (await played()).slice(heardBefore);
+    info("Telefon: yeni fiilin karti acilinca fiil kendiliginden okunuyor", heard.length > 0, heard.slice(0, 3).join(" | ").slice(0, 160) || "ses yok");
     await p2.locator(".verb-learn .verb-learn-next").click();
     fit("test sorusu", await shot("10-telefon-soru.png"));
     await p2.locator(".verb-options .object-option").first().click();

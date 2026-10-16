@@ -211,6 +211,18 @@
 .verb-karma-text small { display:block; margin-top:6px; font-weight:800; color:#ffd54a; font-size:14px; }
 .verb-hard-tag { display:inline-block; margin-left:10px; padding:3px 10px; border-radius:999px; background:#ff6b6b; color:#fff; font-size:12px; font-weight:800; border:2px solid #fff; vertical-align:middle; }
 .verb-collection { margin-top:28px; padding:22px 26px; }
+.verb-mistakes { margin-top:22px; padding:20px 24px; display:grid; gap:10px; background:#fff6f4; }
+.verb-mistakes-head { display:flex; align-items:center; gap:10px; }
+.verb-mistakes h2 { margin:0; font-size:22px; font-weight:800; }
+.verb-mistakes-count { min-width:30px; height:30px; padding:0 9px; border-radius:999px; display:inline-grid; place-items:center; background:#e5484d; color:#fff; font-weight:800; font-size:15px; }
+.verb-mistakes-lead { margin:0; color:#3d5a7a; font-weight:600; font-size:14px; line-height:1.45; }
+.verb-mistakes-verbs { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+.verb-mistakes-verbs li { display:inline-flex; align-items:center; gap:7px; padding:4px 12px 4px 4px; border-radius:999px; background:#fff; border:2px solid #ffd9d6; font-weight:800; font-size:15px; color:#1f3b5c; }
+.verb-mistakes-verbs li.more { padding:4px 12px; color:#7a5a5a; }
+.verb-mistakes-verbs img { width:32px; height:32px; border-radius:50%; object-fit:cover; background:#fff; }
+.verb-mistakes-start { justify-self:start; }
+.verb-mistakes-none,.verb-mistakes-done { margin:0; display:flex; align-items:center; gap:8px; color:#2e7d4f; font-weight:700; }
+.verb-mistakes-done { justify-content:center; margin:6px 0 12px; font-size:17px; }
 .verb-collection h2 { margin:0 0 4px; font-size:22px; font-weight:800; }
 .verb-collection-lead { margin:0 0 14px; color:#3d5a7a; font-weight:600; font-size:14px; }
 .verb-stickers { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
@@ -398,6 +410,8 @@
  .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-main:only-of-type { grid-row:1 / span 2; align-self:center; }
  .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-sentence { grid-column:1 / -1; justify-self:stretch; }
  .verb-question .puzzle-hint { margin-bottom:6px; font-size:11.5px; line-height:1.4; }
+ .verb-mistakes { padding:16px; }
+ .verb-mistakes-start { justify-self:stretch; }
  .verb-question .letter-puzzle { margin-top:8px; }
  .verb-question .puzzle-meta { margin:6px 0 4px; }
  .verb-question .letter-bank-heading { display:none; }

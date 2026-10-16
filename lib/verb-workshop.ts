@@ -154,6 +154,19 @@ export function isPartRound(session:Pick<Session,'mode'|'questions'>,family:Verb
 export function roundEnd(session:Pick<Session,'mode'|'questions'>){
  return session.mode===WORKSHOP_MODE&&session.questions.length===LEGACY_WORKSHOP_TOTAL&&sameIds(idsOf(session.questions),legacyWorkshopIds)?LEGACY_PART_END:session.questions.length;
 }
+/** Yanlışlarım: a round of the learner's own mistakes on the workshop path (stored with the review mode, so it is never taken for a part). */
+export const MISTAKES_MODE='review';
+/** Workshop questions whose last answer was wrong, in path order: one right answer takes a question off the list. */
+export function workshopMistakeIds(reviews:readonly Review[]){
+ const byId=reviewRows(reviews);
+ return workshopIds().filter(id=>{const row=byId.get(id);return !!row&&row.wrong_count>0&&row.streak===0;});
+}
+/** The verbs behind those mistakes, in path order. */
+export function mistakeVerbs(ids:readonly string[]){
+ const seen=new Set<string>();const out:Verb[]=[];
+ for(const id of ids){const verbId=questionById.get(id)?.verbId;if(verbId&&!seen.has(verbId)){seen.add(verbId);out.push(verbMap.get(verbId)!);}}
+ return out;
+}
 export function exerciseCount(){return verbQuestions.filter(isVerbExercise).length;}
 export function workshopMistakes(session:Pick<Session,'answers'>,lookup:(id:string)=>Question|undefined){
  return session.answers.filter(answer=>!answer.correct).map(answer=>lookup(answer.question_id)).filter((q):q is Question=>!!q);

@@ -13,7 +13,7 @@ import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,ChapterCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,continuationIds,roundEnd,learnStage} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,continuationIds,roundEnd,learnStage,MISTAKES_MODE,workshopMistakeIds,mistakeVerbs} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -89,6 +89,9 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const parts=partsStatus(snapshot.sessions);const path=currentPart(snapshot.sessions);
  const nextVerb=verbMap.get(path.nextVerbId)??workshopVerbs[0];
  const stickers=verbStatus(snapshot.sessions);
+ // Yanlışlarım: workshop questions whose last answer was wrong; one right answer takes a question off the list.
+ const mistakeIds=ready?workshopMistakeIds(snapshot.reviews):[];const mistakeVerbList=mistakeVerbs(mistakeIds);
+ const mistakesRound=session?.mode===MISTAKES_MODE;
  const roundFamily:VerbFamily=(session&&verbFamilyOf(lookup(session.questions[0]?.id??'')?.verbId??''))||verbFamilies[0];
  function fail(e:unknown,fallback:ErrorKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
@@ -133,6 +136,15 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    }
    const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
    if(!mounted.current)return;openSession(data.session);
+  }catch(e){fail(e,'startError');}
+  finally{mutation.current=false;if(mounted.current)setBusy(false);}
+ }
+ /** A round of the open mistakes (mixed so the same verb never comes twice in a row); answered wrong again, a question stays on the list. */
+ async function startMistakes(){
+  if(mutation.current||!mistakeIds.length)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();speech.prepare();
+  try{
+   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:MISTAKES_MODE,topic:WORKSHOP_TOPIC,count:mistakeIds.length,onlyIds:mistakeIds},'','de');
+   if(!mounted.current)return;setView(null);openSession(data.session);
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
@@ -247,9 +259,10 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    {error&&<div className="object-alert" role="alert"><p>{errorText(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{v('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}
    {session?finished?<section className="object-results panel verb-results">
-    <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('partDone',{n:roundFamily.number,total:roundFamily.verbs.length}):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:end})}</p>
+    <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('partDone',{n:roundFamily.number,total:roundFamily.verbs.length}):mistakesRound?t('mistakesTitle'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:end})}</p>
     <RoundReward answers={session.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
-    <div className="object-actions"><button type="button" className="btn" disabled={busy} onClick={()=>void enterPart(roundFamily,true)}><RotateCcw size={18}/>{t('workshopRestart')}</button><button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
+    {mistakesRound&&!mistakeIds.length&&<p className="verb-mistakes-done" role="status"><CheckCircle2 size={18}/>{t('mistakesAllDone')}</p>}
+    <div className="object-actions">{mistakesRound?mistakeIds.length>0&&<button type="button" className="btn" disabled={busy} onClick={()=>void startMistakes()}><RotateCcw size={18}/>{t('mistakesLeft',{n:mistakeIds.length})}</button>:<button type="button" className="btn" disabled={busy} onClick={()=>void enterPart(roundFamily,true)}><RotateCcw size={18}/>{t('workshopRestart')}</button>}<button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
     <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:end})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
@@ -314,6 +327,14 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       {path.session&&!path.finished&&path.done>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterPart(path.family,true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
      </div>
      {!path.finished&&<div className="verb-bubble">{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</div>}
+    </article>
+    <article className="panel verb-mistakes" aria-labelledby="verb-mistakes-heading" data-verb-mistakes={mistakeIds.length}>
+     <div className="verb-mistakes-head"><h2 id="verb-mistakes-heading">{t('mistakesTitle')}</h2>{mistakeIds.length>0&&<span className="verb-mistakes-count">{mistakeIds.length}</span>}</div>
+     {mistakeIds.length>0?<>
+      <p className="verb-mistakes-lead">{t('mistakesLead',{n:mistakeIds.length})}</p>
+      <ul className="verb-mistakes-verbs">{mistakeVerbList.slice(0,10).map(item=><li key={item.id}><img src={verbPicture(item)??''} alt="" width={40} height={40} loading="lazy" decoding="async"/><span lang="de" dir="ltr" className={kindClass(item)}>{item.display}</span></li>)}{mistakeVerbList.length>10&&<li className="more">+{mistakeVerbList.length-10}</li>}</ul>
+      <button type="button" className="btn verb-mistakes-start" disabled={busy||!ready} onClick={()=>void startMistakes()} data-verb-mistakes-start=""><RotateCcw size={18}/>{t('mistakesStart')}</button>
+     </>:<p className="verb-mistakes-none"><CheckCircle2 size={18} aria-hidden="true"/>{ready?t('mistakesNone'):v('loading')}</p>}
     </article>
     <section className="verb-map" aria-labelledby="verb-map-heading">
      <h2 id="verb-map-heading" className="verb-map-title">{t('mapTitle')}</h2>

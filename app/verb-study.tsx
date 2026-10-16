@@ -190,16 +190,16 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  }
  function correctLabel(question:Question,item:Verb){
   const kind=question.verbTask??'';
-  return kind==='praesens'||kind==='write-praesens'||kind==='perfekt'||kind==='write-perfekt'?item.subject+' '+question.answer:kind==='fit'?praesensForm(item):item.display;
+  return kind==='praesens'||kind==='write-praesens'||kind==='perfekt'||kind==='write-perfekt'?item.subject+' '+question.answer:kind==='fit'?praesensForm(item):kind==='write-partizip'?question.answer:item.display;
  }
  /** The forms shown after an answer: only what the stage teaches (meaning: the verb; Perfekt: sie/er hat/ist …). */
  function verbForms(item:Verb,task?:VerbTask){
   const stage=learnStage(task);
-  return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong>{task==='partizip'&&<> → {item.participle}</>}{stage==='perfekt'&&<> — {item.subject} {perfektLabel(item)}</>}{stage==='praesens'&&<> — {item.subject} {item.praesens}</>}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;
+  return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong>{(task==='partizip'||task==='write-partizip')&&<> → {item.participle}</>}{stage==='perfekt'&&<> — {item.subject} {perfektLabel(item)}</>}{stage==='praesens'&&<> — {item.subject} {item.praesens}</>}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;
  }
  function heading(question:Question){
   const kind=question.verbTask;
-  return kind==='meaning'?t('promptMeaning'):kind==='word'?t('promptWord'):kind==='partizip'?t('promptPartizip'):kind==='fit'?t('promptFit'):kind==='praesens'?t('promptPraesens'):kind==='perfekt'?t('promptPerfekt'):kind==='write'?t('writeInfinitive'):kind==='write-praesens'?t('gapPraesens'):kind==='write-perfekt'?t('gapPerfekt'):kind==='hear'?t('listenMeaning'):t('listenVerb');
+  return kind==='meaning'?t('promptMeaning'):kind==='word'?t('promptWord'):kind==='partizip'?t('promptPartizip'):kind==='fit'?t('promptFit'):kind==='praesens'?t('promptPraesens'):kind==='perfekt'?t('promptPerfekt'):kind==='write-partizip'?t('writePartizip'):kind==='write'?t('writeInfinitive'):kind==='write-praesens'?t('gapPraesens'):kind==='write-perfekt'?t('gapPerfekt'):kind==='hear'?t('listenMeaning'):t('listenVerb');
  }
  /** The example sentence with gaps where the verb goes; filled in after the answer. */
  function sentenceLine(question:Question,item:Verb){

@@ -241,7 +241,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:end})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
     {place&&<PathStepper place={place} language={language}/>}
-    {overlay==='chapter'&&place?<ChapterCard family={place.family} stage={place.stage} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
+    {overlay==='chapter'&&place?<ChapterCard family={place.family} stage={place.stage} both={place.layout==='verb'} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
     overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
     <article className={'object-question panel verb-question'+(answered?' answered':'')}>
      <h1 id="object-question-heading" tabIndex={-1} className={answered?'verb-hidden-heading':undefined}>{heading(q)}</h1>

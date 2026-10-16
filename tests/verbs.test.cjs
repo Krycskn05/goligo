@@ -396,6 +396,10 @@ test('Fiil Atölyesi: two parts in book order, each verb in turn: card, meaning 
  for(const language of languages)assert.ok(copy.verbText(language,'conjugationTitle').includes('Präsens'));
  assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no single sie/er sentence');
  assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
+ // Phone: the verb and its meaning stand beside the picture, one under the other — the meaning never drops into the narrow picture column.
+ const verbCss=fs.readFileSync('app/verbs.css','utf8');
+ assert.ok(verbCss.includes('.verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-meaning { grid-column:2;')||/> \.verb-card-meaning \{ grid-column:2;/.test(verbCss)||verbCss.includes('> .verb-card-meaning { grid-column:2; overflow-wrap:normal;'),'meaning beside the picture');
+ assert.ok(verbCss.includes('> .verb-picture { grid-column:1; grid-row:1 / span 2;')&&verbCss.includes('grid-auto-flow:row dense;')&&verbCss.includes('> .verb-sentence { grid-column:1 / -1;'),'picture spans both lines, a sentence takes the full width');
 });
 test('after an answer every person gets an example sentence: Präsens after meanings, Perfekt after Perfekt',()=>{
  const persons=load('verb-persons');const byId=id=>verbs.verbMap.get(id);

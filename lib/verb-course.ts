@@ -8,7 +8,7 @@ import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
  * questions `verb-*`. Answer options stay German; meanings follow the interface language.
  */
 export type VerbAux='hat'|'ist';
-export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
+export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
 export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
 
 type Spec=readonly [display:string,praesens:string,perfekt:string,praesensWrong:readonly [string,string,string],perfektWrong:readonly [string,string,string],meanings:VaultTranslations];
@@ -85,12 +85,18 @@ function conflicts(id:string){return new Set(sameMeaning.filter(set=>set.include
 function meaningDistractors(verb:Verb,seed:string){const blocked=conflicts(verb.id);return seeded(verbs.filter(other=>!blocked.has(other.id)).map(other=>other.id),seed).slice(0,3);}
 const stem=(id:string)=>id.replace(/^(ab|an|auf|aus|ein|herunter|mit|be)(?=[a-zäöüß]{4,})/,'');
 /** For heard forms: verbs built on the same stem first (fahren ↔ ab|fahren), then others. */
-function formDistractors(verb:Verb,seed:string){
+function formDistractors(verb:Verb,seed:string,count=3){
  const near=verbs.filter(other=>other.id!==verb.id&&stem(other.id)===stem(verb.id)).map(other=>other.id);
  const rest=seeded(verbs.filter(other=>other.id!==verb.id&&!near.includes(other.id)).map(other=>other.id),seed);
- return [...seeded(near,seed),...rest].slice(0,3);
+ return [...seeded(near,seed),...rest].slice(0,count);
 }
 
+/** The Perfekt forms of three other verbs (a verb with the same stem first, e.g. fahren for ab|fahren), all different from the right one. */
+function perfektDistractors(verb:Verb,seed:string){
+ const taken=new Set([verb.perfekt]);const result:string[]=[];
+ for(const id of formDistractors(verb,seed,8)){const other=verbs.find(item=>item.id===id)!;if(taken.has(other.perfekt))continue;taken.add(other.perfekt);result.push(other.perfekt);if(result.length===3)break;}
+ return result;
+}
 /** Präsens forms of the other persons (du, ich, wir, ihr), the prefix at the end: the wrong options of the sentence task. */
 export function praesensPersons(verb:Verb){
  const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';const tail=prefix?' '+prefix:'';
@@ -119,6 +125,8 @@ for(const verb of verbs){
  add('verb-fit-'+verb.id,'fit',{kind:'choice',prompt:verb.display+' · Özneye göre boşluğa uyan biçim hangisi?',answer:verb.praesens,options:[verb.praesens,...personDistractors(verb)]});
  add('verb-praesens-'+verb.id,'praesens',{kind:'choice',prompt:verb.display+' · Präsens: '+subject+' …',answer:verb.praesens,options:[verb.praesens,...verb.praesensWrong]});
  add('verb-perfekt-'+verb.id,'perfekt',{kind:'choice',prompt:verb.display+' · Perfekt: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...verb.perfektWrong]});
+ // The last step of the Perfekt stage: the meaning is shown, the Perfekt of that verb is chosen among the Perfekt forms of other verbs.
+ add('verb-meaning-perfekt-'+verb.id,'meaning-perfekt',{kind:'choice',prompt:'“'+meaning+'” anlamındaki fiilin Perfekt biçimi: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...perfektDistractors(verb,'meaning-perfekt-'+verb.id)]});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});
  add('verb-write-praesens-'+verb.id,'write-praesens',{kind:'write',writingTask:'gap',prompt:verb.display+' · Präsens yaz.',gap:subject+' ___',answer:verb.praesens});
  add('verb-write-perfekt-'+verb.id,'write-perfekt',{kind:'write',writingTask:'gap',prompt:verb.display+' · Perfekt yaz.',gap:subject+' ___ ___',answer:verb.perfekt,...(verb.alsoIst?{accepted:['ist '+verb.participle]}:{})});

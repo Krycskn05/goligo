@@ -61,9 +61,11 @@ test('Fiiller keeps the 38 verbs of the page with Präsens, Perfekt and a meanin
 });
 
 test('every verb has choice, writing and listening exercises with new IDs only',()=>{
- const kinds=['meaning','word','fit','praesens','perfekt','meaning-perfekt','write','write-praesens','write-perfekt','hear','hear-praesens','hear-perfekt'];
- assert.equal(verbs.verbQuestions.length,38*kinds.length);
+ const kinds=['meaning','word','fit','praesens','perfekt','partizip','write','write-praesens','write-perfekt','hear','hear-praesens','hear-perfekt'];
+ // meaning-perfekt (the Perfekt among other verbs' forms) stays in the bank for old rounds but is no exercise any more.
+ assert.equal(verbs.verbQuestions.length,38*(kinds.length+1));
  assert.equal(new Set(verbs.verbQuestions.map(q=>q.id)).size,verbs.verbQuestions.length);
+ for(const verb of verbs.verbs){const old=course.questionMap.get('verb-meaning-perfekt-'+verb.id);assert.ok(old,verb.id);assert.ok(!practice.isVerbExercise(old),old.id);}
  for(const verb of verbs.verbs)for(const task of kinds){
   const q=course.questionMap.get('verb-'+task+'-'+verb.id);assert.ok(q,task+' '+verb.id);
   assert.equal(q.verbTask,task);assert.equal(q.verbId,verb.id);assert.equal(q.topic,verb.group);
@@ -85,14 +87,16 @@ test('every verb has choice, writing and listening exercises with new IDs only',
  assert.ok(practice.isVerbListeningQuestion(course.questionMap.get('verb-hear-perfekt-abfahren')));
  assert.equal(course.questionMap.get('verb-hear-perfekt-abfahren').audio,'er ist abgefahren');
  assert.equal(course.questionMap.get('verb-hear-praesens-gefallen').audio,'es gefällt');
- // Meaning → Perfekt: the right Perfekt among the Perfekt forms of other verbs (a same-stem verb first), all different.
+ // Past form: the infinitive is shown, the Partizip II is chosen among wrong forms of the same verb — no hat/ist, no other verbs.
  for(const verb of verbs.verbs){
-  const q=course.questionMap.get('verb-meaning-perfekt-'+verb.id);assert.equal(q.kind,'choice');assert.equal(q.answer,verb.perfekt);assert.equal(q.options[0],verb.perfekt);
-  assert.ok(q.prompt.includes(verb.meanings[0]),q.id);assert.ok(practice.isVerbTestQuestion(q),q.id);
-  for(const option of q.options.slice(1))assert.ok(verbs.verbs.some(other=>other.id!==verb.id&&other.perfekt===option),q.id+' '+option);
+  const q=course.questionMap.get('verb-partizip-'+verb.id);assert.equal(q.kind,'choice');assert.equal(q.answer,verb.participle);assert.equal(q.options[0],verb.participle);
+  assert.ok(q.prompt.startsWith(verb.display+' · '),q.id);assert.ok(practice.isVerbTestQuestion(q),q.id);
+  for(const option of q.options){assert.ok(!/^(hat|ist) /.test(option)&&!option.includes(' '),q.id+' '+option);assert.ok(!verbs.verbs.some(other=>other.id!==verb.id&&other.participle===option),q.id+' '+option+' is another verb');}
  }
- assert.deepEqual(course.questionMap.get('verb-meaning-perfekt-abfahren').options[1],'ist gefahren');
- assert.deepEqual(course.questionMap.get('verb-meaning-perfekt-mitkommen').options.slice(1,3).sort(),['ist angekommen','ist gekommen']);
+ assert.deepEqual(course.questionMap.get('verb-partizip-abfahren').options,['abgefahren','abgefahrt','abfahren','geabfahren']);
+ assert.deepEqual(course.questionMap.get('verb-partizip-bekommen').options,['bekommen','gebekommen','bekommt','gebekommt']);
+ assert.deepEqual(course.questionMap.get('verb-partizip-gefallen').options,['gefallen','gegefallen','gefällt','gefallt']);
+ assert.ok(course.gradeAnswer(course.questionMap.get('verb-partizip-fahren'),'gefahren')&&!course.gradeAnswer(course.questionMap.get('verb-partizip-fahren'),'gefahrt'));
 });
 
 test('grading checks hat or ist, the umlaut and the separable prefix',()=>{
@@ -239,117 +243,91 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
 });
 
-test('Fiil Atölyesi: two parts in book order, each verb whole (meaning, then at once its Perfekt), cards open the part and every stage',()=>{
+test('Fiil Atölyesi: two parts in book order, each verb in turn: card, meaning test, spelling, past form',()=>{
  const all=families.verbFamilies.flatMap(f=>f.verbs);assert.equal(all.length,38);assert.equal(new Set(all).size,38);
  for(const verb of verbs.verbs)assert.ok(families.verbFamilyOf(verb.id),verb.id);
- for(const family of families.verbFamilies)for(const language of languages){assert.ok(families.familyTitle(family,language).trim());assert.ok(families.familyRule(family,language).length>20);}
+ for(const family of families.verbFamilies)for(const language of languages){assert.ok(families.familyTitle(family,language).trim());assert.ok(families.familyRule(family,language).length>20);assert.ok(!/hat …|ist …|sie\/er/.test(families.familyRule(family,language)),'no hat/ist in the part text');}
  // Part 1 runs from ab|fahren to essen (the learner's line), part 2 from fahren to mit|kommen, both in the book's order.
  const byId=id=>verbs.verbMap.get(id);const logic=load('verb-logic');
  assert.equal(families.verbFamilies.length,2);assert.deepEqual(families.verbFamilies.map(f=>f.id),['verbs-w1','verbs-w2']);
  assert.deepEqual(families.verbFamilies.map(f=>f.verbs.length),[19,19]);
  assert.deepEqual(families.verbFamilies[0].verbs,verbs.verbs.slice(0,19).map(v=>v.id));assert.deepEqual(families.verbFamilies[1].verbs,verbs.verbs.slice(19).map(v=>v.id));
  assert.equal(families.verbFamilies[0].verbs[18],'essen');assert.equal(families.verbFamilies[1].verbs[0],'fahren');
- const ids=workshop.workshopIds();assert.equal(ids.length,38*5,'every verb: one test and one spelling for its meaning; one test, one spelling and meaning → Perfekt for its Perfekt');assert.equal(new Set(ids).size,ids.length);
+ // Each verb in turn: the meaning test, spelling, then the past form; only then the next verb.
+ const ids=workshop.workshopIds();assert.equal(ids.length,38*3);assert.equal(new Set(ids).size,ids.length);
  for(const id of ids)assert.ok(practice.isVerbExercise(course.questionMap.get(id)),id);
- // A verb is finished in one go: its meaning steps, then straight away its Perfekt steps; only then the next verb.
- assert.deepEqual(workshop.verbSteps,['meaning','write','perfekt','write-perfekt','meaning-perfekt']);
- assert.deepEqual(ids.slice(0,5).map(id=>course.questionMap.get(id).verbTask),['meaning','write','perfekt','write-perfekt','meaning-perfekt']);
- assert.ok(ids.slice(0,5).every(id=>course.questionMap.get(id).verbId==='abfahren'));assert.equal(course.questionMap.get(ids[5]).verbId,'abgeben');assert.equal(course.questionMap.get(ids[5]).verbTask,'meaning');
- assert.ok(!ids.some(id=>course.questionMap.get(id).verbTask==='word'),'one test per verb: no second choice question');
- assert.ok(!ids.some(id=>course.questionMap.get(id).kind==='listen'),'no listening questions on the path');
- assert.equal(course.questionMap.get(ids[95]).verbId,'fahren');
+ assert.deepEqual(workshop.verbSteps,['meaning','write','partizip']);
+ assert.deepEqual(ids.slice(0,4),['verb-meaning-abfahren','verb-write-abfahren','verb-partizip-abfahren','verb-meaning-abgeben']);
+ assert.ok(!ids.some(id=>/^verb-(perfekt|write-perfekt|meaning-perfekt|word|hear)/.test(id)),'no hat/ist questions, no second choice, no listening on the path');
+ assert.equal(course.questionMap.get(ids[57]).verbId,'fahren');
  const questions=ids.map(id=>({id}));const lookup=id=>course.questionMap.get(id);
- const first=workshop.pathPlace(questions,0,lookup);assert.equal(first.verb.id,'abfahren');assert.ok(first.chapterStart&&first.stageStart);assert.equal(first.stage,'meaning');assert.equal(first.verbNumber,1);assert.deepEqual(first.steps,['meaning','write']);assert.equal(first.layout,'verb');
- for(const i of [1]){const later=workshop.pathPlace(questions,i,lookup);assert.ok(!later.stageStart&&!later.chapterStart);assert.equal(later.step,i);}
- const perfekt=workshop.pathPlace(questions,2,lookup);assert.equal(perfekt.verb.id,'abfahren');assert.equal(perfekt.stage,'perfekt');assert.ok(perfekt.stageStart&&!perfekt.chapterStart,'the Perfekt of a verb opens its learning card, not a part card');assert.deepEqual(perfekt.steps,['perfekt','write-perfekt','meaning-perfekt']);assert.equal(perfekt.step,0);assert.equal(perfekt.verbNumber,1);
- assert.equal(workshop.pathPlace(questions,4,lookup).step,2);
- const second=workshop.pathPlace(questions,5,lookup);assert.equal(second.verb.id,'abgeben');assert.equal(second.stage,'meaning');assert.ok(second.stageStart&&!second.chapterStart);assert.equal(second.verbNumber,2);
- const part2=workshop.pathPlace(questions,95,lookup);assert.equal(part2.family.number,2);assert.equal(part2.stage,'meaning');assert.ok(part2.chapterStart);assert.equal(part2.verb.id,'fahren');
+ // Cards: the part card at the start of a part, the verb's card (its meaning) before each verb; the past form has no card of its own.
+ const first=workshop.pathPlace(questions,0,lookup);assert.equal(first.verb.id,'abfahren');assert.ok(first.chapterStart&&first.stageStart);assert.equal(first.stage,'meaning');assert.equal(first.verbNumber,1);assert.deepEqual(first.steps,['meaning','write','partizip']);
+ for(const i of [1,2]){const later=workshop.pathPlace(questions,i,lookup);assert.ok(!later.stageStart&&!later.chapterStart,String(i));assert.equal(later.step,i);assert.equal(later.stage,'meaning');}
+ const second=workshop.pathPlace(questions,3,lookup);assert.equal(second.verb.id,'abgeben');assert.ok(second.stageStart&&!second.chapterStart);assert.equal(second.verbNumber,2);assert.equal(second.step,0);
+ const part2=workshop.pathPlace(questions,57,lookup);assert.equal(part2.family.number,2);assert.ok(part2.chapterStart);assert.equal(part2.verb.id,'fahren');
  assert.deepEqual(study.selectQuestions('workshop','verbs-all',ids.length,[],ids).map(q=>q.id),ids,'the path keeps its order');
- assert.ok(practice.verbModePredicate('workshop')(course.questionMap.get('verb-hear-essen'))&&practice.verbModePredicate('workshop')(course.questionMap.get('verb-write-perfekt-essen')));
- // No part is locked: each part is its own round of 95 questions for 19 verbs. Older rounds: `stage` (95: all meanings, then all Perfekt), `legacy` (76: the same with two Perfekt steps).
- const [w1,w2]=families.verbFamilies;const P=workshop.partTotal(w1);assert.equal(P,95);assert.equal(workshop.partTotal(w2),95);assert.equal(workshop.partTotal(w1,'stage'),95);assert.equal(workshop.partTotal(w1,'legacy'),76);
- assert.deepEqual(workshop.partIds(w1),ids.slice(0,95));assert.deepEqual(workshop.partIds(w2),ids.slice(95));
- const stagedIds=workshop.partIds(w1,'stage');assert.equal(stagedIds.length,95);assert.deepEqual(new Set(stagedIds),new Set(workshop.partIds(w1)),'the same questions in another order');
- assert.ok(stagedIds.slice(0,38).every(id=>/^verb-(meaning|write)-/.test(id)));assert.deepEqual(stagedIds.slice(38,41),['verb-perfekt-abfahren','verb-write-perfekt-abfahren','verb-meaning-perfekt-abfahren']);
- const oldIds=workshop.workshopIds('legacy');assert.equal(oldIds.length,152);assert.deepEqual(workshop.partIds(w2,'legacy'),oldIds.slice(76));assert.ok(!oldIds.some(id=>id.startsWith('verb-meaning-perfekt-')));
- const asQuestions=list=>list.map(id=>({id}));const oldQuestions=asQuestions(oldIds);const stagedQuestions=asQuestions(stagedIds);
- // Every round is read from its own questions: the older orders are known as such, anything else runs verb by verb.
- assert.equal(workshop.roundLayout(questions.slice(0,95)),'verb');assert.equal(workshop.roundLayout(stagedQuestions),'stage');assert.equal(workshop.roundLayout(oldQuestions),'legacy');assert.equal(workshop.roundLayout(oldQuestions.slice(0,76)),'legacy');
- assert.ok(workshop.isStagedRound(stagedQuestions)&&workshop.isStagedRound(oldQuestions)&&!workshop.isStagedRound(questions.slice(0,95)));assert.ok(workshop.isLegacyRound(oldQuestions.slice(0,76))&&!workshop.isLegacyRound(stagedQuestions));
- assert.equal(workshop.roundFamily(stagedQuestions).id,'verbs-w1');assert.equal(workshop.roundFamily(asQuestions(workshop.partIds(w2,'legacy'))).id,'verbs-w2');assert.equal(workshop.roundFamily(oldQuestions).id,'verbs-w1');
- // Progress comes from the round's questions and the count answered: the meaning tick after both meaning steps, the Perfekt tick after all three.
- const p6=workshop.partProgress(w1,workshop.partIds(w1),6);assert.equal(p6.stage,'meaning');assert.equal(p6.meaningDone,1);assert.equal(p6.perfektDone,1);assert.equal(p6.stageVerbsDone,1);assert.equal(p6.nextVerbId,'abgeben');assert.ok(p6.started&&!p6.finished);assert.equal(p6.layout,'verb');assert.equal(p6.count,95);
- const p7=workshop.partProgress(w1,workshop.partIds(w1),7);assert.equal(p7.stage,'perfekt');assert.equal(p7.meaningDone,2);assert.equal(p7.perfektDone,1);assert.equal(p7.stageVerbsDone,1);assert.equal(p7.nextVerbId,'abgeben');
- const p10=workshop.partProgress(w1,workshop.partIds(w1),10);assert.equal(p10.meaningDone,2);assert.equal(p10.perfektDone,2);assert.equal(p10.stage,'meaning');assert.equal(p10.nextVerbId,'anbieten');
- assert.deepEqual(p7.marks.slice(0,3),[{meaning:true,perfekt:true},{meaning:true,perfekt:false},{meaning:false,perfekt:false}]);
- const fresh2=workshop.partProgress(w2,workshop.partIds(w2),0);assert.equal(fresh2.nextVerbId,'fahren');assert.ok(!fresh2.started);
- assert.ok(workshop.partProgress(w1,workshop.partIds(w1),95).finished);assert.ok(!workshop.partProgress(w1,workshop.partIds(w1),94).finished);assert.equal(workshop.partProgress(w1,workshop.partIds(w1),94).perfektDone,18);assert.equal(workshop.partProgress(w1,workshop.partIds(w1),94).meaningDone,19);
- // Progress of the older layouts, as they stand: staged (two, then three steps) and legacy (two, then two; the whole path ends after part 1).
- const s38=workshop.partProgress(w1,stagedIds,38);assert.equal(s38.stage,'perfekt');assert.equal(s38.stageVerbsDone,0);assert.equal(s38.nextVerbId,'abfahren');assert.equal(s38.meaningDone,19);assert.equal(s38.count,95);assert.equal(s38.layout,'stage');
- const s6=workshop.partProgress(w1,stagedIds,6);assert.equal(s6.meaningDone,3);assert.equal(s6.perfektDone,0);assert.equal(s6.stage,'meaning');assert.equal(s6.nextVerbId,'anfangen');assert.equal(s6.stageVerbsDone,3);
- assert.equal(workshop.partProgress(w1,stagedIds,40).perfektDone,0);assert.equal(workshop.partProgress(w1,stagedIds,41).perfektDone,1);
- const l40=workshop.partProgress(w1,workshop.partIds(w1,'legacy'),40);assert.equal(l40.perfektDone,1);assert.equal(l40.meaningDone,19);assert.equal(l40.count,76);assert.ok(!l40.finished);assert.ok(workshop.partProgress(w1,workshop.partIds(w1,'legacy'),76).finished);
- const whole90=workshop.partProgress(w1,oldIds,90);assert.equal(whole90.count,76);assert.equal(whole90.done,76);assert.ok(whole90.finished,'an old round past part 1 counts as part 1 done');assert.equal(whole90.perfektDone,19);
- // An older round is not continued in its old order: the part goes on verb by verb with what is left, and the questions left out count as done.
- const stagedRound={questions:stagedQuestions,answers:stagedIds.slice(0,10).map(id=>({question_id:id}))};
- const left=workshop.continuationIds(w1,stagedRound);assert.equal(left.length,85);assert.deepEqual(left.slice(0,4),['verb-perfekt-abfahren','verb-write-perfekt-abfahren','verb-meaning-perfekt-abfahren','verb-perfekt-abgeben']);
- assert.deepEqual(left.slice(15,20),['verb-meaning-anrufen','verb-write-anrufen','verb-perfekt-anrufen','verb-write-perfekt-anrufen','verb-meaning-perfekt-anrufen']);
- assert.equal(workshop.roundLayout(asQuestions(left)),'verb');assert.ok(!workshop.isStagedRound(asQuestions(left)));
- const c0=workshop.partProgress(w1,left,0);assert.equal(c0.count,85);assert.equal(c0.meaningDone,5);assert.equal(c0.perfektDone,0);assert.equal(c0.stage,'perfekt');assert.equal(c0.nextVerbId,'abfahren');
- const c3=workshop.partProgress(w1,left,3);assert.equal(c3.perfektDone,1);assert.deepEqual(c3.marks.slice(0,2),[{meaning:true,perfekt:true},{meaning:true,perfekt:false}]);assert.equal(c3.nextVerbId,'abgeben');
- assert.ok(workshop.partProgress(w1,left,85).finished);assert.equal(workshop.partProgress(w1,left,85).perfektDone,19);
- const legacyRound={questions:asQuestions(workshop.partIds(w1,'legacy')),answers:workshop.partIds(w1,'legacy').slice(0,40).map(id=>({question_id:id}))};
- const left2=workshop.continuationIds(w1,legacyRound);assert.equal(left2.length,55);assert.equal(left2[0],'verb-meaning-perfekt-abfahren');assert.equal(left2[1],'verb-perfekt-abgeben');
- assert.deepEqual(workshop.pathPlace(asQuestions(left2),0,lookup).steps,['meaning-perfekt'],'the stepper shows the steps the round still holds');
- assert.deepEqual(workshop.continuationIds(w1,{questions:stagedQuestions,answers:stagedIds.map(id=>({question_id:id}))}),workshop.partIds(w1),'nothing left: the whole part');
- const place0=workshop.pathPlace(asQuestions(left),0,lookup);assert.equal(place0.verb.id,'abfahren');assert.equal(place0.stage,'perfekt');assert.ok(place0.chapterStart&&place0.stageStart);assert.equal(place0.layout,'verb');
- const place15=workshop.pathPlace(asQuestions(left),15,lookup);assert.equal(place15.verb.id,'anrufen');assert.equal(place15.stage,'meaning');assert.ok(place15.stageStart&&!place15.chapterStart);
- // Rounds as the study API lists them: an open Fiil Atölyesi round carries its questions; a finished one counts whole; an older whole-path round (152) counts for part 1.
- const round=(id,list,answered,finished_at=null,withIds=true)=>({id,mode:'workshop',topic:'verbs-all',first:list[0],total:list.length,answered,finished_at,ids:withIds&&!finished_at?list:null});
- assert.deepEqual(workshop.summaryIds(round('a',left,3)),left);assert.deepEqual(workshop.summaryIds(round('b',oldIds,3,null,false)),oldIds);
- assert.deepEqual(workshop.summaryIds(round('c',workshop.partIds(w2,'legacy'),3,null,false)),workshop.partIds(w2,'legacy'));assert.deepEqual(workshop.summaryIds(round('d',left,85,9,false)),workshop.partIds(w1));
- const legacy=round('old',oldIds,33);const round2=round('p2',workshop.partIds(w2,'legacy'),10);
- assert.equal(workshop.sessionPart(round('n',workshop.partIds(w2),50)).id,'verbs-w2');assert.equal(workshop.sessionPart(round('a',left,3)).id,'verbs-w1');assert.equal(workshop.sessionPart(legacy).id,'verbs-w1');assert.equal(workshop.sessionPart(round2).id,'verbs-w2');
+ const [w1,w2]=families.verbFamilies;assert.equal(workshop.partTotal(w1),57);assert.equal(workshop.partTotal(w2),57);
+ assert.deepEqual(workshop.partIds(w1),ids.slice(0,57));assert.deepEqual(workshop.partIds(w2),ids.slice(57));
+ assert.equal(workshop.WORKSHOP_TOTAL,114);assert.equal(workshop.LEGACY_WORKSHOP_TOTAL,152);
+ // Progress: the meaning tick after the meaning test and spelling, the past tick after the past form.
+ const p4=workshop.partProgress(w1,ids.slice(0,57),4);assert.equal(p4.meaningDone,1);assert.equal(p4.perfektDone,1);assert.equal(p4.verbsDone,1);assert.equal(p4.nextVerbId,'abgeben');assert.ok(p4.started&&!p4.finished);assert.equal(p4.count,57);
+ const p5=workshop.partProgress(w1,ids.slice(0,57),5);assert.equal(p5.meaningDone,2);assert.equal(p5.perfektDone,1);assert.equal(p5.nextVerbId,'abgeben');
+ assert.deepEqual(p5.marks.slice(0,3),[{meaning:true,perfekt:true},{meaning:true,perfekt:false},{meaning:false,perfekt:false}]);
+ const fresh2=workshop.partProgress(w2,workshop.partIds(w2),0);assert.ok(!fresh2.started);assert.equal(fresh2.nextVerbId,'fahren');
+ assert.ok(workshop.partProgress(w1,ids.slice(0,57),57).finished);assert.equal(workshop.partProgress(w1,ids.slice(0,57),56).perfektDone,18);
+ // Older rounds (all meanings first; Perfekt with hat/ist) count from their own questions …
+ const stagedIds=[...w1.verbs.flatMap(id=>['meaning','write'].map(step=>'verb-'+step+'-'+id)),...w1.verbs.flatMap(id=>['perfekt','write-perfekt','meaning-perfekt'].map(step=>'verb-'+step+'-'+id))];
+ const verbByVerb=w1.verbs.flatMap(id=>['meaning','write','perfekt','write-perfekt','meaning-perfekt'].map(step=>'verb-'+step+'-'+id));
+ const legacyPart=workshop.legacyWorkshopIds.slice(0,76);const oldIds=workshop.legacyWorkshopIds;
+ const asQuestions=list=>list.map(id=>({id}));
+ for(const list of [stagedIds,verbByVerb,legacyPart,oldIds])assert.ok(workshop.isOlderRound(asQuestions(list)));
+ assert.ok(!workshop.isOlderRound(asQuestions(workshop.partIds(w1))));
+ const s6=workshop.partProgress(w1,stagedIds,6);assert.equal(s6.meaningDone,3);assert.equal(s6.perfektDone,0);assert.equal(s6.nextVerbId,'anfangen');
+ assert.equal(workshop.partProgress(w1,stagedIds,41).perfektDone,1);assert.equal(workshop.partProgress(w1,verbByVerb,7).perfektDone,1);
+ const l40=workshop.partProgress(w1,legacyPart,40);assert.equal(l40.perfektDone,1);assert.equal(l40.meaningDone,19);assert.equal(l40.count,76);
+ const whole90=workshop.partProgress(w1,oldIds,90);assert.equal(whole90.count,76);assert.ok(whole90.finished,'an old whole-path round past part 1 counts as part 1 done');
+ // … and are not continued as they were: the part goes on in the new order with what is left; the past form is asked for every verb.
+ const left=workshop.continuationIds(w1,{questions:asQuestions(stagedIds),answers:stagedIds.slice(0,10).map(id=>({question_id:id}))});
+ assert.equal(left.length,57-10);assert.deepEqual(left.slice(0,6),['verb-partizip-abfahren','verb-partizip-abgeben','verb-partizip-anbieten','verb-partizip-anfangen','verb-partizip-ankommen','verb-meaning-anrufen']);
+ assert.ok(!workshop.isOlderRound(asQuestions(left)));
+ const c0=workshop.partProgress(w1,left,0);assert.equal(c0.meaningDone,5);assert.equal(c0.perfektDone,0);assert.equal(c0.nextVerbId,'abfahren');
+ const c2=workshop.partProgress(w1,left,2);assert.deepEqual(c2.marks.slice(0,3),[{meaning:true,perfekt:true},{meaning:true,perfekt:true},{meaning:true,perfekt:false}]);
+ const placeLeft=workshop.pathPlace(asQuestions(left),0,lookup);assert.deepEqual(placeLeft.steps,['partizip'],'the stepper shows the steps the round holds');assert.ok(placeLeft.chapterStart&&placeLeft.stageStart,'the verb card comes first');
+ const placeNext=workshop.pathPlace(asQuestions(left),1,lookup);assert.equal(placeNext.verb.id,'abgeben');assert.ok(placeNext.stageStart);
+ assert.deepEqual(workshop.continuationIds(w1,{questions:asQuestions(stagedIds),answers:workshop.partIds(w1).map(id=>({question_id:id}))}),workshop.partIds(w1),'nothing left: the whole part');
+ // Rounds as the study API lists them: an open round carries its questions; a finished one counts whole; the old whole path counts for part 1.
+ const round=(id,list,answered,finished_at=null)=>({id,mode:'workshop',topic:'verbs-all',first:list[0],total:list.length,answered,finished_at,ids:finished_at?null:list});
+ assert.deepEqual(workshop.summaryIds(round('a',left,3)),left);assert.deepEqual(workshop.summaryIds({...round('b',oldIds,3),ids:null}),oldIds);assert.deepEqual(workshop.summaryIds(round('d',stagedIds,95,9)),workshop.partIds(w1));
+ const legacy=round('old',oldIds,33);const round2=round('p2',workshop.legacyWorkshopIds.slice(76),10);
+ assert.equal(workshop.sessionPart(round('n',workshop.partIds(w2),20)).id,'verbs-w2');assert.equal(workshop.sessionPart(round('a',left,3)).id,'verbs-w1');assert.equal(workshop.sessionPart(legacy).id,'verbs-w1');assert.equal(workshop.sessionPart(round2).id,'verbs-w2');
  const other={id:'x',mode:'mixed',topic:'verbs-all',total:30,answered:3,finished_at:null};assert.equal(workshop.sessionPart(other),undefined);
- assert.equal(workshop.partAnswered(round('n',workshop.partIds(w1),50),w1),50);assert.equal(workshop.partAnswered(round('o',workshop.partIds(w1,'legacy'),40),w1),40);assert.equal(workshop.partAnswered(legacy,w1),33);assert.equal(workshop.partAnswered(round('old',oldIds,90),w1),76);
+ assert.equal(workshop.partAnswered(round('n',workshop.partIds(w1),50),w1),50);assert.equal(workshop.partAnswered(legacy,w1),33);assert.equal(workshop.partAnswered(round('old',oldIds,90),w1),76);
  const sessions=[round2,legacy,other];
  assert.equal(workshop.findPartSession(sessions,w1).id,'old');assert.equal(workshop.findPartSession(sessions,w2).id,'p2');
- const parts=workshop.partsStatus(sessions);assert.deepEqual(parts.map(p=>p.done),[33,10]);assert.deepEqual(parts.map(p=>p.layout),['legacy','legacy']);
+ assert.deepEqual(workshop.partsStatus(sessions).map(p=>p.done),[33,10]);
  assert.equal(workshop.currentPart(sessions).family.id,'verbs-w2','the part practised last is continued');
  assert.equal(workshop.currentPart([]).family.id,'verbs-w1');
- assert.equal(workshop.currentPart([round('a',workshop.partIds(w1,'legacy'),76,5)]).family.id,'verbs-w2','a finished part moves on to the next one');
- const past=workshop.partsStatus([round('old',oldIds,90)])[0];assert.equal(past.done,76);assert.ok(past.finished,'an old round past part 1 counts as part 1 done');
- const carried=workshop.partsStatus([round('new',left,3),round('old',stagedIds,10)]);assert.equal(carried[0].session.id,'new','the newest open round of a part counts');assert.equal(carried[0].meaningDone,5);assert.equal(carried[0].perfektDone,1);assert.equal(carried[0].count,85);
- const finishedCarried=workshop.partsStatus([round('f',left,85,9)])[0];assert.ok(finishedCarried.finished);assert.equal(finishedCarried.perfektDone,19);assert.equal(finishedCarried.percent,100);
- assert.equal(workshop.findPartSession([round('f',left,85,9),round('old',stagedIds,10)],w1).id,'f','a finished part is not reopened through an older round');
- const status=workshop.verbStatus([round('a',workshop.partIds(w1,'legacy'),40),round('b',workshop.partIds(w2,'legacy'),2)]);
+ assert.equal(workshop.currentPart([round('a',workshop.partIds(w1),57,5)]).family.id,'verbs-w2','a finished part moves on to the next one');
+ const carried=workshop.partsStatus([round('new',left,2),round('old',stagedIds,10)]);assert.equal(carried[0].session.id,'new','the newest round of a part counts');assert.equal(carried[0].perfektDone,2);
+ assert.equal(workshop.findPartSession([round('f',left,47,9),round('old',stagedIds,10)],w1).id,'f','a finished part is not reopened through an older round');assert.ok(workshop.partsStatus([round('f',left,47,9)])[0].finished);
+ const status=workshop.verbStatus([round('a',legacyPart,40),round('b',workshop.legacyWorkshopIds.slice(76),2)]);
  assert.deepEqual(status.get('abfahren'),{meaning:true,perfekt:true});assert.deepEqual(status.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(status.get('fahren'),{meaning:true,perfekt:false});assert.deepEqual(status.get('finden'),{meaning:false,perfekt:false});
- const whole=workshop.verbStatus([round('v',workshop.partIds(w1),7)]);
- assert.deepEqual(whole.get('abfahren'),{meaning:true,perfekt:true});assert.deepEqual(whole.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(whole.get('anbieten'),{meaning:false,perfekt:false});
- const staged=workshop.verbStatus([round('s',stagedIds,7)]);
- assert.deepEqual(staged.get('abfahren'),{meaning:true,perfekt:false});assert.deepEqual(staged.get('anbieten'),{meaning:true,perfekt:false});assert.deepEqual(staged.get('anfangen'),{meaning:false,perfekt:false});
- assert.equal(workshop.WORKSHOP_TOTAL,190);assert.equal(workshop.LEGACY_WORKSHOP_TOTAL,152);
- assert.ok(workshop.isPartRound({mode:'workshop',questions:oldQuestions},w1),'an old whole-path round continues as part 1');assert.ok(!workshop.isPartRound({mode:'workshop',questions:oldQuestions},w2));
- assert.ok(!workshop.isPartRound({mode:'workshop',questions},w1),'the whole path is no round of its own any more');
- assert.ok(workshop.isPartRound({mode:'workshop',questions:asQuestions(workshop.partIds(w2))},w2));assert.ok(!workshop.isPartRound({mode:'workshop',questions:asQuestions(workshop.partIds(w2))},w1));
- assert.ok(workshop.isPartRound({mode:'workshop',questions:asQuestions(workshop.partIds(w2,'legacy'))},w2),'an older part round continues');
- assert.ok(workshop.isPartRound({mode:'workshop',questions:stagedQuestions},w1)&&!workshop.isPartRound({mode:'workshop',questions:stagedQuestions},w2),'a staged part round is a round of its part');
- assert.ok(workshop.isPartRound({mode:'workshop',questions:asQuestions(left)},w1)&&!workshop.isPartRound({mode:'workshop',questions:asQuestions(left)},w2),'a carried-on round is a round of its part');
+ const fresh=workshop.verbStatus([round('v',workshop.partIds(w1),5)]);assert.deepEqual(fresh.get('abgeben'),{meaning:true,perfekt:false});assert.deepEqual(fresh.get('anbieten'),{meaning:false,perfekt:false});
+ // Which saved round belongs to a part, and where it ends.
+ assert.ok(workshop.isPartRound({mode:'workshop',questions:asQuestions(oldIds)},w1)&&!workshop.isPartRound({mode:'workshop',questions:asQuestions(oldIds)},w2),'an old whole-path round belongs to part 1');
+ assert.ok(!workshop.isPartRound({mode:'workshop',questions},w1),'the whole path is no round of its own');
+ for(const list of [workshop.partIds(w1),stagedIds,verbByVerb,legacyPart,left])assert.ok(workshop.isPartRound({mode:'workshop',questions:asQuestions(list)},w1)&&!workshop.isPartRound({mode:'workshop',questions:asQuestions(list)},w2));
  assert.ok(!workshop.isPartRound({mode:'mixed',questions:asQuestions(left)},w1)&&!workshop.isPartRound({mode:'workshop',questions:[]},w1));
- assert.equal(workshop.roundEnd({mode:'workshop',questions:oldQuestions}),76);assert.equal(workshop.roundEnd({mode:'workshop',questions:oldQuestions.slice(0,76)}),76);assert.equal(workshop.roundEnd({mode:'workshop',questions:questions.slice(0,95)}),95);assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(left)}),85);
- // Each round keeps its own cards: the stepper of a legacy round shows two Perfekt steps; a staged round opens a part card at its Perfekt stage; the current order does not.
- assert.deepEqual(workshop.pathPlace(oldQuestions,38,lookup).steps,['perfekt','write-perfekt']);
- const stagedPerfekt=workshop.pathPlace(stagedQuestions,38,lookup);assert.equal(stagedPerfekt.layout,'stage');assert.ok(stagedPerfekt.chapterStart&&stagedPerfekt.stageStart);assert.equal(stagedPerfekt.steps.length,3);assert.equal(stagedPerfekt.verb.id,'abfahren');
- // The page: after spelling, one step further asks the Perfekt from the meaning; its result card shows no example sentences again.
- const pageText=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(pageText.includes("kind==='meaning-perfekt'?t('promptMeaningPerfekt')")&&pageText.includes("examples={q.verbTask!=='meaning-perfekt'}")&&pageText.includes("kind!=='meaning-perfekt'&&kind!=='hear'"),'meaning → Perfekt on the page');
- for(const language of languages)assert.ok(copy.verbText(language,'promptMeaningPerfekt').includes('Perfekt')&&copy.verbText(language,'stepMeaningPerfekt').includes('Perfekt'),language);
- // The page: an older round is carried on verb by verb; the part card says meaning and Perfekt come together; the study API lists an open round's questions.
- assert.ok(pageText.includes("if(!isStagedRound(data.session.questions)){openSession(data.session);return;}")&&pageText.includes("ids=continuationIds(family,data.session);"),'an older round goes on in the new order');
- assert.ok(pageText.includes("both={place.layout==='verb'}"),'the part card knows the verb-by-verb flow');
- const cardSrc=fs.readFileSync('app/verb-workshop.tsx','utf8');assert.ok(cardSrc.includes("{both?t('stageBoth'):perfekt?t('stepPerfekt'):t('stageMeanings')}")&&cardSrc.includes("{both&&<p className=\"verb-chapter-rule verb-chapter-flow\">{t('verbFlow')}</p>}"));
- for(const language of languages){assert.ok(copy.verbText(language,'stageBoth').includes('Perfekt'),language);assert.ok(copy.verbText(language,'verbFlow').includes('Perfekt'),language);}
+ assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(oldIds)}),76);assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(workshop.partIds(w1))}),57);assert.equal(workshop.roundEnd({mode:'workshop',questions:asQuestions(left)}),47);
+ // The page: the past form asks for the Partizip II with the infinitive shown; its result shows infinitive → Partizip II, no example sentences.
+ const pageText=fs.readFileSync('app/verb-study.tsx','utf8');const cardSrc=fs.readFileSync('app/verb-workshop.tsx','utf8');
+ assert.ok(pageText.includes("kind==='partizip'?t('promptPartizip')")&&pageText.includes("past={q.verbTask==='partizip'}")&&!pageText.includes('meaning-perfekt'),'the past form on the page');
+ assert.ok(cardSrc.includes("{examples&&!past&&<PersonSentences")&&cardSrc.includes("{verb.participle}</span></>"),'the result of the past form');
+ assert.ok(pageText.includes("if(!isOlderRound(data.session.questions)){openSession(data.session);return;}")&&pageText.includes("ids=continuationIds(family,data.session);"),'an older round goes on in the new order');
+ assert.ok(pageText.includes("<ChapterCard family={place.family} verbs={chapterVerbs} language={language}")&&!cardSrc.includes("<VerbForm verb={verb} stage=\"perfekt\"/></small>"),'the part card shows the verbs only');
+ for(const language of languages)for(const key of ['stageBoth','verbFlow','stepPartizip','promptPartizip'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
+ for(const language of languages)assert.ok(copy.verbText(language,'verbFlow').includes('gefahren')&&!/hat …|ist …/.test(copy.verbText(language,'verbFlow')),language);
  assert.ok(fs.readFileSync('app/api/study/route.ts','utf8').includes("first:list[0]?.id??null,ids:s.mode==='workshop'&&!s.finished_at?list.map(q=>q.id??''):undefined"),'the summary carries the first question, and the questions of an open round');
  // The page: islands start or continue their part; no lock is shown.
  const pageSrc=fs.readFileSync('app/verb-study.tsx','utf8');
@@ -400,7 +378,7 @@ test('Fiil Atölyesi: two parts in book order, each verb whole (meaning, then at
  for(const verb of verbs.verbs){const f=verbs.praesensPersons(verb);assert.equal(f.er,verb.praesens,verb.id);assert.equal(new Set([f.ich,f.wir]).size,2,verb.id);}
  for(const language of languages)assert.ok(copy.verbText(language,'conjugationTitle').includes('Präsens'));
  assert.ok(!page.includes("sentenceText(item,'praesens')"),'meaning feedback shows no single sie/er sentence');
- assert.ok(page.includes("(kind!=='meaning'&&kind!=='meaning-perfekt'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
+ assert.ok(page.includes("(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback"),'pictures hidden for meaning and listening questions');
 });
 test('after an answer every person gets an example sentence: Präsens after meanings, Perfekt after Perfekt',()=>{
  const persons=load('verb-persons');const byId=id=>verbs.verbMap.get(id);

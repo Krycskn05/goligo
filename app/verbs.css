@@ -259,6 +259,7 @@
 .verb-example .verb-chunk.mark.prefix,.verb-example .verb-chunk.mark.participle { color:#e26a1c; }
 .verb-chapter h1 { margin:0; font-size:30px; font-weight:800; }
 .verb-chapter-rule { margin:0; font-size:17px; line-height:1.6; font-weight:700; color:#1f3b5c; padding:14px 16px; border-radius:18px; background:#f3f9ff; border:2px solid #fff; box-shadow:0 4px 14px rgba(28,82,130,.08); }
+.verb-chapter-flow { font-size:15px; font-weight:600; background:#fff !important; }
 .verb-chapter-verbs { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px; }
 .verb-chapter-verbs li { display:grid; justify-items:center; gap:6px; font-size:14px; font-weight:800; text-align:center; color:#1f3b5c; }
 .verb-chapter-verbs small { font-size:12px; font-weight:600; color:#3d5a7a; }

@@ -124,6 +124,21 @@ async function visit(page, url, shot, errors) {
     await p2.locator(".verb-result-next").click();
     await p2.waitForSelector(".letter-puzzle", { timeout: 20000 });
     fit("yazim", await shot("12-telefon-yazim.png"));
+    // Bolume tiklayinca fiil listesi, fiile tiklayinca fiil karti (anlamli ornek cumlelerle). Bilgi amaclidir.
+    await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
+    await p2.waitForTimeout(1200);
+    await p2.locator("[data-verb-island-go]").first().click();
+    await p2.waitForSelector("#verb-part-heading", { timeout: 20000 });
+    await p2.waitForTimeout(700);
+    await p2.screenshot({ path: path.join(OUT, "13-telefon-bolum-listesi.png"), fullPage: true });
+    const listed = await p2.locator("[data-verb-open]").count();
+    info("Telefon: bolum listesinde fiiller gorunuyor", listed === 19, `${listed} fiil`);
+    await p2.locator("[data-verb-open]").first().click();
+    await p2.waitForSelector("#verb-detail-heading", { timeout: 20000 });
+    await p2.waitForTimeout(1500);
+    await p2.screenshot({ path: path.join(OUT, "14-telefon-fiil-karti.png"), fullPage: true });
+    const meanings = await p2.locator(".verb-person-meaning").count();
+    info("Telefon: fiil kartinda ornek cumlelerin anlami var", meanings === 9, `${meanings} anlam satiri`);
   } catch (e) {
     info("Telefon: atolye adimlari", false, String(e && e.message || e).slice(0, 200));
   }

@@ -8,7 +8,7 @@ import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
  * questions `verb-*`. Answer options stay German; meanings follow the interface language.
  */
 export type VerbAux='hat'|'ist';
-export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
+export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'partizip'|'write'|'write-praesens'|'write-perfekt'|'hear'|'hear-praesens'|'hear-perfekt';
 export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
 
 type Spec=readonly [display:string,praesens:string,perfekt:string,praesensWrong:readonly [string,string,string],perfektWrong:readonly [string,string,string],meanings:VaultTranslations];
@@ -97,6 +97,15 @@ function perfektDistractors(verb:Verb,seed:string){
  for(const id of formDistractors(verb,seed,8)){const other=verbs.find(item=>item.id===id)!;if(taken.has(other.perfekt))continue;taken.add(other.perfekt);result.push(other.perfekt);if(result.length===3)break;}
  return result;
 }
+// Past forms that are wrong for these two verbs (their Partizip II looks like the infinitive).
+const extraPartizipWrong:Record<string,string>={bekommen:'gebekommt',gefallen:'gefallt'};
+/** Three wrong past forms of the same verb, without hat/ist: the made-up forms of the book list (abgefahrt, geabfahren), then the infinitive. */
+export function partizipDistractors(verb:Verb){
+ const taken=new Set([verb.participle]);const result:string[]=[];
+ const wrong=verb.perfektWrong.map(form=>form.split(' ').slice(1).join(' '));
+ for(const form of [wrong[0],wrong[1],verb.infinitive,...wrong.slice(2),extraPartizipWrong[verb.id]??'']){if(!form||taken.has(form))continue;taken.add(form);result.push(form);if(result.length===3)break;}
+ return result;
+}
 /** Präsens forms of the other persons (du, ich, wir, ihr), the prefix at the end: the wrong options of the sentence task. */
 export function praesensPersons(verb:Verb){
  const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';const tail=prefix?' '+prefix:'';
@@ -127,6 +136,8 @@ for(const verb of verbs){
  add('verb-perfekt-'+verb.id,'perfekt',{kind:'choice',prompt:verb.display+' · Perfekt: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...verb.perfektWrong]});
  // The last step of the Perfekt stage: the meaning is shown, the Perfekt of that verb is chosen among the Perfekt forms of other verbs.
  add('verb-meaning-perfekt-'+verb.id,'meaning-perfekt',{kind:'choice',prompt:'“'+meaning+'” anlamındaki fiilin Perfekt biçimi: '+subject+' …',answer:verb.perfekt,options:[verb.perfekt,...perfektDistractors(verb,'meaning-perfekt-'+verb.id)]});
+ // The past form of the verb alone: the infinitive is shown, the Partizip II is chosen (no hat/ist, no other verbs).
+ add('verb-partizip-'+verb.id,'partizip',{kind:'choice',prompt:verb.display+' · geçmiş hali (Partizip II) hangisi?',answer:verb.participle,options:[verb.participle,...partizipDistractors(verb)]});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});
  add('verb-write-praesens-'+verb.id,'write-praesens',{kind:'write',writingTask:'gap',prompt:verb.display+' · Präsens yaz.',gap:subject+' ___',answer:verb.praesens});
  add('verb-write-perfekt-'+verb.id,'write-perfekt',{kind:'write',writingTask:'gap',prompt:verb.display+' · Perfekt yaz.',gap:subject+' ___ ___',answer:verb.perfekt,...(verb.alsoIst?{accepted:['ist '+verb.participle]}:{})});

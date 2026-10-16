@@ -37,7 +37,7 @@ export async function GET(request:Request){
    english?Promise.resolve(null):db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode='workshop' AND topic LIKE 'verbs-%' AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user).first<{id:string}>()
   ]);
   const stats=url.searchParams.get('stats')==='1'?await loadStats(db,user,english,url.searchParams.get('tz')):undefined;
-  return json({stats,reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,activeVerbSessionId:activeVerb?.id??null,sessions:sessions.results.map(s=>{const list=JSON.parse(s.questions as string) as {id?:string}[];return {...s,questions:undefined,total:list.length,first:list[0]?.id??null,third:list[2]?.id??null};})});
+  return json({stats,reviews:(reviews.results as Review[]).filter(r=>r.question_id.startsWith('en-')===english),notes:Object.fromEntries(notes.results.map(n=>[n.key,n.value])),activePictureSessionId:activePicture?.id??null,activeVerbSessionId:activeVerb?.id??null,sessions:sessions.results.map(s=>{const list=JSON.parse(s.questions as string) as {id?:string}[];return {...s,questions:undefined,total:list.length,first:list[0]?.id??null,ids:s.mode==='workshop'&&!s.finished_at?list.map(q=>q.id??''):undefined};})});
  }catch(error){return failure(error);}
 }
 export async function POST(request:Request){

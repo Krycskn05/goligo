@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useId,useMemo,useRef,useState} from 'react';
-import {ArrowRight,Lightbulb} from 'lucide-react';
+import {Lightbulb} from 'lucide-react';
 import {makeLetterPuzzle,makeLetterBank,remainingLetterChoices,completeLetterPuzzle,placedLetters,readLetterBankDraft,readPuzzleExtras,letterFits,tileForLetter,scoredLetterAnswer,hintLimit,noMistakes,noHints,type LetterPlacements,type PuzzleMistakes,type PuzzleHints} from '@/lib/letter-puzzle';
 import {vaultText,type VaultLanguage} from '@/lib/object-vault-copy';
 import {puzzleText} from '@/lib/article-logic';
@@ -9,7 +9,8 @@ import type {LearningLanguage} from '@/lib/learning-language';
 /**
  * Fill the gaps letter by letter. A tapped letter jumps into the next empty box; a right letter pops in,
  * a wrong one shakes and goes back (the question then counts as a mistake). Tapping a filled box sends its
- * letter back, the hint places the next right letter, and the answer is checked as soon as every box is full.
+ * letter back, the hint places the next right letter, and the answer is checked by itself as soon as every box
+ * is full — there is no button to press.
  */
 export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=false,locked=false,result,strictCase=false,course='de'}:{answer:string;course?:LearningLanguage;storageKey:string;language:VaultLanguage;onChange:(answer:string)=>void;onSubmit:(answer:string)=>void;busy?:boolean;locked?:boolean;result?:boolean;strictCase?:boolean}){
  const text=(key:Parameters<typeof vaultText>[1],params?:Record<string,string|number>)=>vaultText(language,key,params,course);
@@ -25,13 +26,16 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
  useEffect(()=>{const saved=readLetterBankDraft(puzzle,bank,storageKey);const extras=readPuzzleExtras(puzzle,storageKey);setPlacements(saved);setMistakes(extras.mistakes);setHints(extras.hints);setActive(puzzle.editable.find(index=>!saved[index])??puzzle.editable[0]);sent.current=false;setReady(true);},[puzzle,bank,storageKey]);
  useEffect(()=>{onChange(completed.complete?scored:'');},[completed.complete,scored,onChange]);
  useEffect(()=>{if(!ready)return;try{if(result!==undefined)localStorage.removeItem(storageKey);else localStorage.setItem(storageKey,JSON.stringify({version:3,slots:placements,mistakes,hints}));}catch{}},[placements,mistakes,hints,storageKey,result,ready]);
- // Every box full: a short moment to see the last letter, then the answer is checked by itself.
+ // Every box full: a short moment to see the last letter, then the answer is checked by itself. If the page could not
+ // take it yet (a sound still ending), it is tried again a few times; the page ignores a second answer to the same question.
  const submitLatest=useRef(()=>{});submitLatest.current=()=>onSubmit(scored);
  useEffect(()=>{
   if(!completed.complete){sent.current=false;return;}
-  if(unavailable||sent.current||result!==undefined)return;
-  const timer=setTimeout(()=>{sent.current=true;submitLatest.current();},520);
-  return()=>clearTimeout(timer);
+  if(unavailable||result!==undefined)return;
+  let tries=0;
+  const first=setTimeout(()=>{sent.current=true;submitLatest.current();},350);
+  const again=setInterval(()=>{tries++;if(tries>6){clearInterval(again);return;}submitLatest.current();},1200);
+  return()=>{clearTimeout(first);clearInterval(again);};
  },[completed.complete,unavailable,result]);
  useEffect(()=>{if(!shake)return;const timer=setTimeout(()=>setShake(current=>current?.turn===shake.turn?null:current),520);return()=>clearTimeout(timer);},[shake]);
  function focus(index:number|undefined){if(index!==undefined)requestAnimationFrame(()=>fields.current.get(index)?.focus({preventScroll:true}));}
@@ -111,6 +115,5 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
    <div className="letter-bank" role="group" aria-label={text('letterBank')} dir="ltr" lang={course}>{choices.map(choice=><button type="button" key={choice.letter} className="letter-tile" disabled={unavailable} data-letter={choice.letter} data-token-id={choice.id} aria-label={text('puzzleCopies',{letter:choice.letter,n:choice.count})} onClick={()=>pick(choice.id)}><span>{choice.letter}</span>{choice.count>1&&<small className="letter-tile-count" aria-hidden="true">{choice.count}</small>}</button>)}</div>
   </div>}
   {!locked&&<p className="puzzle-keyboard-tip">{puzzleText(language,'keyboardTip')}</p>}
-  {!locked&&<button type="submit" className="btn check-button" disabled={unavailable||!completed.complete}>{text('checkAnswer')}<ArrowRight size={18}/></button>}
  </form>;
 }

@@ -388,6 +388,15 @@
  /* Picture beside the meaning: room for the letters below. */
  .verb-question .verb-card.with-picture:has(.verb-picture) { grid-template-columns:84px minmax(0,1fr); justify-items:start; align-items:center; text-align:start; gap:12px; }
  .verb-question .verb-card.with-picture .verb-picture { width:84px; max-width:84px; margin:0; border-radius:14px; }
+ /* The verb and its meaning stack beside the picture (the meaning never falls into the narrow picture column); a sentence takes the full width below. */
+ .verb-question .verb-card.with-picture:has(.verb-picture) { grid-template-rows:auto auto; grid-auto-flow:row dense; row-gap:2px; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-picture { grid-column:1; grid-row:1 / span 2; align-self:center; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-main,
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-meaning { grid-column:2; overflow-wrap:normal; word-break:normal; hyphens:manual; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-main { align-self:end; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-meaning { align-self:start; font-size:15px; line-height:1.35; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-card-main:only-of-type { grid-row:1 / span 2; align-self:center; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-sentence { grid-column:1 / -1; justify-self:stretch; }
  .verb-question .puzzle-hint { margin-bottom:6px; font-size:11.5px; line-height:1.4; }
  .verb-question .letter-puzzle { margin-top:8px; }
  .verb-question .puzzle-meta { margin:6px 0 4px; }

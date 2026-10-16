@@ -193,6 +193,11 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  assert.equal(persons.learnSpeech(fahren,'meaning'),'einladen');assert.equal(persons.learnSpeech(fahren,'perfekt'),'er hat eingeladen');
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
  assert.ok(cards.includes('const rows=conjugationRows(verb);')&&cards.includes('onClick={()=>speech.speak(spoken)}')&&cards.includes('const spoken=learnSpeech(verb,stage);')&&cards.includes('onClick={()=>speech.speak(row.text)}'),'the cards speak exactly these texts');
+ // A new verb's card says the verb by itself, once (a natural clip exists for it); closing the card stops it, taps ready the voice.
+ const study=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert.ok(study.includes("if(overlay!=='learn'||!place||!session)return;")&&study.includes("speech.speak(learnSpeech(place.verb,")&&study.includes("if(spokenCard.current===key)return;spokenCard.current=key;"),'the verb card speaks the verb once');
+ assert.ok(study.includes("function dismiss(kind:'c'|'l'){if(kind==='l')speech.stop();else speech.prepare();")&&study.includes("stopFeedback();speech.prepare();const upcoming=index+1;"),'the voice is readied inside the tap and stopped when the card closes');
+ for(const verb of verbs.verbs)assert.ok(texts.has(persons.learnSpeech(verb,'meaning')),verb.id+' has a clip');
  // Long voice runs stop in time and continue in a new run.
  assert.match(fs.readFileSync('scripts/voices/make-voices.py','utf8'),/VOICE_BUDGET_MIN/);
  assert.match(fs.readFileSync('scripts/voices/build.sh','utf8'),/gh workflow run sesler\.yml/);

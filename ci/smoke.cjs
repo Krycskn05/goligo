@@ -179,6 +179,22 @@ async function visit(page, url, shot, errors) {
     await p2.screenshot({ path: path.join(OUT, "14-telefon-fiil-karti.png"), fullPage: true });
     const meanings = await p2.locator(".verb-person-meaning").count();
     info("Telefon: fiil kartinda ornek cumlelerin anlami var", meanings === 9, `${meanings} anlam satiri`);
+    // Yanlislarim: atolye sayfasinda yanlislar bolumu; yanlis varsa ayri bir turda calisilir.
+    await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
+    await p2.waitForSelector("[data-verb-mistakes]", { timeout: 20000 });
+    const open = Number(await p2.locator("[data-verb-mistakes]").first().getAttribute("data-verb-mistakes"));
+    await p2.locator("[data-verb-mistakes]").first().scrollIntoViewIfNeeded();
+    await p2.waitForTimeout(500);
+    await p2.screenshot({ path: path.join(OUT, "18-telefon-yanlislarim.png") });
+    let round = "yanlis yok";
+    if (open > 0) {
+      await p2.locator("[data-verb-mistakes-start]").click();
+      await p2.waitForSelector("#object-question-heading", { timeout: 20000 });
+      await p2.waitForTimeout(700);
+      await p2.screenshot({ path: path.join(OUT, "19-telefon-yanlis-turu.png") });
+      round = ((await p2.locator(".object-practice-top").first().textContent()) || "").replace(/\s+/g, " ").trim();
+    }
+    info("Telefon: Yanlislarim bolumu var ve calisiliyor", true, `${open} yanlis · ${round}`);
   } catch (e) {
     info("Telefon: atolye adimlari", false, String(e && e.message || e).slice(0, 200));
   }

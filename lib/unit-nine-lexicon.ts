@@ -1,4 +1,5 @@
 import type {StudyLanguage} from './study-languages';
+import {packText} from './site-languages';
 
 // Each entry is German | English | Arabic | Ukrainian | French.
 const rows=`
@@ -184,6 +185,7 @@ const normalize=(value:string)=>value.replace(/\*/g,'').replace(/\([^)]*\)/g,'')
 const lexicon=new Map(rows.trim().split('\n').map(line=>{const [de,en,ar,uk,fr]=line.split('|');return [normalize(de),{de,en,ar,uk,fr}];}));
 export function wordMeaning(german:string,language:StudyLanguage):string|undefined{
  if(language==='tr')return undefined;
- return lexicon.get(normalize(german))?.[language];
+ const entry=lexicon.get(normalize(german));if(!entry)return undefined;
+ return language==='de'||language==='en'||language==='ar'||language==='uk'||language==='fr'?entry[language]:packText(language,entry.en);
 }
 export function hasWordMeaning(german:string){return lexicon.has(normalize(german));}

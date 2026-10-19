@@ -1,4 +1,5 @@
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
+import {pickText} from './site-languages';
 
 /**
  * Fiil Atölyesi: the 72 verbs in four parts, in the order of the textbook pages, each page split at the
@@ -28,7 +29,6 @@ const familyOfVerb=new Map(verbFamilies.flatMap(family=>family.verbs.map(verb=>[
 export const isVerbFamilyTopic=(topic:string)=>verbFamilyMap.has(topic);
 /** The part a verb belongs to (every verb has exactly one). */
 export function verbFamilyOf(verbId:string){return familyOfVerb.get(verbId);}
-const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
-export function familyTitle(family:VerbFamily,language:VaultLanguage){return family.title[languageIndex[language]];}
+export function familyTitle(family:VerbFamily,language:VaultLanguage){return pickText(family.title,language);}
 /** What the part is about, in the chosen language (shown on the part's opening card). */
-export function familyRule(family:VerbFamily,language:VaultLanguage){return family.rule[languageIndex[language]];}
+export function familyRule(family:VerbFamily,language:VaultLanguage){return pickText(family.rule,language);}

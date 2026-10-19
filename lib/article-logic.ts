@@ -1,5 +1,6 @@
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {compoundHeads,pluralNouns} from './article-challenges';
+import {pickText} from './site-languages';
 
 /**
  * Why a Nesne Kasası noun has its article: one short, honest rule per word
@@ -33,8 +34,7 @@ const copy={
 } as const satisfies Record<string,VaultTranslations>;
 export type PuzzleCopyKey=keyof typeof copy;
 export const puzzleCopy=copy;
-const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
 export function puzzleText(language:VaultLanguage,key:PuzzleCopyKey,params:Record<string,string>={}){
- return copy[key][languageIndex[language]].replace(/\{([a-z]+)\}/g,(token,name:string)=>params[name]??token);
+ return pickText(copy[key],language).replace(/\{([a-z]+)\}/g,(token,name:string)=>params[name]??token);
 }
 export function articleRuleText(language:VaultLanguage,rule:ArticleRule){return puzzleText(language,rule.key,{x:rule.x,a:rule.a??''});}

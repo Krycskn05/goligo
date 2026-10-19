@@ -7,6 +7,7 @@ import "./verbs.css";
 import "./koko-theme.css";
 import "./members.css";
 import "./ausbildung.css";
+import "./notebook.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Lora:ital,wght@0,500..700;1,500..700&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased">{children}<LearningEffects/></body>
     </html>

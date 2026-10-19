@@ -50,6 +50,7 @@ export const categoryCopy={
  grammar:['Dil bilgisi','Grammatik','Grammar','القواعد','Граматика','Grammaire'],
  goals:['Bu ünitede','In dieser Einheit','In this unit','في هذه الوحدة','У цьому розділі','Dans cette unité'],
  levelLabel:['Öğrenme düzeyi','Lernniveau','Learning level','مستوى التعلم','Навчальний рівень','Niveau d’apprentissage'],
+ comingSoon:['Yakında','Bald verfügbar','Coming soon','قريبًا','Незабаром','Bientôt'],
  mixedTopics:['Her konuda karma alıştırmalar','Gemischte Übungen pro Thema','Mixed activities in each topic','تدريبات متنوعة في كل موضوع','Змішані вправи в кожній темі','Exercices variés pour chaque sujet'],
  allUnits:['Tüm üniteler','Alle Einheiten','All units','كل الوحدات','Усі розділи','Toutes les unités'],
  savedText:['Metnin kaydedildi.','Dein Text wurde gespeichert.','Your text was saved.','تم حفظ نصك.','Текст збережено.','Ton texte a été enregistré.'],

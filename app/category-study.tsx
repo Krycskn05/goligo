@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {BookOpen,Image as ImageIcon,PenLine,RotateCcw,Trophy} from 'lucide-react';
+import {BookOpen,Clock,Image as ImageIcon,PenLine,RotateCcw,Trophy} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {courseUnits,type CourseLevel} from '@/lib/textbook-curriculum';
 import {englishCourseUnits} from '@/lib/english-course';
@@ -18,7 +18,7 @@ import {SiteHeader} from './site-header';
 import {housingText} from '@/lib/housing-copy';
 import type {Snapshot} from '@/lib/study';
 import {api} from './study-shared';
-import {housingProgress} from '@/lib/progress';
+import {housingProgress,type TopicProgress} from '@/lib/progress';
 import {ProgressMeter,SidebarProgress} from './progress-ui';
 
 export default function CategoryStudy(){
@@ -39,6 +39,9 @@ export function Workshop({language,onLanguage,course='de',onCourse}:{language:St
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null);
  // Progress is read from the signed-in learner's saved answers; it stays hidden if they cannot be loaded.
  useEffect(()=>{if(course!=='de'){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course]);
+ // Lektion 12 keeps its progress in this browser; its helpers load only when the catalogue needs them.
+ const [ausbildung,setAusbildung]=useState<TopicProgress|null>(null);
+ useEffect(()=>{if(course!=='de'){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={languageDirection(language)} lang={language}>
@@ -48,8 +51,25 @@ export function Workshop({language,onLanguage,course='de',onCourse}:{language:St
    <main id="main" className="work-main" tabIndex={-1}>
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}
     <section className="toon-hero"><div><span className="eyebrow">{learningText(language,course)}</span><h1 id="work-heading" tabIndex={-1}>{c(language,'catalogTitle')}</h1></div><div className="toon-hero-art"><HeroArt/></div></section>
-    <div className="toon-level-switch" role="group" aria-label={c(language,'levelLabel')}>{(['A1.1','A1.2'] as const).map(value=><button type="button" key={value} className={level===value?'active':''} aria-pressed={level===value} onClick={()=>setLevel(value)}><strong>{value}</strong><span>{c(language,'categories')}</span></button>)}</div>
-    <section id="curriculum" aria-labelledby="curriculum-heading"><div className="toon-curriculum-head"><h2 id="curriculum-heading">{level} · {c(language,'categories')}</h2></div><div className="category-grid toon-topic-grid">{units.map(unit=>{const title=translate(unit.names,language);return <article className="category-card toon-topic-card catalog-topic-card" key={unit.id} data-unit={unit.id}><div className="catalog-topic-content"><div className="toon-topic-art"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/><span className="toon-card-number">{String(unit.number).padStart(2,'0')}</span></div><h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}{course==='de'&&unit.id==='book-11'&&snapshot&&<ProgressMeter progress={housingProgress('all',snapshot.reviews)} language={language} label={title} compact/>}{course==='de'&&unit.id==='book-11'&&<a className="btn small housing-open" href="/a1-2/ev-ve-yasam">{housingText(language,'open')}</a>}{course==='de'&&unit.id==='book-12'&&<a className="btn small housing-open" href="/a1-2/ausbildung" data-l12-open="">{housingText(language,'open')}</a>}</div></article>;})}</div></section>
+    {/* The catalogue as a spiral notebook: level tabs, ruled paper, unit photos taped onto the page. */}
+    <section id="curriculum" className="nb" aria-labelledby="curriculum-heading">
+     <div className="nb-tabs" role="group" aria-label={c(language,'levelLabel')}>{(['A1.1','A1.2'] as const).map(value=><button type="button" key={value} className={level===value?'active':''} aria-pressed={level===value} onClick={()=>setLevel(value)}><strong>{value}</strong><span>{c(language,'categories')}</span></button>)}</div>
+     <div className="nb-book">
+      <div className="nb-spiral" aria-hidden="true">{Array.from({length:30},(_,i)=><span key={i}/>)}</div>
+      <div className="nb-page">
+       <h2 id="curriculum-heading" className="nb-title">{level} · {c(language,'categories')}</h2>
+       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':null:null;const progress=course!=='de'?null:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:null;
+        return <li className={'nb-card tape-'+(i%4)+(lesson?' has-lesson':'')} key={unit.id} data-unit={unit.id}>
+         <span className="nb-tape" aria-hidden="true"/>
+         <div className="nb-photo"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/></div>
+         <span className="nb-num" lang={course} dir="ltr">{course==='de'?'Lektion':'Unit'} {unit.number}</span>
+         <h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}
+         {progress&&<ProgressMeter progress={progress} language={language} label={title} compact/>}
+         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
+        </li>;})}</ul>
+      </div>
+     </div>
+    </section>
    </main>
   </div><SiteFooter/>
  </div>;

@@ -11,7 +11,7 @@ import {defaultEffects,EFFECTS_CHANGED,EFFECTS_KEY,LEARNING_REACTION,readEffects
 import {languageDirection,loadLanguagePack} from '@/lib/site-languages';
 
 // Buttons and links that open another view get a soft gust of wind instead of a tap.
-const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-feature,.vault-category-open,.vault-back-categories,.object-exit,.progress-topic,.toon-level-switch button';
+const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-feature,.vault-category-open,.vault-back-categories,.object-exit,.progress-topic,.toon-level-switch button,.nb-tabs button';
 const SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
 const OPEN_EFFECTS='lernkoko-open-effects';

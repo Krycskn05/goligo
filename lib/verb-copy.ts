@@ -1,4 +1,5 @@
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
+import {pickText} from './site-languages';
 
 /** Interface copy for the Fiiller page (order: tr, de, en, ar, uk, fr, es, ru, fa, pl, it, pt). Shared buttons come from vaultText. */
 export const verbCopy={
@@ -153,7 +154,6 @@ export const verbCopy={
 } as const satisfies Record<string,VaultTranslations>;
 
 export type VerbCopyKey=keyof typeof verbCopy;
-const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
 export function verbText(language:VaultLanguage,key:VerbCopyKey,params:Record<string,string|number>={}):string{
- return verbCopy[key][languageIndex[language]].replace(/\{([^{}]+)\}/g,(token,name:string)=>Object.prototype.hasOwnProperty.call(params,name)?String(params[name]):token);
+ return pickText(verbCopy[key],language).replace(/\{([^{}]+)\}/g,(token,name:string)=>Object.prototype.hasOwnProperty.call(params,name)?String(params[name]):token);
 }

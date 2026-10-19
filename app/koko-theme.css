@@ -206,3 +206,21 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 .verb-fold > summary:hover .verb-fold-icon { filter:brightness(.96); }
 .verb-fold > summary:focus-visible { outline:3px solid var(--blue-2); outline-offset:4px; border-radius:12px; }
 @media (prefers-reduced-motion:reduce) { .verb-fold-icon { transition:none; } }
+
+/* 31 site languages: long names (e.g. Bosanski / Hrvatski / Srpski) must not push the header wider than the phone. */
+.site-language select { max-width:min(46vw,230px); text-overflow:ellipsis; }
+
+/* Fiil Atölyesi altındaki alt bağlantılar: Oyunlar ve Yanlışlarım */
+.work-subnav { display:grid; gap:6px; margin:-2px 0 2px; padding-inline-start:18px; border-inline-start:3px solid #f6dc9a; margin-inline-start:20px; }
+.toon-app .work-nav.work-subnav-link,.work-nav.work-subnav-link { text-decoration:none; min-height:42px; padding:.5rem .85rem; font-size:13px; font-weight:700; }
+.work-subnav-link svg { color:var(--blue-2); flex:none; }
+@media (max-width:760px) {
+ .work-subnav { display:contents; }
+}
+
+/* Oyunlar ve Yanlışlarım: sol menüden açılan ayrı sayfalar */
+.verb-section { display:grid; gap:16px; max-width:760px; }
+.verb-section-head { display:grid; gap:6px; }
+.verb-section-head h1,.verb-mistakes-head h1 { margin:0; font-size:28px; line-height:1.15; color:var(--ink); }
+.verb-section-games { margin-top:0; }
+.verb-section-games .btn { min-height:56px; padding:0 22px; font-size:16px; border-radius:999px; }

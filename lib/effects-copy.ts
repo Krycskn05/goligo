@@ -1,4 +1,5 @@
-import {vaultLanguages,type VaultLanguage,type VaultTranslations} from './object-vault-copy';
+import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
+import {pickText} from './site-languages';
 const copy={
  settings:['Sesler ve animasyonlar','Klänge und Animationen','Sounds and animations','الأصوات والحركات','Звуки й анімації','Sons et animations','Sonidos y animaciones','Звуки и анимация','صداها و پویانمایی','Dźwięki i animacje','Suoni e animazioni','Sons e animações'],
  enabled:['Ses efektleri','Klangeffekte','Sound effects','المؤثرات الصوتية','Звукові ефекти','Effets sonores','Efectos de sonido','Звуковые эффекты','جلوه‌های صوتی','Efekty dźwiękowe','Effetti sonori','Efeitos sonoros'],
@@ -71,4 +72,4 @@ const copy={
  soundUnavailable:['Ses açılamadı. Cihazının sesini açıp yeniden dene.','Kein Ton verfügbar. Prüfe die Lautstärke und versuche es erneut.','Audio is unavailable. Check your device volume and try again.','تعذر تشغيل الصوت. تحقق من مستوى الصوت وحاول مجدداً.','Звук недоступний. Перевір гучність і спробуй ще раз.','Son indisponible. Vérifie le volume et réessaie.','Audio no disponible. Revisa el volumen e inténtalo de nuevo.','Звук недоступен. Проверь громкость и попробуй снова.','صدا پخش نشد. صدای دستگاه را بررسی کن و دوباره تلاش کن.','Dźwięk niedostępny. Sprawdź głośność i spróbuj ponownie.','Audio non disponibile. Controlla il volume e riprova.','Áudio indisponível. Verifique o volume e tente novamente.'],
 } satisfies Record<string,VaultTranslations>;
 export type EffectsCopyKey=keyof typeof copy;
-export function effectsText(language:VaultLanguage,key:EffectsCopyKey){return copy[key][vaultLanguages.findIndex(item=>item.id===language)];}
+export function effectsText(language:VaultLanguage,key:EffectsCopyKey){return pickText(copy[key],language);}

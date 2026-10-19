@@ -2,7 +2,7 @@ const {test}=require('node:test');const assert=require('node:assert/strict');con
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
 const housing=load('housing-course'),traps=load('housing-traps'),course=load('course'),study=load('study'),puzzle=load('letter-puzzle'),copy=load('housing-copy'),{translate}=load('study-languages');
-const languages=['tr','de','en','ar','uk','fr'];
+const languages=load('site-languages').siteLanguages.map(item=>item.id);
 const trapQuestions=housing.housingQuestions.filter(q=>q.trap);
 
 test('every section gets a solid set of trick questions with an explanation in each language',()=>{

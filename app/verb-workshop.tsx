@@ -93,7 +93,7 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
   </div>
   {/* No example sentences while learning; the meaning card shows the Präsens forms for every person instead. */}
   {stage==='meaning'?<ConjugationTable verb={verb} language={language} speech={speech}/>:<RuleBox lines={verbRules(verb,stage,language)} language={language}/>}
-  {stage==='perfekt'&&verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
+  {stage==='perfekt'&&verb.alsoIst&&<p className="verb-note">{t('liegenNote',{verb:'ist '+verb.participle})}</p>}
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
@@ -201,7 +201,7 @@ export function VerbDetail({verb,family,position,total,marks,language,speech,onB
   </div>
   <ConjugationTable verb={verb} language={language} speech={speech}/>
   <button type="button" className="verb-detail-perfekt" disabled={speech.busy} aria-label={perfektSpeech} onClick={()=>speech.speak(perfektSpeech)}><small>Perfekt</small><span lang="de" dir="ltr">{verb.subject} <VerbForm verb={verb} stage="perfekt"/></span><Volume2 size={16} aria-hidden="true"/></button>
-  {verb.alsoIst&&<p className="verb-note">{t('liegenNote')}</p>}
+  {verb.alsoIst&&<p className="verb-note">{t('liegenNote',{verb:'ist '+verb.participle})}</p>}
   <div className="verb-detail-tabs" role="group" aria-label={t('examplesTitle',{t:'Präsens / Perfekt'})}>{(['praesens','perfekt'] as const).map(item=><button type="button" key={item} className={'verb-detail-tab'+(tense===item?' active':'')} aria-pressed={tense===item} onClick={()=>setTense(item)}>{item==='praesens'?'Präsens':'Perfekt'}</button>)}</div>
   <PersonSentences verb={verb} tense={tense} language={language} speech={speech}/>
  </article>;

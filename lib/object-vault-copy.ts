@@ -1,32 +1,20 @@
 /** Complete interface copy for the picture vocabulary vault.
  * Keep this tuple order in sync with vaultLanguages; answer options remain German.
  */
-export const vaultLanguages = [
-  {id:'tr',label:'Türkçe'},
-  {id:'de',label:'Deutsch'},
-  {id:'en',label:'English'},
-  {id:'ar',label:'العربية'},
-  {id:'uk',label:'Українська'},
-  {id:'fr',label:'Français'},
-  {id:'es',label:'Español'},
-  {id:'ru',label:'Русский'},
-  {id:'fa',label:'فارسی'},
-  {id:'pl',label:'Polski'},
-  {id:'it',label:'Italiano'},
-  {id:'pt',label:'Português'},
-] as const;
+import {siteLanguages,isSiteLanguage,languageDirection,pickText,type SiteLanguage} from './site-languages';
 
-export type VaultLanguage = typeof vaultLanguages[number]['id'];
+/** The vault offers the same site languages as every page (site-languages.ts). */
+export const vaultLanguages = siteLanguages;
+
+export type VaultLanguage = SiteLanguage;
 export type VaultTranslations = readonly [tr:string,de:string,en:string,ar:string,uk:string,fr:string,es:string,ru:string,fa:string,pl:string,it:string,pt:string];
 
-const languageIndex:Record<VaultLanguage,number> = {tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
-
 export function isVaultLanguage(value:string):value is VaultLanguage {
-  return vaultLanguages.some(language=>language.id===value);
+  return isSiteLanguage(value);
 }
 
 export function vaultDirection(language:VaultLanguage):'rtl'|'ltr' {
-  return language==='ar'||language==='fa'?'rtl':'ltr';
+  return languageDirection(language);
 }
 
 export const vaultCopy = {
@@ -182,6 +170,6 @@ const englishVaultCopy:Partial<Record<VaultCopyKey,VaultTranslations>>={
 
 export function vaultText(language:VaultLanguage,key:VaultCopyKey,params:Record<string,string|number>={},course:'de'|'en'='de'):string {
   const englishKey=key==='puzzleArticlePrompt'?'puzzlePrompt':key;
-  const text=(course==='en'?englishVaultCopy[englishKey]??vaultCopy[englishKey]:vaultCopy[key])[languageIndex[language]];
+  const text=pickText(course==='en'?englishVaultCopy[englishKey]??vaultCopy[englishKey]:vaultCopy[key],language);
   return text.replace(/\{([^{}]+)\}/g,(token,name:string)=>Object.prototype.hasOwnProperty.call(params,name)?String(params[name]):token);
 }

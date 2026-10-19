@@ -1,6 +1,7 @@
 import type {Question} from './course';
 import type {Topic} from './lessons';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
+import {pickText} from './site-languages';
 
 /**
  * Fiiller: the 72 verbs from the learner's two textbook pages (infinitive, 3rd person
@@ -105,8 +106,7 @@ export const verbs:Verb[]=specs.map(([display,praesens,perfekt,praesensWrong,per
  return {id,display,infinitive:id,subject:impersonal.has(id)?'es':femininSubject.has(id)?'sie':'sie/er',praesens,perfekt,aux:aux as VerbAux,participle:rest.join(' '),alsoIst:alsoIst.has(id),group:verbGroups.find(group=>index>=group.from&&index<group.to)!.id,number:index+1,praesensWrong,perfektWrong,meanings};
 });
 export const verbMap=new Map(verbs.map(verb=>[verb.id,verb]));
-const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
-export function verbMeaning(verb:Verb,language:VaultLanguage){return verb.meanings[languageIndex[language]];}
+export function verbMeaning(verb:Verb,language:VaultLanguage){return pickText(verb.meanings,language);}
 /** Spoken subject: one clear singular pronoun (the page writes "sie/er"; "es" and "sie" stay as written). */
 export function spokenSubject(verb:Verb){return verb.subject==='es'?'es':verb.subject==='sie'?'sie':'er';}
 /** The Perfekt as the page shows it, e.g. "hat/ist gelegen". */

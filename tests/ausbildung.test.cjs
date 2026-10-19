@@ -97,7 +97,11 @@ test('the chapter page, the listening page and the catalogue link are wired up',
  const study=fs.readFileSync('app/ausbildung-study.tsx','utf8');
  for(const piece of ['housing-section-grid','housing-card','toon-hero','housing-lesson-intro','ProgressMeter','object-practice'])assert(study.includes(piece),piece);
  assert(fs.readFileSync('app/layout.tsx','utf8').includes('import "./ausbildung.css";'));
- const home=fs.readFileSync('app/category-study.tsx','utf8');assert(home.includes("unit.id==='book-12'")&&home.includes('href="/a1-2/ausbildung"'));
+ const home=fs.readFileSync('app/category-study.tsx','utf8');assert(home.includes("unit.id==='book-12'?'/a1-2/ausbildung'")&&home.includes("unit.id==='book-11'?'/a1-2/ev-ve-yasam'"));
+ // The catalogue is a spiral notebook: level tabs, ruled page, taped unit photos, "coming soon" for units without lessons.
+ for(const piece of ['className="nb-tabs"','className="nb-spiral"','nb-card','nb-tape',"c(language,'comingSoon')"])assert(home.includes(piece),piece);
+ assert(fs.readFileSync('app/layout.tsx','utf8').includes('import "./notebook.css";'));
+ assert(fs.readFileSync('app/learning-effects.tsx','utf8').includes('.nb-tabs button'));
  const {siteLanguages}=load('site-languages');const {turkishNote}=load('ausbildung-course');
  for(const language of siteLanguages)if(language.id!=='tr')assert(turkishNote[language.id],language.id);
 });

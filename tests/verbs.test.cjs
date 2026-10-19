@@ -316,6 +316,7 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  assert.ok(page.includes("answer.replace('|','')"),'the | mark is not part of the saved answer');
  assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+' '+prefix)"));
  assert.ok(page.includes('<VerbGame ')&&page.includes('gameIds.map'));
+ const gamesLib=load('verb-games');assert.deepEqual([...gamesLib.gameIds],['match'],'only the matching cards are on the page');
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
 });
 
@@ -422,7 +423,7 @@ test('Fiil Atölyesi: four parts in book order, each verb in turn: card, meaning
  assert.ok(pageText.includes("kind==='write-partizip'?t('writePartizip')")&&pageText.includes("kind==='write-partizip'?question.answer:item.display")&&cardSrc.includes("'write-partizip':'stepWritePartizip'"),'the past form spelled on the page');
  assert.ok(cardSrc.includes("{examples&&<PersonSentences verb={verb} tense={past||stage==='perfekt'?'perfekt':'praesens'}")&&cardSrc.includes("{verb.participle}</span></>"),'the result of the past form');
  assert.ok(pageText.includes("if(!isOlderRound(data.session.questions)){openSession(data.session);return;}")&&pageText.includes("ids=continuationIds(family,data.session);"),'an older round goes on in the new order');
- assert.ok(pageText.includes("<ChapterCard family={place.family} verbs={chapterVerbs} language={language}")&&!cardSrc.includes("<VerbForm verb={verb} stage=\"perfekt\"/></small>"),'the part card shows the verbs only');
+ assert.ok(!pageText.includes('<ChapterCard ')&&!pageText.includes("'chapter'"),'no part card: a part opens on its first verb card');
  for(const language of languages)for(const key of ['stageBoth','verbFlow','stepPartizip','promptPartizip','stepWritePartizip','writePartizip'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
  for(const language of languages)assert.ok(copy.verbText(language,'verbFlow').includes('gefahren')&&!/hat …|ist …/.test(copy.verbText(language,'verbFlow')),language);
  assert.ok(fs.readFileSync('app/api/study/route.ts','utf8').includes("first:list[0]?.id??null,ids:s.mode==='workshop'&&!s.finished_at?list.map(q=>q.id??''):undefined"),'the summary carries the first question, and the questions of an open round');
@@ -451,7 +452,7 @@ test('Fiil Atölyesi: four parts in book order, each verb in turn: card, meaning
  assert.equal(logic.praesensForm(byId('fahren')),'fährt');assert.equal(logic.praesensForm(byId('aufstehen')),'steht … auf');assert.equal(logic.praesensForm(byId('leidtun')),'tut … leid');
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
  assert.ok(!page.includes("v('resume')"),'no resume card on the page');
- assert.ok(page.includes('<SiteHeader ')&&page.includes('<ChapterCard ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
+ assert.ok(page.includes('<SiteHeader ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
  assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
  for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','stageMeanings','perfektChapter','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);
  assert.ok(!page.includes('startKarma')&&!page.includes('data-verb-karma'),'no Karma sınav on the page');

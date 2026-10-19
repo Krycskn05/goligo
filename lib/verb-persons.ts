@@ -8,23 +8,23 @@ import examples from './verb-examples.json';
  * Every person has its own short A1 sentence (statements, questions, negations, time words first),
  * kept in verb-examples.json; the meanings in the helper languages are in verb-examples.<language>.json
  * and are loaded only for the language the learner reads (verb-example-meanings.ts).
- * gefallen and leid|tun are said with the person in the dative (Die Stadt gefällt mir …),
- * gelten with für + accusative (Das Ticket gilt für mich …).
+ * gefallen, leid|tun and weh|tun are said with the person in the dative (Die Stadt gefällt mir …, Der Kopf tut mir weh),
+ * scheinen with bei + dative (Bei mir scheint die Sonne), gelten with für + accusative (Das Ticket gilt für mich …).
  */
 export type PersonKey='ich'|'du'|'er'|'sie'|'es'|'wir'|'ihr'|'sie-plural'|'Sie';
 export const personKeys:readonly PersonKey[]=['ich','du','er','sie','es','wir','ihr','sie-plural','Sie'];
 export type PersonTense='praesens'|'perfekt';
 type ExampleSet=readonly [praesens:readonly string[],perfekt:readonly string[]];
 const exampleSets=examples as unknown as Record<string,ExampleSet>;
-/** The person as an object instead of the subject: gefallen, leid|tun (dative), gelten (für + accusative). */
-const objectModes:Record<string,'dative'|'fuer'>={gefallen:'dative',leidtun:'dative',gelten:'fuer'};
+/** The person as an object instead of the subject: gefallen, leid|tun, weh|tun, scheinen (dative), gelten (für + accusative). */
+const objectModes:Record<string,'dative'|'fuer'>={gefallen:'dative',leidtun:'dative',wehtun:'dative',scheinen:'dative',gelten:'fuer'};
 const datives:Record<PersonKey,readonly string[]>={ich:['mir'],du:['dir'],er:['ihm'],sie:['ihr'],es:['ihm','dem'],wir:['uns'],ihr:['euch'],'sie-plural':['ihnen'],Sie:['Ihnen']};
 const accusatives:Record<PersonKey,readonly string[]>={ich:['mich'],du:['dich'],er:['ihn'],sie:['sie'],es:['es','das'],wir:['uns'],ihr:['euch'],'sie-plural':['sie'],Sie:['Sie']};
 /** Which form of the verb a person takes: er/sie/es share one, wir/sie/Sie share one. */
 const formOf:Record<PersonKey,'ich'|'du'|'er'|'wir'|'ihr'>={ich:'ich',du:'du',er:'er',sie:'er',es:'er',wir:'wir',ihr:'ihr','sie-plural':'wir',Sie:'wir'};
 const helpers={hat:{ich:'habe',du:'hast',er:'hat',wir:'haben',ihr:'habt'},ist:{ich:'bin',du:'bist',er:'ist',wir:'sind',ihr:'seid'}} as const;
 /** The finite verb of the object verbs: it agrees with the thing (gefällt/gefallen), not with the person. */
-const objectFinite:Record<string,readonly string[]>={gefallen:['gefällt','gefallen'],leidtun:['tut','tun'],gelten:['gilt','gelten']};
+const objectFinite:Record<string,readonly string[]>={gefallen:['gefällt','gefallen'],leidtun:['tut','tun'],wehtun:['tut','tun'],scheinen:['scheint','scheinen'],gelten:['gilt','gelten']};
 /** The label of the row: the pronoun as the learner says it (sie-plural shows as "sie"). */
 export const personLabel=(key:PersonKey)=>key==='sie-plural'?'sie':key;
 /** plain text, the finite verb or helper (verb), the prefix or Partizip at the end (end), or the person as an object (person). */

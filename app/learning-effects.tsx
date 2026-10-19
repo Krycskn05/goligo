@@ -8,6 +8,7 @@ import {useGermanSpeech} from './study-shared';
 import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
 import {isVaultLanguage,type VaultLanguage} from '@/lib/object-vault-copy';
 import {defaultEffects,EFFECTS_CHANGED,EFFECTS_KEY,LEARNING_REACTION,readEffects,saveEffects,motionAllowed,playLearningSound,canPlayEffects,stopAllEffects,warmEffects,type EffectsPreferences,type LearningReaction} from '@/lib/learning-effects';
+import {languageDirection,loadLanguagePack} from '@/lib/site-languages';
 
 // Buttons and links that open another view get a soft gust of wind instead of a tap.
 const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-feature,.vault-category-open,.vault-back-categories,.object-exit,.progress-topic,.toon-level-switch button';
@@ -52,7 +53,9 @@ export default function LearningEffects() {
    document.documentElement.dataset.lernkokoMotion=next.motion&&!media.matches?'full':'reduced';
    if(!next.motion||media.matches)setReaction(null);
   };
-  const locale=()=>{const code=document.documentElement.lang.split('-')[0];if(isVaultLanguage(code))setLanguage(code);};
+  // The page sets <html lang> after the language pack is loaded; load it here too before switching (it is cached).
+  let localeRequest=0;
+  const locale=()=>{const code=document.documentElement.lang.split('-')[0];if(!isVaultLanguage(code))return;const id=++localeRequest;void loadLanguagePack(code).then(()=>{if(id===localeRequest)setLanguage(code);});};
   sync();locale();
   const observer=new MutationObserver(locale);observer.observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   const storage=(event:StorageEvent)=>{if(event.key===EFFECTS_KEY){stopAllEffects();sync();}};
@@ -94,7 +97,7 @@ export default function LearningEffects() {
    <div className="lk-reaction-badge">{reaction.kind==='complete'?<Trophy size={26}/>:reaction.kind==='correct'?<Sparkles size={26}/>:<RotateCcw size={24}/>}<strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
    {confetti&&Array.from({length:reaction.kind==='complete'?24:14},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%430)-215}px`,'--lk-y':`${85+i*43%175}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={14} fill="currentColor"/>:null}</span>)}
   </div>}
-  <dialog ref={dialog} className="lk-effects-dialog" aria-labelledby="lk-effects-title" lang={language} dir={language==='ar'||language==='fa'?'rtl':'ltr'} data-no-effects onClose={()=>{previewStop.current?.();setPlaying(null);speech.stop();}} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();}}}>
+  <dialog ref={dialog} className="lk-effects-dialog" aria-labelledby="lk-effects-title" lang={language} dir={languageDirection(language)} data-no-effects onClose={()=>{previewStop.current?.();setPlaying(null);speech.stop();}} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();}}}>
    <div className="lk-effects-head"><div><Sparkles size={22}/><h2 id="lk-effects-title">{text('settings')}</h2></div><button type="button" className="lk-effects-close" aria-label={text('close')} onClick={close}><X size={21}/></button></div>
    <section className="lk-voice-section" aria-labelledby="lk-voice-title">
     <h3 id="lk-voice-title"><Mic size={18}/>{text('voiceTitle')}</h3>

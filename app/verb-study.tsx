@@ -1,7 +1,7 @@
 'use client';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {ArrowRight,CheckCircle2,ChevronRight,Compass,Headphones,Loader2,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle,type VerbFamily} from '@/lib/verb-families';
@@ -361,10 +361,10 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}{overall&&<> · {progressText(language,'learned',{n:overall.learned,total:overall.total})}</>}</p>
      <div className="verb-stickers">{workshopVerbs.map(item=>{const done=stickers.get(item.id);return <img key={item.id} className={done?.perfekt?'got full':done?.meaning?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display+(done?.perfekt?' · '+perfektLabel(item):'')} width={96} height={96} loading="lazy" decoding="async"/>;})}</div>
     </article>
-    <details className="verb-list"><summary>{t('verbList')} · {verbs.length}</summary>
+    <details className="verb-list verb-fold"><summary><span>{t('verbList')} · {verbs.length}</span><ChevronDown className="verb-fold-icon" size={20} aria-hidden="true"/></summary>
      <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr" className={kindClass(item)}>{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
     </details>
-    <details className="verb-list verb-games-row"><summary>{t('gamesTitle')}</summary>
+    <details className="verb-list verb-games-row verb-fold"><summary><span>{t('gamesTitle')}</span><ChevronDown className="verb-fold-icon" size={20} aria-hidden="true"/></summary>
      <div className="verb-game-chips">{gameIds.map(id=><button type="button" key={id} className="btn secondary small" data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}>{t(gameKeys[id])}</button>)}</div>
     </details>
    </section>}

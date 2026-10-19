@@ -1,7 +1,7 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR to compiled lib directory.');
 const logic=require(path.join(compiled,'article-logic.js'));const objects=require(path.join(compiled,'object-course.js'));const articles=require(path.join(compiled,'article-challenges.js'));
-const languages=['tr','de','en','ar','uk','fr','es','ru','fa','pl','it','pt'];
+const languages=require(path.join(compiled,'site-languages.js')).siteLanguages.map(item=>item.id);
 
 test('every vault noun gets an honest article rule in every language',()=>{
  for(const word of objects.objectVocabulary){

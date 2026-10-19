@@ -82,7 +82,8 @@ test('progress copy is complete in every vault language',()=>{
  assert.equal(copy.progressText('de','learned',{n:4,total:9}),'Gelernt: 4/9');
  assert.equal(copy.formatPercent(41,'tr'),'%41');
  assert.equal(copy.formatPercent(41,'en'),'41%');
- for(const language of languages)for(const stage of ['new','started','warming','half','almost','master'])assert(copy.stageText(language,stage));
+ // Every site language (the later ones read the stage names from their language pack).
+ for(const {id:language} of require(path.join(compiled,'site-languages.js')).siteLanguages)for(const stage of ['new','started','warming','half','almost','master'])assert(copy.stageText(language,stage));
 });
 
 function app(){

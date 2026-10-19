@@ -290,7 +290,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       <p className="verb-write-answer">{v('correctAnswer')}: <strong lang="de" dir="ltr">{correctLabel(q,verb)}</strong><button type="button" className="verb-result-speak" disabled={busy||cueBusy} aria-label={v('repeatAudio')} title={v('repeatAudio')} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/></button></p>
       {!feedback.correct&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
       {!feedback.correct&&<RuleBox lines={feedbackRules(q,verb)} language={language}/>}
-      {verb.alsoIst&&learnStage(q.verbTask)==='perfekt'&&<p className="verb-note">{t('liegenNote')}</p>}
+      {verb.alsoIst&&learnStage(q.verbTask)==='perfekt'&&<p className="verb-note">{t('liegenNote',{verb:'ist '+verb.participle})}</p>}
       <button type="button" className="btn object-next" disabled={busy} onClick={next}>{v(index+1===end?'viewResults':'nextPuzzle')}<ArrowRight size={18} className="vault-direction-icon"/></button>
      </div>}
      </>}

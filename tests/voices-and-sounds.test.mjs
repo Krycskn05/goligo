@@ -12,6 +12,7 @@ const voices=require(compiled+'/site-voices.js');
 const speech=require(compiled+'/german-speech.js');
 const effects=require(compiled+'/effect-sounds.js');
 const copy=require(compiled+'/effects-copy.js');
+const siteLanguageIds=require(compiled+'/site-languages.js').siteLanguages.map(item=>item.id);
 
 const manifest=voices.parseVoiceManifest({version:3,voices:['F1','M2','bad'],clips:{'das  Haus ':'0123456789abcdef','Hallo!':'fedcba9876543210','x':'not-a-hash'}});
 
@@ -127,7 +128,7 @@ test('every effect has a rendered sound, a fallback recipe and readable labels',
  // Every moment has several sounds to choose from; a chosen tap sound plays as it is.
  for(const list of [effects.tapChoiceIds,effects.pageSoundIds,effects.correctSoundIds,effects.completeSoundIds,effects.wrongSoundIds]){assert.ok(list.length>=5);for(const id of list)assert.ok(rendered.includes(id),id);}
  assert.equal(effects.nextTapSound('tapWood'),'tapWood');assert.ok(['tap','tap2','tap3'].includes(effects.nextTapSound('tap')));
- const languages=['tr','de','en','ar','uk','fr','es','ru','fa','pl','it','pt'];
+ const languages=siteLanguageIds;
  const chosenNames=[...effects.tapChoiceIds,...effects.pageSoundIds,...effects.correctSoundIds,...effects.completeSoundIds].filter(id=>!['tap','whoosh','correct','complete'].includes(id));
  for(const key of ['whoosh','voiceTitle','voiceFemale','voiceMale','voiceSpeed','voicePreview','effectsTitle',...effects.wrongSoundIds,'chooseTap','choosePage','chooseCorrect','chooseComplete','nameBubble','nameWind','nameChimes','nameCelebration',...chosenNames])
   for(const language of languages)assert.ok(copy.effectsText(language,key)?.trim(),key+':'+language);

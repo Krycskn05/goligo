@@ -12,6 +12,7 @@ import {ObjectArt,HeroArt} from './toon-art';
 import {objectMeaning} from '@/lib/object-translations';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {readVaultLanguage,saveVaultLanguage} from '@/lib/vault-language-preference';
+import {useLanguageSwitch} from './language-switch';
 import {PracticeModes} from './practice-modes';
 import {LetterPuzzle} from './letter-puzzle';
 import {ArticlePuzzle} from './article-puzzle';
@@ -44,10 +45,11 @@ export function ObjectAnswerMeaning({word,language,course='de'}:{word:ObjectWord
 }
 export default function ObjectStudy(){
  const [language,setLanguage]=useState<VaultLanguage>('tr');const [course,setCourse]=useState<LearningLanguage>('de');const [languageReady,setLanguageReady]=useState(false);
- useEffect(()=>{try{setLanguage(readVaultLanguage(localStorage));setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}setLanguageReady(true);},[]);
+ const switchLanguage=useLanguageSwitch(setLanguage);
+ useEffect(()=>{let saved:VaultLanguage|null=null;try{saved=readVaultLanguage(localStorage);setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}if(saved)switchLanguage(saved,()=>setLanguageReady(true));else setLanguageReady(true);},[switchLanguage]);
  useEffect(()=>{if(!languageReady)return;try{saveVaultLanguage(localStorage,language);saveLearningLanguage(localStorage,course);}catch{}},[language,course,languageReady]);
  function changeCourse(value:LearningLanguage){window.speechSynthesis?.cancel();setCourse(value);const url=new URL(window.location.href);url.searchParams.set('learn',value);url.searchParams.delete('session');window.history.replaceState(null,'',url);}
- return languageReady?<ObjectWorkshop key={course} language={language} onLanguage={setLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
+ return languageReady?<ObjectWorkshop key={course} language={language} onLanguage={switchLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
 }
 export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{language:VaultLanguage;onLanguage:(value:VaultLanguage)=>void;course?:LearningLanguage;onCourse?:(value:LearningLanguage)=>void}){
  const text=(key:VaultCopyKey,params?:Record<string,string|number>)=>vaultText(language,key,params,course);

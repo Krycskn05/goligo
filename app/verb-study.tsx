@@ -10,7 +10,7 @@ import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
-import {LearnCard,ChapterCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
+import {LearnCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
 import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,continuationIds,roundEnd,learnStage,MISTAKES_MODE,workshopMistakeIds,mistakeVerbs} from '@/lib/verb-workshop';
@@ -75,7 +75,8 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const finished=!!session&&index>=end;
  const workshop=session?.mode===WORKSHOP_MODE;
  const place=workshop&&session?pathPlace(session.questions,index,lookup):null;
- const overlay=place&&place.chapterStart&&!dismissed.has('c:'+index)?'chapter':place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
+ // No part card: a part opens straight on its first verb's card (the learner asked to drop the part introduction).
+ const overlay=place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
  // A new verb: its card says the verb aloud once by itself (only the German verb — never the question, the meaning or an explanation).
  const spokenCard=useRef('');
  useEffect(()=>{
@@ -244,7 +245,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const writing=q?.kind==='write';const listening=q?.kind==='listen';
  // A test answer opens the result card in place of the question; a spelling answer keeps the puzzle with a short note.
  const answered=!!feedback&&!writing;
- const chapterVerbs=place?workshopVerbs.filter(item=>verbFamilyOf(item.id)?.id===place.family.id):[];
  const overall=ready?verbProgress('verbs-all',snapshot.reviews):null;
  const nextFamily=path.family;
  const nextLabel=t('nextUp',{verb:'\u2063'}).split('\u2063');
@@ -268,8 +268,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:end})}</span><button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
     {place&&<PathStepper place={place} language={language}/>}
-    {overlay==='chapter'&&place?<ChapterCard family={place.family} verbs={chapterVerbs} language={language} onContinue={()=>dismiss('c')}/>:
-    overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
+    {overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
     <article className={'object-question panel verb-question'+(answered?' answered':'')}>
      <h1 id="object-question-heading" tabIndex={-1} className={answered?'verb-hidden-heading':undefined}>{heading(q)}</h1>
      {answered&&feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} correct={!!feedback.correct} status={v(feedback.correct?'correct':'wrong')} chosen={feedback.correct?undefined:<>{v('yourChoice')}: {optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} nextLabel={v(index+1===end?'viewResults':listening?'nextListening':'nextQuestion')} onNext={next} busy={busy} past={q.verbTask==='partizip'}/>:<>

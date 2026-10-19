@@ -17,7 +17,7 @@ export const LEARNING_REACTION = 'lernkoko-learning-reaction';
 /** One chosen sound for each moment: tap (buttons), page (moving to another page or card), correct, complete (end of a round) and wrong. */
 export type EffectsPreferences = {enabled:boolean;motion:boolean;volume:number;wrong:WrongSoundId;tap:TapChoiceId;page:PageSoundId;correct:CorrectSoundId;complete:CompleteSoundId};
 export type LearningReaction = 'correct'|'wrong'|'complete';
-export const defaultEffects:EffectsPreferences = {enabled:true,motion:true,volume:.65,wrong:'cartoon',tap:'tap',page:'whoosh',correct:'correct',complete:'complete'};
+export const defaultEffects:EffectsPreferences = {enabled:true,motion:true,volume:.65,wrong:'soft',tap:'tap',page:'whoosh',correct:'correct',complete:'complete'};
 const pick=<T extends string>(list:readonly T[],value:unknown,fallback:T):T=>list.includes(value as T)?value as T:fallback;
 
 export function normalizeEffects(value:unknown):EffectsPreferences {

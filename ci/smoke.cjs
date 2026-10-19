@@ -283,8 +283,8 @@ async function memberFlow(browser) {
     await p2.screenshot({ path: path.join(OUT, "14-telefon-fiil-karti.png"), fullPage: true });
     const meanings = await p2.locator(".verb-person-meaning").count();
     info("Telefon: fiil kartinda ornek cumlelerin anlami var", meanings === 9, `${meanings} anlam satiri`);
-    // Yanlislarim: atolye sayfasinda yanlislar bolumu; yanlis varsa ayri bir turda calisilir.
-    await p2.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
+    // Yanlislarim: ana sayfanin sol menusunden acilir (/fiiller?bolum=yanlislar); yanlis varsa ayri bir turda calisilir.
+    await p2.goto(BASE + "/fiiller?bolum=yanlislar", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForSelector("[data-verb-mistakes]", { timeout: 20000 });
     const open = Number(await p2.locator("[data-verb-mistakes]").first().getAttribute("data-verb-mistakes"));
     await p2.locator("[data-verb-mistakes]").first().scrollIntoViewIfNeeded();

@@ -441,6 +441,7 @@
 .verb-learn-form.kind-modal,.verb-part-word strong.kind-modal,.verb-list-word strong.kind-modal { color:#0f6e86; }
 .verb-conj-cell.irregular { border-color:#d6b8f5; background:#fbf7ff; }
 .verb-conj-cell.irregular .verb-conj-form { color:#7a2fc0; }
+.verb-kind-note .verb-irregular-form { font-weight:800; }
 .verb-result-line { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
 .verb-result-line .verb-kind-badge { font-size:11px; padding:0 7px; }
 

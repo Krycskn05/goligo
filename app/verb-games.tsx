@@ -101,7 +101,7 @@ function AuxGame({language,topic,feedback,onRestart}:GameProps){
  if(!task||!verb)return <GameOver language={language} score={score} total={tasks.length} best={best} onRestart={onRestart}/>;
  const ok=choice!==null&&auxCorrect(verb,choice);
  const lines=verbRuleKeys(verb,'perfekt').filter(rule=>['move','change','bleiben','hat','clothes'].includes(rule.key)).map(rule=>ruleText(language,rule.key,rule.params));
- if(verb.alsoIst)lines.push(verbText(language,'liegenNote'));
+ if(verb.alsoIst)lines.push(verbText(language,'liegenNote',{verb:'ist '+verb.participle}));
  return <div className="verb-game-body">
   <GameHeader language={language} index={index} total={tasks.length} score={score} streak={streak}/>
   <VerbPrompt verb={verb} language={language} label={verbText(language,'auxQuestion')}/>

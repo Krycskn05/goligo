@@ -15,7 +15,7 @@ export function useAnswerSound(){
  const stop=useCallback(()=>{generation.current++;cancel.current?.();cancel.current=null;},[]);
  const play=useCallback((kind:'correct'|'wrong'|'complete',after?:()=>void)=>{
   stop();const token=++generation.current;learningReaction(kind);
-  cancel.current=playLearningSound(kind==='wrong'?readEffects().wrong:kind,()=>{if(generation.current!==token)return;cancel.current=null;after?.();});
+  const chosen=readEffects();cancel.current=playLearningSound(kind==='wrong'?chosen.wrong:kind==='correct'?chosen.correct:chosen.complete,()=>{if(generation.current!==token)return;cancel.current=null;after?.();});
  },[stop]);
  const wrong=useCallback((after?:()=>void)=>play('wrong',after),[play]);
  const correct=useCallback((after?:()=>void)=>play('correct',after),[play]);

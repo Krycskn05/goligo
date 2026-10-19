@@ -1,4 +1,4 @@
-import {soundRecipes,soundDuration,wrongSoundIds,type SoundId,type WrongSoundId} from './effect-sounds';
+import {soundRecipes,soundDuration,wrongSoundIds,tapChoiceIds,pageSoundIds,correctSoundIds,completeSoundIds,type SoundId,type WrongSoundId,type TapChoiceId,type PageSoundId,type CorrectSoundId,type CompleteSoundId} from './effect-sounds';
 
 /** Generated at build time by scripts/sounds/make-sounds.mjs. */
 export const SOUND_FOLDER='/sfx/';
@@ -14,13 +14,15 @@ import {configureAudioSession} from './audio-session';
 export const EFFECTS_KEY = 'lernkoko-effects-v1';
 export const EFFECTS_CHANGED = 'lernkoko-effects-changed';
 export const LEARNING_REACTION = 'lernkoko-learning-reaction';
-export type EffectsPreferences = {enabled:boolean;motion:boolean;volume:number;wrong:WrongSoundId};
+/** One chosen sound for each moment: tap (buttons), page (moving to another page or card), correct, complete (end of a round) and wrong. */
+export type EffectsPreferences = {enabled:boolean;motion:boolean;volume:number;wrong:WrongSoundId;tap:TapChoiceId;page:PageSoundId;correct:CorrectSoundId;complete:CompleteSoundId};
 export type LearningReaction = 'correct'|'wrong'|'complete';
-export const defaultEffects:EffectsPreferences = {enabled:true,motion:true,volume:.65,wrong:'cartoon'};
+export const defaultEffects:EffectsPreferences = {enabled:true,motion:true,volume:.65,wrong:'cartoon',tap:'tap',page:'whoosh',correct:'correct',complete:'complete'};
+const pick=<T extends string>(list:readonly T[],value:unknown,fallback:T):T=>list.includes(value as T)?value as T:fallback;
 
 export function normalizeEffects(value:unknown):EffectsPreferences {
  const data=value && typeof value==='object'?value as Partial<EffectsPreferences>:{};
- return {enabled:typeof data.enabled==='boolean'?data.enabled:defaultEffects.enabled,motion:typeof data.motion==='boolean'?data.motion:defaultEffects.motion,volume:typeof data.volume==='number'&&Number.isFinite(data.volume)?Math.min(1,Math.max(0,data.volume)):defaultEffects.volume,wrong:wrongSoundIds.includes(data.wrong as WrongSoundId)?data.wrong as WrongSoundId:defaultEffects.wrong};
+ return {enabled:typeof data.enabled==='boolean'?data.enabled:defaultEffects.enabled,motion:typeof data.motion==='boolean'?data.motion:defaultEffects.motion,volume:typeof data.volume==='number'&&Number.isFinite(data.volume)?Math.min(1,Math.max(0,data.volume)):defaultEffects.volume,wrong:pick(wrongSoundIds,data.wrong,defaultEffects.wrong),tap:pick(tapChoiceIds,data.tap,defaultEffects.tap),page:pick(pageSoundIds,data.page,defaultEffects.page),correct:pick(correctSoundIds,data.correct,defaultEffects.correct),complete:pick(completeSoundIds,data.complete,defaultEffects.complete)};
 }
 let memory={...defaultEffects};
 export function readEffects():EffectsPreferences {

@@ -1,5 +1,6 @@
 import {objectWordMap} from './object-course';
 import type {VaultLanguage} from './object-vault-copy';
+import {packText} from './site-languages';
 import {extraObjectMeanings} from './object-extra-translations';
 import {movingObjectMeanings} from './object-moving-additions';
 import {buildingObjectMeanings} from './object-building-additions';
@@ -79,5 +80,7 @@ export function objectMeaning(id:string,language:VaultLanguage):string{
  if(language==='tr')return word.tr;
  if(language==='de')return word.description;
  if(language==='en'||language==='ar'||language==='uk'||language==='fr')return objectMeanings[id]?.[index[language]]??'';
- return extraObjectMeanings[id]?.[extraIndex[language]]??'';
+ if(language==='es'||language==='ru'||language==='fa'||language==='pl'||language==='it'||language==='pt')return extraObjectMeanings[id]?.[extraIndex[language]]??'';
+ // Later site languages read the meaning from their language pack, by the English meaning.
+ const english=objectMeanings[id]?.[0]??'';return english?packText(language,english):'';
 }

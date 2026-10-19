@@ -50,7 +50,7 @@ test('suspended audio is resumed and the fallback completes once',async t=>{
 test('saved choices survive re-reading and malformed preferences use safe defaults',t=>{
  const {effects,data}=setup(t);effects.saveEffects({...effects.defaultEffects,wrong:'retro',volume:.4,motion:false});assert.equal(effects.readEffects().wrong,'retro');assert.equal(effects.readEffects().volume,.4);assert.equal(effects.readEffects().motion,false);
  data.set(effects.EFFECTS_KEY,'broken json');assert.equal(effects.readEffects().wrong,'retro');
- assert.equal(effects.normalizeEffects({wrong:'unknown',volume:400}).wrong,'cartoon');assert.equal(effects.normalizeEffects({volume:400}).volume,1);assert.equal(effects.normalizeEffects({volume:NaN}).volume,.65);
+ assert.equal(effects.normalizeEffects({wrong:'unknown',volume:400}).wrong,'cartoon');const chosen=effects.normalizeEffects({tap:'tapBell',page:'nope',correct:'correctCoin',complete:'completeHarp'});assert.equal(chosen.tap,'tapBell');assert.equal(chosen.page,'whoosh');assert.equal(chosen.correct,'correctCoin');assert.equal(chosen.complete,'completeHarp');assert.deepEqual([effects.defaultEffects.tap,effects.defaultEffects.page,effects.defaultEffects.correct,effects.defaultEffects.complete],['tap','whoosh','correct','complete']);assert.equal(effects.normalizeEffects({volume:400}).volume,1);assert.equal(effects.normalizeEffects({volume:NaN}).volume,.65);
 });
 
 

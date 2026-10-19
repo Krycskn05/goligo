@@ -1,9 +1,11 @@
-export const studyLanguages=[{id:'tr',label:'Türkçe'},{id:'de',label:'Deutsch'},{id:'en',label:'English'},{id:'ar',label:'العربية'},{id:'uk',label:'Українська'},{id:'fr',label:'Français'}] as const;
-export type StudyLanguage=typeof studyLanguages[number]['id'];
+import {siteLanguages,isSiteLanguage,siteLanguageIndex,pickText,type SiteLanguage} from './site-languages';
+/** Every page offers the same site languages (see site-languages.ts); tuples below hold tr de en ar uk fr, the rest come from language packs. */
+export const studyLanguages=siteLanguages;
+export type StudyLanguage=SiteLanguage;
 export type Translations=readonly [tr:string,de:string,en:string,ar:string,uk:string,fr:string];
-export const languageIndex=(language:StudyLanguage)=>studyLanguages.findIndex(item=>item.id===language);
-export const translate=(text:Translations,language:StudyLanguage)=>text[languageIndex(language)];
-export const isStudyLanguage=(value:string):value is StudyLanguage=>studyLanguages.some(item=>item.id===value);
+export const languageIndex=(language:StudyLanguage)=>siteLanguageIndex(language);
+export const translate=(text:Translations,language:StudyLanguage)=>pickText(text,language);
+export const isStudyLanguage=(value:string):value is StudyLanguage=>isSiteLanguage(value);
 
 export const copy={
  originalArt:['Özgün çalışma çizimleri','Eigene Lernillustrationen','Original study illustrations','رسومات تعليمية أصلية','Оригінальні навчальні ілюстрації','Illustrations pédagogiques originales'],

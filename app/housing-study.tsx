@@ -7,6 +7,8 @@ import {trapReasons} from '@/lib/housing-traps';
 import {housingText,type HousingCopyKey} from '@/lib/housing-copy';
 import {gradeAnswer} from '@/lib/course';
 import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib/study-languages';
+import {languageDirection} from '@/lib/site-languages';
+import {useLanguageSwitch} from './language-switch';
 import {vaultText,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {starNoteKey,starredQuestionIds,type Session,type Snapshot,type Answer} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
@@ -23,9 +25,10 @@ import {ProgressMeter,RoundReward} from './progress-ui';
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 export default function HousingStudy(){
  const [language,setLanguage]=useState<StudyLanguage>('tr');const [loaded,setLoaded]=useState(false);
- useEffect(()=>{try{const saved=localStorage.getItem('german-study-language');if(saved&&isStudyLanguage(saved))setLanguage(saved);}catch{}setLoaded(true);},[]);
- useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=language==='ar'?'rtl':'ltr';document.title=housingText(language,'title')+' · '+SITE_NAME;try{localStorage.setItem('german-study-language',language);}catch{}},[language,loaded]);
- return <HousingWorkshop language={language} onLanguage={setLanguage}/>;
+ const switchLanguage=useLanguageSwitch(setLanguage);
+ useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('german-study-language');}catch{}if(saved&&isStudyLanguage(saved))switchLanguage(saved,()=>setLoaded(true));else setLoaded(true);},[switchLanguage]);
+ useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title=housingText(language,'title')+' · '+SITE_NAME;try{localStorage.setItem('german-study-language',language);}catch{}},[language,loaded]);
+ return <HousingWorkshop language={language} onLanguage={switchLanguage}/>;
 }
 export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void}){
  const h=(key:HousingCopyKey,params?:Record<string,string|number>)=>housingText(language,key,params);
@@ -102,7 +105,7 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
  function next(){if(!feedback||busy)return;stop();setIndex(value=>value+1);setFeedback(null);setSelected('');pendingAnswer.current=null;focus();if(session&&index+1>=session.questions.length){answerAudio.complete();void refresh();}}
  const actionDisabled=busy||cueBusy||speech.busy;
  const modeLabels={test:v('testPractice'),write:v('writePractice'),testDetail:v('testDetail'),writeDetail:v('puzzleHint')};
- return <div className="category-app toon-app housing-app" lang={language} dir={language==='ar'?'rtl':'ltr'}>
+ return <div className="category-app toon-app housing-app" lang={language} dir={languageDirection(language)}>
   <a className="skip-link" href="#housing-main">{v('home')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref="/?learn=de&level=A1.2" homeLabel={h('back')} stats={snapshot.stats}/>
   <main id="housing-main" className="object-page housing-page">

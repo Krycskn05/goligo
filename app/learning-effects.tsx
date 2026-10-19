@@ -1,8 +1,8 @@
 'use client';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {Check,Mic,Play,RotateCcw,Smartphone,Sparkles,Square,Star,Trophy,Volume2,VolumeX,X} from 'lucide-react';
-import {wrongSoundIds,nextTapSound,type SoundId} from '@/lib/effect-sounds';
-import {chooseGermanVoice,germanSpeechPreview} from '@/lib/german-speech';
+import {Check,ChevronDown,Mic,Play,RotateCcw,Sparkles,Square,Star,Trophy,Volume2,VolumeX,X} from 'lucide-react';
+import {wrongSoundIds,tapChoiceIds,pageSoundIds,correctSoundIds,completeSoundIds,nextTapSound,type SoundId} from '@/lib/effect-sounds';
+import {germanSpeechPreview} from '@/lib/german-speech';
 import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGreeting} from '@/lib/site-voices';
 import {useGermanSpeech} from './study-shared';
 import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
@@ -14,6 +14,18 @@ const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-featu
 const SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
 const OPEN_EFFECTS='lernkoko-open-effects';
+/** The sound groups of the dialog: the moment, its title and the sounds to choose from (the first is the default). */
+const soundGroups=[
+ {key:'tap',title:'chooseTap',ids:tapChoiceIds},
+ {key:'page',title:'choosePage',ids:pageSoundIds},
+ {key:'correct',title:'chooseCorrect',ids:correctSoundIds},
+ {key:'complete',title:'chooseComplete',ids:completeSoundIds},
+ {key:'wrong',title:'wrong',ids:wrongSoundIds},
+] as const satisfies readonly {key:'tap'|'page'|'correct'|'complete'|'wrong';title:EffectsCopyKey;ids:readonly SoundId[]}[];
+/** The four first sounds keep their old copy keys ("Tıklama · Baloncuk"); in the list only the sound's own name is shown. */
+const defaultNames:Partial<Record<SoundId,EffectsCopyKey>>={tap:'nameBubble',whoosh:'nameWind',correct:'nameChimes',complete:'nameCelebration'};
+const soundName=(id:SoundId):EffectsCopyKey=>defaultNames[id]??(id as EffectsCopyKey);
+
 export function EffectsSettingsButton({language}:{language:VaultLanguage}) {
  return <button type="button" className="lk-effects-button" data-no-effects aria-label={effectsText(language,'settings')} title={effectsText(language,'settings')} aria-haspopup="dialog" onClick={()=>window.dispatchEvent(new Event(OPEN_EFFECTS))}><Volume2 size={19}/><Sparkles size={15}/></button>;
 }
@@ -30,10 +42,8 @@ export default function LearningEffects() {
  const sequence=useRef(0);
  const text=(key:EffectsCopyKey)=>effectsText(language,key);
  const speech=useGermanSpeech('de');
- // A device voice the learner picked earlier stays visible as the device choice.
- const savedDevice=speech.voiceName&&!isSiteVoice(speech.voiceName)?speech.voices.find(voice=>voice.name===speech.voiceName):undefined;
- const deviceVoice=savedDevice??chooseGermanVoice(speech.voices);
- const currentVoice=speech.voiceName||(speech.siteVoices.length?DEFAULT_SITE_VOICE:'');
+ // Only the natural site voices are offered (no "Cihaz sesi" choice); anything else shows the default voice as chosen.
+ const currentVoice=isSiteVoice(speech.voiceName)?speech.voiceName:(speech.siteVoices.length?DEFAULT_SITE_VOICE:'');
  function chooseVoice(id:string,sample:string){stopAllEffects();previewStop.current?.();setPlaying(null);speech.setVoiceName(id);speech.speak(sample,false,id);setMessage('saved');}
  useEffect(()=>{
   const media=window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -59,7 +69,7 @@ export default function LearningEffects() {
    if(!target||target.closest('[data-no-effects],.lk-effects-dialog')||target.matches(':disabled,[aria-disabled="true"]'))return;
    // Answer and speech buttons have their own feedback; never cover pronunciation with a pop.
    const silent=target.matches('.object-option,.check-button,[type="submit"]')||target.closest('.vault-listen-player,.vault-speech-settings,.sound-settings,.audio-actions')||target.querySelector('[class*="lucide-volume"],[class*="lucide-headphone"],[class*="lucide-mic"],[class*="lucide-square"]');
-   if(!silent&&!window.speechSynthesis?.speaking&&!window.speechSynthesis?.pending){playLearningSound(target.matches(NAVIGATION)?'whoosh':nextTapSound());}
+   if(!silent&&!window.speechSynthesis?.speaking&&!window.speechSynthesis?.pending){const chosen=readEffects();playLearningSound(target.matches(NAVIGATION)?chosen.page:nextTapSound(chosen.tap));}
    if(!motionAllowed())return;
    const mark=++sequence.current;target.dataset.lkTap=String(mark);
    target.classList.remove('lk-tap-pop');void target.offsetWidth;target.classList.add('lk-tap-pop');
@@ -93,7 +103,6 @@ export default function LearningEffects() {
     {speech.siteVoicesState==='unavailable'&&<p className="lk-effects-note">{text('voiceFallback')}</p>}
     <div className="lk-voice-grid" role="radiogroup" aria-labelledby="lk-voice-title">
      {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={currentVoice===voice.id} className={'lk-voice-chip '+voice.gender+(currentVoice===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceGreeting(voice))}><span className="lk-voice-avatar" aria-hidden="true">{voice.name[0]}</span><span><strong>{voice.name}</strong><small>{text(voice.gender==='female'?'voiceFemale':'voiceMale')}</small></span></button>)}
-     {deviceVoice&&<button type="button" role="radio" aria-checked={currentVoice===deviceVoice.name} className={'lk-voice-chip device'+(currentVoice===deviceVoice.name?' selected':'')} onClick={()=>chooseVoice(deviceVoice.name,germanSpeechPreview)}><span className="lk-voice-avatar" aria-hidden="true"><Smartphone size={16}/></span><span><strong>{text('voiceDevice')}</strong><small>{deviceVoice.name}</small></span></button>}
     </div>
     <div className="lk-voice-speed" role="group" aria-label={text('voiceSpeed')}><span>{text('voiceSpeed')}</span>{SPEEDS.map(([value,key])=><button type="button" key={value} aria-pressed={speech.rate===value} className={speech.rate===value?'active':''} onClick={()=>{speech.setRate(value);setMessage('saved');}}>{text(key)}</button>)}</div>
     <button type="button" className="lk-preview-button lk-voice-preview" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();previewStop.current?.();setPlaying(null);const voice=speech.siteVoices.find(item=>item.id===currentVoice);speech.speak(voice?voiceGreeting(voice):germanSpeechPreview);}}>{speech.busy?<Square size={15}/>:<Play size={15}/>} {text(speech.busy?'voiceStop':'voicePreview')}</button>
@@ -101,8 +110,8 @@ export default function LearningEffects() {
    <h3 className="lk-effects-subtitle"><Sparkles size={17}/>{text('effectsTitle')}</h3>
    <div className="lk-effects-switches"><label><span>{preferences.enabled?<Volume2 size={18}/>:<VolumeX size={18}/>} {text('enabled')}</span><input type="checkbox" checked={preferences.enabled} onChange={event=>update({enabled:event.target.checked})}/></label><label><span><Sparkles size={18}/> {text('motion')}</span><input type="checkbox" checked={preferences.motion} onChange={event=>update({motion:event.target.checked})}/></label></div>
    <label className="lk-volume-label" htmlFor="lk-volume"><span>{text('volume')}</span><output>{Math.round(preferences.volume*100)}%</output></label><input id="lk-volume" className="lk-volume" type="range" min="0" max="100" step="5" value={Math.round(preferences.volume*100)} onChange={event=>update({volume:Number(event.target.value)/100})}/>
-   <div className="lk-fixed-sounds">{(['tap','whoosh','correct','complete'] as const).map(id=><div className="lk-sound-row" key={id}><span>{text(id)}</span><button type="button" className="lk-preview-button" disabled={preferences.volume===0} aria-label={text('listen')+' · '+text(id)} onClick={()=>preview(id)}>{playing===id?<Volume2 size={16}/>:<Play size={15}/>} {text('listen')}</button></div>)}</div>
-   <fieldset className="lk-wrong-sounds"><legend>{text('wrong')}</legend>{wrongSoundIds.map(id=><div className={'lk-sound-row '+(preferences.wrong===id?'selected':'')} key={id}><button type="button" className="lk-choose-sound" aria-pressed={preferences.wrong===id} aria-label={text('choose')+' · '+text(id)} onClick={()=>{update({wrong:id});preview(id);setMessage('saved');}}><span className="lk-radio" aria-hidden="true">{preferences.wrong===id&&<Check size={14}/>}</span><span>{text(id)}</span>{preferences.wrong===id&&<small>{text('chosen')}</small>}</button><button type="button" className="lk-preview-button" disabled={preferences.volume===0} aria-label={text('listen')+' · '+text(id)} onClick={()=>preview(id)}>{playing===id?<Volume2 size={16}/>:<Play size={15}/>} {text('listen')}</button></div>)}</fieldset>
+   {/* One group for each moment (tap, page change, correct, end of a round, wrong); each sound can be heard and chosen. */}
+   {soundGroups.map(group=>{const chosen=preferences[group.key];return <details className="lk-sound-group" key={group.key} data-sound-group={group.key}><summary><span>{text(group.title)}</span><small>{text(soundName(chosen))}</small><ChevronDown size={17} aria-hidden="true"/></summary><fieldset className="lk-wrong-sounds"><legend className="lk-visually-hidden">{text(group.title)}</legend>{group.ids.map(id=><div className={'lk-sound-row '+(chosen===id?'selected':'')} key={id}><button type="button" className="lk-choose-sound" aria-pressed={chosen===id} aria-label={text('choose')+' · '+text(soundName(id))} onClick={()=>{update({[group.key]:id} as Partial<EffectsPreferences>);preview(id);setMessage('saved');}}><span className="lk-radio" aria-hidden="true">{chosen===id&&<Check size={14}/>}</span><span>{text(soundName(id))}</span>{chosen===id&&<small>{text('chosen')}</small>}</button><button type="button" className="lk-preview-button" disabled={preferences.volume===0} aria-label={text('listen')+' · '+text(soundName(id))} onClick={()=>preview(id)}>{playing===id?<Volume2 size={16}/>:<Play size={15}/>} {text('listen')}</button></div>)}</fieldset></details>;})}
    {systemReduced&&<p className="lk-effects-note">{text('reduced')}</p>}
    <p className="lk-effects-note lk-effects-message" role="status" aria-live="polite">{message?text(message):'\u00a0'}</p>
    <button type="button" className="lk-effects-done" onClick={close}>{text('close')}<Check size={17}/></button>

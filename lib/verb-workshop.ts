@@ -5,7 +5,7 @@ import {verbFamilies,verbFamilyOf,type VerbFamily} from './verb-families';
 import {isVerbExercise} from './verb-practice';
 
 /**
- * Fiil Atölyesi: one path through all 38 verbs in two parts (the textbook order, split at
+ * Fiil Atölyesi: one path through all 72 verbs in four parts (the textbook order, each page split at
  * the learner's line). Each verb is finished in one go before the next one: its card with the
  * meaning, then the meaning test, then spelling it with letters, then its past form: the infinitive
  * is shown and the Partizip II is chosen (abfahren → abgefahren; no hat/ist, no other verbs), then spelled.
@@ -26,18 +26,20 @@ export const verbSteps:readonly WorkshopStep[]=['meaning','write','partizip','wr
 const pastTasks:readonly VerbTask[]=['partizip','write-partizip','perfekt','write-perfekt','meaning-perfekt'];
 /** Every task a workshop round has ever held. */
 const workshopTasks=new Set<string>([...verbSteps,...pastTasks]);
-/** The verbs in path order: part 1 first, then part 2. */
+/** The verbs in path order: part 1 first, then part 2, 3 and 4. */
 export const workshopVerbs:Verb[]=verbFamilies.flatMap(family=>family.verbs.map(id=>verbMap.get(id)!));
 export const questionId=(step:string,verbId:string)=>'verb-'+step+'-'+verbId;
 const questionById=new Map(verbQuestions.map(q=>[q.id,q]));
 /** One part's questions in order: verb by verb, each with its four steps. */
 export function partIds(family:VerbFamily){return family.verbs.flatMap(id=>verbSteps.map(step=>questionId(step,id)));}
 export function partTotal(family:VerbFamily){return partIds(family).length;}
-/** Every question of the path in order: part 1, then part 2. */
+/** Every question of the path in order: part 1, then part 2, 3 and 4. */
 export function workshopIds(){return verbFamilies.flatMap(family=>partIds(family));}
 export const WORKSHOP_TOTAL=workshopIds().length;
-/** The whole path as the first rounds saved it (152 questions): per part all meanings, then all Perfekt forms with hat/ist. */
-export const legacyWorkshopIds=verbFamilies.flatMap(family=>[...family.verbs.flatMap(id=>['meaning','write'].map(step=>questionId(step,id))),...family.verbs.flatMap(id=>['perfekt','write-perfekt'].map(step=>questionId(step,id)))]);
+/** The whole path as the first rounds saved it (152 questions, the two parts of the first page): per part all meanings,
+ * then all Perfekt forms with hat/ist. The parts of the second page came later and were never part of it. */
+const firstPageFamilies=verbFamilies.slice(0,2);
+export const legacyWorkshopIds=firstPageFamilies.flatMap(family=>[...family.verbs.flatMap(id=>['meaning','write'].map(step=>questionId(step,id))),...family.verbs.flatMap(id=>['perfekt','write-perfekt'].map(step=>questionId(step,id)))]);
 export const LEGACY_WORKSHOP_TOTAL=legacyWorkshopIds.length;
 /** Where that whole-path round stops: the end of part 1. */
 const LEGACY_PART_END=verbFamilies[0].verbs.length*4;

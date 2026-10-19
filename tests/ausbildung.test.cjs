@@ -55,11 +55,47 @@ test('the listening page has 14 sections with valid answers and every text is re
  for(const part of course.lessonParts)for(const number of part.listen??[])assert(hoeren.hoerenTasks.some(task=>task.number===number),part.id+' '+number);
  const texts=hoeren.ausbildungSpeechTexts();assert(texts.length>150);
  const listed=JSON.parse(execFileSync(process.execPath,[path.join(__dirname,'..','scripts','voices','list-texts.cjs')],{env:{...process.env,STUDY_CHECK_DIR:compiled},maxBuffer:64*1024*1024}).toString());
- for(const text of ['die Ausbildung','Ich kann gut schwimmen.','neunzehnhunderteinundneunzig',hoeren.hoerenTasks[0].lines[0].text])assert(listed.includes(text),text);
+ for(const text of ['die Ausbildung','Ich kann gut schwimmen.','neunzehnhunderteinundneunzig','Dunya will eine Ausbildung machen.',hoeren.hoerenTasks[0].lines[0].text])assert(listed.includes(text),text);
+});
+
+test('every part opens in steps, and progress is counted per answer',()=>{
+ const course=load('ausbildung-course');const progress=load('ausbildung-progress');
+ const steps=Object.fromEntries(course.lessonParts.map(part=>[part.id,progress.partSteps(part)]));
+ for(const id of ['a','b','c','d'])assert.deepEqual(steps[id],['kelimeler','konu','alistirmalar','dinleme'],id);
+ assert.deepEqual(steps.schreiben,['konu','alistirmalar','dinleme']);
+ assert.deepEqual(steps.test,['alistirmalar']);
+ assert.deepEqual(steps.magazin,['alistirmalar']);
+ const a=course.lessonPartMap.get('a');
+ const empty=progress.partProgress(a,{});assert.equal(empty.percent,0);assert.equal(empty.stage,'new');
+ const first=a.exercises.find(progress.isCheckable);const count=progress.exerciseAnswerCount(first);
+ const one=progress.partProgress(a,{[first.id]:{right:count,total:count}});
+ assert.equal(one.learned,count);assert(one.percent>0&&one.percent<100);
+ const all=Object.fromEntries(a.exercises.map(exercise=>{const n=progress.exerciseAnswerCount(exercise);return [exercise.id,{right:n,total:n}];}));
+ assert.equal(progress.partProgress(a,all).percent,100);assert.equal(progress.partProgress(a,all).stars,3);
+ // The test is scored in points (25), rounded to halves.
+ const test=course.lessonPartMap.get('test');
+ assert.deepEqual(progress.testPoints(test,{t1:{right:5,total:5,points:5},t2:{right:3,total:5,points:1.5}}),{points:6.5,max:25,checked:2,total:5});
+ assert.equal(progress.wordArticle('die Ausbildung, -en'),'die');assert.equal(progress.wordArticle('an|bieten'),'');
+});
+
+test('example sentences and sentence frames are read aloud, but not years or slashes',()=>{
+ const course=load('ausbildung-course');
+ assert.equal(course.exampleSpeech('Yetenek: *Ana kann gut Deutsch sprechen.* (öğrendi)'),'Ana kann gut Deutsch sprechen.');
+ assert.equal(course.exampleSpeech('*Ich will* → güçlü istek, niyet, plan.'),'');
+ assert.equal(course.exampleSpeech('**kein/keine** → isimden önce'),'');
+ assert.equal(course.exampleSpeech('*Ich bin 2019 gekommen.*'),'');
+ assert.equal(course.frameSpeech(['–','Willst','du einen Kurs','machen?']),'Willst du einen Kurs machen?');
+ assert.equal(course.frameSpeech(['2021','bin','ich nach Deutschland','gekommen.']),'');
+ const texts=course.lessonSpeechTexts();
+ for(const text of ['Ana kann gut Deutsch sprechen.','Dunya will eine Ausbildung machen.','Wann bist du nach Berlin gezogen?','die Ausbildung'])assert(texts.includes(text),text);
+ assert.equal(new Set(texts).size,texts.length);
 });
 
 test('the chapter page, the listening page and the catalogue link are wired up',()=>{
- for(const file of ['app/a1-2/ausbildung/page.tsx','app/a1-2/ausbildung/hoeren/page.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx','app/ausbildung.css'])assert(fs.existsSync(file),file);
+ for(const file of ['app/a1-2/ausbildung/page.tsx','app/a1-2/ausbildung/hoeren/page.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx','app/ausbildung-listen.tsx','app/ausbildung-ui.tsx','app/ausbildung.css'])assert(fs.existsSync(file),file);
+ // The lesson is built from the site's own lesson pieces (Ev ve Yaşam cards, lesson cards, practice screens).
+ const study=fs.readFileSync('app/ausbildung-study.tsx','utf8');
+ for(const piece of ['housing-section-grid','housing-card','toon-hero','housing-lesson-intro','ProgressMeter','object-practice'])assert(study.includes(piece),piece);
  assert(fs.readFileSync('app/layout.tsx','utf8').includes('import "./ausbildung.css";'));
  const home=fs.readFileSync('app/category-study.tsx','utf8');assert(home.includes("unit.id==='book-12'")&&home.includes('href="/a1-2/ausbildung"'));
  const {siteLanguages}=load('site-languages');const {turkishNote}=load('ausbildung-course');

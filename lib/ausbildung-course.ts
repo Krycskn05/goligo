@@ -291,7 +291,7 @@ const teilB:L12Part={
    {k:'gap',text:'Ich ___ dort meine Tante ___ (besuchen).',answers:[['habe'],['besucht']]},
    {k:'gap',text:'Wir ___ zusammen ___ (kochen) und ich ___ erst um 23 Uhr nach Hause ___ (kommen).',answers:[['haben'],['gekocht'],['bin'],['gekommen']]},
   ]},
-  {id:'b7',title:'Ü7 · Schreiben: Mein Zeitstrahl',hint:'Kendin hakkında 6 cümle yaz.',items:[
+  {id:'b7',title:'Ü7 · Schreiben: Mein Zeitstrahl',hint:'Kendin hakkında 6 cümle yaz. Kalıp: *Ich bin … in … geboren. Ich bin von … bis … zur Schule gegangen. Ich habe … gearbeitet. 20… bin ich nach … gekommen. Jetzt … Mein Ziel: Ich will …*',items:[
    {k:'open',prompt:'Mein Zeitstrahl (6 Sätze)',sample:'Ich bin 1988 in Izmir geboren. Ich bin von 1994 bis 2006 zur Schule gegangen. Ich habe von 2006 bis 2011 Tiermedizin studiert. Ich habe zehn Jahre als Tierarzt gearbeitet. 2024 bin ich nach Berlin gekommen. Jetzt lerne ich Deutsch. Mein Ziel: Ich will wieder als Tierarzt arbeiten.'},
   ],key:'Kalıp: *Ich bin … in … geboren. Ich bin von … bis … zur Schule gegangen. Ich habe von … bis … Tiermedizin studiert. Ich habe … Jahre als Tierarzt/Tierärztin gearbeitet. 20… bin ich nach Berlin gekommen. Jetzt lerne ich Deutsch. Mein Ziel: Ich will …*'},
  ],
@@ -416,7 +416,7 @@ const teilC:L12Part={
    {k:'choice',text:'Verbinden: Wann ist Herr Aydın nach Berlin gekommen?',options:['Seit zehn Monaten.','In fünf Jahren.','Vor einem Jahr.'],answer:2},
    {k:'choice',text:'Verbinden: Seit wann lernt er Deutsch?',options:['Seit zehn Monaten.','In fünf Jahren.','Vor einem Jahr.'],answer:0},
    {k:'choice',text:'Verbinden: Wann möchte er eine Praxis haben?',options:['Seit zehn Monaten.','In fünf Jahren.','Vor einem Jahr.'],answer:1},
-  ]},
+  ],key:'Yanlış olanlar: 2 F (*vor einem Jahr*) · 4 F (*in zwei Monaten*) · 6 F (*in einem Jahr*).'},
   {id:'c6',title:'Ü6 · Prüfung: Sprachbausteine',hint:'Doğru olanı seç.',reading:{lines:['Sehr (1) Frau Weber,','ich möchte (2) ein Praktikum in Ihrem Blumenladen machen. Ich komme aus Polen und ich wohne (3) zwei Jahren in Berlin. Seit einem Jahr lerne ich Deutsch. (4) drei Jahren habe ich in Krakau in einem Blumenladen gearbeitet. Die Arbeit (5) Spaß gemacht.','Ich freue mich auf Ihre Antwort.','Mit freundlichen Grüßen','Ola Nowak']},items:[
    {k:'choice',text:'(1)',options:['geehrter','geehrte'],answer:1},
    {k:'choice',text:'(2)',options:['gern','lieber'],answer:0},
@@ -554,7 +554,7 @@ const richtigSchreiben:L12Part={
  ],
  exercises:[
   {id:'s1',title:'Ü1 · f mi, v mi?',hint:'Metindeki kelimeleri iki listeye ayır: f ile mi yazılıyor, v ile mi?',reading:{lines:['Ich bin Frau Vogel und ich bin Verkäuferin von Beruf. Vor fünf Jahren habe ich in einer Firma angefangen. Ich finde, die Arbeit ist toll! Ich fahre jeden Tag mit dem Fahrrad zur Firma und ich verdiene gut. Mein Vater findet das auch gut.']},items:
-   [['Frau',0],['Vogel',1],['Verkäuferin',1],['von',1],['Beruf',0],['Vor',1],['fünf',0],['Firma',0],['finde',0],['fahre',0],['Fahrrad',0],['verdiene',1],['Vater',1],['findet',0]].map(([word,v])=>({k:'choice' as const,text:String(word),options:['f-Liste','v-Liste'],answer:Number(v)}))},
+   [['Frau',0],['Vogel',1],['Verkäuferin',1],['von',1],['Beruf',0],['Vor',1],['fünf',0],['Firma',0],['angefangen',0],['finde',0],['fahre',0],['Fahrrad',0],['verdiene',1],['Vater',1],['findet',0]].map(([word,v])=>({k:'choice' as const,text:String(word),options:['f-Liste','v-Liste'],answer:Number(v)}))},
   {id:'s2',title:'Ü2 · f oder v?',hint:'Eksik harfi yaz (f, F, v ya da V).',items:[
    {k:'gap',text:'Ich heiße ___atma und ich bin ___erkäu___erin ___on Beru___. ___or ___ier Jahren habe ich in einer ___irma gearbeitet. Jetzt möchte ich mehr ___erdienen. In ___ünf Wochen ___ange ich eine Ausbildung an. Meine ___amilie ___indet das gut. Am Wochenende ___ahre ich mit ___reunden nach ___rankfurt.',answers:[['F'],['V'],['f'],['v'],['f'],['V'],['v'],['F'],['v'],['f'],['f'],['F'],['f'],['f'],['F'],['F']]},
   ],key:'Fatma · Verkäuferin · von · Beruf · Vor · vier · Firma · verdienen · fünf · fange · Familie · findet · fahre · Freunden · Frankfurt'},
@@ -571,7 +571,8 @@ const allesKlar:L12Part={
    {k:'gap',text:'Samir hat in einer Sp___ (1) Deutsch gelernt.',answers:[['rachschule','Sprachschule']]},
    {k:'gap',text:'Jetzt macht er ein Pr___ (2) in einem Autohaus.',answers:[['aktikum','Praktikum']]},
    {k:'gap',text:'Er kann gut Autos re___ (3).',answers:[['parieren','reparieren']]},
-   {k:'gap',text:'In drei Mo___ (4) möchte er eine Au___ (5) zum Mechatroniker anfangen.',answers:[['naten','Monaten'],['sbildung','Ausbildung']]},
+   {k:'gap',text:'In drei Mo___ (4) …',answers:[['naten','Monaten']]},
+   {k:'gap',text:'… möchte er eine Au___ (5) zum Mechatroniker anfangen.',answers:[['sbildung','Ausbildung']]},
   ]},
   {id:'t2',title:'2.1 seit, vor oder in? (2,5 Punkte)',points:2.5,items:[
    {k:'gap',text:'Herr Okafor ist ___ (1) sechs Jahren nach Deutschland gekommen. Er wohnt ___ (2) vier Monaten in Leipzig und er will dort bleiben. ___ (3) zwei Wochen beginnt sein neuer Job. Er hat ___ (4) einem Jahr die Prüfung B1 gemacht. ___ (5) drei Jahren lernt er schon Deutsch.',answers:[['vor'],['seit'],['In'],['vor'],['Seit']]},
@@ -584,7 +585,7 @@ const allesKlar:L12Part={
    {k:'gap',text:'___ ihr am Montag nicht zur Schule ___? (gehen)',answers:[['Seid'],['gegangen']]},
   ]},
   {id:'t4',title:'3 Kommunikation (10 Punkte)',hint:'Resmî e-postayı tamamla.',points:10,items:[
-   {k:'gap',text:'___ (1) Herr Falke, ___ (2) ein Praktikum in Ihrem Autohaus machen. Ich komme aus Syrien und ___ (3) drei Jahren in Berlin. Vor vier Jahren habe ich schon als Mechaniker in einer Firma gearbeitet. Die Arbeit hat ___ (4). Ich repariere gern Autos und ich arbeite gern im Team. ___ (5) auf Ihre Antwort. Mit freundlichen Grüßen Karim Haddad',answers:[['Sehr geehrter'],['ich möchte gern','ich möchte'],['ich wohne seit','wohne ich seit'],['Spaß gemacht','viel Spaß gemacht','mir Spaß gemacht','mir viel Spaß gemacht'],['Ich freue mich']]},
+   {k:'gap',text:'___ (1) Herr Falke, ___ (2) ein Praktikum in Ihrem Autohaus machen. Ich komme aus Syrien und ___ (3) drei Jahren in Berlin. Vor vier Jahren habe ich schon als Mechaniker in einer Firma gearbeitet. Die Arbeit hat ___ (4). Ich repariere gern Autos und ich arbeite gern im Team. ___ (5) auf Ihre Antwort. Mit freundlichen Grüßen Karim Haddad',answers:[['Sehr geehrter'],['ich möchte gern','ich möchte'],['ich wohne seit','ich wohne schon seit'],['Spaß gemacht','viel Spaß gemacht','mir Spaß gemacht','mir viel Spaß gemacht'],['Ich freue mich']]},
   ]},
   {id:'t5',title:'4 Zusatz: können / wollen (5 Punkte)',points:5,items:[
    {k:'gap',text:'Ich ___ gut Fahrrad fahren, aber ich ___ nicht so gut schwimmen. (können)',answers:[['kann'],['kann']]},
@@ -655,10 +656,10 @@ const magazin:L12Part={
    rf('b2) Er hat die Ausbildung 2014 angefangen.',false),
    rf('b3) Er arbeitet seit 2020 als Mechatroniker.',true),
    rf('b4) Er will einen Laden haben.',true),
-   {k:'open',prompt:'c) Mein Steckbrief',sample:'Ich bin geboren: 1988\nIch bin in Deutschland seit: 2024\nIch bin Tierarzt von Beruf.\nMeine Ausbildung: Ich bin von 1994 bis 2006 zur Schule gegangen. Dann habe ich in Izmir Tiermedizin studiert. 2024 bin ich nach Berlin gekommen. Seit einem Jahr lerne ich Deutsch.\nIch will noch: … wieder als Tierarzt arbeiten.\nKaffee oder Tee? Kaffee!\nIn der Freizeit: … gehe ich spazieren.'},
-  ],key:'b2: F (2017). c) Kendi Steckbrief\'ini aynı başlıklarla yaz (*Ich bin geboren · Ich bin in Deutschland seit · Ich arbeite als / Ich bin … von Beruf · Meine Ausbildung · Ich will noch · Kaffee oder Tee? · In der Freizeit*). Ünitenin tüm gramerini (Perfekt, seit/vor/in, wollen) burada kullan.'},
+   {k:'open',prompt:'c) Mein Steckbrief – kendi Steckbrief\'ini aynı başlıklarla yaz: *Ich bin geboren · Ich bin in Deutschland seit · Ich bin … von Beruf · Meine Ausbildung · Ich will noch · Kaffee oder Tee? · In der Freizeit*. Perfekt, seit/vor/in ve wollen kullan.',sample:'Ich bin geboren: 1988\nIch bin in Deutschland seit: 2024\nIch bin Tierarzt von Beruf.\nMeine Ausbildung: Ich bin von 1994 bis 2006 zur Schule gegangen. Dann habe ich in Izmir Tiermedizin studiert. 2024 bin ich nach Berlin gekommen. Seit einem Jahr lerne ich Deutsch.\nIch will noch: … wieder als Tierarzt arbeiten.\nKaffee oder Tee? Kaffee!\nIn der Freizeit: … gehe ich spazieren.'},
+  ],key:'b2: F (Ausbildung 2017–2020; 2014 ist er nach Leipzig gekommen).'},
   {id:'m2',title:'2 · Was verdient man in Deutschland?',hint:'Tahmin et: her meslek ne kadar kazanıyor? (aylık, kitaptaki Entgeltatlas verileri)',items:[
-   ['die Friseurin','1.666 €'],['die Verkäuferin','2.279 €'],['die Lageristin (depo görevlisi)','2.445 €'],['die Krankenschwester','3.645 €'],['die Lehrerin','4.444 €'],['die Ingenieurin','5.858 €'],
+   ['die Lehrerin','4.444 €'],['die Friseurin','1.666 €'],['die Ingenieurin','5.858 €'],['die Verkäuferin','2.279 €'],['die Krankenschwester','3.645 €'],['die Lageristin (depo görevlisi)','2.445 €'],
   ].map(([job,amount])=>({k:'choice' as const,text:job,options:['1.666 €','2.279 €','2.445 €','3.645 €','4.444 €','5.858 €'],answer:['1.666 €','2.279 €','2.445 €','3.645 €','4.444 €','5.858 €'].indexOf(amount)}))},
  ],
  after:[{t:'note',text:'Magazin\'in „Vom Bauernhaus bis zum Tiny-House" kısmı Wohnen konusu; Lektion 13\'te.'}],
@@ -682,11 +683,35 @@ export function matchesAnswer(given:string,accepted:readonly string[]){const val
 /** Number of blanks in a gap text. */
 export const gapCount=(text:string)=>text.split('___').length-1;
 
-/** Every German text the lesson page reads aloud (word tables). */
+/**
+ * The German example sentences of a text (its *…* parts that are whole sentences), joined to be read
+ * aloud; '' when the text has none. Short phrases such as *Ich will* are not read.
+ */
+export function exampleSpeech(text:string):string{
+ const sentences=[...text.replace(/\*\*[^*]+\*\*/g,' ').matchAll(/\*([^*]+)\*/g)].map(match=>match[1].trim()).filter(part=>/^[A-ZÄÖÜ„].*\s.*[.?!]$/u.test(part)&&!/[…\/\d]/.test(part));
+ return sentences.join(' ');
+}
+/** A sentence-frame row read aloud: its cells without the empty "–" position. */
+export function frameSpeech(row:readonly string[]){
+ const text=row.filter(cell=>cell.trim()&&cell.trim()!=='–').join(' ').replace(/\s+/g,' ').trim();
+ return /[…\/\d]/.test(text)?'':text;
+}
+/** Every German text a list of blocks reads aloud: words, example sentences and sentence frames. */
+export function blockSpeechTexts(blocks:readonly L12Block[]){
+ const texts:string[]=[];
+ for(const block of blocks){
+  if(block.t==='vocab')for(const word of block.words)texts.push(wordSpeech(word));
+  if(block.t==='p'||block.t==='note'){const say=exampleSpeech(block.text);if(say)texts.push(say);}
+  if(block.t==='list')for(const item of block.items){const say=exampleSpeech(item);if(say)texts.push(say);}
+  if(block.t==='table'&&block.frame)for(const row of block.rows){const say=frameSpeech(row);if(say)texts.push(say);}
+ }
+ return texts;
+}
+/** Every German text the lesson page reads aloud (words, example sentences, sentence frames). */
 export function lessonSpeechTexts(){
  const texts:string[]=[];
- for(const part of lessonParts)for(const section of part.sections)for(const block of section.blocks)if(block.t==='vocab')for(const word of block.words)texts.push(wordSpeech(word));
- return texts;
+ for(const part of lessonParts){for(const section of part.sections)texts.push(...blockSpeechTexts(section.blocks));if(part.after)texts.push(...blockSpeechTexts(part.after));}
+ return [...new Set(texts)];
 }
 
 /** A learner's answer for one item: blanks, a chosen option, a sentence, a free text or the picked words. */

@@ -9,14 +9,15 @@ import {verbPrefix} from './verb-logic';
 export type VerbKind='regular'|'irregular'|'modal';
 export const modalVerbs:ReadonlySet<string>=new Set(['können','müssen','dürfen','sollen','wollen','mögen','möchten']);
 const inseparable=/^(be|emp|ent|er|ge|miss|ver|zer)/;
-export type VerbKindInfo={kind:VerbKind;stemChange:boolean;irregularPartizip:boolean;changedPersons:readonly ('du'|'er')[]};
+export type VerbKindInfo={kind:VerbKind;stemChange:boolean;irregularPartizip:boolean;changedPersons:readonly ('ich'|'du'|'er')[]};
 export function verbKindInfo(verb:Verb):VerbKindInfo{
  const prefix=verbPrefix(verb);const base=verb.infinitive.slice(prefix.length);const stem=base.replace(/e?n$/,'');
  if(modalVerbs.has(base))return {kind:'modal',stemChange:false,irregularPartizip:false,changedPersons:[]};
  const forms=praesensPersons(verb);const strip=(form:string)=>prefix?form.slice(0,-(prefix.length+1)):form;
  const dt=/[dt]$/.test(stem)||/[^aeiouäöülrhmn][mn]$/.test(stem);
  const regularEr=stem+(dt?'et':'t');const regularDu=stem+(dt?'est':/[sßxz]$/.test(stem)?'t':'st');
- const changedPersons=([['du',strip(forms.du)!==regularDu],['er',strip(forms.er)!==regularEr]] as const).filter(([,changed])=>changed).map(([person])=>person);
+ // ich changes only in a few verbs (wissen → ich weiß); du and er change in the strong verbs (fahren → du fährst, er fährt).
+ const changedPersons=([['ich',strip(forms.ich)!==stem+'e'],['du',strip(forms.du)!==regularDu],['er',strip(forms.er)!==regularEr]] as const).filter(([,changed])=>changed).map(([person])=>person);
  const stemChange=changedPersons.length>0;
  const regularPartizip=prefix+(inseparable.test(base)||/ieren$/.test(base)?'':'ge')+stem+(dt?'et':'t');
  const irregularPartizip=verb.participle!==regularPartizip;

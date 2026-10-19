@@ -1,4 +1,5 @@
-import {vaultLanguages,type VaultLanguage,type VaultTranslations} from './object-vault-copy';
+import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
+import {languageLocale,pickText} from './site-languages';
 import type {ProgressStage} from './progress';
 
 /** Progress, XP and streak copy. Tuple order follows vaultLanguages (tr de en ar uk fr es ru fa pl it pt). */
@@ -29,13 +30,11 @@ export const progressCopy={
 
 export type ProgressCopyKey=keyof typeof progressCopy;
 const stageKeys:Record<ProgressStage,ProgressCopyKey>={new:'stageNew',started:'stageStarted',warming:'stageWarming',half:'stageHalf',almost:'stageAlmost',master:'stageMaster'};
-const locales:Record<VaultLanguage,string>={tr:'tr-TR',de:'de-DE',en:'en-GB',ar:'ar',uk:'uk-UA',fr:'fr-FR',es:'es-ES',ru:'ru-RU',fa:'fa-IR',pl:'pl-PL',it:'it-IT',pt:'pt-BR'};
 
-function languageIndex(language:VaultLanguage){const index=vaultLanguages.findIndex(item=>item.id===language);return index<0?0:index;}
 export function progressText(language:VaultLanguage,key:ProgressCopyKey,params:Record<string,string|number>={}){
- return progressCopy[key][languageIndex(language)].replace(/\{(\w+)\}/g,(_,name:string)=>String(params[name]??''));
+ return pickText(progressCopy[key],language).replace(/\{(\w+)\}/g,(_,name:string)=>String(params[name]??''));
 }
 export function stageText(language:VaultLanguage,stage:ProgressStage){return progressText(language,stageKeys[stage]);}
 export function formatPercent(value:number,language:VaultLanguage){
- try{return new Intl.NumberFormat(locales[language],{style:'percent',maximumFractionDigits:0}).format(value/100);}catch{return '%'+value;}
+ try{return new Intl.NumberFormat(languageLocale(language),{style:'percent',maximumFractionDigits:0}).format(value/100);}catch{return '%'+value;}
 }

@@ -47,13 +47,13 @@ test('site voice manifest: normalised lookup, default voice and safe parsing',()
 
 test('an old device-voice choice moves once to the natural site voice; later choices are kept',()=>{
  assert.equal(voices.savedVoiceName({voiceName:'Helena',rate:'0.94'},'de'),'','a pre-site-voice choice falls back to automatic (Lena)');
- assert.equal(voices.savedVoiceName({voiceName:'Helena',voices:voices.VOICE_PREFERENCE_VERSION},'de'),'Helena','a device voice chosen later stays');
+ assert.equal(voices.savedVoiceName({voiceName:'Helena',voices:voices.VOICE_PREFERENCE_VERSION},'de'),'','German offers only the natural voices: a device voice falls back to Lena');
  assert.equal(voices.savedVoiceName({voiceName:'site:M2'},'de'),'site:M2');
  assert.equal(voices.savedVoiceName({voiceName:'Samantha'},'en'),'Samantha','other courses are untouched');
  assert.equal(voices.savedVoiceName(null,'de'),'');assert.equal(voices.savedVoiceName({voiceName:3},'de'),'');
  const shared=readFileSync('app/study-shared.tsx','utf8');
  assert.ok(shared.includes('savedVoiceName(saved,course)')&&shared.includes('voices:VOICE_PREFERENCE_VERSION'));
- assert.ok(readFileSync('app/learning-effects.tsx','utf8').includes('const deviceVoice=savedDevice??chooseGermanVoice(speech.voices)'));
+ const effectsDialog=readFileSync('app/learning-effects.tsx','utf8');assert.ok(!effectsDialog.includes('lk-voice-chip device')&&!effectsDialog.includes("text('voiceDevice')"),'no Cihaz sesi choice in the voice list');
 });
 
 function setup(t,resolve){
@@ -124,8 +124,12 @@ test('every effect has a rendered sound, a fallback recipe and readable labels',
   assert.ok(effects.soundDuration(id)*1000+1200>info.durations[id]*1000,id+' playback timer outlasts the sound');
  }
  assert.ok(['tap','tap2','tap3'].includes(effects.nextTapSound()));
+ // Every moment has several sounds to choose from; a chosen tap sound plays as it is.
+ for(const list of [effects.tapChoiceIds,effects.pageSoundIds,effects.correctSoundIds,effects.completeSoundIds,effects.wrongSoundIds]){assert.ok(list.length>=5);for(const id of list)assert.ok(rendered.includes(id),id);}
+ assert.equal(effects.nextTapSound('tapWood'),'tapWood');assert.ok(['tap','tap2','tap3'].includes(effects.nextTapSound('tap')));
  const languages=['tr','de','en','ar','uk','fr','es','ru','fa','pl','it','pt'];
- for(const key of ['whoosh','voiceTitle','voiceFemale','voiceMale','voiceSpeed','voicePreview','effectsTitle',...effects.wrongSoundIds])
+ const chosenNames=[...effects.tapChoiceIds,...effects.pageSoundIds,...effects.correctSoundIds,...effects.completeSoundIds].filter(id=>!['tap','whoosh','correct','complete'].includes(id));
+ for(const key of ['whoosh','voiceTitle','voiceFemale','voiceMale','voiceSpeed','voicePreview','effectsTitle',...effects.wrongSoundIds,'chooseTap','choosePage','chooseCorrect','chooseComplete','nameBubble','nameWind','nameChimes','nameCelebration',...chosenNames])
   for(const language of languages)assert.ok(copy.effectsText(language,key)?.trim(),key+':'+language);
 });
 

@@ -1,6 +1,7 @@
 // LernKoko sound effects: original, playful cartoon sounds synthesised from
 // scratch (marimba, celesta, glockenspiel, bubbles, wind, slide whistle,
-// spring and a soft "wah-wah"). No recordings or samples are used.
+// spring, brass and retro chip tones). No recordings or samples are used.
+// Several sounds for each moment: the learner chooses one in "Sesler ve animasyonlar".
 // Usage: node scripts/sounds/make-sounds.mjs [output-folder]   (default public/sfx)
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
@@ -122,6 +123,7 @@ export function wav(samples){
 }
 
 const C4=note(-9),E4=note(-5),G4=note(-2),C5=note(3),D5=note(5),E5=note(7),G5=note(10),A5=note(12),C6=note(15),E6=note(19),G6=note(22),C7=note(27),E7=note(31);
+const B5=note(14),D6=note(17),A6=note(24);
 function tap(f){const b=track(.24);bubble(b,0,f,.075,.9,1.9);marimba(b,.004,f*2,.22,.05);return finish(reverb(b,.06),.3);}
 export const soundDesigns={
  // Short wooden "plip" for buttons; three pitches so repeated taps feel alive.
@@ -140,6 +142,30 @@ export const soundDesigns={
  retro:()=>{const b=track(.65);chip(b,0,.085,G5,.4);chip(b,.1,.085,E5,.4);chip(b,.2,.085,C5,.4);chip(b,.3,.24,G4,.4,note(-3));return finish(b,.3);},
  low:()=>{const b=track(.95);brass(b,0,.29,note(-6),.7,{bend:.985});brass(b,.31,.55,note(-7),.75,{bend:.965,vibrato:.022});return finish(reverb(b,.12),.48);},
  cartoon:()=>{const b=track(.85);slideWhistle(b,0,.38,1450,390,.55);boing(b,.39,.36,175,.75);return finish(reverb(b,.08),.58);},
+ // The learner chooses one sound for each moment. Taps: short and light.
+ tapWood:()=>{const b=track(.22);marimba(b,0,C6,.9,.07);click(b,0,.15,.003,7);return finish(reverb(b,.06),.3);},
+ tapPop:()=>{const b=track(.22);bubble(b,0,380,.1,.9,2.8);return finish(reverb(b,.05),.3);},
+ tapDrop:()=>{const b=track(.26);bubble(b,0,1250,.035,.6,.55);bubble(b,.03,650,.09,.9,2.3);return finish(reverb(b,.08),.3);},
+ tapBell:()=>{const b=track(.4);glock(b,0,E7,.6,.09);return finish(reverb(b,.08),.24);},
+ tapChip:()=>{const b=track(.2);chip(b,0,.05,C6,.4,G6);chip(b,.06,.05,G6,.3);return finish(b,.2);},
+ // Page changes.
+ pageFlip:()=>{const b=track(.32);whoosh(b,0,.17,.9,1800,5200,23);click(b,0,.2,.004,5);click(b,.13,.12,.004,9);return finish(b,.3);},
+ pageSlide:()=>{const b=track(.48);slideWhistle(b,0,.34,520,1300,.55,7);return finish(reverb(b,.1),.32);},
+ pageHarp:()=>{const b=track(.75);[C5,E5,G5,C6,E6].forEach((f,i)=>celesta(b,i*.035,f,.5,.35));return finish(reverb(b,.18),.34);},
+ pageBubbles:()=>{const b=track(.42);[[520,0],[680,.06],[860,.12],[1080,.18]].forEach(([f,t])=>bubble(b,t,f,.07,.8,1.8));return finish(reverb(b,.1),.32);},
+ pageChip:()=>{const b=track(.26);[C5,E5,G5,C6].forEach((f,i)=>chip(b,i*.04,.04,f,.4));return finish(b,.22);},
+ // Correct answers: always happy.
+ correctMarimba:()=>{const b=track(.95);[C5,E5,G5].forEach((f,i)=>marimba(b,i*.08,f,.6,.3));marimba(b,.24,C6,.7,.6);marimba(b,.24,C5,.35,.6);return finish(reverb(b,.2),.7);},
+ correctCoin:()=>{const b=track(.62);chip(b,0,.07,B5,.4);chip(b,.075,.38,E6,.4);return finish(reverb(b,.08),.32);},
+ correctDing:()=>{const b=track(1.2);glock(b,0,C6,.7,.6);glock(b,.16,G6,.7,.7);return finish(reverb(b,.22),.65);},
+ correctFanfare:()=>{const b=track(.95);brass(b,0,.1,C5,.5);brass(b,.1,.1,E5,.5);brass(b,.2,.1,G5,.5);brass(b,.3,.5,C6,.55,{vibrato:.012});glock(b,.3,C7,.18,.5);return finish(reverb(b,.18),.6);},
+ correctBubbles:()=>{const b=track(.95);[[500,0],[630,.08],[790,.16],[1000,.24]].forEach(([f,t])=>bubble(b,t,f,.08,.85,1.8));celesta(b,.32,C7,.35,.45);sparkle(b,.34,.3,5,.12,31);return finish(reverb(b,.18),.65);},
+ // End of a round: a bigger celebration.
+ completeFanfare:()=>{const b=track(1.6);brass(b,0,.12,C5,.5);brass(b,.14,.12,C5,.5);brass(b,.28,.12,C5,.5);brass(b,.42,.85,G5,.6,{vibrato:.015});[C6,E6,G6].forEach(f=>glock(b,.42,f,.22,.8));sparkle(b,.5,.7,10,.12,41);return finish(reverb(b,.22),.72);},
+ completeLevel:()=>{const b=track(1.1);[C5,E5,G5,C6,E6,G6].forEach((f,i)=>chip(b,i*.055,.05,f,.35));chip(b,.33,.55,C7,.35);return finish(b,.32);},
+ completeChimes:()=>{const b=track(1.65);sparkle(b,0,1.05,18,.22,51);[C6,E6,G6].forEach(f=>celesta(b,.05,f,.3,1));return finish(reverb(b,.3),.7);},
+ completeHarp:()=>{const b=track(1.6);[C5,D5,E5,G5,A5,C6,D6,E6,G6,A6,C7].forEach((f,i)=>celesta(b,i*.04,f,.42,.5));[C6,E6,G6].forEach(f=>glock(b,.48,f,.3,.9));return finish(reverb(b,.26),.72);},
+ completeMarimba:()=>{const b=track(1.6);marimba(b,0,C4,.7,.25);marimba(b,.16,C4,.7,.25);marimba(b,.32,G4,.7,.25);[C5,E5,G5,C6].forEach(f=>marimba(b,.48,f,.45,.8));glock(b,.48,C7,.25,.8);return finish(reverb(b,.2),.72);},
 };
 export const soundIds=Object.keys(soundDesigns);
 

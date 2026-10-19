@@ -565,7 +565,8 @@ test('the cards say regular, irregular or modal; irregular names and forms get t
  const byId=id=>verbs.verbMap.get(id);
  assert.deepEqual(kinds.verbKindInfo(byId('fahren')).changedPersons,['du','er']);assert.ok(kinds.verbKindInfo(byId('fahren')).irregularPartizip);
  assert.deepEqual(kinds.verbKindInfo(byId('anrufen')).changedPersons,[]);assert.ok(kinds.verbKindInfo(byId('anrufen')).irregularPartizip);
- assert.deepEqual(kinds.verbKindInfo(byId('kennen')).changedPersons,[]);assert.ok(kinds.verbKindInfo(byId('kennen')).irregularPartizip,'gekannt is irregular');
+ assert.deepEqual(kinds.verbKindInfo(byId('kennen')).changedPersons,[]);
+ assert.deepEqual(kinds.verbKindInfo(byId('wissen')).changedPersons,['ich','du','er'],'ich weiß is irregular too');assert.deepEqual(kinds.verbKindInfo(byId('tun')).changedPersons,[]);assert.ok(kinds.verbKindInfo(byId('tun')).irregularPartizip,'getan');assert.ok(kinds.verbKindInfo(byId('kennen')).irregularPartizip,'gekannt is irregular');
  const make=(display,praesens,participle)=>({...byId('kennen'),id:display.replace('|',''),display,infinitive:display.replace('|',''),praesens,participle});
  assert.equal(kinds.verbKind(make('machen','macht','gemacht')),'regular');assert.equal(kinds.verbKind(make('ab|holen','holt ab','abgeholt')),'regular');
  assert.equal(kinds.verbKind(make('arbeiten','arbeitet','gearbeitet')),'regular');assert.equal(kinds.verbKind(make('besuchen','besucht','besucht')),'regular');
@@ -573,7 +574,7 @@ test('the cards say regular, irregular or modal; irregular names and forms get t
  for(const language of languages)for(const key of ['kindIrregular','kindRegular','kindModal','kindModalNote','partVerbsTitle','partVerbsLead','backToPart','prevVerb','nextVerb','verbDoneMeaning','verbDonePerfekt','verbNotDone'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
  for(const language of languages){assert.ok(copy.verbText(language,'kindStem',{verb:'du fährst'}).includes('du fährst'));assert.ok(copy.verbText(language,'kindPartizip',{verb:'gefahren'}).includes('gefahren'));assert.ok(copy.verbText(language,'partOpen',{n:2}).includes('2'));}
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const css=fs.readFileSync('app/verbs.css','utf8');
- assert.ok(cards.includes('<VerbKindBadge verb={verb} language={language} note/>')&&cards.includes("className={'verb-conj-cell'+(irregular(pronoun)?' irregular':'')}"),'the card shows the badge and the changed forms');
+ assert.ok(cards.includes('className="verb-irregular-form"'),'the irregular forms in the note are coloured');assert.ok(cards.includes('<VerbKindBadge verb={verb} language={language} note/>')&&cards.includes("className={'verb-conj-cell'+(irregular(pronoun)?' irregular':'')}"),'the card shows the badge and the changed forms');
  assert.match(css,/\.verb-irregular-form \{ color:#7a2fc0; \}/);
 });
 test('a part opens its verb list with what is done; a verb opens its own card',()=>{

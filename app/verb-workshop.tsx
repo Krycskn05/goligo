@@ -27,17 +27,19 @@ export function VerbKindBadge({verb,language,note=false}:{verb:Verb;language:Vau
  const info=verbKindInfo(verb);const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  const label=t(info.kind==='modal'?'kindModal':info.kind==='irregular'?'kindIrregular':'kindRegular');
  const f=praesensPersons(verb);
- const lines=info.kind==='modal'?[t('kindModalNote')]:info.kind==='regular'?[t('kindRegularNote',{verb:verb.participle})]:[
-  ...(info.stemChange?[t('kindStem',{verb:info.changedPersons.map(person=>person==='du'?'du '+f.du:'er '+f.er).join(', ')})]:[]),
-  ...(info.irregularPartizip?[t('kindPartizip',{verb:verb.participle})]:[]),
+ // Each line names the forms; the irregular forms themselves are shown in the irregular colour (like the table cells).
+ const lines:{key:VerbCopyKey;form:string;mark:boolean}[]=info.kind==='modal'?[{key:'kindModalNote',form:'',mark:false}]:info.kind==='regular'?[{key:'kindRegularNote',form:verb.participle,mark:false}]:[
+  ...(info.stemChange?[{key:'kindStem' as VerbCopyKey,form:info.changedPersons.map(person=>person==='ich'?'ich '+f.ich:person==='du'?'du '+f.du:'er '+f.er).join(', '),mark:true}]:[]),
+  ...(info.irregularPartizip?[{key:'kindPartizip' as VerbCopyKey,form:verb.participle,mark:true}]:[]),
  ];
- return <span className={'verb-kind kind-'+info.kind} data-verb-kind={info.kind}><span className="verb-kind-badge">{label}</span>{note&&lines.length>0&&<span className="verb-kind-note" lang={language} dir={vaultDirection(language)}>{lines.join(' · ')}</span>}</span>;
+ const line=({key,form,mark}:{key:VerbCopyKey;form:string;mark:boolean})=>{const [before,after='']=t(key,{verb:'\u0000'}).split('\u0000');return <>{before}{form&&(mark?<span className="verb-irregular-form" lang="de" dir="ltr">{form}</span>:form)}{after}</>;};
+ return <span className={'verb-kind kind-'+info.kind} data-verb-kind={info.kind}><span className="verb-kind-badge">{label}</span>{note&&lines.length>0&&<span className="verb-kind-note" lang={language} dir={vaultDirection(language)}>{lines.map((item,i)=><span key={item.key}>{i>0&&' · '}{line(item)}</span>)}</span>}</span>;
 }
 /** The Präsens forms of the verb for every person, singular on the left, plural on the right; tap a form to hear it. */
 export function ConjugationTable({verb,language,speech}:{verb:Verb;language:VaultLanguage;speech:Speech}){
  // The spoken texts come from the lib, so each one has a natural site-voice clip.
  const rows=conjugationRows(verb);const changed=verbKindInfo(verb).changedPersons;
- const irregular=(pronoun:string)=>(pronoun==='du'&&changed.includes('du'))||(pronoun==='er/sie/es'&&changed.includes('er'));
+ const irregular=(pronoun:string)=>(pronoun==='ich'&&changed.includes('ich'))||(pronoun==='du'&&changed.includes('du'))||(pronoun==='er/sie/es'&&changed.includes('er'));
  return <div className="verb-conj" data-verb-conjugation={verb.id}>
   <small lang={language} dir={vaultDirection(language)}>{verbText(language,'conjugationTitle')}</small>
   <div className="verb-conj-grid" lang="de" dir="ltr">{rows.map(({pronoun,form,spoken})=><button type="button" key={pronoun} className={'verb-conj-cell'+(irregular(pronoun)?' irregular':'')} disabled={speech.busy} aria-label={spoken} onClick={()=>speech.speak(spoken)}><span className="verb-conj-pronoun">{pronoun}</span><span className="verb-conj-form">{form}</span><Volume2 size={15} aria-hidden="true"/></button>)}</div>

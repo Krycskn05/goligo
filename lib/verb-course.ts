@@ -3,13 +3,13 @@ import type {Topic} from './lessons';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 
 /**
- * Fiiller: the 38 verbs from the learner's textbook page (infinitive, 3rd person
- * Präsens, Perfekt with hat/ist). Only new IDs are added here: topics `verbs-*`,
+ * Fiiller: the 72 verbs from the learner's two textbook pages (infinitive, 3rd person
+ * Präsens, Perfekt with hat/ist): 38 from the first page, 34 from the second (mit|nehmen → zurück|kommen). Only new IDs are added here: topics `verbs-*`,
  * questions `verb-*`. Answer options stay German; meanings follow the interface language.
  */
 export type VerbAux='hat'|'ist';
 export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'partizip'|'write'|'write-praesens'|'write-perfekt'|'write-partizip'|'hear'|'hear-praesens'|'hear-perfekt';
-export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
+export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es'|'sie';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
 
 type Spec=readonly [display:string,praesens:string,perfekt:string,praesensWrong:readonly [string,string,string],perfektWrong:readonly [string,string,string],meanings:VaultTranslations];
 // Meaning order: tr, de, en, ar, uk, fr, es, ru, fa, pl, it, pt (same as the vault languages).
@@ -52,25 +52,63 @@ const specs:readonly Spec[]=[
  ['liegen','liegt','hat gelegen',['lägt','liegst','lieget'],['hat geliegt','hat gelagen','hat geliegen'],['yatmak, bulunmak','sich waagerecht befinden','to lie, to be located','يستلقي، يقع','лежати','être couché, se trouver','estar tumbado, estar situado','лежать','دراز کشیدن، قرار داشتن','leżeć','giacere, trovarsi','estar deitado, ficar (situado)']],
  ['mit|bringen','bringt mit','hat mitgebracht',['mitbringt','bringst mit','brängt mit'],['ist mitgebracht','hat mitgebringt','hat gemitbracht'],['yanında getirmek','dabeihaben und übergeben','to bring along','يُحضِر معه','приносити з собою','apporter (avec soi)','traer (consigo)','приносить с собой','با خود آوردن','przynosić ze sobą','portare con sé','trazer consigo']],
  ['mit|kommen','kommt mit','ist mitgekommen',['mitkommt','kommst mit','kömmt mit'],['hat mitgekommen','ist mitgekommt','ist gemitkommen'],['birlikte gelmek','begleiten','to come along','يأتي مع','іти разом','venir avec, accompagner','venir (con alguien)','идти вместе','همراه آمدن','iść razem','venire con','vir junto']],
+ // The learner's second page (mit|nehmen → zurück|kommen).
+ ['mit|nehmen','nimmt mit','hat mitgenommen',['nehmt mit','mitnimmt','nimmst mit'],['ist mitgenommen','hat mitgenehmt','hat gemitnommen'],['yanına almak, yanında götürmek','einpacken und dabeihaben','to take along','يأخذ معه','брати з собою','emporter, emmener','llevarse, llevar consigo','брать с собой','با خود بردن','zabierać ze sobą','portare con sé','levar consigo']],
+ ['nehmen','nimmt','hat genommen',['nehmt','nimmst','nahmt'],['ist genommen','hat genehmt','hat genehmen'],['almak','greifen, an sich nehmen','to take','يأخذ','брати','prendre','tomar, coger','брать','برداشتن، گرفتن','brać','prendere','pegar, tomar']],
+ ['rufen','ruft','hat gerufen',['rüft','rufst','rief'],['ist gerufen','hat geruft','hat gerifen'],['seslenmek, çağırmak','laut nach jemandem sprechen','to call (out)','ينادي','кликати, гукати','appeler (à voix haute)','llamar (en voz alta)','звать, окликать','صدا زدن','wołać','chiamare (a voce)','chamar (em voz alta)']],
+ ['scheinen','scheint','hat geschienen',['scheinet','scheinst','schient'],['ist geschienen','hat gescheint','hat gescheinen'],['parlamak (güneş)','hell leuchten (die Sonne)','to shine','تشرق، تسطع (الشمس)','світити (про сонце)','briller (le soleil)','brillar (el sol)','светить (о солнце)','تابیدن (خورشید)','świecić (słońce)','splendere (il sole)','brilhar (o sol)']],
+ ['schlafen','schläft','hat geschlafen',['schlaft','schläfst','schlieft'],['ist geschlafen','hat geschlaft','hat geschliefen'],['uyumak','ruhen, nicht wach sein','to sleep','ينام','спати','dormir','dormir','спать','خوابیدن','spać','dormire','dormir']],
+ ['schließen','schließt','hat geschlossen',['schließet','schloss','schließst'],['ist geschlossen','hat geschließt','hat geschließen'],['kapatmak','zumachen','to close, to shut','يغلق','зачиняти','fermer','cerrar','закрывать','بستن','zamykać','chiudere','fechar']],
+ ['schneiden','schneidet','hat geschnitten',['schneidt','schneidest','schnittet'],['ist geschnitten','hat geschneidet','hat geschnieden'],['kesmek','mit dem Messer teilen','to cut','يقطع','різати','couper','cortar','резать','بریدن','kroić, ciąć','tagliare','cortar']],
+ ['schreiben','schreibt','hat geschrieben',['schriebt','schreibst','schreibet'],['ist geschrieben','hat geschreibt','hat geschreiben'],['yazmak','Wörter auf Papier bringen','to write','يكتب','писати','écrire','escribir','писать','نوشتن','pisać','scrivere','escrever']],
+ ['schwimmen','schwimmt','ist geschwommen',['schwämmt','schwimmst','schwammt'],['hat geschwommen','ist geschwimmt','ist geschwammen'],['yüzmek','sich im Wasser bewegen','to swim','يسبح','плавати','nager','nadar','плавать','شنا کردن','pływać','nuotare','nadar']],
+ ['sehen','sieht','hat gesehen',['seht','siehst','sah'],['ist gesehen','hat gesieht','hat gesahen'],['görmek','mit den Augen wahrnehmen','to see','يرى','бачити','voir','ver','видеть','دیدن','widzieć','vedere','ver']],
+ ['singen','singt','hat gesungen',['sängt','singst','sang'],['ist gesungen','hat gesingt','hat gesangen'],['şarkı söylemek','ein Lied mit der Stimme machen','to sing','يغني','співати','chanter','cantar','петь','آواز خواندن','śpiewać','cantare','cantar']],
+ ['sitzen','sitzt','hat gesessen',['sitzet','setzt','saß'],['hat gesitzt','hat gesetzt','hat gesatzen'],['oturmak','auf einem Stuhl oder einer Bank sein','to sit','يجلس','сидіти','être assis','estar sentado','сидеть','نشستن','siedzieć','stare seduto','estar sentado']],
+ ['sprechen','spricht','hat gesprochen',['sprecht','sprichst','sprach'],['ist gesprochen','hat gesprecht','hat gesprachen'],['konuşmak','reden','to speak, to talk','يتكلم','говорити, розмовляти','parler','hablar','говорить','صحبت کردن','mówić, rozmawiać','parlare','falar']],
+ ['stehen','steht','hat gestanden',['stäht','stehst','stand'],['hat gesteht','hat gestehen','hat gestunden'],['ayakta durmak','auf den Beinen sein, nicht sitzen','to stand','يقف','стояти','être debout','estar de pie','стоять','ایستادن','stać','stare in piedi','estar de pé']],
+ ['stoßen','stößt','hat gestoßen',['stoßt','stößst','stieß'],['ist gestoßen','hat gestößt','hat gestoßt'],['çarpmak, itmek','kräftig gegen etwas kommen','to bump, to push','يصطدم، يدفع','вдарятися, штовхати','cogner, pousser','golpearse, empujar','ударяться, толкать','خوردن به، هل دادن','uderzać się, pchać','urtare, spingere','bater, empurrar']],
+ ['tragen','trägt','hat getragen',['tragt','trägst','trug'],['ist getragen','hat getragt','hat geträgen'],['taşımak; giymek','in der Hand halten und bringen; anhaben','to carry; to wear','يحمل؛ يرتدي','нести; носити (одяг)','porter','llevar, cargar','нести; носить (одежду)','حمل کردن؛ پوشیدن','nieść; nosić','portare (in mano, addosso)','carregar; usar (roupa)']],
+ ['treffen','trifft','hat getroffen',['trefft','triffst','traf'],['ist getroffen','hat getrefft','hat getreffen'],['buluşmak, karşılaşmak','mit jemandem zusammenkommen','to meet','يقابل، يلتقي','зустрічати','rencontrer, retrouver','quedar con, encontrarse con','встречать','ملاقات کردن','spotykać','incontrare','encontrar-se com']],
+ ['trinken','trinkt','hat getrunken',['tränkt','trinkst','trank'],['ist getrunken','hat getrinkt','hat getranken'],['içmek','Wasser oder Saft zu sich nehmen','to drink','يشرب','пити','boire','beber','пить','نوشیدن','pić','bere','beber']],
+ ['tun','tut','hat getan',['tunt','tust','tat'],['ist getan','hat getut','hat getunt'],['yapmak, etmek','machen','to do','يفعل','робити','faire','hacer','делать','انجام دادن','robić','fare','fazer']],
+ ['überweisen','überweist','hat überwiesen',['überweisst','überweisest','überwies'],['ist überwiesen','hat überweist','hat geüberwiesen'],['havale etmek (para göndermek)','Geld vom Konto schicken','to transfer (money)','يحوّل (مالًا)','переказувати (гроші)','virer (de l’argent)','transferir (dinero)','переводить (деньги)','حواله کردن (پول)','przelewać (pieniądze)','trasferire (denaro)','transferir (dinheiro)']],
+ ['um|steigen','steigt um','ist umgestiegen',['stiegt um','umsteigt','steigst um'],['hat umgestiegen','ist umgesteigt','ist geumstiegen'],['aktarma yapmak','in einen anderen Zug oder Bus wechseln','to change (trains, buses)','يغيّر وسيلة النقل','робити пересадку','changer (de train, de bus)','hacer transbordo','делать пересадку','عوض کردن قطار یا اتوبوس','przesiadać się','cambiare (treno, autobus)','fazer transbordo']],
+ ['um|ziehen','zieht um','ist umgezogen',['ziet um','umzieht','ziehst um'],['hat umgezogen','ist umgezieht','ist umgeziehen'],['taşınmak (yeni eve)','in eine neue Wohnung gehen','to move (house)','ينتقل إلى سكن جديد','переїжджати','déménager','mudarse de casa','переезжать','اسباب‌کشی کردن','przeprowadzać się','traslocare','mudar de casa']],
+ ['unterschreiben','unterschreibt','hat unterschrieben',['unterschriebt','unterschreibst','schreibt unter'],['ist unterschrieben','hat untergeschrieben','hat unterschreibt'],['imzalamak','seinen Namen unter etwas schreiben','to sign','يوقّع','підписувати','signer','firmar','подписывать','امضا کردن','podpisywać','firmare','assinar']],
+ ['vergessen','vergisst','hat vergessen',['vergesst','vergißt','vergass'],['ist vergessen','hat vergesst','hat gevergessen'],['unutmak','nicht mehr daran denken','to forget','ينسى','забувати','oublier','olvidar','забывать','فراموش کردن','zapominać','dimenticare','esquecer']],
+ ['verlieren','verliert','hat verloren',['verlort','verlierst','verlierte'],['ist verloren','hat verliert','hat geverloren'],['kaybetmek','etwas nicht mehr haben','to lose','يفقد، يُضيّع','губити, втрачати','perdre','perder','терять','گم کردن، از دست دادن','gubić, tracić','perdere','perder']],
+ ['verstehen','versteht','hat verstanden',['verstäht','verstehst','verstand'],['ist verstanden','hat versteht','hat geverstanden'],['anlamak','den Sinn kennen, begreifen','to understand','يفهم','розуміти','comprendre','entender','понимать','فهمیدن','rozumieć','capire','entender, compreender']],
+ ['weh|tun','tut weh','hat wehgetan',['wehtut','tut wehe','tust weh'],['ist wehgetan','hat wehgetut','hat gewehtan'],['acımak, ağrımak','Schmerzen machen','to hurt','يؤلم','боліти','faire mal','doler','болеть','درد کردن','boleć','fare male','doer']],
+ ['werden','wird','ist geworden',['werdet','wirst','wurde'],['hat geworden','ist gewird','ist gewerden'],['olmak (bir şey haline gelmek)','sich zu etwas verändern','to become','يصبح','ставати','devenir','llegar a ser, hacerse','становиться','شدن','stawać się','diventare','tornar-se']],
+ ['wissen','weiß','hat gewusst',['wisst','weißt','wusste'],['ist gewusst','hat gewisst','hat gewissen'],['bilmek (bir bilgiyi)','eine Information im Kopf haben','to know (a fact)','يعرف (معلومة)','знати (факт)','savoir','saber','знать (факт)','دانستن','wiedzieć','sapere','saber']],
+ ['ziehen','zieht','ist gezogen',['ziet','ziehst','zog'],['ist gezieht','ist geziehen','ist gezugen'],['(bir yere) taşınmak; çekmek','woandershin gehen und dort wohnen; auch: zerren','to move (to a place); to pull','ينتقل (إلى مكان)؛ يسحب','переїжджати (кудись); тягнути','aller vivre (ailleurs) ; tirer','irse a vivir (a otro lugar); tirar','переезжать (куда-то); тянуть','نقل مکان کردن؛ کشیدن','przenosić się (dokądś); ciągnąć','trasferirsi; tirare','mudar-se (para um lugar); puxar']],
+ ['zurück|geben','gibt zurück','hat zurückgegeben',['gebt zurück','zurückgibt','gibst zurück'],['ist zurückgegeben','hat zurückgegebt','hat gezurückgeben'],['geri vermek','wiedergeben, was man geliehen hat','to give back, to return','يُرجع، يُعيد','повертати (віддавати)','rendre','devolver','возвращать (отдавать)','پس دادن','oddawać, zwracać','restituire','devolver']],
+ ['zurück|gehen','geht zurück','ist zurückgegangen',['gehet zurück','zurückgeht','gehst zurück'],['hat zurückgegangen','ist zurückgegeht','ist gezurückgangen'],['geri gitmek (yürüyerek)','zu Fuß wieder an den alten Ort','to go back (on foot)','يعود (مشيًا)','повертатися (пішки)','retourner (à pied)','volver (a pie)','возвращаться (пешком)','برگشتن (پیاده)','wracać (pieszo)','tornare indietro (a piedi)','voltar (a pé)']],
+ ['zurück|fahren','fährt zurück','ist zurückgefahren',['fahrt zurück','zurückfährt','fährst zurück'],['hat zurückgefahren','ist zurückgefahrt','ist gezurückfahren'],['(araçla) geri dönmek','mit dem Auto, Bus oder Zug zurück','to go back (by vehicle), to drive back','يعود (بمركبة)','їхати назад','rentrer (en véhicule)','volver (en vehículo)','ехать обратно','برگشتن (با وسیلهٔ نقلیه)','wracać (pojazdem)','tornare (con un mezzo)','voltar (de veículo)']],
+ ['zurück|kommen','kommt zurück','ist zurückgekommen',['kömmt zurück','zurückkommt','kommst zurück'],['hat zurückgekommen','ist zurückgekommt','ist gezurückkommen'],['geri gelmek','wieder hierher kommen','to come back','يرجع، يعود','повертатися (сюди)','revenir','regresar, volver','возвращаться (сюда)','برگشتن (به اینجا)','wracać (tu)','tornare (qui)','regressar, voltar']],
 ];
 
-/** Four groups in the order of the textbook page; `verbs-all` practises every verb. */
-export const verbGroups=[{id:'verbs-1',from:0,to:10},{id:'verbs-2',from:10,to:20},{id:'verbs-3',from:20,to:30},{id:'verbs-4',from:30,to:38}] as const;
+/** Groups in the order of the textbook pages (1–4: first page, 5–8: second page); `verbs-all` practises every verb. */
+export const verbGroups=[{id:'verbs-1',from:0,to:10},{id:'verbs-2',from:10,to:20},{id:'verbs-3',from:20,to:30},{id:'verbs-4',from:30,to:38},{id:'verbs-5',from:38,to:47},{id:'verbs-6',from:47,to:56},{id:'verbs-7',from:56,to:64},{id:'verbs-8',from:64,to:72}] as const;
 /** Some meanings overlap; these verbs never appear together in a meaning question. */
-const sameMeaning=[['anfangen','beginnen'],['geben','abgeben'],['bringen','mitbringen'],['kommen','ankommen','mitkommen'],['gehen','laufen','fahren'],['fahren','abfahren'],['abfahren','aufstehen']];
-// Southern German, Austrian and Swiss usage also forms the Perfekt of liegen with ist.
-const alsoIst=new Set(['liegen']);
-const impersonal=new Set(['gefallen','leidtun']);
+const sameMeaning=[['anfangen','beginnen'],['geben','abgeben','zurückgeben'],['bringen','mitbringen','tragen','mitnehmen'],['kommen','ankommen','mitkommen','zurückkommen'],['gehen','laufen','fahren','zurückgehen'],['fahren','abfahren','zurückfahren'],['abfahren','aufstehen'],
+ ['zurückgehen','zurückfahren','zurückkommen'],['nehmen','mitnehmen','bekommen'],['rufen','anrufen'],['stehen','aufstehen'],['tragen','anziehen'],['treffen','finden'],['wissen','kennen'],['ziehen','umziehen','ausziehen'],['sehen','aussehen']];
+// Southern German, Austrian and Swiss usage also forms the Perfekt of liegen, sitzen and stehen with ist (the book writes hat/ist).
+const alsoIst=new Set(['liegen','sitzen','stehen']);
+const impersonal=new Set(['gefallen','leidtun','wehtun']);
+// The book writes "sie scheint" (die Sonne).
+const femininSubject=new Set(['scheinen']);
 
 export const verbs:Verb[]=specs.map(([display,praesens,perfekt,praesensWrong,perfektWrong,meanings],index)=>{
  const id=display.replace('|','');const [aux,...rest]=perfekt.split(' ');
- return {id,display,infinitive:id,subject:impersonal.has(id)?'es':'sie/er',praesens,perfekt,aux:aux as VerbAux,participle:rest.join(' '),alsoIst:alsoIst.has(id),group:verbGroups.find(group=>index>=group.from&&index<group.to)!.id,number:index+1,praesensWrong,perfektWrong,meanings};
+ return {id,display,infinitive:id,subject:impersonal.has(id)?'es':femininSubject.has(id)?'sie':'sie/er',praesens,perfekt,aux:aux as VerbAux,participle:rest.join(' '),alsoIst:alsoIst.has(id),group:verbGroups.find(group=>index>=group.from&&index<group.to)!.id,number:index+1,praesensWrong,perfektWrong,meanings};
 });
 export const verbMap=new Map(verbs.map(verb=>[verb.id,verb]));
 const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
 export function verbMeaning(verb:Verb,language:VaultLanguage){return verb.meanings[languageIndex[language]];}
-/** Spoken subject: one clear singular pronoun (the page writes "sie/er"). */
-export function spokenSubject(verb:Verb){return verb.subject==='es'?'es':'er';}
+/** Spoken subject: one clear singular pronoun (the page writes "sie/er"; "es" and "sie" stay as written). */
+export function spokenSubject(verb:Verb){return verb.subject==='es'?'es':verb.subject==='sie'?'sie':'er';}
 /** The Perfekt as the page shows it, e.g. "hat/ist gelegen". */
 export function perfektLabel(verb:Verb){return verb.alsoIst?'hat/ist '+verb.participle:verb.perfekt;}
 /** One spoken row for the verb list: infinitive, Präsens, Perfekt. */
@@ -83,7 +121,7 @@ function seeded<T>(items:readonly T[],seed:string){return [...items].sort((a,b)=
 function conflicts(id:string){return new Set(sameMeaning.filter(set=>set.includes(id)).flat().concat(id));}
 /** Three other verbs whose meanings cannot be confused with this one. */
 function meaningDistractors(verb:Verb,seed:string){const blocked=conflicts(verb.id);return seeded(verbs.filter(other=>!blocked.has(other.id)).map(other=>other.id),seed).slice(0,3);}
-const stem=(id:string)=>id.replace(/^(ab|an|auf|aus|ein|herunter|mit|be)(?=[a-zäöüß]{4,})/,'');
+const stem=(id:string)=>id.replace(/^(ab|an|auf|aus|ein|herunter|mit|um|zurück|be)(?=[a-zäöüß]{4,})/,'');
 /** For heard forms: verbs built on the same stem first (fahren ↔ ab|fahren), then others. */
 function formDistractors(verb:Verb,seed:string,count=3){
  const near=verbs.filter(other=>other.id!==verb.id&&stem(other.id)===stem(verb.id)).map(other=>other.id);
@@ -97,8 +135,8 @@ function perfektDistractors(verb:Verb,seed:string){
  for(const id of formDistractors(verb,seed,8)){const other=verbs.find(item=>item.id===id)!;if(taken.has(other.perfekt))continue;taken.add(other.perfekt);result.push(other.perfekt);if(result.length===3)break;}
  return result;
 }
-// Past forms that are wrong for these two verbs (their Partizip II looks like the infinitive).
-const extraPartizipWrong:Record<string,string>={bekommen:'gebekommt',gefallen:'gefallt'};
+// Past forms that are wrong for these verbs (their Partizip II looks like the infinitive).
+const extraPartizipWrong:Record<string,string>={bekommen:'gebekommt',gefallen:'gefallt',vergessen:'vergissen'};
 /** Three wrong past forms of the same verb, without hat/ist: the made-up forms of the book list (abgefahrt, geabfahren), then the infinitive. */
 export function partizipDistractors(verb:Verb){
  const taken=new Set([verb.participle]);const result:string[]=[];
@@ -107,7 +145,10 @@ export function partizipDistractors(verb:Verb){
  return result;
 }
 /** Präsens forms of the other persons (du, ich, wir, ihr), the prefix at the end: the wrong options of the sentence task. */
+/** wissen keeps the old singular: ich weiß, du weißt, er weiß (no -e, no -t). */
+const personForms:Record<string,{er:string;du:string;ich:string;wir:string;ihr:string}>={wissen:{er:'weiß',du:'weißt',ich:'weiß',wir:'wissen',ihr:'wisst'}};
 export function praesensPersons(verb:Verb){
+ const fixed=personForms[verb.id];if(fixed)return {...fixed};
  const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';const tail=prefix?' '+prefix:'';
  const er=prefix?verb.praesens.slice(0,-(prefix.length+1)):verb.praesens;
  const base=verb.infinitive.slice(prefix.length);const stem=base.replace(/e?n$/,'');

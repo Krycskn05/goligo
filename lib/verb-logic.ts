@@ -1,5 +1,6 @@
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {verbs,verbMap,type Verb} from './verb-course';
+import {pickText} from './site-languages';
 
 /**
  * The logic behind the 72 Fiiller verbs: example sentences (Präsens and Perfekt),
@@ -149,9 +150,8 @@ const ruleCopy={
 } as const satisfies Record<string,VaultTranslations>;
 export type RuleKey=keyof typeof ruleCopy;
 export const verbRuleCopy=ruleCopy;
-const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
 export function ruleText(language:VaultLanguage,key:RuleKey,params:Record<string,string>={}){
- return ruleCopy[key][languageIndex[language]].replace(/\{([a-z]+)\}/g,(token,name:string)=>params[name]??token);
+ return pickText(ruleCopy[key],language).replace(/\{([a-z]+)\}/g,(token,name:string)=>params[name]??token);
 }
 const noGe=new Set(['beginnen','bekommen','empfehlen','gefallen','überweisen','unterschreiben','vergessen','verlieren','verstehen']);
 const vowelA=new Set(['abfahren','fahren','anfangen','einladen','herunterladen','gefallen','laufen','schlafen','tragen','zurückfahren']);

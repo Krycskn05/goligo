@@ -16,11 +16,11 @@ export const completeSoundIds:readonly CompleteSoundId[] = ['complete','complete
 /** The real sounds are rendered by scripts/sounds/make-sounds.mjs into /sfx.
  * These short Web Audio sketches are only a fallback when a file cannot play. */
 export const soundRecipes:Record<SoundId,readonly SoundNote[]> = {
- soft:[{f:392,end:388,start:0,duration:.3,gain:.13,type:'sine'},{f:329.6,end:326,start:.17,duration:.5,gain:.13,type:'sine'}],
- beep:[{f:920,end:1330,start:0,duration:.09,gain:.1,type:'sine'},{f:720,end:1040,start:.1,duration:.09,gain:.1,type:'sine'},{f:540,end:780,start:.2,duration:.09,gain:.1,type:'sine'},{f:400,end:580,start:.31,duration:.1,gain:.1,type:'sine'}],
- retro:[{f:783.99,start:0,duration:.085,gain:.07,type:'triangle'},{f:659.25,start:.1,duration:.085,gain:.07,type:'triangle'},{f:523.25,start:.2,duration:.085,gain:.07,type:'triangle'},{f:392,end:370,start:.3,duration:.24,gain:.08,type:'triangle'}],
- low:[{f:311,end:306,start:0,duration:.29,gain:.12,type:'triangle'},{f:293.7,end:283,start:.31,duration:.55,gain:.12,type:'triangle'}],
- cartoon:[{f:1450,end:390,start:0,duration:.38,gain:.09,type:'sine'},{f:175,end:240,start:.39,duration:.36,gain:.12,type:'sine'}],
+ soft:[{f:440,start:0,duration:.35,gain:.1,type:'sine'},{f:349.23,start:.2,duration:.55,gain:.1,type:'sine'}],
+ beep:[{f:587.33,start:0,duration:.25,gain:.1,type:'sine'},{f:440,start:.16,duration:.35,gain:.1,type:'sine'}],
+ retro:[{f:659.25,start:0,duration:.11,gain:.07,type:'triangle'},{f:523.25,start:.14,duration:.22,gain:.07,type:'triangle'}],
+ low:[{f:261.63,start:0,duration:.12,gain:.12,type:'triangle'},{f:220,start:.15,duration:.2,gain:.12,type:'triangle'}],
+ cartoon:[{f:523.25,start:0,duration:.2,gain:.08,type:'sine'},{f:440,start:.22,duration:.38,gain:.08,type:'sine'}],
  tap:[{f:560,end:1060,start:0,duration:.075,gain:.085,type:'sine'},{f:1120,end:1120,start:.004,duration:.05,gain:.02,type:'sine'}],
  tap2:[{f:640,end:1210,start:0,duration:.075,gain:.085,type:'sine'},{f:1280,end:1280,start:.004,duration:.05,gain:.02,type:'sine'}],
  tap3:[{f:720,end:1360,start:0,duration:.075,gain:.085,type:'sine'},{f:1440,end:1440,start:.004,duration:.05,gain:.02,type:'sine'}],

@@ -16,14 +16,18 @@ The user wants objects in future uploaded study images added to Nesne Kasası an
 
 - Inspect the supplied images and use only identifiable objects. Reuse an appropriate thematic category; add a new `objects-*` category when needed. Do not organize new categories solely by upload date or filename.
 - Keep existing object, question and category IDs stable so saved answers, mistakes and sessions remain usable.
-- Add the German name with its article, meanings in all 12 supported vault languages, and a clear original 3D animated-film-style object illustration. Keep the established visual style and use topic-related objects rather than the former fox mascot.
+- Add the German name with its article, meanings in the 12 languages written in the code (the other site languages take them from their language pack by the English meaning), and a clear original 3D animated-film-style object illustration. Keep the established visual style and use topic-related objects rather than the former fox mascot.
 - Keep this section a picture-to-word test with exactly four German choices per question. Meanings appear after selection in the chosen study language.
 - Preserve correct-answer German pronunciation, the audible error cue followed by the correct German word, and the saved test continuation card. Open the categories landing page first; resume only when the user selects the continuation card.
 - Offer exactly four test lengths: 5, 10, 20 and all questions. All means the complete selected category, or the whole vault when all categories are selected. Derive totals from the content rather than hardcoding 60. Do not display “tek tek”.
 
 Content is defined in `lib/object-course.ts`, translations in `lib/object-translations.ts`, artwork mappings in `lib/object-toon-art.json`, and the picture-test selection in `lib/object-practice.ts`.
 
-- Localize every vault UI string, category label and accessibility label using `lib/object-vault-copy.ts`. Support RTL for Arabic and Persian. Additional meanings are in `lib/object-extra-translations.ts`.
+- Localize every vault UI string, category label and accessibility label using `lib/object-vault-copy.ts`. Support RTL for Arabic, Persian, Dari, Pashto and Urdu (`languageDirection`). Additional meanings are in `lib/object-extra-translations.ts`.
+
+Site languages: every page offers the same 31 languages from `lib/site-languages.ts` (order: tr de en ar uk fr es ru fa pl it pt, then ku sq ro bg hbs el vi prs ps ti so zh hi ur ja ko nl hu cs). Text tuples in the code keep their order (6 entries in lesson/housing copy, 12 in vault/verb copy); `pickText` reads a language beyond the tuple from `lib/language-packs/<id>.json` ({English text: translation}), loaded on demand before the page switches language. When adding or changing an English text, add its translation to every pack (missing entries fall back to English). Verb example meanings live in `lib/verb-examples.<id>.json` for every language except German.
 
 
 Category cards share image, title, subtitle and footer spacing with equal heights. Keep the 20 catalogue unit headings in book order. Object subtopics are defined in `lib/object-subgroups.ts` and filter all three practice modes, reviews and test-length totals through existing question IDs; do not move saved parent topic IDs. Housing A–D step buttons open lesson notes before scoped practice. Every housing question has an original 3D illustration from `lib/housing-illustrations.ts`, preserving established object artwork where available. Do not show a target picture in object listening before the answer; retain its four image choices.
+
+Fiil Atölyesi: the verb games and the Yanlışlarım (mistakes) list open from the home page sidebar, as sub-links under Fiil Atölyesi (`/fiiller?bolum=oyunlar`, `/fiiller?bolum=yanlislar`). The workshop page itself does not show them.

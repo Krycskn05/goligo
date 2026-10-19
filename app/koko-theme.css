@@ -196,3 +196,13 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 }
 @media (max-width:360px) { .site-greeting::before,.site-greeting::after { display:none; } }
 @media (prefers-reduced-motion:reduce) { .site-sparkle { animation:none; } }
+
+/* Fiil listesi ve Oyunlar: açılıp kapanan sekmeler */
+.verb-fold > summary { list-style:none; justify-content:space-between; gap:12px; font-size:17px; }
+.verb-fold > summary::-webkit-details-marker { display:none; }
+.verb-fold > summary::marker { content:''; }
+.verb-fold-icon { flex:none; width:36px; height:36px; padding:8px; border-radius:50%; background:#eaf3ff; color:var(--blue-2); transition:transform .2s ease; }
+.verb-fold[open] > summary .verb-fold-icon { transform:rotate(180deg); }
+.verb-fold > summary:hover .verb-fold-icon { filter:brightness(.96); }
+.verb-fold > summary:focus-visible { outline:3px solid var(--blue-2); outline-offset:4px; border-radius:12px; }
+@media (prefers-reduced-motion:reduce) { .verb-fold-icon { transition:none; } }

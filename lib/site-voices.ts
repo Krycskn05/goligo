@@ -27,15 +27,17 @@ export type VoiceManifest={version:number;settings?:string;voices:string[];clips
 
 export function isSiteVoice(name:string|undefined|null):boolean{return typeof name==='string'&&name.startsWith(SITE_VOICE_PREFIX);}
 export function siteVoiceById(id:string){return siteVoices.find(voice=>voice.id===id);}
-/** Preferences saved since the natural site voices arrived carry this version. An older
- * German device-voice choice (for example "Helena") is dropped once, so the learner hears
- * the default site voice; any choice made after that is kept as it is. */
+/** Preferences saved since the natural site voices arrived carry this version. German offers only
+ * the natural site voices now (the learner asked to drop the "Cihaz sesi" choice): a saved German
+ * device-voice choice (for example "Helena") is dropped, so the learner hears the default site voice.
+ * The device voice stays only as the silent fallback when a natural clip cannot play. */
 export const VOICE_PREFERENCE_VERSION=2;
 export function savedVoiceName(saved:unknown,course:string):string{
  if(!saved||typeof saved!=='object')return '';
  const {voiceName,voices}=saved as {voiceName?:unknown;voices?:unknown};
  if(typeof voiceName!=='string')return '';
- return course!=='de'||voices===VOICE_PREFERENCE_VERSION||isSiteVoice(voiceName)?voiceName:'';
+ void voices;
+ return course!=='de'||isSiteVoice(voiceName)?voiceName:'';
 }
 /** The same normalisation is used when the clips are rendered and when they are looked up. */
 export function normalizeSpeechText(text:string){return text.replace(/\s+/g,' ').trim();}

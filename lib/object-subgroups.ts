@@ -1,5 +1,6 @@
 import type {VaultLanguage} from './object-vault-copy';
 import type {Question} from './course';
+import {pickText} from './site-languages';
 type Names=readonly [string,string,string,string,string,string,string,string,string,string,string,string];
 export type ObjectSubgroup={id:string;parent:string;names:Names;wordIds:readonly string[];art:string};
 const make=(id:string,parent:string,names:Names,ids:string):ObjectSubgroup=>{const wordIds=ids.split(' ');return {id,parent,names,wordIds,art:wordIds[0]};};
@@ -23,7 +24,6 @@ export const objectSubgroups:ObjectSubgroup[]=[
  make('transport','objects-moving',['Taşıma ve paketleme','Transport und Verpackung','Transport and packing','النقل والتعبئة','Перевезення й пакування','Transport et emballage','Transporte y embalaje','Перевозка и упаковка','حمل‌ونقل و بسته‌بندی','Transport i pakowanie','Trasporto e imballaggio','Transporte e embalagem'],'karton umzugswagen lastwagen seil kette rad'),
  make('daily-items','objects-moving',['Günlük eşyalar','Alltagsgegenstände','Everyday items','الأشياء اليومية','Повсякденні речі','Objets du quotidien','Objetos cotidianos','Повседневные вещи','وسایل روزمره','Przedmioty codzienne','Oggetti quotidiani','Objetos do dia a dia'],'regenschirm schirmstaender brille zeitschrift bogen pfeil'),
 ];
-const languageIndex:Record<VaultLanguage,number>={tr:0,de:1,en:2,ar:3,uk:4,fr:5,es:6,ru:7,fa:8,pl:9,it:10,pt:11};
-export const subgroupName=(group:ObjectSubgroup,language:VaultLanguage)=>group.names[languageIndex[language]];
+export const subgroupName=(group:ObjectSubgroup,language:VaultLanguage)=>pickText(group.names,language);
 export const subgroupsFor=(parent:string)=>objectSubgroups.filter(group=>group.parent===parent);
 export function inObjectSubgroup(question:Question|undefined,id:string){if(id==='all')return true;const group=objectSubgroups.find(group=>group.id===id);return !!question?.objectId&&!!group?.wordIds.includes(question.objectId);}

@@ -4,7 +4,9 @@ import {sentenceChunks,sentenceDistractor,participlePieces,participleWrongPieces
 
 /** Fiiller games: rounds are built here (pure functions), the page only shows them. */
 export type GameId='sentence'|'aux'|'build'|'match';
-export const gameIds:GameId[]=['sentence','aux','build','match'];
+// Only the matching cards are offered on the page; Cümle kurma, hat mı ist mi? and Biçim yapbozu were taken off at the learner's request
+// (their rounds stay here, unused, so nothing else breaks).
+export const gameIds:GameId[]=['match'];
 export type Tile={id:string;text:string};
 type Random=()=>number;
 export function mix<T>(items:readonly T[],random:Random=Math.random):T[]{const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}

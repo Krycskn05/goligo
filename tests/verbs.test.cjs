@@ -2,7 +2,8 @@ const {test}=require('node:test');const assert=require('node:assert/strict');con
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR to compiled lib directory.');
 const load=name=>require(path.join(compiled,name+'.js'));
 const course=load('course'),study=load('study'),verbs=load('verb-course'),practice=load('verb-practice'),copy=load('verb-copy'),progress=load('progress'),workshop=load('verb-workshop'),families=load('verb-families');
-const languages=['tr','de','en','ar','uk','fr','es','ru','fa','pl','it','pt'];
+// Every site language (31): the first twelve are written in the code, the others come from language packs.
+const languages=load('site-languages').siteLanguages.map(item=>item.id);
 
 // The learner's two textbook pages: infinitive – sie/er (es, sie) Präsens – Perfekt.
 const page=`ab|fahren;fährt ab;ist abgefahren
@@ -170,7 +171,7 @@ test('rounds follow the chosen group and mode, solved questions wait and the sam
  assert.equal(progress.verbProgress('verbs-1',reviews).learned,1);
 });
 
-test('every text of the page exists in all twelve languages',()=>{
+test('every text of the page exists in every site language',()=>{
  for(const key of Object.keys(copy.verbCopy))for(const language of languages){
   const text=copy.verbText(language,key,{n:7,verb:'ab|fahren',total:9,t:'Präsens',p:'ab'});assert.ok(text.trim(),key+':'+language);assert.ok(!/\{[a-z]+\}/.test(text),key+':'+language);
  }
@@ -605,7 +606,7 @@ test('letter puzzles: a wrong letter goes back and counts, hints help, a full wo
  assert.ok(ui.includes('onClick={()=>giveBack(part.index)}'),'a filled box sends its letter back');
  assert.ok(ui.includes('const first=setTimeout(()=>{sent.current=true;submitLatest.current();},350);')&&ui.includes('submitLatest.current();},1200);'),'a full word is checked by itself, and tried again while the page is not ready');
  assert.ok(!ui.includes('type="submit"')&&!ui.includes("text('checkAnswer')"),'no button to press for checking');
- for(const language of languages)assert.ok(load('object-vault-copy').vaultText(language,'letterBankHint').split(/[.!。]\s*/).filter(Boolean).length>=3,language+' the hint says it checks by itself');
+ for(const language of languages)assert.ok(load('object-vault-copy').vaultText(language,'letterBankHint').split(/[.!。।۔።؟]\s*/).filter(Boolean).length>=3,language+' the hint says it checks by itself');
  assert.ok(ui.includes("if(letterFits(puzzle,index,token.letter,strictCase,course))place(index,tokenId);else miss(index,token.letter);"),'right letters go in, wrong ones shake');
  assert.ok(ui.includes('onClick={hint}'),'hint button');
  for(const language of languages)for(const key of ['puzzleHintButton','puzzleHintAria','puzzleMistakes','puzzleMistakeNote','letterBankHint'])assert.ok(load('object-vault-copy').vaultText(language,key,{n:2}).trim(),language+' '+key);

@@ -70,6 +70,19 @@ export const wordPictures:Record<string,L12Picture>={
  "die Gärtnerei, -en":{src:"/toon/lektion12/gaertnerei.webp",width:432,height:346,crop:{x:0,y:0,width:432,height:346},fill:"#fef8e9"},
  "die Notiz, -en: Notizen machen":{src:"/toon/lektion12/notiz.webp",width:361,height:356,crop:{x:0,y:0,width:361,height:356},fill:"#fefaee"},
  "müde":{src:"/toon/lektion12/muede.webp",width:229,height:375,crop:{x:0,y:0,width:229,height:375},fill:"#fefaee"},
+ // Teil C: the learner's second picture pack (made with ChatGPT, 640 × 640)
+ "der Monat, -e · die Woche, -n":{src:"/toon/lektion12/monat-woche.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef8e8"},
+ "die Stunde, -n · die Minute, -n":{src:"/toon/lektion12/stunde-minute.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef9e9"},
+ "der Computerladen · der Fahrradladen":{src:"/toon/lektion12/computerladen-fahrradladen.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef9ea"},
+ "die Agentur für Arbeit":{src:"/toon/lektion12/agentur-fuer-arbeit.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef9ea"},
+ "dauern":{src:"/toon/lektion12/dauern.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef8ea"},
+ "anfangen / beginnen":{src:"/toon/lektion12/anfangen-beginnen.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef9ea"},
+ "fertig":{src:"/toon/lektion12/fertig.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef9ea"},
+ "seit · vor · in":{src:"/toon/lektion12/seit-vor-in.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef9ec"},
+ "Seit wann? · Wie lange?":{src:"/toon/lektion12/seit-wann-wie-lange.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef8ea"},
+ "sich freuen auf":{src:"/toon/lektion12/sich-freuen-auf.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef8e9"},
+ "die Antwort, -en":{src:"/toon/lektion12/antwort.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fef8e8"},
+ "die Anrede · der Gruß":{src:"/toon/lektion12/anrede-gruss.webp",width:640,height:640,crop:{x:0,y:0,width:640,height:640},fill:"#fdf9ea"},
 };
 export const wordPicture=(de:string):L12Picture|null=>wordPictures[de]??null;
 

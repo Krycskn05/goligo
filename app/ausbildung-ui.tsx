@@ -25,6 +25,9 @@ export function SayButton({text,speech,label}:{text:string;speech:Speech;label?:
 
 /** A German word with its article coloured, separable prefixes marked and the plural ending kept small. */
 export function GermanWord({de}:{de:string}){
+ // Two words in one row (der Monat, -e · die Woche, -n): each keeps its own article and plural.
+ const pair=de.split(' · ');
+ if(pair.length>1&&pair.every(part=>part.trim()))return <span className="l12-word-pair">{pair.map((part,i)=><Fragment key={i}>{i>0&&<span className="l12-or"> · </span>}<GermanWord de={part}/></Fragment>)}</span>;
  const comma=de.indexOf(', ');const main=comma>0?de.slice(0,comma):de;const plural=comma>0?de.slice(comma+2):'';
  return <span className="l12-word" lang="de" dir="ltr">{main.split(' / ').map((option,n)=>{
   const article=wordArticle(option);const rest=article?option.slice(article.length+1):option;

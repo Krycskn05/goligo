@@ -221,9 +221,30 @@
 .l12-listen-head .l12-p { margin:0; max-width:560px; }
 .l12-speed { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; padding:5px; border-radius:999px; background:#eaf4ff; }
 .l12-speed span { padding:0 8px; font-size:13px; font-weight:800; color:var(--ink-2); }
-.l12-speed button { min-height:38px; padding:4px 14px; border-radius:999px; border:0; background:transparent; color:var(--ink-2); font-weight:800; font-size:14px; cursor:pointer; }
+.l12-speed button { min-width:44px; min-height:36px; padding:4px 9px; border-radius:999px; border:0; background:transparent; color:var(--ink-2); font-weight:800; font-size:14px; cursor:pointer; font-variant-numeric:tabular-nums; }
 .l12-speed button.active { background:#fff; color:var(--blue-2); box-shadow:var(--soft-2); }
-.l12-player { display:flex; justify-items:start; align-items:center; gap:14px; padding:16px 18px; margin:0 0 16px; text-align:start; }
+.l12-player { display:grid; justify-items:stretch; grid-template-columns:auto minmax(0,1fr); grid-template-areas:"icon text" "controls controls" "seek seek" "foot foot"; align-items:center; gap:12px 14px; padding:16px 18px; margin:0 0 16px; text-align:start; }
+.l12-player-icon { grid-area:icon; }
+.l12-player-text { grid-area:text; }
+/* Back one sentence · play / pause · forward one sentence */
+.l12-player-controls { grid-area:controls; display:flex; align-items:center; gap:8px; }
+.l12-jump { flex:none; display:grid; place-items:center; width:46px; height:46px; border-radius:50%; border:1px solid var(--toy-line); background:#fff; color:var(--blue-2); cursor:pointer; box-shadow:var(--soft-2); transition:transform .12s; }
+.l12-jump:hover:enabled { transform:scale(1.06); }
+.l12-jump:disabled { opacity:.4; cursor:default; box-shadow:none; }
+.l12-jump:focus-visible,.l12-seek-step:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
+/* One bar piece per sentence: tap one to jump there */
+.l12-seek { grid-area:seek; display:flex; gap:4px; }
+.l12-seek-step { position:relative; flex:1 1 0; min-width:0; height:26px; padding:0; border:0; border-radius:6px; background:none; cursor:pointer; }
+.l12-seek-step::before { content:""; position:absolute; left:0; right:0; top:9px; height:8px; border-radius:999px; background:#dbe7f3; transition:background .15s; }
+.l12-seek-step:hover::before { background:#b9d5f1; }
+.l12-seek-step.done::before { background:#8ec0ee; }
+.l12-seek-step.current::before { top:7px; height:12px; background:var(--blue-2); box-shadow:0 0 0 3px rgba(47,127,214,.18); }
+.l12-player-foot { grid-area:foot; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.l12-player-foot .text-button { display:inline-flex; align-items:center; gap:6px; font-weight:700; }
+.l12-dict-speed { display:flex; justify-content:flex-end; margin:0 0 12px; }
+.l12-face-chip.speaking { color:var(--ink); }
+.l12-face-chip.speaking .l12-face { box-shadow:0 0 0 3px #f6c46b; }
+.l12-line.current .l12-bubble { box-shadow:0 0 0 3px #f6c46b,var(--soft-2); }
 .l12-player-icon { flex:none; display:grid; place-items:center; width:54px; height:54px; border-radius:50%; background:#fff; color:#7c5ce0; box-shadow:var(--soft-2); }
 .l12-player-text { flex:1; min-width:0; display:grid; gap:2px; }
 .l12-player-text small { color:var(--ink-3); font-weight:700; }
@@ -292,14 +313,23 @@
  .l12-actions .btn { flex:1 1 auto; }
  .l12-results-head { flex-direction:column; text-align:center; }
  .l12-results-head .l12-koko { width:96px; }
- .l12-player { flex-wrap:wrap; }
- .l12-player .btn { width:100%; }
+ .l12-player { padding:14px; }
+ .l12-player-controls .btn { flex:1; }
+ .l12-player-foot { justify-content:center; }
+ .l12-speed { gap:2px; padding:4px; border-radius:16px; }
+ .l12-speed span { padding:0 4px; font-size:12px; }
+ .l12-speed button { min-width:36px; min-height:36px; padding:4px 5px; font-size:13px; }
+}
+@media (max-width:400px) {
+ .l12-speed { flex-wrap:nowrap; }
+ .l12-speed span { display:none; }
+ .l12-speed button { min-width:32px; padding:4px 3px; font-size:12.5px; }
  .l12-bubble { max-width:calc(100% - 50px); }
  .l12-line { gap:8px; }
  .l12-line .l12-face { width:42px; height:42px; }
 }
 @media (prefers-reduced-motion:reduce) {
- .l12-step,.l12-option,.l12-say { transition:none; }
+ .l12-step,.l12-option,.l12-say,.l12-jump,.l12-seek-step::before { transition:none; }
  .l12-step:hover,.l12-option:hover { transform:none; }
  .l12-say.playing,.l12-results-head .l12-koko { animation:none; }
 }

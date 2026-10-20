@@ -95,7 +95,7 @@ export function clipPlaybackRate(rate:number){
 }
 
 type ClipEvents={onStart:()=>void;onEnd:()=>void;onError:()=>void};
-export type ClipPlayer={unlock:()=>void;play:(url:string,rate:number,events:ClipEvents)=>void;stop:()=>void};
+export type ClipPlayer={unlock:()=>void;play:(url:string,rate:number,events:ClipEvents,speed?:number)=>void;stop:()=>void};
 // 50 ms of silence: playing it inside a tap lets the same element play the
 // answer later, after the sound effect (needed on iPhone and iPad).
 const SILENCE='data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACA'+'gICA'.repeat(133);
@@ -111,13 +111,14 @@ export function createClipPlayer(createAudio:()=>HTMLAudioElement=()=>new Audio(
    const audio=media();if(!audio.paused)return;
    try{detach(audio);audio.muted=true;audio.src=SILENCE;const started=audio.play();if(started)void started.then(()=>{if(audio.src===SILENCE){audio.pause();audio.muted=false;}},()=>{audio.muted=false;});}catch{audio.muted=false;}
   },
-  play(url,rate,events){
+  play(url,rate,events,speed=1){
    const audio=media();const mine=++token;
    detach(audio);try{audio.pause();}catch{}
    audio.muted=false;audio.src=url;
    const pitch=audio as HTMLAudioElement&{webkitPreservesPitch?:boolean;mozPreservesPitch?:boolean};
    try{pitch.preservesPitch=true;pitch.webkitPreservesPitch=true;pitch.mozPreservesPitch=true;}catch{}
-   audio.playbackRate=clipPlaybackRate(rate);audio.defaultPlaybackRate=audio.playbackRate;
+   // speed: a listening player's 0.5×–2× on top of the reading rate.
+   audio.playbackRate=clipPlaybackRate(rate)*(Number.isFinite(speed)?Math.max(0.5,Math.min(2,speed)):1);audio.defaultPlaybackRate=audio.playbackRate;
    audio.onplaying=()=>{if(mine===token)events.onStart();};
    audio.onended=()=>{if(mine===token){detach(audio);events.onEnd();}};
    audio.onerror=()=>{if(mine===token){detach(audio);events.onError();}};

@@ -18,7 +18,7 @@ import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
 import {ProgressMeter} from './progress-ui';
 import {LessonBook} from './lesson-book';
 import {ExerciseView,Flashcards,LessonBlocks,Rich,TeachingCard,readKnown,readScores,teachingCards,type Speech} from './ausbildung-ui';
-import {LISTEN_CHANGED,ListenTask,SpeedToggle,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
+import {LISTEN_CHANGED,ListenTask,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
 const unit=courseUnits.find(item=>item.id==='book-12')!;
 const partParam=(value:string|null):L12PartId|null=>value&&lessonPartMap.has(value as L12PartId)?value as L12PartId:null;
@@ -263,7 +263,7 @@ function ListenStep({part}:{part:L12Part}){
  const player=useListenPlayer();
  const tasks=(part.listen??[]).map(number=>tasksByNumber.get(number)).filter((task):task is HoerenTask=>!!task);
  return <div className="l12-step-body">
-  <div className="panel l12-listen-head"><div><h2><Headphones size={22} aria-hidden="true"/>Dinleme</h2><p className="l12-p">Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku.</p></div><SpeedToggle player={player}/></div>
+  <div className="panel l12-listen-head"><div><h2><Headphones size={22} aria-hidden="true"/>Dinleme</h2><p className="l12-p">Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku. Dinlerken cümle cümle geri ve ileri gidebilir, hızı 0,5x ile 2x arasında seçebilirsin.</p></div></div>
   {player.warning&&<p className="object-alert" role="status">{player.warning}</p>}
   {tasks.map(task=><ListenTask key={task.id} task={task} player={player}/>)}
  </div>;

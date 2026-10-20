@@ -13,7 +13,7 @@ import {SiteFooter} from './site-footer';
 import {RasterArt} from './toon-art';
 import {LessonBook} from './lesson-book';
 import {hoerenPicture} from '@/lib/ausbildung-art';
-import {LISTEN_CHANGED,ListenTask,SpeedToggle,listenPart,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
+import {LISTEN_CHANGED,ListenTask,listenPart,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
 /** Lektion 12 – Hören: the 14 listening sections; one section at a time (?bolum=1 … 14). */
 export default function AusbildungHoeren(){
@@ -61,7 +61,6 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
     <span className="eyebrow" lang="de">Lektion 12 · Ausbildung</span>
     {task?<p className="lb-title" lang="de">Hören</p>:<h1 id="l12-heading" tabIndex={-1} className="lb-title" lang="de">Hören</h1>}
     <p className="lb-lead">14 dinleme bölümü · {done} / {hoerenTasks.length} yapıldı</p>
-    <SpeedToggle player={player}/>
     <ol className="lb-index" aria-label="Dinleme bölümleri">{hoerenTasks.map(item=>{const result=results[item.id];const perfect=!!result&&result.right===result.total;const current=item.number===task?.number;return <li key={item.id}><button type="button" className={'lb-index-item'+(current?' active':'')+(result?(perfect?' perfect':' partial'):'')} data-l12-hoeren-card={item.number} aria-current={current?'page':undefined} onClick={()=>open(item.number)}>
      <span className="lb-index-number" aria-hidden="true">{result&&perfect?<Check size={16}/>:item.number}</span>
      <span className="lb-index-text"><small lang="de">{listenPart(item.number)}</small><strong lang="de">{item.title}</strong>{result&&<em>{result.right} / {result.total} doğru</em>}</span>
@@ -69,7 +68,7 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
     <nav className="lb-pager" aria-label="Lektion 12"><a className="text-button" href={AUSBILDUNG_PATH}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>Lektion 12'ye dön</a></nav>
    </>} right={task?<TaskView task={task} player={player} onOpen={open}/>:<div className="lb-start-page">
     <h2 className="lb-heading">Nasıl çalışırım?</h2>
-    <ol className="lb-howto"><li>Önce metni görmeden iki kez dinle.</li><li>Soruları cevapla, sonra „Kontrol et"e bas.</li><li>En son metni aç ve dinlerken oku.</li></ol>
+    <ol className="lb-howto"><li>Önce metni görmeden iki kez dinle.</li><li>Soruları cevapla, sonra „Kontrol et"e bas.</li><li>En son metni aç ve dinlerken oku.</li><li>Kaçırdığın cümleye geri düğmesiyle dön; hızı 0,5x ile 2x arasında seç.</li></ol>
     <figure className="lb-photo"><RasterArt art={hoerenPicture} title="Hören"/></figure>
     <div className="lb-start"><button type="button" className="btn l12-resume" onClick={()=>open((hoerenTasks.find(item=>!results[item.id])??hoerenTasks[0]).number)}><Headphones size={20} aria-hidden="true"/>{done?'Sıradaki bölümü dinle':'İlk bölümle başla'}</button><small>{done} / {hoerenTasks.length} bölüm yapıldı</small></div>
    </div>}/>
@@ -81,7 +80,7 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
 function TaskView({task,player,onOpen}:{task:HoerenTask;player:ReturnType<typeof useListenPlayer>;onOpen:(number:number|null)=>void}){
  const index=hoerenTasks.findIndex(item=>item.id===task.id);const previous=hoerenTasks[index-1];const next=hoerenTasks[index+1];
  return <section className="l12-part l12-task-page" aria-labelledby="l12-heading">
-  <div className="l12-task-top"><button type="button" className="text-button vault-back-categories" onClick={()=>onOpen(null)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Tüm bölümler</button><SpeedToggle player={player}/></div>
+  <div className="l12-task-top"><button type="button" className="text-button vault-back-categories" onClick={()=>onOpen(null)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Tüm bölümler</button></div>
   <h1 id="l12-heading" tabIndex={-1} className="l12-sr">Hören {task.number}</h1>
   <ListenTask key={task.id} task={task} player={player} onNext={next?()=>onOpen(next.number):undefined} nextLabel={next?'Sonraki bölüm ('+next.number+')':undefined}/>
   <nav className="l12-pager" aria-label="Dinleme bölümleri">{previous?<button type="button" className="btn secondary" onClick={()=>onOpen(previous.number)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Bölüm {previous.number}</button>:<span/>}{next?<button type="button" className="btn" onClick={()=>onOpen(next.number)}>Bölüm {next.number}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>:<a className="btn" href={AUSBILDUNG_PATH}>Lektion 12<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></a>}</nav>

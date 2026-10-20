@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {Check,CheckCircle2,Eye,EyeOff,Headphones,Play,RotateCcw,Square,X} from 'lucide-react';
+import {Check,CheckCircle2,Eye,EyeOff,Headphones,Pause,Play,RotateCcw,SkipBack,SkipForward,Square,X} from 'lucide-react';
 import {lessonParts,normalizeAnswer} from '@/lib/ausbildung-course';
 import {hoerenTasks,questionSpeech,speakerVoice,type HoerenQuestion,type HoerenTask} from '@/lib/ausbildung-hoeren';
 import {speakerPicture} from '@/lib/ausbildung-art';
@@ -8,34 +8,64 @@ import {useAnswerSound,useGermanSpeech} from './study-shared';
 
 type Item={text:string;voice?:string};
 type Line={who:string;text:string};
+/** The listening speeds (× the normal reading speed), shown as 0,5x … 2x. */
+export const LISTEN_SPEEDS=[0.5,0.75,1,1.5,2] as const;
+const SPEED_KEY='lernkoko-l12-speed';
+/** Where a played text is: its line, how many lines it has, whether it is paused. */
+export type ListenPosition={key:string;index:number;total:number;paused:boolean};
 /**
  * Plays listening texts line by line. Each speaker keeps one site voice (women and men differ);
- * without the site's natural voices the device's German voice reads.
+ * without the site's natural voices the device's German voice reads. The learner can pause,
+ * go back or forward one sentence, jump to any sentence and choose the speed (kept in this browser).
  */
 export function useListenPlayer(){
  const speech=useGermanSpeech('de');
- const [slow,setSlow]=useState(false);const [playing,setPlaying]=useState<string|null>(null);
- const queue=useRef<{key:string;items:Item[];index:number}|null>(null);const started=useRef(false);
- const latest=useRef({speech,slow});latest.current={speech,slow};
- const speakNext=useCallback(()=>{const current=queue.current;if(!current)return;if(current.index>=current.items.length){queue.current=null;setPlaying(null);return;}const item=current.items[current.index++];started.current=false;latest.current.speech.speak(item.text,latest.current.slow,item.voice);},[]);
- useEffect(()=>{if(speech.busy){started.current=true;return;}if(started.current&&queue.current){started.current=false;speakNext();}},[speech.busy,speakNext]);
+ const [speed,setSpeedValue]=useState<number>(1);const [position,setPosition]=useState<ListenPosition|null>(null);
+ const queue=useRef<{key:string;items:Item[];index:number}|null>(null);const started=useRef(false);const paused=useRef(false);
+ const latest=useRef({speech,speed});latest.current={speech,speed};
+ useEffect(()=>{try{const saved=Number(localStorage.getItem(SPEED_KEY));if((LISTEN_SPEEDS as readonly number[]).includes(saved))setSpeedValue(saved);}catch{}},[]);
+ /** Reads line `index` of the current text; past the last line the text is done. */
+ const speakAt=useCallback((index:number)=>{
+  const current=queue.current;if(!current)return;
+  if(index>=current.items.length){queue.current=null;paused.current=false;setPosition(null);return;}
+  const target=Math.max(0,index);current.index=target;paused.current=false;
+  setPosition({key:current.key,index:target,total:current.items.length,paused:false});
+  // Counted as started at once: a jump while a line is playing keeps the speech busy without a
+  // pause in between, so the end of the new line is the next busy → idle change.
+  started.current=true;
+  const item=current.items[target];latest.current.speech.speak(item.text,false,item.voice,latest.current.speed);
+ },[]);
+ // A line has ended (the speech went from busy to idle): read the next one.
+ useEffect(()=>{if(speech.busy){started.current=true;return;}if(started.current&&queue.current&&!paused.current){started.current=false;speakAt(queue.current.index+1);}},[speech.busy,speakAt]);
  useEffect(()=>()=>{queue.current=null;},[]);
  const voiceFor=useCallback((who:string,speakers:string[])=>{
   const kind=speakerVoice(who);if(kind==='n')return undefined;
   const pool=latest.current.speech.siteVoices.filter(voice=>voice.gender===(kind==='f'?'female':'male'));if(!pool.length)return undefined;
   const same=speakers.filter(name=>speakerVoice(name)===kind);return pool[Math.max(0,same.indexOf(who))%pool.length].id;
  },[]);
- const play=useCallback((key:string,lines:Line[])=>{
-  latest.current.speech.stop();const speakers=[...new Set(lines.map(line=>line.who))];
-  queue.current={key,items:lines.map(line=>({text:line.text,voice:voiceFor(line.who,speakers)})),index:0};setPlaying(key);speakNext();
- },[speakNext,voiceFor]);
- const stop=useCallback(()=>{queue.current=null;started.current=false;setPlaying(null);latest.current.speech.stop();},[]);
- return {play,stop,playing,busy:speech.busy,slow,setSlow,warning:speech.warning};
+ const play=useCallback((key:string,lines:Line[],from=0)=>{
+  started.current=false;latest.current.speech.stop();const speakers=[...new Set(lines.map(line=>line.who))];
+  queue.current={key,items:lines.map(line=>({text:line.text,voice:voiceFor(line.who,speakers)})),index:0};speakAt(Math.min(Math.max(0,from),lines.length-1));
+ },[speakAt,voiceFor]);
+ const pause=useCallback(()=>{if(!queue.current)return;paused.current=true;started.current=false;latest.current.speech.stop();setPosition(previous=>previous?{...previous,paused:true}:previous);},[]);
+ /** Continues with the sentence where it was paused (from its start). */
+ const resume=useCallback(()=>{if(queue.current)speakAt(queue.current.index);},[speakAt]);
+ /** Back or forward: reads sentence `index` of the current text. */
+ const seek=useCallback((index:number)=>{const current=queue.current;if(!current)return;speakAt(Math.min(current.items.length-1,Math.max(0,index)));},[speakAt]);
+ const stop=useCallback(()=>{queue.current=null;started.current=false;paused.current=false;setPosition(null);latest.current.speech.stop();},[]);
+ /** A new speed is used at once: the sentence being read starts again at that speed. */
+ const setSpeed=useCallback((value:number)=>{
+  setSpeedValue(value);latest.current.speed=value;try{localStorage.setItem(SPEED_KEY,String(value));}catch{}
+  if(queue.current&&!paused.current)speakAt(queue.current.index);
+ },[speakAt]);
+ const playing=position&&!position.paused?position.key:null;
+ return {play,pause,resume,seek,stop,playing,position,busy:speech.busy,speed,setSpeed,warning:speech.warning};
 }
 export type ListenPlayer=ReturnType<typeof useListenPlayer>;
+const speedLabel=(value:number)=>String(value).replace('.',',')+'x';
 
 export function SpeedToggle({player}:{player:ListenPlayer}){
- return <div className="l12-speed" role="group" aria-label="Okuma hızı"><span>Okuma hızı</span><button type="button" aria-pressed={!player.slow} className={!player.slow?'active':''} onClick={()=>player.setSlow(false)}>Normal</button><button type="button" aria-pressed={player.slow} className={player.slow?'active':''} onClick={()=>player.setSlow(true)}>Yavaş</button></div>;
+ return <div className="l12-speed" role="group" aria-label="Okuma hızı"><span>Hız</span>{LISTEN_SPEEDS.map(value=><button type="button" key={value} aria-pressed={player.speed===value} className={player.speed===value?'active':''} onClick={()=>player.setSpeed(value)}>{speedLabel(value)}</button>)}</div>;
 }
 
 type Answers=Record<number,string>;
@@ -70,6 +100,7 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
  const set=(i:number,value:string)=>{setAnswers(previous=>({...previous,[i]:value}));if(checked)setChecked(false);};
  const right=task.questions.filter((q,i)=>isRight(q,answers[i])).length;const total=task.questions.length;const perfect=right===total;
  const sound=useAnswerSound();const key=task.id;const active=player.playing===key;
+ const here=player.position?.key===key?player.position:null;const speaker=here?task.lines?.[here.index]?.who:undefined;
  const answered=Object.values(answers).some(value=>value!=='');
  return <article className="panel object-question l12-exercise l12-hoeren" id={'bolum-'+task.number} data-l12-hoeren={task.number} aria-labelledby={'l12-h-'+task.id}>
   <div className="l12-exercise-head"><span className="object-pill" lang="de"><Headphones size={14} aria-hidden="true"/>Hören {task.number} · {listenPart(task.number)}</span></div>
@@ -77,9 +108,16 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
   <p className="housing-cue l12-hint">{task.hint}</p>
   {task.lines&&<div className="vault-listen-player l12-player">
    <span className="l12-player-icon" aria-hidden="true"><Headphones size={26}/></span>
-   <div className="l12-player-text"><strong>{active?'Dinliyorsun…':'Önce metni görmeden dinle'}</strong><span className="l12-faces" lang="de">{[...new Set(task.lines.map(line=>line.who))].map(who=><span key={who} className="l12-face-chip"><SpeakerFace who={who}/>{who}</span>)}</span></div>
-   {active?<button type="button" className="btn secondary" onClick={player.stop}><Square size={16} aria-hidden="true"/>Durdur</button>:<button type="button" className="btn" disabled={player.busy&&!!player.playing} onClick={()=>player.play(key,task.lines!)}><Play size={18} aria-hidden="true"/>Dinle</button>}
+   <div className="l12-player-text"><strong aria-live="polite">{here?'Cümle '+(here.index+1)+' / '+here.total+(here.paused?' · duraklatıldı':''):'Önce metni görmeden dinle'}</strong><span className="l12-faces" lang="de">{[...new Set(task.lines.map(line=>line.who))].map(who=><span key={who} className={'l12-face-chip'+(who===speaker?' speaking':'')}><SpeakerFace who={who}/>{who}</span>)}</span></div>
+   <div className="l12-player-controls">
+    <button type="button" className="l12-jump" aria-label="Önceki cümle" title="Önceki cümle" disabled={!here} onClick={()=>here&&player.seek(here.index-1)}><SkipBack size={20} aria-hidden="true"/></button>
+    {active?<button type="button" className="btn secondary" onClick={player.pause}><Pause size={18} aria-hidden="true"/>Duraklat</button>:here?<button type="button" className="btn" onClick={player.resume}><Play size={18} aria-hidden="true"/>Devam et</button>:<button type="button" className="btn" disabled={player.busy&&!!player.playing} onClick={()=>player.play(key,task.lines!)}><Play size={18} aria-hidden="true"/>Dinle</button>}
+    <button type="button" className="l12-jump" aria-label="Sonraki cümle" title="Sonraki cümle" disabled={!here||here.index>=here.total-1} onClick={()=>here&&player.seek(here.index+1)}><SkipForward size={20} aria-hidden="true"/></button>
+   </div>
+   <div className="l12-seek" role="group" aria-label="Cümleye git">{task.lines.map((line,i)=><button type="button" key={i} className={'l12-seek-step'+(here&&i===here.index?' current':here&&i<here.index?' done':'')} aria-label={`Cümle ${i+1} · ${line.who}`} title={`Cümle ${i+1} · ${line.who}`} aria-current={here&&i===here.index?'step':undefined} onClick={()=>here?player.seek(i):player.play(key,task.lines!,i)}/>)}</div>
+   <div className="l12-player-foot">{here?<button type="button" className="text-button" onClick={()=>player.play(key,task.lines!)}><RotateCcw size={15} aria-hidden="true"/>Baştan dinle</button>:<span/>}<SpeedToggle player={player}/></div>
   </div>}
+  {!task.lines&&<div className="l12-dict-speed"><SpeedToggle player={player}/></div>}
   <ol className="l12-items">{task.questions.map((q,i)=>{const given=answers[i]??'';const ok=checked&&isRight(q,given);const bad=checked&&!ok;const say=questionSpeech(q);const sayKey=key+':'+i;
    return <li key={i} className={'l12-item'+(ok?' ok':bad?' bad':'')}>
     <span className="l12-item-number" aria-hidden="true">{ok?<Check size={15}/>:bad?<X size={15}/>:i+1}</span>
@@ -100,7 +138,7 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
    <button type="button" className="btn check-button" disabled={!answered} onClick={()=>{sound.prepare();if(perfect)sound.correct();else sound.wrong();setChecked(true);}}><Check size={18} aria-hidden="true"/>Kontrol et</button>
    <button type="button" className="btn secondary small" aria-pressed={transcript} onClick={()=>setTranscript(value=>!value)}>{transcript?<EyeOff size={17} aria-hidden="true"/>:<Eye size={17} aria-hidden="true"/>}{transcript?'Metni gizle':'Metni göster'}</button>
   </div>}
-  {transcript&&<div className="l12-transcript" lang="de" dir="ltr">{task.lines?task.lines.map((line,i)=><div key={i} className={'l12-line'+(line.who===task.lines![0].who?'':' alt')}><SpeakerFace who={line.who}/><p className="l12-bubble"><b>{line.who}</b>{line.show??line.text}</p></div>):<ol>{task.questions.map((q,i)=><li key={i}>{q.type==='mc'?q.say:q.type==='dict'?q.answer+(q.say&&q.say!==q.answer?' – '+q.say:''):answerText(q)}</li>)}</ol>}</div>}
+  {transcript&&<div className="l12-transcript" lang="de" dir="ltr">{task.lines?task.lines.map((line,i)=><div key={i} className={'l12-line'+(line.who===task.lines![0].who?'':' alt')+(here?.index===i?' current':'')}><SpeakerFace who={line.who}/><p className="l12-bubble"><b>{line.who}</b>{line.show??line.text}</p></div>):<ol>{task.questions.map((q,i)=><li key={i}>{q.type==='mc'?q.say:q.type==='dict'?q.answer+(q.say&&q.say!==q.answer?' – '+q.say:''):answerText(q)}</li>)}</ol>}</div>}
   {(answered||checked)&&<button type="button" className="text-button l12-reset" onClick={()=>{setAnswers({});setChecked(false);setTranscript(false);}}><RotateCcw size={15} aria-hidden="true"/>Bu bölümü sıfırla</button>}
  </article>;
 }

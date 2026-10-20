@@ -133,3 +133,17 @@ test('every Lektion 12 picture belongs to a part, a word or a speaker and its fi
  const ui=fs.readFileSync('app/ausbildung-ui.tsx','utf8');assert(ui.includes('<WordPicture de={word[0]}/>')&&ui.includes('className="l12-flash-pic"'));
  assert(fs.readFileSync('app/ausbildung-listen.tsx','utf8').includes('<SpeakerFace who={line.who}/>'));
 });
+
+test('the listening player can go back and forward a sentence and play at 0.5x–2x',()=>{
+ const source=fs.readFileSync('app/ausbildung-listen.tsx','utf8');
+ for(const piece of ['aria-label="Önceki cümle"','aria-label="Sonraki cümle"','className="l12-seek"','LISTEN_SPEEDS=[0.5,0.75,1,1.5,2]','player.pause','player.resume','player.seek('])assert(source.includes(piece),piece);
+ // The speed reaches both the natural clips and the device voice.
+ const voices=load('site-voices');const audio={setAttribute(){},pause(){},play(){return Promise.resolve();}};
+ voices.createClipPlayer(()=>audio).play('/voices/x.mp3',voices.SITE_CLIP_BASE_RATE,{onStart(){},onEnd(){},onError(){}},2);
+ assert.equal(audio.playbackRate,2);
+ const speech=load('german-speech');const spoken=[];
+ const synthesis={speaking:false,pending:false,paused:false,getVoices:()=>[],cancel(){},resume(){},speak(u){spoken.push(u);}};
+ const player=speech.createGermanSpeechPlayer(synthesis,text=>({text}),()=>{},'de');
+ player.speak('Hallo',{rate:0.94,speed:0.5});player.speak('Hallo',{rate:0.94,speed:2});player.speak('Hallo',{rate:0.94});
+ assert.deepEqual(spoken.map(u=>Number(u.rate.toFixed(2))),[0.47,1.88,0.94]);
+});

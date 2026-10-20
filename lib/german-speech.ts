@@ -126,20 +126,22 @@ export function createGermanSpeechPlayer(
     }
   }
 
-  function speak(text: string, options: {voiceName?: string; rate?: number} = {}) {
+  /** `speed`: a listening player's 0.5×–2× on top of the reading rate (clips and the device voice alike). */
+  function speak(text: string, options: {voiceName?: string; rate?: number; speed?: number} = {}) {
     configureAudioSession();
     stop();
     if (!text.trim()) return;
     const requestedRate=options.rate??defaultSpeechRate(language);
     const rate = Number.isFinite(requestedRate)?Math.max(0.5, Math.min(1.2, requestedRate)):defaultSpeechRate(language);
+    const speed = options.speed !== undefined && Number.isFinite(options.speed) ? Math.max(0.5, Math.min(2, options.speed)) : 1;
     const found = clips ? clips.resolve(text, options.voiceName ?? '') : null;
     const urls = found == null ? [] : typeof found === 'string' ? [found] : found.filter(Boolean);
-    if (urls.length) playClip(text, urls, rate, options);
-    else speakWithEngine(text, rate, options.voiceName);
+    if (urls.length) playClip(text, urls, rate, options, speed);
+    else speakWithEngine(text, rate * speed, options.voiceName);
   }
 
   /** Natural site-voice clips: when one fails before it starts the next voice is tried; the device voice comes last. */
-  function playClip(text: string, urls: readonly string[], rate: number, options: {voiceName?: string}) {
+  function playClip(text: string, urls: readonly string[], rate: number, options: {voiceName?: string}, speed = 1) {
     const token = generation;
     let started = false;
     let attempt = 0;
@@ -149,7 +151,7 @@ export function createGermanSpeechPlayer(
       clearTimer();
       clips?.player.stop();
       if (attempt + 1 < urls.length) { attempt++; tryClip(); return; }
-      speakWithEngine(text, rate, isSiteVoice(options.voiceName) ? '' : options.voiceName);
+      speakWithEngine(text, rate * speed, isSiteVoice(options.voiceName) ? '' : options.voiceName);
     };
     const tryClip = () => {
     clips!.player.play(urls[attempt], rate, {
@@ -158,7 +160,7 @@ export function createGermanSpeechPlayer(
         started = true;
         clearTimer();
         update({status: 'speaking', text, warning: ''});
-        timer = setTimeout(() => { if (token === generation) stop('Dinleme kesildi. Dinle düğmesine yeniden dokun.'); }, 60000);
+        timer = setTimeout(() => { if (token === generation) stop('Dinleme kesildi. Dinle düğmesine yeniden dokun.'); }, 60000 / speed);
       },
       onEnd: () => {
         if (token !== generation) return;
@@ -171,7 +173,7 @@ export function createGermanSpeechPlayer(
         clearTimer();
         update({...idlePlayback});
       },
-    });
+    }, speed);
     if (token === generation && !started) timer = setTimeout(fallback, 4000);
     };
     tryClip();

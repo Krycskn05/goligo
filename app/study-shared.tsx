@@ -90,7 +90,7 @@ export function useGermanSpeech(course:LearningLanguage='de'){
  const stop=useCallback(()=>player.current?.stop(),[]);
  const prepare=useCallback(()=>player.current?.prepare(),[]);
  const isActive=useCallback(()=>player.current?.isActive()??false,[]);
- const speak=useCallback((text:string,slow=false,voiceOverride?:string)=>{if(!player.current){setPlayback({...idlePlayback,warning:'Ses desteği bulunamadı. Güncel Safari veya Chrome ile aç.'});return;}player.current.speak(text,{voiceName:voiceOverride??(preferenceCourse.current===course?voiceName:''),rate:slow?0.65:preferenceCourse.current===course?Number(rate):defaultSpeechRate(course)});},[voiceName,rate,course]);
+ const speak=useCallback((text:string,slow=false,voiceOverride?:string,speed?:number)=>{if(!player.current){setPlayback({...idlePlayback,warning:'Ses desteği bulunamadı. Güncel Safari veya Chrome ile aç.'});return;}player.current.speak(text,{voiceName:voiceOverride??(preferenceCourse.current===course?voiceName:''),rate:slow?0.65:preferenceCourse.current===course?Number(rate):defaultSpeechRate(course),speed});},[voiceName,rate,course]);
  return {speaking:playback.status==='speaking',loading:playback.status==='loading',busy:playback.status!=='idle',activeText:playback.text,warning:playback.warning,voices,siteVoices,siteVoicesState,voiceName,setVoiceName:changeVoice,rate,setRate:changeRate,prepare,speak,stop,isActive};
 }export function Recorder({language="tr"}:{language?:StudyLanguage}){
  const [recording,setRecording]=useState(false);const [starting,setStarting]=useState(false);const [url,setUrl]=useState('');const [error,setError]=useState('');

@@ -1,0 +1,30 @@
+/* Paul Hoca's small animations (app/paul-hoca.tsx): about 90 px on computers, 70 px on phones */
+.paul-hoca { display:block; flex-shrink:0; width:90px; height:90px; pointer-events:none; user-select:none; }
+.paul-hoca img { display:block; width:100%; height:100%; object-fit:contain; }
+
+/* Home: Koko and Paul (waving) side by side above the welcome */
+.ht-hosts { display:flex; align-items:flex-end; justify-content:center; gap:8px; }
+
+/* Hint and rule boxes: the text first, Paul at the end of the box pointing at it */
+.paul-box { display:flex; align-items:center; gap:12px; }
+.paul-box-text { flex:1; min-width:0; margin:0; }
+.paul-box>.paul-hoca { margin-block:-6px -8px; margin-inline-end:-4px; }
+.vault-hint .paul-box-text { display:grid; gap:4px; }
+.verb-rules .paul-box-text p { margin:4px 0 0; }
+
+/* Wrong answer: Paul raises his finger in the "Tekrar dene" badge (learning-effects.tsx), for 2.6 seconds */
+.lk-reaction-paul { display:block; flex-shrink:0; width:90px; height:90px; margin-block:-12px -10px; margin-inline-start:-8px; object-fit:contain; }
+.retry .lk-reaction-badge:has(.lk-reaction-paul) { padding:8px 22px 8px 12px; animation:lk-paul-retry 2.6s both; }
+@keyframes lk-paul-retry {
+ 0% { opacity:0; transform:translate(-50%,10px) scale(.8); }
+ 10% { opacity:1; transform:translate(-50%,0) scale(1.04); }
+ 16%,86% { opacity:1; transform:translate(-50%,0) scale(1); }
+ 100% { opacity:0; transform:translate(-50%,-6px) scale(.97); }
+}
+
+@media (max-width:760px) {
+ .paul-hoca,.lk-reaction-paul { width:70px; height:70px; }
+ .paul-box { gap:8px; }
+ /* The verb learning card fits one phone screen; Paul stays out of its small rule box there. */
+ .verb-learn .paul-box>.paul-hoca { display:none; }
+}

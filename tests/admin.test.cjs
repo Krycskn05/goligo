@@ -36,7 +36,8 @@ function seed(){
 
 test('only the site owner may open the panel; everyone else sees no records',()=>{
  assert.ok(access.isAdminEmail('kooraycoskun@gmail.com'));assert.ok(access.isAdminEmail('  KoorayCoskun@Gmail.com '));
- for(const other of ['','ada@example.com','kooraycoskun@gmail.com.evil.test',null,undefined,42])assert.ok(!access.isAdminEmail(other),String(other));
+ assert.ok(access.isAdminEmail('koraycoskun@hotmail.com'));assert.ok(access.isAdminEmail(' KorayCoskun@Hotmail.com '));
+ for(const other of ['','ada@example.com','kooraycoskun@gmail.com.evil.test','koraycoskun@gmail.com','kooraycoskun@hotmail.com',null,undefined,42])assert.ok(!access.isAdminEmail(other),String(other));
  const page=read('app/yonetim/page.tsx');
  const guard=page.indexOf('if(!isAdminEmail(user.email))return');
  assert.ok(guard>0&&guard<page.indexOf('getRawDb()'),'no database read before the e-mail check');

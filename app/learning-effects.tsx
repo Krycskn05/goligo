@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {Check,ChevronDown,Mic,Play,RotateCcw,Sparkles,Square,Star,Trophy,Volume2,VolumeX,X} from 'lucide-react';
+import {Check,ChevronDown,Mic,Play,Sparkles,Square,Star,Trophy,Volume2,VolumeX,X} from 'lucide-react';
 import {wrongSoundIds,tapChoiceIds,pageSoundIds,correctSoundIds,completeSoundIds,nextTapSound,type SoundId} from '@/lib/effect-sounds';
 import {germanSpeechPreview} from '@/lib/german-speech';
 import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGreeting} from '@/lib/site-voices';
@@ -9,12 +9,15 @@ import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
 import {isVaultLanguage,type VaultLanguage} from '@/lib/object-vault-copy';
 import {defaultEffects,EFFECTS_CHANGED,EFFECTS_KEY,LEARNING_REACTION,readEffects,saveEffects,motionAllowed,playLearningSound,canPlayEffects,stopAllEffects,warmEffects,type EffectsPreferences,type LearningReaction} from '@/lib/learning-effects';
 import {languageDirection,loadLanguagePack} from '@/lib/site-languages';
+import {PAUL_PICTURES} from './paul-hoca';
 
 // Buttons and links that open another view get a soft gust of wind instead of a tap.
 const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-feature,.vault-category-open,.vault-back-categories,.object-exit,.progress-topic,.toon-level-switch button,.nb-tabs button';
 const SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
 const OPEN_EFFECTS='lernkoko-open-effects';
+/** After a wrong answer Paul Hoca raises his finger in the badge; it stays a little longer so his animation can be seen. */
+const WRONG_MS=2600;
 /** The sound groups of the dialog: the moment, its title and the sounds to choose from (the first is the default). */
 const soundGroups=[
  {key:'tap',title:'chooseTap',ids:tapChoiceIds},
@@ -64,7 +67,7 @@ export default function LearningEffects() {
    const kind=(event as CustomEvent<LearningReaction>).detail;
    if(!['correct','wrong','complete'].includes(kind)||document.hidden||!motionAllowed())return;
    if(reactionTimer.current)clearTimeout(reactionTimer.current);
-   setReaction({kind,id:++sequence.current});reactionTimer.current=setTimeout(()=>setReaction(null),kind==='complete'?1500:1050);
+   setReaction({kind,id:++sequence.current});reactionTimer.current=setTimeout(()=>setReaction(null),kind==='complete'?1500:kind==='wrong'?WRONG_MS:1050);
   };
   const tap=(event:MouseEvent)=>{
    if(!(event.target instanceof Element))return;
@@ -78,7 +81,8 @@ export default function LearningEffects() {
    target.classList.remove('lk-tap-pop');void target.offsetWidth;target.classList.add('lk-tap-pop');
    setTimeout(()=>{if(target.dataset.lkTap===String(mark)){target.classList.remove('lk-tap-pop');delete target.dataset.lkTap;}},440);
   };
-  const warm=()=>warmEffects();
+  // Paul's wrong-answer picture is fetched after the first tap, so it is ready before the first wrong answer.
+  const warm=()=>{warmEffects();const paul=new Image();paul.decoding='async';paul.src=PAUL_PICTURES.wrong;};
   const visibility=()=>{if(document.hidden){stopAllEffects();previewStop.current?.();setPlaying(null);setReaction(null);}};
   window.addEventListener(EFFECTS_CHANGED,sync);window.addEventListener('storage',storage);window.addEventListener(OPEN_EFFECTS,open);window.addEventListener(LEARNING_REACTION,feedback);
   document.addEventListener('click',tap,true);document.addEventListener('pointerdown',warm,{once:true,capture:true});document.addEventListener('visibilitychange',visibility);media.addEventListener('change',sync);
@@ -94,7 +98,7 @@ export default function LearningEffects() {
  const confetti=reaction&&reaction.kind!=='wrong';
  return <>
   {reaction&&<div key={reaction.id} className={'lk-reaction-layer '+(reaction.kind==='wrong'?'retry':'celebrate')} aria-hidden="true">
-   <div className="lk-reaction-badge">{reaction.kind==='complete'?<Trophy size={26}/>:reaction.kind==='correct'?<Sparkles size={26}/>:<RotateCcw size={24}/>}<strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
+   <div className="lk-reaction-badge">{reaction.kind==='complete'?<Trophy size={26}/>:reaction.kind==='correct'?<Sparkles size={26}/>:<img className="lk-reaction-paul" src={PAUL_PICTURES.wrong} alt="" width={180} height={180} decoding="async"/>}<strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
    {confetti&&Array.from({length:reaction.kind==='complete'?24:14},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%430)-215}px`,'--lk-y':`${85+i*43%175}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={14} fill="currentColor"/>:null}</span>)}
   </div>}
   <dialog ref={dialog} className="lk-effects-dialog" aria-labelledby="lk-effects-title" lang={language} dir={languageDirection(language)} data-no-effects onClose={()=>{previewStop.current?.();setPlaying(null);speech.stop();}} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();}}}>

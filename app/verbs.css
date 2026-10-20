@@ -174,6 +174,12 @@
 .verb-path-restart { display:inline-flex; align-items:center; gap:6px; margin-top:8px; color:#7f95ad; font-size:14px; }
 .verb-bubble { position:relative; background:#fff6d6; border:2px solid #ffe29a; border-radius:16px; padding:12px 16px; font-weight:800; color:#6a4400; font-size:16px; box-shadow:none; white-space:nowrap; }
 .verb-bubble strong { color:#e07a3f; }
+button.verb-bubble { display:inline-flex; align-items:center; gap:10px; font-family:inherit; font-weight:800; text-align:start; cursor:pointer; transition:transform .15s,box-shadow .15s; }
+button.verb-bubble:hover:enabled { transform:translateY(-2px); box-shadow:0 6px 14px rgba(192,106,34,.18); }
+button.verb-bubble:disabled { opacity:.6; cursor:default; }
+button.verb-bubble:focus-visible { outline:3px solid var(--blue-2); outline-offset:3px; }
+button.verb-bubble svg { flex:none; color:#c06a22; }
+.verb-hero.only-title { display:block; margin:20px 0 26px; }
 .verb-bubble::before { content:""; position:absolute; left:-16px; top:26px; border:8px solid transparent; border-right-color:#ffe29a; }
 .verb-map { position:relative; margin-top:44px; }
 .verb-map-path { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
@@ -282,6 +288,7 @@
  .verb-home { padding-bottom:90px; }
  .verb-hero { grid-template-columns:1fr; gap:26px; margin:16px 0 34px; }
  .verb-hero-title { font-size:46px; }
+ .verb-hero.only-title { margin:14px 0 20px; }
  .verb-hero-lead { font-size:16px; padding:16px 18px; }
  .verb-hero-cta { gap:12px; }
  .verb-hero-cta .btn { width:100%; }

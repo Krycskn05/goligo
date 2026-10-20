@@ -1,13 +1,13 @@
 'use client';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
-import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,verbsHeroPicture,type VerbTense} from '@/lib/verb-logic';
+import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox} from './verb-games';
 import {LearnCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
@@ -325,19 +325,9 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     return <PartVerbs family={part.family} part={part} verbs={members} marks={stickers} language={language} disabled={busy||!ready} onStart={restart=>void enterPart(part.family,restart)} onOpen={item=>openVerb(part.family,item.id)} onBack={closeView}/>;
    })():
    <section className="verb-home" aria-labelledby="vault-heading">
-    <div className="verb-hero">
-     <div className="verb-hero-text">
-      <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
-      <p className="verb-hero-lead">{t('workshopLead')}</p>
-      <div className="verb-hero-cta">
-       <button type="button" className="btn verb-path-enter" disabled={busy||!ready} onClick={()=>void enterPart(path.family,path.finished)}><Play size={20} fill="currentColor" aria-hidden="true"/>{t(path.finished?'workshopRestart':path.started?'workshopEnter':'workshopStart')}</button>
-      </div>
-     </div>
-     <div className="verb-polaroid">
-      <img className="verb-polaroid-photo" src={verbsHeroPicture} alt="" width={1200} height={800} decoding="async"/>
-      <div className="verb-polaroid-sticker" aria-hidden="true"><b>{verbs.length}</b>{t('verbsWord')}</div>
-      <span className="verb-koko" aria-hidden="true"/>
-     </div>
+    {/* Only the title on top: the path card below shows where the learner is and continues with one tap. */}
+    <div className="verb-hero only-title">
+     <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
     </div>
     <article className="panel verb-path-panel" data-verb-workshop="">
      <div className="verb-avatar"><VerbPicture verb={nextVerb} language={language} small/></div>
@@ -347,7 +337,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
       {initializing?<p className="verb-path-note">{v('loading')}</p>:path.finished?<p className="verb-path-note verb-path-done"><CheckCircle2 size={16} aria-hidden="true"/>{t('workshopDone')}</p>:<p className="verb-path-note">{t('chapterOf',{n:nextFamily.number})} · <span lang="de" dir="ltr">{familyTitle(nextFamily,language)}</span> · {t('stageBoth')}</p>}
       {path.session&&!path.finished&&path.done>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterPart(path.family,true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
      </div>
-     {!path.finished&&<div className="verb-bubble">{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</div>}
+     {!path.finished&&<button type="button" className="verb-bubble" disabled={busy||!ready} onClick={()=>void enterPart(path.family,false)}><span>{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</span><ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>}
     </article>
     <section className="verb-map" aria-labelledby="verb-map-heading">
      <h2 id="verb-map-heading" className="verb-map-title">{t('mapTitle')}</h2>

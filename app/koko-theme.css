@@ -149,6 +149,20 @@ strong { font-weight:700; }
 .toon-app .work-nav,.work-nav { background:#fff; border:1px solid var(--toy-line); border-radius:999px; color:var(--ink-2); box-shadow:none; font-weight:700; }
 .toon-app .work-nav.active,.work-nav.active { background:linear-gradient(180deg,#ffe8a3,#f6c46b); color:#5b3600; border-color:#fff; box-shadow:var(--soft-2); }
 .toon-app .work-nav:hover { background:#f3f9ff; }
+/* Sol menü simgeleri: beyaz kenarlı, hafif eğik yapıştırılmış çıkartmalar; iki tonlu çizim, her bölüm kendi renginde (app/nav-icons.tsx) */
+.nav-icon { flex:none; display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:#fff; color:var(--nav-c); box-shadow:0 0 0 3px #fff,0 5px 12px rgba(28,82,130,.2); transform:rotate(-6deg); }
+.work-nav:nth-child(even) .nav-icon { transform:rotate(5deg); }
+.nav-icon svg { display:block; width:24px; height:24px; }
+.nav-icon-fill { fill:var(--nav-duo); stroke:none; }
+.nav-icon-units { --nav-c:#b06d00; --nav-duo:#ffe08a; }
+.nav-icon-vault { --nav-c:#1f6fc4; --nav-duo:#bfe0ff; }
+.nav-icon-verbs { --nav-c:#6b48d6; --nav-duo:#ddd0ff; }
+.nav-icon-games { --nav-c:#c93f72; --nav-duo:#ffc9da; }
+.nav-icon-mistakes { --nav-c:#d1442c; --nav-duo:#ffd3c7; }
+@media (max-width:760px) {
+ .nav-icon { width:30px; height:30px; box-shadow:0 0 0 2px #fff,0 3px 8px rgba(28,82,130,.18); }
+ .nav-icon svg { width:19px; height:19px; }
+}
 .object-nav-link,.verb-nav-link { background:#fff; color:var(--ink-2); }
 .site-copyright,footer.site-copyright { color:var(--ink-2); font-weight:600; background:transparent; border-top:0; }
 .verb-list { border-top:0; padding:14px 20px; background:#fff; border:2px solid #fff; border-radius:20px; box-shadow:var(--soft-2); }

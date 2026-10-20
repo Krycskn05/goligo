@@ -54,8 +54,8 @@
  .verb-chip,.vault-category-card.featured .verb-chip { font-size:12px; padding:4px 8px; box-shadow:0 2px 0 #ece4d1; }
 }
 /* Pictures, sentence gaps and rules */
-.verb-picture { display:block; width:100%; max-width:220px; aspect-ratio:1; object-fit:cover; border-radius:18px; background:#fbf8ef; box-shadow:0 4px 0 #ece4d1; }
-.verb-picture.small { max-width:64px; width:64px; height:64px; border-radius:12px; box-shadow:none; }
+.verb-picture { display:block; width:100%; max-width:250px; aspect-ratio:1; object-fit:cover; border-radius:18px; background:#fbf8ef; box-shadow:0 4px 0 #ece4d1; }
+.verb-picture.small { max-width:72px; width:72px; height:72px; border-radius:12px; box-shadow:none; }
 .verb-picture-empty { display:grid; place-items:center; font-weight:750; color:#6b5a33; background:#fff6dd; font-size:14px; text-align:center; padding:6px; }
 .verb-picture-empty.small { font-size:10px; }
 .verb-hero-picture { width:100%; height:100%; object-fit:cover; }
@@ -75,7 +75,7 @@
 .verb-rules strong { display:block; margin-bottom:4px; color:#1f4f66; }
 .verb-rules ul { margin:0; padding-inline-start:18px; display:grid; gap:4px; }
 .verb-feedback-main { display:flex; align-items:center; gap:12px; }
-.verb-list-rows li { grid-template-columns:28px 64px 44px minmax(0,1.1fr) minmax(0,1fr); }
+.verb-list-rows li { grid-template-columns:28px 72px 44px minmax(0,1.1fr) minmax(0,1fr); }
 /* Games */
 .verb-games-title { display:flex; align-items:center; gap:8px; margin-top:34px; }
 .verb-game-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
@@ -120,15 +120,15 @@
 .verb-match-card { min-height:120px; display:grid; place-items:center; padding:8px; border-radius:16px; border:1px solid #d9d2bf; background:linear-gradient(145deg,#2c7d78,#1f5f63); color:#fff; font-weight:750; font-size:16px; cursor:pointer; box-shadow:0 4px 0 #cfc7b2; text-align:center; overflow-wrap:anywhere; }
 .verb-match-card.shown { background:#fffdf6; color:#33434c; }
 .verb-match-card.matched { background:#e6f5e8; border-color:#57926a; color:#285c38; cursor:default; }
-.verb-match-card .verb-picture.small { width:88px; height:88px; max-width:88px; }
+.verb-match-card .verb-picture.small { width:98px; height:98px; max-width:98px; }
 .verb-match-back { font-size:30px; opacity:.85; }
 .verb-game-over { display:grid; justify-items:center; gap:8px; text-align:center; padding:18px; margin-top:14px; border-radius:18px; background:#fff8e3; color:#5d4b1c; }
 @media (max-width:1000px) { .verb-game-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:760px) {
- .verb-picture { max-width:180px; }
+ .verb-picture { max-width:205px; }
  .verb-sentence { font-size:17px; }
- .verb-list-rows li { grid-template-columns:56px 44px minmax(0,1fr); }
- .verb-list-rows li .verb-picture.small { width:56px; height:56px; max-width:56px; }
+ .verb-list-rows li { grid-template-columns:62px 44px minmax(0,1fr); }
+ .verb-list-rows li .verb-picture.small { width:62px; height:62px; max-width:62px; }
  .verb-list-word { grid-column:3; }
  .verb-list-forms { grid-column:2 / 4; }
  .verb-game-grid { grid-template-columns:1fr 1fr; gap:10px; }
@@ -138,7 +138,7 @@
  .verb-game-word { font-size:23px; }
  .verb-match-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
  .verb-match-card { min-height:100px; font-size:14px; }
- .verb-match-card .verb-picture.small { width:72px; height:72px; max-width:72px; }
+ .verb-match-card .verb-picture.small { width:80px; height:80px; max-width:80px; }
  .verb-tile { font-size:16px; min-height:44px; padding:6px 11px; }
 }
 .puzzle-keyboard-tip { margin:6px 0 0; font-size:12.5px; color:#7a8287; }
@@ -162,7 +162,7 @@
 /* Koko peeks from the corner of the picture (the mascot cut out of the logo). */
 .verb-koko { position:absolute; left:-72px; bottom:-44px; width:190px; height:152px; background:url('/branding/koko-mascot.png') no-repeat center / contain; transform:rotate(6deg); filter:drop-shadow(0 10px 12px rgba(0,0,0,.22)); animation:koko-float 5s ease-in-out infinite reverse; }
 .verb-path-panel { display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center; padding:24px 28px; }
-.verb-avatar .verb-picture.small { width:100px; height:100px; max-width:100px; border:5px solid #fff; box-shadow:0 0 0 3px #9ccbff; }
+.verb-avatar .verb-picture.small { width:112px; height:112px; max-width:112px; border:5px solid #fff; box-shadow:0 0 0 3px #9ccbff; }
 .verb-path-status { min-width:0; }
 .verb-path-title { margin:0; font-size:28px; font-weight:800; color:#1f3b5c; }
 .verb-path-title .n { color:#2f7fd6; }
@@ -187,7 +187,7 @@
 .verb-island h3 { margin:0; font-size:22px; font-weight:800; color:#1f3b5c; }
 .verb-island p { margin:4px 0 0; font-weight:600; color:#3d5a7a; font-size:14px; }
 .verb-island-pics { display:flex; margin-top:10px; }
-.verb-island-pics img { width:50px; height:50px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); margin-right:-10px; background:#fff; }
+.verb-island-pics img { width:56px; height:56px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); margin-right:-10px; background:#fff; }
 .verb-ring { position:relative; width:76px; height:76px; border-radius:50%; background:conic-gradient(var(--c2) calc(var(--p)*1%),#e7eef7 0); display:grid; place-items:center; box-shadow:none; }
 .verb-ring::after { content:attr(data-v); position:absolute; inset:8px; border-radius:50%; background:#fff; display:grid; place-items:center; font-weight:800; font-size:15px; color:var(--c2); }
 .verb-island.current { border-color:#ffd54a; box-shadow:0 0 0 4px rgba(255,213,74,.35),0 8px 24px rgba(28,82,130,.12); }
@@ -226,7 +226,7 @@
 .verb-collection h2 { margin:0 0 4px; font-size:22px; font-weight:800; }
 .verb-collection-lead { margin:0 0 14px; color:#3d5a7a; font-weight:600; font-size:14px; }
 .verb-stickers { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-.verb-stickers img { width:66px; height:66px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); background:#fff; }
+.verb-stickers img { width:72px; height:72px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 6px rgba(28,82,130,.15); background:#fff; }
 .verb-stickers img:nth-child(odd) { transform:rotate(-5deg); } .verb-stickers img:nth-child(even) { transform:rotate(4deg); }
 .verb-stickers img.missing { filter:grayscale(1); opacity:.35; box-shadow:none; border:3px dashed #c9dbec; }
 .verb-stickers img.full { border-color:#ffd54a; box-shadow:0 0 0 2px #ffd54a,0 2px 6px rgba(28,82,130,.15); }
@@ -289,7 +289,7 @@
  .verb-polaroid-sticker { width:92px; height:92px; right:-8px; top:-22px; font-size:13px; } .verb-polaroid-sticker b { font-size:28px; }
  .verb-koko { width:140px; height:112px; left:-22px; bottom:-30px; }
  .verb-path-panel { grid-template-columns:auto 1fr; gap:16px; padding:20px; }
- .verb-avatar .verb-picture.small { width:84px; height:84px; max-width:84px; }
+ .verb-avatar .verb-picture.small { width:94px; height:94px; max-width:94px; }
  .verb-path-title { font-size:24px; }
  .verb-energy { height:24px; }
  .verb-bubble { grid-column:1 / -1; white-space:normal; } .verb-bubble::before { display:none; }
@@ -301,7 +301,7 @@
  .verb-karma { grid-template-columns:1fr; text-align:center; padding:22px; justify-items:center; }
  .verb-karma .btn { width:100%; }
  .verb-hard-tag { margin-left:6px; }
- .verb-stickers img { width:60px; height:60px; }
+ .verb-stickers img { width:64px; height:64px; }
  .verb-learn,.verb-chapter { padding:18px; }
  .verb-learn-body { grid-template-columns:1fr; justify-items:center; text-align:center; }
  .verb-learn-text { justify-items:center; }
@@ -341,9 +341,9 @@
 /* After a test answer: one result card (picture and verb on top, right or wrong, sentences, next). */
 .verb-hidden-heading { position:absolute !important; width:1px; height:1px; margin:0 !important; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .verb-result { display:grid; gap:10px; outline:none; }
-.verb-result-head { display:grid; grid-template-columns:110px minmax(0,1fr); gap:14px; align-items:center; padding:10px; border-radius:18px; background:#eafbe4; border:2px solid #fff; }
+.verb-result-head { display:grid; grid-template-columns:124px minmax(0,1fr); gap:14px; align-items:center; padding:10px; border-radius:18px; background:#eafbe4; border:2px solid #fff; }
 .verb-result.retry .verb-result-head { background:#fff0f4; }
-.verb-result-head .verb-picture { width:110px; max-width:110px; border-radius:16px; border-width:3px; }
+.verb-result-head .verb-picture { width:124px; max-width:124px; border-radius:16px; border-width:3px; }
 .verb-result-text { display:grid; gap:3px; min-width:0; justify-items:start; }
 .verb-result-status { display:inline-flex; align-items:center; gap:5px; margin:0; font-size:14px; font-weight:800; }
 .verb-result-status.right { color:#2e7d22; }
@@ -376,7 +376,7 @@
  .verb-learn { gap:8px; padding:12px; }
  .verb-learn .verb-learn-kicker { display:none; }
  .verb-learn-body { gap:4px; }
- .verb-learn .verb-picture { max-width:112px; border-radius:16px; }
+ .verb-learn .verb-picture { max-width:124px; border-radius:16px; }
  .verb-learn-text { gap:2px; }
  .verb-learn-title { justify-content:center; gap:8px; }
  .verb-learn-form { font-size:26px; }
@@ -398,8 +398,8 @@
  .verb-practice .verb-question h1 { font-size:18px; margin-bottom:8px; }
  .verb-question .verb-card { padding:10px 12px; margin-bottom:10px; }
  /* Picture beside the meaning: room for the letters below. */
- .verb-question .verb-card.with-picture:has(.verb-picture) { grid-template-columns:84px minmax(0,1fr); justify-items:start; align-items:center; text-align:start; gap:12px; }
- .verb-question .verb-card.with-picture .verb-picture { width:84px; max-width:84px; margin:0; border-radius:14px; }
+ .verb-question .verb-card.with-picture:has(.verb-picture) { grid-template-columns:92px minmax(0,1fr); justify-items:start; align-items:center; text-align:start; gap:12px; }
+ .verb-question .verb-card.with-picture .verb-picture { width:92px; max-width:92px; margin:0; border-radius:14px; }
  /* The verb and its meaning stack beside the picture (the meaning never falls into the narrow picture column); a sentence takes the full width below. */
  .verb-question .verb-card.with-picture:has(.verb-picture) { grid-template-rows:auto auto; grid-auto-flow:row dense; row-gap:2px; }
  .verb-question .verb-card.with-picture:has(.verb-picture) > .verb-picture { grid-column:1; grid-row:1 / span 2; align-self:center; }
@@ -417,8 +417,8 @@
  .verb-question .letter-bank-heading { display:none; }
  .verb-question.answered { padding:8px; }
  .verb-result { gap:8px; }
- .verb-result-head { grid-template-columns:76px minmax(0,1fr); gap:10px; padding:6px; }
- .verb-result-head .verb-picture { width:76px; max-width:76px; border-radius:14px; }
+ .verb-result-head { grid-template-columns:84px minmax(0,1fr); gap:10px; padding:6px; }
+ .verb-result-head .verb-picture { width:84px; max-width:84px; border-radius:14px; }
  .verb-result-title strong { font-size:21px; }
  .verb-result-meaning { font-size:14px; }
  /* The stepper above already names the verb. */

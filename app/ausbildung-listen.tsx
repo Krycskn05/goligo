@@ -3,6 +3,7 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import {Check,CheckCircle2,Eye,EyeOff,Headphones,Play,RotateCcw,Square,X} from 'lucide-react';
 import {lessonParts,normalizeAnswer} from '@/lib/ausbildung-course';
 import {hoerenTasks,questionSpeech,speakerVoice,type HoerenQuestion,type HoerenTask} from '@/lib/ausbildung-hoeren';
+import {speakerPicture} from '@/lib/ausbildung-art';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 
 type Item={text:string;voice?:string};
@@ -56,6 +57,12 @@ export function listenResult(task:HoerenTask):{right:number;total:number}|null{
 export const LISTEN_CHANGED='lernkoko-l12-listen';
 
 /** One listening task as a practice card: listen, answer, check, then read the text. */
+/** A speaker's round picture; speakers without one show their first letter. */
+export function SpeakerFace({who}:{who:string}){
+ const src=speakerPicture(who);
+ return <span className={'l12-face'+(src?'':' letter')} aria-hidden="true">{src?<img src={src} alt="" width={320} height={320} loading="lazy" decoding="async"/>:(who.replace(/^Herr /,'')[0]??'?')}</span>;
+}
+
 export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;player:ListenPlayer;onNext?:()=>void;nextLabel?:string}){
  const [answers,setAnswers]=useState<Answers>({});const [checked,setChecked]=useState(false);const [transcript,setTranscript]=useState(false);const [loadedFor,setLoadedFor]=useState<string|null>(null);
  useEffect(()=>{let saved:Saved|null=null;try{saved=JSON.parse(localStorage.getItem(storage(task.id))??'null') as Saved|null;}catch{}setAnswers(saved?.a??{});setChecked(!!saved?.c);setTranscript(false);setLoadedFor(task.id);},[task.id]);
@@ -70,7 +77,7 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
   <p className="housing-cue l12-hint">{task.hint}</p>
   {task.lines&&<div className="vault-listen-player l12-player">
    <span className="l12-player-icon" aria-hidden="true"><Headphones size={26}/></span>
-   <div className="l12-player-text"><strong>{active?'Dinliyorsun…':'Önce metni görmeden dinle'}</strong><small>{[...new Set(task.lines.map(line=>line.who))].join(' · ')}</small></div>
+   <div className="l12-player-text"><strong>{active?'Dinliyorsun…':'Önce metni görmeden dinle'}</strong><span className="l12-faces" lang="de">{[...new Set(task.lines.map(line=>line.who))].map(who=><span key={who} className="l12-face-chip"><SpeakerFace who={who}/>{who}</span>)}</span></div>
    {active?<button type="button" className="btn secondary" onClick={player.stop}><Square size={16} aria-hidden="true"/>Durdur</button>:<button type="button" className="btn" disabled={player.busy&&!!player.playing} onClick={()=>player.play(key,task.lines!)}><Play size={18} aria-hidden="true"/>Dinle</button>}
   </div>}
   <ol className="l12-items">{task.questions.map((q,i)=>{const given=answers[i]??'';const ok=checked&&isRight(q,given);const bad=checked&&!ok;const say=questionSpeech(q);const sayKey=key+':'+i;
@@ -93,7 +100,7 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
    <button type="button" className="btn check-button" disabled={!answered} onClick={()=>{sound.prepare();if(perfect)sound.correct();else sound.wrong();setChecked(true);}}><Check size={18} aria-hidden="true"/>Kontrol et</button>
    <button type="button" className="btn secondary small" aria-pressed={transcript} onClick={()=>setTranscript(value=>!value)}>{transcript?<EyeOff size={17} aria-hidden="true"/>:<Eye size={17} aria-hidden="true"/>}{transcript?'Metni gizle':'Metni göster'}</button>
   </div>}
-  {transcript&&<div className="l12-transcript" lang="de" dir="ltr">{task.lines?task.lines.map((line,i)=><p key={i} className={'l12-bubble'+(line.who===task.lines![0].who?'':' alt')}><b>{line.who}</b>{line.show??line.text}</p>):<ol>{task.questions.map((q,i)=><li key={i}>{q.type==='mc'?q.say:q.type==='dict'?q.answer+(q.say&&q.say!==q.answer?' – '+q.say:''):answerText(q)}</li>)}</ol>}</div>}
+  {transcript&&<div className="l12-transcript" lang="de" dir="ltr">{task.lines?task.lines.map((line,i)=><div key={i} className={'l12-line'+(line.who===task.lines![0].who?'':' alt')}><SpeakerFace who={line.who}/><p className="l12-bubble"><b>{line.who}</b>{line.show??line.text}</p></div>):<ol>{task.questions.map((q,i)=><li key={i}>{q.type==='mc'?q.say:q.type==='dict'?q.answer+(q.say&&q.say!==q.answer?' – '+q.say:''):answerText(q)}</li>)}</ol>}</div>}
   {(answered||checked)&&<button type="button" className="text-button l12-reset" onClick={()=>{setAnswers({});setChecked(false);setTranscript(false);}}><RotateCcw size={15} aria-hidden="true"/>Bu bölümü sıfırla</button>}
  </article>;
 }

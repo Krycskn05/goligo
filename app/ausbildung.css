@@ -18,7 +18,11 @@
 .housing-feature.l12-resume>div,.housing-feature.l12-listen-feature>div { flex:1; min-width:0; }
 .l12-app a.housing-feature { text-decoration:none; color:inherit; }
 .l12-grid-title { margin:8px 0 16px; }
-.l12-card .housing-card-art { display:grid; place-items:center; }
+.l12-card .housing-card-art { display:grid; place-items:center; border-radius:18px; overflow:hidden; }
+/* Pictures cut from the learner's picture sheets (public/toon/lektion12) sit on their own cream background. */
+.l12-feature-art { flex:none; width:96px; height:84px; border-radius:18px; overflow:hidden; border:2px solid #fff; box-shadow:var(--soft-2); }
+.l12-feature-art .toon-art,.l12-hero-art .toon-art { width:100%; height:100%; }
+.l12-hero-art { border-radius:24px; overflow:hidden; }
 .l12-koko { display:block; width:100%; height:100%; object-fit:contain; }
 .l12-test-badge { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 4px; padding:10px 14px; border-radius:14px; background:#fff8dc; border:1px solid #ffe6a3; color:#6a4400; font-weight:700; font-size:14px; }
 .l12-test-badge small { font-weight:600; }
@@ -27,10 +31,10 @@
 .l12-part { display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
 .l12-part > *,.l12-step-body > * { min-width:0; }
 .l12-part > .vault-back-categories { margin:4px 0 -4px; justify-self:start; }
-.l12-intro { display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:20px; align-items:center; margin:0; }
+.l12-intro { display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:20px; align-items:center; margin:0; }
 .l12-intro h1 { margin:10px 0 12px; }
 .l12-intro p { margin:0; font-size:17px; }
-.l12-intro-art { width:190px; height:150px; }
+.l12-intro-art { width:220px; height:180px; border-radius:20px; overflow:hidden; }
 .l12-intro-art .toon-art { width:100%; height:100%; }
 
 /* Steps: Kelimeler → Konu anlatımı → Alıştırmalar → Dinleme */
@@ -86,14 +90,21 @@
 .l12-words-cta { display:grid; justify-items:center; gap:8px; flex:none; }
 .l12-words-cta small { color:var(--ink-2); font-weight:700; font-size:13px; }
 .l12-teach-words h2 { margin-bottom:12px; }
-.l12-word-grid { list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+.l12-word-grid { list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:12px; }
 .l12-word-tile { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 12px 12px 16px; border-radius:16px; background:#f6fbff; border:2px solid #fff; box-shadow:var(--soft-2); }
 .l12-word-tile.known { background:#f1fbef; }
-.l12-word-text { display:grid; gap:4px; min-width:0; }
-.l12-word { display:inline; color:var(--ink); font-size:17px; line-height:1.6; overflow-wrap:anywhere; }
+.l12-word-text { display:grid; gap:4px; min-width:0; flex:1; order:1; }
+.l12-word-tile .l12-say { order:2; }
+/* A pictured word: picture first; on phones the listen button sits on the picture's corner. */
+.l12-word-media { display:contents; }
+.l12-word-tile.has-pic { padding-inline-start:10px; }
+.l12-word-pic { display:block; flex:none; width:100px; height:82px; border-radius:12px; overflow:hidden; border:2px solid #fff; box-shadow:0 0 0 1px #e7eef6; }
+.l12-word-pic .toon-art,.l12-flash-pic .toon-art { width:100%; height:100%; }
+.l12-word { display:inline; color:var(--ink); font-size:17px; line-height:1.6; overflow-wrap:anywhere; hyphens:auto; }
 .l12-word strong { font-weight:800; }
 .l12-or { color:var(--ink-3); font-weight:600; }
 .l12-plural { color:var(--ink-3); font-weight:700; font-size:13px; margin-inline-start:6px; white-space:nowrap; }
+.l12-plural.long { white-space:normal; }
 .l12-sep { color:#e26a1c; font-weight:800; padding:0 1px; }
 .l12-article { display:inline-block; padding:0 7px; margin-inline-end:5px; border-radius:999px; font-size:13px; font-weight:800; line-height:1.6; vertical-align:1px; }
 .l12-der { background:#e3efff; color:#1f5fae; }
@@ -114,6 +125,7 @@
 .l12-track span { display:block; height:100%; border-radius:inherit; background:linear-gradient(180deg,#8be07a,#4aa84f); transition:width .3s ease; }
 .l12-flash { display:grid; place-items:center; align-content:center; gap:14px; width:100%; min-height:230px; padding:28px 20px; border-radius:24px; border:2px dashed #cfe3f7; background:linear-gradient(180deg,#f3f9ff,#fff); color:var(--ink); cursor:pointer; text-align:center; }
 .l12-flash .l12-word { justify-content:center; font-size:30px; }
+.l12-flash-pic { display:block; width:min(280px,100%); height:190px; border-radius:20px; overflow:hidden; border:3px solid #fff; box-shadow:var(--soft-2); }
 .l12-flash .l12-article { font-size:16px; }
 .l12-flash .l12-plural { font-size:18px; }
 .l12-card-tr { font-size:26px; font-weight:800; color:var(--ink); }
@@ -229,10 +241,21 @@
 .l12-item-listen { display:flex; }
 .l12-transcript { margin-top:16px; padding:16px; border-radius:18px; background:#f6fbff; display:grid; gap:10px; }
 .l12-transcript ol { margin:0; padding-inline-start:22px; display:grid; gap:6px; }
-.l12-bubble { margin:0; max-width:88%; padding:10px 14px; border-radius:16px 16px 16px 4px; background:#fff; box-shadow:var(--soft-2); line-height:1.65; }
+.l12-bubble { margin:0; max-width:min(88%,calc(100% - 58px)); padding:10px 14px; border-radius:16px 16px 16px 4px; background:#fff; box-shadow:var(--soft-2); line-height:1.65; }
 .l12-bubble b { display:block; font-size:13px; color:var(--blue-2); }
-.l12-bubble.alt { justify-self:end; border-radius:16px 16px 4px 16px; background:#fff8e3; }
-.l12-bubble.alt b { color:#c06a22; }
+/* Speakers: a round picture next to every line; the second voice answers from the other side */
+.l12-line { display:flex; align-items:flex-end; gap:10px; }
+.l12-line.alt { flex-direction:row-reverse; }
+.l12-line.alt .l12-bubble { border-radius:16px 16px 4px 16px; background:#fff8e3; }
+.l12-line.alt .l12-bubble b { color:#c06a22; }
+.l12-face { flex:none; display:grid; place-items:center; width:48px; height:48px; border-radius:50%; overflow:hidden; background:#fdf9ec; border:2px solid #fff; box-shadow:0 0 0 2px #cfe3f7; color:var(--blue-2); font-weight:800; font-size:18px; }
+.l12-face img { display:block; width:100%; height:100%; object-fit:cover; }
+.l12-face.letter { background:#eef5ff; }
+.l12-line.alt .l12-face { box-shadow:0 0 0 2px #ffd9a8; }
+.l12-line.alt .l12-face.letter { background:#fff4dc; color:#c06a22; }
+.l12-faces { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:6px; }
+.l12-face-chip { display:inline-flex; align-items:center; gap:7px; color:var(--ink-2); font-size:14px; font-weight:700; }
+.l12-face-chip .l12-face { width:40px; height:40px; font-size:15px; }
 .l12-task-grid { list-style:none; margin:0 0 26px; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
 .l12-task-card { width:100%; height:100%; display:flex; align-items:center; gap:14px; padding:16px 18px; text-align:start; cursor:pointer; transition:transform .15s,box-shadow .15s; }
 .l12-task-card:hover { transform:translateY(-2px); box-shadow:var(--soft-3); }
@@ -251,8 +274,14 @@
 
 /* Phones */
 @media (max-width:650px) {
- .l12-intro { grid-template-columns:minmax(0,1fr) 96px; gap:12px; padding:20px; }
- .l12-intro-art { width:96px; height:84px; }
+ .l12-intro { grid-template-columns:minmax(0,1fr) 112px; gap:12px; padding:20px; }
+ .l12-intro-art { width:112px; height:104px; border-radius:16px; }
+ .l12-feature-art { width:84px; height:74px; }
+ .l12-word-pic { width:88px; height:74px; }
+ .l12-word-media { display:block; position:relative; flex:none; }
+ .l12-word-media .l12-say { position:absolute; inset-inline-end:-8px; bottom:-8px; width:36px; height:36px; box-shadow:var(--soft-2); }
+ .l12-word-tile.has-pic { padding-inline-end:12px; }
+ .l12-flash-pic { height:160px; }
  .l12-intro h1 { font-size:25px; }
  .l12-intro p { font-size:15px; }
  .l12-steps ol { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
@@ -293,7 +322,9 @@
  .l12-task-grid { grid-template-columns:minmax(0,1fr); }
  .l12-player { flex-wrap:wrap; }
  .l12-player .btn { width:100%; }
- .l12-bubble { max-width:100%; }
+ .l12-bubble { max-width:calc(100% - 50px); }
+ .l12-line { gap:8px; }
+ .l12-line .l12-face { width:42px; height:42px; }
 }
 @media (prefers-reduced-motion:reduce) {
  .l12-step,.l12-option,.l12-say,.l12-task-card { transition:none; }

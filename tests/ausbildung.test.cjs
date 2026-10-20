@@ -105,3 +105,25 @@ test('the chapter page, the listening page and the catalogue link are wired up',
  const {siteLanguages}=load('site-languages');const {turkishNote}=load('ausbildung-course');
  for(const language of siteLanguages)if(language.id!=='tr')assert(turkishNote[language.id],language.id);
 });
+
+test('every Lektion 12 picture belongs to a part, a word or a speaker and its file exists',()=>{
+ const course=load('ausbildung-course');const art=load('ausbildung-art');const hoeren=load('ausbildung-hoeren');
+ const file=src=>path.join('public',src.replace(/^\//,''));
+ const pictures=[art.hoerenPicture,...Object.values(art.partPictures).filter(Boolean),...Object.values(art.wordPictures)];
+ for(const picture of pictures){assert(fs.existsSync(file(picture.src)),picture.src);assert.match(picture.fill,/^#[0-9a-f]{6}$/);assert(picture.crop.width===picture.width&&picture.crop.height===picture.height,picture.src);}
+ assert.equal(art.partPictures.test,null);
+ for(const part of course.lessonParts)if(part.id!=='test')assert(art.partPictures[part.id],part.id);
+ // Word pictures are keyed by the exact German column of the word tables.
+ const words=new Set(course.lessonParts.flatMap(part=>part.sections.flatMap(section=>section.blocks.flatMap(block=>block.t==='vocab'?block.words.map(word=>word[0]):[]))));
+ for(const key of Object.keys(art.wordPictures))assert(words.has(key),key);
+ const speakers=new Set(hoeren.hoerenTasks.flatMap(task=>(task.lines??[]).map(line=>line.who)));
+ for(const [who,src] of Object.entries(art.speakerPictures)){assert(speakers.has(who),who);assert(fs.existsSync(file(src)),src);}
+ // Every shipped picture is used.
+ const used=new Set([...pictures.map(picture=>picture.src),...Object.values(art.speakerPictures)].map(src=>path.basename(src)));
+ for(const name of fs.readdirSync('public/toon/lektion12'))assert(used.has(name),name);
+ // ... and shown: part cards, the listening page, word tiles and cards, speakers in the dialogues.
+ assert(fs.readFileSync('app/ausbildung-study.tsx','utf8').includes('partPictures[part.id]'));
+ assert(fs.readFileSync('app/ausbildung-hoeren.tsx','utf8').includes('art={hoerenPicture}'));
+ const ui=fs.readFileSync('app/ausbildung-ui.tsx','utf8');assert(ui.includes('<WordPicture de={word[0]}/>')&&ui.includes('className="l12-flash-pic"'));
+ assert(fs.readFileSync('app/ausbildung-listen.tsx','utf8').includes('<SpeakerFace who={line.who}/>'));
+});

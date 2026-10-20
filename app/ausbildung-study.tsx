@@ -13,19 +13,19 @@ import {useLanguageSwitch} from './language-switch';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
-import {TopicArt} from './toon-art';
+import {RasterArt,TopicArt} from './toon-art';
+import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
 import {ProgressMeter} from './progress-ui';
 import {ExerciseView,Flashcards,LessonBlocks,Rich,TeachingCard,readKnown,readScores,teachingCards,type Speech} from './ausbildung-ui';
 import {LISTEN_CHANGED,ListenTask,SpeedToggle,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
 const unit=courseUnits.find(item=>item.id==='book-12')!;
 const partParam=(value:string|null):L12PartId|null=>value&&lessonPartMap.has(value as L12PartId)?value as L12PartId:null;
-/** The picture of each part, from the site's own illustrations. */
-const partArt:Record<L12PartId,string>={a:'book-02',b:'a12-07',c:'a12-03',d:'book-19',schreiben:'a12-10',test:'',pruefung:'book-18',magazin:'book-06'};
 export const KOKO_SRC='/branding/koko-mascot.png';
+/** The picture of each part (public/toon/lektion12); the „Alles klar?" test shows Koko. */
 function PartArt({part}:{part:L12Part}){
- const id=partArt[part.id];
- return id?<TopicArt id={id} title={part.de}/>:<img className="l12-koko" src={KOKO_SRC} alt="" width={400} height={329}/>;
+ const picture=partPictures[part.id];
+ return picture?<RasterArt art={picture} title={part.de}/>:<img className="l12-koko" src={KOKO_SRC} alt="" width={400} height={329}/>;
 }
 const stepLabel:Record<L12Step,string>={kelimeler:'Kelimeler',konu:'Konu anlatımı',alistirmalar:'Alıştırmalar',dinleme:'Dinleme'};
 const stepGo:Record<L12Step,string>={kelimeler:'Kelimelere geç',konu:'Konu anlatımına geç',alistirmalar:'Alıştırmalara geç',dinleme:'Dinlemeye geç'};
@@ -123,7 +123,7 @@ function Overview({unitName,scores,tick,onOpen,language}:{unitName:string;scores
     <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
    </button>
    <a className="housing-feature panel l12-listen-feature" href={AUSBILDUNG_PATH+'/hoeren'}>
-    <span className="housing-letter l12-letter" aria-hidden="true"><Headphones size={26}/></span>
+    <span className="l12-feature-art" aria-hidden="true"><RasterArt art={hoerenPicture} title="Hören"/></span>
     <div><h2>Hören · 14 dinleme</h2><p>{listened?`${listened} / ${hoerenTasks.length} bölüm yapıldı`:'Diyalogları dinle, soruları cevapla.'}</p></div>
     <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
    </a>

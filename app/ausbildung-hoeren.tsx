@@ -10,7 +10,8 @@ import {hoerenTasks,type HoerenTask} from '@/lib/ausbildung-hoeren';
 import {useLanguageSwitch} from './language-switch';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
-import {TopicArt} from './toon-art';
+import {RasterArt} from './toon-art';
+import {hoerenPicture} from '@/lib/ausbildung-art';
 import {LISTEN_CHANGED,ListenTask,SpeedToggle,listenPart,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
 /** Lektion 12 – Hören: the 14 listening sections; one section at a time (?bolum=1 … 14). */
@@ -55,7 +56,7 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
    {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
    {player.warning&&<p className="object-alert" role="status">{player.warning}</p>}
    {task?<TaskView task={task} player={player} onOpen={open}/>:<section aria-labelledby="l12-heading">
-    <div className="toon-hero housing-hero l12-hero"><div><span className="eyebrow" lang="de">Lektion 12 · Ausbildung</span><h1 id="l12-heading" tabIndex={-1} lang="de">Hören</h1><p>14 dinleme bölümü. Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku.</p><SpeedToggle player={player}/></div><div className="toon-hero-art"><TopicArt id="book-12" title="Hören"/></div></div>
+    <div className="toon-hero housing-hero l12-hero"><div><span className="eyebrow" lang="de">Lektion 12 · Ausbildung</span><h1 id="l12-heading" tabIndex={-1} lang="de">Hören</h1><p>14 dinleme bölümü. Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku.</p><SpeedToggle player={player}/></div><div className="toon-hero-art l12-hero-art"><RasterArt art={hoerenPicture} title="Hören"/></div></div>
     <div className="housing-feature-grid"><button type="button" className="housing-feature panel l12-resume" onClick={()=>open((hoerenTasks.find(item=>!results[item.id])??hoerenTasks[0]).number)}><span className="housing-letter l12-letter" aria-hidden="true"><Headphones size={26}/></span><div><h2>{done?'Sıradaki bölümü dinle':'İlk bölümle başla'}</h2><p>{done} / {hoerenTasks.length} bölüm yapıldı</p></div><ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/></button>
      <a className="housing-feature panel" href={AUSBILDUNG_PATH}><span className="housing-letter l12-letter" aria-hidden="true">12</span><div><h2>Lektion 12'ye dön</h2><p>Kelimeler, konu anlatımı ve alıştırmalar</p></div><ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/></a></div>
     <ol className="l12-task-grid">{hoerenTasks.map(item=>{const result=results[item.id];const perfect=!!result&&result.right===result.total;return <li key={item.id}><button type="button" className={'panel l12-task-card'+(result?(perfect?' perfect':' partial'):'')} data-l12-hoeren-card={item.number} onClick={()=>open(item.number)}>

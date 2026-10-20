@@ -4,6 +4,8 @@ import {ArrowRight,Check,CheckCircle2,Eye,EyeOff,Layers,Lightbulb,RotateCcw,Shuf
 import {useAnswerSound} from './study-shared';
 import {exampleSpeech,frameSpeech,gradeExercise,gradeItem,matchesAnswer,wordSpeech,type L12Block,type L12Exercise,type L12Item,type L12Section,type L12Value,type L12Word} from '@/lib/ausbildung-course';
 import {wordArticle,type L12ScoreMap} from '@/lib/ausbildung-progress';
+import {wordPicture} from '@/lib/ausbildung-art';
+import {RasterArt} from './toon-art';
 
 /** Inline markup: *German* (marked as German) and **bold**. */
 export function Rich({text}:{text:string}){
@@ -27,13 +29,19 @@ export function GermanWord({de}:{de:string}){
  return <span className="l12-word" lang="de" dir="ltr">{main.split(' / ').map((option,n)=>{
   const article=wordArticle(option);const rest=article?option.slice(article.length+1):option;
   return <Fragment key={n}>{n>0&&<span className="l12-or"> / </span>}{article&&<span className={'l12-article l12-'+article}>{article}</span>}<strong>{rest.split('|').map((piece,i)=><Fragment key={i}>{i>0&&<span className="l12-sep">|</span>}{piece}</Fragment>)}</strong></Fragment>;
- })}{plural&&<small className="l12-plural" title="çoğul">{plural}</small>}</span>;
+ })}{plural&&<small className={'l12-plural'+(plural.length>14?' long':'')} title="çoğul">{plural}</small>}</span>;
+}
+
+/** The word's picture, when it has one (the word itself is written next to it). */
+export function WordPicture({de,className='l12-word-pic'}:{de:string;className?:string}){
+ const picture=wordPicture(de);
+ return picture?<span className={className} aria-hidden="true"><RasterArt art={picture} title={de.replace(/\|/g,'')}/></span>:null;
 }
 
 export function WordGrid({words,speech,known}:{words:readonly L12Word[];speech:Speech;known?:ReadonlySet<string>}){
- return <ul className="l12-word-grid">{words.map(word=><li key={word[0]} className={'l12-word-tile'+(known?.has(word[0])?' known':'')}>
+ return <ul className="l12-word-grid">{words.map(word=><li key={word[0]} className={'l12-word-tile'+(known?.has(word[0])?' known':'')+(wordPicture(word[0])?' has-pic':'')}>
+  {wordPicture(word[0])?<div className="l12-word-media"><WordPicture de={word[0]}/><SayButton text={wordSpeech(word)} speech={speech}/></div>:<SayButton text={wordSpeech(word)} speech={speech}/>}
   <div className="l12-word-text"><GermanWord de={word[0]}/><span className="l12-word-tr"><Rich text={word[1]}/></span></div>
-  <SayButton text={wordSpeech(word)} speech={speech}/>
  </li>)}</ul>;
 }
 
@@ -62,6 +70,8 @@ export function Flashcards({id,words,speech,onClose,onChange}:{id:string;words:r
    <div className="object-actions">{round.again.length>0&&<button type="button" className="btn orange" onClick={()=>restart(round.again)}><RotateCcw size={18} aria-hidden="true"/>Bilmediklerimi tekrar et ({round.again.length})</button>}<button type="button" className="btn secondary" onClick={()=>restart([...words])}>Baştan başla</button><button type="button" className="btn" onClick={onClose}>Listeye dön</button></div>
   </div>:<>
    <button type="button" className={'l12-flash'+(flipped?' flipped':'')} aria-live="polite" onClick={()=>setFlipped(value=>!value)}>
+    {/* the picture goes with the meaning: on the front when the meaning is asked first, otherwise after turning */}
+    {(reverse||flipped)&&<WordPicture de={card[0]} className="l12-flash-pic"/>}
     <span className="l12-card-face">{reverse?<span className="l12-card-tr"><Rich text={card[1]}/></span>:<GermanWord de={card[0]}/>}</span>
     {flipped?<span className="l12-card-back">{reverse?<GermanWord de={card[0]}/>:<Rich text={card[1]}/>}</span>:<small className="l12-card-hint">Düşün, sonra kartı çevirmek için dokun</small>}
    </button>

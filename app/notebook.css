@@ -31,7 +31,7 @@
 .tape-1 .nb-tape { background:rgba(156,203,255,.7); transform:rotate(4deg); }
 .tape-2 .nb-tape { background:rgba(255,179,198,.7); }
 .tape-3 .nb-tape { background:rgba(139,224,122,.6); transform:rotate(2deg); }
-.nb-photo { height:150px; border-radius:4px; overflow:hidden; background:#fbf7ef; }
+.nb-photo { height:176px; border-radius:4px; overflow:hidden; background:#fbf7ef; }
 .nb-photo .toon-art { width:100%; height:100%; transition:transform .35s ease; }
 .nb-card:hover .nb-photo .toon-art { transform:scale(1.05); }
 .nb-num { font-family:var(--nb-serif); font-style:italic; color:#c06a22; font-weight:600; font-size:15px; margin-top:6px; }
@@ -59,7 +59,7 @@
  [dir=rtl] .nb-page { padding:40px 40px 26px 16px; background:linear-gradient(270deg,transparent 26px,var(--nb-margin) 26px,var(--nb-margin) 28px,transparent 28px),repeating-linear-gradient(180deg,transparent 0 33px,var(--nb-line) 33px 34px); }
  .nb-title { font-size:24px; margin-bottom:22px; }
  .nb-grid { grid-template-columns:minmax(0,1fr); gap:28px; }
- .nb-photo { height:170px; }
+ .nb-photo { height:200px; }
 }
 @media (prefers-reduced-motion:reduce) {
  .nb-card,.nb-card:nth-child(even),.nb-card:hover { transform:none; animation:none; }

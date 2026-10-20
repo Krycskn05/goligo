@@ -79,10 +79,12 @@
  .progress-fill::after,.progress-streak.lit .progress-stat-icon,.round-xp,.progress-summary { animation:none; }
 }
 
-/* Ana sayfa: ilerleme sol menünün en altında (bilgisayarda sol alt köşede sabit, telefonda menü düğmelerinin altında). */
-.work-sidebar:has(.sidebar-progress) { position:relative; top:auto; align-self:stretch; display:flex; flex-direction:column; gap:14px; }
-.work-sidebar:has(.sidebar-progress) nav { position:sticky; top:16px; }
-.sidebar-progress { position:sticky; bottom:16px; margin-top:auto; display:grid; gap:7px; padding:14px; border-radius:20px; background:#fff; border:2px solid #fff; box-shadow:0 8px 24px rgba(28,82,130,.12); }
+/* Ana sayfa: ilerleme sol menünün altında. Bilgisayarda menü ve ilerleme tek bir sütun olarak
+ * ekranda kalır, ikisi hiç üst üste binmez (ekran kısaysa sütun kendi içinde kayar); telefonda
+ * menü düğmelerinin altında. */
+.work-sidebar:has(.sidebar-progress) { position:sticky; top:0; align-self:start; display:flex; flex-direction:column; gap:14px; max-height:100vh; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+.work-sidebar:has(.sidebar-progress) nav { position:static; }
+.sidebar-progress { position:static; display:grid; gap:7px; padding:14px; border-radius:20px; background:#fff; border:2px solid #fff; box-shadow:0 8px 24px rgba(28,82,130,.12); }
 .sidebar-progress h2 { display:flex; align-items:center; gap:6px; margin:0; font-size:14px; font-weight:800; letter-spacing:0; color:#1f3b5c; }
 .sidebar-progress h2 svg { color:#f0a132; }
 .sidebar-progress-level { display:flex; align-items:center; justify-content:space-between; gap:8px; }
@@ -98,7 +100,7 @@
 .sidebar-progress-areas a:hover { color:#1f3b5c; }
 .sidebar-progress-areas strong { color:#1f3b5c; }
 @media (max-width:760px) {
- .work-sidebar:has(.sidebar-progress) { display:block; }
+ .work-sidebar:has(.sidebar-progress) { display:block; position:static; max-height:none; overflow:visible; }
  .work-sidebar:has(.sidebar-progress) nav { position:static; }
  .sidebar-progress { position:static; margin-top:10px; }
 }

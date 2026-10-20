@@ -130,7 +130,9 @@ test('home, Ev ve Yaşam and Nesne Kasası show the progress interface',()=>{
  assert(!main.includes('<SidebarProgress')&&!home.includes('<ProgressSummaryPanel'),'no progress panel in the main column');
  const header=fs.readFileSync('app/site-header.tsx','utf8');
  assert(!header.includes('site-progress')&&!home.includes('stats={course'),'no progress bar in the header');
- assert(fs.readFileSync('app/progress.css','utf8').includes('.sidebar-progress { position:sticky; bottom:16px; margin-top:auto;'));
+ // Menu and progress stay on screen as one column, so the progress never slides over the menu links.
+ const progressCss=fs.readFileSync('app/progress.css','utf8');
+ assert(progressCss.includes('.work-sidebar:has(.sidebar-progress) { position:sticky; top:0; align-self:start;')&&progressCss.includes('.sidebar-progress { position:static;'));
  const page=fs.readFileSync('app/housing-study.tsx','utf8');
  assert(page.includes('housingProgress(item.id,snapshot.reviews)')&&page.includes("housingProgress('all',snapshot.reviews)")&&page.includes('<RoundReward'));
  const vault=fs.readFileSync('app/object-study.tsx','utf8');

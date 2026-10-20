@@ -875,3 +875,10 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 @keyframes puzzle-wave { 0%,100% { transform:translateY(0); } 45% { transform:translateY(-8px) scale(1.08); } }
 html[data-lernkoko-motion="reduced"] .puzzle-empty.filled,html[data-lernkoko-motion="reduced"] .puzzle-empty.shake,html[data-lernkoko-motion="reduced"] .letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; }
 @media (prefers-reduced-motion:reduce) { .puzzle-empty.filled,.puzzle-empty.shake,.letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; } }
+/* Nesne Kasası: "Tüm nesneler" is the only big card; on wide screens it spans the page with the picture on the left. */
+.vault-feature-grid:has(> :only-child) { grid-template-columns:minmax(0,1fr); }
+@media (min-width:761px) {
+ .vault-feature-grid > .vault-mode-card.featured:only-child > .vault-category-open { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:28px; align-items:center; }
+ .vault-feature-grid > .vault-mode-card.featured:only-child .vault-category-art { margin-bottom:0; }
+}
+

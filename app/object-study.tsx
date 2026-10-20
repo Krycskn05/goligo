@@ -33,7 +33,7 @@ const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objec
 const groupImages:Record<string,string>={'objects-house':'dach','objects-furniture':'sessel','objects-kitchen':'teekanne','objects-cleaning':'putzeimer','objects-tools':'bohrmaschine','objects-building':'schubkarre','objects-nature':'kaktus','objects-moving':'karton'};
 function categoryName(group:string,language:VaultLanguage){return group==='all'?vaultText(language,'allObjects'):groupKeys[group]?vaultText(language,groupKeys[group]):objectGroups.find(item=>item.id===group)?.title??group;}
 function CategoryArt({group,title}:{group:string;title:string}){
- if(group==='all'||group==='resume')return <HeroArt variant={group==='all'?'objects':'course'} alt={title}/>;
+ if(group==='all')return <HeroArt variant="objects" alt={title}/>;
  const id=groupImages[group]??objectVocabulary.find(word=>word.topic===group)?.id;
  return id?<ObjectArt id={id} title={title}/>:null;
 }
@@ -60,13 +60,10 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const pickPicture=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[],_options?:ObjectPickOptions)=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds):pickPictureQuiz;
  const pickWriting=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[],_options?:ObjectPickOptions)=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds,true):pickObjectWritingQuiz;
  const pickListening=course==='en'?(group:string,count:number|'all',reviews:Snapshot['reviews'],reviewOnly=false,onlyIds?:string[],_options?:ObjectPickOptions)=>pickEnglishObjectQuiz(group,count,reviews,reviewOnly,onlyIds,false,true):pickObjectListeningQuiz;
- const topicPrefix=course==='en'?'en-objects-':'objects-';
  const [snapshot,setSnapshot]=useState<Snapshot>(blank);
  const [ready,setReady]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState<VaultCopyKey|null>(null);const [signIn,setSignIn]=useState(false);
- const [initializing,setInitializing]=useState(true);
  const [practiceMode,setPracticeMode]=useState<PracticeMode>('test');
  const [view,setView]=useState<'categories'|'configure'>('categories');const [group,setGroup]=useState('all');const [subgroup,setSubgroup]=useState('all');const [count]=useState<PictureQuizSize>('all');
- const [requestedResume,setRequestedResume]=useState<string|null>(null);
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);
  const [feedback,setFeedback]=useState<Answer|null>(null);const [selected,setSelected]=useState('');
  const [heardQuestionId,setHeardQuestionId]=useState<string|null>(null);const [starBusy,setStarBusy]=useState(false);
@@ -82,9 +79,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const articleQuestion=course==='de'&&q&&isArticleChallenge(q)?q:undefined;
  const pronunciation=articleQuestion?articleFullAnswer(articleQuestion):currentWord?(course==='en'?englishObjectName(currentWord.id):currentWord.de):q?.answer??'';
  const finished=!!session&&index>=session.questions.length;
- const latest=snapshot.sessions.find(s=>s.topic.startsWith(topicPrefix)&&['visual','write','listen'].includes(s.mode)&&!s.finished_at);
- const resumeId=requestedResume??latest?.id??snapshot.activePictureSessionId;
- const resumeSummary=snapshot.sessions.find(s=>s.id===resumeId);
  const scopedQuestions=Array.from(questionMap.values()).filter(item=>modePredicate(practiceMode)(item)&&(group==='all'||item.topic===(course==='en'?'en-':'')+group)&&inObjectSubgroup(item,subgroup));
  const availableCount=scopedQuestions.length;
  const selectedSubgroup=objectSubgroups.find(item=>item.id===subgroup);
@@ -98,15 +92,15 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   catch(e){if(mounted.current)setReady(false);fail(e,'loadError');}
  }
  useEffect(()=>{
-  mounted.current=true;setRequestedResume(new URLSearchParams(window.location.search).get('session'));
-  void refresh().finally(()=>{if(mounted.current)setInitializing(false);});
+  mounted.current=true;
+  void refresh();
   return()=>{mounted.current=false;};
  },[]);
  useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=vaultDirection(language);document.title=vaultText(language,'vaultTitle')+' · '+SITE_NAME;stopFeedback();},[language]);
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
  function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setNounArticle('');setArticleWarning(false);setShowHint(false);pendingAnswer.current=null;}
- function overview(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('categories');setError(null);setRequestedResume(null);void refresh();focus('vault-heading');}
+ function overview(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('categories');setError(null);void refresh();focus('vault-heading');}
  function chooseCategory(id:string,mode:PracticeMode=practiceMode){if(mutation.current)return;stopFeedback();setGroup(id);setSubgroup('all');setPracticeMode(mode);setView('configure');setError(null);pendingStart.current=null;focus('vault-config-heading');}
  async function start(reviewOnly=false,onlyIds?:string[]){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
@@ -117,7 +111,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   if(!request.ids.length){setError(reviewOnly?'emptyReview':'emptyQuestions');mutation.current=false;setBusy(false);return;}
   try{
    const data=await api<{session:Session}>({action:'start',id:request.id,mode:practiceMode==='write'?'write':practiceMode==='listen'?'listen':'visual',topic:request.topic,count:request.ids.length,onlyIds:request.ids},'',course);
-   if(!mounted.current)return;setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;setRequestedResume(null);focus();
+   if(!mounted.current)return;setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;focus();
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
@@ -127,15 +121,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   try{await api({action:'note',key,value},'',course);}
   catch(e){if(mounted.current){setSnapshot(previous=>({...previous,notes:{...previous.notes,[key]:value?'':'1'}}));fail(e,'starError');}}
   finally{if(mounted.current)setStarBusy(false);}
- }
- async function resume(id:string){
-  if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
-  try{
-   const data=await api<{session:Session}>(undefined,'?session='+encodeURIComponent(id),course);
-   if(!data.session.topic.startsWith(topicPrefix)||!['visual','write','listen'].includes(data.session.mode)||!data.session.questions.every(item=>modePredicate(data.session.mode)(questionMap.get(item.id)))){setError('legacyError');return;}
-   if(!mounted.current)return;const restored=data.session.topic.replace(/^en-/,'');setPracticeMode(data.session.mode==='write'?'write':data.session.mode==='listen'?'listen':'test');setGroup(restored==='objects-all'?'all':restored);setSubgroup('all');setSession(data.session);setIndex(data.session.answers.length);clearAnswer();focus();
-  }catch(e){fail(e,'sessionError');}
-  finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
  async function submit(answer:string){
   if(mutation.current||feedback||!session||!q||!answer.trim()||(options.length>0&&!options.includes(answer))||speech.isActive()||(session.mode==='listen'&&heardQuestionId!==q.id))return;
@@ -153,7 +138,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   }catch(e){fail(e,'saveError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
- function next(){if(mutation.current||!session||!feedback)return;stopFeedback();setIndex(i=>i+1);clearAnswer();focus();if(index+1>=session.questions.length){answerAudio.complete();setRequestedResume(null);void refresh();}}
+ function next(){if(mutation.current||!session||!feedback)return;stopFeedback();setIndex(i=>i+1);clearAnswer();focus();if(index+1>=session.questions.length){answerAudio.complete();void refresh();}}
  const options=q?(session?.questions[index]?.options??q.options??[]):[];
  // Word puzzles: the learner chooses der/die/das and spells the noun (the article is no longer given away).
  const articleSplit=course==='de'&&session?.mode==='write'&&q&&!articleQuestion?/^(der|die|das) (.+)$/.exec(q.answer):null;
@@ -207,7 +192,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
     <h1 id="vault-heading" tabIndex={-1}>{text('vaultTitle')}</h1>
     <div className="vault-feature-grid">
      {categoryCard('all',text('allObjects'),true)}
-     <article className={'vault-category-card vault-mode-card featured resume '+(busy||!ready||!resumeId?'unavailable':'')} data-vault-category="resume"><button type="button" className="vault-category-open" disabled={busy||!ready||!resumeId} onClick={()=>{if(resumeId)void resume(resumeId);}}><div className="vault-category-art"><CategoryArt group="resume" title={text('resume')}/></div><div className="vault-category-label"><h3>{text('resume')}</h3>{initializing?<p>{text('loading')}</p>:resumeSummary?<p>{text('progress',{n:resumeSummary.answered,total:resumeSummary.total})}</p>:<p>{text('noSavedTest')}</p>}<ArrowRight size={22} className="vault-direction-icon"/></div></button><div className="vault-resume-controls"><button type="button" className="btn secondary vault-resume-action" disabled={busy||!ready||!resumeId} onClick={()=>{if(resumeId)void resume(resumeId);}}><RotateCcw size={18}/>{text('resume')}<ArrowRight size={18} className="vault-direction-icon"/></button></div></article>
     </div>
     <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
    </section>}

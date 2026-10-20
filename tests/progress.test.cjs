@@ -141,3 +141,9 @@ test('home, Ev ve Yaşam and Nesne Kasası show the progress interface',()=>{
  const ui=fs.readFileSync('app/progress-ui.tsx','utf8');
  assert(!/speak|speechSynthesis/.test(ui),'progress never triggers speech');
 });
+
+test('the object vault shows no "continue where I left off" card and pages sit on a cream background',()=>{
+ const vault=fs.readFileSync('app/object-study.tsx','utf8');
+ assert(!vault.includes('data-vault-category="resume"')&&!vault.includes("text('resume')"),'no resume card in Nesne Kasası');
+ assert(fs.readFileSync('app/koko-theme.css','utf8').includes('body { --background:#fdf8ec; background:linear-gradient(180deg,#fbf3e1'));
+});

@@ -19,8 +19,8 @@
 }
 html { -webkit-text-size-adjust:100%; }
 body { font-family:var(--koko-font); font-optical-sizing:auto; color:var(--ink); font-size:17px; line-height:1.5; -webkit-font-smoothing:antialiased; }
-/* A pale sky behind every page, fixed so it stays calm while scrolling. */
-body { background:linear-gradient(180deg,var(--sky-1) 0,var(--sky-2) 60%,var(--sky-3) 100%) fixed; }
+/* A warm cream page behind every page (the learner's choice), fixed so it stays calm while scrolling. */
+body { --background:#fdf8ec; background:linear-gradient(180deg,#fbf3e1 0,#fdf8ec 60%,#fffcf5 100%) fixed; }
 h1,h2,h3 { font-weight:800; letter-spacing:-.02em; }
 strong { font-weight:700; }
 .eyebrow { color:var(--ink-3); font-weight:700; letter-spacing:.08em; }

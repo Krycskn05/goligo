@@ -1,0 +1,222 @@
+/*
+ * Lesson pages as an open spiral notebook (Lektion 11 and 12, markup: LessonBook in
+ * app/lesson-book.tsx): a soft blue cover, cream ruled pages with a red margin line and wire
+ * rings between the two pages. From 1000 px the pages lie side by side; below that they stack
+ * and the rings sit along the top. Headings use Lora (as the catalogue notebook), text stays Inter.
+ */
+.lb { --lb-paper:#fffdf6; --lb-line:#e3edf8; --lb-margin:#ffbccb; --lb-serif:"Lora",Georgia,"Times New Roman",serif; --lb-gutter:34px; position:relative; margin:18px 0 12px; color:var(--ink); }
+.housing-page:has(.lb) { width:min(1260px,100%); max-width:none; }
+.housing-lesson:has(.lb),.l12-part:has(.lb) { max-width:none; }
+
+/* Cover, pages and rings */
+.lb-spread { position:relative; display:grid; grid-template-columns:minmax(0,1fr) var(--lb-gutter) minmax(0,1fr); padding:10px; border-radius:24px; background:linear-gradient(160deg,#cfe0f1,#b9cfe6); box-shadow:0 22px 44px rgba(28,82,130,.17),inset 0 0 0 1px rgba(255,255,255,.55); }
+.lb-wide .lb-spread { grid-template-columns:minmax(0,9fr) var(--lb-gutter) minmax(0,16fr); }
+.lb-single { max-width:980px; margin-inline:auto; }
+.lb-single .lb-spread { grid-template-columns:minmax(0,1fr); margin-top:16px; }
+.lb-page { position:relative; min-width:0; padding:40px 30px 36px 64px; background:linear-gradient(90deg,transparent 44px,var(--lb-margin) 44px,var(--lb-margin) 46px,transparent 46px),repeating-linear-gradient(180deg,transparent 0 33px,var(--lb-line) 33px 34px),var(--lb-paper); }
+.lb-page:dir(rtl) { padding:40px 64px 36px 30px; background:linear-gradient(270deg,transparent 44px,var(--lb-margin) 44px,var(--lb-margin) 46px,transparent 46px),repeating-linear-gradient(180deg,transparent 0 33px,var(--lb-line) 33px 34px),var(--lb-paper); }
+.lb-left { border-radius:16px 3px 3px 16px; box-shadow:inset -30px 0 28px -26px rgba(120,96,50,.3); }
+.lb-right { border-radius:3px 16px 16px 3px; box-shadow:inset 30px 0 28px -26px rgba(120,96,50,.3); }
+.lb-left:dir(rtl) { border-radius:3px 16px 16px 3px; box-shadow:inset 30px 0 28px -26px rgba(120,96,50,.3); }
+.lb-right:dir(rtl) { border-radius:16px 3px 3px 16px; box-shadow:inset -30px 0 28px -26px rgba(120,96,50,.3); }
+.lb-single .lb-right,.lb-single .lb-right:dir(rtl) { border-radius:16px; box-shadow:none; }
+.lb-rings { position:relative; z-index:2; background:linear-gradient(90deg,#eadfc6,#fbf6ea 40%,#fbf6ea 60%,#eadfc6); }
+.lb-rings::before { content:""; position:absolute; inset:26px -8px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='30' viewBox='0 0 50 30'%3E%3Ccircle cx='8' cy='18' r='3.4' fill='%23cdbf9f'/%3E%3Ccircle cx='42' cy='18' r='3.4' fill='%23cdbf9f'/%3E%3Cpath d='M8 18C8 5 42 5 42 18' fill='none' stroke='%238ea4ba' stroke-width='4.2' stroke-linecap='round'/%3E%3Cpath d='M10.5 14C12.5 8.5 37.5 8.5 39.5 14' fill='none' stroke='%23f2f7fc' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") center top / 50px 30px repeat-y; }
+/* One page: the rings run along the top edge */
+.lb-single .lb-rings { position:absolute; top:-18px; left:26px; right:26px; height:40px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='40' viewBox='0 0 30 40'%3E%3Ccircle cx='15' cy='31' r='3.4' fill='%23cdbf9f'/%3E%3Crect x='9' y='3' width='12' height='30' rx='6' fill='none' stroke='%238ea4ba' stroke-width='4'/%3E%3Cpath d='M12 9v13' stroke='%23f2f7fc' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") left top / 30px 40px space no-repeat; }
+.lb-single .lb-rings::before { display:none; }
+
+/* Writing on the pages */
+.lb .eyebrow { color:#c06a22; }
+.lb-title { margin:8px 0 14px; font-family:var(--lb-serif); font-style:italic; font-weight:700; font-size:38px; line-height:1.18; letter-spacing:0; color:var(--ink); text-decoration:underline wavy #f6b25c; text-decoration-thickness:2px; text-underline-offset:9px; text-decoration-skip-ink:none; overflow-wrap:break-word; }
+.lb-sub { margin:0 0 10px; font-family:var(--lb-serif); font-weight:600; font-size:21px; color:#2f6b5e; }
+.lb-lead { margin:0 0 6px; font-size:16px; line-height:1.75; color:var(--ink-2); }
+.lb-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 12px; margin:0 0 6px; font-family:var(--lb-serif); font-style:italic; font-weight:700; font-size:30px; line-height:1.3; color:var(--ink); }
+.lb-heading small { font-family:inherit; font-style:normal; font-weight:600; font-size:14px; color:var(--ink-3); }
+.lb-subheading { margin:26px 0 2px; font-family:var(--lb-serif); font-style:italic; font-weight:700; font-size:22px; color:#c06a22; }
+.lb .vault-back-categories { margin:0 0 14px; }
+.lb .panel { border-radius:12px; border:1px solid #eee4d0; background:rgba(255,255,255,.86); box-shadow:0 8px 18px rgba(120,96,50,.08); }
+
+/* A photo taped onto the page */
+.lb-photo { position:relative; width:min(100%,330px); margin:26px auto 22px; padding:10px 10px 14px; background:#fff; border-radius:4px; box-shadow:0 12px 24px rgba(28,82,130,.14); transform:rotate(-2deg); }
+.lb-photo::before { content:""; position:absolute; top:-12px; left:50%; width:96px; height:24px; margin-left:-48px; background:rgba(255,214,102,.78); border-radius:3px; transform:rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.05); }
+.lb-photo .toon-art,.lb-photo .l12-koko { display:block; width:100%; height:210px; border-radius:2px; }
+
+/* Sticky notes (start, continue, listening) */
+.lb-notes { display:grid; gap:18px; margin-top:8px; }
+.lb .lb-note { position:relative; display:flex; align-items:center; gap:14px; width:100%; min-height:0; margin:0; padding:18px 18px 20px; border:0; border-radius:3px 3px 20px 3px; background:#fff3a6; color:var(--ink); text-align:start; font:inherit; text-decoration:none; cursor:pointer; box-shadow:0 12px 20px rgba(120,96,50,.15); transform:rotate(-1deg); transition:transform .15s ease,box-shadow .15s ease; }
+.lb .lb-note:nth-child(even) { background:#d8ebff; transform:rotate(.8deg); }
+.lb .lb-note:nth-child(3) { background:#ffdfe8; }
+.lb .lb-note:not(:disabled):hover { transform:rotate(0) translateY(-2px); box-shadow:0 16px 24px rgba(120,96,50,.18); }
+.lb .lb-note:disabled { opacity:.6; cursor:default; }
+.lb .lb-note:focus-visible { outline:3px solid var(--blue-2); outline-offset:3px; }
+.lb .lb-note>div { flex:1; min-width:0; }
+.lb .lb-note h2 { margin:0 0 4px; font-size:19px; line-height:1.3; }
+.lb .lb-note p { margin:0; font-size:14px; color:var(--ink-2); }
+.lb .lb-note .housing-letter { min-width:54px; min-height:54px; border-radius:50%; font-size:22px; background:rgba(255,255,255,.7); }
+.lb .lb-note .progress-meter { margin-top:10px; }
+.lb .lb-note>svg:last-child { flex:none; }
+
+/* What the unit teaches, as a ticked list on the left page */
+.lb-goals { margin:26px 0 0; padding:16px 0 0; border-top:1.5px dashed #dccfb3; }
+.lb-goals ul { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.lb-goals h2 { margin:0 0 10px; font-family:var(--lb-serif); font-style:italic; font-size:22px; color:#c06a22; }
+.lb-goals li { display:grid; grid-template-columns:22px minmax(0,1fr); gap:10px; align-items:start; font-size:15px; line-height:1.55; }
+.lb-goals li::before { content:""; width:18px; height:18px; margin-top:3px; border:2px solid #9cc8f0; border-radius:5px; background:#fff; }
+
+/* Contents (Inhalt): one row per part */
+.lb-toc { list-style:none; margin:10px 0 0; padding:0; display:grid; }
+.lb-toc-row { padding:14px 2px 16px; border-bottom:1.5px dashed #dccfb3; }
+.lb-toc-open,.lb .housing-card-open { display:grid; grid-template-columns:auto 92px minmax(0,1fr) auto; align-items:center; gap:14px; width:100%; padding:0; border:0; background:none; color:inherit; font:inherit; text-align:start; cursor:pointer; }
+.lb-toc-open:focus-visible,.lb-toc-more:focus-visible,.lb .housing-card-open:focus-visible,.lb .housing-card-bottom:focus-visible { outline:3px solid var(--blue-2); outline-offset:4px; border-radius:8px; }
+.lb-toc-badge { display:grid; place-items:center; min-width:46px; height:46px; padding:0 8px; border:2px solid #f0a94a; border-radius:999px; background:#fff7e6; color:#b25f12; font-family:var(--lb-serif); font-weight:700; font-size:19px; }
+.lb-toc-photo { display:block; width:92px; height:72px; padding:4px; border-radius:4px; background:#fff; box-shadow:0 6px 12px rgba(28,82,130,.13); transform:rotate(-2.5deg); }
+.lb-toc-row:nth-child(even) .lb-toc-photo { transform:rotate(2deg); }
+.lb-toc-photo .toon-art,.lb-toc-photo .l12-koko { display:block; width:100%; height:100%; }
+.lb-toc-text { display:grid; gap:3px; min-width:0; }
+.lb-toc-text strong { font-size:18px; line-height:1.3; color:var(--ink); }
+.lb-toc-text small { font-size:13.5px; line-height:1.5; color:var(--ink-2); }
+.lb-toc-meta { font-size:12px; font-weight:700; color:#2f6b5e; }
+.lb-toc-open>svg,.lb .housing-card-open>svg { flex:none; color:var(--blue-2); }
+.lb-toc-open:hover strong,.lb .housing-card-open:hover:enabled strong { color:var(--blue-2); text-decoration:underline; text-underline-offset:3px; }
+.lb-toc-row>.progress-meter,.lb-toc-row>.l12-test-badge,.lb .lb-toc-row>.housing-card-bottom { margin:10px 0 0; margin-inline-start:152px; }
+.lb .lb-toc-row>.housing-card-bottom { display:inline-flex; justify-content:flex-start; align-items:center; gap:6px; width:auto; margin-top:8px; padding:0; border:0; background:none; color:#28706a; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* Index tabs (the steps of a part) stick out above the right page */
+.lb-tabbed { margin-top:74px; }
+.lb .lb-right>.l12-steps { margin:-104px -8px 26px; }
+.lb .l12-steps ol { display:flex; align-items:flex-end; gap:6px; }
+.lb .l12-steps li { flex:1 1 0; min-width:0; }
+.lb .l12-step { height:auto; padding:10px 12px 18px; border:0; border-radius:14px 14px 0 0; background:#ffe9a8; box-shadow:0 -3px 8px rgba(28,82,130,.08); transform:translateY(10px); transition:transform .15s; }
+.lb .l12-steps li:nth-child(2) .l12-step { background:#d2e8ff; }
+.lb .l12-steps li:nth-child(3) .l12-step { background:#ffd7e3; }
+.lb .l12-steps li:nth-child(4) .l12-step { background:#d6f2cf; }
+.lb .l12-step:hover { transform:translateY(5px); box-shadow:0 -3px 8px rgba(28,82,130,.1); }
+.lb .l12-steps li .l12-step.active { transform:none; background:var(--lb-paper); box-shadow:0 -4px 10px rgba(28,82,130,.1); }
+.lb .l12-step .l12-step-number { width:30px; height:30px; font-size:14px; background:rgba(255,255,255,.75); }
+.lb .l12-step-text strong { font-size:15px; overflow-wrap:normal; word-break:normal; hyphens:manual; }
+.lb .l12-step-text strong svg { display:none; }
+.lb .l12-step.active .l12-step-number { background:#f6c46b; }
+.lb .l12-step.done .l12-step-number { background:#dff5d8; }
+
+/* Left page of a part: stays in view while the right page scrolls */
+.lb-sticky { position:sticky; top:18px; }
+.lb-sticky .progress-meter,.lb-sticky .l12-test-badge { margin-top:4px; }
+.lb-pager { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:20px; padding-top:14px; border-top:1.5px dashed #dccfb3; }
+.lb-pager .text-button { display:inline-flex; align-items:center; gap:6px; font-weight:700; }
+
+/* Sentence frames on a page: all parts of a sentence stay in one row */
+@media (min-width:651px) {
+ .lb .l12-frame-row .housing-sentence-frame { grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:8px; }
+ .lb .l12-frame-row .housing-sentence-part { padding:10px; }
+ .lb .l12-frame-row .housing-sentence-part strong { font-size:17px; overflow-wrap:break-word; }
+}
+
+/* Lektion 12 words on a wide right page: German and Turkish side by side, like a word notebook */
+@media (min-width:1000px) {
+ .lb-wide .lb-right .l12-word-grid { grid-template-columns:minmax(0,1fr); gap:10px; }
+ .lb-wide .lb-right .l12-word-text { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); align-items:center; gap:4px 16px; }
+ .lb-wide .lb-right .l12-word-tr { padding-inline-start:14px; border-inline-start:1.5px dashed #d8cfbb; }
+}
+
+/* Hören: the 14 sections as an index on the left page */
+.lb-index { list-style:none; margin:18px 0 0; padding:0; display:grid; gap:2px; }
+.lb-index-item { display:grid; grid-template-columns:34px minmax(0,1fr); align-items:center; gap:12px; width:100%; padding:8px 10px; border:0; border-radius:10px; background:none; color:inherit; font:inherit; text-align:start; cursor:pointer; }
+.lb-index-item:hover { background:rgba(255,255,255,.75); }
+.lb-index-item.active { background:#fff3a6; box-shadow:0 6px 12px rgba(120,96,50,.12); }
+.lb-index-item:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
+.lb-index-number { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; border:2px solid #9cc8f0; background:#fff; color:var(--blue-2); font-weight:800; font-size:14px; }
+.lb-index-item.perfect .lb-index-number { border-color:#8fd18a; background:#dff5d8; color:#2f7a31; }
+.lb-index-item.partial .lb-index-number { border-color:#f2c86a; background:#fff4d6; color:#8a5a00; }
+.lb-index-text { display:grid; min-width:0; }
+.lb-index-text small { color:var(--ink-3); font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+.lb-index-text strong { font-size:14px; line-height:1.35; color:var(--ink); }
+.lb-index-text em { font-style:normal; font-size:12px; font-weight:700; color:#2f7a31; }
+.lb-howto { margin:8px 0 22px; padding-inline-start:22px; display:grid; gap:8px; font-size:16px; line-height:1.6; }
+.lb-start { display:grid; justify-items:start; gap:8px; }
+.lb-start small { color:var(--ink-3); font-weight:700; }
+.lb .l12-task-top { display:none; }
+
+/* Left page of lesson notes: the cards of the lesson as a numbered list */
+.lb .housing-lesson-intro { margin:0; padding:0; background:none; border:0; box-shadow:none; }
+.lb .housing-lesson-intro h2.lb-sub { margin:0 0 8px; font-size:20px; }
+.lb .housing-lesson-intro p { margin:0 0 8px; }
+.lb-contents { list-style:none; margin:18px 0 0; padding:14px 0 0; border-top:1.5px dashed #dccfb3; display:grid; gap:2px; }
+.lb-contents button { display:flex; align-items:baseline; gap:10px; width:100%; padding:7px 8px; border:0; border-radius:8px; background:none; color:var(--ink); font:inherit; font-size:15px; font-weight:600; line-height:1.4; text-align:start; cursor:pointer; }
+.lb-contents button:hover { background:rgba(255,255,255,.8); color:var(--blue-2); }
+.lb-contents button:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
+.lb-contents span { flex:none; min-width:24px; font-family:var(--lb-serif); font-style:italic; font-weight:700; color:#c06a22; }
+.lb .housing-teaching-card { scroll-margin-top:16px; }
+.lb-sticky:has(.lb-contents) { max-height:calc(100vh - 36px); overflow-y:auto; overscroll-behavior:contain; }
+.l12-step-page { display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
+.l12-step-page > * { min-width:0; }
+.lb-start-page .lb-photo { margin-top:10px; }
+
+/* Pages as worksheets: lesson cards and practice sit on the paper as notes */
+.lb .housing-lesson-stack,.lb .l12-step-body { gap:18px; }
+.lb .housing-teaching-card,.lb .housing-lesson-next,.lb .l12-next { padding:24px; }
+.lb .housing-teaching-card h2 { font-family:var(--lb-serif); font-style:italic; }
+.lb .housing-lesson-next,.lb .l12-next { background:#eefbe8; border-color:#d5ecc9; }
+.lb .object-practice { max-width:none; margin:0; }
+.lb .object-question { margin-bottom:0; }
+.lb .object-results { margin:0; box-shadow:none; border:0; background:transparent; padding:0; }
+.lb .practice-modes { margin-bottom:22px; }
+.lb .housing-remaining,.lb .housing-tip { margin-bottom:0; }
+
+@media (max-width:1099px) and (min-width:1000px) {
+ .lb-page { padding-inline:52px 22px; }
+ .lb-title { font-size:32px; }
+}
+/* Narrow two-page spreads: the tabs keep their words whole (no number circle, a tick when done) */
+@media (max-width:1199px) and (min-width:1000px) {
+ .lb .l12-step { padding:10px 10px 18px; }
+ .lb .l12-step .l12-step-number { display:none; }
+ .lb .l12-step-text strong { font-size:14px; }
+ .lb .l12-step.done .l12-step-text strong::before { content:"✓"; margin-inline-end:4px; color:#2f7a31; }
+}
+@media (max-width:999px) {
+ .lb .lb-spread,.lb-wide .lb-spread { grid-template-columns:minmax(0,1fr); margin-top:16px; padding:8px; border-radius:20px; }
+ .lb-rings { position:absolute; top:-18px; left:22px; right:22px; height:40px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='40' viewBox='0 0 30 40'%3E%3Ccircle cx='15' cy='31' r='3.4' fill='%23cdbf9f'/%3E%3Crect x='9' y='3' width='12' height='30' rx='6' fill='none' stroke='%238ea4ba' stroke-width='4'/%3E%3Cpath d='M12 9v13' stroke='%23f2f7fc' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") left top / 30px 40px space no-repeat; }
+ .lb-rings::before { display:none; }
+ .lb-left,.lb-left:dir(rtl) { border-radius:14px 14px 0 0; box-shadow:none; border-bottom:2px dashed #e4d8bd; }
+ .lb-right,.lb-right:dir(rtl) { border-radius:0 0 14px 14px; box-shadow:none; }
+ .lb-single .lb-right,.lb-single .lb-right:dir(rtl) { border-radius:14px; }
+ .lb-sticky { position:static; }
+ .lb-tabbed { margin-top:18px; }
+ .lb .lb-right>.l12-steps { margin:0 0 20px; }
+ .lb .l12-steps ol { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+ .lb .l12-step,.lb .l12-steps li .l12-step.active { height:100%; padding:10px; border-radius:12px; transform:none; box-shadow:0 4px 10px rgba(28,82,130,.08); }
+ .lb .l12-steps li .l12-step.active { box-shadow:0 0 0 3px #f6c46b; }
+ .lb .l12-step:hover { transform:none; }
+ .lb-hoeren.has-task .lb-left { display:none; }
+ .lb-hoeren.has-task .lb-right { border-radius:14px; }
+ .lb .l12-task-top { display:flex; }
+ .lb-photo { width:min(100%,300px); }
+ .lb-photo .toon-art,.lb-photo .l12-koko { height:180px; }
+}
+@media (max-width:650px) {
+ .lb-page,.lb-page:dir(rtl) { padding:34px 14px 24px 36px; background:linear-gradient(90deg,transparent 24px,var(--lb-margin) 24px,var(--lb-margin) 26px,transparent 26px),repeating-linear-gradient(180deg,transparent 0 33px,var(--lb-line) 33px 34px),var(--lb-paper); }
+ .lb-page:dir(rtl) { padding:34px 36px 24px 14px; background:linear-gradient(270deg,transparent 24px,var(--lb-margin) 24px,var(--lb-margin) 26px,transparent 26px),repeating-linear-gradient(180deg,transparent 0 33px,var(--lb-line) 33px 34px),var(--lb-paper); }
+ .housing-page:has(.lb) { padding-inline:8px; }
+ .lb .lb-spread,.lb-wide .lb-spread { padding:5px; }
+ .lb-single .lb-page,.lb-single .lb-page:dir(rtl) { padding:32px 12px 20px; background:repeating-linear-gradient(180deg,transparent 0 33px,var(--lb-line) 33px 34px),var(--lb-paper); }
+ .lb-title { font-size:29px; }
+ .lb-heading { font-size:25px; }
+ .lb-toc-open,.lb .housing-card-open { grid-template-columns:auto 72px minmax(0,1fr); gap:10px; }
+ .lb-toc-open>svg,.lb .housing-card-open>svg { display:none; }
+ .lb-toc-badge { min-width:38px; height:38px; font-size:16px; }
+ .lb-toc-photo { width:72px; height:58px; }
+ .lb-toc-text strong { font-size:16px; }
+ .lb-toc-row>.progress-meter,.lb-toc-row>.l12-test-badge,.lb .lb-toc-row>.housing-card-bottom { margin-inline-start:0; }
+ .lb .lb-note { padding:16px; }
+ .lb .lb-note .housing-letter { min-width:46px; min-height:46px; font-size:19px; }
+ .lb .housing-teaching-card,.lb .housing-lesson-next,.lb .l12-next { padding:18px; }
+ .lb-photo .toon-art,.lb-photo .l12-koko { height:160px; }
+ .lb-wide .lb-left .lb-photo { width:min(100%,250px); margin:22px auto 16px; }
+ .lb-wide .lb-left .lb-photo .toon-art,.lb-wide .lb-left .lb-photo .l12-koko { height:130px; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .lb .lb-note,.lb .lb-note:nth-child(even),.lb .lb-note:not(:disabled):hover,.lb-photo,.lb-toc-photo,.lb-toc-row:nth-child(even) .lb-toc-photo { transform:none; transition:none; }
+ .lb .l12-step { transition:none; }
+}
+html[data-lernkoko-motion=reduced] .lb .lb-note,html[data-lernkoko-motion=reduced] .lb .l12-step { transition:none; }

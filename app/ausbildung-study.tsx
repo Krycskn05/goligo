@@ -16,6 +16,7 @@ import {SiteFooter} from './site-footer';
 import {RasterArt,TopicArt} from './toon-art';
 import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
 import {ProgressMeter} from './progress-ui';
+import {LessonBook} from './lesson-book';
 import {ExerciseView,Flashcards,LessonBlocks,Rich,TeachingCard,readKnown,readScores,teachingCards,type Speech} from './ausbildung-ui';
 import {LISTEN_CHANGED,ListenTask,SpeedToggle,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
@@ -100,37 +101,49 @@ function partSummary(part:L12Part){
  const words=partWords(part).length;const exercises=part.exercises.length;const listen=part.listen?.length??0;
  return [words?words+' kelime':'',exercises?exercises+' alıştırma':'',listen?listen+' dinleme':''].filter(Boolean).join(' · ');
 }
+/** What Lektion 12 teaches, ticked off on the overview's left page. */
+const GOALS=['Ne yapabildiğini anlat: *Ich kann gut kochen.*','Planını söyle: *Ich will eine Ausbildung machen.*','Geçmişi anlat: *Ich bin nach Berlin gekommen.*','Zamanı söyle: *seit 2019 · vor zwei Jahren · in einem Jahr*','Resmî e-posta yaz: *Sehr geehrte Damen und Herren, …*'];
 function Overview({unitName,scores,tick,onOpen,language}:{unitName:string;scores:L12ScoreMap;tick:number;onOpen:(part:L12PartId,step?:L12Step)=>void;language:StudyLanguage}){
  const [last,setLast]=useState<Last|null>(null);const [listened,setListened]=useState(0);
  useEffect(()=>{setLast(readLast());setListened(hoerenTasks.filter(task=>listenResult(task)).length);},[tick]);
  const lastPart=last?lessonPartMap.get(last.part):undefined;
  const total=lessonProgress(scores);
- const card=(part:L12Part)=><article className="housing-card panel l12-card" data-l12-part={part.id} key={part.id}>
-  <button type="button" className="housing-card-open" onClick={()=>onOpen(part.id)}>
-   <div className="housing-card-top"><span className={'housing-letter l12-letter'+(part.badge.length>1?' wide':'')} aria-hidden="true">{part.badge}</span><div className="housing-card-art"><PartArt part={part}/></div></div>
-   <h2 lang="de" dir="ltr">{part.title}</h2>
-   <p><Rich text={part.card??part.lead}/></p>
+ // One line of the contents page: badge, taped picture, title, what is inside, progress.
+ const row=(part:L12Part)=><li className="lb-toc-row" data-l12-part={part.id} key={part.id}>
+  <button type="button" className="lb-toc-open" onClick={()=>onOpen(part.id)}>
+   <span className="lb-toc-badge" aria-hidden="true">{part.badge}</span>
+   <span className="lb-toc-photo" aria-hidden="true"><PartArt part={part}/></span>
+   <span className="lb-toc-text"><strong lang="de" dir="ltr">{part.title}</strong><small><Rich text={part.card??part.lead}/></small><span className="lb-toc-meta">{partSummary(part)}</span></span>
+   <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
   </button>
   {part.id==='test'?<TestBadge part={part} scores={scores}/>:<ProgressMeter progress={partProgress(part,scores)} language={language} label={part.de} compact/>}
-  <button type="button" className="housing-card-bottom" onClick={()=>onOpen(part.id)}><span>{partSummary(part)}</span><ArrowRight size={21} className="vault-direction-icon" aria-hidden="true"/></button>
- </article>;
+ </li>;
  return <section aria-labelledby="l12-heading">
-  <div className="toon-hero housing-hero l12-hero"><div><span className="eyebrow" lang="de">A1.2 · 12 · Ausbildung</span><h1 id="l12-heading" tabIndex={-1}>{unitName}</h1><p className="l12-hero-de" lang="de">Was wollen Sie noch lernen?</p><p>Meslek eğitimi, staj ve hayat hikâyeni anlatmak: <Rich text="*können / wollen*, Perfekt mit *sein*, *seit / vor / in* ve resmî e-posta."/></p></div><div className="toon-hero-art"><TopicArt id="book-12" title={unitName}/></div></div>
-  <div className="housing-feature-grid">
-   <button type="button" className="housing-feature panel l12-resume" onClick={()=>last?onOpen(last.part,last.step):onOpen('a','kelimeler')}>
-    <span className="housing-letter l12-letter" aria-hidden="true"><Play size={26}/></span>
-    <div><h2>{last?'Kaldığın yerden devam et':'Derse başla'}</h2><p>{lastPart&&last?lastPart.de+' · '+stepLabel[last.step]:'Teil A · Kelimeler'}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
-    <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
-   </button>
-   <a className="housing-feature panel l12-listen-feature" href={AUSBILDUNG_PATH+'/hoeren'}>
-    <span className="l12-feature-art" aria-hidden="true"><RasterArt art={hoerenPicture} title="Hören"/></span>
-    <div><h2>Hören · 14 dinleme</h2><p>{listened?`${listened} / ${hoerenTasks.length} bölüm yapıldı`:'Diyalogları dinle, soruları cevapla.'}</p></div>
-    <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
-   </a>
-  </div>
-  <div className="housing-section-grid">{lessonParts.slice(0,4).map(card)}</div>
-  <h2 className="vault-category-section-title l12-grid-title">Ünite sonu</h2>
-  <div className="housing-section-grid">{lessonParts.slice(4).map(card)}</div>
+  <LessonBook left={<>
+   <span className="eyebrow" lang="de">A1.2 · Lektion 12 · Ausbildung</span>
+   <h1 id="l12-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
+   <p className="lb-sub" lang="de">Was wollen Sie noch lernen?</p>
+   <p className="lb-lead">Meslek eğitimi, staj ve hayat hikâyeni anlatmak: <Rich text="*können / wollen*, Perfekt mit *sein*, *seit / vor / in* ve resmî e-posta."/></p>
+   <figure className="lb-photo"><TopicArt id="book-12" title={unitName}/></figure>
+   <div className="lb-notes">
+    <button type="button" className="housing-feature lb-note l12-resume" onClick={()=>last?onOpen(last.part,last.step):onOpen('a','kelimeler')}>
+     <span className="housing-letter l12-letter" aria-hidden="true"><Play size={24}/></span>
+     <div><h2>{last?'Kaldığın yerden devam et':'Derse başla'}</h2><p>{lastPart&&last?lastPart.de+' · '+stepLabel[last.step]:'Teil A · Kelimeler'}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
+     <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
+    </button>
+    <a className="housing-feature lb-note l12-listen-feature" href={AUSBILDUNG_PATH+'/hoeren'}>
+     <span className="l12-feature-art" aria-hidden="true"><RasterArt art={hoerenPicture} title="Hören"/></span>
+     <div><h2>Hören · 14 dinleme</h2><p>{listened?`${listened} / ${hoerenTasks.length} bölüm yapıldı`:'Diyalogları dinle, soruları cevapla.'}</p></div>
+     <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
+    </a>
+   </div>
+   <section className="lb-goals" aria-labelledby="l12-goals"><h2 id="l12-goals">Bu ünitede</h2><ul>{GOALS.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
+  </>} right={<>
+   <h2 className="lb-heading"><span lang="de">Inhalt</span><small>İçindekiler</small></h2>
+   <ol className="lb-toc">{lessonParts.slice(0,4).map(row)}</ol>
+   <h3 className="lb-subheading">Ünite sonu</h3>
+   <ol className="lb-toc">{lessonParts.slice(4).map(row)}</ol>
+  </>}/>
  </section>;
 }
 function TestBadge({part,scores}:{part:L12Part;scores:L12ScoreMap}){
@@ -156,21 +169,29 @@ function PartPage({part,step,scores,tick,speech,onScore,onOpen,language}:{part:L
  const done:Record<L12Step,boolean>={kelimeler:words.length>0&&known.size>=words.length,konu:!!seen[part.id],alistirmalar:checkable.length>0&&checked>=checkable.length,dinleme:!!part.listen&&listened>=part.listen.length};
  const goNext=()=>{if(step==='konu')markSeen(part.id);if(nextStep)onOpen(part.id,nextStep);else if(nextPart)onOpen(nextPart.id);else onOpen(null);};
  const nextText=nextStep?stepGo[nextStep]:nextPart?'Sonraki bölüm: '+nextPart.de:'Lektion 12\'ye dön';
- return <section className="housing-lesson l12-part" aria-labelledby="l12-heading">
-  <button type="button" className="text-button vault-back-categories" onClick={()=>onOpen(null)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Lektion 12</button>
-  <header className="panel housing-lesson-intro l12-intro">
-   <div className="l12-intro-text"><span className="eyebrow" lang="de">A1.2 · 12 · {part.de}</span><h1 id="l12-heading" tabIndex={-1} lang="de">{part.title}</h1><p><Rich text={part.lead}/></p></div>
-   <div className="l12-intro-art"><PartArt part={part}/></div>
-  </header>
-  {steps.length>1&&<nav className="l12-steps" aria-label="Bölümün adımları"><ol>{steps.map((item,i)=><li key={item}><button type="button" className={'l12-step'+(item===step?' active':'')+(done[item]?' done':'')} aria-current={item===step?'step':undefined} onClick={()=>onOpen(part.id,item)}>
-   <span className="l12-step-number" aria-hidden="true">{done[item]?<Check size={16}/>:i+1}</span>
-   <span className="l12-step-text"><strong><StepIcon step={item} size={15}/>{stepLabel[item]}</strong><small>{detail[item]}</small></span>
-  </button></li>)}</ol></nav>}
-  {step==='kelimeler'&&<WordsStep part={part} words={words} known={known} speech={speech} onKnown={setKnown}/>}
-  {step==='konu'&&<TopicStep part={part} speech={speech}/>}
-  {step==='alistirmalar'&&<ExerciseRunner part={part} scores={scores} onScore={onScore} onOpen={onOpen} language={language}/>}
-  {step==='dinleme'&&<ListenStep part={part}/>}
-  {step!=='alistirmalar'&&<div className="panel housing-lesson-next l12-next"><p>{step==='kelimeler'?'Kelimeleri dinledin, kartlarla denedin mi? Şimdi konuyu öğrenelim.':step==='konu'?'Konuyu okudun. Şimdi alıştırmalarla pekiştir.':'Dinleme bitti.'+(nextPart?' Sıradaki bölüme geçebilirsin.':'')}</p><button type="button" className="btn" onClick={goNext}>{nextText}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button></div>}
+ const previousPart=lessonParts[index-1];
+ return <section className="l12-part" aria-labelledby="l12-heading">
+  <LessonBook variant="wide" className={steps.length>1?'lb-tabbed':''} left={<div className="lb-sticky">
+   <button type="button" className="text-button vault-back-categories" onClick={()=>onOpen(null)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Lektion 12</button>
+   <span className="eyebrow" lang="de">A1.2 · 12 · {part.de}</span>
+   <h1 id="l12-heading" tabIndex={-1} lang="de" className="lb-title">{part.title}</h1>
+   <p className="lb-lead"><Rich text={part.lead}/></p>
+   <figure className="lb-photo"><PartArt part={part}/></figure>
+   {part.id==='test'?<TestBadge part={part} scores={scores}/>:<ProgressMeter progress={partProgress(part,scores)} language={language} label={part.de} compact/>}
+   <nav className="lb-pager" aria-label="Bölümler">{previousPart?<button type="button" className="text-button" onClick={()=>onOpen(previousPart.id)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{previousPart.de}</button>:<span/>}{nextPart?<button type="button" className="text-button" onClick={()=>onOpen(nextPart.id)}>{nextPart.de}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:null}</nav>
+  </div>} right={<>
+   {steps.length>1&&<nav className="l12-steps" aria-label="Bölümün adımları"><ol>{steps.map((item,i)=><li key={item}><button type="button" className={'l12-step'+(item===step?' active':'')+(done[item]?' done':'')} aria-current={item===step?'step':undefined} onClick={()=>onOpen(part.id,item)}>
+    <span className="l12-step-number" aria-hidden="true">{done[item]?<Check size={16}/>:i+1}</span>
+    <span className="l12-step-text"><strong><StepIcon step={item} size={15}/>{stepLabel[item]}</strong><small>{detail[item]}</small></span>
+   </button></li>)}</ol></nav>}
+   <div className="l12-step-page">
+    {step==='kelimeler'&&<WordsStep part={part} words={words} known={known} speech={speech} onKnown={setKnown}/>}
+    {step==='konu'&&<TopicStep part={part} speech={speech}/>}
+    {step==='alistirmalar'&&<ExerciseRunner part={part} scores={scores} onScore={onScore} onOpen={onOpen} language={language}/>}
+    {step==='dinleme'&&<ListenStep part={part}/>}
+    {step!=='alistirmalar'&&<div className="panel housing-lesson-next l12-next"><p>{step==='kelimeler'?'Kelimeleri dinledin, kartlarla denedin mi? Şimdi konuyu öğrenelim.':step==='konu'?'Konuyu okudun. Şimdi alıştırmalarla pekiştir.':'Dinleme bitti.'+(nextPart?' Sıradaki bölüme geçebilirsin.':'')}</p><button type="button" className="btn" onClick={goNext}>{nextText}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button></div>}
+   </div>
+  </>}/>
  </section>;
 }
 

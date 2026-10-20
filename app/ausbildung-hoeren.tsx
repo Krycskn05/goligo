@@ -11,6 +11,7 @@ import {useLanguageSwitch} from './language-switch';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
 import {RasterArt} from './toon-art';
+import {LessonBook} from './lesson-book';
 import {hoerenPicture} from '@/lib/ausbildung-art';
 import {LISTEN_CHANGED,ListenTask,SpeedToggle,listenPart,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
@@ -55,16 +56,23 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
    <div className="object-breadcrumb"><a href="/?learn=de&level=A1.2">A1.2</a><span aria-hidden="true">›</span><a href={AUSBILDUNG_PATH}>Lektion 12 · Ausbildung</a><span aria-hidden="true">›</span>{task?<><a href={AUSBILDUNG_PATH+'/hoeren'} onClick={event=>{event.preventDefault();open(null);}}>Hören</a><span aria-hidden="true">›</span><span>{task.number}</span></>:<span>Hören</span>}</div>
    {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
    {player.warning&&<p className="object-alert" role="status">{player.warning}</p>}
-   {task?<TaskView task={task} player={player} onOpen={open}/>:<section aria-labelledby="l12-heading">
-    <div className="toon-hero housing-hero l12-hero"><div><span className="eyebrow" lang="de">Lektion 12 · Ausbildung</span><h1 id="l12-heading" tabIndex={-1} lang="de">Hören</h1><p>14 dinleme bölümü. Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku.</p><SpeedToggle player={player}/></div><div className="toon-hero-art l12-hero-art"><RasterArt art={hoerenPicture} title="Hören"/></div></div>
-    <div className="housing-feature-grid"><button type="button" className="housing-feature panel l12-resume" onClick={()=>open((hoerenTasks.find(item=>!results[item.id])??hoerenTasks[0]).number)}><span className="housing-letter l12-letter" aria-hidden="true"><Headphones size={26}/></span><div><h2>{done?'Sıradaki bölümü dinle':'İlk bölümle başla'}</h2><p>{done} / {hoerenTasks.length} bölüm yapıldı</p></div><ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/></button>
-     <a className="housing-feature panel" href={AUSBILDUNG_PATH}><span className="housing-letter l12-letter" aria-hidden="true">12</span><div><h2>Lektion 12'ye dön</h2><p>Kelimeler, konu anlatımı ve alıştırmalar</p></div><ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/></a></div>
-    <ol className="l12-task-grid">{hoerenTasks.map(item=>{const result=results[item.id];const perfect=!!result&&result.right===result.total;return <li key={item.id}><button type="button" className={'panel l12-task-card'+(result?(perfect?' perfect':' partial'):'')} data-l12-hoeren-card={item.number} onClick={()=>open(item.number)}>
-     <span className="l12-task-number" aria-hidden="true">{result&&perfect?<Check size={18}/>:item.number}</span>
-     <span className="l12-task-text"><small lang="de">{listenPart(item.number)}</small><strong lang="de">{item.title}</strong>{result&&<span className="l12-task-score">{result.right} / {result.total} doğru</span>}</span>
-     <ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/>
+   {/* An open notebook: the 14 sections as an index on the left page, the open section on the right. */}
+   <LessonBook variant="wide" className={'lb-hoeren'+(task?' has-task':'')} left={<>
+    <span className="eyebrow" lang="de">Lektion 12 · Ausbildung</span>
+    {task?<p className="lb-title" lang="de">Hören</p>:<h1 id="l12-heading" tabIndex={-1} className="lb-title" lang="de">Hören</h1>}
+    <p className="lb-lead">14 dinleme bölümü · {done} / {hoerenTasks.length} yapıldı</p>
+    <SpeedToggle player={player}/>
+    <ol className="lb-index" aria-label="Dinleme bölümleri">{hoerenTasks.map(item=>{const result=results[item.id];const perfect=!!result&&result.right===result.total;const current=item.number===task?.number;return <li key={item.id}><button type="button" className={'lb-index-item'+(current?' active':'')+(result?(perfect?' perfect':' partial'):'')} data-l12-hoeren-card={item.number} aria-current={current?'page':undefined} onClick={()=>open(item.number)}>
+     <span className="lb-index-number" aria-hidden="true">{result&&perfect?<Check size={16}/>:item.number}</span>
+     <span className="lb-index-text"><small lang="de">{listenPart(item.number)}</small><strong lang="de">{item.title}</strong>{result&&<em>{result.right} / {result.total} doğru</em>}</span>
     </button></li>;})}</ol>
-   </section>}
+    <nav className="lb-pager" aria-label="Lektion 12"><a className="text-button" href={AUSBILDUNG_PATH}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>Lektion 12'ye dön</a></nav>
+   </>} right={task?<TaskView task={task} player={player} onOpen={open}/>:<div className="lb-start-page">
+    <h2 className="lb-heading">Nasıl çalışırım?</h2>
+    <ol className="lb-howto"><li>Önce metni görmeden iki kez dinle.</li><li>Soruları cevapla, sonra „Kontrol et"e bas.</li><li>En son metni aç ve dinlerken oku.</li></ol>
+    <figure className="lb-photo"><RasterArt art={hoerenPicture} title="Hören"/></figure>
+    <div className="lb-start"><button type="button" className="btn l12-resume" onClick={()=>open((hoerenTasks.find(item=>!results[item.id])??hoerenTasks[0]).number)}><Headphones size={20} aria-hidden="true"/>{done?'Sıradaki bölümü dinle':'İlk bölümle başla'}</button><small>{done} / {hoerenTasks.length} bölüm yapıldı</small></div>
+   </div>}/>
   </main>
   <SiteFooter/>
  </div>;
@@ -72,7 +80,7 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
 
 function TaskView({task,player,onOpen}:{task:HoerenTask;player:ReturnType<typeof useListenPlayer>;onOpen:(number:number|null)=>void}){
  const index=hoerenTasks.findIndex(item=>item.id===task.id);const previous=hoerenTasks[index-1];const next=hoerenTasks[index+1];
- return <section className="housing-lesson l12-part" aria-labelledby="l12-heading">
+ return <section className="l12-part l12-task-page" aria-labelledby="l12-heading">
   <div className="l12-task-top"><button type="button" className="text-button vault-back-categories" onClick={()=>onOpen(null)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Tüm bölümler</button><SpeedToggle player={player}/></div>
   <h1 id="l12-heading" tabIndex={-1} className="l12-sr">Hören {task.number}</h1>
   <ListenTask key={task.id} task={task} player={player} onNext={next?()=>onOpen(next.number):undefined} nextLabel={next?'Sonraki bölüm ('+next.number+')':undefined}/>

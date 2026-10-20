@@ -8,6 +8,7 @@ import "./koko-theme.css";
 import "./members.css";
 import "./ausbildung.css";
 import "./notebook.css";
+import "./lesson-book.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

@@ -93,15 +93,21 @@ test('example sentences and sentence frames are read aloud, but not years or sla
 
 test('the chapter page, the listening page and the catalogue link are wired up',()=>{
  for(const file of ['app/a1-2/ausbildung/page.tsx','app/a1-2/ausbildung/hoeren/page.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx','app/ausbildung-listen.tsx','app/ausbildung-ui.tsx','app/ausbildung.css'])assert(fs.existsSync(file),file);
- // The lesson is built from the site's own lesson pieces (Ev ve Yaşam cards, lesson cards, practice screens).
+ // The lesson is an open notebook (LessonBook) filled with the site's own lesson pieces (lesson cards, practice screens).
  const study=fs.readFileSync('app/ausbildung-study.tsx','utf8');
- for(const piece of ['housing-section-grid','housing-card','toon-hero','housing-lesson-intro','ProgressMeter','object-practice'])assert(study.includes(piece),piece);
+ for(const piece of ['<LessonBook','lb-toc-row','lb-note','housing-lesson-next','ProgressMeter','object-practice'])assert(study.includes(piece),piece);
  assert(fs.readFileSync('app/layout.tsx','utf8').includes('import "./ausbildung.css";'));
  const home=fs.readFileSync('app/category-study.tsx','utf8');assert(home.includes("unit.id==='book-12'?'/a1-2/ausbildung'")&&home.includes("unit.id==='book-11'?'/a1-2/ev-ve-yasam'"));
  // The catalogue is a spiral notebook: level tabs, ruled page, taped unit photos, "coming soon" for units without lessons.
  for(const piece of ['className="nb-tabs"','className="nb-spiral"','nb-card','nb-tape',"c(language,'comingSoon')"])assert(home.includes(piece),piece);
  assert(fs.readFileSync('app/layout.tsx','utf8').includes('import "./notebook.css";'));
  assert(fs.readFileSync('app/learning-effects.tsx','utf8').includes('.nb-tabs button'));
+ // Inside, both lessons are open spiral notebooks: two pages on wide screens, one under the other on phones.
+ assert(fs.readFileSync('app/layout.tsx','utf8').includes('import "./lesson-book.css";'));
+ const book=fs.readFileSync('app/lesson-book.tsx','utf8');for(const piece of ['lb-spread','lb-left','lb-rings','lb-right'])assert(book.includes(piece),piece);
+ for(const file of ['app/housing-study.tsx','app/ausbildung-hoeren.tsx'])assert(fs.readFileSync(file,'utf8').includes('<LessonBook'),file);
+ const notes=fs.readFileSync('app/housing-lesson.tsx','utf8');assert(notes.includes('lb-spread')&&notes.includes('lb-rings')&&!notes.includes("from './lesson-book'"),'lesson notes write the notebook markup themselves');
+ assert(fs.readFileSync('app/ausbildung-hoeren.tsx','utf8').includes('className="lb-index"'));
  const {siteLanguages}=load('site-languages');const {turkishNote}=load('ausbildung-course');
  for(const language of siteLanguages)if(language.id!=='tr')assert(turkishNote[language.id],language.id);
 });

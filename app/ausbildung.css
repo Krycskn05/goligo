@@ -1,7 +1,8 @@
 /*
- * Lektion 12 „Ausbildung". The page is built from the site's own pieces (the Ev ve Yaşam cards,
- * lesson cards and practice screens); this file only adds what those pieces do not have:
- * word tiles, word cards, the step bar, the exercise answers and the listening cards.
+ * Lektion 12 „Ausbildung". The pages are an open notebook (app/lesson-book.css, shared with
+ * Lektion 11) filled with the site's own lesson pieces (lesson cards, practice screens); this file
+ * only adds what those pieces do not have: word tiles, word cards, the step tabs, the exercise
+ * answers and the listening player.
  */
 .l12-page { padding-bottom:50px; }
 .l12-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -9,20 +10,14 @@
 .l12-de { font-weight:700; color:#1d4f86; }
 .l12-app .eyebrow { text-transform:uppercase; font-size:12px; }
 
-/* Overview */
-.l12-hero .l12-hero-de { font-size:20px; font-weight:800; color:#2f6b5e; margin:-6px 0 10px; }
-.l12-hero p .l12-de { color:#1f3b5c; }
+/* Overview notes */
 .l12-letter { flex-shrink:0; }
-.l12-letter.wide { font-size:22px; padding:0 10px; }
 .l12-resume .progress-meter { margin-top:10px; }
 .housing-feature.l12-resume>div,.housing-feature.l12-listen-feature>div { flex:1; min-width:0; }
 .l12-app a.housing-feature { text-decoration:none; color:inherit; }
-.l12-grid-title { margin:8px 0 16px; }
-.l12-card .housing-card-art { display:grid; place-items:center; border-radius:18px; overflow:hidden; }
 /* Pictures cut from the learner's picture sheets (public/toon/lektion12) sit on their own cream background. */
 .l12-feature-art { flex:none; width:96px; height:84px; border-radius:18px; overflow:hidden; border:2px solid #fff; box-shadow:var(--soft-2); }
-.l12-feature-art .toon-art,.l12-hero-art .toon-art { width:100%; height:100%; }
-.l12-hero-art { border-radius:24px; overflow:hidden; }
+.l12-feature-art .toon-art { width:100%; height:100%; }
 .l12-koko { display:block; width:100%; height:100%; object-fit:contain; }
 .l12-test-badge { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 4px; padding:10px 14px; border-radius:14px; background:#fff8dc; border:1px solid #ffe6a3; color:#6a4400; font-weight:700; font-size:14px; }
 .l12-test-badge small { font-weight:600; }
@@ -30,12 +25,6 @@
 /* Part page */
 .l12-part { display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
 .l12-part > *,.l12-step-body > * { min-width:0; }
-.l12-part > .vault-back-categories { margin:4px 0 -4px; justify-self:start; }
-.l12-intro { display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:20px; align-items:center; margin:0; }
-.l12-intro h1 { margin:10px 0 12px; }
-.l12-intro p { margin:0; font-size:17px; }
-.l12-intro-art { width:220px; height:180px; border-radius:20px; overflow:hidden; }
-.l12-intro-art .toon-art { width:100%; height:100%; }
 
 /* Steps: Kelimeler → Konu anlatımı → Alıştırmalar → Dinleme */
 .l12-steps ol { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
@@ -256,34 +245,18 @@
 .l12-faces { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:6px; }
 .l12-face-chip { display:inline-flex; align-items:center; gap:7px; color:var(--ink-2); font-size:14px; font-weight:700; }
 .l12-face-chip .l12-face { width:40px; height:40px; font-size:15px; }
-.l12-task-grid { list-style:none; margin:0 0 26px; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-.l12-task-card { width:100%; height:100%; display:flex; align-items:center; gap:14px; padding:16px 18px; text-align:start; cursor:pointer; transition:transform .15s,box-shadow .15s; }
-.l12-task-card:hover { transform:translateY(-2px); box-shadow:var(--soft-3); }
-.l12-task-card > svg { flex:none; color:var(--blue-2); }
-.l12-task-number { flex:none; display:grid; place-items:center; width:46px; height:46px; border-radius:16px; background:#efe9ff; color:#6b4fd0; font-size:19px; font-weight:800; }
-.l12-task-card.perfect .l12-task-number { background:#dff5d8; color:#2f7a31; }
-.l12-task-card.partial .l12-task-number { background:#fff4d6; color:#8a5a00; }
-.l12-task-text { flex:1; min-width:0; display:grid; gap:3px; }
-.l12-task-text small { color:var(--ink-3); font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
-.l12-task-text strong { font-size:16px; line-height:1.35; }
-.l12-task-score { color:#2f7a31; font-weight:700; font-size:13px; }
 .l12-task-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
 .l12-task-top .vault-back-categories { margin:0; }
-.l12-hero .l12-speed { margin-top:4px; }
 .l12-pager { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 
 /* Phones */
 @media (max-width:650px) {
- .l12-intro { grid-template-columns:minmax(0,1fr) 112px; gap:12px; padding:20px; }
- .l12-intro-art { width:112px; height:104px; border-radius:16px; }
  .l12-feature-art { width:84px; height:74px; }
  .l12-word-pic { width:88px; height:74px; }
  .l12-word-media { display:block; position:relative; flex:none; }
  .l12-word-media .l12-say { position:absolute; inset-inline-end:-8px; bottom:-8px; width:36px; height:36px; box-shadow:var(--soft-2); }
  .l12-word-tile.has-pic { padding-inline-end:12px; }
  .l12-flash-pic { height:160px; }
- .l12-intro h1 { font-size:25px; }
- .l12-intro p { font-size:15px; }
  .l12-steps ol { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
  .l12-step { padding:10px; gap:8px; border-radius:16px; }
  .l12-step-number { width:30px; height:30px; font-size:14px; }
@@ -319,7 +292,6 @@
  .l12-actions .btn { flex:1 1 auto; }
  .l12-results-head { flex-direction:column; text-align:center; }
  .l12-results-head .l12-koko { width:96px; }
- .l12-task-grid { grid-template-columns:minmax(0,1fr); }
  .l12-player { flex-wrap:wrap; }
  .l12-player .btn { width:100%; }
  .l12-bubble { max-width:calc(100% - 50px); }
@@ -327,7 +299,7 @@
  .l12-line .l12-face { width:42px; height:42px; }
 }
 @media (prefers-reduced-motion:reduce) {
- .l12-step,.l12-option,.l12-say,.l12-task-card { transition:none; }
- .l12-step:hover,.l12-option:hover,.l12-task-card:hover { transform:none; }
+ .l12-step,.l12-option,.l12-say { transition:none; }
+ .l12-step:hover,.l12-option:hover { transform:none; }
  .l12-say.playing,.l12-results-head .l12-koko { animation:none; }
 }

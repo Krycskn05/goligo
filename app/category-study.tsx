@@ -21,36 +21,46 @@ import type {Snapshot} from '@/lib/study';
 import {api} from './study-shared';
 import {housingProgress,type TopicProgress} from '@/lib/progress';
 import {ProgressMeter,SidebarProgress} from './progress-ui';
+import {HomeTour} from './home-tour';
+import {InstallGuide} from './install-guide';
 
-export default function CategoryStudy(){
+/** home = the welcome page at "/" (Koko's tour of the site); units = the units catalogue at /konular. */
+export type HomePage='home'|'units';
+
+export default function CategoryStudy({page='home'}:{page?:HomePage}){
  const [language,setLanguage]=useState<StudyLanguage>('tr');
  const [course,setCourse]=useState<LearningLanguage>('de');
  const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
+ // Old links to the catalogue ("/?level=A1.2") now open it at /konular.
+ useEffect(()=>{if(page!=='home')return;const level=new URLSearchParams(window.location.search).get('level');if(level==='A1.1'||level==='A1.2')window.location.replace('/konular?level='+level);},[page]);
  // The saved language is applied once its language pack has loaded (Turkish meanwhile shows the loading line).
  useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('german-study-language');setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}if(saved&&isStudyLanguage(saved))switchLanguage(saved,()=>setLoaded(true));else setLoaded(true);},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);try{localStorage.setItem('german-study-language',language);saveLearningLanguage(localStorage,course);}catch{}},[language,course,loaded]);
  function changeCourse(value:LearningLanguage){window.speechSynthesis?.cancel();setCourse(value);const url=new URL(window.location.href);url.searchParams.set('learn',value);window.history.replaceState(null,'',url);}
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <Workshop language={language} onLanguage={switchLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>;
+ return <Workshop page={page} language={language} onLanguage={switchLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>;
 }
-export function Workshop({language,onLanguage,course='de',onCourse}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;course?:LearningLanguage;onCourse?:(value:LearningLanguage)=>void}){
+export function Workshop({page='units',language,onLanguage,course='de',onCourse}:{page?:HomePage;language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;course?:LearningLanguage;onCourse?:(value:LearningLanguage)=>void}){
+ const home=page==='home'&&course==='de';
  const [level,setLevel]=useState<CourseLevel>('A1.1');
  useEffect(()=>{if(new URLSearchParams(window.location.search).get('level')==='A1.2')setLevel('A1.2');},[]);
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null);
  // Progress is read from the signed-in learner's saved answers; it stays hidden if they cannot be loaded.
- useEffect(()=>{if(course!=='de'){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course]);
+ // The home page only introduces the site, so it loads no progress.
+ useEffect(()=>{if(course!=='de'||home){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course,home]);
  // Lektion 12 keeps its progress in this browser; its helpers load only when the catalogue needs them.
  const [ausbildung,setAusbildung]=useState<TopicProgress|null>(null);
- useEffect(()=>{if(course!=='de'){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course]);
+ useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={languageDirection(language)} lang={language}>
   <a className="skip-link" href="#main">{t(language,'skip')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref={'/?learn='+course} homeLabel={t(language,'home')} showHome={false}/>
-  <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}><a className="work-nav active" href="#curriculum" aria-current="page"><NavIcon name="units"/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><NavIcon name="vault"/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<><a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><NavIcon name="verbs"/>{verbText(language,'workshopTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=oyunlar" data-verb-section-link="games"><NavIcon name="games"/>{verbText(language,'gamesTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=yanlislar" data-verb-section-link="mistakes"><NavIcon name="mistakes"/>{verbText(language,'mistakesTitle')}</a></>}</nav>{course==='de'&&snapshot?.stats&&<SidebarProgress stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}</aside>
+  <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}>{course==='de'&&<a className={'work-nav'+(home?' active':' object-nav-link')} href="/" aria-current={home?'page':undefined}><NavIcon name="home"/>{vaultText(language,'home')}</a>}<a className={'work-nav'+(home?' object-nav-link':' active')} href={home?'/konular':'#curriculum'} aria-current={home?undefined:'page'}><NavIcon name="units"/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><NavIcon name="vault"/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<><a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><NavIcon name="verbs"/>{verbText(language,'workshopTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=oyunlar" data-verb-section-link="games"><NavIcon name="games"/>{verbText(language,'gamesTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=yanlislar" data-verb-section-link="mistakes"><NavIcon name="mistakes"/>{verbText(language,'mistakesTitle')}</a></>}</nav><InstallGuide language={language}/>{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}</aside>
    <main id="main" className="work-main" tabIndex={-1}>
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}
+    {home?<HomeTour language={language}/>:<>
     <section className="toon-hero"><div><span className="eyebrow">{learningText(language,course)}</span><h1 id="work-heading" tabIndex={-1}>{c(language,'catalogTitle')}</h1></div><div className="toon-hero-art"><HeroArt/></div></section>
     {/* The catalogue as a spiral notebook: level tabs, ruled paper, unit photos taped onto the page. */}
     <section id="curriculum" className="nb" aria-labelledby="curriculum-heading">
@@ -71,6 +81,7 @@ export function Workshop({language,onLanguage,course='de',onCourse}:{language:St
       </div>
      </div>
     </section>
+    </>}
    </main>
   </div><SiteFooter/>
  </div>;

@@ -29,3 +29,12 @@ CREATE TABLE IF NOT EXISTS auth_attempts (
   count INTEGER NOT NULL,
   window_start INTEGER NOT NULL
 );
+
+-- Giriş kayıtları: her girişin zamanı (yönetici panelinde "Girişler"). En fazla 90 gün tutulur;
+-- daha eskileri yeni bir giriş olduğunda silinir.
+CREATE TABLE IF NOT EXISTS member_logins (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  member_id TEXT NOT NULL,
+  at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS member_logins_member ON member_logins(member_id, at);

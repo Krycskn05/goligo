@@ -17,6 +17,7 @@ export default async function PrivacyPage(){
    <h2>Hangi bilgileri saklıyoruz?</h2>
    <ul>
     <li><strong>Hesap bilgileri:</strong> adın, e-posta adresin, üyelik ve son giriş tarihin, koşulları kabul ettiğin tarih.</li>
+    <li><strong>Giriş zamanların:</strong> her girişinin tarihi ve saati. Bu kayıtlar en fazla 90 gün saklanır.</li>
     <li><strong>Şifren:</strong> şifrenin kendisi saklanmaz. Yalnızca geri çevrilemeyen bir özeti (PBKDF2-SHA256, her üyeye ayrı tuz) saklanır.</li>
     <li><strong>Çalışma kayıtların:</strong> başlattığın testler, verdiğin cevaplar, doğru/yanlış sonuçları, tekrar listesi, yıldızların ve site içi notların.</li>
     <li><strong>Oturum çerezi:</strong> giriş yaptığında tarayıcına <code>lk_session</code> adlı bir çerez yazılır. İçinde rastgele bir anahtar vardır; 30 gün sonra ya da çıkış yapınca geçersiz olur.</li>
@@ -26,6 +27,7 @@ export default async function PrivacyPage(){
 
    <h2>Neden saklıyoruz?</h2>
    <p>Hesabını açmak, seni tanıyıp giriş yaptırmak, ilerlemeni kaydedip kaldığın yerden devam etmeni sağlamak, yanlışlarını tekrar göstermek ve hesabını kötüye kullanıma karşı korumak için. Bilgilerini reklam için kullanmayız, satmayız ve başkalarıyla paylaşmayız.</p>
+   <p>Site yöneticisi, siteyi geliştirmek için üyelerin çalışma istatistiklerini (giriş zamanları, çalışılan bölümler, doğru ve yanlış cevaplar) yalnızca kendisinin açabildiği bir yönetici panelinde görebilir. Bu bilgiler kimseyle paylaşılmaz.</p>
 
    <h2>Nerede saklanıyor?</h2>
    <p>Site ve veritabanı <strong>Cloudflare</strong> altyapısında (Cloudflare Workers ve D1) çalışır. Bu nedenle bilgilerin <strong>Türkiye dışındaki sunucularda</strong> işlenebilir ve saklanabilir. Üye olurken bunu kabul edersin. Sayfaların yazı tipi Google Fonts&apos;tan yüklenir; bu sırada tarayıcın Google sunucularına bağlanır.</p>

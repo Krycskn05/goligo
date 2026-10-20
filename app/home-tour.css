@@ -1,0 +1,54 @@
+/* Home page: the introduction of the site (app/home-tour.tsx) */
+.ht { display:grid; gap:20px; }
+.ht img { object-fit:contain; }
+.ht .toon-art,.ht .toon-hero-image { width:100%; height:100%; }
+
+/* Koko and the welcome */
+.ht-hero { display:grid; justify-items:center; text-align:center; gap:6px; padding:26px 30px 30px; border-radius:26px; background:#fff; box-shadow:var(--soft); }
+.ht-koko { width:150px; height:auto; animation:koko-float 4s ease-in-out infinite; }
+.ht-hero h1 { margin:4px 0 0; font-size:38px; outline:none; }
+.ht-hero p { margin:0; max-width:640px; color:var(--ink-2); font-size:17px; line-height:1.7; }
+
+/* One picture card per main part: the wide units card and the object vault, then the verb workshop, games and mistakes */
+.ht-title { margin:6px 0 0; font-size:24px; }
+.ht-grid { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.ht-grid>li:first-child { grid-column:span 2; }
+.ht-card { height:100%; display:grid; gap:6px; align-content:start; padding:12px 14px 16px; color:var(--ink); text-decoration:none; transition:transform .15s,box-shadow .15s; }
+.ht-card:hover { transform:translateY(-3px); box-shadow:var(--soft-3); }
+.ht-art { display:block; height:150px; border-radius:14px; overflow:hidden; background:#fbf7ef; }
+.ht-art img,.ht-art .toon-art { display:block; width:100%; height:100%; }
+.ht-name { display:flex; align-items:center; gap:10px; margin-top:4px; }
+.ht-name strong { font-size:18px; }
+.ht-name .nav-icon { width:32px; height:32px; }
+.ht-name .nav-icon svg { width:20px; height:20px; }
+.ht-card small { color:#c06a22; font-weight:700; font-size:12.5px; }
+.ht-text { color:var(--ink-2); font-size:14.5px; line-height:1.55; }
+
+@media (max-width:1100px) { .ht-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:760px) {
+ .ht-hero { padding:22px 18px 24px; }
+ .ht-koko { width:120px; }
+ .ht-hero h1 { font-size:28px; }
+ .ht-hero p { font-size:16px; }
+ .ht-grid { grid-template-columns:minmax(0,1fr); }
+ .ht-grid>li:first-child { grid-column:auto; }
+}
+@media (prefers-reduced-motion:reduce) { .ht-koko { animation:none; } .ht-card { transition:none; } }
+
+/* "Uygulama olarak indir": a menu button under the left menu and its window (app/install-guide.tsx) */
+.ig { display:block; }
+.ig-trigger { width:100%; border:0; font:inherit; text-align:start; cursor:pointer; }
+.ig-backdrop { position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:20px; background:rgba(18,32,48,.45); }
+.ig-panel { position:relative; width:min(400px,100%); max-height:calc(100vh - 40px); overflow-y:auto; padding:22px 22px 16px; border-radius:24px; background:#fff; box-shadow:0 24px 60px rgba(18,32,48,.3); text-align:start; }
+.ig-icon { display:block; width:64px; height:64px; margin:0 0 10px; border-radius:16px; box-shadow:0 6px 16px rgba(15,60,70,.25); }
+.ig-panel h2 { margin:0 30px 4px 0; font-size:20px; }
+.ig-panel:dir(rtl) h2 { margin:0 0 4px 30px; }
+.ig .ig-lead { margin:0 0 10px; color:var(--ink-2); font-size:14.5px; line-height:1.5; }
+.ig-close { position:absolute; top:12px; inset-inline-end:12px; display:grid; place-items:center; width:34px; height:34px; padding:0; border:0; border-radius:50%; background:#f3f5f8; color:var(--ink-2); cursor:pointer; }
+.ig-now { display:inline-flex; align-items:center; gap:6px; margin:0 0 10px; }
+.ig-os { padding:10px 0 4px; border-top:1px solid #eef1f4; }
+.ig-os h3 { margin:0 0 6px; font-size:14px; color:#0f6b78; }
+.ig-os ol { margin:0; padding-inline-start:20px; display:grid; gap:4px; color:var(--ink); font-size:14.5px; line-height:1.45; }
+.ig .ig-note { margin:8px 0 0; color:var(--ink-3); font-size:12.5px; line-height:1.45; }
+/* On a phone the window comes up from the bottom of the screen. */
+@media (max-width:760px) { .ig-backdrop { place-items:end center; padding:0; } .ig-panel { width:100%; border-radius:24px 24px 0 0; padding-bottom:calc(18px + env(safe-area-inset-bottom)); } }

@@ -1,0 +1,93 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
+const compiled=process.env.STUDY_CHECK_DIR;
+assert.ok(compiled,'Set STUDY_CHECK_DIR to compiled libraries.');
+const homeCopy=require(path.join(compiled,'home-copy.js'));
+const site=require(path.join(compiled,'site-languages.js'));
+const read=file=>fs.readFileSync(file,'utf8');
+
+test('the home page introduces the site; the units catalogue moved to /konular',()=>{
+ const page=read('app/page.tsx');
+ assert.ok(page.includes('<StudyApp page="home" />')&&page.includes('<Landing />'),'members see the introduction, visitors the landing page');
+ assert.ok(read('app/konular/page.tsx').includes('<StudyApp page="units"/>'));
+ const home=read('app/category-study.tsx');
+ assert.ok(home.includes('{home?<HomeTour language={language}/>:<>'),'the introduction replaces the catalogue on the home page');
+ // The introduction shows no progress: no sidebar progress panel and no progress requests on the home page.
+ assert.ok(home.includes("{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress ")&&home.includes("if(course!=='de'||home){setSnapshot(null);return;}"));
+ // The menu starts with "Ana sayfa"; "Üniteler ve konular" opens /konular from the home page.
+ const nav=home.slice(home.indexOf('<nav '),home.indexOf('</nav>'));
+ assert.ok(nav.indexOf('href="/"')<nav.indexOf("href={home?'/konular':'#curriculum'}"));
+ assert.ok(nav.includes('<NavIcon name="home"/>{vaultText(language,\'home\')}'));
+ // Old links to "/?level=A1.2" still reach the catalogue.
+ assert.ok(home.includes("window.location.replace('/konular?level='+level)"));
+ for(const file of ['app/housing-study.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx']){
+  const source=read(file);
+  assert.ok(!source.includes('/?learn=de&level=A1.2'),file);
+  assert.ok(source.includes('homeHref="/konular?level=A1.2"')&&source.includes('<a href="/konular?level=A1.2">A1.2</a>'),file);
+ }
+ assert.ok(read('app/layout.tsx').includes('import "./home-tour.css";'));
+ const icons=read('app/nav-icons.tsx');
+ for(const name of ['home','housing','ausbildung'])assert.ok(icons.includes(' '+name+':<>')&&read('app/koko-theme.css').includes('.nav-icon-'+name+' {'),name);
+});
+
+test('the introduction has one picture card per main part of the left menu, in menu order, and nothing else',()=>{
+ const tour=read('app/home-tour.tsx');
+ const parts=[...tour.matchAll(/\{id:'(\w+)',icon:'(\w+)',href:([^,]+),/g)].map(m=>[m[1],m[3]]);
+ assert.deepEqual(parts,[['units',"'/konular'"],['vault',"'/ev-esyalar?learn=de'"],['verbs',"'/fiiller'"],['games',"'/fiiller?bolum=oyunlar'"],['mistakes',"'/fiiller?bolum=yanlislar'"]]);
+ // The same parts and links as the left menu, and none of the lessons inside them (Ev ve Yaşam, Ausbildung).
+ const menu=read('app/category-study.tsx');
+ for(const href of ['/ev-esyalar?learn=','/fiiller','/fiiller?bolum=oyunlar','/fiiller?bolum=yanlislar'])assert.ok(menu.includes(href),href);
+ for(const lesson of ['/a1-2/ev-ve-yasam','AUSBILDUNG_PATH','housing','ausbildung'])assert.ok(!tour.includes(lesson),lesson);
+ // The whole card is the link; the picture is decoration.
+ assert.ok(tour.includes('<a className="ht-card panel" href={part.href}>')&&tour.includes('<span className="ht-art" aria-hidden="true">'));
+ // Only an introduction: no progress, lessons, verb of the day, sound or saved places.
+ for(const word of ['ProgressMeter','Progress(','speak(','useGermanSpeech','localStorage','api('])assert.ok(!tour.includes(word),word);
+});
+
+test('every home page text exists in all site languages',()=>{
+ const packs=Object.fromEntries(site.packLanguages.map(id=>[id,JSON.parse(read(`lib/language-packs/${id}.json`))]));
+ assert.deepEqual(Object.keys(homeCopy.homeCopy),['welcome','about','tourTitle','unitsText','vaultText','verbsText','gamesText','mistakesText','installButton','installTitle','installLead','iosStep1','iosStep2','iosStep3','androidStep1','androidStep2','androidStep3','installNow','installNote']);
+ for(const [key,tuple] of Object.entries(homeCopy.homeCopy)){
+  assert.equal(tuple.length,6,key);
+  for(const text of tuple)assert.ok(text.trim(),key);
+  for(const [id,pack] of Object.entries(packs))assert.ok(typeof pack[tuple[2]]==='string'&&pack[tuple[2]].trim(),id+': '+key);
+ }
+});
+
+const pngSize=file=>{const data=fs.readFileSync(file);assert.equal(data.toString('ascii',1,4),'PNG',file);return [data.readUInt32BE(16),data.readUInt32BE(20)];};
+
+test('the site has the Koko app icon for the browser tab, the phone home screen and the installed app',()=>{
+ const layout=read('app/layout.tsx');
+ assert.ok(layout.includes('<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />')&&layout.includes('<link rel="manifest" href="/manifest.json" />'));
+ assert.ok(layout.includes('<meta name="apple-mobile-web-app-title" content={SITE_NAME} />'),'the name under the icon is LernKoko');
+ assert.deepEqual(pngSize('public/apple-touch-icon.png'),[180,180]);
+ const manifest=JSON.parse(read('public/manifest.json'));
+ assert.equal(manifest.name,'LernKoko');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
+ const sizes=Object.fromEntries(manifest.icons.map(icon=>[icon.src,pngSize('public'+icon.src).join('x')]));
+ assert.deepEqual(sizes,{'/icons/icon-192.png':'192x192','/icons/icon-512.png':'512x512','/icons/icon-maskable-512.png':'512x512'});
+ assert.ok(manifest.icons.some(icon=>icon.purpose==='maskable'));
+ assert.ok(read('public/favicon.svg').includes('data:image/png;base64,')&&fs.existsSync('public/favicon.ico'),'the tab icon is Koko too');
+ // Browsers fetch these without the login cookie, so the site gate must let them through.
+ const auth=require(path.join(compiled,'member-auth.js'));
+ for(const file of ['/manifest.json','/apple-touch-icon.png','/favicon.ico','/favicon.svg',...manifest.icons.map(icon=>icon.src)])assert.ok(auth.isPublicPath(file),file);
+});
+
+test('"Uygulama olarak indir" in the left menu explains how to add LernKoko to the phone',()=>{
+ // A menu button right under the left menu (home page and units page), not in the welcome card.
+ const home=read('app/category-study.tsx');
+ const aside=home.slice(home.indexOf('<aside className="work-sidebar">'),home.indexOf('</aside>'));
+ assert.ok(aside.indexOf('</nav><InstallGuide language={language}/>')>0);
+ assert.ok(!read('app/home-tour.tsx').includes('InstallGuide'));
+ assert.equal(homeCopy.homeCopy.installButton[0],'Uygulama olarak indir');
+ const guide=read('app/install-guide.tsx');
+ assert.ok(guide.includes('className="work-nav object-nav-link ig-trigger"')&&guide.includes('<NavIcon name="app"/>'));
+ // The steps open in a window drawn on the page body (above the page's cards and pictures).
+ assert.ok(guide.includes('createPortal(')&&guide.includes(',document.body)')&&guide.includes('role="dialog" aria-modal="true"'));
+ // iPhone and Android steps; the phone's own steps only on a phone, both on a computer.
+ assert.ok(guide.includes("{platform==='android'?android:platform==='ios'?ios:<>{ios}{android}</>}"));
+ for(const key of ['iosStep1','iosStep2','iosStep3','androidStep1','androidStep2','androidStep3','installNote'])assert.ok(guide.includes("h('"+key+"')"),key);
+ // The browser's own install window when it offers one; nothing at all inside the installed app.
+ assert.ok(guide.includes("addEventListener('beforeinstallprompt',offer)")&&guide.includes('if(installed)return null;')&&guide.includes("matchMedia('(display-mode: standalone)')"));
+ assert.ok(guide.includes("event.key==='Escape'")&&guide.includes('opener?.focus()'));
+});

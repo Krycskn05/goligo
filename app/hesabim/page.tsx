@@ -5,6 +5,7 @@ import {getRawDb} from '@/db';
 import {SITE_NAME} from '@/lib/site-brand';
 import {SESSION_COOKIE,readCookie,signInPath} from '@/lib/member-auth';
 import {memberById,memberForToken,type Db,type Member} from '@/lib/member-store';
+import {isAdminEmail} from '@/lib/admin-access';
 import {getChatGPTUser} from '../chatgpt-auth';
 import AccountPanel from '../account-panel';
 import {PublicPage} from '../public-shell';
@@ -22,7 +23,8 @@ export default async function AccountPage(){
  }catch(error){console.error('Hesap bilgisi okunamadı',error);failed=true;}
  if(member){
   const since=new Date(member.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
-  return <PublicPage signedIn narrow><AccountPanel name={member.name} email={member.email} since={since}/></PublicPage>;
+  // Only the site owner (lib/admin-access.ts ADMIN_EMAILS) sees the way to the admin panel.
+  return <PublicPage signedIn narrow><AccountPanel name={member.name} email={member.email} since={since}/>{isAdminEmail(member.email)&&<p className="adm-entry"><a className="btn" href="/yonetim">Yönetici paneli</a></p>}</PublicPage>;
  }
  // Üyelik oturumu yok ama eski yöntemle (Cloudflare Access ya da yerel deneme girişi) girilmiş.
  return <PublicPage signedIn narrow>

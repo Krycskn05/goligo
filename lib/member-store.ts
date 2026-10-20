@@ -38,13 +38,19 @@ export async function setPasswordHash(db: Db, id: string, passwordHash: string):
   await db.prepare('UPDATE members SET password_hash=? WHERE id=?').bind(passwordHash, id).run();
 }
 
-/** Yeni oturum açar ve çereze yazılacak anahtarı döndürür. Üyenin süresi geçmiş oturumları temizlenir. */
+/** Giriş kayıtları (yönetici panelindeki "Girişler") en fazla bu kadar tutulur. */
+export const LOGIN_KEEP_MS = 90 * 24 * 60 * 60 * 1000;
+
+/** Yeni oturum açar ve çereze yazılacak anahtarı döndürür. Üyenin süresi geçmiş oturumları temizlenir;
+ * girişin zamanı member_logins tablosuna yazılır, 90 günden eski giriş kayıtları silinir. */
 export async function createSession(db: Db, memberId: string, now = Date.now()): Promise<string> {
   const token = newToken();
   await db.batch([
     db.prepare('DELETE FROM member_sessions WHERE member_id=? AND expires_at<=?').bind(memberId, now),
     db.prepare('INSERT INTO member_sessions (id,member_id,created_at,expires_at) VALUES (?,?,?,?)').bind(await tokenHash(token), memberId, now, now + SESSION_MS),
     db.prepare('UPDATE members SET last_login_at=? WHERE id=?').bind(now, memberId),
+    db.prepare('DELETE FROM member_logins WHERE at<?').bind(now - LOGIN_KEEP_MS),
+    db.prepare('INSERT INTO member_logins (member_id,at) VALUES (?,?)').bind(memberId, now),
   ]);
   return token;
 }
@@ -75,6 +81,7 @@ export async function deleteMember(db: Db, memberId: string, email: string): Pro
     db.prepare('DELETE FROM study_notes WHERE user_id=?').bind(memberId),
     db.prepare('DELETE FROM study_sessions WHERE user_id=?').bind(memberId),
     db.prepare('DELETE FROM member_sessions WHERE member_id=?').bind(memberId),
+    db.prepare('DELETE FROM member_logins WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM auth_attempts WHERE key=?').bind('login:' + email),
     db.prepare('DELETE FROM members WHERE id=?').bind(memberId),
   ]);
@@ -82,11 +89,12 @@ export async function deleteMember(db: Db, memberId: string, email: string): Pro
 
 /** Üyenin kendi kayıtlarının dökümü (Hesabım → Verilerimi indir). */
 export async function exportMember(db: Db, member: Member): Promise<Record<string, unknown>> {
-  const [sessions, answers, reviews, notes] = await Promise.all([
+  const [sessions, answers, reviews, notes, logins] = await Promise.all([
     db.prepare('SELECT id,mode,topic,created_at,finished_at FROM study_sessions WHERE user_id=? ORDER BY created_at').bind(member.id).all(),
     db.prepare('SELECT session_id,question_id,answer,correct,created_at FROM study_answers WHERE user_id=? ORDER BY created_at').bind(member.id).all(),
     db.prepare('SELECT question_id,wrong_count,streak,seen,last_answer,last_wrong,last_at,due_at FROM study_review WHERE user_id=? ORDER BY question_id').bind(member.id).all(),
     db.prepare('SELECT key,value FROM study_notes WHERE user_id=? ORDER BY key').bind(member.id).all(),
+    db.prepare('SELECT at FROM member_logins WHERE member_id=? ORDER BY at').bind(member.id).all<{ at: number }>(),
   ]);
   return {
     exportedAt: new Date().toISOString(),
@@ -95,6 +103,7 @@ export async function exportMember(db: Db, member: Member): Promise<Record<strin
     answers: answers.results,
     reviews: reviews.results,
     notes: notes.results,
+    logins: logins.results.map((row) => new Date(Number(row.at)).toISOString()),
   };
 }
 

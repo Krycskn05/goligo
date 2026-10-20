@@ -9,16 +9,21 @@ import "./members.css";
 import "./ausbildung.css";
 import "./notebook.css";
 import "./lesson-book.css";
+import "./home-tour.css";
+import "./admin.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {
   title: `${SITE_NAME} · Almanca ve İngilizce Eğitimi`,
   applicationName: SITE_NAME,
   description: "Almanca ve İngilizce eğitim seçenekleri, ünite ve konu başlıkları, özgün resimli Nesne Kasası, testler ve harf bulmacaları. Learn German and English with picture vocabulary tests and letter puzzles.",
+  // Koko on a dark background: browser tab, phone home screen (apple-touch-icon) and installed app (manifest).
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -32,6 +37,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Lora:ital,wght@0,500..700;1,500..700&display=swap" rel="stylesheet" />
+        {/* Phone home screen: icon, name and colour when the site is added as an app (see app/install-guide.tsx). */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
+        <meta name="theme-color" content="#fdf8ec" />
       </head>
       <body className="antialiased">{children}<LearningEffects/></body>
     </html>

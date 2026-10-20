@@ -154,7 +154,11 @@ strong { font-weight:700; }
 .work-nav:nth-child(even) .nav-icon { transform:rotate(5deg); }
 .nav-icon svg { display:block; width:24px; height:24px; }
 .nav-icon-fill { fill:var(--nav-duo); stroke:none; }
+.nav-icon-app { --nav-c:#0f6b78; --nav-duo:#cdeff3; }
+.nav-icon-home { --nav-c:#2f7a31; --nav-duo:#c9efbf; }
 .nav-icon-units { --nav-c:#b06d00; --nav-duo:#ffe08a; }
+.nav-icon-housing { --nav-c:#2c6c64; --nav-duo:#cdeee6; }
+.nav-icon-ausbildung { --nav-c:#b25f12; --nav-duo:#ffe0bf; }
 .nav-icon-vault { --nav-c:#1f6fc4; --nav-duo:#bfe0ff; }
 .nav-icon-verbs { --nav-c:#6b48d6; --nav-duo:#ddd0ff; }
 .nav-icon-games { --nav-c:#c93f72; --nav-duo:#ffc9da; }

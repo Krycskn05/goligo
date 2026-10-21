@@ -170,8 +170,14 @@ export function isAssetPath(pathname: string): boolean {
   return /\.[a-z0-9]{1,8}$/i.test(pathname) || pathname.startsWith('/_next/') || pathname.startsWith('/@') || pathname.startsWith('/__') || pathname.startsWith('/cdn-cgi/') || pathname.startsWith('/node_modules/');
 }
 
+/**
+ * Pages a visitor without an account may open for the guest taste (lib/guest-taste.ts): the first part of each is open,
+ * the rest asks to sign up. Hesabım and the admin page stay for members.
+ */
+export const GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/a1-2/ev-ve-yasam', '/a1-2/ausbildung', '/a1-2/ausbildung/hoeren']);
+
 export function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PAGES.has(pathname) || pathname === '/api' || pathname.startsWith('/api/') || isAssetPath(pathname);
+  return PUBLIC_PAGES.has(pathname) || GUEST_PAGES.has(pathname) || pathname === '/api' || pathname.startsWith('/api/') || isAssetPath(pathname);
 }
 
 /** Giriş sonrası dönülecek adres: yalnızca bu sitenin kendi sayfaları; giriş/çıkış sayfaları olmaz. */

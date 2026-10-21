@@ -1,7 +1,7 @@
 import {getRawDb} from '@/db';
 import {getChatGPTUser} from '@/app/chatgpt-auth';
 import {gradeAnswer,questionMap,modeLabels,learningTopics as topics,shuffle} from '@/lib/course';
-import {selectQuestions,STAR_NOTE_PREFIX,type Review,type SessionQuestion} from '@/lib/study';
+import {guestQuestion,guestRound,selectQuestions,STAR_NOTE_PREFIX,type Review,type SessionQuestion} from '@/lib/study';
 
 export const dynamic='force-dynamic';
 const noCache={'Cache-Control':'no-store'};
@@ -24,9 +24,37 @@ async function loadSession(db:D1Database,user:string,id:string){
  const {results}=await db.prepare('SELECT id,question_id,answer,correct,created_at FROM study_answers WHERE session_id=? AND user_id=? ORDER BY created_at,id').bind(id,user).all();
  return {...row,topic:String(row.topic),user_id:undefined,questions:JSON.parse(row.questions as string),answers:results};
 }
+/**
+ * A visitor without an account (the guest taste, lib/guest-taste.ts): an empty record, rounds of the first part of each
+ * section built like a member's but never saved, answers graded without writing anything. Stars and notes need an account.
+ */
+function guestGet(url:URL){
+ if(url.searchParams.get('session'))return json({error:'Test bulunamadı.'},404);
+ if(url.searchParams.get('note'))return json({error:'Kayıtlarını görmek için giriş yap.',signIn:true},401);
+ return json({guest:true,reviews:[],notes:{},sessions:[],activePictureSessionId:null,activeVerbSessionId:null});
+}
+function guestPost(body:Record<string,unknown>){
+ const now=Date.now();
+ if(body.action==='start'){
+  const id=typeof body.id==='string'?body.id:'';const mode=String(body.mode??'');const topic=String(body.topic??'');const count=Number(body.count??20);
+  const onlyIds=Array.isArray(body.onlyIds)?body.onlyIds.filter((x):x is string=>typeof x==='string').slice(0,2000):[];
+  if(!/^[a-zA-Z0-9-]{16,64}$/.test(id)||!modeLabels[mode]||!Number.isInteger(count)||count<1||count>2000||body.course==='en')return json({error:'Test seçenekleri geçersiz.'},400);
+  if(!guestRound(mode,topic,onlyIds))return json({error:'Bu kısım üyelere açık. Ücretsiz üye ol.',signIn:true,guest:true},401);
+  const picked=selectQuestions(mode,topic,count,[],onlyIds,'de');if(!picked.length)return json({error:'Bu konu için seçtiğin türde soru yok. Başka bir tür seç.'},400);
+  const questions:SessionQuestion[]=picked.map(q=>({id:q.id,...(q.options?{options:shuffle(q.options)}:{})}));
+  return json({session:{id,mode,topic,questions,created_at:now,finished_at:null,answers:[],guest:true}},201);
+ }
+ if(body.action==='answer'){
+  const sessionId=String(body.sessionId??'').slice(0,64);const questionId=String(body.questionId??'');const answer=typeof body.answer==='string'?body.answer.trim():'';
+  if(!answer||answer.length>1500)return json({error:'Bir cevap yaz veya bir şık seç.'},400);
+  const q=questionMap.get(questionId);if(!q||!guestQuestion(questionId))return json({error:'Bu kısım üyelere açık. Ücretsiz üye ol.',signIn:true,guest:true},401);
+  return json({result:{id:sessionId+':'+questionId,question_id:questionId,answer,correct:gradeAnswer(q,answer)?1:0,created_at:now},correctAnswer:q.answer,explanation:q.explanation});
+ }
+ return json({error:'İlerlemeni kaydetmek için giriş yap.',signIn:true},401);
+}
 export async function GET(request:Request){
  try{
-  const user=await identity();if(!user)return json({error:'Kayıtlarını görmek için giriş yap.',signIn:true},401);
+  const user=await identity();if(!user)return guestGet(new URL(request.url));
   const db=getRawDb();const url=new URL(request.url);const id=url.searchParams.get('session');const english=url.searchParams.get('learn')==='en';
   if(id){const session=await loadSession(db,user,id);return session&&String(session.topic).startsWith('en-')===english?json({session}):json({error:'Test bulunamadı.'},404);}
   // The welcome tour is shown once per member (the learner asked): the home page asks only for this one note.
@@ -44,10 +72,11 @@ export async function GET(request:Request){
 }
 export async function POST(request:Request){
  try{
-  const user=await identity();if(!user)return json({error:'İlerlemeni kaydetmek için giriş yap.',signIn:true},401);
+  const user=await identity();
   const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return json({error:'Geçersiz istek.'},403);
   if(Number(request.headers.get('content-length')??0)>24000)return json({error:'Metin çok uzun.'},413);
-  const body=await request.json() as Record<string,unknown>;const db=getRawDb();const now=Date.now();
+  const body=await request.json() as Record<string,unknown>;
+  if(!user)return guestPost(body);const db=getRawDb();const now=Date.now();
   if(body.action==='start'){
    const id=typeof body.id==='string'?body.id:'';const mode=String(body.mode??'mixed');const english=body.course==='en';const requestedTopic=String(body.topic??'all');const topic=english&&requestedTopic==='all'?'en-all':requestedTopic;
    const count=Number(body.count??20);if(!/^[a-zA-Z0-9-]{16,64}$/.test(id)||!modeLabels[mode]||!['all','unit-1','unit-8','unit-9',...topics.map(t=>t.id)].includes(topic)||(topic!=='all'&&topic.startsWith('en-')!==english)||!Number.isInteger(count)||count<1||count>2000)return json({error:'Test seçenekleri geçersiz.'},400);

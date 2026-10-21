@@ -40,7 +40,7 @@ test('out-of-order answers, invalid options and answers from another account are
  const a=app();const picks=course.questions.filter(q=>q.options).slice(0,2);const id='test-session-order-12345';const {session}=await (await a.post({action:'start',id,mode:'mixed',topic:'all',count:2,onlyIds:picks.map(q=>q.id)})).json();
  assert.equal((await a.post({action:'answer',sessionId:id,questionId:session.questions[1].id,answer:course.questionMap.get(session.questions[1].id).answer})).status,409);
  assert.equal((await a.post({action:'answer',sessionId:id,questionId:session.questions[0].id,answer:'invented option'})).status,400);
- a.user('student-b');assert.equal((await a.get('?session='+id)).status,404);assert.equal((await a.post({action:'answer',sessionId:id,questionId:session.questions[0].id,answer:picks[0].answer})).status,404);assert.equal((await (await a.get()).json()).sessions.length,0);a.user(null);assert.equal((await a.get()).status,401);
+ a.user('student-b');assert.equal((await a.get('?session='+id)).status,404);assert.equal((await a.post({action:'answer',sessionId:id,questionId:session.questions[0].id,answer:picks[0].answer})).status,404);assert.equal((await (await a.get()).json()).sessions.length,0);a.user(null);const guest=await a.get();assert.equal(guest.status,200);const empty=await guest.json();assert.equal(empty.guest,true);assert.equal(empty.sessions.length,0,'a visitor sees nothing saved');assert.equal((await a.get('?session='+id)).status,404);
 });
 test('question IDs, canonical answers, supported variants, audio and images stay valid',()=>{
  assert.equal(new Set(course.questions.map(q=>q.id)).size,course.questions.length);

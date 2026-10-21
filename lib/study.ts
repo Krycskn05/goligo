@@ -5,6 +5,8 @@ import {englishQuestions,englishTopics,englishUnitContains} from './english-cour
 import {verbQuestions,isVerbTopic,inVerbTopic,spreadVerbRound} from './verb-course';
 import {type LearningLanguage} from './learning-language';
 import type {StudyStats} from './progress';
+/** The guest taste (a visitor without an account): which questions and rounds app/api/study serves without saving. */
+export {guestQuestion,guestRound} from './guest-taste';
 /** Stars the learner puts on questions are kept as study notes: star:<question id> = '1'. */
 export const STAR_NOTE_PREFIX='star:';
 export const starNoteKey=(questionId:string)=>STAR_NOTE_PREFIX+questionId;

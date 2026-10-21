@@ -110,3 +110,15 @@ export function germanMoment(date:Date){
  const hour=date.getHours(),minute=date.getMinutes();
  return {part:partOfDay(hour),greetings:greetings(hour),partPhrases:partPhrases(hour),day:dayPhrases(date),week:weekPhrases(date),time:timePhrases(hour,minute)};
 }
+
+/**
+ * Every way to say "now" in German, one after another: the time (official and everyday), a greeting, the part of the
+ * day, the day and the date, the week — mixed so two taps in a row never say the same kind of sentence.
+ */
+export function momentSayings(date:Date):string[]{
+ const moment=germanMoment(date);
+ const groups=[moment.time,moment.greetings,moment.day,moment.partPhrases,moment.week].map(list=>list.map(item=>item.de));
+ const longest=Math.max(...groups.map(list=>list.length));const out:string[]=[];
+ for(let i=0;i<longest;i++)for(const list of groups)if(list[i])out.push(list[i]);
+ return out;
+}

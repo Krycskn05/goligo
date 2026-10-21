@@ -1,4 +1,5 @@
-import {BookOpen,CheckCircle2,Headphones,Languages,RotateCcw,Sparkles} from 'lucide-react';
+import {ArrowRight,BookOpen,CheckCircle2,Headphones,Languages,RotateCcw,Sparkles} from 'lucide-react';
+import {guestText} from '@/lib/guest-copy';
 import {SITE_NAME} from '@/lib/site-brand';
 import {PublicHeader} from './public-shell';
 import {SiteFooter} from './site-footer';
@@ -12,13 +13,14 @@ import {pageLanguage} from './page-language';
 
 // One card for each part of the site, in the order of the menu, with the names the menu uses; the pictures come from all
 // the learner's sets and change every 30 minutes (lib/site-pictures.ts; the learner asked: not always the same).
-function features(language:SiteLanguage):{part:PicturePart;title:string;text:string}[]{
+// `href`: the part a visitor can try without an account (the guest taste; Yanlışlarım needs saved answers).
+function features(language:SiteLanguage):{part:PicturePart;title:string;text:string;href?:string}[]{
  const p=(key:PublicCopyKey)=>publicText(language,key);
  return [
-  {part:'units',title:c(language,'catalogTitle'),text:p('unitsText')},
-  {part:'vault',title:vaultText(language,'vaultTitle'),text:p('vaultText')},
-  {part:'verbs',title:verbText(language,'workshopTitle'),text:p('verbsText')},
-  {part:'games',title:verbText(language,'gamesTitle'),text:p('gamesText')},
+  {part:'units',title:c(language,'catalogTitle'),text:p('unitsText'),href:'/konular'},
+  {part:'vault',title:vaultText(language,'vaultTitle'),text:p('vaultText'),href:'/ev-esyalar'},
+  {part:'verbs',title:verbText(language,'workshopTitle'),text:p('verbsText'),href:'/fiiller'},
+  {part:'games',title:verbText(language,'gamesTitle'),text:p('gamesText'),href:'/fiiller?bolum=oyunlar'},
   {part:'mistakes',title:verbText(language,'mistakesTitle'),text:p('mistakesText')},
  ];
 }
@@ -44,16 +46,18 @@ export function LandingView({language}:{language:SiteLanguage}){
       <a className="btn secondary" href="/giris">{p('signIn')}</a>
      </div>
      <p className="lk-hero-note"><CheckCircle2 size={18} aria-hidden="true"/>{p('freeNoAds')}</p>
+     <a className="lk-try-link" href="#lk-features-title" data-landing-try-top>{guestText(language,'guestTryTitle')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></a>
     </div>
     <div className="lk-hero-art"><img src={pictures.welcome} alt={p('heroAlt')} width={1400} height={700}/></div>
    </section>
 
    <section className="lk-section" aria-labelledby="lk-features-title">
     <h2 id="lk-features-title">{p('whatsInside')}</h2>
+    <p className="lk-try-text">{guestText(language,'guestTryText')}</p>
     <div className="lk-features">
      {features(language).map(item=><article key={item.part} className="lk-feature">
       <img src={pictures[item.part]} alt="" width={1200} height={600} loading="lazy"/>
-      <div><h3>{item.title}</h3><p>{item.text}</p></div>
+      <div><h3>{item.title}</h3><p>{item.text}</p>{item.href&&<a className="lk-feature-try" href={item.href} data-landing-try={item.part}>{guestText(language,'guestTryTitle')}<ArrowRight size={17} className="vault-direction-icon" aria-hidden="true"/></a>}</div>
      </article>)}
     </div>
    </section>

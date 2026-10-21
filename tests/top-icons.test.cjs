@@ -35,7 +35,7 @@ test('they are used in the header, the sound settings, the clock, the tour and H
  assert.ok(effects.includes("<TopIcon name={enabled?'sounds':'soundsOff'} size={30}/>")&&effects.includes('window.addEventListener(EFFECTS_CHANGED,sync)'));
  for(const piece of ['<TopIcon name="sounds" size={32}/>','<TopIcon name="voice" size={26}/>','<TopIcon name="animations" size={26}/>',"<TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={26}/>"])assert.ok(effects.includes(piece),piece);
  const clock=read('app/site-greeting.tsx');
- assert.ok(clock.includes('<TopIcon name="calendar" size={24} className="sg-day-icon"/>')&&clock.includes('<TopIcon name="clock" size={30}/>'));
+ assert.ok(clock.includes('<TopIcon name="calendar" size={24} className="sg-day-icon"/>'));
  assert.ok(read('app/site-tour.tsx').includes('<TopIcon name="voice" size={24}/>'));
  assert.ok(read('app/account-panel.tsx').includes('<Card icon={<TopIcon name="account" size={26}/>} title={texts.nameLabel}>'));
  // Decorative: the words are on the button or the heading.

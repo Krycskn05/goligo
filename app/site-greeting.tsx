@@ -1,13 +1,11 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {createPortal} from 'react-dom';
-import {X} from 'lucide-react';
-import {germanMoment,PART_NOUN,WEEKDAYS,MONTHS,isoWeek,type GreetingNote,type PartOfDay} from '@/lib/german-time';
+import {germanMoment,momentSayings,PART_NOUN,WEEKDAYS,type PartOfDay} from '@/lib/german-time';
 import {greetingText,type GreetingCopyKey} from '@/lib/greeting-copy';
 import type {VaultLanguage} from '@/lib/object-vault-copy';
-import {languageDirection} from '@/lib/site-languages';
 import {usePaulMotion} from './paul-hoca';
-import {TopIcon,type TopIconName} from './top-icons';
+import {TopIcon} from './top-icons';
+import {useGermanSpeech} from './study-shared';
 
 /** A small coloured picture for the part of the day: the sun rising, high, with a cloud in the afternoon, setting, and
  * the moon at night. */
@@ -39,64 +37,40 @@ export function AnalogClock({date,seconds=true,className=''}:{date:Date;seconds?
  </svg>;
 }
 
-/** The learner's top-menu icons for the groups of the window (the part of the day has its own small picture). */
-const GROUP_ICONS:Partial<Record<GreetingCopyKey,TopIconName>>={greeting:'voice',day:'calendar',week:'calendar',time:'clock'};
-
-/** The date line of the window: part of the day, weekday, date and KW. */
-function facts(date:Date){
- const part=PART_NOUN[germanMoment(date).part];
- return `${part} · ${WEEKDAYS[date.getDay()]}, ${date.getDate()}. ${MONTHS[date.getMonth()]} · KW ${isoWeek(date)}`;
-}
-
 /**
  * The header's clock (the learner asked: no frame, only the clock, the day and the part of the day, placed neatly):
  * an analog clock for the learner's own time (ticking second hand with motion on; no digits), the weekday in German
- * (Mittwoch) and the part of the day with a small picture (Morgen, Vormittag, Mittag, Nachmittag, Abend, Nacht). A
- * tap opens a window with all the ways to say it (greeting, time of day, day and date, week, time — official and
- * everyday), with short notes in the site language. Before the page knows the learner's clock it keeps the place empty.
+ * (Mittwoch) and the part of the day with a small picture (Morgen, Vormittag, Mittag, Nachmittag, Abend, Nacht). Each
+ * tap says another German sentence about now (the learner asked, 21 October 2026: no window, a different saying on
+ * every tap): the time officially and in everyday speech, a greeting, the day, the date, the week. The sentence shows
+ * for a moment under the clock. Before the page knows the learner's clock it keeps the place empty.
  */
 export function SiteGreeting({language,line}:{language:VaultLanguage;line:string}){
  const motion=usePaulMotion();
  const [now,setNow]=useState<Date|null>(null);
- const [open,setOpen]=useState(false);
- const button=useRef<HTMLButtonElement>(null);
- const closeButton=useRef<HTMLButtonElement>(null);
+ const [said,setSaid]=useState('');
+ const turn=useRef(0);const hide=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const speech=useGermanSpeech('de');
  // Every second with motion on (the clock's second hand), every 15 s without.
  useEffect(()=>{const tick=()=>setNow(new Date());tick();const timer=setInterval(tick,motion?1000:15000);return()=>clearInterval(timer);},[motion]);
- useEffect(()=>{
-  if(!open)return;
-  closeButton.current?.focus();
-  const key=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};
-  document.addEventListener('keydown',key);
-  return()=>{document.removeEventListener('keydown',key);button.current?.focus();};
- },[open]);
+ useEffect(()=>()=>{if(hide.current)clearTimeout(hide.current);},[]);
  const t=(key:GreetingCopyKey)=>greetingText(language,key);
  if(!now)return <span className="site-greeting site-greeting-waiting" aria-hidden="true"/>;
  const moment=germanMoment(now);
- const groups:[GreetingCopyKey,{de:string;note?:GreetingNote}[]][]=[['greeting',moment.greetings],['partOfDay',moment.partPhrases],['day',moment.day],['week',moment.week],['time',moment.time]];
  const time=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
- return <>
-  <button ref={button} type="button" className="site-greeting site-greeting-button" aria-haspopup="dialog" aria-expanded={open} title={t('open')} onClick={()=>setOpen(true)} data-site-greeting={moment.part}>
-   <AnalogClock date={now} seconds={motion}/>
-   <span className="site-greeting-words" lang="de" dir="ltr">
-    <strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>
-    <span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>
-    <span className="lk-visually-hidden">{time}</span>
-   </span>
-  </button>
-  {open&&createPortal(<div className="sg-backdrop" onPointerDown={event=>{if(event.target===event.currentTarget)setOpen(false);}}>
-   <section className="sg-panel" role="dialog" aria-modal="true" aria-labelledby="sg-title" lang={language} dir={languageDirection(language)}>
-    <button ref={closeButton} type="button" className="sg-close" aria-label={t('close')} onClick={()=>setOpen(false)}><X size={18} aria-hidden="true"/></button>
-    <h2 id="sg-title"><TopIcon name="clock" size={30}/>{t('panelTitle')}</h2>
-    <p className="sg-now" lang="de" dir="ltr">{facts(now)}</p>
-    {groups.map(([key,phrases])=><div key={key} className={'sg-group sg-'+key} data-greeting-group={key}>
-     <h3>{key==='partOfDay'?<PartOfDayIcon part={moment.part}/>:<TopIcon name={GROUP_ICONS[key]??'clock'} size={22}/>}{t(key)}</h3>
-     {key==='time'&&<AnalogClock date={now} seconds={motion} className="sg-clock"/>}
-     <ul>{phrases.map(item=><li key={item.de}><span lang="de" dir="ltr">{item.de}</span>{item.note&&<small>{t(item.note)}</small>}</li>)}</ul>
-     {key==='week'&&<p className="sg-hint">{t('kw')}</p>}
-    </div>)}
-    <p className="sg-line">{line}</p>
-   </section>
-  </div>,document.body)}
- </>;
+ function say(){
+  const list=momentSayings(new Date());const sentence=list[turn.current%list.length];turn.current+=1;
+  speech.speak(sentence);setSaid(sentence);
+  if(hide.current)clearTimeout(hide.current);hide.current=setTimeout(()=>setSaid(''),5000);
+ }
+ return <button type="button" className="site-greeting site-greeting-button" title={t('tapToHear')} aria-label={t('tapToHear')+' · '+WEEKDAYS[now.getDay()]+', '+PART_NOUN[moment.part]+', '+time} onClick={say} data-site-greeting={moment.part}>
+  <AnalogClock date={now} seconds={motion}/>
+  <span className="site-greeting-words" lang="de" dir="ltr">
+   <strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>
+   <span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>
+   <span className="lk-visually-hidden">{time}</span>
+  </span>
+  {/* The sentence just said, for a moment below the clock (it is read out, so screen readers need no second copy). */}
+  <span className={'sg-said'+(said?' shown':'')} aria-hidden="true" lang="de" dir="ltr" title={line} data-site-greeting-said>{said}</span>
+ </button>;
 }

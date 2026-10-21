@@ -58,7 +58,9 @@ test('oturum anahtarı, çerez ve dönüş adresi',async()=>{
  for(const bad of ['//evil.example','https://evil.example','/\\evil','fiiller','/giris','/uye-ol?return_to=/x','/cikis','/api/auth',null,5])assert.equal(auth.safeReturnTo(bad),'/',String(bad));
  assert.equal(auth.signInPath('/fiiller'),'/giris?return_to=%2Ffiiller');assert.equal(auth.signInPath('/'),'/giris');
  for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/favicon.svg','/verbs/abfahren.webp','/assets/app.js','/_next/x'])assert.ok(auth.isPublicPath(open),open);
- for(const closed of ['/fiiller','/ev-esyalar','/a1-2/ev-ve-yasam','/hesabim','/apis'])assert.ok(!auth.isPublicPath(closed),closed);
+ for(const closed of ['/hesabim','/yonetim','/apis','/fiiller/x'])assert.ok(!auth.isPublicPath(closed),closed);
+ // The guest taste: the study pages open for visitors too (the first part of each; app/api/study saves nothing for them).
+ for(const taste of ['/konular','/ev-esyalar','/fiiller','/a1-2/ev-ve-yasam','/a1-2/ausbildung','/a1-2/ausbildung/hoeren'])assert.ok(auth.isPublicPath(taste),taste);
 });
 
 test('oturumlar: açılır, süresi dolar, kapanır; deneme sınırı pencere içinde sayılır',async()=>{
@@ -95,17 +97,17 @@ const location=r=>{assert.ok(r instanceof Response,'yönlendirme bekleniyordu');
 
 test('kapı: girişsiz ziyaretçi tanıtım ve yasal sayfaları görür, ders sayfaları girişe yönlenir',async()=>{
  const db=fakeDb();const env={DB:db};
- for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/verbs/abfahren.webp']){const out=await gate.siteGate(req(open),env);assert.ok(out instanceof Request,open);assert.equal(out.headers.get('oai-authenticated-user-id'),null,open);}
- assert.equal(location(await gate.siteGate(req('/fiiller'),env)),'/giris?return_to=%2Ffiiller');
- assert.equal(location(await gate.siteGate(req('/a1-2/ev-ve-yasam?x=1'),env)),'/giris?return_to=%2Fa1-2%2Fev-ve-yasam%3Fx%3D1');
+ for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/verbs/abfahren.webp','/fiiller','/konular','/a1-2/ausbildung/hoeren']){const out=await gate.siteGate(req(open),env);assert.ok(out instanceof Request,open);assert.equal(out.headers.get('oai-authenticated-user-id'),null,open);}
+ assert.equal(location(await gate.siteGate(req('/yonetim'),env)),'/giris?return_to=%2Fyonetim');
+ assert.equal(location(await gate.siteGate(req('/hesabim?x=1'),env)),'/giris?return_to=%2Fhesabim%3Fx%3D1');
  assert.equal(location(await gate.siteGate(req('/hesabim'),env)),'/giris?return_to=%2Fhesabim');
- const post=await gate.siteGate(req('/fiiller',{method:'POST',body:'x'}),env);assert.equal(post.status,401);
+ const post=await gate.siteGate(req('/hesabim',{method:'POST',body:'x'}),env);assert.equal(post.status,401);
 });
 
 test('kapı: istemcinin yazdığı kimlik başlıklarına asla güvenilmez',async()=>{
  const db=fakeDb();const env={DB:db};
  const spoof={'oai-authenticated-user-id':'member:victim','oai-authenticated-user-email':'victim@example.com','lk-verified-access-id':'cf-access:victim','LK-Verified-Access-Email':'victim@example.com'};
- assert.equal(location(await gate.siteGate(req('/fiiller',{headers:spoof}),env)),'/giris?return_to=%2Ffiiller');
+ assert.equal(location(await gate.siteGate(req('/hesabim',{headers:spoof}),env)),'/giris?return_to=%2Fhesabim');
  const open=await gate.siteGate(req('/api/auth',{headers:spoof}),env);
  for(const name of Object.keys(spoof))assert.equal(open.headers.get(name),null,name);
  // Yalnızca yerel geliştirmede, Vite eklentisinin koyduğu deneme kimliği geçerlidir.
@@ -130,8 +132,8 @@ test('kapı: geçerli üyelik oturumu kimliği verir; giriş ve çıkış adresl
  assert.equal(location(await gate.siteGate(req('/auth/login',{headers:{referer:'https://evil.example/x'}}),env)),'/giris');
  assert.equal(location(await gate.siteGate(req('/callback'),env)),'/');
  // Bozuk ya da süresi dolmuş çerez: girişsiz sayılır.
- assert.equal(location(await gate.siteGate(req('/fiiller',{headers:{cookie:'lk_session='+auth.newToken()}}),env)),'/giris?return_to=%2Ffiiller');
- assert.equal(location(await gate.siteGate(req('/fiiller',{headers:cookie}),env,{now:now+auth.SESSION_MS+1})),'/giris?return_to=%2Ffiiller');
+ assert.equal(location(await gate.siteGate(req('/hesabim',{headers:{cookie:'lk_session='+auth.newToken()}}),env)),'/giris?return_to=%2Fhesabim');
+ assert.equal(location(await gate.siteGate(req('/hesabim',{headers:cookie}),env,{now:now+auth.SESSION_MS+1})),'/giris?return_to=%2Fhesabim');
  // Çıkış: oturum silinir, çerez temizlenir.
  const bye=await gate.siteGate(req('/cikis',{headers:cookie}),env);assert.equal(location(bye),'/');assert.match(bye.headers.get('set-cookie'),/lk_session=;.*Max-Age=0/);
  assert.equal(await store.memberForToken(db,token),null);
@@ -141,7 +143,7 @@ test('kapı: geçerli üyelik oturumu kimliği verir; giriş ve çıkış adresl
 test('kapı: veritabanına ulaşılamazsa kimse içeri alınmaz',async()=>{
  const db=fakeDb();const token=await store.createSession(db,'member:x',Date.now());db.broken=true;
  const error=console.error;console.error=()=>{};
- try{assert.equal(location(await gate.siteGate(req('/fiiller',{headers:{cookie:'lk_session='+token}}),{DB:db})),'/giris?return_to=%2Ffiiller');}finally{console.error=error;}
+ try{assert.equal(location(await gate.siteGate(req('/hesabim',{headers:{cookie:'lk_session='+token}}),{DB:db})),'/giris?return_to=%2Fhesabim');}finally{console.error=error;}
 });
 
 test('kapı: geçiş dönemi — Access ile giren tanınır, üyelik oturumu önceliklidir',async()=>{
@@ -152,10 +154,10 @@ test('kapı: geçiş dönemi — Access ile giren tanınır, üyelik oturumu ön
  await store.createMember(db,{id:'member:other',email:'o@example.com',name:'O',passwordHash:'x'});const token=await store.createSession(db,'member:other');
  const both=await gate.siteGate(req('/fiiller',{headers:{...jwt,cookie:'lk_session='+token}}),env,{fetcher:team.fetcher});assert.equal(both.headers.get('oai-authenticated-user-id'),'member:other');
  const forged=(await team.token()).replace(/\.[^.]+$/,'.AAAA');
- assert.equal(location(await gate.siteGate(req('/fiiller',{headers:{'cf-access-jwt-assertion':forged}}),env,{fetcher:team.fetcher})),'/giris?return_to=%2Ffiiller');
+ assert.equal(location(await gate.siteGate(req('/hesabim',{headers:{'cf-access-jwt-assertion':forged}}),env,{fetcher:team.fetcher})),'/giris?return_to=%2Fhesabim');
  const error=console.error;console.error=()=>{};
- try{const other=await accessTeam('members-down');const down=async()=>new Response('down',{status:500});assert.equal(location(await gate.siteGate(req('/fiiller',{headers:{'cf-access-jwt-assertion':await other.token()}}),{DB:db,...other.settings},{fetcher:down})),'/giris?return_to=%2Ffiiller','Access servisi yoksa üyelikle devam edilir');}finally{console.error=error;}
- assert.equal(location(await gate.siteGate(req('/fiiller',{headers:jwt}),{DB:db},{fetcher:team.fetcher})),'/giris?return_to=%2Ffiiller','Access ayarı yoksa belge yok sayılır');
+ try{const other=await accessTeam('members-down');const down=async()=>new Response('down',{status:500});assert.equal(location(await gate.siteGate(req('/hesabim',{headers:{'cf-access-jwt-assertion':await other.token()}}),{DB:db,...other.settings},{fetcher:down})),'/giris?return_to=%2Fhesabim','Access servisi yoksa üyelikle devam edilir');}finally{console.error=error;}
+ assert.equal(location(await gate.siteGate(req('/hesabim',{headers:jwt}),{DB:db},{fetcher:team.fetcher})),'/giris?return_to=%2Fhesabim','Access ayarı yoksa belge yok sayılır');
 });
 
 // ---- Üyelik API'si ----

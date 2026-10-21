@@ -110,3 +110,26 @@
  .lk-hero-actions .btn { flex:1 1 100%; }
  .lk-auth-card,.lk-account-card,.lk-legal,.lk-account-head { padding:22px 18px; border-radius:22px; }
 }
+
+/* Üye olmadan tadımlık (app/guest-taste.tsx): the note on top of a study page, the sign-up card and the lock on the
+   parts for members. */
+.guest-banner { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin:0 0 16px; padding:12px 16px; border-radius:18px; background:#fff7dc; color:#6b4e00; border:1px solid #f1dc9a; }
+.guest-banner > svg { flex:none; }
+.guest-banner p { margin:0; flex:1 1 220px; font-weight:700; line-height:1.4; }
+.guest-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.guest-more { display:grid; justify-items:center; gap:10px; margin:18px 0 0; padding:20px; border-radius:20px; background:#eef6ff; color:var(--ink); text-align:center; }
+.guest-more p { margin:0; font-weight:700; max-width:42ch; line-height:1.45; }
+.guest-lock { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:8px 14px; border-radius:999px; background:#f1f3f7; color:#4b5b70; font-weight:800; text-decoration:none; }
+.guest-lock:hover, .guest-lock:focus-visible { background:#e6eaf1; color:var(--ink); }
+/* A part for members: its pictures fade; the lock stays clear. */
+.guest-locked img, .guest-locked .vault-category-art, .guest-locked .lb-toc-photo, .guest-locked .game-icon { filter:grayscale(.7); opacity:.7; }
+/* Landing: "Üye olmadan dene" under the hero buttons and on every part a visitor can try. */
+.lk-try-link, .lk-feature-try { display:inline-flex; align-items:center; gap:6px; min-height:44px; color:var(--blue-2); font-weight:800; text-decoration:none; }
+.lk-try-link { margin-top:6px; }
+.lk-try-link:hover, .lk-feature-try:hover { text-decoration:underline; }
+.lk-try-text { margin:-4px 0 16px; color:var(--ink-2); }
+.game-card.guest-locked { text-decoration:none; color:inherit; }
+.guest-card-lock { margin-inline-start:auto; flex:none; color:#4b5b70; }
+a[data-guest-locked], a[data-guest-locked] * { text-decoration:none; color:inherit; }
+a.guest-lock { color:#4b5b70; }
+.guest-lock-tag { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:#f1f3f7; color:#4b5b70; font-size:14px; font-weight:800; white-space:nowrap; }

@@ -159,6 +159,19 @@ async function languageFlow(browser) {
     const dead = await page.locator("[data-reset-page] .lk-form-error").textContent().catch(() => "");
     const robots = await page.locator('meta[name="robots"]').getAttribute("content").catch(() => "");
     record("Sifre yenileme: bozuk baglanti acikca soyleniyor, sayfa aramada cikmiyor", /geçersiz/.test(dead || "") && /noindex/.test(robots || ""), `${(dead || "").slice(0, 80)} · ${robots}`);
+    // Uye olmadan tadimlik (ogrenci istedi): her bolumun ilk kismi acik, gerisi kilitli; hicbir sey kaydedilmez.
+    await page.goto(BASE + "/fiiller", { waitUntil: "networkidle", timeout: 90000 });
+    const verbs = { banner: await page.locator("[data-guest-banner]").count(), open: await page.locator("[data-verb-island-go]").count(), locked: await page.locator("[data-guest-locked]").count() };
+    await page.locator("[data-verb-island-go]").first().click();
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(OUT, "34-uyesiz-fiiller.png") });
+    record("Uyesiz: Fiil Atolyesi'nin 1. bolumu acik, digerleri kilitli", verbs.banner === 1 && verbs.open === 1 && verbs.locked === 3, JSON.stringify(verbs));
+    await page.goto(BASE + "/ev-esyalar", { waitUntil: "networkidle", timeout: 90000 });
+    const vault = { banner: await page.locator("[data-guest-banner]").count(), open: await page.locator('[data-vault-category]:not(.guest-locked)').count() };
+    record("Uyesiz: Nesne Kasasi'nda ilk grup acik", vault.banner === 1 && vault.open === 1, JSON.stringify(vault));
+    const locked = await page.request.post(BASE + "/api/study", { headers: { origin: BASE, "content-type": "application/json" }, data: { action: "start", id: "smoke-guest-0000001", mode: "visual", topic: "objects-kitchen", count: 1, onlyIds: ["obj-picture-herd"] } });
+    const snap = await (await page.request.get(BASE + "/api/study?stats=1&tz=0")).json().catch(() => ({}));
+    record("Uyesiz: kilitli kisim acilmiyor, kayit tutulmuyor", locked.status() === 401 && snap.guest === true && (snap.sessions || []).length === 0, `baslat HTTP ${locked.status()}, guest ${snap.guest}`);
   } catch (e) { record("Dil kontrolu", false, String((e && e.message) || e).slice(0, 200)); }
   await ctx.close();
 }

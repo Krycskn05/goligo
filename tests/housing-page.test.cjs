@@ -5,7 +5,7 @@ test('the Ev ve Yaşam page shows no intro sentence, page numbers or A1–D3 ste
  assert(!source.includes("h('intro')"),'hero intro sentence removed');
  assert(!source.includes("h('pages'"),'textbook page numbers removed');
  assert(!source.includes('housing-step-list'),'step buttons removed from the section cards');
- assert(source.includes('className="housing-card-open"')&&source.includes('className="housing-card-bottom"'),'each A–D card still opens its section');
+ assert(source.includes("{opener(item.id,'housing-card-open',<>")&&source.includes('className="housing-card-bottom" disabled={busy} onClick={()=>choose(item.id)}'),'each A–D card still opens its section');
 });
 
 test('practice setup pages show no sub-topic, length or back-to-notes controls and the home hero has no hint line',()=>{

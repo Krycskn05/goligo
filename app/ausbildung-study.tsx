@@ -19,6 +19,8 @@ import {RasterArt,TopicArt} from './toon-art';
 import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
 import {ProgressMeter} from './progress-ui';
 import {LessonBook} from './lesson-book';
+import {GUEST_L12_PART} from '@/lib/guest-parts';
+import {GuestBanner,GuestLock,GuestMore} from './guest-taste';
 import {ExerciseView,Flashcards,LessonBlocks,Rich,TeachingCard,readKnown,readScores,teachingCards,type Speech} from './ausbildung-ui';
 import {LISTEN_CHANGED,ListenTask,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
 
@@ -48,19 +50,20 @@ function partWords(part:L12Part):L12Word[]{
 }
 
 /** Lektion 12 „Ausbildung": the overview and one part at a time (?bolum=a … magazin, &adim=kelimeler … dinleme). */
-export default function AusbildungStudy(){
+/** `guest`: a visitor without an account (app/a1-2/ausbildung/page.tsx) — Teil A is open, the other parts ask to sign up. */
+export default function AusbildungStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 · Ausbildung · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <AusbildungLesson language={language} onLanguage={switchLanguage}/>;
+ return <AusbildungLesson language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 
 type Route={part:L12PartId|null;step:L12Step|null};
 function readRoute():Route{const params=new URLSearchParams(window.location.search);const step=params.get('adim');return {part:partParam(params.get('bolum')),step:isStep(step)?step:null};}
 
-export function AusbildungLesson({language,onLanguage}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void}){
+export function AusbildungLesson({language,onLanguage,guest=false}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest?:boolean}){
  const [route,setRoute]=useState<Route>({part:null,step:null});
  const [scores,setScores]=useState<L12ScoreMap>({});const [tick,setTick]=useState(0);
  const german=useGermanSpeech('de');
@@ -85,12 +88,13 @@ export function AusbildungLesson({language,onLanguage}:{language:StudyLanguage;o
  const unitName=translate(unit.names,language);
  return <div className="category-app toon-app housing-app l12-app" lang={language} dir={languageDirection(language)}>
   <a className="skip-link" href="#l12-main">{housingText(language,'back')}</a>
-  <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){german.stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={housingText(language,'back')}/>
+  <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){german.stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={housingText(language,'back')} guest={guest}/>
   <main id="l12-main" className="object-page housing-page l12-page" lang="tr" dir="ltr">
    <div className="object-breadcrumb"><a href="/konular?level=A1.2">A1.2</a><span aria-hidden="true">›</span>{current?<><a href={AUSBILDUNG_PATH} onClick={event=>{event.preventDefault();open(null);}}>Lektion 12 · Ausbildung</a><span aria-hidden="true">›</span><span>{current.de}</span></>:<span>Lektion 12 · Ausbildung</span>}</div>
+   {guest&&<GuestBanner language={language} back={AUSBILDUNG_PATH}/>}
    {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
    {german.warning&&<p className="object-alert" role="status">{german.warning}</p>}
-   {current&&step?<PartPage key={current.id} part={current} step={step} scores={scores} tick={tick} speech={speech} onScore={refresh} onOpen={open} language={language}/>:<Overview unitName={unitName} scores={scores} tick={tick} onOpen={open} language={language}/>}
+   {current&&step&&guest&&current.id!==GUEST_L12_PART?<section className="panel" aria-labelledby="l12-heading" data-guest-part={current.id}><h1 id="l12-heading" tabIndex={-1} lang="de">{current.title}</h1><GuestMore language={language} back={AUSBILDUNG_PATH}/></section>:current&&step?<PartPage key={current.id} part={current} step={step} scores={scores} tick={tick} speech={speech} onScore={refresh} onOpen={open} language={language}/>:<Overview unitName={unitName} scores={scores} tick={tick} onOpen={open} language={language} guest={guest}/>}
   </main>
   <SiteFooter language={language}/>
  </div>;
@@ -104,21 +108,22 @@ function partSummary(part:L12Part){
 }
 /** What Lektion 12 teaches, ticked off on the overview's left page. */
 const GOALS=['Ne yapabildiğini anlat: *Ich kann gut kochen.*','Planını söyle: *Ich will eine Ausbildung machen.*','Geçmişi anlat: *Ich bin nach Berlin gekommen.*','Zamanı söyle: *seit 2019 · vor zwei Jahren · in einem Jahr*','Resmî e-posta yaz: *Sehr geehrte Damen und Herren, …*'];
-function Overview({unitName,scores,tick,onOpen,language}:{unitName:string;scores:L12ScoreMap;tick:number;onOpen:(part:L12PartId,step?:L12Step)=>void;language:StudyLanguage}){
+function Overview({unitName,scores,tick,onOpen,language,guest=false}:{unitName:string;scores:L12ScoreMap;tick:number;onOpen:(part:L12PartId,step?:L12Step)=>void;language:StudyLanguage;guest?:boolean}){
  const [last,setLast]=useState<Last|null>(null);const [listened,setListened]=useState(0);
  useEffect(()=>{setLast(readLast());setListened(hoerenTasks.filter(task=>listenResult(task)).length);},[tick]);
  const lastPart=last?lessonPartMap.get(last.part):undefined;
  const total=lessonProgress(scores);
  // One line of the contents page: badge, taped picture, title, what is inside, progress.
- const row=(part:L12Part)=><li className="lb-toc-row" data-l12-part={part.id} key={part.id}>
+ // The guest taste: only Teil A opens; the other rows carry a lock and lead to the sign-up card.
+ const row=(part:L12Part)=>{const locked=guest&&part.id!==GUEST_L12_PART;return <li className={'lb-toc-row'+(locked?' guest-locked':'')} data-l12-part={part.id} key={part.id}>
   <button type="button" className="lb-toc-open" onClick={()=>onOpen(part.id)}>
    <span className="lb-toc-badge" aria-hidden="true">{part.badge}</span>
    <span className="lb-toc-photo" aria-hidden="true"><PartArt part={part}/></span>
    <span className="lb-toc-text"><strong lang="de" dir="ltr">{part.title}</strong><small><Rich text={part.card??part.lead}/></small><span className="lb-toc-meta">{partSummary(part)}</span></span>
    <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
   </button>
-  {part.id==='test'?<TestBadge part={part} scores={scores}/>:<ProgressMeter progress={partProgress(part,scores)} language={language} label={part.de} compact/>}
- </li>;
+  {locked?<GuestLock language={language} back={AUSBILDUNG_PATH}/>:part.id==='test'?<TestBadge part={part} scores={scores}/>:<ProgressMeter progress={partProgress(part,scores)} language={language} label={part.de} compact/>}
+ </li>;};
  return <section aria-labelledby="l12-heading">
   <LessonBook left={<>
    <span className="eyebrow" lang="de">A1.2 · Lektion 12 · Ausbildung</span>
@@ -127,7 +132,7 @@ function Overview({unitName,scores,tick,onOpen,language}:{unitName:string;scores
    <p className="lb-lead">Meslek eğitimi, staj ve hayat hikâyeni anlatmak: <Rich text="*können / wollen*, Perfekt mit *sein*, *seit / vor / in* ve resmî e-posta."/></p>
    <figure className="lb-photo"><TopicArt id="book-12" title={unitName}/></figure>
    <div className="lb-notes">
-    <button type="button" className="housing-feature lb-note l12-resume" onClick={()=>last?onOpen(last.part,last.step):onOpen('a','kelimeler')}>
+    <button type="button" className="housing-feature lb-note l12-resume" onClick={()=>last&&!(guest&&last.part!==GUEST_L12_PART)?onOpen(last.part,last.step):onOpen('a','kelimeler')}>
      <span className="housing-letter l12-letter" aria-hidden="true"><Play size={24}/></span>
      <div><h2>{last?'Kaldığın yerden devam et':'Derse başla'}</h2><p>{lastPart&&last?lastPart.de+' · '+stepLabel[last.step]:'Teil A · Kelimeler'}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>

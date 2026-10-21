@@ -41,8 +41,8 @@ test('team domain accepts a name, a host or a full address',()=>{
 test('without a valid Access token nobody is signed in; client identity headers alone never count',async()=>{
  const t=await makeTeam();const settings={TEAM_DOMAIN:t.team,POLICY_AUD:AUD};
  const none=await siteGate(req('/api/study'),settings,{fetcher:t.fetcher});assert(none instanceof Request);assert.equal(none.headers.get('oai-authenticated-user-id'),null);
- const spoofed=await siteGate(req('/fiiller',{headers:{'oai-authenticated-user-id':'someone-else','oai-authenticated-user-email':'x@y.z'}}),settings,{fetcher:t.fetcher});
- assert(spoofed instanceof Response);assert.equal(spoofed.status,302,'client identity headers alone must never sign anyone in');assert.equal(spoofed.headers.get('location'),'/giris?return_to=%2Ffiiller');
+ const spoofed=await siteGate(req('/hesabim',{headers:{'oai-authenticated-user-id':'someone-else','oai-authenticated-user-email':'x@y.z'}}),settings,{fetcher:t.fetcher});
+ assert(spoofed instanceof Response);assert.equal(spoofed.status,302,'client identity headers alone must never sign anyone in');assert.equal(spoofed.headers.get('location'),'/giris?return_to=%2Fhesabim');
 });
 
 test('a valid token signs the user in and replaces any client-supplied identity',async()=>{
@@ -93,7 +93,7 @@ test('an unreachable Access key service signs nobody in through Access',async()=
  const t=await makeTeam();const token=await t.token();
  const down=async()=>new Response('down',{status:500});
  const error=console.error;console.error=()=>{};
- try{const r=await siteGate(req('/fiiller',{headers:{'cf-access-jwt-assertion':token}}),{TEAM_DOMAIN:t.team,POLICY_AUD:AUD},{fetcher:down});assert(r instanceof Response);assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/giris?return_to=%2Ffiiller');}
+ try{const r=await siteGate(req('/hesabim',{headers:{'cf-access-jwt-assertion':token}}),{TEAM_DOMAIN:t.team,POLICY_AUD:AUD},{fetcher:down});assert(r instanceof Response);assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/giris?return_to=%2Fhesabim');}
  finally{console.error=error;}
 });
 

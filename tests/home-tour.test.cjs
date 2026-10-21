@@ -10,7 +10,7 @@ const read=file=>fs.readFileSync(file,'utf8');
 test('the home page introduces the site; the units catalogue moved to /konular',()=>{
  const page=read('app/page.tsx');
  assert.ok(page.includes('<StudyApp page="home" />')&&page.includes('<Landing />'),'members see the introduction, visitors the landing page');
- assert.ok(read('app/konular/page.tsx').includes('<StudyApp page="units"/>'));
+ assert.ok(read('app/konular/page.tsx').includes('<StudyApp page="units" guest={!(await getChatGPTUser())}/>'));
  const home=read('app/category-study.tsx');
  // (with the welcome tour beside it, app/site-tour.tsx)
  assert.ok(home.includes('{home?<><HomeTour language={language}/><SiteTour language={language}/></>:<>'),'the introduction replaces the catalogue on the home page');

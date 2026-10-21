@@ -430,7 +430,9 @@ test('Fiil Atölyesi: four parts in book order, each verb in turn: card, meaning
  assert.ok(fs.readFileSync('app/api/study/route.ts','utf8').includes("first:list[0]?.id??null,ids:s.mode==='workshop'&&!s.finished_at?list.map(q=>q.id??''):undefined"),'the summary carries the first question, and the questions of an open round');
  // The page: islands start or continue their part; no lock is shown.
  const pageSrc=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(pageSrc.includes('onClick={()=>openPart(family)}')&&!pageSrc.includes('<Lock')&&!pageSrc.includes("'locked'"),'every part opens from the map');
+ assert.ok(pageSrc.includes('onClick={()=>openPart(family)}')&&!pageSrc.includes("'locked'"),'every part opens from the map');
+ // Only a visitor without an account (the guest taste) finds parts 2–4 locked.
+ assert.ok(pageSrc.includes('const locked=guest&&family.id!==GUEST_VERB_PART;')&&pageSrc.includes('{locked?<GuestLock language={language} back={back} className="verb-island-go"/>:'),'members find no lock');
  for(const language of languages)for(const key of ['chapterContinue','chapterAgain'])assert.ok(copy.verbText(language,key).trim(),key);
  for(const language of languages)assert.ok(copy.verbText(language,'partDone',{n:2,total:19}).includes('19'),language);
  // Sentence task: the verb is shown, the answer is its form for the subject, the wrong options are the other persons (du, ich, wir, ihr), the prefix at the end.

@@ -323,7 +323,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     if(at>=0){const item=members[at];return <VerbDetail verb={item} family={part.family} position={at+1} total={members.length} marks={stickers.get(item.id)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={()=>openPart(part.family)} onPrev={at>0?()=>openVerb(part.family,members[at-1].id):undefined} onNext={at<members.length-1?()=>openVerb(part.family,members[at+1].id):undefined}/>;}
     return <PartVerbs family={part.family} part={part} verbs={members} marks={stickers} language={language} disabled={busy||!ready} onStart={restart=>void enterPart(part.family,restart)} onOpen={item=>openVerb(part.family,item.id)} onBack={closeView}/>;
    })():
-   <section className="verb-home" aria-labelledby="vault-heading">
+   <section className="verb-home" aria-labelledby="vault-heading" data-verb-workshop="">
     {/* Only the title on top (the learner removed the "0 / 19 fiil" card): the pencil badge of the menu, the title in
         the site's navy with a gold wavy line under "Atölyesi", and the count of verbs and parts. The map below shows
         where the learner is ("Buradasın!"). */}

@@ -183,7 +183,7 @@ async function memberFlow(browser) {
   await visit(page, "/fiiller", "06-fiiller.png", errors);
   const workshopPanels = await page.locator("[data-verb-workshop]").count();
   const islands = await page.locator("[data-verb-island]").count();
-  record("Fiil Atolyesi sayfasinda yol paneli ve dort bolum var", workshopPanels === 1 && islands === 4, `yol ${workshopPanels}, bolum ${islands}`);
+  record("Fiil Atolyesi sayfasinda baslik ve dort bolum var", workshopPanels === 1 && islands === 4, `atolye ${workshopPanels}, bolum ${islands}`);
 
   const phone = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const p2 = await phone.newPage();
@@ -211,7 +211,9 @@ async function memberFlow(browser) {
     const played = () => p2.evaluate(() => (window.__played || []).filter((x) => x && !x.startsWith("data:")));
     await p2.goto(BASE + "/signin-with-chatgpt?return_to=%2Ffiiller", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForTimeout(1500);
-    await p2.locator(".verb-path-enter").first().click();
+    // Yol kartı kaldırıldı (öğrenci istedi): ilk bölümü açıp "Başla" düğmesine basılır.
+    await p2.locator("[data-verb-island-go]").first().click();
+    await p2.locator("[data-verb-part-start]").first().click();
     await p2.waitForSelector("#verb-chapter-heading, #verb-learn-heading, #object-question-heading", { timeout: 20000 });
     const shot = async (file) => {
       await p2.waitForTimeout(700);

@@ -7,6 +7,8 @@ import type {Db} from '@/lib/member-store';
 import {isAdminEmail,loadOverview,loadAreas,loadMembers,loadTopMistakes,loadSessions,loadMember,formatTime,ago,percent,modeName,topicName,dayStart,zoneOffsetMs,type DayRow,type AreaRow,type SessionRow} from '@/lib/admin-stats';
 import {getChatGPTUser} from '../chatgpt-auth';
 import {PublicPage} from '../public-shell';
+/** The admin panel is written in Turkish (the site owner's language), so its header and footer are Turkish too. */
+const ADMIN_LANGUAGE='tr' as const;
 export const dynamic='force-dynamic';
 export const metadata:Metadata={title:`Yönetici paneli · ${SITE_NAME}`,robots:{index:false,follow:false}};
 
@@ -20,17 +22,17 @@ type Search=Promise<Record<string,string|string[]|undefined>>;
 export default async function AdminPage({searchParams}:{searchParams:Search}){
  const user=await getChatGPTUser();
  if(!user)redirect(signInPath('/yonetim'));
- if(!isAdminEmail(user.email))return <PublicPage signedIn narrow><section className="lk-auth-card" data-admin-denied><h1>Sayfa bulunamadı</h1><p className="lk-auth-lead">Aradığın sayfa yok.</p><a className="btn" href="/">Ana sayfaya dön</a></section></PublicPage>;
+ if(!isAdminEmail(user.email))return <PublicPage language={ADMIN_LANGUAGE} signedIn narrow><section className="lk-auth-card" data-admin-denied><h1>Sayfa bulunamadı</h1><p className="lk-auth-lead">Aradığın sayfa yok.</p><a className="btn" href="/">Ana sayfaya dön</a></section></PublicPage>;
  const query=await searchParams;const memberId=typeof query.uye==='string'?query.uye:null;
  const db=getRawDb() as unknown as Db;const now=Date.now();
  try{
   if(memberId){
    const member=await loadMember(db,memberId,now);
-   return <PublicPage signedIn><div className="adm" data-admin-panel="member">{member?<MemberView member={member} now={now}/>:<section className="adm-card"><a className="adm-back" href="/yonetim">← Yönetici paneli</a><h1>Üye bulunamadı</h1></section>}</div></PublicPage>;
+   return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="member">{member?<MemberView member={member} now={now}/>:<section className="adm-card"><a className="adm-back" href="/yonetim">← Yönetici paneli</a><h1>Üye bulunamadı</h1></section>}</div></PublicPage>;
   }
   const [overview,areas,members,mistakes,sessions]=await Promise.all([loadOverview(db,now),loadAreas(db),loadMembers(db,now),loadTopMistakes(db,20),loadSessions(db,30)]);
   const accuracy=percent(overview.correct,overview.answers);
-  return <PublicPage signedIn><div className="adm" data-admin-panel="overview">
+  return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="overview">
    <header className="adm-head"><div><span className="eyebrow">{SITE_NAME}</span><h1>Yönetici paneli</h1><p>Üyelerin ne çalıştığı, ne zaman girdiği ve nerede zorlandığı. Saatler Berlin saatiyle.</p></div>
     <nav className="adm-jump" aria-label="Bölümler"><a href="#uyeler">Üyeler</a><a href="#yanlislar">Zorlanılan sorular</a><a href="#son">Son çalışmalar</a></nav></header>
    <section className="adm-cards" aria-label="Özet">
@@ -72,7 +74,7 @@ export default async function AdminPage({searchParams}:{searchParams:Search}){
   </div></PublicPage>;
  }catch(error){
   console.error('Yönetici paneli okunamadı',error);
-  return <PublicPage signedIn narrow><section className="lk-auth-card"><h1>Yönetici paneli</h1><p className="lk-form-error" role="alert">Kayıtlara şu anda ulaşılamıyor. Biraz sonra yeniden dene.</p></section></PublicPage>;
+  return <PublicPage language={ADMIN_LANGUAGE} signedIn narrow><section className="lk-auth-card"><h1>Yönetici paneli</h1><p className="lk-form-error" role="alert">Kayıtlara şu anda ulaşılamıyor. Biraz sonra yeniden dene.</p></section></PublicPage>;
  }
 }
 

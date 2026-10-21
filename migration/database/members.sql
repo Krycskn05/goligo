@@ -1,4 +1,4 @@
--- Goliqo üyelik tabloları (e-posta + şifre).
+-- Goligo üyelik tabloları (e-posta + şifre).
 -- Her yayında yeniden çalıştırılır; IF NOT EXISTS sayesinde var olan tablolara ve
 -- kayıtlara dokunmaz. Çalışma kayıtları (study_*) değişmez: üyenin kimliği (members.id)
 -- study_* tablolarındaki user_id ile aynıdır.

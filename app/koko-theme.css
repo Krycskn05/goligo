@@ -189,7 +189,7 @@ strong { font-weight:700; }
 }
 @media (prefers-reduced-motion:reduce) { .vault-category-card:hover,.toon-topic-card:hover,.toon-app .btn:hover:enabled,.object-option:hover:enabled,.practice-mode-button:hover:enabled { transform:none; } }
 
-/* Header: the Goliqo logo on a warm beige base (the learner asked), colourful round buttons and a few small stars. */
+/* Header: the Goligo logo on a warm beige base (the learner asked), colourful round buttons and a few small stars. */
 .toon-app .work-header.site-header,.work-header.logo-header.site-header { position:relative; overflow:hidden; background:linear-gradient(180deg,#f5e4c3 0,#f9ecd3 55%,#fcf4e4 100%); border-color:#efdcb7; box-shadow:0 10px 26px rgba(150,110,50,.12),inset 0 1px 0 #fff8ea; }
 /* The header clock (app/site-greeting.tsx): no frame (the learner asked), right on the beige header. */
 .site-greeting { position:relative; margin:0; padding:4px 10px 4px 4px; background:none; border:0; border-radius:20px; box-shadow:none; color:var(--ink); line-height:1.15; }
@@ -200,13 +200,16 @@ strong { font-weight:700; }
 .site-sparkle.three { top:8px; left:47%; width:9px; height:9px; background:#ffb3c6; animation-delay:2.1s; }
 @keyframes koko-twinkle { 0%,100% { opacity:.95; transform:scale(1); } 50% { opacity:.45; transform:scale(.7); } }
 html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
-.site-header .site-language { background:#eaf4ff; border:2px solid #b9d8f6; box-shadow:0 4px 0 #cfe3f7; }
+/* Site language without a frame, right on the beige header (the learner asked). */
+.site-header .site-language { background:transparent; border:0; box-shadow:none; padding:2px 4px 2px 0; }
+.site-header .site-language select { background:transparent; border:0; box-shadow:none; color:var(--ink); font-weight:800; font-size:16px; cursor:pointer; border-radius:12px; padding:4px 6px; field-sizing:content; width:auto; flex:none; }
+.site-header .site-language select:hover { background:rgba(255,255,255,.55); }
 .site-header .lk-effects-button { background:#fff5d6; border:2px solid #ffd968; box-shadow:0 4px 0 #f5df9c; color:#b77800; }
 .site-header .lk-effects-button:hover { background:#ffefc2; }
 .site-header .site-account { background:#ffeef3; border:2px solid #ffb3c6; box-shadow:0 4px 0 #f7cdd8; color:#e05c80; }
 .site-header .site-account:hover { background:#ffe3eb; }
 .site-header .site-home:not(.site-account),.logo-header.site-header .object-back { background:#eaf8ee; border:2px solid #a8dcb6; box-shadow:0 4px 0 #cdebd5; color:#2e8b57; }
-.site-header .site-language:hover,.site-header .lk-effects-button:hover,.site-header .site-home:hover { transform:translateY(-1px); }
+.site-header .lk-effects-button:hover,.site-header .site-home:hover { transform:translateY(-1px); }
 @media (prefers-reduced-motion:reduce) { .site-sparkle { animation:none; } }
 
 /* Fiil listesi ve Oyunlar: açılıp kapanan sekmeler */
@@ -242,7 +245,7 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 @media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:38px; padding:5px 12px; } }
 @media (prefers-reduced-motion:reduce) { .object-breadcrumb a { transition:none; } .object-breadcrumb a:hover { transform:none; } }
 
-/* Goliqo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
+/* Goligo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
    shown 248 px wide); the waving mascot and the big waving logo stand in for the old Koko pictures. */
 img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
 .brand-mascot { display:block; height:auto; object-fit:contain; pointer-events:none; user-select:none; }
@@ -350,8 +353,8 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
  .site-header .site-logo-brand { grid-area:logo; width:clamp(124px,40vw,176px); }
  .site-header .site-greeting { grid-area:bubble; justify-self:center; }
  .site-header .site-header-tools { display:contents; }
- .site-header .site-language { grid-area:lang; width:100%; box-sizing:border-box; }
- .site-header .site-language select { flex:1; max-width:none; }
+ .site-header .site-language { grid-area:lang; justify-self:center; }
+ .site-header .site-language select { max-width:70vw; }
  .site-header .site-header-buttons { grid-area:buttons; gap:8px; }
 }
 

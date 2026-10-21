@@ -3,12 +3,16 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {PublicHeader} from './public-shell';
 import {SiteFooter} from './site-footer';
 import {BrandLogoWave} from './site-logo';
+import {pickPictures,type PicturePart} from '@/lib/site-pictures';
 
-// The same pictures as the cards on the home page (the learner's menu pictures).
-const features=[
- {img:'/toon/home/vault.webp',title:'Nesne Kasası',text:'Evdeki, mutfaktaki ve işteki eşyaların adlarını özgün resimlerle öğren. Almanca ya da İngilizce çalışabilirsin.'},
- {img:'/toon/home/verbs.webp',title:'Fiil Atölyesi',text:'Fiiller tek tek ilerler: kart, anlam testi, yazım, geçmiş hali (Partizip II) ve onun yazımı. Yanlışlarını ayrı bir turda yeniden çalışırsın.'},
- {img:'/toon/home/units.webp',title:'A1.1 ve A1.2 konuları',text:'Ünite ünite konular ve Ev ve Yaşam alıştırmaları: test, yazarak pekiştirme ve harf bulmacaları.'},
+// One card for each part of the site, in the order of the menu; the pictures come from all the learner's sets and change
+// every 30 minutes (lib/site-pictures.ts; the learner asked: not always the same).
+const features:{part:PicturePart;title:string;text:string}[]=[
+ {part:'units',title:'Üniteler ve konular',text:'Kitaptaki üniteler A1.1 ve A1.2 olarak sırayla: konu notları, test, yazarak pekiştirme ve harf bulmacaları.'},
+ {part:'vault',title:'Nesne Kasası',text:'Evdeki, mutfaktaki ve işteki eşyaların adlarını özgün resimlerle öğren. Almanca ya da İngilizce çalışabilirsin.'},
+ {part:'verbs',title:'Fiil Atölyesi',text:'Fiiller tek tek ilerler: kart, anlam testi, yazım, geçmiş hali (Partizip II) ve onun yazımı.'},
+ {part:'games',title:'Oyunlar',text:'Eşleştirme kartlarıyla fiilleri resmiyle, anlamıyla ya da Perfekt hâliyle eşleştir.'},
+ {part:'mistakes',title:'Yanlışlarım',text:'Yanlış cevapladığın sorular burada toplanır; doğru cevapladıkça listeden çıkar.'},
 ];
 const perks=[
  {icon:Headphones,text:'Cevaptan sonra doğru cevabın söylenişini duyarsın.'},
@@ -20,6 +24,7 @@ const steps=['Ücretsiz üye ol: adın, e-postan ve bir şifre yeterli.','Bir ko
 
 /** Giriş yapmamış ziyaretçinin gördüğü tanıtım sayfası. */
 export default function Landing(){
+ const pictures=pickPictures();
  return <div className="lk-public lk-landing" data-landing>
   <a className="skip-link" href="#main">İçeriğe geç</a>
   <PublicHeader/>
@@ -36,14 +41,14 @@ export default function Landing(){
      </div>
      <p className="lk-hero-note"><CheckCircle2 size={18} aria-hidden="true"/>Ücretsiz. Reklam yok.</p>
     </div>
-    <div className="lk-hero-art"><img src="/toon/learning-hero.webp" alt="Elinde kitapla gülümseyen gözlüklü tilki" width={1774} height={887}/></div>
+    <div className="lk-hero-art"><img src={pictures.welcome} alt="Kitap maskotuyla birlikte Almanca öğrenenler; arkada Berlin’deki Brandenburg Kapısı" width={1400} height={700}/></div>
    </section>
 
    <section className="lk-section" aria-labelledby="lk-features-title">
     <h2 id="lk-features-title">Neler var?</h2>
     <div className="lk-features">
      {features.map(item=><article key={item.title} className="lk-feature">
-      <img src={item.img} alt="" width={1200} height={600} loading="lazy"/>
+      <img src={pictures[item.part]} alt="" width={1200} height={600} loading="lazy"/>
       <div><h3>{item.title}</h3><p>{item.text}</p></div>
      </article>)}
     </div>

@@ -3,8 +3,8 @@ import {useEffect,useState} from 'react';
 import {usePaulMotion} from './paul-hoca';
 
 /**
- * Goliqo's logo and mascot, from the learner's own logo files (made in ChatGPT): the book mascot with the word
- * "Goliqo", a bouncing gold ball (it jumps out of the mascot's hand over the letters onto the "i") and the mascot
+ * Goligo's logo and mascot, from the learner's own logo files (made in ChatGPT): the book mascot with the word
+ * "Goligo", a bouncing gold ball (it jumps out of the mascot's hand over the letters onto the "i") and the mascot
  * waving. public/branding: 20 frames a second like the learner's files, twice the shown size, cropped to the logo;
  * the still pictures are single frames of them.
  * With motion off (the site setting or the device) only the still pictures show.
@@ -44,5 +44,5 @@ export function BrandMascot({className=''}:{className?:string}){
 /** The whole logo with the mascot waving (the big logo on the introduction page). */
 export function BrandLogoWave({className=''}:{className?:string}){
  const animated=useAnimated(BRAND.logoWave);
- return <img className={('brand-logo-wave '+className).trim()} src={animated?BRAND.logoWave:BRAND.logoWaveStill} alt="Goliqo" width={560} height={205} decoding="async" draggable={false}/>;
+ return <img className={('brand-logo-wave '+className).trim()} src={animated?BRAND.logoWave:BRAND.logoWaveStill} alt="Goligo" width={560} height={205} decoding="async" draggable={false}/>;
 }

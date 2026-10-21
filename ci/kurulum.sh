@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Goliqo kurulum kontrolü — GitHub Actions'ta çalışır.
+# Goligo kurulum kontrolü — GitHub Actions'ta çalışır.
 # 01-BASLA-BURADAN.md içindeki yerel kurulum adımlarını sırayla dener:
 # pnpm 11.25.0, kilit dosyasıyla kurulum, derleme, TypeScript, testler,
 # yalnızca YEREL veritabanı şeması ve sitenin tarayıcıda açılması.

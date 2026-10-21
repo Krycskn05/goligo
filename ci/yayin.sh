@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Goliqo'yu Koray'ın KENDİ Cloudflare hesabına yayınlar (GitHub Actions'ta çalışır).
+# Goligo'yu Koray'ın KENDİ Cloudflare hesabına yayınlar (GitHub Actions'ta çalışır).
 # ChatGPT Sites projesine hiçbir şey göndermez, ona dokunmaz.
 #
 # CLOUDFLARE_API_TOKEN yoksa yalnızca DENEME yapar: paket hazırlanır, yayın yapılmaz.
@@ -72,7 +72,7 @@ s_d1() {
   echo "$id" > "$OUT/d1-id.txt"
 }
 s_build() {
-  GOLIQO_D1_ID="$(cat "$OUT/d1-id.txt" 2>/dev/null || true)" pnpm run build || return 1
+  GOLIGO_D1_ID="$(cat "$OUT/d1-id.txt" 2>/dev/null || true)" pnpm run build || return 1
   echo "--- dist/server/wrangler.json (özet) ---"
   node -e '
     const c=require("./dist/server/wrangler.json");
@@ -123,6 +123,17 @@ s_kontrol() {
   done
 }
 
+s_eski() { # Eski adres(ler): herkesi yeni adrese gönderir, tarayıcı ayarlarını bir kez taşır (ci/eski-adres).
+  local url old
+  url=$(cat "$OUT/ADRES.txt" 2>/dev/null || true)
+  [ -n "$url" ] || { echo "Yeni adres bulunamadı"; return 1; }
+  for old in $(node -p "(require('./yayin.json').oldWorkerNames||[]).join(' ')"); do
+    [ "$old" = "$WORKER" ] && continue
+    echo "Eski adres: $old -> $url"
+    wr deploy --config ci/eski-adres/wrangler.json --name "$old" --var "NEW_ORIGIN:$url" || return 1
+  done
+}
+
 adim "1-pnpm" 01-pnpm.log s_pnpm
 adim "2-kurulum" 02-install.log s_install
 if [ "$DRY" -eq 1 ]; then
@@ -137,7 +148,8 @@ else
     && adim "6-sema" 06-schema.log s_sema \
     && adim "6-uyelik" 06-members.log s_uyelik \
     && adim "7-yayin" 07-deploy.log s_yayin \
-    && adim "8-kontrol" 08-check.log s_kontrol
+    && adim "8-kontrol" 08-check.log s_kontrol \
+    && adim "9-eski-adres" 09-old-address.log s_eski
 fi
 
 cd "$OUT"

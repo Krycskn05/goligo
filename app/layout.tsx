@@ -14,6 +14,7 @@ import "./admin.css";
 import "./paul-hoca.css";
 import "./site-tour.css";
 import LearningEffects from './learning-effects';
+import { STORAGE_MOVE_SCRIPT } from "@/lib/storage-move";
 
 export const metadata: Metadata = {
   // Only the site name in the browser tab (the learner removed the tagline after it).
@@ -37,6 +38,8 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
+        {/* Moving from the old address: takes this browser's settings along once (lib/storage-move.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: STORAGE_MOVE_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Lora:ital,wght@0,500..700;1,500..700&display=swap" rel="stylesheet" />

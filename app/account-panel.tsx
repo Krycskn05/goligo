@@ -75,7 +75,7 @@ export default function AccountPanel({name:initialName,email,since}:Props){
 
   <Card icon={<Download size={20} aria-hidden="true"/>} title="Verilerim">
    <p>Hesap bilgilerini ve bütün çalışma kayıtlarını (cevaplar, ilerleme, notlar) bir dosya olarak indirebilirsin.</p>
-   <a className="btn secondary small" href="/api/auth?export=1" download="goliqo-verilerim.json" data-account-export>Verilerimi indir</a>
+   <a className="btn secondary small" href="/api/auth?export=1" download="goligo-verilerim.json" data-account-export>Verilerimi indir</a>
   </Card>
 
   <Card icon={<Trash2 size={20} aria-hidden="true"/>} title="Hesabı sil">

@@ -1,30 +1,32 @@
-// The site is called Goliqo (it was LernKoko). Every name a learner sees says Goliqo; the browser keys
-// (lernkoko-…), the database and the Cloudflare worker keep their old internal names, so nobody loses settings or data.
+// The site is called Goligo (it was LernKoko). Every name a learner sees says Goligo; the browser keys
+// (lernkoko-…) and the database keep their old internal names, so nobody loses settings or data; the web address
+// moved to goligo.… (the learner asked) and the old address sends everybody there (tests/storage-move.test.cjs).
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const read=file=>fs.readFileSync(file,'utf8');
 const walk=dir=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(entry=>entry.isDirectory()?walk(path.join(dir,entry.name)):[path.join(dir,entry.name)]);
 
-test('the site name is Goliqo everywhere a learner can see it',()=>{
- assert.ok(read('lib/site-brand.ts').includes("export const SITE_NAME = 'Goliqo';"));
+test('the site name is Goligo everywhere a learner can see it',()=>{
+ assert.ok(read('lib/site-brand.ts').includes("export const SITE_NAME = 'Goligo';"));
  const manifest=JSON.parse(read('public/manifest.json'));
- assert.equal(manifest.name,'Goliqo');assert.equal(manifest.short_name,'Goliqo');
- assert.ok(read('public/favicon.svg').includes('<title>Goliqo</title>'));
+ assert.equal(manifest.name,'Goligo');assert.equal(manifest.short_name,'Goligo');
+ assert.ok(read('public/favicon.svg').includes('<title>Goligo</title>'));
  // The browser tab shows only the name (the learner removed "Almanca ve İngilizce Eğitimi").
  const layout=read('app/layout.tsx');assert.ok(layout.includes('  title: SITE_NAME,')&&!layout.includes('İngilizce Eğitimi'));
- for(const file of [...walk('app'),...walk('lib')].filter(file=>/\.(tsx?|json|css)$/.test(file)))
-  assert.ok(!read(file).includes('LernKoko'),file+' still says LernKoko');
+ for(const file of [...walk('app'),...walk('lib')].filter(file=>/\.(tsx?|json|css)$/.test(file))){
+  const text=read(file);assert.ok(!text.includes('LernKok')&&!text.includes('Goliqo'),file+' still says LernKoko or Goliqo');
+ }
  const home=read('lib/home-copy.ts');
- assert.ok(home.includes("'Goliqo’ya hoş geldin!'")&&home.includes("'Goliqo’yu uygulama gibi kullan'"));
+ assert.ok(home.includes("'Goligo’ya hoş geldin!'")&&home.includes("'Goligo’yu uygulama gibi kullan'"));
  assert.ok(read('app/yonetim/page.tsx').includes('<span className="eyebrow">{SITE_NAME}</span>'));
  // The data download is named after the site, too.
- assert.ok(read('app/account-panel.tsx').includes('download="goliqo-verilerim.json"'));
- assert.ok(read('app/api/auth/route.ts').includes('filename="goliqo-verilerim.json"'));
+ assert.ok(read('app/account-panel.tsx').includes('download="goligo-verilerim.json"'));
+ assert.ok(read('app/api/auth/route.ts').includes('filename="goligo-verilerim.json"'));
  // Everywhere else too (the learner asked): the project, the build and the notes.
- assert.equal(JSON.parse(read('package.json')).name,'goliqo');
- assert.ok(read('vite.config.ts').includes('process.env.GOLIQO_D1_ID')&&read('ci/yayin.sh').includes('GOLIQO_D1_ID=')&&!read('ci/yayin.sh').includes('LERNKOKO_D1_ID'));
- for(const file of ['migration/database/members.sql','CLAUDE.md'])assert.ok(read(file).includes('Goliqo'),file);
+ assert.equal(JSON.parse(read('package.json')).name,'goligo');
+ assert.ok(read('vite.config.ts').includes('process.env.GOLIGO_D1_ID')&&read('ci/yayin.sh').includes('GOLIGO_D1_ID=')&&!read('ci/yayin.sh').includes('LERNKOKO_D1_ID'));
+ for(const file of ['migration/database/members.sql','CLAUDE.md'])assert.ok(read(file).includes('Goligo'),file);
  assert.ok(!read('lib/member-auth.ts').includes('lernkoko.local'));
  assert.ok(!read('app/landing.tsx').includes('tilki Koko'));
 });
@@ -43,7 +45,7 @@ function webp(file){
  return {size,frames,loop,bytes:data.length};
 }
 
-test('the learner\'s Goliqo logo and animations are used in many places',()=>{
+test('the learner\'s Goligo logo and animations are used in many places',()=>{
  // The learner's own logo files (ChatGPT): a still logo, the gold ball bouncing onto the "i", the mascot waving.
  const logo=read('app/site-logo.tsx');
  // High quality (the learner asked): all 20 frames a second of the learner's files, twice the shown size, and every
@@ -69,9 +71,9 @@ test('the learner\'s Goliqo logo and animations are used in many places',()=>{
  for(const file of ['app/home-tour.tsx','app/ausbildung-study.tsx'])assert.ok(!read(file).includes('koko-mascot.png'),file);
 });
 
-test('internal names stay, so saved settings, sign-ins and data keep working',()=>{
+test('internal names stay, so saved settings and data keep working; the address is goligo now',()=>{
  assert.ok(read('lib/learning-effects.ts').includes("export const EFFECTS_KEY = 'lernkoko-effects-v1';"));
  assert.ok(read('lib/learning-language.ts').includes("'lernkoko-learning-language'"));
  const hosting=JSON.parse(read('yayin.json'));
- assert.equal(hosting.workerName,'lernkoko');assert.equal(hosting.d1DatabaseName,'lernkoko-db');
+ assert.equal(hosting.workerName,'goligo');assert.deepEqual(hosting.oldWorkerNames,['lernkoko']);assert.equal(hosting.d1DatabaseName,'lernkoko-db');
 });

@@ -61,10 +61,10 @@ const pngSize=file=>{const data=fs.readFileSync(file);assert.equal(data.toString
 test('the site has the Koko app icon for the browser tab, the phone home screen and the installed app',()=>{
  const layout=read('app/layout.tsx');
  assert.ok(layout.includes('<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />')&&layout.includes('<link rel="manifest" href="/manifest.json" />'));
- assert.ok(layout.includes('<meta name="apple-mobile-web-app-title" content={SITE_NAME} />'),'the name under the icon is Goliqo');
+ assert.ok(layout.includes('<meta name="apple-mobile-web-app-title" content={SITE_NAME} />'),'the name under the icon is Goligo');
  assert.deepEqual(pngSize('public/apple-touch-icon.png'),[180,180]);
  const manifest=JSON.parse(read('public/manifest.json'));
- assert.equal(manifest.name,'Goliqo');assert.equal(manifest.short_name,'Goliqo');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
+ assert.equal(manifest.name,'Goligo');assert.equal(manifest.short_name,'Goligo');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
  const sizes=Object.fromEntries(manifest.icons.map(icon=>[icon.src,pngSize('public'+icon.src).join('x')]));
  assert.deepEqual(sizes,{'/icons/icon-192.png':'192x192','/icons/icon-512.png':'512x512','/icons/icon-maskable-512.png':'512x512'});
  assert.ok(manifest.icons.some(icon=>icon.purpose==='maskable'));
@@ -74,7 +74,7 @@ test('the site has the Koko app icon for the browser tab, the phone home screen 
  for(const file of ['/manifest.json','/apple-touch-icon.png','/favicon.ico','/favicon.svg',...manifest.icons.map(icon=>icon.src)])assert.ok(auth.isPublicPath(file),file);
 });
 
-test('"Uygulama olarak indir" in the left menu explains how to add Goliqo to the phone',()=>{
+test('"Uygulama olarak indir" in the left menu explains how to add Goligo to the phone',()=>{
  // A menu button right under the left menu (home page and units page), not in the welcome card.
  const home=read('app/category-study.tsx');
  const aside=home.slice(home.indexOf('<aside className="work-sidebar">'),home.indexOf('</aside>'));
@@ -109,8 +109,18 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  }
  for(const name of ['housing','ausbildung'])assert.ok(!icons.includes(name+":'/icons/menu/"),name+' keeps its drawing');
  assert.ok(icons.includes("if(picture)return <span className={'nav-icon has-picture nav-icon-'+name} aria-hidden=\"true\"><img src={picture} alt=\"\" width={128} height={128}"));
- // One picture of the learner's per home page card (1200 × 600).
+ // One picture of the learner's per home page card (1200 × 600) from all their sets, changing every 30 minutes
+ // (lib/site-pictures.ts; the learner asked: not always the same).
  const tour=read('app/home-tour.tsx');
- assert.ok(tour.includes("const art=(id:string)=><img src={'/toon/home/'+id+'.webp'} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;"));
- for(const id of ['units','vault','verbs','games','mistakes']){assert.ok(tour.includes("art:art('"+id+"')"),id);assert.deepEqual(size('public/toon/home/'+id+'.webp'),[1200,600],id);}
+ assert.ok(tour.includes("const art=(id:keyof PicturePick)=><img src={pictures[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;")&&tour.includes('useState<PicturePick>(()=>pickPictures())')&&tour.includes('nextPictureChange()'));
+ const pictures=read('lib/site-pictures.ts');
+ for(const id of ['units','vault','verbs','games','mistakes']){
+  assert.ok(tour.includes("art:art('"+id+"')"),id);
+  const list=[...pictures.match(new RegExp(' '+id+':\\[([^\\]]*)\\]'))[1].matchAll(/'([^']+)'/g)].map(m=>m[1]);
+  assert.ok(list.length>=3,id+': at least three pictures to mix');
+  for(const src of list)assert.deepEqual(size('public'+src),[1200,600],src);
+ }
+ const landing=read('app/landing.tsx');
+ assert.ok(landing.includes('const pictures=pickPictures();')&&landing.includes('<img src={pictures.welcome}')&&landing.includes('<img src={pictures[item.part]}'));
+ for(const src of ['/toon/landing/karsilama.webp','/toon/landing/karsilama-2.webp','/toon/landing/karsilama-3.webp'])assert.deepEqual(size('public'+src),[1400,700],src);
 });

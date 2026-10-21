@@ -1,5 +1,8 @@
 {
-  "workerName": "lernkoko",
+  "workerName": "goligo",
+  "oldWorkerNames": [
+    "lernkoko"
+  ],
   "d1DatabaseName": "lernkoko-db",
   "accessTeamDomain": "https://throbbing-bread-1016.cloudflareaccess.com",
   "accessPolicyAud": "3cd3e8e441c3a316e36262af3a1bb856b8e59cfe09100720ad8804701ffde8b0"

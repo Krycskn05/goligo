@@ -4,7 +4,7 @@ const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_C
 const load=name=>require(path.join(compiled,name+'.js'));
 const auth=load('member-auth'),store=load('member-store'),gate=load('site-gate');
 
-const SITE='https://goliqo.test';
+const SITE='https://goligo.test';
 function fakeDb(){
  const sql=new DatabaseSync(':memory:');
  sql.exec(fs.readFileSync('drizzle/0000_heavy_brood.sql','utf8'));

@@ -2,7 +2,9 @@
  * The welcome tour (the learner asked: after signing up, everyone is first asked about the sounds and then shown
  * around the site). Design "Spot ışığı" (the learner chose it): the page dims, the real part of the page lights up and
  * Paul explains it in a card next to it. Shown once in each browser (new members right after signing up, members
- * who were already there on their next visit to the home page); Hesabım can start it again ("/?tur=1").
+ * who were already there on their next visit to the home page); Hesabım can start it again ("/?tur=1"). Once per
+ * member (the learner asked: not on every visit): the account keeps a note `tour` = done as soon as the tour opens,
+ * so it does not come back on another device or after leaving it half way.
  */
 export const TOUR_KEY='lernkoko-tour-v1';
 export const TOUR_DONE='done';
@@ -27,9 +29,17 @@ export const TOUR_STEPS:readonly {id:TourStepId;target:string|null}[]=[
  {id:'done',target:null},
 ];
 
-/** The tour starts when this browser has not finished it yet, or when the address asks for it (?tur=1). */
-export function shouldStartTour(saved:string|null,search:string){
- return saved!==TOUR_DONE||new URLSearchParams(search).get(TOUR_PARAM)==='1';
+/** The member's note in the account (app/api/study: GET ?note=tour, POST action note). */
+export const TOUR_NOTE='tour';
+/** Hesabım's "Site turunu başlat" opens it again (?tur=1). */
+export function tourReplay(search:string){return new URLSearchParams(search).get(TOUR_PARAM)==='1';}
+/**
+ * What the home page does: `skip` when the account has seen the tour; `sync` when only this browser has (from before
+ * the account kept it) — tell the account and skip; otherwise `show` it and tell the account at once.
+ */
+export function tourPlan(account:string|null|undefined,browser:string|null):'show'|'sync'|'skip'{
+ if(account===TOUR_DONE)return 'skip';
+ return browser===TOUR_DONE?'sync':'show';
 }
 
 export type Box={left:number;top:number;width:number;height:number};

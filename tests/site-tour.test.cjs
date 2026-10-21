@@ -8,6 +8,8 @@ const tour=require(path.join(compiled,'site-tour.js'));
 const copy=require(path.join(compiled,'tour-copy.js'));
 const site=require(path.join(compiled,'site-languages.js'));
 const read=file=>fs.readFileSync(file,'utf8');
+const vm=require('node:vm');const {DatabaseSync}=require('node:sqlite');const ts=require('typescript');
+const course=require(path.join(compiled,'course.js'));const study=require(path.join(compiled,'study.js'));
 
 test('the sounds come first, then the header, the menu and "Hazırsın!"',()=>{
  assert.deepEqual(tour.TOUR_STEPS.map(step=>step.id),['sounds','clock','language','effects','account','units','vault','verbs','games','mistakes','install','done']);
@@ -18,11 +20,16 @@ test('the sounds come first, then the header, the menu and "Hazırsın!"',()=>{
  assert.ok(home.includes("href={home?'/konular':'#curriculum'}")&&home.includes("href={'/ev-esyalar?learn='+course}")&&home.includes('verb-nav-link')&&home.includes('data-verb-section-link="games"')&&home.includes('data-verb-section-link="mistakes"')&&install.includes('ig-trigger'));
 });
 
-test('shown once in each browser; ?tur=1 starts it again',()=>{
- assert.equal(tour.shouldStartTour(null,''),true);
- assert.equal(tour.shouldStartTour('done',''),false);
- assert.equal(tour.shouldStartTour('done','?tur=1'),true);
- assert.equal(tour.shouldStartTour('done','?learn=de'),false);
+test('shown once per member (the account remembers it); ?tur=1 starts it again',()=>{
+ assert.equal(tour.tourPlan('',null),'show');
+ assert.equal(tour.tourPlan(undefined,null),'show');
+ assert.equal(tour.tourPlan('done',null),'skip','seen on another device');
+ assert.equal(tour.tourPlan('done','done'),'skip');
+ assert.equal(tour.tourPlan('','done'),'sync','seen in this browser before the account kept it');
+ assert.equal(tour.tourReplay('?tur=1'),true);assert.equal(tour.tourReplay('?learn=de'),false);
+ const ui=read('app/site-tour.tsx');
+ // Remembered as soon as it opens, so leaving half way or another device does not bring it back.
+ assert.ok(ui.includes("if(plan!=='skip')remember();")&&ui.includes("void api({action:'note',key:TOUR_NOTE,value:TOUR_DONE})")&&ui.includes("fetch('/api/study?note='+TOUR_NOTE"));
  // A new member always gets it, even on a browser that has seen it.
  const auth=read('app/auth-form.tsx');assert.ok(auth.includes("if(register){try{localStorage.removeItem(TOUR_KEY);}catch{}}"));
  // Hesabım can start it again.
@@ -60,4 +67,21 @@ test('the tour speaks every site language and asks about the sounds',()=>{
  assert.ok(ui.includes("element.setAttribute('inert','')")&&ui.includes("if(event.key==='Escape')")&&ui.includes('localStorage.setItem(TOUR_KEY,TOUR_DONE)'));
  assert.ok(read('app/paul-hoca.tsx').includes(".sg-backdrop,.st-layer')"),'Paul does not pop up during the tour');
  assert.ok(read('app/layout.tsx').includes('import "./site-tour.css";'));
+});
+
+// The study API keeps the member's tour note (the same harness as tests/housing-review.test.cjs).
+function app(){
+ const sql=new DatabaseSync(':memory:');sql.exec(fs.readFileSync('drizzle/0000_heavy_brood.sql','utf8'));
+ const db={prepare(query){return {query,args:[],bind(...args){this.args=args;return this;},async first(column){const r=sql.prepare(this.query).get(...this.args);return column?r?.[column]??null:r??null;},async all(){return {results:sql.prepare(this.query).all(...this.args)};},async run(){return sql.prepare(this.query).run(...this.args);}};},async batch(items){sql.exec('BEGIN');try{const result=[];for(const item of items)result.push(await item.run());sql.exec('COMMIT');return result;}catch(error){sql.exec('ROLLBACK');throw error;}}};
+ const source=ts.transpileModule(fs.readFileSync('app/api/study/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;const module={exports:{}};
+ vm.runInNewContext(source,{module,exports:module.exports,Response,Request,URL,console,Date,require(name){if(name==='@/db')return {getRawDb:()=>db};if(name==='@/app/chatgpt-auth')return {getChatGPTUser:async()=>({userId:'star-student'})};if(name==='@/lib/course')return course;if(name==='@/lib/study')return study;throw Error(name);}});
+ return {post(body){return module.exports.POST(new Request('https://tour.test/api/study',{method:'POST',headers:{'content-type':'application/json',origin:'https://tour.test'},body:JSON.stringify(body)}));},get(query=''){return module.exports.GET(new Request('https://tour.test/api/study'+query));}};
+}
+
+test('the account keeps the tour note for the member',async()=>{
+ const a=app();
+ assert.deepEqual(await (await a.get('?note=tour')).json(),{tour:''});
+ assert.equal((await a.post({action:'note',key:'tour',value:'done'})).status,200);
+ assert.deepEqual(await (await a.get('?note=tour')).json(),{tour:'done'});
+ assert.equal((await a.post({action:'note',key:'tour',value:'yes'})).status,400,'only done or empty');
 });

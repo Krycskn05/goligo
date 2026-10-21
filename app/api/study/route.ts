@@ -29,6 +29,8 @@ export async function GET(request:Request){
   const user=await identity();if(!user)return json({error:'Kayıtlarını görmek için giriş yap.',signIn:true},401);
   const db=getRawDb();const url=new URL(request.url);const id=url.searchParams.get('session');const english=url.searchParams.get('learn')==='en';
   if(id){const session=await loadSession(db,user,id);return session&&String(session.topic).startsWith('en-')===english?json({session}):json({error:'Test bulunamadı.'},404);}
+  // The welcome tour is shown once per member (the learner asked): the home page asks only for this one note.
+  if(url.searchParams.get('note')==='tour'){const row=await db.prepare('SELECT value FROM study_notes WHERE user_id=? AND key=?').bind(user,'tour').first<{value:string}>();return json({tour:row?.value??''});}
   const [reviews,notes,sessions,activePicture,activeVerb]=await Promise.all([
    db.prepare('SELECT question_id,wrong_count,streak,seen,last_answer,last_wrong,last_at,due_at FROM study_review WHERE user_id=?').bind(user).all(),
    db.prepare('SELECT key,value FROM study_notes WHERE user_id=?').bind(user).all<{key:string;value:string}>(),
@@ -89,7 +91,8 @@ export async function POST(request:Request){
    const key=String(body.key??'');const value=typeof body.value==='string'?body.value:'';
    const starred=key.startsWith(STAR_NOTE_PREFIX)?key.slice(STAR_NOTE_PREFIX.length):'';
    const star=!!starred&&(questionMap.has(starred)||questionMap.has(starred+'-test'))&&(value===''||value==='1');
-   if(!(key==='profile'||star||(key.startsWith('lesson:')&&topics.some(t=>'lesson:'+t.id===key)))||value.length>10000)return json({error:'Geçersiz çalışma kaydı.'},400);
+   const tour=key==='tour'&&(value===''||value==='done');
+   if(!(key==='profile'||star||tour||(key.startsWith('lesson:')&&topics.some(t=>'lesson:'+t.id===key)))||value.length>10000)return json({error:'Geçersiz çalışma kaydı.'},400);
    await db.prepare('INSERT INTO study_notes (user_id,key,value,updated_at) VALUES (?,?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind(user,key,value,now).run();
    return json({saved:true});
   }

@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useLayoutEffect,useRef,useState,type CSSProperties} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowLeft,ArrowRight,Check,Play,Square,Volume2,X} from 'lucide-react';
-import {TOUR_STEPS,TOUR_KEY,TOUR_DONE,TOUR_PARAM,shouldStartTour,placeTip,type Box,type TipPlace,type TourStepId} from '@/lib/site-tour';
+import {TOUR_STEPS,TOUR_KEY,TOUR_DONE,TOUR_NOTE,TOUR_PARAM,tourPlan,tourReplay,placeTip,type Box,type TipPlace,type TourStepId} from '@/lib/site-tour';
 import {tourText,type TourCopyKey} from '@/lib/tour-copy';
 import {effectsText} from '@/lib/effects-copy';
 import {homeText} from '@/lib/home-copy';
@@ -13,7 +13,7 @@ import {languageDirection,pickText} from '@/lib/site-languages';
 import type {StudyLanguage} from '@/lib/study-languages';
 import {EFFECTS_CHANGED,canPlayEffects,playLearningSound,readEffects,saveEffects,stopAllEffects,type EffectsPreferences} from '@/lib/learning-effects';
 import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGreeting} from '@/lib/site-voices';
-import {useGermanSpeech} from './study-shared';
+import {api,useGermanSpeech} from './study-shared';
 import {VOICE_SPEEDS} from './learning-effects';
 import {PAUL_PICTURES,PAUL_STILL,usePaulMotion,type PaulPose} from './paul-hoca';
 import {accountLabel,siteLanguageLabel} from './site-header';
@@ -117,11 +117,22 @@ export function SiteTour({language}:{language:StudyLanguage}){
  const t=(key:TourCopyKey)=>tourText(language,key);
 
  useEffect(()=>{
-  let saved:string|null=null;try{saved=localStorage.getItem(TOUR_KEY);}catch{}
-  if(!shouldStartTour(saved,window.location.search))return;
+  let alive=true,timer:ReturnType<typeof setTimeout>|undefined;
   // A moment after the page is ready, so the header and the menu are in place.
-  const timer=setTimeout(()=>{setSteps(TOUR_STEPS.filter(item=>!item.target||shown(document.querySelector(item.target))));setIndex(0);},700);
-  return()=>clearTimeout(timer);
+  const start=()=>{timer=setTimeout(()=>{if(alive){setSteps(TOUR_STEPS.filter(item=>!item.target||shown(document.querySelector(item.target))));setIndex(0);}},700);};
+  // Seen: this browser and the member's account remember it, so the tour comes only once per member.
+  const remember=()=>{try{localStorage.setItem(TOUR_KEY,TOUR_DONE);}catch{}void api({action:'note',key:TOUR_NOTE,value:TOUR_DONE}).catch(()=>{});};
+  if(tourReplay(window.location.search))start();
+  else{
+   let browser:string|null=null;try{browser=localStorage.getItem(TOUR_KEY);}catch{}
+   fetch('/api/study?note='+TOUR_NOTE,{cache:'no-store'}).then(response=>response.ok?response.json() as Promise<{tour?:string}>:null).then(data=>{
+    if(!alive||!data)return;
+    const plan=tourPlan(data.tour,browser);
+    if(plan!=='skip')remember();
+    if(plan==='show')start();
+   }).catch(()=>{});
+  }
+  return()=>{alive=false;if(timer)clearTimeout(timer);};
  },[]);
  const finish=useCallback(()=>{
   try{localStorage.setItem(TOUR_KEY,TOUR_DONE);}catch{}

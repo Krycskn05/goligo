@@ -9,7 +9,7 @@ import {verbText} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {gameText,type GameCopyKey} from '@/lib/game-copy';
 import {motionAllowed} from '@/lib/learning-effects';
-import {bestKey} from '@/lib/verb-games';
+import {bestKey,MATCH_PREVIEW_SECONDS} from '@/lib/verb-games';
 import {
  ARTICLES,RAIN_LIVES,rainRound,rainSeconds,catchRound,catchPoints,catchMultiplier,CATCH_SECONDS,quickDeck,QUICK_SECONDS,
  searchGrid,searchFind,searchCells,rescueRound,rescueMask,rescueSolved,rescueMisses,RESCUE_BALLOONS,RESCUE_KEYS,pluralRound,
@@ -30,6 +30,17 @@ function useLater(){
  const timers=useRef<ReturnType<typeof setTimeout>[]>([]);
  useEffect(()=>()=>{timers.current.forEach(clearTimeout);},[]);
  return {later:(fn:()=>void,ms:number)=>{timers.current.push(setTimeout(fn,ms));},clear:()=>{timers.current.forEach(clearTimeout);timers.current=[];}};
+}
+/** Matching cards: every card face up for the first seconds (a countdown, "Hemen başla" to skip), then the game starts.
+ * A new deal (another round, another language) shows them again. */
+export function useMatchPreview(deal:unknown){
+ const [seconds,setSeconds]=useState(MATCH_PREVIEW_SECONDS);
+ useEffect(()=>{setSeconds(MATCH_PREVIEW_SECONDS);},[deal]);
+ useEffect(()=>{if(seconds<=0)return;const timer=setTimeout(()=>setSeconds(value=>value-1),1000);return()=>clearTimeout(timer);},[seconds]);
+ return {seconds,skip:()=>setSeconds(0)};
+}
+export function MatchPreview({language,preview}:{language:VaultLanguage;preview:{seconds:number;skip:()=>void}}){
+ return preview.seconds>0?<div className="match-preview" role="status" data-match-preview><strong>{gameText(language,'memorize',{n:preview.seconds})}</strong><button type="button" className="text-button" onClick={preview.skip} data-match-preview-skip>{gameText(language,'skipPreview')}</button></div>:null;
 }
 function Picture({id,language}:{id:string;language:VaultLanguage}){return <span className="game-picture"><ObjectArt id={id} title={objectMeaning(id,language)}/></span>;}
 function Over({language,line,best,onRestart,children}:{language:VaultLanguage;line:string;best?:string|null;onRestart:()=>void;children?:ReactNode}){
@@ -205,11 +216,11 @@ export function RescueGame({language,feedback,onRestart}:Props){
 export function PluralGame({language,feedback,onRestart}:Props){
  const cards=useMemo(()=>pluralRound(6),[]);
  const [open,setOpen]=useState<string[]>([]);const [matched,setMatched]=useState<Set<string>>(new Set());const [moves,setMoves]=useState(0);const [best,setBest]=useState<number|null>(null);
- const {later}=useLater();
+ const {later}=useLater();const preview=useMatchPreview(cards);
  useEffect(()=>{setBest(readBest(bestKey('plural','objects')));},[]);
  const pairs=cards.length/2;const done=matched.size===pairs&&pairs>0;
  function flip(id:string){
-  if(open.length>=2||open.includes(id)||done)return;const card=cards.find(item=>item.id===id);if(!card||matched.has(card.pair))return;
+  if(preview.seconds>0||open.length>=2||open.includes(id)||done)return;const card=cards.find(item=>item.id===id);if(!card||matched.has(card.pair))return;
   const next=[...open,id];setOpen(next);if(next.length<2)return;
   setMoves(value=>value+1);const [a,b]=next.map(cardId=>cards.find(item=>item.id===cardId)!);
   if(a.pair===b.pair){const plural=a.face==='plural'?a.text:b.text;const all=new Set(matched).add(a.pair);setMatched(all);setOpen([]);feedback.answer(true,plural);if(all.size===pairs)setBest(saveBest(bestKey('plural','objects'),moves+1,true));}
@@ -217,7 +228,8 @@ export function PluralGame({language,feedback,onRestart}:Props){
  }
  return <div className="verb-game-body game-plural" data-game="plural">
   <div className="verb-game-status"><span>{verbText(language,'pairsFound',{n:matched.size,total:pairs})}</span><span>{verbText(language,'moves',{n:moves})}</span>{best!==null&&<span>{verbText(language,'bestScore',{n:best})}</span>}</div>
-  <div className="verb-match-grid">{cards.map((card,i)=>{const shown=open.includes(card.id)||matched.has(card.pair);return <button type="button" key={card.id} className={'verb-match-card plural-card '+card.face+(shown?' shown':'')+(matched.has(card.pair)?' matched':'')} aria-pressed={shown} aria-label={shown?card.text:verbText(language,'cardHidden',{n:i+1})} disabled={matched.has(card.pair)} onClick={()=>flip(card.id)}>{shown?<>{card.face==='singular'&&<Picture id={card.pair} language={language}/>}<span lang="de" dir="ltr">{card.text}</span></>:<span className="verb-match-back" aria-hidden="true">?</span>}</button>;})}</div>
+  <MatchPreview language={language} preview={preview}/>
+  <div className={'verb-match-grid'+(preview.seconds>0?' previewing':'')}>{cards.map((card,i)=>{const shown=preview.seconds>0||open.includes(card.id)||matched.has(card.pair);return <button type="button" key={card.id} className={'verb-match-card plural-card '+card.face+(shown?' shown':'')+(matched.has(card.pair)?' matched':'')} aria-pressed={shown} aria-label={shown?card.text:verbText(language,'cardHidden',{n:i+1})} disabled={matched.has(card.pair)} onClick={()=>flip(card.id)}>{shown?<>{card.face==='singular'&&<Picture id={card.pair} language={language}/>}<span lang="de" dir="ltr">{card.text}</span></>:<span className="verb-match-back" aria-hidden="true">?</span>}</button>;})}</div>
   {done&&<Over language={language} line={verbText(language,'moves',{n:moves})} best={best?verbText(language,'bestScore',{n:best}):null} onRestart={onRestart}/>}
  </div>;
 }

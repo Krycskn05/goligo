@@ -359,6 +359,16 @@ async function languageFlow(browser) {
       await p2.locator(`[data-verb-game-card="${id}"]`).click();
       if (await p2.locator("[data-game-start]").count()) await p2.locator("[data-game-start]").click();
       await p2.waitForTimeout(700);
+      if (id === "plural") {
+        // Eslestirme (ogrenci istedi): ilk 5 saniye butun kartlar acik, sonra kapaniyor; "Hemen basla" hemen kapatiyor.
+        const all = await p2.locator(".plural-card").count();
+        const shownFirst = await p2.locator(".plural-card.shown").count();
+        const banner = await p2.locator("[data-match-preview]").count();
+        await p2.locator("[data-match-preview-skip]").click();
+        await p2.waitForTimeout(300);
+        const shownAfter = await p2.locator(".plural-card.shown").count();
+        record("Eslestirme: kartlar once acik, sonra kapaniyor", all > 0 && shownFirst === all && banner === 1 && shownAfter === 0, `${shownFirst}/${all} acik → ${shownAfter}`);
+      }
       const answer = { rain: "[data-rain-article]", catch: "[data-catch-option]", quick: "[data-quick-answer]", search: "[data-search-cell]", rescue: "[data-rescue-key]", plural: ".plural-card" }[id];
       await p2.locator(answer).first().click();
       await p2.waitForTimeout(900);

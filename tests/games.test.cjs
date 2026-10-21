@@ -60,6 +60,21 @@ test('Çoğul eşleştirme: six pairs, the word and its plural with die',()=>{
  for(const pair of new Set(cards.map(card=>card.pair))){const two=cards.filter(card=>card.pair===pair);assert.deepEqual(two.map(card=>card.face).sort(),['plural','singular']);assert.ok(two.find(card=>card.face==='plural').text.startsWith('die '));}
 });
 
+test('both matching games show every card for 5 seconds first (the learner asked), with a "start now" button',()=>{
+ assert.equal(verbGames.MATCH_PREVIEW_SECONDS,5);
+ const games=read('app/object-games.tsx');
+ assert.ok(games.includes('export function useMatchPreview(')&&games.includes('export function MatchPreview('));
+ assert.ok(games.includes("gameText(language,'memorize',{n:preview.seconds})")&&games.includes('onClick={preview.skip}'));
+ for(const [file,code] of [['app/verb-games.tsx',read('app/verb-games.tsx')],['app/object-games.tsx',games]]){
+  assert.ok(code.includes('const preview=useMatchPreview(cards);'),file);
+  assert.ok(code.includes('if(preview.seconds>0||open.length>=2'),file+': no flipping while the cards are shown');
+  assert.ok(code.includes('const shown=preview.seconds>0||open.includes(card.id)'),file+': every card face up during the preview');
+  assert.ok(code.includes('<MatchPreview language={language} preview={preview}/>'),file);
+ }
+ assert.ok(copy.gameText('tr','memorize',{n:5}).includes('5')&&copy.gameText('de','memorize',{n:3}).includes('3'));
+ assert.ok(read('app/games.css').includes('.match-preview {'));
+});
+
 test('the Oyunlar page offers every game, named in every site language',()=>{
  assert.deepEqual(verbGames.gameIds,['match','rain','catch','quick','search','rescue','plural']);
  const ids=site.siteLanguages.map(item=>item.id);

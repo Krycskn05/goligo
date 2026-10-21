@@ -63,5 +63,8 @@ export function matchRound(topic:string,kind:MatchKind,language:VaultLanguage,pa
  }
  return mix(cards,random);
 }
+/** Matching cards (Eşleştirme kartları, Çoğul eşleştirme): all cards are shown face up for this many seconds first, then
+ * they turn over and the game starts (the learner asked). */
+export const MATCH_PREVIEW_SECONDS=5;
 /** Best scores stay in this browser only (higher is better; for memory fewer moves is better). */
 export function bestKey(game:GameId,topic:string,kind=''){return 'lernkoko-verb-game:'+game+':'+topic+(kind?':'+kind:'');}

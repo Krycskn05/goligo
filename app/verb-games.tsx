@@ -4,6 +4,7 @@ import {ArrowLeft,ArrowRight,CheckCircle2,RotateCcw,Trophy,X} from 'lucide-react
 import {verbMap,verbMeaning,verbGroups,spokenSubject,type Verb} from '@/lib/verb-course';
 import {verbPicture,verbRules,verbRuleKeys,ruleText,sentenceText,type VerbTense} from '@/lib/verb-logic';
 import {sentenceRound,sentenceCorrect,auxRound,auxCorrect,buildRound,buildCorrect,buildTarget,buildSuffix,matchRound,matchKinds,bestKey,type GameId,type MatchKind,type Tile} from '@/lib/verb-games';
+import {MatchPreview,useMatchPreview} from './object-games';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {PaulHoca} from './paul-hoca';
@@ -159,10 +160,11 @@ function MatchGame({language,topic,feedback,onRestart}:GameProps){
  const [open,setOpen]=useState<string[]>([]);const [matched,setMatched]=useState<Set<string>>(new Set());const [moves,setMoves]=useState(0);const [best,setBest]=useState<number|null>(null);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
  useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
+ const preview=useMatchPreview(cards);
  useEffect(()=>{setOpen([]);setMatched(new Set());setMoves(0);setBest(readBest(bestKey('match',topic,kind)));},[cards,topic,kind]);
  const pairs=cards.length/2;const done=matched.size===pairs&&pairs>0;
  function flip(id:string){
-  if(open.length>=2||open.includes(id)||done)return;const card=cards.find(item=>item.id===id);if(!card||matched.has(card.pair))return;
+  if(preview.seconds>0||open.length>=2||open.includes(id)||done)return;const card=cards.find(item=>item.id===id);if(!card||matched.has(card.pair))return;
   const next=[...open,id];setOpen(next);if(next.length<2)return;
   setMoves(value=>value+1);const [a,b]=next.map(cardId=>cards.find(item=>item.id===cardId)!);
   if(a.pair===b.pair){const verb=verbMap.get(a.pair)!;const all=new Set(matched).add(a.pair);setMatched(all);setOpen([]);feedback.answer(true,verb.infinitive);if(all.size===pairs){setBest(saveBest(bestKey('match',topic,kind),moves+1,true));}}
@@ -170,7 +172,8 @@ function MatchGame({language,topic,feedback,onRestart}:GameProps){
  }
  return <div className="verb-game-body">
   <div className="verb-game-status"><span>{verbText(language,'pairsFound',{n:matched.size,total:pairs})}</span><span>{verbText(language,'moves',{n:moves})}</span>{best!==null&&<span>{verbText(language,'bestScore',{n:best})}</span>}</div>
-  <div className="verb-match-grid">{cards.map((card,i)=>{const shown=open.includes(card.id)||matched.has(card.pair);const verb=verbMap.get(card.pair)!;return <button type="button" key={card.id} className={'verb-match-card '+card.face+(shown?' shown':'')+(matched.has(card.pair)?' matched':'')} aria-pressed={shown} aria-label={shown?card.text:verbText(language,'cardHidden',{n:i+1})} disabled={matched.has(card.pair)} onClick={()=>flip(card.id)}>{shown?card.face==='picture'?<VerbPicture verb={verb} language={language} small/>:<span lang={card.face==='meaning'?language:'de'} dir={card.face==='meaning'?vaultDirection(language):'ltr'}>{card.text}</span>:<span className="verb-match-back" aria-hidden="true">?</span>}</button>;})}</div>
+  <MatchPreview language={language} preview={preview}/>
+  <div className={'verb-match-grid'+(preview.seconds>0?' previewing':'')}>{cards.map((card,i)=>{const shown=preview.seconds>0||open.includes(card.id)||matched.has(card.pair);const verb=verbMap.get(card.pair)!;return <button type="button" key={card.id} className={'verb-match-card '+card.face+(shown?' shown':'')+(matched.has(card.pair)?' matched':'')} aria-pressed={shown} aria-label={shown?card.text:verbText(language,'cardHidden',{n:i+1})} disabled={matched.has(card.pair)} onClick={()=>flip(card.id)}>{shown?card.face==='picture'?<VerbPicture verb={verb} language={language} small/>:<span lang={card.face==='meaning'?language:'de'} dir={card.face==='meaning'?vaultDirection(language):'ltr'}>{card.text}</span>:<span className="verb-match-back" aria-hidden="true">?</span>}</button>;})}</div>
   {done&&<GameOver language={language} score={moves} total={pairs} best={best} lowerIsBetter onRestart={onRestart}/>}
  </div>;
 }

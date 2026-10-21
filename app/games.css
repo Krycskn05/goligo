@@ -122,6 +122,11 @@
 .rescue-key.miss { background:#fde5e5; border-color:#f2c0c8; color:#b9a3a8; }
 .rescue-key:disabled { cursor:default; }
 
+/* Eşleştirme kartları and Çoğul eşleştirme: the cards face up for the first seconds. */
+.match-preview { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 12px; margin:6px 0 10px; padding:10px 14px; border-radius:16px; background:#fff7dc; color:#7a5a00; }
+.match-preview strong { font-size:16px; font-variant-numeric:tabular-nums; }
+.verb-match-grid.previewing .verb-match-card { cursor:default; }
+
 /* Çoğul eşleştirme */
 .plural-card .game-picture { width:52px; }
 .plural-card.shown { display:grid; place-items:center; gap:2px; }

@@ -21,6 +21,12 @@ test('the site name is Goliqo everywhere a learner can see it',()=>{
  // The data download is named after the site, too.
  assert.ok(read('app/account-panel.tsx').includes('download="goliqo-verilerim.json"'));
  assert.ok(read('app/api/auth/route.ts').includes('filename="goliqo-verilerim.json"'));
+ // Everywhere else too (the learner asked): the project, the build and the notes.
+ assert.equal(JSON.parse(read('package.json')).name,'goliqo');
+ assert.ok(read('vite.config.ts').includes('process.env.GOLIQO_D1_ID')&&read('ci/yayin.sh').includes('GOLIQO_D1_ID=')&&!read('ci/yayin.sh').includes('LERNKOKO_D1_ID'));
+ for(const file of ['migration/database/members.sql','CLAUDE.md'])assert.ok(read(file).includes('Goliqo'),file);
+ assert.ok(!read('lib/member-auth.ts').includes('lernkoko.local'));
+ assert.ok(!read('app/landing.tsx').includes('tilki Koko'));
 });
 
 /** Width, height, frame count and loop count of a WebP file. */

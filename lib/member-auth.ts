@@ -160,11 +160,11 @@ export function safeReturnTo(value: unknown): string {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return '/';
   let url: URL;
   try {
-    url = new URL(value, 'https://lernkoko.local');
+    url = new URL(value, 'https://goliqo.local');
   } catch {
     return '/';
   }
-  if (url.origin !== 'https://lernkoko.local' || AUTH_PATHS.has(url.pathname) || url.pathname.startsWith('/api/')) return '/';
+  if (url.origin !== 'https://goliqo.local' || AUTH_PATHS.has(url.pathname) || url.pathname.startsWith('/api/')) return '/';
   return url.pathname + url.search + url.hash;
 }
 

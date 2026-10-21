@@ -36,7 +36,7 @@ export default function Landing(){
      </div>
      <p className="lk-hero-note"><CheckCircle2 size={18} aria-hidden="true"/>Ücretsiz. Reklam yok.</p>
     </div>
-    <div className="lk-hero-art"><img src="/toon/learning-hero.webp" alt="Elinde kitapla gülümseyen gözlüklü tilki Koko" width={1774} height={887}/></div>
+    <div className="lk-hero-art"><img src="/toon/learning-hero.webp" alt="Elinde kitapla gülümseyen gözlüklü tilki" width={1774} height={887}/></div>
    </section>
 
    <section className="lk-section" aria-labelledby="lk-features-title">

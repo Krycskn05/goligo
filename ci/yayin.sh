@@ -72,7 +72,7 @@ s_d1() {
   echo "$id" > "$OUT/d1-id.txt"
 }
 s_build() {
-  LERNKOKO_D1_ID="$(cat "$OUT/d1-id.txt" 2>/dev/null || true)" pnpm run build || return 1
+  GOLIQO_D1_ID="$(cat "$OUT/d1-id.txt" 2>/dev/null || true)" pnpm run build || return 1
   echo "--- dist/server/wrangler.json (özet) ---"
   node -e '
     const c=require("./dist/server/wrangler.json");

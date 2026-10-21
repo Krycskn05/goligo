@@ -11,9 +11,9 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 
 const { d1, r2 } = hostingConfig;
 
-// Own Cloudflare hosting (yayin.json). ci/yayin.sh sets LERNKOKO_D1_ID to the
+// Own Cloudflare hosting (yayin.json). ci/yayin.sh sets GOLIQO_D1_ID to the
 // real D1 database of the user's account; local builds keep the placeholder.
-const productionDatabaseId = process.env.LERNKOKO_D1_ID?.trim();
+const productionDatabaseId = process.env.GOLIQO_D1_ID?.trim();
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";

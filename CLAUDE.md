@@ -1,4 +1,4 @@
-# LernKoko taşıma kopyası
+# Goliqo taşıma kopyası (eski adı LernKoko)
 
 Bu klasör yayımdaki kaynakların dışa aktarımıdır. Önce 01-BASLA-BURADAN.md,
 migration/BAGIMSIZ-YAYIN.md ve migration/VERITABANI-AKTARIMI.md dosyalarını oku.

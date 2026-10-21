@@ -9,7 +9,7 @@ const {verifyAccessJwt,normalizeTeamDomain,withoutClientIdentity}=load(compiled+
 // accepted while Cloudflare Access is being switched off, so old progress can be linked.
 const {siteGate}=load(compiled+'/site-gate.js');
 
-const AUD='aud-lernkoko-test';
+const AUD='aud-goliqo-test';
 const b64url=bytes=>Buffer.from(bytes).toString('base64url');
 const json64=value=>b64url(Buffer.from(JSON.stringify(value)));
 let teamCounter=0;

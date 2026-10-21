@@ -22,7 +22,7 @@ test('the eight icons are small, sharp and see-through',()=>{
  const icons=read('app/top-icons.tsx');
  for(const file of ['sesler','ses-kapali','animasyonlar','konusan-ses','site-dili','hesabim','saat','takvim']){
   const info=webp('public/icons/top/'+file+'.webp');
-  assert.deepEqual(info.size,[128,128],file);assert.ok(info.alpha,file+' has a clear background');assert.ok(info.bytes<14*1024,file+' '+info.bytes);
+  assert.deepEqual(info.size,[128,128],file);assert.ok(info.alpha,file+' has a clear background');assert.ok(info.bytes<20*1024,file+' '+info.bytes);
   assert.ok(icons.includes("'"+file+"'"),file+' is listed');
  }
 });

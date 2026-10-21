@@ -120,7 +120,10 @@ async function memberFlow(browser) {
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
-  page.on("console", (m) => { if (m.type() === "error") errors.push("console: " + m.text()); });
+  // A file that cannot be loaded is reported with its address. The natural voices (/voices) are added only when the
+  // site is published, so here they are missing on purpose; 401 from the study API is expected before signing in.
+  page.on("console", (m) => { if (m.type() === "error" && !m.text().startsWith("Failed to load resource")) errors.push("console: " + m.text()); });
+  page.on("response", (r) => { const u = r.url(); if (r.status() >= 400 && !u.includes("/voices/") && !(r.status() === 401 && u.includes("/api/"))) errors.push(`yuklenemedi ${r.status()}: ${u.replace(BASE, "")}`); });
 
   // Girissiz ziyaretci: tanitim sayfasini ve yasal sayfalari gorur; ders sayfalari giris sayfasina yonlenir.
   await visit(page, "/", "01-tanitim.png", errors);

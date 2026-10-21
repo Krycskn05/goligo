@@ -445,6 +445,15 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  .verb-learn .verb-note { margin:0; padding:6px 10px; font-size:12.5px; }
  .verb-write-feedback { margin-top:10px; padding:10px 12px; }
  .verb-result .verb-note { padding:6px 10px; font-size:12.5px; }
+ /* The result with its example sentences fits one phone screen (the learner asked that every step does): compact rows. */
+ .verb-result { gap:6px; }
+ .verb-result .verb-persons { gap:2px; padding:4px; }
+ .verb-result .verb-persons ul { gap:2px; }
+ .verb-result .verb-person-row { grid-template-columns:34px minmax(0,1fr); gap:2px; padding:1px 20px 1px 6px; }
+ .verb-result .verb-person-body { padding:0; }
+ .verb-result .verb-person-text { font-size:13.5px; line-height:1.2; }
+ .verb-result .verb-person-meaning { font-size:11.5px; line-height:1.2; }
+ .verb-result .verb-person-pronoun { font-size:12px; }
  .verb-write-feedback h2 { margin:0 0 4px; }
  .verb-write-feedback p { margin:0 0 6px; }
 }

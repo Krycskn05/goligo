@@ -131,6 +131,10 @@ async function languageFlow(browser) {
       record(`Dil: ${url} Turkce telefonda da Almanca aciliyor`, shown.lang === "de" && (!h1 || shown.h1 === h1), JSON.stringify(shown));
     }
     await page.screenshot({ path: path.join(OUT, "30-dil-uye-ol-almanca.png") });
+    // Dil paketinden okunan bir dil (Rusca): sunucu paketi yukleyip sayfayi o dilde yaziyor (Ingilizceye dusmuyor).
+    await choose("ru");
+    const ru = await info();
+    record("Dil: dil paketi olan bir dil (Rusca) sunucuda da dogru", ru.lang === "ru" && ru.h1 === "Зарегистрироваться бесплатно", JSON.stringify(ru));
     await choose("ar");
     const ar = await info();
     const cookie = (await ctx.cookies()).find((c) => c.name === "goligo-dil");
@@ -321,7 +325,9 @@ async function languageFlow(browser) {
     await p2.waitForTimeout(1500);
     await p2.screenshot({ path: path.join(OUT, "14-telefon-fiil-karti.png"), fullPage: true });
     const meanings = await p2.locator(".verb-person-meaning").count();
-    info("Telefon: fiil kartinda ornek cumlelerin anlami var", meanings === 9, `${meanings} anlam satiri`);
+    // Ornek cumlelerin anlami site dilinde yazilir; site dili Almanca (varsayilan) iken anlam satiri olmaz.
+    const pageLang = await p2.evaluate(() => document.documentElement.lang);
+    info("Telefon: fiil kartinda ornek cumlelerin anlami site dilinde", pageLang === "de" ? meanings === 0 : meanings === 9, `site dili ${pageLang}, ${meanings} anlam satiri`);
     // Yanlislarim: ana sayfanin sol menusunden acilir (/fiiller?bolum=yanlislar); yanlis varsa ayri bir turda calisilir.
     await p2.goto(BASE + "/fiiller?bolum=yanlislar", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForSelector("[data-verb-mistakes]", { timeout: 20000 });

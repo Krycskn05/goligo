@@ -386,11 +386,12 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  /* The stepper shows where the learner is; the long bar is not needed on a phone. */
  .verb-practice progress { display:none; }
  .verb-practice .btn { min-height:46px; padding-block:10px; }
- .verb-stepper { margin:0 0 6px; padding:6px 10px; border-radius:14px; }
- .verb-stepper-head { margin-bottom:3px; }
+ .verb-stepper { margin:0 0 6px; padding:5px 10px 4px; border-radius:14px; }
+ .verb-stepper-head { margin-bottom:2px; line-height:1.25; }
  .verb-stepper-verb { font-size:15px; }
  .verb-stepper-count { font-size:11.5px; }
- .verb-stepper-steps li { gap:1px; font-size:9.5px; }
+ /* Long step names (German „Partizip schreiben“, Ukrainian, Hungarian …) take two short lines, so the card still fits. */
+ .verb-stepper-steps li { gap:1px; font-size:9.5px; line-height:1.12; align-content:start; }
  .verb-stepper-dot { height:5px; }
  .verb-learn { gap:8px; padding:12px; }
  .verb-learn .verb-learn-kicker { display:none; }

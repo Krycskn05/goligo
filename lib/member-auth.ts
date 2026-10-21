@@ -1,4 +1,4 @@
-// Goligo üyelik yardımcıları (veritabanına dokunmaz).
+// Goliqo üyelik yardımcıları (veritabanına dokunmaz).
 // - Şifreler PBKDF2-SHA256 ile, her üyeye ayrı rastgele tuzla özetlenir; açık hali saklanmaz.
 // - Oturum çerezi 32 baytlık rastgele bir anahtardır; veritabanında yalnızca SHA-256 özeti durur.
 // - Çerez HttpOnly (sayfa betikleri okuyamaz) ve SameSite=Lax'tır; https'te Secure olur.

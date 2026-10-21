@@ -49,12 +49,12 @@ test('every text of these pages exists in all 31 languages, with its marks',asyn
     assert.equal(holes(value),holes(tuple[2]),name+' '+key+' '+id);
     if(!['tr','de','en','ar','uk','fr'].includes(id))assert.notEqual(value,'',key);
    }
-   // Only short names may stay the same as in English (for example "Goligo", "E-Mail" …); every sentence is translated.
+   // Only short names may stay the same as in English (for example "Goliqo", "E-Mail" …); every sentence is translated.
    if(tuple[2].length>40)for(const id of ids.filter(id=>id!=='en'))assert.notEqual(site.pickText(tuple,id),tuple[2],name+' '+key+' '+id+' is still English');
   }
   assert.equal(typeof text,'function');
  }
- assert.equal(pub.publicText('de','landingLead',{site:'Goligo'}).startsWith('Bei Goligo'),true);
+ assert.equal(pub.publicText('de','landingLead',{site:'Goliqo'}).startsWith('Bei Goliqo'),true);
  assert.equal(legal.legalText('tr','updated',{date:'21 Ekim 2026'}),'Son güncelleme: 21 Ekim 2026');
 });
 

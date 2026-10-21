@@ -1,4 +1,4 @@
-// Goligo giriş kapısı: her istekte (yerelde de) çalışır.
+// Goliqo giriş kapısı: her istekte (yerelde de) çalışır.
 //
 // 1. İstemcinin yazdığı kimlik başlıklarını (`oai-authenticated-user-*`, `lk-verified-*`)
 //    HER ZAMAN siler; kimlik yalnızca sunucuda doğrulanan bir oturumdan gelir.

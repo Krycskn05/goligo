@@ -18,7 +18,7 @@ const standalone=()=>{try{return window.matchMedia('(display-mode: standalone)')
 
 /**
  * "Uygulama olarak indir": a button in the left menu that opens a small window explaining how to put
- * Goligo on the phone's home screen like an app (iPhone: Safari → Paylaş → Ana Ekrana Ekle; Android:
+ * Goliqo on the phone's home screen like an app (iPhone: Safari → Paylaş → Ana Ekrana Ekle; Android:
  * Chrome → ⋮ → Ana ekrana ekle). The phone's own steps come first; when the browser offers its install
  * window (Chrome, Edge), "Şimdi yükle" opens it. Hidden when the site already runs as the installed app.
  */

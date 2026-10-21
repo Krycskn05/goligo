@@ -24,7 +24,7 @@ import {LISTEN_CHANGED,ListenTask,listenResult,tasksByNumber,useListenPlayer} fr
 
 const unit=courseUnits.find(item=>item.id==='book-12')!;
 const partParam=(value:string|null):L12PartId|null=>value&&lessonPartMap.has(value as L12PartId)?value as L12PartId:null;
-/** The picture of each part (public/toon/lektion12); the „Alles klar?" test shows the Goligo mascot waving. */
+/** The picture of each part (public/toon/lektion12); the „Alles klar?" test shows the Goliqo mascot waving. */
 function PartArt({part}:{part:L12Part}){
  const picture=partPictures[part.id];
  return picture?<RasterArt art={picture} title={part.de}/>:<BrandMascot className="l12-koko"/>;

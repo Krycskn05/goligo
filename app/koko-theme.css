@@ -189,7 +189,7 @@ strong { font-weight:700; }
 }
 @media (prefers-reduced-motion:reduce) { .vault-category-card:hover,.toon-topic-card:hover,.toon-app .btn:hover:enabled,.object-option:hover:enabled,.practice-mode-button:hover:enabled { transform:none; } }
 
-/* Header: the Goligo logo on a warm beige base (the learner asked), colourful round buttons and a few small stars. */
+/* Header: the Goliqo logo on a warm beige base (the learner asked), colourful round buttons and a few small stars. */
 .toon-app .work-header.site-header,.work-header.logo-header.site-header { position:relative; overflow:hidden; background:linear-gradient(180deg,#f5e4c3 0,#f9ecd3 55%,#fcf4e4 100%); border-color:#efdcb7; box-shadow:0 10px 26px rgba(150,110,50,.12),inset 0 1px 0 #fff8ea; }
 /* The header clock (app/site-greeting.tsx): no frame (the learner asked), right on the beige header. */
 .site-greeting { position:relative; margin:0; padding:4px 10px 4px 4px; background:none; border:0; border-radius:20px; box-shadow:none; color:var(--ink); line-height:1.15; }
@@ -245,7 +245,7 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 @media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:38px; padding:5px 12px; } }
 @media (prefers-reduced-motion:reduce) { .object-breadcrumb a { transition:none; } .object-breadcrumb a:hover { transform:none; } }
 
-/* Goligo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
+/* Goliqo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
    shown 248 px wide); the waving mascot and the big waving logo stand in for the old Koko pictures. */
 img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
 .brand-mascot { display:block; height:auto; object-fit:contain; pointer-events:none; user-select:none; }

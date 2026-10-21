@@ -1,4 +1,4 @@
-// Goligo sound effects: original, playful cartoon sounds synthesised from
+// Goliqo sound effects: original, playful cartoon sounds synthesised from
 // scratch (marimba, celesta, glockenspiel, bubbles, wind, slide whistle,
 // spring, brass and retro chip tones). No recordings or samples are used.
 // Several sounds for each moment: the learner chooses one in "Sesler ve animasyonlar".
@@ -213,5 +213,5 @@ export function renderSounds(folder){
 if(process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1])){
  const folder=process.argv[2]??'public/sfx';
  const durations=renderSounds(folder);
- console.log('Goligo sesleri hazır:',Object.entries(durations).map(([id,s])=>id+' '+s+'s').join(', '));
+ console.log('Goliqo sesleri hazır:',Object.entries(durations).map(([id,s])=>id+' '+s+'s').join(', '));
 }

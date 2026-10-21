@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Goligo'yu Koray'ın KENDİ Cloudflare hesabına yayınlar (GitHub Actions'ta çalışır).
+# Goliqo'yu Koray'ın KENDİ Cloudflare hesabına yayınlar (GitHub Actions'ta çalışır).
 # ChatGPT Sites projesine hiçbir şey göndermez, ona dokunmaz.
 #
 # CLOUDFLARE_API_TOKEN yoksa yalnızca DENEME yapar: paket hazırlanır, yayın yapılmaz.
@@ -13,6 +13,7 @@ mkdir -p "$OUT"
 HATA=0
 export WRANGLER_SEND_METRICS=false CLOUDFLARE_CF_FETCH_ENABLED=false
 WORKER=$(node -p "require('./yayin.json').workerName")
+DOMAIN=$(node -p "require('./yayin.json').siteDomain||''")
 DBNAME=$(node -p "require('./yayin.json').d1DatabaseName")
 # Anahtarı temizle: baştaki/sondaki boşluk ve satır sonları; yanlışlıkla
 # Cloudflare'in "curl ... Authorization: Bearer <anahtar>" deneme metni
@@ -121,11 +122,19 @@ s_kontrol() {
   for path in / /giris /api/study /ev-esyalar; do
     curl -s -o /dev/null -w "$path -> HTTP %{http_code} %{redirect_url}\n" "$url$path"
   done
+  if [ -n "$DOMAIN" ]; then # Sitenin kendi adresi (goliqo.com): workers.dev ve www buraya yönlenir.
+    echo "Site adresi: https://$DOMAIN"
+    for path in / /giris /ev-esyalar; do
+      curl -s -o /dev/null -w "https://$DOMAIN$path -> HTTP %{http_code} %{redirect_url}\n" "https://$DOMAIN$path"
+    done
+    curl -s -o /dev/null -w "https://www.$DOMAIN/ -> HTTP %{http_code} %{redirect_url}\n" "https://www.$DOMAIN/"
+  fi
 }
 
 s_eski() { # Eski adres(ler): herkesi yeni adrese gönderir, tarayıcı ayarlarını bir kez taşır (ci/eski-adres).
   local url old
   url=$(cat "$OUT/ADRES.txt" 2>/dev/null || true)
+  [ -n "$DOMAIN" ] && url="https://$DOMAIN" # sitenin kendi adresi varsa eski adresler doğrudan oraya gider
   [ -n "$url" ] || { echo "Yeni adres bulunamadı"; return 1; }
   for old in $(node -p "(require('./yayin.json').oldWorkerNames||[]).join(' ')"); do
     [ "$old" = "$WORKER" ] && continue

@@ -1,10 +1,15 @@
 import handler from "vinext/server/fetch-handler";
 import { runWithConnectorBinding } from "../lib/connector-context";
 import { siteGate } from "../lib/site-gate";
+import { siteAddressMove } from "../lib/storage-move";
 import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 
 export default {
   async fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
+    // The site's own address (lib/storage-move.ts): www.goliqo.com and the old workers.dev address go to the same
+    // page on goliqo.com, carrying the browser's saved settings along once.
+    const moved = siteAddressMove(request);
+    if (moved) return moved;
     // Membership gate (lib/site-gate.ts), in production and locally alike.
     // Client-sent identity headers are always discarded; a user is signed in only
     // by a member session verified in D1 (or, during the move away from Cloudflare

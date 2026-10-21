@@ -77,7 +77,7 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
 
   <Card icon={<Download size={20} aria-hidden="true"/>} title={texts.dataCard}>
    <p>{texts.dataText}</p>
-   <a className="btn secondary small" href="/api/auth?export=1" download="goligo-verilerim.json" data-account-export>{texts.dataDownload}</a>
+   <a className="btn secondary small" href="/api/auth?export=1" download="goliqo-verilerim.json" data-account-export>{texts.dataDownload}</a>
   </Card>
 
   <Card icon={<Trash2 size={20} aria-hidden="true"/>} title={texts.deleteCard}>

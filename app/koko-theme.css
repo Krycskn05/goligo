@@ -250,7 +250,7 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 
 /* Goliqo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
    shown 248 px wide); the waving mascot and the big waving logo stand in for the old Koko pictures. */
-img.site-logo-art { aspect-ratio:372/136; object-fit:contain; }
+img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
 .brand-mascot { display:block; height:auto; object-fit:contain; pointer-events:none; user-select:none; }
 .brand-logo-wave { display:block; height:auto; pointer-events:none; user-select:none; }
 .ht-koko.brand-mascot { width:170px; animation:none; }

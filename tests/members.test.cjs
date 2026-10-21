@@ -57,7 +57,7 @@ test('oturum anahtarı, çerez ve dönüş adresi',async()=>{
  assert.equal(auth.safeReturnTo('/fiiller?x=1#a'),'/fiiller?x=1#a');
  for(const bad of ['//evil.example','https://evil.example','/\\evil','fiiller','/giris','/uye-ol?return_to=/x','/cikis','/api/auth',null,5])assert.equal(auth.safeReturnTo(bad),'/',String(bad));
  assert.equal(auth.signInPath('/fiiller'),'/giris?return_to=%2Ffiiller');assert.equal(auth.signInPath('/'),'/giris');
- for(const open of ['/','/giris','/uye-ol','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/favicon.svg','/verbs/abfahren.webp','/assets/app.js','/_next/x'])assert.ok(auth.isPublicPath(open),open);
+ for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/favicon.svg','/verbs/abfahren.webp','/assets/app.js','/_next/x'])assert.ok(auth.isPublicPath(open),open);
  for(const closed of ['/fiiller','/ev-esyalar','/a1-2/ev-ve-yasam','/hesabim','/apis'])assert.ok(!auth.isPublicPath(closed),closed);
 });
 
@@ -95,7 +95,7 @@ const location=r=>{assert.ok(r instanceof Response,'yönlendirme bekleniyordu');
 
 test('kapı: girişsiz ziyaretçi tanıtım ve yasal sayfaları görür, ders sayfaları girişe yönlenir',async()=>{
  const db=fakeDb();const env={DB:db};
- for(const open of ['/','/giris','/uye-ol','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/verbs/abfahren.webp']){const out=await gate.siteGate(req(open),env);assert.ok(out instanceof Request,open);assert.equal(out.headers.get('oai-authenticated-user-id'),null,open);}
+ for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/verbs/abfahren.webp']){const out=await gate.siteGate(req(open),env);assert.ok(out instanceof Request,open);assert.equal(out.headers.get('oai-authenticated-user-id'),null,open);}
  assert.equal(location(await gate.siteGate(req('/fiiller'),env)),'/giris?return_to=%2Ffiiller');
  assert.equal(location(await gate.siteGate(req('/a1-2/ev-ve-yasam?x=1'),env)),'/giris?return_to=%2Fa1-2%2Fev-ve-yasam%3Fx%3D1');
  assert.equal(location(await gate.siteGate(req('/hesabim'),env)),'/giris?return_to=%2Fhesabim');
@@ -159,10 +159,10 @@ test('kapı: geçiş dönemi — Access ile giren tanınır, üyelik oturumu ön
 });
 
 // ---- Üyelik API'si ----
-function api(db){
+function api(db,{mailer=null}={}){
  const source=ts.transpileModule(fs.readFileSync('app/api/auth/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const module={exports:{}};
- vm.runInNewContext(source,{module,exports:module.exports,Response,Request,Headers,URL,console,Date,require(name){if(name==='@/db')return{getRawDb:()=>db};if(name==='@/lib/member-auth')return auth;if(name==='@/lib/member-store')return store;if(name==='@/lib/site-gate')return gate;throw Error(name);}});
+ vm.runInNewContext(source,{module,exports:module.exports,Response,Request,Headers,URL,console,Date,require(name){if(name==='@/db')return{getRawDb:()=>db,getMailer:()=>mailer};if(name==='@/lib/member-auth')return auth;if(name==='@/lib/member-store')return store;if(name==='@/lib/site-gate')return gate;if(name.startsWith('@/lib/'))return load(name.slice(6));throw Error(name);}});
  const call=async(body,{cookie,headers={},origin=SITE}={})=>{const h={'content-type':'application/json',...headers};if(origin)h.origin=origin;if(cookie)h.cookie='lk_session='+cookie;const r=await module.exports.POST(new Request(SITE+'/api/auth',{method:'POST',headers:h,body:JSON.stringify(body)}));return {r,status:r.status,body:await r.clone().json().catch(()=>null),cookie:cookieOf(r)};};
  const get=async(query='',cookie)=>module.exports.GET(new Request(SITE+'/api/auth'+query,{headers:cookie?{cookie:'lk_session='+cookie}:{}}));
  return {call,get};
@@ -267,4 +267,65 @@ test('API: every message comes with a code, so the page shows it in its own lang
  for(const code of copy.AUTH_CODES)assert.ok(copy.publicText('de',code).trim(),code);
  assert.equal(copy.fillText(copy.publicText('de','pwShort'),{n:8}),'Das Passwort muss mindestens 8 Zeichen lang sein.');
  assert.ok(codes.size>=9);
+});
+
+// ---- Şifremi unuttum (the learner asked once the site had its own address goliqo.com) ----
+const keyOf=mail=>{const link=mail.text.match(/https:\/\/\S+/)[0];return {link,key:new URL(link).searchParams.get('anahtar')};};
+
+test('API: şifremi unuttum — tek kullanımlık, 1 saat geçerli bağlantı e-postayla gider; yeni şifreyle giriş yapılır',async()=>{
+ const db=fakeDb();const sent=[];const mailer={async send(message){sent.push(message);return {messageId:'m'+sent.length};}};
+ const {call}=api(db,{mailer});const reg=await call(newUser);const id=(await store.memberForToken(db,reg.cookie)).id;const elsewhere=await store.createSession(db,id);
+ // Kayıtlı olmayan adres de aynı cevabı alır; e-posta gitmez.
+ const unknown=await call({action:'forgot',email:'yok@example.com',language:'de'});assert.equal(unknown.status,200);assert.deepEqual(unknown.body,{ok:true});assert.equal(sent.length,0);
+ assert.equal((await call({action:'forgot',email:'ada'})).body.code,'errEmail');
+ assert.equal((await call({action:'forgot',email:'ada@example.com'},{origin:'https://evil.example'})).status,403);
+ const asked=await call({action:'forgot',email:' ADA@example.com',language:'de'});assert.deepEqual(asked.body,{ok:true});assert.equal(sent.length,1);
+ const mail=sent[0];assert.equal(mail.to,'ada@example.com');assert.equal(mail.from,'noreply@goliqo.com');assert.equal(mail.subject,'Goliqo: Passwort zurücksetzen');
+ assert.ok(mail.text.startsWith('Hallo Ada Çınar,\n')&&mail.text.includes('1 Stunde gültig'));assert.ok(mail.html.includes('<html lang="de" dir="ltr">')&&!mail.html.includes('<script'));
+ const first=keyOf(mail);assert.ok(first.link.startsWith(SITE+'/sifre-yenile?anahtar='));assert.ok(auth.validToken(first.key));
+ assert.equal(count(db,'password_resets','id=?',first.key),0,'anahtarın kendisi saklanmaz');assert.equal(count(db,'password_resets'),1);
+ // Arapça sayfadan istenince e-posta Arapça ve sağdan sola.
+ await call({action:'forgot',email:'ada@example.com',language:'ar'});assert.ok(sent[1].html.includes('<html lang="ar" dir="rtl">'));
+ const second=keyOf(sent[1]);assert.equal(count(db,'password_resets'),1,'yeni bağlantı eskisinin yerine geçer');
+ assert.equal((await call({action:'reset',token:first.key,password:'Yeni-Sifre 2026'})).body.code,'errResetLink','eski bağlantı çalışmaz');
+ assert.equal((await call({action:'reset',token:second.key,password:'kısa'})).body.code,'pwShort');
+ assert.equal((await call({action:'reset',token:second.key,password:'ada@example.com'})).body.code,'pwEmail');
+ const done=await call({action:'reset',token:second.key,password:'Yeni-Sifre 2026'});assert.equal(done.status,200);assert.equal(done.body.returnTo,'/');assert.ok(done.cookie);
+ assert.equal((await store.memberForToken(db,done.cookie)).email,'ada@example.com','bu cihaz giriş yapmış olur');
+ assert.equal(await store.memberForToken(db,elsewhere),null,'başka cihazlardaki oturumlar kapanır');assert.equal(await store.memberForToken(db,reg.cookie),null);
+ assert.equal((await call({action:'reset',token:second.key,password:'Baska-Sifre 2026'})).body.code,'errResetLink','bağlantı tek kullanımlık');
+ assert.equal((await call({action:'login',email:'ada@example.com',password:'Lern-Koko 2026'})).status,401);
+ assert.equal((await call({action:'login',email:'ada@example.com',password:'Yeni-Sifre 2026'})).status,200);
+ // Dil gelmezse sayfanın dil çerezi, o da yoksa Almanca.
+ const third=await call({action:'forgot',email:'ada@example.com'},{headers:{cookie:'goligo-dil=tr'}});assert.equal(third.status,200);assert.equal(sent[2].subject,'Goliqo: şifreni yenile');
+ db.sql.prepare('UPDATE password_resets SET expires_at=?').run(Date.now()-1);
+ assert.equal((await call({action:'reset',token:keyOf(sent[2]).key,password:'Ucuncu-Sifre 2026'})).body.code,'errResetLink','1 saat sonra geçersiz');
+ // Bir adrese saatte en fazla 3 e-posta.
+ assert.equal((await call({action:'forgot',email:'ada@example.com'})).status,429);assert.equal(sent.length,3);
+ db.sql.prepare("UPDATE auth_attempts SET window_start=window_start-61*60*1000 WHERE key LIKE 'forgot%'").run();
+ assert.equal((await call({action:'forgot',email:'ada@example.com'})).status,200,'bir saat sonra yeniden');assert.equal(sent.length,4);assert.equal(sent[3].subject,'Goliqo: Passwort zurücksetzen');
+ // Hesap silinince bağlantıları da silinir.
+ const me=await call({action:'login',email:'ada@example.com',password:'Yeni-Sifre 2026'});
+ await call({action:'delete',current:'Yeni-Sifre 2026',confirm:true},{cookie:me.cookie});assert.equal(count(db,'password_resets'),0);
+});
+
+test('API: şifremi unuttum — e-posta gönderilemezse açık hata; yanlış anahtarlar sınırlanır',async()=>{
+ const db=fakeDb();const {call}=api(db);await call(newUser);const error=console.error;console.error=()=>{};
+ try{
+  assert.equal((await call({action:'forgot',email:'ada@example.com'})).body.code,'errService','kayıtlı adreste e-posta gidemezse söylenir');
+  assert.equal((await call({action:'forgot',email:'yok@example.com'})).status,200);
+ }finally{console.error=error;}
+ for(let i=0;i<20;i++)assert.equal((await call({action:'reset',token:auth.newToken(),password:'Yeni-Sifre 2026'})).body.code,'errResetLink');
+ assert.equal((await call({action:'reset',token:auth.newToken(),password:'Yeni-Sifre 2026'})).status,429,'20 yanlış anahtardan sonra bekletilir');
+});
+
+test('pages: "Şifremi unuttum" form on the sign in page, the link page, the email binding only in the deployed build',()=>{
+ const signIn=fs.readFileSync('app/giris/page.tsx','utf8');assert.ok(signIn.includes('<ForgotForm language={language} texts={forgotFormTexts(language)}/>')&&!signIn.includes("p('noReset')"));
+ const page=fs.readFileSync('app/sifre-yenile/page.tsx','utf8');
+ assert.ok(page.includes("referrer:'no-referrer'")&&page.includes('robots:{index:false,follow:false}')&&page.includes('validToken(token)')&&page.includes('<ResetForm token={token} texts={resetFormTexts(language)}/>'));
+ assert.ok(fs.readFileSync('app/forgot-form.tsx','utf8').includes("JSON.stringify({action:'forgot',email,language})"));
+ assert.ok(fs.readFileSync('app/reset-form.tsx','utf8').includes("JSON.stringify({action:'reset',token,password})"));
+ assert.ok(fs.readFileSync('vite.config.ts','utf8').includes('...(productionDatabaseId ? { send_email: [{ name: "EMAIL" }] } : {}),'));
+ assert.ok(fs.readFileSync('db/index.ts','utf8').includes('export function getMailer(): Mailer | null'));
+ assert.ok(fs.readFileSync('app/privacy-view.tsx','utf8').includes("<li>{rich('whatReset')}</li>"));
 });

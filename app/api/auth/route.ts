@@ -1,9 +1,13 @@
-// Üyelik API'si: üye ol, giriş yap, çıkış, ad ve şifre değiştir, hesabı sil, verilerimi indir.
+// Üyelik API'si: üye ol, giriş yap, çıkış, şifremi unuttum (e-postayla yenileme), ad ve şifre değiştir, hesabı sil,
+// verilerimi indir.
 // Kimlik yalnızca HttpOnly oturum çerezinden (lk_session) okunur; istemcinin gönderdiği
 // kimlik başlıklarına güvenilmez (lib/site-gate.ts onları zaten siler).
-import {getRawDb} from '@/db';
+import {getMailer,getRawDb} from '@/db';
 import {DUMMY_HASH,SESSION_COOKIE,cleanName,clearSessionCookie,hashPassword,newMemberId,normalizeEmail,passwordIssue,passwordProblem,readCookie,safeReturnTo,sessionCookie,validEmail,verifyPassword} from '@/lib/member-auth';
-import {clearAttempts,countAttempt,createMember,createSession,deleteMember,deleteMemberSessions,deleteSession,exportMember,isLimited,memberByEmail,memberById,memberForToken,setMemberName,setPasswordHash,type Db} from '@/lib/member-store';
+import {clearAttempts,countAttempt,createMember,createPasswordReset,createSession,deleteMember,deleteMemberSessions,deleteSession,exportMember,finishPasswordReset,isLimited,memberByEmail,memberById,memberForReset,memberForToken,setMemberName,setPasswordHash,type Db} from '@/lib/member-store';
+import {resetLink,resetMail} from '@/lib/reset-mail';
+import {requestLanguage} from '@/lib/device-language';
+import {isSiteLanguage} from '@/lib/site-languages';
 import {VERIFIED_ACCESS_ID} from '@/lib/site-gate';
 
 export const dynamic='force-dynamic';
@@ -15,7 +19,13 @@ const LOGIN_IP_LIMIT=30;
 const REGISTER_WINDOW=60*MINUTE;
 const REGISTER_IP_LIMIT=30;
 const ACCOUNT_LIMIT=10;
-const ACTIONS=new Set(['register','login','logout','profile','password','delete']);
+// Şifremi unuttum: bir adrese saatte en fazla 3 e-posta, bir bağlantıdan (IP) saatte 10 istek; yanlış bağlantı denemesi
+// 15 dakikada 20.
+const FORGOT_WINDOW=60*MINUTE;
+const FORGOT_EMAIL_LIMIT=3;
+const FORGOT_IP_LIMIT=10;
+const RESET_IP_LIMIT=20;
+const ACTIONS=new Set(['register','login','logout','forgot','reset','profile','password','delete']);
 
 function json(data:unknown,status=200,cookie?:string){
  const headers=new Headers({'Cache-Control':'no-store'});
@@ -94,6 +104,42 @@ export async function POST(request:Request){
   if(body.action==='logout'){
    if(token)await deleteSession(db,token);
    return json({ok:true},200,clearSessionCookie(secure));
+  }
+
+  // Şifremi unuttum: kayıtlı adrese 1 saat geçerli, tek kullanımlık bir bağlantı gider (lib/reset-mail.ts).
+  if(body.action==='forgot'){
+   const email=normalizeEmail(body.email);
+   if(!validEmail(email))return json({error:'Geçerli bir e-posta adresi yaz.',code:'errEmail',field:'email'},400);
+   const emailKey='forgot:'+email;const ipKey='forgot-ip:'+ip;
+   if(await isLimited(db,emailKey,FORGOT_EMAIL_LIMIT,FORGOT_WINDOW,now)||await isLimited(db,ipKey,FORGOT_IP_LIMIT,FORGOT_WINDOW,now))return tooMany();
+   await countAttempt(db,emailKey,FORGOT_WINDOW,now);await countAttempt(db,ipKey,FORGOT_WINDOW,now);
+   const member=await memberByEmail(db,email);
+   if(member){
+    const mailer=getMailer();if(!mailer)throw new Error('E-posta gönderimi (EMAIL bağlantısı) yok');
+    const language=isSiteLanguage(body.language)?body.language:requestLanguage(request.headers.get('cookie'));
+    const resetToken=await createPasswordReset(db,member.id,now);
+    await mailer.send(await resetMail(language,member.email,member.name,resetLink(url.origin,resetToken)));
+   }
+   // Hesap olsun olmasın aynı cevap: adresin kayıtlı olup olmadığı buradan anlaşılmaz.
+   return json({ok:true});
+  }
+
+  // E-postadaki bağlantıyla yeni şifre: kaydedilince bütün oturumlar ve bağlantılar kapanır, bu cihaz giriş yapmış olur.
+  if(body.action==='reset'){
+   const ipKey='reset-ip:'+ip;
+   if(await isLimited(db,ipKey,RESET_IP_LIMIT,LOGIN_WINDOW,now))return tooMany();
+   const password=text(body.password);
+   const member=await memberForReset(db,text(body.token),now);
+   if(!member){
+    await countAttempt(db,ipKey,LOGIN_WINDOW,now);
+    return json({error:'Bu bağlantı geçersiz ya da süresi dolmuş. Giriş sayfasından yeni bir bağlantı iste.',code:'errResetLink'},400);
+   }
+   const issue=passwordIssue(password,member.email);if(issue)return json({error:passwordProblem(password,member.email),code:issue.code,n:issue.n,field:'password'},400);
+   await finishPasswordReset(db,member.id,await hashPassword(password));
+   await clearAttempts(db,'login:'+member.email);
+   if(token)await deleteSession(db,token);
+   const session=await createSession(db,member.id,now);
+   return json({ok:true,returnTo:'/'},200,sessionCookie(session,secure));
   }
 
   // Bundan sonrası yalnızca giriş yapmış üye içindir.

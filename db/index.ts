@@ -16,3 +16,10 @@ export function getDb() {
 
   return drizzle(env.DB, { schema });
 }
+
+/** Cloudflare Email Service (the `EMAIL` binding; only in the deployed site, see vite.config.ts). */
+export type Mailer = { send(message: { to: string; from: string; subject: string; text: string; html: string }): Promise<unknown> };
+export function getMailer(): Mailer | null {
+  const mailer = (env as unknown as { EMAIL?: Mailer }).EMAIL;
+  return mailer && typeof mailer.send === 'function' ? mailer : null;
+}

@@ -147,6 +147,18 @@ async function languageFlow(browser) {
     const tr = await info();
     await page.screenshot({ path: path.join(OUT, "32-dil-turkce-gizlilik.png") });
     record("Dil: Turkce asil metin, ceviri notu yok", tr.lang === "tr" && !tr.note, JSON.stringify(tr));
+    // Sifremi unuttum (ogrenci istedi): giris sayfasindaki form; kayitli olmayan adres de ayni cevabi alir (e-posta gitmez).
+    await page.goto(BASE + "/giris", { waitUntil: "networkidle", timeout: 90000 });
+    await page.locator("[data-forgot] summary").click();
+    await page.fill('[data-forgot-form] input[name="email"]', `kimse-yok-${Date.now()}@example.com`);
+    await page.click('[data-forgot-form] button[type="submit"]');
+    const sent = await page.locator("[data-forgot-sent]").textContent({ timeout: 15000 }).catch(() => "");
+    await page.screenshot({ path: path.join(OUT, "33-sifremi-unuttum.png") });
+    record("Sifremi unuttum: form calisiyor, cevap sayfanin dilinde", /bağlantı/.test(sent || ""), (sent || "").slice(0, 120));
+    await page.goto(BASE + "/sifre-yenile?anahtar=bozuk", { waitUntil: "networkidle", timeout: 90000 });
+    const dead = await page.locator("[data-reset-page] .lk-form-error").textContent().catch(() => "");
+    const robots = await page.locator('meta[name="robots"]').getAttribute("content").catch(() => "");
+    record("Sifre yenileme: bozuk baglanti acikca soyleniyor, sayfa aramada cikmiyor", /geçersiz/.test(dead || "") && /noindex/.test(robots || ""), `${(dead || "").slice(0, 80)} · ${robots}`);
   } catch (e) { record("Dil kontrolu", false, String((e && e.message) || e).slice(0, 200)); }
   await ctx.close();
 }

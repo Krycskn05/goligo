@@ -154,10 +154,16 @@ export function clearSessionCookie(secure: boolean): string {
   return `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${secure ? '; Secure' : ''}`;
 }
 
-/** Giriş yapmadan açılabilen sayfalar: tanıtım, giriş, üye ol ve yasal metinler. */
-export const PUBLIC_PAGES = new Set(['/', '/giris', '/uye-ol', '/gizlilik', '/kullanim-kosullari']);
+/** Şifre yenileme sayfası (e-postadaki bağlantı buraya gelir). */
+export const RESET_PAGE = '/sifre-yenile';
+/** Şifre yenileme bağlantısı bu kadar süre geçerlidir (tek kullanımlık). */
+export const RESET_MINUTES = 60;
+export const RESET_MS = RESET_MINUTES * 60 * 1000;
+
+/** Giriş yapmadan açılabilen sayfalar: tanıtım, giriş, üye ol, şifre yenileme ve yasal metinler. */
+export const PUBLIC_PAGES = new Set(['/', '/giris', '/uye-ol', RESET_PAGE, '/gizlilik', '/kullanim-kosullari']);
 /** Giriş ve çıkış adresleri (dönüş adresi olarak kullanılmaz). */
-export const AUTH_PATHS = new Set(['/giris', '/uye-ol', '/cikis', '/signin-with-chatgpt', '/signout-with-chatgpt', '/auth/login', '/auth/logout', '/callback']);
+export const AUTH_PATHS = new Set(['/giris', '/uye-ol', RESET_PAGE, '/cikis', '/signin-with-chatgpt', '/signout-with-chatgpt', '/auth/login', '/auth/logout', '/callback']);
 
 /** Dosya (resim, ses, betik, stil…) ya da çerçevenin kendi adresi mi? */
 export function isAssetPath(pathname: string): boolean {

@@ -61,6 +61,8 @@
 .lk-forgot { margin-top:14px; color:var(--ink-2); text-align:center; }
 .lk-forgot summary { cursor:pointer; color:var(--blue-2); font-weight:700; min-height:44px; display:inline-flex; align-items:center; }
 .lk-forgot p { margin:6px 0 0; }
+.lk-forgot-form { margin-top:8px; text-align:start; }
+.lk-forgot-lead { margin:0 !important; }
 .lk-spin { animation:lk-spin 1s linear infinite; }
 @keyframes lk-spin { to { transform:rotate(360deg); } }
 @media (prefers-reduced-motion:reduce) { .lk-spin { animation:none; } }

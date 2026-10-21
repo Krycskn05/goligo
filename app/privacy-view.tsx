@@ -17,6 +17,7 @@ export function PrivacyView({language,signedIn}:{language:SiteLanguage;signedIn:
     <li>{rich('whatAccount')}</li>
     <li>{rich('whatSignins')}</li>
     <li>{rich('whatPassword')}</li>
+    <li>{rich('whatReset')}</li>
     <li>{rich('whatStudy')}</li>
     <li>{rich('whatCookie',{code:()=><code>lk_session</code>})}</li>
     <li>{rich('whatLanguageCookie',{code:()=><code>{LANGUAGE_COOKIE}</code>})}</li>

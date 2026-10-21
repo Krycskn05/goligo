@@ -38,3 +38,13 @@ CREATE TABLE IF NOT EXISTS member_logins (
   at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS member_logins_member ON member_logins(member_id, at);
+
+-- Şifre yenileme bağlantıları ("Şifremi unuttum"). E-postadaki rastgele anahtarın kendisi değil, SHA-256 özeti
+-- saklanır; bağlantı 1 saat geçerli ve tek kullanımlıktır (lib/member-store.ts).
+CREATE TABLE IF NOT EXISTS password_resets (
+  id TEXT PRIMARY KEY,
+  member_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS password_resets_member ON password_resets(member_id);

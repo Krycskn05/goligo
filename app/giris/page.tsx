@@ -1,13 +1,13 @@
 import type {Metadata} from 'next';
-import {SITE_CONTACT_EMAIL,SITE_NAME} from '@/lib/site-brand';
+import {SITE_NAME} from '@/lib/site-brand';
 import {safeReturnTo} from '@/lib/member-auth';
 import {publicText,type PublicCopyKey} from '@/lib/public-copy';
 import AuthForm from '../auth-form';
-import {authFormTexts} from '@/lib/auth-texts';
+import ForgotForm from '../forgot-form';
+import {authFormTexts,forgotFormTexts} from '@/lib/auth-texts';
 import {PublicPage} from '../public-shell';
 import {BrandMascot} from '../site-logo';
 import {pageLanguage} from '../page-language';
-import {richText} from '../rich-text';
 export const dynamic='force-dynamic';
 export async function generateMetadata():Promise<Metadata>{
  const language=await pageLanguage();
@@ -25,7 +25,7 @@ export default async function SignInPage({searchParams}:{searchParams:Search}){
    <p className="lk-auth-lead">{returnTo==='/'?p('signInLead'):p('signInLeadPage')}</p>
    <AuthForm mode="login" returnTo={returnTo} texts={authFormTexts(language)}/>
    <p className="lk-auth-switch">{p('noAccount')} <a href={registerHref}>{p('registerFree')}</a></p>
-   <details className="lk-forgot"><summary>{p('forgot')}</summary><p>{p('noReset')} {SITE_CONTACT_EMAIL?richText(p('resetContact'),{email:()=><a href={`mailto:${SITE_CONTACT_EMAIL}`}>{SITE_CONTACT_EMAIL}</a>}):p('resetKeep')}</p></details>
+   <details className="lk-forgot" data-forgot><summary>{p('forgot')}</summary><ForgotForm language={language} texts={forgotFormTexts(language)}/></details>
   </section>
  </PublicPage>;
 }

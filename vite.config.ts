@@ -39,6 +39,9 @@ const localBindingConfig = {
     TEAM_DOMAIN: deployConfig.accessTeamDomain,
     POLICY_AUD: deployConfig.accessPolicyAud,
   },
+  // "Şifremi unuttum" emails (Cloudflare Email Service, goliqo.com onboarded in the dashboard): only in the deployed
+  // build; local runs and checks have no email binding (app/api/auth answers errService if it would need one).
+  ...(productionDatabaseId ? { send_email: [{ name: "EMAIL" }] } : {}),
   r2_buckets: r2
     ? [
         {

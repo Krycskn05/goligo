@@ -1,5 +1,5 @@
 // Goliqo üyelik kayıtları (Cloudflare D1). Tablolar: migration/database/members.sql.
-import { SESSION_MS, newToken, tokenHash, validToken } from './member-auth';
+import { RESET_MS, SESSION_MS, newToken, tokenHash, validToken } from './member-auth';
 
 /** D1'in burada kullanılan kısmı (testlerde node:sqlite ile taklit edilir). */
 export type Statement = {
@@ -81,6 +81,7 @@ export async function deleteMember(db: Db, memberId: string, email: string): Pro
     db.prepare('DELETE FROM study_notes WHERE user_id=?').bind(memberId),
     db.prepare('DELETE FROM study_sessions WHERE user_id=?').bind(memberId),
     db.prepare('DELETE FROM member_sessions WHERE member_id=?').bind(memberId),
+    db.prepare('DELETE FROM password_resets WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM member_logins WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM auth_attempts WHERE key=?').bind('login:' + email),
     db.prepare('DELETE FROM members WHERE id=?').bind(memberId),
@@ -134,4 +135,36 @@ export async function setMemberName(db: Db, id: string, name: string): Promise<v
 
 export async function clearAttempts(db: Db, key: string): Promise<void> {
   await db.prepare('DELETE FROM auth_attempts WHERE key=?').bind(key).run();
+}
+
+/**
+ * Şifre yenileme ("Şifremi unuttum"): e-postaya giden bağlantının rastgele anahtarı. Veritabanında yalnızca SHA-256
+ * özeti durur; bağlantı RESET_MS (1 saat) geçerli ve tek kullanımlıktır. Üyenin önceki bağlantıları ve süresi geçmiş
+ * bütün bağlantılar silinir, yani her zaman yalnızca en son gönderilen bağlantı çalışır.
+ */
+export async function createPasswordReset(db: Db, memberId: string, now = Date.now()): Promise<string> {
+  const token = newToken();
+  await db.batch([
+    db.prepare('DELETE FROM password_resets WHERE member_id=? OR expires_at<=?').bind(memberId, now),
+    db.prepare('INSERT INTO password_resets (id,member_id,created_at,expires_at) VALUES (?,?,?,?)').bind(await tokenHash(token), memberId, now, now + RESET_MS),
+  ]);
+  return token;
+}
+
+/** Bağlantının üyesi (bağlantı geçerliyse). */
+export async function memberForReset(db: Db, token: string | null | undefined, now = Date.now()): Promise<Member | null> {
+  if (!validToken(token)) return null;
+  return db
+    .prepare('SELECT m.id,m.email,m.name,m.created_at,m.last_login_at FROM password_resets r JOIN members m ON m.id=r.member_id WHERE r.id=? AND r.expires_at>?')
+    .bind(await tokenHash(token), now)
+    .first<Member>();
+}
+
+/** Yeni şifreyi kaydeder; üyenin bütün yenileme bağlantıları ve bütün oturumları kapanır. */
+export async function finishPasswordReset(db: Db, memberId: string, passwordHash: string): Promise<void> {
+  await db.batch([
+    db.prepare('UPDATE members SET password_hash=? WHERE id=?').bind(passwordHash, memberId),
+    db.prepare('DELETE FROM password_resets WHERE member_id=?').bind(memberId),
+    db.prepare('DELETE FROM member_sessions WHERE member_id=?').bind(memberId),
+  ]);
 }

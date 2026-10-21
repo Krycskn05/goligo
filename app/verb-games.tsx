@@ -6,7 +6,6 @@ import {verbPicture,verbRules,verbRuleKeys,ruleText,sentenceText,type VerbTense}
 import {sentenceRound,sentenceCorrect,auxRound,auxCorrect,buildRound,buildCorrect,buildTarget,buildSuffix,matchRound,matchKinds,bestKey,type GameId,type MatchKind,type Tile} from '@/lib/verb-games';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
-import {PaulHoca} from './paul-hoca';
 
 type Feedback={answer:(correct:boolean,text:string)=>void;stop:()=>void;complete:()=>void;busy:boolean};
 type Props={game:GameId;language:VaultLanguage;topic:string;onTopic:(topic:string)=>void;onExit:()=>void;feedback:Feedback};
@@ -19,9 +18,9 @@ export function VerbPicture({verb,language,small=false}:{verb:Verb;language:Vaul
  const src=verbPicture(verb);
  return src?<img className={'verb-picture'+(small?' small':'')} src={src} alt={verbMeaning(verb,language)} width={512} height={512} loading="lazy" decoding="async"/>:<span className={'verb-picture verb-picture-empty'+(small?' small':'')} aria-hidden="true" lang="de" dir="ltr">{verb.display}</span>;
 }
-/** Rule lines shown after an answer, so the learner sees why the form is right; Paul Hoca points at them. */
+/** Rule lines shown after an answer, so the learner sees why the form is right. */
 export function RuleBox({lines,language}:{lines:string[];language:VaultLanguage}){
- return lines.length?<div className="verb-rules paul-box" lang={language} dir={vaultDirection(language)}><div className="paul-box-text"><strong>{verbText(language,'ruleTitle')}</strong><ul>{lines.map(line=><li key={line}>{line}</li>)}</ul></div><PaulHoca pose="tip"/></div>:null;
+ return lines.length?<div className="verb-rules" lang={language} dir={vaultDirection(language)}><strong>{verbText(language,'ruleTitle')}</strong><ul>{lines.map(line=><li key={line}>{line}</li>)}</ul></div>:null;
 }
 function useTiles(){
  const [placed,setPlaced]=useState<Tile[]>([]);
@@ -38,11 +37,12 @@ export function VerbGame({game,language,topic,onTopic,onExit,feedback}:Props){
  return <section className="verb-game panel" data-verb-game={game} lang={language} dir={dir}>
   <button type="button" className="text-button vault-back-categories" onClick={()=>{feedback.stop();onExit();}}><ArrowLeft size={18} className="vault-direction-icon"/>{t('backGames')}</button>
   <h1 id="verb-game-heading" tabIndex={-1}>{t(gameTitle[game])}</h1>
-  <div className="verb-game-topics" role="group" aria-label={t('chooseGroup')}>{topics.map(id=><button type="button" key={id} className={'verb-topic-chip'+(id===topic?' active':'')} aria-pressed={id===topic} onClick={()=>{feedback.stop();onTopic(id);setSeed(value=>value+1);}}>{topicName(id)}</button>)}</div>
+  {/* No group chips (the learner removed them): the matching cards always use all verbs. Other games keep the choice. */}
+  {game!=='match'&&<div className="verb-game-topics" role="group" aria-label={t('chooseGroup')}>{topics.map(id=><button type="button" key={id} className={'verb-topic-chip'+(id===topic?' active':'')} aria-pressed={id===topic} onClick={()=>{feedback.stop();onTopic(id);setSeed(value=>value+1);}}>{topicName(id)}</button>)}</div>}
   {game==='sentence'?<SentenceGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='aux'?<AuxGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='build'?<BuildGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
-   <MatchGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>}
+   <MatchGame key={'verbs-all'+seed} language={language} topic="verbs-all" feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>}
  </section>;
 }
 type GameProps={language:VaultLanguage;topic:string;feedback:Feedback;onRestart:()=>void};
@@ -138,10 +138,10 @@ function BuildGame({language,topic,feedback,onRestart}:GameProps){
 }
 
 function MatchGame({language,topic,feedback,onRestart}:GameProps){
+ // Only picture ↔ verb cards (the learner removed "Fiil ↔ Perfekt" and "Fiil ↔ Anlam"); without pictures, the first kind.
  const kinds=matchKinds(topic);
- const [kind,setKind]=useState<MatchKind>(kinds[0]);
- const [round,setRound]=useState(0);
- const cards=useMemo(()=>matchRound(topic,kind,language),[topic,kind,language,round]);// eslint-disable-line react-hooks/exhaustive-deps
+ const kind:MatchKind=kinds.includes('picture')?'picture':kinds[0];
+ const cards=useMemo(()=>matchRound(topic,kind,language),[topic,kind,language]);
  const [open,setOpen]=useState<string[]>([]);const [matched,setMatched]=useState<Set<string>>(new Set());const [moves,setMoves]=useState(0);const [best,setBest]=useState<number|null>(null);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
  useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
@@ -154,9 +154,7 @@ function MatchGame({language,topic,feedback,onRestart}:GameProps){
   if(a.pair===b.pair){const verb=verbMap.get(a.pair)!;const all=new Set(matched).add(a.pair);setMatched(all);setOpen([]);feedback.answer(true,verb.infinitive);if(all.size===pairs){setBest(saveBest(bestKey('match',topic,kind),moves+1,true));}}
   else{feedback.answer(false,'');timer.current=setTimeout(()=>setOpen([]),1100);}
  }
- const labels:Record<MatchKind,VerbCopyKey>={picture:'matchPicture',perfekt:'matchPerfekt',meaning:'matchMeaning'};
  return <div className="verb-game-body">
-  <div className="verb-game-topics match-kinds" role="group">{kinds.map(value=><button type="button" key={value} className={'verb-topic-chip'+(value===kind?' active':'')} aria-pressed={value===kind} onClick={()=>{feedback.stop();setKind(value);setRound(n=>n+1);}}>{verbText(language,labels[value])}</button>)}</div>
   <div className="verb-game-status"><span>{verbText(language,'pairsFound',{n:matched.size,total:pairs})}</span><span>{verbText(language,'moves',{n:moves})}</span>{best!==null&&<span>{verbText(language,'bestScore',{n:best})}</span>}</div>
   <div className="verb-match-grid">{cards.map((card,i)=>{const shown=open.includes(card.id)||matched.has(card.pair);const verb=verbMap.get(card.pair)!;return <button type="button" key={card.id} className={'verb-match-card '+card.face+(shown?' shown':'')+(matched.has(card.pair)?' matched':'')} aria-pressed={shown} aria-label={shown?card.text:verbText(language,'cardHidden',{n:i+1})} disabled={matched.has(card.pair)} onClick={()=>flip(card.id)}>{shown?card.face==='picture'?<VerbPicture verb={verb} language={language} small/>:<span lang={card.face==='meaning'?language:'de'} dir={card.face==='meaning'?vaultDirection(language):'ltr'}>{card.text}</span>:<span className="verb-match-back" aria-hidden="true">?</span>}</button>;})}</div>
   {done&&<GameOver language={language} score={moves} total={pairs} best={best} lowerIsBetter onRestart={onRestart}/>}

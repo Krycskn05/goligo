@@ -43,20 +43,43 @@ export function ProgressSummaryPanel({stats,reviews,language,housingLabel,vaultL
   <p className="progress-help">{p('correctTotal',{n:summary.correct})} · {p('howItWorks')}</p>
  </section>;
 }
-/** Home page, at the bottom of the left menu (Üniteler ve konular, Nesne Kasası, Fiiller): the level and XP,
- * the day streak, the daily goal and the three areas, small and stacked. On a computer it stays in the
- * bottom-left corner while the page scrolls; on a phone it sits under the menu buttons. */
+/**
+ * Units page, at the bottom of the left menu: "İlerlemen", made easy to read (the learner asked for a clearer level
+ * and progress system). Four plain blocks, each with its own words:
+ * 1. Level: a big level number, the XP so far, a bar and "N XP to the next level".
+ * 2. Streak: the flame with "Seri: N gün" and what to do today.
+ * 3. Daily goal: "n/20 answers" with its own bar.
+ * 4. Areas (Ev ve Yaşam, Nesne Kasası, Fiiller): the percentage, a bar and "Öğrenilen: n/total".
+ * At the end, how XP is earned. On a computer it stays in the bottom-left corner while the page scrolls; on a phone it
+ * sits under the menu buttons.
+ */
 export function SidebarProgress({stats,reviews,language,housingLabel,vaultLabel,verbsLabel}:{stats:StudyStats;reviews:Review[];language:VaultLanguage;housingLabel:string;vaultLabel:string;verbsLabel?:string}){
  const p=(key:ProgressCopyKey,params?:Record<string,string|number>)=>progressText(language,key,params);
  const summary=progressSummary(stats);const level=summary.level;const goalDone=summary.goalPercent>=100;
  const areas=[{href:'/a1-2/ev-ve-yasam',label:housingLabel,progress:housingProgress('all',reviews)},{href:'/ev-esyalar?learn=de',label:vaultLabel,progress:objectProgress('all',reviews)},...(verbsLabel?[{href:'/fiiller',label:verbsLabel,progress:verbProgress('verbs-all',reviews)}]:[])];
+ const streakNote=p(summary.practisedToday?'streakDone':summary.streak?'streakKeep':'streakStart');
  return <section className="sidebar-progress" aria-labelledby="progress-heading" data-progress-summary="">
   <h2 id="progress-heading"><Sparkles size={16} aria-hidden="true"/>{p('title')}</h2>
-  <div className="sidebar-progress-level"><span className="sidebar-progress-badge"><Trophy size={14} aria-hidden="true"/>{p('level',{n:level.level})}</span><span className={'sidebar-progress-streak'+(summary.practisedToday?' lit':'')} title={p('streak',{n:summary.streak})} aria-label={p('streak',{n:summary.streak})}><Flame size={15} aria-hidden="true"/>{summary.streak}</span></div>
-  <div className="progress-track xp" role="progressbar" aria-label={p('level',{n:level.level})} aria-valuemin={0} aria-valuemax={level.span} aria-valuenow={level.intoLevel} aria-valuetext={level.xp+' XP'}><span className="progress-fill" style={{width:level.percent+'%'}}/></div>
-  <small className="sidebar-progress-xp">{level.xp} XP · {p('toNext',{n:level.toNext})}</small>
-  <p className={'sidebar-progress-goal'+(goalDone?' done':'')}><Target size={14} aria-hidden="true"/>{p('dailyGoal')}: {p('dailyCount',{n:summary.todayAnswers,goal:summary.dailyGoal})}</p>
-  <ul className="sidebar-progress-areas">{areas.map(area=><li key={area.href}><a href={area.href}><span>{area.label}</span><strong>{formatPercent(area.progress.percent,language)}</strong></a><div className="progress-track" role="progressbar" aria-label={area.label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={area.progress.percent}><span className="progress-tried" style={{width:area.progress.triedPercent+'%'}}/><span className="progress-fill" style={{width:area.progress.percent+'%'}}/></div></li>)}</ul>
+  <div className="sp-block sp-level">
+   <div className="sp-level-head"><span className="sp-level-number" aria-hidden="true">{level.level}</span><div><strong>{p('level',{n:level.level})}</strong><small>{level.xp} XP</small></div></div>
+   <div className="progress-track xp" role="progressbar" aria-label={p('level',{n:level.level})} aria-valuemin={0} aria-valuemax={level.span} aria-valuenow={level.intoLevel} aria-valuetext={level.xp+' XP'}><span className="progress-fill" style={{width:level.percent+'%'}}/></div>
+   <small className="sp-note">{p('toNext',{n:level.toNext})}</small>
+  </div>
+  <div className={'sp-block sp-streak'+(summary.practisedToday?' lit':'')}>
+   <span className="sp-icon" aria-hidden="true"><Flame size={17}/></span>
+   <div><strong>{p('streak',{n:summary.streak})}</strong><small className="sp-note">{streakNote}</small></div>
+  </div>
+  <div className={'sp-block sp-goal'+(goalDone?' done':'')}>
+   <div className="sp-row"><span className="sp-icon" aria-hidden="true"><Target size={16}/></span><strong>{p('dailyGoal')}</strong></div>
+   <div className="progress-track" role="progressbar" aria-label={p('dailyGoal')} aria-valuemin={0} aria-valuemax={summary.dailyGoal} aria-valuenow={Math.min(summary.todayAnswers,summary.dailyGoal)}><span className="progress-fill" style={{width:summary.goalPercent+'%'}}/></div>
+   <small className="sp-note">{goalDone?p('goalDone')+' · ':''}{p('dailyCount',{n:summary.todayAnswers,goal:summary.dailyGoal})}</small>
+  </div>
+  <ul className="sidebar-progress-areas">{areas.map(area=><li key={area.href}><a href={area.href}>
+   <span className="sp-area-head"><span className="sp-area-name">{area.label}</span><strong>{formatPercent(area.progress.percent,language)}</strong></span>
+   <span className="progress-track" role="progressbar" aria-label={area.label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={area.progress.percent}><span className="progress-tried" style={{width:area.progress.triedPercent+'%'}}/><span className="progress-fill" style={{width:area.progress.percent+'%'}}/></span>
+   <small className="sp-note">{p('learned',{n:area.progress.learned,total:area.progress.total})}</small>
+  </a></li>)}</ul>
+  <p className="sp-help">{p('howItWorks')}</p>
  </section>;
 }
 /** Result screen reward: XP from this round and the topic's updated percentage. */

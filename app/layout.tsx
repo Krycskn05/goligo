@@ -11,7 +11,6 @@ import "./notebook.css";
 import "./lesson-book.css";
 import "./home-tour.css";
 import "./admin.css";
-import "./paul-hoca.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

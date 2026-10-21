@@ -453,9 +453,10 @@ test('Fiil Atölyesi: four parts in book order, each verb in turn: card, meaning
  assert.equal(logic.praesensForm(byId('fahren')),'fährt');assert.equal(logic.praesensForm(byId('aufstehen')),'steht … auf');assert.equal(logic.praesensForm(byId('leidtun')),'tut … leid');
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
  assert.ok(!page.includes("v('resume')"),'no resume card on the page');
- // The top shows only the title (no lead text, photo or start button); the "next verb" bubble continues the path.
+ // The top shows only the title (no lead text, photo or start button) and no "0 / 19 fiil" card: the map shows where the learner is.
  assert.ok(!page.includes("t('workshopLead')")&&!page.includes('verb-polaroid')&&!page.includes('verb-path-enter'),'plain title on top');
- assert.ok(page.includes('className="verb-bubble" disabled={busy||!ready} onClick={()=>void enterPart(path.family,false)}'),'the bubble continues the path');
+ assert.ok(!page.includes('verb-path-panel')&&!page.includes('className="verb-bubble"'),'no path card under the title');
+ assert.ok(page.includes('<span className="verb-hero-badge" aria-hidden="true"><NavIcon name="verbs"/></span>')&&page.includes('className="verb-hero-sub"'));
  assert.ok(page.includes('<SiteHeader ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
  assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');
  for(const key of ['workshopTitle','workshopLead','workshopEnter','stepPick','stepListen','stageMeanings','perfektChapter','gotIt','promptFit','pathDone'])assert.ok(copy.verbCopy[key]);

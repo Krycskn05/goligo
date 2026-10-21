@@ -6,7 +6,6 @@ import {exampleSpeech,frameSpeech,gradeExercise,gradeItem,matchesAnswer,wordSpee
 import {wordArticle,type L12ScoreMap} from '@/lib/ausbildung-progress';
 import {wordPicture} from '@/lib/ausbildung-art';
 import {RasterArt} from './toon-art';
-import {PaulHoca} from './paul-hoca';
 
 /** Inline markup: *German* (marked as German) and **bold**. */
 export function Rich({text}:{text:string}){
@@ -181,7 +180,7 @@ export function ExerciseView({exercise,number,total,onScore,onNext,nextLabel}:{e
  const answered=exercise.items.some((item,i)=>{const value=values[i];return Array.isArray(value)?value.some(part=>String(part).trim()):value!==undefined&&value!==null&&String(value).trim()!=='';});
  return <article className="panel object-question l12-exercise" data-l12-exercise={exercise.id} aria-labelledby={'l12-ex-'+exercise.id}>
   <div className="l12-exercise-head"><h2 id={'l12-ex-'+exercise.id} className="l12-exercise-title" lang="de" tabIndex={-1}><span className="l12-sr">Alıştırma {number} / {total}: </span>{exercise.title}</h2>{exercise.points!==undefined&&!exercise.title.includes('Punkte')&&<span className="l12-points">{formatPoints(exercise.points)} Punkte</span>}</div>
-  {exercise.hint&&<div className="housing-cue l12-hint paul-box"><p className="paul-box-text"><Rich text={exercise.hint}/></p><PaulHoca pose="tip"/></div>}
+  {exercise.hint&&<p className="housing-cue l12-hint"><Rich text={exercise.hint}/></p>}
   {exercise.reading&&<div className="housing-reading l12-reading" lang="de" dir="ltr">{exercise.reading.title&&<h3>{exercise.reading.title}</h3>}{exercise.reading.lines.map((line,i)=><p key={i}><Rich text={line}/></p>)}</div>}
   {exercise.bank&&<div className="housing-word-bank l12-bank"><small>Kelime kutusu</small><p lang="de" dir="ltr">{exercise.bank.map(word=><span key={word}>{word}</span>)}</p></div>}
   <ol className="l12-items">{exercise.items.map((item,i)=>{const result=checked&&item.k!=='open'?gradeItem(item,values[i]):null;return <li key={i} className={'l12-item l12-k-'+item.k+(result?(result.right===result.total?' ok':' bad'):'')}>

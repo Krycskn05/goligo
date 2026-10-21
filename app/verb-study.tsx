@@ -22,6 +22,7 @@ import {useLanguageSwitch} from './language-switch';
 import {LetterPuzzle} from './letter-puzzle';
 import {SiteFooter} from './site-footer';
 import {SiteHeader} from './site-header';
+import {NavIcon} from './nav-icons';
 import {verbProgress} from '@/lib/progress';
 import {RoundReward} from './progress-ui';
 import {progressText} from '@/lib/progress-copy';
@@ -54,7 +55,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const dir=vaultDirection(language);
  const [snapshot,setSnapshot]=useState<Snapshot>(blank);
  const [ready,setReady]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState<ErrorKey|null>(null);const [signIn,setSignIn]=useState(false);
- const [initializing,setInitializing]=useState(true);
+ const [,setInitializing]=useState(true);
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);
  const [feedback,setFeedback]=useState<Answer|null>(null);const [selected,setSelected]=useState('');
  const [heardQuestionId,setHeardQuestionId]=useState<string|null>(null);const [starBusy,setStarBusy]=useState(false);
@@ -94,7 +95,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  const starred=starredQuestionIds(snapshot.notes);
  // No part is locked: every part has its own round; the hero continues the part practised last.
  const parts=partsStatus(snapshot.sessions);const path=currentPart(snapshot.sessions);
- const nextVerb=verbMap.get(path.nextVerbId)??workshopVerbs[0];
  const stickers=verbStatus(snapshot.sessions);
  // Yanlışlarım: workshop questions whose last answer was wrong; one right answer takes a question off the list.
  const mistakeIds=ready?workshopMistakeIds(snapshot.reviews):[];const mistakeVerbList=mistakeVerbs(mistakeIds);
@@ -253,8 +253,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
  // A test answer opens the result card in place of the question; a spelling answer keeps the puzzle with a short note.
  const answered=!!feedback&&!writing;
  const overall=ready?verbProgress('verbs-all',snapshot.reviews):null;
- const nextFamily=path.family;
- const nextLabel=t('nextUp',{verb:'\u2063'}).split('\u2063');
  // "Fiil Atölyesi" → first word plain, the rest in the accent colour.
  const titleWords=(()=>{const words=t('workshopTitle').split(' ');return {head:words[0],tail:words.slice(1).join(' ')};})();
 
@@ -325,20 +323,16 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
     return <PartVerbs family={part.family} part={part} verbs={members} marks={stickers} language={language} disabled={busy||!ready} onStart={restart=>void enterPart(part.family,restart)} onOpen={item=>openVerb(part.family,item.id)} onBack={closeView}/>;
    })():
    <section className="verb-home" aria-labelledby="vault-heading">
-    {/* Only the title on top: the path card below shows where the learner is and continues with one tap. */}
+    {/* Only the title on top (the learner removed the "0 / 19 fiil" card): the pencil badge of the menu, the title in
+        the site's navy with a gold wavy line under "Atölyesi", and the count of verbs and parts. The map below shows
+        where the learner is ("Buradasın!"). */}
     <div className="verb-hero only-title">
-     <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
-    </div>
-    <article className="panel verb-path-panel" data-verb-workshop="">
-     <div className="verb-avatar"><VerbPicture verb={nextVerb} language={language} small/></div>
-     <div className="verb-path-status">
-      <p className="verb-path-title"><span className="n">{path.finished?path.verbCount:path.verbsDone}</span> / {path.verbCount} {t('verbsWord')}</p>
-      <div className="verb-energy" role="progressbar" aria-label={t('workshopTitle')} aria-valuemin={0} aria-valuemax={path.count} aria-valuenow={path.done} aria-valuetext={path.percent+'%'}><span className="verb-energy-fill" style={{width:Math.max(3,path.percent)+'%'}}/><span className="verb-energy-ticks"/></div>
-      {initializing?<p className="verb-path-note">{v('loading')}</p>:path.finished?<p className="verb-path-note verb-path-done"><CheckCircle2 size={16} aria-hidden="true"/>{t('workshopDone')}</p>:<p className="verb-path-note">{t('chapterOf',{n:nextFamily.number})} · <span lang="de" dir="ltr">{familyTitle(nextFamily,language)}</span> · {t('stageBoth')}</p>}
-      {path.session&&!path.finished&&path.done>0&&<button type="button" className="text-button verb-path-restart" disabled={busy||!ready} onClick={()=>void enterPart(path.family,true)}><RotateCcw size={15}/>{t('workshopRestart')}</button>}
+     <span className="verb-hero-badge" aria-hidden="true"><NavIcon name="verbs"/></span>
+     <div className="verb-hero-words">
+      <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
+      <p className="verb-hero-sub" lang="de" dir="ltr">{workshopVerbs.length} Verben · {parts.length} Teile</p>
      </div>
-     {!path.finished&&<button type="button" className="verb-bubble" disabled={busy||!ready} onClick={()=>void enterPart(path.family,false)}><span>{nextLabel[0]}<strong lang="de" dir="ltr">{nextVerb.display}</strong>{nextLabel[1]}</span><ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>}
-    </article>
+    </div>
     <section className="verb-map" aria-labelledby="verb-map-heading">
      <h2 id="verb-map-heading" className="verb-map-title">{t('mapTitle')}</h2>
      <svg className="verb-map-path" viewBox="0 0 1130 1180" preserveAspectRatio="none" aria-hidden="true"><path d="M200 120 C 500 160, 700 180, 820 300 S 300 520, 310 640 S 900 820, 830 960 S 420 1100, 300 1140" fill="none" stroke="#fff" strokeWidth="14" strokeLinecap="round" strokeDasharray="2 30" opacity=".9"/></svg>

@@ -84,21 +84,41 @@
  * menü düğmelerinin altında. */
 .work-sidebar:has(.sidebar-progress) { position:sticky; top:0; align-self:start; display:flex; flex-direction:column; gap:14px; max-height:100vh; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
 .work-sidebar:has(.sidebar-progress) nav { position:static; }
-.sidebar-progress { position:static; display:grid; gap:7px; padding:14px; border-radius:20px; background:#fff; border:2px solid #fff; box-shadow:0 8px 24px rgba(28,82,130,.12); }
-.sidebar-progress h2 { display:flex; align-items:center; gap:6px; margin:0; font-size:14px; font-weight:800; letter-spacing:0; color:#1f3b5c; }
+.sidebar-progress { position:static; display:grid; gap:10px; padding:14px; border-radius:20px; background:#fff; border:2px solid #fff; box-shadow:0 8px 24px rgba(28,82,130,.12); }
+.sidebar-progress h2 { display:flex; align-items:center; gap:6px; margin:0; font-size:15px; font-weight:800; letter-spacing:0; color:#1f3b5c; }
 .sidebar-progress h2 svg { color:#f0a132; }
-.sidebar-progress-level { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.sidebar-progress-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; background:linear-gradient(180deg,#ffe8a3,#f6c46b); color:#5b3600; font-size:12.5px; font-weight:800; white-space:nowrap; }
-.sidebar-progress-streak { display:inline-flex; align-items:center; gap:3px; font-size:13px; font-weight:800; color:#9aa8b8; }
-.sidebar-progress-streak.lit { color:#e26a1c; }
-.sidebar-progress .progress-track { height:7px; }
-.sidebar-progress-xp { font-size:11.5px; line-height:1.35; color:#5a7a99; }
-.sidebar-progress-goal { display:flex; align-items:center; gap:5px; margin:0; font-size:12px; font-weight:700; color:#3d5a7a; }
-.sidebar-progress-goal.done { color:#2e7d22; }
-.sidebar-progress-areas { list-style:none; margin:2px 0 0; padding:0; display:grid; gap:8px; }
-.sidebar-progress-areas a { display:flex; justify-content:space-between; gap:6px; margin-bottom:3px; font-size:12px; font-weight:700; color:#3d5a7a; text-decoration:none; }
-.sidebar-progress-areas a:hover { color:#1f3b5c; }
-.sidebar-progress-areas strong { color:#1f3b5c; }
+.sidebar-progress .progress-track { display:block; height:9px; }
+.sidebar-progress strong { color:#1f3b5c; }
+/* One small block per idea: level, streak, daily goal */
+.sp-block { display:grid; gap:5px; padding:9px 10px; border-radius:14px; background:#f6f9fd; }
+.sp-note { display:block; font-size:11.5px; line-height:1.35; color:#5a7a99; font-weight:600; }
+.sp-row { display:flex; align-items:center; gap:7px; font-size:13px; }
+.sp-icon { flex:none; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#fff; color:#9aa8b8; box-shadow:0 1px 3px rgba(28,82,130,.15); }
+/* 1. Level: big number in a gold coin */
+.sp-level { background:linear-gradient(180deg,#fff7df,#fff1c9); }
+.sp-level-head { display:flex; align-items:center; gap:9px; }
+.sp-level-number { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg,#ffd76a,#f0a132); color:#5b3600; font-size:20px; font-weight:900; line-height:1; box-shadow:0 0 0 3px #fff,0 3px 8px rgba(176,110,10,.3); }
+.sp-level-head strong { display:block; font-size:15px; color:#5b3600; }
+.sp-level-head small { display:block; font-size:12px; font-weight:700; color:#8a5a00; }
+.sp-level .progress-track { background:#fff; }
+.sp-level .progress-fill { background:linear-gradient(90deg,#ffcf5c,#f0a132); }
+.sp-level .sp-note { color:#8a5a00; }
+/* 2. Streak */
+.sp-streak { grid-template-columns:auto 1fr; align-items:center; gap:9px; font-size:13px; }
+.sp-streak.lit { background:#fff1e8; }
+.sp-streak.lit .sp-icon { color:#e26a1c; }
+/* 3. Daily goal */
+.sp-goal .sp-icon { color:#2f7fd6; }
+.sp-goal.done { background:#eaf7ee; }
+.sp-goal.done .sp-icon { color:#2e7d22; }
+.sp-goal .progress-fill { background:linear-gradient(90deg,#7cc0ff,#2f7fd6); }
+.sp-goal.done .progress-fill { background:linear-gradient(90deg,#8be07a,#3a9a4c); }
+/* 4. Areas */
+.sidebar-progress-areas { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.sidebar-progress-areas a { display:grid; gap:4px; padding:8px 10px; border-radius:12px; color:#3d5a7a; text-decoration:none; border:2px solid #edf2f8; }
+.sidebar-progress-areas a:hover { border-color:#cfe3f7; background:#f6f9fd; }
+.sp-area-head { display:flex; justify-content:space-between; gap:6px; font-size:13px; font-weight:800; color:#1f3b5c; }
+.sp-help { margin:0; font-size:11px; line-height:1.45; color:#7f95ad; }
 @media (max-width:760px) {
  .work-sidebar:has(.sidebar-progress) { display:block; position:static; max-height:none; overflow:visible; }
  .work-sidebar:has(.sidebar-progress) nav { position:static; }

@@ -11,7 +11,6 @@ import {usePaulMotion} from './paul-hoca';
  */
 export const BRAND={
  logo:'/branding/goliqo-logo.webp',logoBounce:'/branding/goliqo-logo-zipla.webp',
- logoWave:'/branding/goliqo-logo-el-salla.webp',logoWaveStill:'/branding/goliqo-logo-buyuk.webp',
  mascot:'/branding/goliqo-maskot.webp',mascotWave:'/branding/goliqo-maskot-el-salla.webp',
 } as const;
 /** True once the animated picture has loaded (the small still picture shows until then; never with motion off). */
@@ -41,8 +40,3 @@ export function BrandMascot({className=''}:{className?:string}){
  return <img className={('brand-mascot '+className).trim()} src={animated?BRAND.mascotWave:BRAND.mascot} alt="" width={340} height={256} decoding="async" draggable={false}/>;
 }
 
-/** The whole logo with the mascot waving (the big logo on the introduction page). */
-export function BrandLogoWave({className=''}:{className?:string}){
- const animated=useAnimated(BRAND.logoWave);
- return <img className={('brand-logo-wave '+className).trim()} src={animated?BRAND.logoWave:BRAND.logoWaveStill} alt="Goliqo" width={560} height={205} decoding="async" draggable={false}/>;
-}

@@ -52,7 +52,7 @@ test('the learner\'s Goliqo logo and animations are used in many places',()=>{
  const logo=read('app/site-logo.tsx');
  // High quality (the learner asked): all 20 frames a second of the learner's files, twice the shown size, and every
  // animation loops (the header bounce plays all the time).
- for(const [file,size,frames,loop] of [['goliqo-logo.webp',[496,182],0,null],['goliqo-logo-zipla.webp',[496,182],128,0],['goliqo-logo-el-salla.webp',[560,205],100,0],['goliqo-logo-buyuk.webp',[560,205],0,null],['goliqo-maskot-el-salla.webp',[340,256],100,0],['goliqo-maskot.webp',[340,256],0,null]]){
+ for(const [file,size,frames,loop] of [['goliqo-logo.webp',[496,182],0,null],['goliqo-logo-zipla.webp',[496,182],128,0],['goliqo-maskot-el-salla.webp',[340,256],100,0],['goliqo-maskot.webp',[340,256],0,null]]){
   const info=webp('public/branding/'+file);
   assert.deepEqual(info.size,size,file);assert.equal(info.frames,frames,file);if(loop!==null)assert.equal(info.loop,loop,file+' loop');
   assert.ok(info.bytes<(frames?3300:60)*1024,file+' size: '+info.bytes);
@@ -65,7 +65,8 @@ test('the learner\'s Goliqo logo and animations are used in many places',()=>{
  // The waving mascot and the big waving logo where the old Koko pictures were, and more.
  // The welcome box on the home page has no mascot or logo any more (the learner removed it).
  const tour=read('app/home-tour.tsx');assert.ok(!tour.includes('BrandMascot')&&!tour.includes('ht-koko')&&!tour.includes('koko-mascot'));
- assert.ok(read('app/landing.tsx').includes('<BrandLogoWave className="lk-hero-logo"/>'));
+ // The introduction page has no big waving logo above its title any more (the learner removed it, 21 October 2026).
+ assert.ok(!read('app/landing.tsx').includes('BrandLogoWave')&&!logo.includes('BrandLogoWave')&&!logo.includes('goliqo-logo-el-salla'));
  for(const page of ['app/giris/page.tsx','app/uye-ol/page.tsx'])assert.ok(read(page).includes('<BrandMascot className="lk-auth-mascot"/>'),page);
  assert.ok(read('app/account-panel.tsx').includes('<BrandMascot className="lk-account-mascot"/>'));
  assert.equal((read('app/ausbildung-study.tsx').match(/<BrandMascot className="l12-koko"\/>/g)||[]).length,2);

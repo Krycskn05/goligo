@@ -2,7 +2,6 @@ import {BookOpen,CheckCircle2,Headphones,Languages,RotateCcw,Sparkles} from 'luc
 import {SITE_NAME} from '@/lib/site-brand';
 import {PublicHeader} from './public-shell';
 import {SiteFooter} from './site-footer';
-import {BrandLogoWave} from './site-logo';
 import {pickPictures,type PicturePart} from '@/lib/site-pictures';
 import {publicText,type PublicCopyKey} from '@/lib/public-copy';
 import {languageDirection,type SiteLanguage} from '@/lib/site-languages';
@@ -38,7 +37,6 @@ export function LandingView({language}:{language:SiteLanguage}){
   <main id="main" tabIndex={-1} className="lk-public-main">
    <section className="lk-hero" aria-labelledby="lk-hero-title">
     <div className="lk-hero-text">
-     <BrandLogoWave className="lk-hero-logo"/>
      <p className="lk-eyebrow">{p('landingEyebrow')}</p>
      <h1 id="lk-hero-title">{p('landingTitle')}</h1>
      <p className="lk-lead">{p('landingLead')}</p>

@@ -41,17 +41,15 @@ test('Paul pops up all over the screen now and then (waving every other time, hi
  assert.ok(!read('app/home-tour.tsx').includes('PaulHoca'));
  const tsx=read('app/paul-hoca.tsx');
  assert.ok(tsx.includes('export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_GAP_MS=PEEK_EVERY_MS/2,PEEK_SHOW_MS=3600;'),'a visit every 75 s, a wave every 2.5 min');
- // From any point of any edge, never the same edge twice in a row, head into the screen (the learner asked).
- assert.ok(tsx.includes("export const PEEK_EDGES=['bottom','top','left','right'] as const;"));
- assert.ok(tsx.includes("const edges=PEEK_EDGES.filter(edge=>edge!==lastEdge);")&&tsx.includes('at:Math.round(12+random()*76)'));
+ // Only from the bottom of the screen, at any point along it, each time somewhere else (the learner asked).
+ assert.ok(tsx.includes('const at=Math.round(10+random()*80);if(last===null||Math.abs(at-last)>=25)return at;')&&!tsx.includes('PEEK_EDGES'));
  assert.ok(tsx.includes("export const PEEK_OTHER_POSES:readonly PaulPose[]=['correct','cheer','think','tip','desk'];"),'all his other animations, the raised finger stays for wrong answers');
  assert.ok(tsx.includes("export function peekPose(n:number):PaulPose{return n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length];}"));
- assert.ok(tsx.includes("<div key={visit.n} className={'paul-peek edge-'+visit.edge+' pose-'+visit.pose} style={{'--peek-at':visit.at+'%'} as CSSProperties} aria-hidden=\"true\"><img src={PAUL_PICTURES[visit.pose]}"));
+ assert.ok(tsx.includes("<div key={visit.n} className={'paul-peek edge-bottom pose-'+visit.pose} style={{'--peek-at':visit.at+'%'} as CSSProperties} aria-hidden=\"true\"><img src={PAUL_PICTURES[visit.pose]}"));
  assert.ok(tsx.includes("later(()=>setVisit(null),PEEK_SHOW_MS);later(peek,PEEK_GAP_MS);"));
  const peekCss=read('app/paul-hoca.css');
- for(const edge of ['bottom','top','left','right'])assert.ok(peekCss.includes('.paul-peek.edge-'+edge+' {')&&peekCss.includes('@keyframes paul-peek-'+edge+' '),edge);
- // Head into the screen: upside down from the top, sideways from the left and the right.
- for(const rule of ['.paul-peek.edge-top img { transform:rotate(180deg)','.paul-peek.edge-left img { transform:rotate(90deg)','.paul-peek.edge-right img { transform:rotate(-90deg)'])assert.ok(peekCss.includes(rule),rule);
+ assert.ok(peekCss.includes('bottom:0; animation-name:paul-peek-bottom; }')&&peekCss.includes('@keyframes paul-peek-bottom '));
+ for(const edge of ['top','left','right'])assert.ok(!peekCss.includes('edge-'+edge)&&!peekCss.includes('paul-peek-'+edge),'not from the '+edge);
  assert.ok(tsx.includes("if(busyScreen()){later(peek,12000);return;}")&&tsx.includes("if(!motion||QUIET_PAGES.test(window.location.pathname))return;"));
  assert.ok(tsx.includes("if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}"),'hello sound once per visit');
  assert.ok(read('app/paul-hoca.css').includes('@keyframes paul-peek'));

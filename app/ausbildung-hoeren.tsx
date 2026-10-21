@@ -1,4 +1,5 @@
 'use client';
+import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useState} from 'react';
 import {ArrowLeft,ArrowRight,Check,Headphones} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
@@ -17,10 +18,10 @@ import {LISTEN_CHANGED,ListenTask,listenPart,listenResult,tasksByNumber,useListe
 
 /** Lektion 12 – Hören: the 14 listening sections; one section at a time (?bolum=1 … 14). */
 export default function AusbildungHoeren(){
- const [language,setLanguage]=useState<StudyLanguage>('tr');const [loaded,setLoaded]=useState(false);
+ const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
- useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('german-study-language');}catch{}if(saved&&isStudyLanguage(saved))switchLanguage(saved,()=>setLoaded(true));else setLoaded(true);},[switchLanguage]);
- useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 – Hören · '+SITE_NAME;try{localStorage.setItem('german-study-language',language);}catch{}},[language,loaded]);
+ useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
+ useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 – Hören · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
  return <HoerenPage language={language} onLanguage={switchLanguage}/>;
 }
@@ -73,7 +74,7 @@ export function HoerenPage({language,onLanguage}:{language:StudyLanguage;onLangu
     <div className="lb-start"><button type="button" className="btn l12-resume" onClick={()=>open((hoerenTasks.find(item=>!results[item.id])??hoerenTasks[0]).number)}><Headphones size={20} aria-hidden="true"/>{done?'Sıradaki bölümü dinle':'İlk bölümle başla'}</button><small>{done} / {hoerenTasks.length} bölüm yapıldı</small></div>
    </div>}/>
   </main>
-  <SiteFooter/>
+  <SiteFooter language={language}/>
  </div>;
 }
 

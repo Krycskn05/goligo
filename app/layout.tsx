@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
+    <html lang="de">
       <head>
         {/* Moving from the old address: takes this browser's settings along once (lib/storage-move.ts). */}
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MOVE_SCRIPT }} />

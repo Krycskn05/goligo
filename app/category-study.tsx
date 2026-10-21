@@ -1,4 +1,5 @@
 'use client';
+import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useEffect,useState} from 'react';
 import {Clock} from 'lucide-react';
 import {NavIcon} from './nav-icons';
@@ -29,15 +30,15 @@ import {SiteTour} from './site-tour';
 export type HomePage='home'|'units';
 
 export default function CategoryStudy({page='home'}:{page?:HomePage}){
- const [language,setLanguage]=useState<StudyLanguage>('tr');
+ const [language,setLanguage]=useState<StudyLanguage>('de');
  const [course,setCourse]=useState<LearningLanguage>('de');
  const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
  // Old links to the catalogue ("/?level=A1.2") now open it at /konular.
  useEffect(()=>{if(page!=='home')return;const level=new URLSearchParams(window.location.search).get('level');if(level==='A1.1'||level==='A1.2')window.location.replace('/konular?level='+level);},[page]);
  // The saved language is applied once its language pack has loaded (Turkish meanwhile shows the loading line).
- useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('german-study-language');setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}if(saved&&isStudyLanguage(saved))switchLanguage(saved,()=>setLoaded(true));else setLoaded(true);},[switchLanguage]);
- useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);try{localStorage.setItem('german-study-language',language);saveLearningLanguage(localStorage,course);}catch{}},[language,course,loaded]);
+ useEffect(()=>{try{setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
+ useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);rememberSiteLanguage(language);try{saveLearningLanguage(localStorage,course);}catch{}},[language,course,loaded]);
  function changeCourse(value:LearningLanguage){window.speechSynthesis?.cancel();setCourse(value);const url=new URL(window.location.href);url.searchParams.set('learn',value);window.history.replaceState(null,'',url);}
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
  return <Workshop page={page} language={language} onLanguage={switchLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>;
@@ -84,6 +85,6 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse}
     </section>
     </>}
    </main>
-  </div><SiteFooter/>
+  </div><SiteFooter language={language}/>
  </div>;
 }

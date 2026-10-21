@@ -37,7 +37,7 @@ test('they are used in the header, the sound settings, the clock, the tour and H
  const clock=read('app/site-greeting.tsx');
  assert.ok(clock.includes('<TopIcon name="calendar" size={24} className="sg-day-icon"/>')&&clock.includes('<TopIcon name="clock" size={30}/>'));
  assert.ok(read('app/site-tour.tsx').includes('<TopIcon name="voice" size={24}/>'));
- assert.ok(read('app/account-panel.tsx').includes('<Card icon={<TopIcon name="account" size={26}/>} title="Adın">'));
+ assert.ok(read('app/account-panel.tsx').includes('<Card icon={<TopIcon name="account" size={26}/>} title={texts.nameLabel}>'));
  // Decorative: the words are on the button or the heading.
  assert.ok(read('app/top-icons.tsx').includes('alt="" aria-hidden="true"'));
 });

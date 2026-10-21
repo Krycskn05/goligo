@@ -33,7 +33,7 @@ test('shown once per member (the account remembers it); ?tur=1 starts it again',
  // A new member always gets it, even on a browser that has seen it.
  const auth=read('app/auth-form.tsx');assert.ok(auth.includes("if(register){try{localStorage.removeItem(TOUR_KEY);}catch{}}"));
  // Hesabım can start it again.
- assert.ok(read('app/account-panel.tsx').includes('<a className="btn secondary small" href="/?tur=1" data-account-tour>Site turunu başlat</a>'));
+ assert.ok(read('app/account-panel.tsx').includes('<a className="btn secondary small" href="/?tur=1" data-account-tour>{texts.tourStart}</a>')&&read('lib/public-copy.ts').includes("tourStart:['Site turunu başlat',"));
  // Only on the home page of the German course, where the header and the whole menu are.
  assert.ok(read('app/category-study.tsx').includes('{home?<><HomeTour language={language}/><SiteTour language={language}/></>:<>'));
 });

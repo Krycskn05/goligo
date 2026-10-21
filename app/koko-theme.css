@@ -347,6 +347,9 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
  .site-header .site-logo-brand { grid-area:logo; }
  .site-header .site-greeting { grid-area:bubble; justify-self:end; }
  .site-header .site-header-tools { grid-area:tools; margin:0; flex-wrap:nowrap; justify-content:space-between; }
+ /* No speech bubble on the pages a visitor sees before signing in: one row. */
+ .work-header.logo-header.site-header.lk-public-header { grid-template-areas:"logo tools"; }
+ .site-header.lk-public-header .site-header-tools { justify-content:flex-end; gap:14px; }
 }
 @media (max-width:760px) {
  .toon-app .work-header.site-header,.work-header.logo-header.site-header { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"logo buttons" "bubble bubble" "lang lang"; align-items:center; gap:10px; }
@@ -356,6 +359,13 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
  .site-header .site-language { grid-area:lang; justify-self:center; }
  .site-header .site-language select { max-width:70vw; }
  .site-header .site-header-buttons { grid-area:buttons; gap:8px; }
+ /* The pages a visitor sees before signing in have no speech bubble: the logo and the site language, then the two
+    buttons side by side (room for long words in every language). */
+ .work-header.logo-header.site-header.lk-public-header { grid-template-columns:auto minmax(0,1fr); grid-template-areas:"logo lang" "buttons buttons"; }
+ .site-header.lk-public-header .site-language { justify-self:end; min-width:0; max-width:100%; }
+ .site-header.lk-public-header .site-language select { min-width:0; max-width:100%; flex:0 1 auto; text-overflow:ellipsis; }
+ .site-header.lk-public-header .lk-public-nav { display:grid; grid-template-columns:1fr 1fr; width:100%; }
+ .site-header.lk-public-header .lk-public-nav .btn { justify-content:center; text-align:center; }
 }
 
 /* Phones: the left menu becomes two compact columns above the page, and the progress panel moves below the page,

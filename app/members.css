@@ -5,6 +5,8 @@
 .lk-public-main.narrow { width:min(720px,100%); }
 .lk-public-nav { display:flex; gap:10px; margin-inline-start:auto; flex-wrap:wrap; justify-content:flex-end; }
 .lk-public-nav .btn { text-decoration:none; }
+/* The header of these pages: logo, then the site language and the buttons (the same places as on the study pages). */
+.lk-public-header .site-header-tools { flex-wrap:nowrap; }
 
 /* Tanıtım */
 .lk-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:28px; align-items:center; background:#fff; border-radius:32px; box-shadow:var(--soft); padding:34px; overflow:hidden; }
@@ -85,6 +87,8 @@
 .lk-legal ul { padding-inline-start:22px; display:grid; gap:8px; }
 .lk-legal strong { color:var(--ink); }
 .lk-legal-date { color:var(--ink-3) !important; font-size:15px; margin:0 0 18px; }
+/* Every language but Turkish: the text is a translation of the Turkish original. */
+.lk-legal-note { margin:-8px 0 20px; padding:10px 14px; border-radius:14px; background:var(--sky-1); color:var(--ink-2) !important; font-size:14.5px; }
 .lk-legal code { background:var(--sky-1); padding:1px 6px; border-radius:6px; font-size:.92em; }
 .site-footer-links { display:flex; gap:4px 8px; flex-wrap:wrap; justify-content:center; }
 /* Big enough to tap on a phone (about 40px high). */

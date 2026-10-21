@@ -43,7 +43,7 @@ export function EffectsSettingsButton({language}:{language:VaultLanguage}) {
 }
 export default function LearningEffects() {
  const [preferences,setPreferences]=useState<EffectsPreferences>(defaultEffects);
- const [language,setLanguage]=useState<VaultLanguage>('tr');
+ const [language,setLanguage]=useState<VaultLanguage>('de');
  const [systemReduced,setSystemReduced]=useState(false);
  const [playing,setPlaying]=useState<SoundId|null>(null);
  const [message,setMessage]=useState<EffectsCopyKey|null>(null);

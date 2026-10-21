@@ -1,4 +1,5 @@
 'use client';
+import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
@@ -25,10 +26,10 @@ import {ProgressMeter,RoundReward} from './progress-ui';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 export default function HousingStudy(){
- const [language,setLanguage]=useState<StudyLanguage>('tr');const [loaded,setLoaded]=useState(false);
+ const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
- useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('german-study-language');}catch{}if(saved&&isStudyLanguage(saved))switchLanguage(saved,()=>setLoaded(true));else setLoaded(true);},[switchLanguage]);
- useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title=housingText(language,'title')+' · '+SITE_NAME;try{localStorage.setItem('german-study-language',language);}catch{}},[language,loaded]);
+ useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
+ useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title=housingText(language,'title')+' · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  return <HousingWorkshop language={language} onLanguage={switchLanguage}/>;
 }
 export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void}){
@@ -145,6 +146,6 @@ export function HousingWorkshop({language,onLanguage}:{language:StudyLanguage;on
     {/* The contents page: one line per section A–D (picture, German title, meaning, progress). */}
     <ol className="lb-toc">{housingSections.map(item=><li className="lb-toc-row" data-housing-section={item.id} key={item.id}><button type="button" className="housing-card-open" disabled={busy} onClick={()=>choose(item.id)}><span className="lb-toc-badge" aria-hidden="true">{item.id.toUpperCase()}</span><span className="lb-toc-photo" aria-hidden="true"><RasterArt art={housingSceneArt[housingSectionScene[item.id]]} title={translate(item.title,language)}/></span><span className="lb-toc-text"><strong lang="de" dir="ltr">{item.de}</strong><small>{translate(item.title,language)}</small></span><ArrowRight size={20}/></button>{ready&&<ProgressMeter progress={housingProgress(item.id,snapshot.reviews)} language={language} label={item.id.toUpperCase()+' · '+translate(item.title,language)} compact/>}<button type="button" className="housing-card-bottom" disabled={busy} onClick={()=>choose(item.id)}><span>{h('exercises',{n:housingPool(item.id,'write').length})}</span><ArrowRight size={16}/></button></li>)}</ol>
    </>}/></section>}
-  </main><SiteFooter/>
+  </main><SiteFooter language={language}/>
  </div>;
 }

@@ -56,14 +56,27 @@ export function validEmail(email: string): boolean {
   return email.length >= 3 && email.length <= EMAIL_MAX && /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(email);
 }
 
+/** Şifredeki sorun (sayfa kendi dilinde gösterir: lib/public-copy.ts pwShort … pwRepeat), yoksa null. */
+export type PasswordIssue = { code: 'pwShort' | 'pwLong' | 'pwSpaces' | 'pwEmail' | 'pwRepeat'; n?: number };
+export function passwordIssue(password: unknown, email = ''): PasswordIssue | null {
+  if (typeof password !== 'string' || password.length < PASSWORD_MIN) return { code: 'pwShort', n: PASSWORD_MIN };
+  if (password.length > PASSWORD_MAX) return { code: 'pwLong', n: PASSWORD_MAX };
+  if (!password.trim()) return { code: 'pwSpaces' };
+  if (email && password.trim().toLowerCase() === email) return { code: 'pwEmail' };
+  if (/^(.)\1+$/.test(password)) return { code: 'pwRepeat' };
+  return null;
+}
+const PASSWORD_TEXT: Record<PasswordIssue['code'], (n?: number) => string> = {
+  pwShort: (n) => `Şifre en az ${n} karakter olmalı.`,
+  pwLong: (n) => `Şifre en fazla ${n} karakter olabilir.`,
+  pwSpaces: () => 'Şifre yalnızca boşluktan oluşamaz.',
+  pwEmail: () => 'Şifre e-posta adresinle aynı olamaz.',
+  pwRepeat: () => 'Şifre tek bir karakterin tekrarı olamaz.',
+};
 /** Şifrede sorun varsa kısa Türkçe açıklamasını, yoksa null döndürür. */
 export function passwordProblem(password: unknown, email = ''): string | null {
-  if (typeof password !== 'string' || password.length < PASSWORD_MIN) return `Şifre en az ${PASSWORD_MIN} karakter olmalı.`;
-  if (password.length > PASSWORD_MAX) return `Şifre en fazla ${PASSWORD_MAX} karakter olabilir.`;
-  if (!password.trim()) return 'Şifre yalnızca boşluktan oluşamaz.';
-  if (email && password.trim().toLowerCase() === email) return 'Şifre e-posta adresinle aynı olamaz.';
-  if (/^(.)\1+$/.test(password)) return 'Şifre tek bir karakterin tekrarı olamaz.';
-  return null;
+  const issue = passwordIssue(password, email);
+  return issue ? PASSWORD_TEXT[issue.code](issue.n) : null;
 }
 
 /** Görünen adı temizler: kontrol karakterleri çıkar, boşluklar teke iner, en fazla NAME_MAX karakter. */

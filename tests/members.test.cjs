@@ -251,3 +251,20 @@ test('sayfalar ve yayın: tablolar her yayında güvenle kurulur, giriş kapıs�
  for(const page of ['app/giris/page.tsx','app/uye-ol/page.tsx','app/hesabim/page.tsx','app/gizlilik/page.tsx','app/kullanim-kosullari/page.tsx'])assert.ok(fs.existsSync(page),page);
  assert.ok(fs.readFileSync('app/page.tsx','utf8').includes('Landing'),'girişsiz ana sayfa tanıtımı gösterir');
 });
+
+test('API: every message comes with a code, so the page shows it in its own language',async()=>{
+ const db=fakeDb();const {call}=api(db);const copy=require(path.join(compiled,'public-copy.js'));
+ const codes=new Set();const note=out=>{assert.ok(copy.isAuthCode(out.body.code),JSON.stringify(out.body));codes.add(out.body.code);return out;};
+ note(await call({...newUser,name:' '}));note(await call({...newUser,email:'ada'}));note(await call({...newUser,accept:false}));
+ const short=note(await call({...newUser,password:'kısa'}));assert.equal(short.body.code,'pwShort');assert.equal(short.body.n,8);assert.match(short.body.error,/en az 8/,'the Turkish text stays for older pages');
+ assert.equal(note(await call({...newUser,password:'ada@example.com'})).body.code,'pwEmail');
+ await call(newUser);assert.equal(note(await call(newUser)).body.code,'errTaken');
+ assert.equal(note(await call({action:'login',email:'ada@example.com',password:'yanlis-sifre'})).body.code,'errWrongLogin');
+ assert.equal(note(await call({action:'login',email:'',password:''})).body.code,'errMissingLogin');
+ assert.equal(note(await call({action:'nope'})).body.code,'errBadRequest');
+ assert.equal(note(await call({action:'profile',name:'X'})).body.code,'errSignedOut');
+ // Each code has its text, with {n} only where a number is sent.
+ for(const code of copy.AUTH_CODES)assert.ok(copy.publicText('de',code).trim(),code);
+ assert.equal(copy.fillText(copy.publicText('de','pwShort'),{n:8}),'Das Passwort muss mindestens 8 Zeichen lang sein.');
+ assert.ok(codes.size>=9);
+});

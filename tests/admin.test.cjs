@@ -45,7 +45,8 @@ test('only the site owner may open the panel; everyone else sees no records',()=
  assert.ok(!read('lib/member-auth.ts').match(/PUBLIC_PAGES = new Set\([^)]*yonetim/),'the panel is not a public page');
  // The way in: a button on Hesabım, for the owner only.
  const account=read('app/hesabim/page.tsx');
- assert.ok(account.includes('{isAdminEmail(member.email)&&<p className="adm-entry"><a className="btn" href="/yonetim">Yönetici paneli</a></p>}'));
+ assert.ok(account.includes('{isAdminEmail(member.email)&&<p className="adm-entry"><a className="btn" href="/yonetim">{p(\'adminPanel\')}</a></p>}'));
+ assert.ok(read('lib/public-copy.ts').includes("adminPanel:['Yönetici paneli',"));
  assert.ok(read('app/layout.tsx').includes('import "./admin.css";'));
 });
 
@@ -60,7 +61,10 @@ test('every login is recorded for 90 days and removed with the account; members 
  await store.deleteMember(db,'mx','x@example.com');
  assert.equal(db.sql.prepare('SELECT COUNT(*) AS n FROM member_logins').get().n,0);
  assert.ok(!/DROP|DELETE|ALTER/i.test(read('migration/database/members.sql').replace(/--.*$/gm,'')));
- assert.ok(read('app/gizlilik/page.tsx').includes('Giriş zamanların:')&&read('app/gizlilik/page.tsx').includes('yönetici panelinde görebilir'),'the privacy page tells members');
+ // The privacy notice (in every site language, lib/legal-copy.ts) tells members.
+ const legal=read('lib/legal-copy.ts'),privacy=read('app/privacy-view.tsx');
+ assert.ok(legal.includes('Giriş zamanların:')&&legal.includes('yönetici panelinde görebilir'),'the privacy page tells members');
+ assert.ok(privacy.includes("rich('whatSignins')")&&privacy.includes("text('whyAdmin')"));
 });
 
 test('the overview counts members, learners, logins and answers per Berlin day',async()=>{

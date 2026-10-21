@@ -1,4 +1,5 @@
 'use client';
+import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
@@ -44,9 +45,9 @@ function prefixOptions(verb:Verb){
  return [...turned.slice(0,hash%4),own,...turned.slice(hash%4)];
 }
 export default function VerbStudy(){
- const [language,setLanguage]=useState<VaultLanguage>('tr');const [ready,setReady]=useState(false);
+ const [language,setLanguage]=useState<VaultLanguage>('de');const [ready,setReady]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
- useEffect(()=>{let saved:VaultLanguage|null=null;try{saved=readVaultLanguage(localStorage);}catch{}if(saved)switchLanguage(saved,()=>setReady(true));else setReady(true);},[switchLanguage]);
+ useEffect(()=>{let saved:VaultLanguage=browserLanguage();try{saved=readVaultLanguage(localStorage,saved);}catch{}switchLanguage(saved,()=>setReady(true));},[switchLanguage]);
  useEffect(()=>{if(!ready)return;try{saveVaultLanguage(localStorage,language);}catch{}},[language,ready]);
  return ready?<VerbWorkshop language={language} onLanguage={switchLanguage}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
 }
@@ -364,6 +365,6 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr" className={kindClass(item)}>{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
     </details>
    </section>}
-  </main><SiteFooter/>
+  </main><SiteFooter language={language}/>
  </div>;
 }

@@ -1,4 +1,5 @@
 'use client';
+import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,BookOpen,Check,Headphones,Layers,PenLine,Play,RotateCcw,Trophy} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
@@ -48,10 +49,10 @@ function partWords(part:L12Part):L12Word[]{
 
 /** Lektion 12 „Ausbildung": the overview and one part at a time (?bolum=a … magazin, &adim=kelimeler … dinleme). */
 export default function AusbildungStudy(){
- const [language,setLanguage]=useState<StudyLanguage>('tr');const [loaded,setLoaded]=useState(false);
+ const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
- useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('german-study-language');}catch{}if(saved&&isStudyLanguage(saved))switchLanguage(saved,()=>setLoaded(true));else setLoaded(true);},[switchLanguage]);
- useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 · Ausbildung · '+SITE_NAME;try{localStorage.setItem('german-study-language',language);}catch{}},[language,loaded]);
+ useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
+ useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 · Ausbildung · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
  return <AusbildungLesson language={language} onLanguage={switchLanguage}/>;
 }
@@ -91,7 +92,7 @@ export function AusbildungLesson({language,onLanguage}:{language:StudyLanguage;o
    {german.warning&&<p className="object-alert" role="status">{german.warning}</p>}
    {current&&step?<PartPage key={current.id} part={current} step={step} scores={scores} tick={tick} speech={speech} onScore={refresh} onOpen={open} language={language}/>:<Overview unitName={unitName} scores={scores} tick={tick} onOpen={open} language={language}/>}
   </main>
-  <SiteFooter/>
+  <SiteFooter language={language}/>
  </div>;
 }
 

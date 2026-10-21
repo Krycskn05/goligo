@@ -1,4 +1,5 @@
 'use client';
+import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronRight,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
@@ -45,9 +46,9 @@ export function ObjectAnswerMeaning({word,language,course='de'}:{word:ObjectWord
  return <span className="object-answer-meaning"><strong lang={course} dir="ltr">{course==='en'?englishObjectName(word.id):word.de}</strong><span className="object-meaning-divider" aria-hidden="true">—</span><span className="object-answer-translation" lang={language} dir={vaultDirection(language)}>{course==='en'&&language==='de'?word.de:objectMeaning(word.id,language)}</span></span>;
 }
 export default function ObjectStudy(){
- const [language,setLanguage]=useState<VaultLanguage>('tr');const [course,setCourse]=useState<LearningLanguage>('de');const [languageReady,setLanguageReady]=useState(false);
+ const [language,setLanguage]=useState<VaultLanguage>('de');const [course,setCourse]=useState<LearningLanguage>('de');const [languageReady,setLanguageReady]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
- useEffect(()=>{let saved:VaultLanguage|null=null;try{saved=readVaultLanguage(localStorage);setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}if(saved)switchLanguage(saved,()=>setLanguageReady(true));else setLanguageReady(true);},[switchLanguage]);
+ useEffect(()=>{let saved:VaultLanguage=browserLanguage();try{saved=readVaultLanguage(localStorage,saved);setCourse(activeLearningLanguage(localStorage,window.location.search));}catch{}switchLanguage(saved,()=>setLanguageReady(true));},[switchLanguage]);
  useEffect(()=>{if(!languageReady)return;try{saveVaultLanguage(localStorage,language);saveLearningLanguage(localStorage,course);}catch{}},[language,course,languageReady]);
  function changeCourse(value:LearningLanguage){window.speechSynthesis?.cancel();setCourse(value);const url=new URL(window.location.href);url.searchParams.set('learn',value);url.searchParams.delete('session');window.history.replaceState(null,'',url);}
  return languageReady?<ObjectWorkshop key={course} language={language} onLanguage={switchLanguage} course={course} onCourse={ENGLISH_COURSE_ENABLED?changeCourse:undefined}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
@@ -198,6 +199,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
     </div>
     <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
    </section>}
-  </main><SiteFooter/>
+  </main><SiteFooter language={language}/>
  </div>;
 }

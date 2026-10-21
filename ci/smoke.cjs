@@ -114,6 +114,36 @@ async function memberFlow(browser) {
   await ctx.close();
 }
 
+// Site dili (ogrenci istedi): telefonun dili, yoksa Almanca; secilen dil cerezde kalir; yasal sayfalar da her dilde.
+async function languageFlow(browser) {
+  const look = async (locale, url, shot) => {
+    const ctx = await browser.newContext({ ...devices["iPhone 13"], locale });
+    const page = await ctx.newPage();
+    await page.goto(BASE + url, { waitUntil: "networkidle", timeout: 90000 });
+    await page.waitForTimeout(800);
+    await page.screenshot({ path: path.join(OUT, shot) });
+    const info = await page.evaluate(() => ({ lang: document.querySelector(".lk-public")?.getAttribute("lang"), dir: document.querySelector(".lk-public")?.getAttribute("dir"), h1: document.querySelector("h1")?.textContent?.trim(), note: !!document.querySelector("[data-legal-translation]") }));
+    return { ctx, page, info };
+  };
+  try {
+    const sw = await look("sw-KE", "/giris", "30-dil-svahili-almanca.png");
+    record("Dil: sitede olmayan telefon dili Almanca aciliyor", sw.info.lang === "de" && sw.info.h1 === "Anmelden", JSON.stringify(sw.info));
+    await sw.ctx.close();
+    const ar = await look("ar-EG", "/gizlilik", "31-dil-arapca-gizlilik.png");
+    record("Dil: Arapca telefonda gizlilik metni Arapca ve sagdan sola", ar.info.lang === "ar" && ar.info.dir === "rtl" && ar.info.note, JSON.stringify(ar.info));
+    await Promise.all([ar.page.waitForLoadState("load"), ar.page.waitForEvent("framenavigated"), ar.page.selectOption("[data-public-language] select", "uk")]);
+    await ar.page.waitForLoadState("networkidle");
+    const after = await ar.page.evaluate(() => document.querySelector(".lk-public")?.getAttribute("lang"));
+    const cookie = (await ar.ctx.cookies()).find((c) => c.name === "goligo-dil");
+    await ar.page.screenshot({ path: path.join(OUT, "32-dil-ukraynaca-secildi.png") });
+    record("Dil: secilen dil kaliyor (cerez) ve sayfa o dilde", after === "uk" && cookie?.value === "uk", `sayfa ${after}, cerez ${cookie?.value}`);
+    await ar.ctx.close();
+    const tr = await look("tr-TR", "/kullanim-kosullari", "33-dil-turkce-kosullar.png");
+    record("Dil: Turkce asil metin, ceviri notu yok", tr.info.lang === "tr" && !tr.info.note, JSON.stringify(tr.info));
+    await tr.ctx.close();
+  } catch (e) { record("Dil kontrolu", false, String((e && e.message) || e).slice(0, 200)); }
+}
+
 (async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "tr-TR" });
@@ -145,6 +175,7 @@ async function memberFlow(browser) {
   record("Sahte kimlik basligi ise yaramiyor (401 beklenir)", spoofed.status() === 401, `HTTP ${spoofed.status()}`);
 
   await memberFlow(browser);
+  await languageFlow(browser);
 
   await page.goto(BASE + "/signin-with-chatgpt?return_to=%2Fev-esyalar", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(1500);

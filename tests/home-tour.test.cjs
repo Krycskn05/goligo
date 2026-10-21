@@ -91,3 +91,25 @@ test('"Uygulama olarak indir" in the left menu explains how to add Goliqo to the
  assert.ok(guide.includes("addEventListener('beforeinstallprompt',offer)")&&guide.includes('if(installed)return null;')&&guide.includes("matchMedia('(display-mode: standalone)')"));
  assert.ok(guide.includes("event.key==='Escape'")&&guide.includes('opener?.focus()'));
 });
+
+test('the learner\'s menu icons and home page pictures are used', ()=>{
+ const fs=require('node:fs');
+ const size=file=>{const d=fs.readFileSync(file);assert.equal(d.toString('ascii',8,12),'WEBP',file);
+  for(let at=12;at+8<=d.length;){const tag=d.toString('ascii',at,at+4),length=d.readUInt32LE(at+4);
+   if(tag==='VP8X')return [1+d.readUIntLE(at+12,3),1+d.readUIntLE(at+15,3)];
+   if(tag==='VP8 ')return [d.readUInt16LE(at+14)&0x3fff,d.readUInt16LE(at+16)&0x3fff];
+   at+=8+length+(length&1);}
+  return null;};
+ // Seven soft 3D icons (128 × 128, clear background) for the left menu; Ev ve Yaşam and Ausbildung keep their drawing.
+ const icons=read('app/nav-icons.tsx');
+ for(const name of ['home','units','vault','verbs','games','mistakes','app']){
+  assert.ok(icons.includes(name+":'/icons/menu/"+name+".webp'"),name);
+  assert.deepEqual(size('public/icons/menu/'+name+'.webp'),[128,128],name);
+ }
+ for(const name of ['housing','ausbildung'])assert.ok(!icons.includes(name+":'/icons/menu/"),name+' keeps its drawing');
+ assert.ok(icons.includes("if(picture)return <span className={'nav-icon has-picture nav-icon-'+name} aria-hidden=\"true\"><img src={picture} alt=\"\" width={128} height={128}"));
+ // One picture of the learner's per home page card (1200 × 600).
+ const tour=read('app/home-tour.tsx');
+ assert.ok(tour.includes("const art=(id:string)=><img src={'/toon/home/'+id+'.webp'} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;"));
+ for(const id of ['units','vault','verbs','games','mistakes']){assert.ok(tour.includes("art:art('"+id+"')"),id);assert.deepEqual(size('public/toon/home/'+id+'.webp'),[1200,600],id);}
+});

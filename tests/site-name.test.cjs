@@ -53,7 +53,8 @@ test('the learner\'s Goliqo logo and animations are used in many places',()=>{
  assert.ok(logo.includes('const bounce=useAnimated(BRAND.logoBounce);')&&!logo.includes('sessionStorage'),'on every page, not once per visit');
  assert.ok(logo.includes('const image=new Image();image.onload=()=>{if(alive)setLoaded(true);};image.src=src;')&&logo.includes('return loaded&&motion;'),'animations only with motion on, after they have loaded');
  // The waving mascot and the big waving logo where the old Koko pictures were, and more.
- assert.ok(read('app/home-tour.tsx').includes('<BrandMascot className="ht-koko"/>'));
+ // The welcome box on the home page has no mascot or logo any more (the learner removed it).
+ const tour=read('app/home-tour.tsx');assert.ok(!tour.includes('BrandMascot')&&!tour.includes('ht-koko')&&!tour.includes('koko-mascot'));
  assert.ok(read('app/landing.tsx').includes('<BrandLogoWave className="lk-hero-logo"/>'));
  for(const page of ['app/giris/page.tsx','app/uye-ol/page.tsx'])assert.ok(read(page).includes('<BrandMascot className="lk-auth-mascot"/>'),page);
  assert.ok(read('app/account-panel.tsx').includes('<BrandMascot className="lk-account-mascot"/>'));

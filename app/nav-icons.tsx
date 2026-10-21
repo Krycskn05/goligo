@@ -17,12 +17,19 @@ const SHAPES:Record<NavIconName,ReactNode>={
 };
 
 /**
- * The home page sidebar icons: two-tone drawings on round white stickers, one colour per part
- * (home green, units yellow, Ev ve Yaşam teal, Ausbildung orange, object vault blue, verb workshop purple,
- * games pink, mistakes red). Styles:
- * `.nav-icon` in app/koko-theme.css.
+ * The learner's own menu icons (soft 3D, made in ChatGPT; 128 × 128 WebP with a clear background, public/icons/menu):
+ * Ana sayfa, Üniteler ve konular, Nesne Kasası, Fiil Atölyesi, Oyunlar, Yanlışlarım, Uygulama olarak indir. Ev ve Yaşam
+ * and Ausbildung have no picture yet and keep their two-tone drawing on a round white sticker.
+ */
+export const NAV_PICTURES:Partial<Record<NavIconName,string>>={home:'/icons/menu/home.webp',units:'/icons/menu/units.webp',vault:'/icons/menu/vault.webp',verbs:'/icons/menu/verbs.webp',games:'/icons/menu/games.webp',mistakes:'/icons/menu/mistakes.webp',app:'/icons/menu/app.webp'};
+
+/**
+ * A left-menu icon: the learner's picture, or for parts without one the two-tone drawing on a round white sticker
+ * (one colour per part). Styles: `.nav-icon` in app/koko-theme.css.
  */
 export function NavIcon({name}:{name:NavIconName}){
+ const picture=NAV_PICTURES[name];
+ if(picture)return <span className={'nav-icon has-picture nav-icon-'+name} aria-hidden="true"><img src={picture} alt="" width={128} height={128} decoding="async" draggable={false}/></span>;
  const shape=SHAPES[name];
  return <span className={'nav-icon nav-icon-'+name} aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" focusable="false"><g className="nav-icon-fill">{shape}</g>{shape}</svg></span>;
 }

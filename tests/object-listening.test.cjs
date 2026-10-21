@@ -55,3 +55,12 @@ test('all three study modes and listening instructions have copy in every helper
  assert.equal(vaultText('tr','testPractice'),'Gör ve Seç');
  assert.equal(vaultText('tr','listenPractice'),'Dinle ve Bul');
 });
+
+test('"Sonraki dinleme" plays the next word at once (the learner asked), from the tap itself',()=>{
+ const page=require('node:fs').readFileSync('app/object-study.tsx','utf8');
+ assert.ok(page.includes("const following=session.mode==='listen'?questionMap.get(session.questions[index+1]?.id??''):undefined;"));
+ assert.ok(page.includes('if(following?.audio){setHeardQuestionId(following.id);speech.speak(following.audio);}'),'started in the tap, the choices open after it');
+ // Only the listening round does this; the first word of a round still waits for the listen button.
+ assert.equal((page.match(/speech\.speak\(following\.audio\)/g)||[]).length,1);
+ assert.ok(page.includes('function hearQuestion(slow=false){if(!q?.audio||busy||cueBusy)return;setHeardQuestionId(q.id);speech.speak(q.audio,slow);}'));
+});

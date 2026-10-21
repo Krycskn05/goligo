@@ -13,7 +13,7 @@ const oldPageScript=target=>move.oldAddressPage(target).match(/<script>([\s\S]*)
 test('the old address goes to the same page on the new one',()=>{
  assert.equal(move.newAddress('https://lernkoko.koray.workers.dev/fiiller?bolum=oyunlar','https://goligo.koray.workers.dev'),'https://goligo.koray.workers.dev/fiiller?bolum=oyunlar');
  const page=move.oldAddressPage('https://goligo.koray.workers.dev/');
- assert.ok(page.includes('Goligo yeni adresine taşındı')&&page.includes('<meta http-equiv="refresh" content="0;url=https://goligo.koray.workers.dev/">'));
+ assert.ok(page.includes('Goligo ist umgezogen')&&page.includes('Goligo yeni adresine taşındı')&&page.includes('<html lang="de">')&&page.includes('<meta http-equiv="refresh" content="0;url=https://goligo.koray.workers.dev/">'));
  const worker=fs.readFileSync('ci/eski-adres/worker.ts','utf8');
  assert.ok(worker.includes("if(!page)return Response.redirect(target,308);")&&worker.includes("'referrer-policy':'origin'"));
  const deploy=fs.readFileSync('ci/yayin.sh','utf8');

@@ -10,7 +10,8 @@ import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,type VerbTense} from '@/lib/verb-logic';
 import {gameIds,type GameId} from '@/lib/verb-games';
-import {VerbGame,VerbPicture,RuleBox} from './verb-games';
+import {VerbGame,VerbPicture,RuleBox,gameName,gameDetail} from './verb-games';
+import {GameIcon} from './game-icons';
 import {LearnCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
@@ -35,7 +36,6 @@ type ErrorKey=VaultCopyKey|'verbLegacy';
 // Answers that are verbs (not forms) are shown as their meaning in these tasks.
 const meaningOptionTasks=new Set(['meaning','hear']);
 const verbOptionTasks=new Set(['word','fit','hear-praesens','hear-perfekt']);
-const gameKeys:Record<GameId,VerbCopyKey>={sentence:'gameSentence',aux:'gameAux',build:'gameBuild',match:'gameMatch'};
 const lookup=(id:string)=>questionMap.get(id);
 
 /** Wrong prefixes offered next to the right one when a separable verb is written in a sentence. */
@@ -302,10 +302,10 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
      </>}
     </article>}
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
-   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy}}/>:
+   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
    section==='games'?<section className="verb-section" aria-labelledby="verb-section-heading" data-verb-section="games">
     <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button><h1 id="verb-section-heading" tabIndex={-1}>{t('gamesTitle')}</h1></div>
-    <div className="verb-game-chips verb-section-games">{gameIds.map(id=><button type="button" key={id} className="btn secondary" data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}>{t(gameKeys[id])}</button>)}</div>
+    <div className="game-cards verb-section-games">{gameIds.map(id=><button type="button" key={id} className={'game-card game-'+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{gameDetail(id,language)}</small></span></button>)}</div>
    </section>:
    section==='mistakes'?<section className="verb-section" data-verb-section="mistakes">
     <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button></div>

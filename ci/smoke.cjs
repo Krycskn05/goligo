@@ -348,6 +348,28 @@ async function languageFlow(browser) {
     info("Telefon: atolye adimlari", false, String(e && e.message || e).slice(0, 200));
   }
 
+  // Oyunlar (ogrenci istedi): yedi oyun var; her biri telefonda aciliyor, ilk cevap aliniyor, betik hatasi yok.
+  try {
+    const gameErrors = [];
+    p2.on("pageerror", (e) => gameErrors.push(e.message));
+    const opened = [];
+    for (const id of ["rain", "catch", "quick", "search", "rescue", "plural"]) {
+      await p2.goto(BASE + "/fiiller?bolum=oyunlar", { waitUntil: "networkidle", timeout: 90000 });
+      if (!opened.length) record("Oyunlar: yedi oyun listeleniyor", (await p2.locator("[data-verb-game-card]").count()) === 7, `${await p2.locator("[data-verb-game-card]").count()} oyun`);
+      await p2.locator(`[data-verb-game-card="${id}"]`).click();
+      if (await p2.locator("[data-game-start]").count()) await p2.locator("[data-game-start]").click();
+      await p2.waitForTimeout(700);
+      const answer = { rain: "[data-rain-article]", catch: "[data-catch-option]", quick: "[data-quick-answer]", search: "[data-search-cell]", rescue: "[data-rescue-key]", plural: ".plural-card" }[id];
+      await p2.locator(answer).first().click();
+      await p2.waitForTimeout(900);
+      await p2.screenshot({ path: path.join(OUT, `40-oyun-${id}.png`) });
+      opened.push(id + ((await p2.locator(`[data-game="${id}"]`).count()) ? "" : "?"));
+    }
+    record("Oyunlar: her oyun telefonda aciliyor ve cevap aliyor", !opened.some((id) => id.endsWith("?")) && gameErrors.length === 0, `${opened.join(", ")}${gameErrors.length ? " · hata: " + gameErrors.slice(0, 2).join(" | ") : ""}`);
+  } catch (e) {
+    record("Oyunlar kontrolu", false, String((e && e.message) || e).slice(0, 200));
+  }
+
   await browser.close();
   fs.writeFileSync(path.join(path.dirname(OUT), "smoke-results.json"), JSON.stringify(results, null, 2));
   process.exit(failed ? 1 : 0);

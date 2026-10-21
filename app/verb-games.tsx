@@ -7,10 +7,17 @@ import {sentenceRound,sentenceCorrect,auxRound,auxCorrect,buildRound,buildCorrec
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {PaulHoca} from './paul-hoca';
+import {gameText,type GameCopyKey} from '@/lib/game-copy';
+import {RainGame,CatchGame,QuickGame,SearchGame,RescueGame,PluralGame,type GameFeedback} from './object-games';
 
-type Feedback={answer:(correct:boolean,text:string)=>void;stop:()=>void;complete:()=>void;busy:boolean};
+type Feedback=GameFeedback;
 type Props={game:GameId;language:VaultLanguage;topic:string;onTopic:(topic:string)=>void;onExit:()=>void;feedback:Feedback};
-const gameTitle:Record<GameId,VerbCopyKey>={sentence:'gameSentence',aux:'gameAux',build:'gameBuild',match:'gameMatch'};
+const verbGameTitle:Partial<Record<GameId,VerbCopyKey>>={sentence:'gameSentence',aux:'gameAux',build:'gameBuild',match:'gameMatch'};
+const newGameCopy:Partial<Record<GameId,[GameCopyKey,GameCopyKey]>>={rain:['gameRain','gameRainDetail'],catch:['gameCatch','gameCatchDetail'],quick:['gameQuick','gameQuickDetail'],search:['gameSearch','gameSearchDetail'],rescue:['gameRescue','gameRescueDetail'],plural:['gamePlural','gamePluralDetail']};
+const verbGameDetail:Partial<Record<GameId,VerbCopyKey>>={sentence:'gameSentenceDetail',aux:'gameAuxDetail',build:'gameBuildDetail'};
+/** A game's name and one line about it, in the site language. */
+export function gameName(game:GameId,language:VaultLanguage){const own=newGameCopy[game];return own?gameText(language,own[0]):verbText(language,verbGameTitle[game]!);}
+export function gameDetail(game:GameId,language:VaultLanguage){const own=newGameCopy[game];return own?gameText(language,own[1]):game==='match'?gameText(language,'gameMatchCard'):verbText(language,verbGameDetail[game]!);}
 
 function readBest(key:string):number|null{try{const value=Number(localStorage.getItem(key));return Number.isFinite(value)&&value>0?value:null;}catch{return null;}}
 function saveBest(key:string,value:number,lowerIsBetter=false){const best=readBest(key);if(best===null||(lowerIsBetter?value<best:value>best)){try{localStorage.setItem(key,String(value));}catch{}return value;}return best;}
@@ -37,12 +44,18 @@ export function VerbGame({game,language,topic,onTopic,onExit,feedback}:Props){
  const topicName=(id:string)=>id==='verbs-all'?t('allVerbs'):t('groupTitle',{n:verbGroups.findIndex(group=>group.id===id)+1});
  return <section className="verb-game panel" data-verb-game={game} lang={language} dir={dir}>
   <button type="button" className="text-button vault-back-categories" onClick={()=>{feedback.stop();onExit();}}><ArrowLeft size={18} className="vault-direction-icon"/>{t('backGames')}</button>
-  <h1 id="verb-game-heading" tabIndex={-1}>{t(gameTitle[game])}</h1>
+  <h1 id="verb-game-heading" tabIndex={-1}>{gameName(game,language)}</h1>
   {/* No group chips (the learner removed them): the matching cards always use all verbs. Other games keep the choice. */}
-  {game!=='match'&&<div className="verb-game-topics" role="group" aria-label={t('chooseGroup')}>{topics.map(id=><button type="button" key={id} className={'verb-topic-chip'+(id===topic?' active':'')} aria-pressed={id===topic} onClick={()=>{feedback.stop();onTopic(id);setSeed(value=>value+1);}}>{topicName(id)}</button>)}</div>}
+  {(game==='sentence'||game==='aux'||game==='build')&&<div className="verb-game-topics" role="group" aria-label={t('chooseGroup')}>{topics.map(id=><button type="button" key={id} className={'verb-topic-chip'+(id===topic?' active':'')} aria-pressed={id===topic} onClick={()=>{feedback.stop();onTopic(id);setSeed(value=>value+1);}}>{topicName(id)}</button>)}</div>}
   {game==='sentence'?<SentenceGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='aux'?<AuxGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='build'?<BuildGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
+   game==='rain'?<RainGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
+   game==='catch'?<CatchGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
+   game==='quick'?<QuickGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
+   game==='search'?<SearchGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
+   game==='rescue'?<RescueGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
+   game==='plural'?<PluralGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    <MatchGame key={'verbs-all'+seed} language={language} topic="verbs-all" feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>}
  </section>;
 }

@@ -1,6 +1,10 @@
 import type {Metadata} from 'next';
 import {SITE_NAME} from '@/lib/site-brand';
+import {vaultText} from '@/lib/object-vault-copy';
+import {publicText} from '@/lib/public-copy';
 import ObjectStudy from '../object-study';
+import {pageLanguage} from '../page-language';
 export const dynamic='force-dynamic';
-export const metadata:Metadata={title:`Nesne Kasası · ${SITE_NAME}`,description:'Almanca veya İngilizce nesne adlarını özgün resimlerle öğren. Test ve Yazarak Pekiştir çalışmaları, seçtiğin dilde seslendirme ve kaldığın yerden devam etme.'};
+/** Title and description in the site language (German unless the learner chose another). */
+export async function generateMetadata():Promise<Metadata>{const language=await pageLanguage();return {title:`${vaultText(language,'vaultTitle')} · ${SITE_NAME}`,description:publicText(language,'vaultText')};}
 export default function ObjectsPage(){return <ObjectStudy/>;}

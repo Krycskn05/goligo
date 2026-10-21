@@ -21,6 +21,9 @@ test('Nesne Kasası rounds are shuffled anew and skip solved questions in every 
   }
   const allSolved=pool.map(q=>row(q.id,0,1));
   assert.equal(pick('objects-house',10,allSolved,false,undefined,{fresh:true,random:seeded(3)}).length,10,mode+' when everything is solved the round mixes all of them again');
+  // Solving them all again: without `fresh` the solved questions come back too.
+  const again=pick('objects-house','all',reviews,false,undefined,{fresh:false,random:seeded(4)}).map(q=>q.id).sort();
+  assert.deepEqual(again,pool.map(q=>q.id).sort(),mode+' "Hepsini baştan çöz" takes every question, the solved ones too');
   const roundMistakes=pool.slice(4,7).map(q=>q.id);
   assert.deepEqual(pick('objects-house','all',reviews,false,roundMistakes).map(q=>q.id).sort(),[...roundMistakes].sort(),mode+' reviewing one round keeps the chosen questions');
  }
@@ -60,10 +63,12 @@ test('stars on Nesne Kasası questions are saved for the signed-in learner',asyn
 test('the Nesne Kasası page shows the star, the combined review button and the unsolved counter',()=>{
  const page=fs.readFileSync('app/object-study.tsx','utf8');
  assert(page.includes('toggleStar(q.id)')&&page.includes('starredQuestionIds(snapshot.notes)'));
- assert(page.includes("{starred,fresh:!reviewOnly&&!onlyIds}"),'normal rounds skip solved questions, reviews add stars');
+ assert(page.includes("{starred,fresh:!reviewOnly&&!onlyIds&&!all}"),'normal rounds skip solved questions, reviews add stars');
+ // "Hepsini baştan çöz" (the learner asked to solve the solved ones again): shown while some are solved and some are not.
+ assert(page.includes("{ready&&unsolved>0&&unsolved<availableCount&&<button type=\"button\" className=\"text-button vault-restart-all\" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all>"));
  assert(page.includes('disabled={busy||!ready||!marked.length}'),'the review button is active whenever there are mistakes or stars');
  assert(page.includes("text(course==='de'?'reviewMarked':'reviewMistakes')")&&page.includes("text('remaining',{n:unsolved})"));
- for(const {id} of copy.vaultLanguages)for(const key of ['star','unstar','reviewMarked','remaining','allSolved','starTip','starError']){
+ for(const {id} of copy.vaultLanguages)for(const key of ['star','unstar','reviewMarked','remaining','allSolved','restartAll','starTip','starError']){
   const value=copy.vaultText(id,key,{n:7});assert(value&&value.trim()&&value!==key,id+' '+key);assert(!value.includes('{n}'),id+' '+key);
  }
  assert.match(copy.vaultText('tr','remaining',{n:7}),/^7 /);

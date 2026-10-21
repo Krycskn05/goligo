@@ -84,7 +84,7 @@ export default function LearningEffects() {
    const target=event.target.closest<HTMLElement>('button,a[href],summary,[role="tab"]');
    if(!target||target.closest('[data-no-effects],.lk-effects-dialog')||target.matches(':disabled,[aria-disabled="true"]'))return;
    // Answer and speech buttons have their own feedback; never cover pronunciation with a pop.
-   const silent=target.matches('.object-option,.check-button,[type="submit"]')||target.closest('.vault-listen-player,.vault-speech-settings,.sound-settings,.audio-actions')||target.querySelector('[class*="lucide-volume"],[class*="lucide-headphone"],[class*="lucide-mic"],[class*="lucide-square"]');
+   const silent=target.matches('.object-option,.check-button,[type="submit"],[data-article-answer],[data-answer-tap]')||target.closest('.vault-listen-player,.vault-speech-settings,.sound-settings,.audio-actions')||target.querySelector('[class*="lucide-volume"],[class*="lucide-headphone"],[class*="lucide-mic"],[class*="lucide-square"]');
    if(!silent&&!window.speechSynthesis?.speaking&&!window.speechSynthesis?.pending){const chosen=readEffects();playLearningSound(target.matches(NAVIGATION)?chosen.page:nextTapSound(chosen.tap));}
    if(!motionAllowed())return;
    const mark=++sequence.current;target.dataset.lkTap=String(mark);

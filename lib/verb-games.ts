@@ -3,10 +3,11 @@ import type {VaultLanguage} from './object-vault-copy';
 import {sentenceChunks,sentenceDistractor,participlePieces,participleWrongPieces,praesensPieces,praesensWrongPieces,verbPicture,verbPrefix,type VerbTense,type SentenceChunk} from './verb-logic';
 
 /** Fiiller games: rounds are built here (pure functions), the page only shows them. */
-export type GameId='sentence'|'aux'|'build'|'match';
-// Only the matching cards are offered on the page; Cümle kurma, hat mı ist mi? and Biçim yapbozu were taken off at the learner's request
-// (their rounds stay here, unused, so nothing else breaks).
-export const gameIds:GameId[]=['match'];
+export type GameId='sentence'|'aux'|'build'|'match'|'rain'|'catch'|'quick'|'search'|'rescue'|'plural';
+// Offered on the page: the matching cards and the new games (the learner asked for them, October 2026; their rounds are
+// in lib/object-games.ts). Cümle kurma, hat mı ist mi? and Biçim yapbozu were taken off at the learner's request (their
+// rounds stay here, unused, so nothing else breaks).
+export const gameIds:GameId[]=['match','rain','catch','quick','search','rescue','plural'];
 export type Tile={id:string;text:string};
 type Random=()=>number;
 export function mix<T>(items:readonly T[],random:Random=Math.random):T[]{const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}

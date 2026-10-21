@@ -1,0 +1,138 @@
+/* Oyunlar: the game cards and the new games (app/object-games.tsx). Colours follow koko-theme.css; der blue, die red,
+   das green as in the Lektion 12 word tiles. */
+.game-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:14px; }
+.game-card { display:flex; align-items:center; gap:14px; min-height:86px; padding:14px 16px; border-radius:22px; border:2px solid #fff; background:#fff; box-shadow:0 4px 14px rgba(28,82,130,.08); color:var(--ink); text-align:start; cursor:pointer; font:inherit; transition:transform .15s ease, border-color .15s ease; }
+.game-card:hover:not(:disabled) { border-color:#cfe3f7; transform:translateY(-1px); }
+.game-card:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
+.game-card-text { display:grid; gap:3px; min-width:0; }
+.game-card-text strong { font-size:17px; color:#1f3b5c; }
+.game-card-text small { color:var(--ink-2); font-size:13.5px; line-height:1.35; }
+.game-icon { flex:none; display:grid; place-items:center; width:54px; height:54px; border-radius:17px; color:#fff; box-shadow:0 3px 0 rgba(0,0,0,.12); }
+.game-icon-match { background:linear-gradient(180deg,#7ab8f5,#2f7fd6); }
+.game-icon-rain { background:linear-gradient(180deg,#8fd3ff,#3a9fd8); }
+.game-icon-catch { background:linear-gradient(180deg,#c39bf3,#8a5bd6); }
+.game-icon-quick { background:linear-gradient(180deg,#ffb36b,#ef7d24); }
+.game-icon-search { background:linear-gradient(180deg,#7fd99a,#3a9a4a); }
+.game-icon-rescue { background:linear-gradient(180deg,#ff9fb2,#e0506c); }
+.game-icon-plural { background:linear-gradient(180deg,#ffd76a,#e9a91c); }
+
+.game-start { display:grid; justify-items:center; gap:14px; padding:26px 10px; text-align:center; color:var(--ink-2); font-size:17px; }
+.game-start p { margin:0; max-width:32em; }
+.game-picture { display:block; width:100%; aspect-ratio:1; }
+.game-picture .toon-art, .game-picture img { display:block; width:100%; height:100%; object-fit:contain; }
+.game-lives { display:inline-flex; gap:3px; align-items:center; }
+.game-lives .on { color:#e0506c; fill:#e0506c; }
+.game-lives .off { color:#c9d3df; }
+.game-multiplier { color:#8a5bd6; font-weight:800; }
+.game-timebar { display:block; height:8px; margin:8px 0 10px; border-radius:999px; background:linear-gradient(90deg,#ffd54a,#f0a132); transform-origin:left center; animation:game-time var(--game-time,8s) linear forwards; }
+[dir="rtl"] .game-timebar, [dir="rtl"] .rain-timer { transform-origin:right center; }
+@keyframes game-time { from { transform:scaleX(1); } to { transform:scaleX(0); } }
+
+/* Artikel yağmuru */
+.rain-sky { position:relative; height:clamp(250px,44vh,360px); margin:10px 0 12px; border-radius:24px; overflow:hidden; background:linear-gradient(180deg,#dff0ff 0%,#f5faff 72%,#e6f4dc 100%); box-shadow:inset 0 -7px 0 #cde8c0; }
+.rain-drop { position:absolute; left:50%; top:-24px; width:150px; display:grid; justify-items:center; gap:5px; transform:translateX(-50%); animation:rain-fall var(--rain-time,6s) linear forwards; }
+@keyframes rain-fall { to { top:calc(100% - 146px); } }
+.rain-drop.stopped { animation-play-state:paused; }
+.rain-drop .game-picture { width:96px; filter:drop-shadow(0 6px 8px rgba(28,82,130,.18)); }
+.rain-noun { padding:4px 14px; border-radius:999px; background:#fff; color:#1f3b5c; font-weight:800; font-size:19px; box-shadow:0 3px 10px rgba(28,82,130,.14); white-space:nowrap; }
+.rain-drop.right .rain-noun { background:#e3f6e0; }
+.rain-drop.wrong .rain-noun { background:#fde5e5; }
+.rain-sky.still .rain-drop { animation:none; top:50%; transform:translate(-50%,-50%); }
+.rain-timer { position:absolute; left:0; right:0; bottom:0; height:7px; background:#f0a132; transform-origin:left center; animation:game-time var(--rain-time,6s) linear forwards; }
+.rain-missed { position:absolute; left:0; right:0; bottom:18px; margin:0; text-align:center; font-weight:800; color:#c0392b; }
+.rain-buckets { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.rain-bucket { min-height:66px; border:0; border-radius:20px; color:#fff; font:inherit; font-size:25px; font-weight:800; box-shadow:0 4px 0 rgba(0,0,0,.16); cursor:pointer; }
+.rain-bucket.article-der { background:#2f7fd6; }
+.rain-bucket.article-die { background:#d9485f; }
+.rain-bucket.article-das { background:#3a9a4a; }
+.rain-bucket:disabled { opacity:.6; cursor:default; }
+.rain-bucket.right { opacity:1; outline:4px solid #ffd54a; outline-offset:2px; }
+.rain-noun b.article-der, .rescue-word b.article-der { color:#1f5fae; }
+.rain-noun b.article-die, .rescue-word b.article-die { color:#c0392b; }
+.rain-noun b.article-das, .rescue-word b.article-das { color:#2e7d32; }
+
+/* Duy ve yakala */
+.catch-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; }
+.catch-head p { margin:0; font-weight:700; color:#1f3b5c; }
+.catch-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.catch-option { display:grid; justify-items:center; gap:4px; padding:8px; border:3px solid #e3ecf6; border-radius:20px; background:#fff; font:inherit; font-weight:800; color:#1f3b5c; cursor:pointer; }
+.catch-option .game-picture { width:min(34vw,150px); }
+.catch-option.right { border-color:#4aa84f; background:#effaee; }
+.catch-option.wrong { border-color:#d9485f; background:#fdeeee; }
+.game-catch .object-feedback, .game-rescue .object-feedback { margin-top:12px; }
+
+/* 30 saniye: doğru mu? */
+.quick-clock { font-variant-numeric:tabular-nums; font-weight:800; }
+.quick-clock.hurry { color:#d9485f; }
+.quick-card { display:grid; justify-items:center; gap:8px; margin:10px 0; padding:14px; border:3px solid #e3ecf6; border-radius:24px; background:#fff; transition:background-color .15s ease, border-color .15s ease; }
+.quick-card .game-picture { width:min(46vw,170px); }
+.quick-card.right { border-color:#4aa84f; background:#effaee; }
+.quick-card.wrong { border-color:#d9485f; background:#fdeeee; }
+.quick-text { margin:0; font-size:24px; font-weight:800; color:#1f3b5c; text-align:center; }
+.quick-prompt { margin:0 0 10px; text-align:center; color:var(--ink-2); font-weight:700; }
+.quick-buttons { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.quick-buttons .btn { justify-content:center; min-height:58px; font-size:18px; }
+.toon-app .quick-buttons .btn.quick-no, .quick-buttons .btn.quick-no { background:linear-gradient(180deg,#ef6b8b 0,#d2456a 100%); border-color:#d2456a; box-shadow:0 3px 0 #9c2848,0 6px 14px rgba(156,40,72,.2); }
+.toon-app .quick-buttons .btn.quick-no:hover:enabled, .quick-buttons .btn.quick-no:hover { background:linear-gradient(180deg,#f27f9b 0,#dc5576 100%); box-shadow:0 5px 0 #9c2848,0 10px 22px rgba(156,40,72,.22); }
+.quick-mistakes { width:100%; max-width:420px; text-align:start; }
+.quick-mistakes h3 { margin:6px 0; font-size:16px; }
+.quick-mistakes ul { margin:0; padding-inline-start:20px; display:grid; gap:4px; }
+.quick-mistakes s { color:#c0392b; }
+
+/* Kelime avı */
+.search-grid { display:grid; grid-template-columns:repeat(var(--search-size,8),minmax(0,1fr)); gap:4px; width:min(100%,430px); margin:10px auto 14px; }
+.search-cell { aspect-ratio:1; min-width:0; padding:0; border:2px solid #e3ecf6; border-radius:10px; background:#fff; color:#1f3b5c; font:inherit; font-weight:800; font-size:clamp(15px,4.3vw,21px); cursor:pointer; }
+.search-cell.selected { background:#ffe9a8; border-color:#f0a132; }
+.search-cell.found { background:#d8f2d2; border-color:#7cc46f; color:#2e7d32; }
+.search-cell.miss { background:#fde5e5; border-color:#e59aa5; }
+.search-words { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+.search-words li { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:14px; background:#fff; font-weight:700; color:#1f3b5c; }
+.search-words .game-picture { width:40px; flex:none; }
+.search-words li.found span { color:#2e7d32; text-decoration:line-through; }
+.search-words li svg { color:#4aa84f; margin-inline-start:auto; }
+
+/* Koko'yu kurtar */
+.rescue-stage { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:14px; margin:8px 0; }
+.rescue-koko { position:relative; width:124px; height:214px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; transition:transform .9s ease; }
+.rescue-koko img { position:relative; z-index:1; width:96px; height:auto; }
+.rescue-koko.landed { transform:translateY(16px); }
+.rescue-koko.saved img { animation:koko-hop .5s ease 2; }
+@keyframes koko-hop { 50% { transform:translateY(-14px); } }
+.rescue-balloons { position:absolute; top:0; left:50%; width:124px; height:118px; transform:translateX(-50%); }
+.rescue-balloon { position:absolute; width:30px; height:38px; border-radius:50% 50% 46% 46%; box-shadow:inset -4px -5px 0 rgba(0,0,0,.12); transition:transform .25s ease, opacity .25s ease; }
+.rescue-balloon::after { content:""; position:absolute; left:50%; top:100%; width:1.5px; height:var(--string,58px); background:#9fb3c8; transform:translateX(-50%); }
+.rescue-balloon.popped { transform:scale(0); opacity:0; }
+.rescue-balloon.b0 { left:6px; top:18px; background:#e0506c; --string:66px; }
+.rescue-balloon.b1 { left:34px; top:2px; background:#3a9fd8; --string:80px; }
+.rescue-balloon.b2 { left:62px; top:8px; background:#ffd54a; --string:74px; }
+.rescue-balloon.b3 { left:88px; top:22px; background:#3a9a4a; --string:62px; }
+.rescue-balloon.b4 { left:20px; top:44px; background:#8a5bd6; --string:42px; }
+.rescue-balloon.b5 { left:72px; top:46px; background:#ef7d24; --string:40px; }
+@media (prefers-reduced-motion:reduce) { .rescue-koko, .rescue-balloon { transition:none; } .rescue-koko.saved img { animation:none; } }
+.rescue-clue { display:grid; justify-items:center; gap:4px; text-align:center; }
+.rescue-clue .game-picture { width:min(36vw,150px); }
+.rescue-clue p { margin:0; font-weight:700; color:var(--ink-2); }
+.rescue-word { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:center; gap:4px; margin:6px 0 12px; font-size:26px; font-weight:800; color:#1f3b5c; }
+.rescue-word b { margin-inline-end:8px; }
+.rescue-letter { display:inline-grid; place-items:center; min-width:24px; height:38px; border-bottom:3px solid #1f3b5c; }
+.rescue-letter.shown { color:#c0392b; }
+.rescue-keys { display:grid; grid-template-columns:repeat(auto-fill,minmax(38px,1fr)); gap:6px; }
+.rescue-key { height:44px; padding:0; border:2px solid #e3ecf6; border-radius:11px; background:#fff; color:#1f3b5c; font:inherit; font-weight:800; font-size:17px; cursor:pointer; }
+.rescue-key.hit { background:#d8f2d2; border-color:#7cc46f; }
+.rescue-key.miss { background:#fde5e5; border-color:#f2c0c8; color:#b9a3a8; }
+.rescue-key:disabled { cursor:default; }
+
+/* Çoğul eşleştirme */
+.plural-card .game-picture { width:52px; }
+.plural-card.shown { display:grid; place-items:center; gap:2px; }
+.game-over .quick-mistakes { margin:6px auto 0; }
+
+@media (max-width:560px) {
+ .game-card { min-height:78px; padding:12px 14px; }
+ .rain-sky { height:clamp(230px,40vh,320px); }
+ .rain-bucket { min-height:60px; font-size:23px; }
+ .rescue-stage { gap:8px; }
+ .rescue-koko { width:104px; height:190px; transform-origin:bottom; }
+ .rescue-word { font-size:23px; }
+ .rescue-letter { min-width:20px; height:34px; }
+}

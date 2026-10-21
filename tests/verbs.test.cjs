@@ -317,7 +317,7 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  assert.ok(page.includes("answer.replace('|','')"),'the | mark is not part of the saved answer');
  assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+' '+prefix)"));
  assert.ok(page.includes('<VerbGame ')&&page.includes('gameIds.map'));
- const gamesLib=load('verb-games');assert.deepEqual([...gamesLib.gameIds],['match'],'only the matching cards are on the page');
+ const gamesLib=load('verb-games');assert.deepEqual([...gamesLib.gameIds],['match','rain','catch','quick','search','rescue','plural'],'the matching cards and the new games (not Cümle kurma, hat mı ist mi?, Biçim yapbozu)');
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
 });
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_NAME } from "@/lib/site-brand";
+import { publicText } from "@/lib/public-copy";
 import "./globals.css";
 import "./learning-effects.css";
 import "./progress.css";
@@ -13,6 +14,7 @@ import "./home-tour.css";
 import "./admin.css";
 import "./paul-hoca.css";
 import "./site-tour.css";
+import "./games.css";
 import LearningEffects from './learning-effects';
 import { STORAGE_MOVE_SCRIPT } from "@/lib/storage-move";
 
@@ -20,7 +22,8 @@ export const metadata: Metadata = {
   // Only the site name in the browser tab (the learner removed the tagline after it).
   title: SITE_NAME,
   applicationName: SITE_NAME,
-  description: "Almanca ve İngilizce eğitim seçenekleri, ünite ve konu başlıkları, özgün resimli Nesne Kasası, testler ve harf bulmacaları. Learn German and English with picture vocabulary tests and letter puzzles.",
+  // German, the site's main language; the pages give their own description in the visitor's language.
+  description: publicText("de", "landingLead", { site: SITE_NAME }),
   // Koko on a dark background: browser tab, phone home screen (apple-touch-icon) and installed app (manifest).
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],

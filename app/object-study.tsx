@@ -88,6 +88,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  const starred=course==='de'?starredQuestionIds(snapshot.notes):new Set<string>();const reviewRows=new Map(reviews.map(r=>[r.question_id,r]));
  const marked=scopedQuestions.filter(item=>isObjectMistake(reviewRows.get(item.id))||starred.has(item.id));
  const unsolved=scopedQuestions.filter(item=>!isObjectSolved(reviewRows.get(item.id))).length;
+ // "Hepsini baştan çöz" (the learner asked): a round from every question here, the solved ones too, while unsolved ones are left.
  function fail(e:unknown,fallback:VaultCopyKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
   try{const next=await api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),course);if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
@@ -104,16 +105,21 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
  function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setNounArticle('');setArticleWarning(false);setShowHint(false);pendingAnswer.current=null;}
  function overview(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('categories');setError(null);void refresh();focus('vault-heading');}
  function chooseCategory(id:string,mode:PracticeMode=practiceMode){if(mutation.current)return;stopFeedback();setGroup(id);setSubgroup('all');setPracticeMode(mode);setView('configure');setError(null);pendingStart.current=null;focus('vault-config-heading');}
- async function start(reviewOnly=false,onlyIds?:string[]){
+ async function start(reviewOnly=false,onlyIds?:string[],all=false){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();
+  // Dinle ve Bul: the first word is heard as soon as the round opens (the learner asked: no tap); the tap that starts
+  // the round prepares the sound so phones allow it.
+  if(practiceMode==='listen')speech.prepare();
   const eligibleIds=subgroup==='all'?onlyIds:scopedQuestions.filter(item=>!onlyIds||onlyIds.includes(item.id)).map(item=>item.id);
-  const key=JSON.stringify([course,practiceMode,group,subgroup,count,reviewOnly,eligibleIds??null]);const topic=(course==='en'?'en-':'')+(group==='all'?'objects-all':group);
-  if(pendingStart.current?.key!==key){const picked=(practiceMode==='write'?pickWriting:practiceMode==='listen'?pickListening:pickPicture)(group,count,reviews,reviewOnly,eligibleIds,{starred,fresh:!reviewOnly&&!onlyIds});pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(x=>x.id),topic};}
+  const key=JSON.stringify([course,practiceMode,group,subgroup,count,reviewOnly,all,eligibleIds??null]);const topic=(course==='en'?'en-':'')+(group==='all'?'objects-all':group);
+  if(pendingStart.current?.key!==key){const picked=(practiceMode==='write'?pickWriting:practiceMode==='listen'?pickListening:pickPicture)(group,count,reviews,reviewOnly,eligibleIds,{starred,fresh:!reviewOnly&&!onlyIds&&!all});pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(x=>x.id),topic};}
   const request=pendingStart.current;
   if(!request.ids.length){setError(reviewOnly?'emptyReview':'emptyQuestions');mutation.current=false;setBusy(false);return;}
   try{
    const data=await api<{session:Session}>({action:'start',id:request.id,mode:practiceMode==='write'?'write':practiceMode==='listen'?'listen':'visual',topic:request.topic,count:request.ids.length,onlyIds:request.ids},'',course);
    if(!mounted.current)return;setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;focus();
+   const first=data.session.mode==='listen'?questionMap.get(data.session.questions[data.session.answers.length]?.id??''):undefined;
+   if(first?.audio){setHeardQuestionId(first.id);speech.speak(first.audio);}
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
@@ -191,7 +197,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
     <div className="vault-config-heading"><div className="vault-config-art"><CategoryArt group={group} title={categoryName(group,language)}/></div><div><h1 id="vault-config-heading" tabIndex={-1}>{categoryName(group,language)}</h1>{selectedSubgroup&&<p className="vault-selected-subtopic">{subgroupName(selectedSubgroup,language)}</p>}<p>{text(practiceMode==='write'?'puzzleCount':'objectsCount',{n:availableCount})}</p></div></div>
     <PracticeModes labels={modeLabels} topicLabel={categoryName(group,language)} active={practiceMode} disabled={busy} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;}}/>
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready} onClick={()=>void start()}>{text(practiceMode==='write'?'startPuzzles':practiceMode==='listen'?'startListening':'startTest')}<ArrowRight size={18} className="vault-direction-icon"/></button><button type="button" className="btn secondary" disabled={busy||!ready||!marked.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{text(course==='de'?'reviewMarked':'reviewMistakes')}{marked.length>0&&<span className="object-count">{marked.length}</span>}</button></div>
-    {ready&&<p className="housing-remaining">{unsolved?text('remaining',{n:unsolved}):text('allSolved')}</p>}{course==='de'&&<p className="housing-tip">{text('starTip')}</p>}
+    {ready&&<p className="housing-remaining">{unsolved?text('remaining',{n:unsolved}):text('allSolved')}</p>}{ready&&unsolved>0&&unsolved<availableCount&&<button type="button" className="text-button vault-restart-all" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all><RotateCcw size={15} aria-hidden="true"/>{text('restartAll')}</button>}{course==='de'&&<p className="housing-tip">{text('starTip')}</p>}
    </section>:<section className="vault-categories" aria-labelledby="vault-heading">
     <h1 id="vault-heading" tabIndex={-1}>{text('vaultTitle')}</h1>
     <div className="vault-feature-grid">

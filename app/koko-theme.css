@@ -384,3 +384,5 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
  .site-header .site-greeting { margin-inline:auto; }
  .site-header .site-header-tools { margin-inline-start:0; }
 }
+/* Nesne Kasası: "Hepsini baştan çöz" under the start buttons (like "Baştan başla" in Fiil Atölyesi). */
+.vault-restart-all { display:inline-flex; align-items:center; gap:6px; min-height:40px; margin-top:4px; color:#5f7f9f; font-size:14px; font-weight:700; }

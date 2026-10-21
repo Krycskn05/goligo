@@ -5,6 +5,7 @@ import sceneData from './object-scenes.json';
 import {movingObjectAdditions} from './object-moving-additions';
 import {buildingObjectAdditions} from './object-building-additions';
 import {toolObjectAdditions} from './object-tool-additions';
+import {bodyObjectAdditions} from './object-body-additions';
 
 export type ObjectCrop={x:number;y:number;width:number;height:number;sheetWidth:number;sheetHeight:number};
 export type SceneKey='building'|'moving';
@@ -19,6 +20,8 @@ export const objectGroups=[
  {id:'objects-building',title:'İnşaat alanı',de:'Auf der Baustelle',subtitle:'İnşaat makineleri ve malzemeleri'},
  {id:'objects-nature',title:'Bitkiler ve hayvanlar',de:'Pflanzen und Tiere',subtitle:'Bitkiler, çiçekler ve hayvanlar'},
  {id:'objects-moving',title:'Taşınma ve günlük eşyalar',de:'Umzug und Alltag',subtitle:'Taşınma ve günlük eşyalar'},
+ {id:'objects-body',title:'Vücut',de:'Der Körper',subtitle:'Baş, gövde, kollar ve bacaklar'},
+ {id:'objects-health',title:'Sağlık ve ilk yardım',de:'Gesundheit und Erste Hilfe',subtitle:'İlk yardım, ilaçlar ve tıbbi araçlar'},
 ];
 type Spec=[string,string,string,string,string,string?];
 const house:Spec[]=[
@@ -77,7 +80,7 @@ const objectCategory:Record<string,string>={
  brett:'objects-building',
  pflanze:'objects-nature',palme:'objects-nature',blumentopf:'objects-nature',kaktus:'objects-nature',vogel:'objects-nature',vogelkaefig:'objects-nature',feder:'objects-nature',fisch:'objects-nature',aquarium:'objects-nature',
 };
-export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions]
+export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions]
  .map(word=>objectCategory[word.id]?{...word,topic:objectCategory[word.id]}:word);
 export const objectWordMap=new Map(objectVocabulary.map(w=>[w.id,w]));
 export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:number;height:number;marks:SceneMark[]}[]=[
@@ -87,11 +90,26 @@ export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:
 export const objectWords:Word[]=objectVocabulary.map(w=>({de:w.de,tr:w.tr,topic:w.topic}));
 export const objectTopics:Topic[]=[...objectGroups,{id:'objects-all',title:'Nesne Kasası',de:'Gegenstände üben',subtitle:''}].map((g,i)=>({id:g.id,title:g.title,de:g.de,unit:0,section:String(i+1),pages:'Nesne Kasası görselleri',minutes:8,lead:'Nesneleri resimli testlerle çalış; cevabından sonra anlamını çalışma dilinde gör.',blocks:[{heading:'Kelimeyi artikeliyle öğren',text:'Resme bak; doğru Almanca kelimeyi dört seçenekten seç. Cevabından sonra anlamını çalışma dilinde görebilirsin.'}]}));
 const imageOf=(w:ObjectWord)=>({src:w.image,alt:w.tr,caption:w.crop?'Yüklediğin resimden nesne ayrıntısı':'Bu çalışma için çizilmiş nesne',...(w.crop?{crop:w.crop}:{})});
+// Pictures that also show another object of the list are never offered together (a thumb is also a finger,
+// a whole head also shows the eyes and the nose).
+const nearPairs:[string,string[]][]=[['daumen',['finger','hand']],['finger',['daumen','hand']],['hand',['finger','daumen','arm']],['arm',['hand','ellbogen','schulter']],['ellbogen',['arm']],['schulter',['arm','koerper']],
+ ['fuss',['zeh','bein']],['zeh',['fuss']],['bein',['knie','fuss','koerper']],['knie',['bein']],['kopf',['auge','ohr','nase','mund','haar','hals']],['hals',['kopf']],['brust',['koerper','bauch']],['bauch',['koerper','brust']],['koerper',['arm','auge','bauch','bein','brust','daumen','finger','fuss','ellbogen','haar','hals','hand','knie','kopf','mund','nase','ohr','schulter','zeh']],
+ ['verband',['gips','verbandskasten']],['gips',['verband']],['verbandskasten',['verband','pflaster','schere']],['tablette',['kapsel']],['kapsel',['tablette']]];
+const nearObjects:Record<string,string[]>={};
+for(const [id,others] of nearPairs)for(const other of others){(nearObjects[id]??=[]).push(other);(nearObjects[other]??=[]).push(id);}
 function distractors(w:ObjectWord){
  // A removal van is also a truck: never offer both names for the same picture.
  const excluded=new Set([w.id,...(w.id==='lastwagen'?['umzugswagen']:w.id==='umzugswagen'?['lastwagen']:[])]);
  const same=objectVocabulary.filter(x=>x.topic===w.topic&&!excluded.has(x.id));
  const all=[...same,...objectVocabulary.filter(x=>x.topic!==w.topic&&!excluded.has(x.id))];
+ // Body parts and health things take their wrong choices from their own category (an eye among other body
+ // parts, not among building tools); the older categories keep the choices they always had.
+ if(w.topic==='objects-body'||w.topic==='objects-health'){
+  const near=new Set(nearObjects[w.id]??[]);const at=objectVocabulary.filter(x=>x.topic===w.topic).indexOf(w);
+  const picked=[...same.slice(at),...same.slice(0,at)].filter(x=>!near.has(x.id)).slice(0,3);
+  // The whole body shows every body part: its wrong choices come from the health things.
+  return picked.length===3?picked:[...picked,...objectVocabulary.filter(x=>x.topic==='objects-health')].slice(0,3);
+ }
  const at=objectVocabulary.indexOf(w)%Math.max(1,all.length-3);return all.slice(at,at+3);
 }
 const objectBank:Question[]=[];

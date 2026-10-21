@@ -1175,5 +1175,401 @@
       "width": 512,
       "height": 512
     }
+  },
+  "arm": {
+    "src": "/objects/toon/koerper-arm.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "auge": {
+    "src": "/objects/toon/koerper-auge.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bauch": {
+    "src": "/objects/toon/koerper-bauch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bein": {
+    "src": "/objects/toon/koerper-bein.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "brust": {
+    "src": "/objects/toon/koerper-brust.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "daumen": {
+    "src": "/objects/toon/koerper-daumen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "finger": {
+    "src": "/objects/toon/koerper-finger.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "fuss": {
+    "src": "/objects/toon/koerper-fuss.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "ellbogen": {
+    "src": "/objects/toon/koerper-ellbogen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "haar": {
+    "src": "/objects/toon/koerper-haar.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "hals": {
+    "src": "/objects/toon/koerper-hals.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "hand": {
+    "src": "/objects/toon/koerper-hand.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "knie": {
+    "src": "/objects/toon/koerper-knie.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kopf": {
+    "src": "/objects/toon/koerper-kopf.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "mund": {
+    "src": "/objects/toon/koerper-mund.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "nase": {
+    "src": "/objects/toon/koerper-nase.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "ohr": {
+    "src": "/objects/toon/koerper-ohr.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schulter": {
+    "src": "/objects/toon/koerper-schulter.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zeh": {
+    "src": "/objects/toon/koerper-zeh.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "koerper": {
+    "src": "/objects/toon/koerper-koerper.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "verband": {
+    "src": "/objects/toon/gesundheit-verband.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pflaster": {
+    "src": "/objects/toon/gesundheit-pflaster.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "verbandskasten": {
+    "src": "/objects/toon/gesundheit-verbandskasten.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "waermflasche": {
+    "src": "/objects/toon/gesundheit-waermflasche.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "salbe": {
+    "src": "/objects/toon/gesundheit-salbe.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "hustensaft": {
+    "src": "/objects/toon/gesundheit-hustensaft.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tablette": {
+    "src": "/objects/toon/gesundheit-tablette.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kapsel": {
+    "src": "/objects/toon/gesundheit-kapsel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schere": {
+    "src": "/objects/toon/gesundheit-schere.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "fieberthermometer": {
+    "src": "/objects/toon/gesundheit-fieberthermometer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "spritze": {
+    "src": "/objects/toon/gesundheit-spritze.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "stethoskop": {
+    "src": "/objects/toon/gesundheit-stethoskop.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "rollstuhl": {
+    "src": "/objects/toon/gesundheit-rollstuhl.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "trage": {
+    "src": "/objects/toon/gesundheit-trage.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kruecke": {
+    "src": "/objects/toon/gesundheit-kruecke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "gips": {
+    "src": "/objects/toon/gesundheit-gips.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
   }
 }

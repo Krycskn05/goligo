@@ -1,30 +1,40 @@
-/* Paul Hoca's small animations (app/paul-hoca.tsx): about 90 px on computers, 70 px on phones */
-.paul-hoca { display:block; flex-shrink:0; width:90px; height:90px; pointer-events:none; user-select:none; }
+/* Paul Hoca's animations (app/paul-hoca.tsx): a middle size — about 110–150 px on a computer, a little smaller on phones */
+.paul-hoca { display:block; flex-shrink:0; width:120px; height:120px; pointer-events:none; user-select:none; }
 .paul-hoca img { display:block; width:100%; height:100%; object-fit:contain; }
 
-/* Home: Koko and Paul (waving) side by side above the welcome */
-.ht-hosts { display:flex; align-items:flex-end; justify-content:center; gap:8px; }
+/* Home: Koko and Paul (waving with his book) side by side above the welcome */
+.ht-hosts { display:flex; align-items:flex-end; justify-content:center; gap:10px; }
+.ht-hosts .paul-hoca { width:150px; height:150px; margin-bottom:-6px; }
 
-/* Hint and rule boxes: the text first, Paul at the end of the box pointing at it */
+/* Hints and rule boxes: the text first, Paul at the end pointing at his little board */
 .paul-box { display:flex; align-items:center; gap:12px; }
 .paul-box-text { flex:1; min-width:0; margin:0; }
-.paul-box>.paul-hoca { margin-block:-6px -8px; margin-inline-end:-4px; }
+.paul-box>.paul-hoca { width:110px; height:110px; margin-block:-10px -12px; margin-inline-end:-6px; }
 .vault-hint .paul-box-text { display:grid; gap:4px; }
 .verb-rules .paul-box-text p { margin:4px 0 0; }
 
-/* Wrong answer: Paul raises his finger in the "Tekrar dene" badge (learning-effects.tsx), for 2.6 seconds */
-.lk-reaction-paul { display:block; flex-shrink:0; width:90px; height:90px; margin-block:-12px -10px; margin-inline-start:-8px; object-fit:contain; }
-.retry .lk-reaction-badge:has(.lk-reaction-paul) { padding:8px 22px 8px 12px; animation:lk-paul-retry 2.6s both; }
-@keyframes lk-paul-retry {
- 0% { opacity:0; transform:translate(-50%,10px) scale(.8); }
- 10% { opacity:1; transform:translate(-50%,0) scale(1.04); }
- 16%,86% { opacity:1; transform:translate(-50%,0) scale(1); }
- 100% { opacity:0; transform:translate(-50%,-6px) scale(.97); }
+/* Yanlışlarım: Paul thinks next to the heading */
+.verb-mistakes-head .paul-hoca { width:110px; height:110px; margin:-14px 0 -18px auto; }
+
+/* Answer badge (learning-effects.tsx): Paul above the word, the badge stays as long as his animation */
+.lk-reaction-badge:has(.lk-reaction-paul) { flex-direction:column; gap:2px; padding:6px 18px 10px; border-radius:24px; }
+.lk-reaction-paul { display:block; width:140px; height:140px; margin:-4px 0 -6px; object-fit:contain; }
+.kind-correct .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge 1.9s both; }
+.kind-wrong .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge 2.1s both; }
+.kind-complete .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge 2.6s both; }
+@keyframes lk-paul-badge {
+ 0% { opacity:0; transform:translate(-50%,14px) scale(.8); }
+ 9% { opacity:1; transform:translate(-50%,0) scale(1.04); }
+ 15%,85% { opacity:1; transform:translate(-50%,0) scale(1); }
+ 100% { opacity:0; transform:translate(-50%,-8px) scale(.97); }
 }
 
 @media (max-width:760px) {
- .paul-hoca,.lk-reaction-paul { width:70px; height:70px; }
- .paul-box { gap:8px; }
+ .paul-hoca { width:96px; height:96px; }
+ .ht-hosts .paul-hoca { width:120px; height:120px; }
+ .paul-box>.paul-hoca { width:84px; height:84px; }
+ .verb-mistakes-head .paul-hoca { width:88px; height:88px; }
+ .lk-reaction-paul { width:112px; height:112px; }
  /* The verb learning card fits one phone screen; Paul stays out of its small rule box there. */
  .verb-learn .paul-box>.paul-hoca { display:none; }
 }

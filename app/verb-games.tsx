@@ -6,6 +6,7 @@ import {verbPicture,verbRules,verbRuleKeys,ruleText,sentenceText,type VerbTense}
 import {sentenceRound,sentenceCorrect,auxRound,auxCorrect,buildRound,buildCorrect,buildTarget,buildSuffix,matchRound,matchKinds,bestKey,type GameId,type MatchKind,type Tile} from '@/lib/verb-games';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
+import {PaulHoca} from './paul-hoca';
 
 type Feedback={answer:(correct:boolean,text:string)=>void;stop:()=>void;complete:()=>void;busy:boolean};
 type Props={game:GameId;language:VaultLanguage;topic:string;onTopic:(topic:string)=>void;onExit:()=>void;feedback:Feedback};
@@ -18,9 +19,9 @@ export function VerbPicture({verb,language,small=false}:{verb:Verb;language:Vaul
  const src=verbPicture(verb);
  return src?<img className={'verb-picture'+(small?' small':'')} src={src} alt={verbMeaning(verb,language)} width={512} height={512} loading="lazy" decoding="async"/>:<span className={'verb-picture verb-picture-empty'+(small?' small':'')} aria-hidden="true" lang="de" dir="ltr">{verb.display}</span>;
 }
-/** Rule lines shown after an answer, so the learner sees why the form is right. */
+/** Rule lines shown after an answer, so the learner sees why the form is right; Paul Hoca points at them (no sound: the answer is being read). */
 export function RuleBox({lines,language}:{lines:string[];language:VaultLanguage}){
- return lines.length?<div className="verb-rules" lang={language} dir={vaultDirection(language)}><strong>{verbText(language,'ruleTitle')}</strong><ul>{lines.map(line=><li key={line}>{line}</li>)}</ul></div>:null;
+ return lines.length?<div className="verb-rules paul-box" lang={language} dir={vaultDirection(language)}><div className="paul-box-text"><strong>{verbText(language,'ruleTitle')}</strong><ul>{lines.map(line=><li key={line}>{line}</li>)}</ul></div><PaulHoca pose="tip"/></div>:null;
 }
 function useTiles(){
  const [placed,setPlaced]=useState<Tile[]>([]);

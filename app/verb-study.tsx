@@ -23,6 +23,7 @@ import {LetterPuzzle} from './letter-puzzle';
 import {SiteFooter} from './site-footer';
 import {SiteHeader} from './site-header';
 import {NavIcon} from './nav-icons';
+import {PaulHoca} from './paul-hoca';
 import {verbProgress} from '@/lib/progress';
 import {RoundReward} from './progress-ui';
 import {progressText} from '@/lib/progress-copy';
@@ -308,7 +309,7 @@ export function VerbWorkshop({language,onLanguage}:{language:VaultLanguage;onLan
    section==='mistakes'?<section className="verb-section" data-verb-section="mistakes">
     <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button></div>
      <article className="panel verb-mistakes" aria-labelledby="verb-section-heading" data-verb-mistakes={mistakeIds.length}>
-     <div className="verb-mistakes-head"><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1>{mistakeIds.length>0&&<span className="verb-mistakes-count">{mistakeIds.length}</span>}</div>
+     <div className="verb-mistakes-head"><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1>{mistakeIds.length>0&&<span className="verb-mistakes-count">{mistakeIds.length}</span>}<PaulHoca pose="think" sound="appear"/></div>
      {mistakeIds.length>0?<>
       <p className="verb-mistakes-lead">{t('mistakesLead',{n:mistakeIds.length})}</p>
       <ul className="verb-mistakes-verbs">{mistakeVerbList.slice(0,10).map(item=><li key={item.id}><img src={verbPicture(item)??''} alt="" width={40} height={40} loading="lazy" decoding="async"/><span lang="de" dir="ltr" className={kindClass(item)}>{item.display}</span></li>)}{mistakeVerbList.length>10&&<li className="more">+{mistakeVerbList.length-10}</li>}</ul>

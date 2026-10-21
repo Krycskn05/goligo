@@ -12,13 +12,15 @@ const categories={
  'objects-building':'geruest zementmischer zementsack schubkarre schlauch kabel schild brett leiter schaufel maurerkelle',
  'objects-nature':'pflanze palme blumentopf kaktus vogel vogelkaefig feder fisch aquarium',
  'objects-moving':'karton umzugswagen lastwagen seil kette rad regenschirm schirmstaender brille zeitschrift bogen pfeil',
+ 'objects-body':'arm auge bauch bein brust daumen finger fuss ellbogen haar hals hand knie kopf mund nase ohr schulter zeh koerper',
+ 'objects-health':'verband pflaster verbandskasten waermflasche salbe hustensaft tablette kapsel schere fieberthermometer spritze stethoskop rollstuhl trage kruecke gips',
 };
-const keys={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving'};
+const keys={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth'};
 
-test('the 107 vault objects are sorted into eight categories by meaning',()=>{
+test('the 143 vault objects are sorted into ten categories by meaning',()=>{
  assert.deepEqual(objects.objectGroups.map(group=>group.id),Object.keys(categories));
  const expected=Object.entries(categories).flatMap(([topic,ids])=>ids.split(' ').map(id=>[id,topic]));
- assert.equal(expected.length,107);assert.equal(objects.objectVocabulary.length,107);
+ assert.equal(expected.length,143);assert.equal(objects.objectVocabulary.length,143);
  for(const [id,topic] of expected){const word=objects.objectWordMap.get(id);assert(word,id);assert.equal(word.topic,topic,id);}
  for(const word of objects.objectVocabulary)for(const kind of ['picture','write','hear-picture']){const q=course.questionMap.get('obj-'+kind+'-'+word.id);assert(q,kind+' '+word.id);assert.equal(q.topic,word.topic);}
  for(const word of objects.objectVocabulary){const groups=subgroups.objectSubgroups.filter(group=>group.wordIds.includes(word.id));assert.equal(groups.length,1,word.id);assert.equal(groups[0].parent,word.topic,word.id);}

@@ -10,7 +10,7 @@ export const englishObjectQuestions:Question[]=objectVocabulary.flatMap((word,in
  const other=objectVocabulary.filter(w=>w.id!==word.id&&w.topic===word.topic);
  const wrong=[...new Set([...other.slice(index%Math.max(1,other.length-3)),...other,...objectVocabulary.filter(w=>w.id!==word.id)].map(w=>englishObjectName(w.id)))].filter(value=>value&&value!==answer).slice(0,3);
  const base={topic:'en-'+word.topic,objectId:word.id,answer,accepted:synonyms,answerTr:word.tr,explanation:answer+' = '+word.tr+'.',explanationEn:'The object in the picture is '+answer+'.',image:{src:word.image,alt:word.tr,caption:'Original object illustration',...(word.crop?{crop:word.crop}:{})}};
- const plural=['treppe','brille'].includes(word.id);const uncountable=['geruest'].includes(word.id);
+ const plural=['treppe','brille','schere'].includes(word.id);const uncountable=['geruest','haar','salbe','hustensaft'].includes(word.id);
  const prefix=plural?'These are ':uncountable?'This is ':'This is '+(/^[aeiou]/i.test(answer)?'an ':'a ');
  const excluded=new Set([word.id,...(word.id==='lastwagen'?['umzugswagen']:word.id==='umzugswagen'?['lastwagen']:[])]);
  const pictures=objectVocabulary.filter(w=>!excluded.has(w.id));

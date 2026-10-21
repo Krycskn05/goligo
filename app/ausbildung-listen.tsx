@@ -5,6 +5,7 @@ import {lessonParts,normalizeAnswer} from '@/lib/ausbildung-course';
 import {hoerenTasks,questionSpeech,speakerVoice,type HoerenQuestion,type HoerenTask} from '@/lib/ausbildung-hoeren';
 import {speakerPicture} from '@/lib/ausbildung-art';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
+import {PaulHoca} from './paul-hoca';
 
 type Item={text:string;voice?:string};
 type Line={who:string;text:string};
@@ -105,7 +106,7 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
  return <article className="panel object-question l12-exercise l12-hoeren" id={'bolum-'+task.number} data-l12-hoeren={task.number} aria-labelledby={'l12-h-'+task.id}>
   <div className="l12-exercise-head"><span className="object-pill" lang="de"><Headphones size={14} aria-hidden="true"/>Hören {task.number} · {listenPart(task.number)}</span></div>
   <h2 id={'l12-h-'+task.id} className="l12-exercise-title" lang="de" tabIndex={-1}>{task.title}</h2>
-  <p className="housing-cue l12-hint">{task.hint}</p>
+  <div className="housing-cue l12-hint paul-box"><p className="paul-box-text">{task.hint}</p><PaulHoca pose="tip"/></div>
   {task.lines&&<div className="vault-listen-player l12-player">
    <span className="l12-player-icon" aria-hidden="true"><Headphones size={26}/></span>
    <div className="l12-player-text"><strong aria-live="polite">{here?'Cümle '+(here.index+1)+' / '+here.total+(here.paused?' · duraklatıldı':''):'Önce metni görmeden dinle'}</strong><span className="l12-faces" lang="de">{[...new Set(task.lines.map(line=>line.who))].map(who=><span key={who} className={'l12-face-chip'+(who===speaker?' speaking':'')}><SpeakerFace who={who}/>{who}</span>)}</span></div>

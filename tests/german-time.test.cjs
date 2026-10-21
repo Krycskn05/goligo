@@ -61,18 +61,14 @@ test('the header clock: every tap says another German sentence about now',()=>{
  assert.ok(bubble.includes('setInterval(tick,motion?1000:15000)'),'the clock ticks every second');
  assert.ok(bubble.includes('transform={`rotate(${angle} 50 50)`}')&&bubble.includes('const hourAngle=(h+m/60)*30,minuteAngle=(m+sec/60)*6,secondAngle=sec*6;'));
  for(const part of ['morgen','vormittag','mittag','nachmittag','abend','nacht'])assert.ok(bubble.includes(part),'a picture for '+part);
- // No window any more (the learner asked, 21 October 2026): a tap reads the next sentence aloud and shows it for a moment.
- for(const gone of ['createPortal(','role="dialog"','sg-panel','setOpen'])assert.ok(!bubble.includes(gone),gone);
- assert.ok(bubble.includes('onClick={say}')&&bubble.includes('const list=momentSayings(new Date());const sentence=list[turn.current%list.length];turn.current+=1;')&&bubble.includes('speech.speak(sentence);setSaid(sentence);'));
- // The sayings take turns: the time, a greeting, the day, the part of the day, the week, then the next of each.
- const sayings=g.momentSayings(new Date(2026,9,21,23,53));
- assert.equal(sayings[0],'Es ist 23:53 Uhr.');assert.equal(sayings[1],g.greetings(23)[0].de);assert.equal(sayings[2],'Heute ist Mittwoch.');
- assert.ok(sayings.includes('Es ist dreiundzwanzig Uhr dreiundfünfzig.')&&sayings.includes('Es ist sieben vor zwölf.')&&sayings.includes('Wir haben KW 43.'));
- assert.equal(new Set(sayings).size,sayings.length,'every tap says something new until the list starts again');
+ // No window (the learner asked, 21 October 2026): a tap says the time the next way (lib/clock-sayings.ts, tested in
+ // tests/clock-sayings.test.cjs) and shows it in a small box under the clock.
+ for(const gone of ['createPortal(','role="dialog"','sg-panel','setOpen','momentSayings'])assert.ok(!bubble.includes(gone),gone);
+ assert.ok(bubble.includes('onClick={say}')&&bubble.includes('measure();speech.speak(saying.de);'));
  const css=fs.readFileSync('app/koko-theme.css','utf8');
  assert.ok(css.includes('.site-greeting { position:relative; margin:0; padding:4px 10px 4px 4px; background:none; border:0;'),'no frame');
  assert.ok(!css.includes('.site-greeting::before')&&!css.includes('.site-greeting::after'),'no speech-bubble tail');
- for(const rule of ['.site-greeting-button {','.site-greeting-day {','.site-greeting-part {','.site-greeting-button .analog-clock {','.sg-said {','.sg-said.shown {'])assert.ok(css.includes(rule),rule);
+ for(const rule of ['.site-greeting-button {','.site-greeting-day {','.site-greeting-part {','.site-greeting-button .analog-clock {','.sg-info {','.sg-info-de {'])assert.ok(css.includes(rule),rule);
  for(const gone of ['.sg-backdrop','.sg-panel','.sg-group'])assert.ok(!css.includes(gone),gone);
  // Placed neatly: wide screens in the middle, middle widths on the right above the buttons, phones centred.
  assert.ok(css.includes(' .site-header .site-greeting { margin-inline:auto; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:end; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:center; }'));

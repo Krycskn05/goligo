@@ -81,7 +81,7 @@ test('pages: the first part opens, the rest carries a lock and the sign-up, ever
  const shared=read('app/guest-taste.tsx');assert.ok(shared.includes("'/uye-ol?return_to='+encodeURIComponent(back)"));
  // The landing page offers the try-out on every part but Yanlışlarım.
  const landing=read('app/landing.tsx');for(const href of ['/konular','/ev-esyalar','/fiiller',"/fiiller?bolum=oyunlar"])assert.ok(landing.includes("href:'"+href+"'"),href);
- assert.ok(landing.includes('data-landing-try={item.part}')&&landing.includes('data-landing-try-top'));
+ assert.ok(landing.includes('data-landing-try={item.href?item.part:undefined}')&&landing.includes('data-landing-try-top'));
  // Texts.
  const copy=load('guest-copy'),site=load('site-languages');
  for(const [key,tuple] of Object.entries(copy.guestCopy))assert.equal(tuple.length,12,key);

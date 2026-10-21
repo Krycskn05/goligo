@@ -21,7 +21,9 @@ test('the colours follow the sound button, the list is not cut off by the header
  assert.ok(css.includes('.site-header .lk-effects-button { background:#fff5d6; border:2px solid #ffd968; box-shadow:0 4px 0 #f5df9c; color:#b77800; }'),'same as the sound button');
  assert.ok(!/\.site-account \{[^}]*#ffeef3/.test(css),'no pink left');
  assert.ok(css.includes('.site-account-list { position:fixed;')&&css.includes('.site-account-list[hidden] { display:none; }'));
- assert.ok(css.includes('.work-header.logo-header.site-header { position:relative; overflow:hidden; backdrop-filter:none; -webkit-backdrop-filter:none;'),'no blur on the header, or the fixed list stays inside it');
+ assert.ok(css.includes('.work-header.logo-header.site-header { position:relative; overflow:hidden; backdrop-filter:none; background:'),'no blur on the header, or the fixed list stays inside it');
+ // The minifier keeps only the last of backdrop-filter / -webkit-backdrop-filter in a rule; a prefixed "none" last was lost in Chrome.
+ assert.ok(!/\.site-header \{[^}]*backdrop-filter:none;[^}]*-webkit-backdrop-filter/.test(css));
  assert.ok(css.includes('html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }')&&css.includes('@media (prefers-reduced-motion:reduce) { .site-account-list li { animation:none; } }'));
 });
 

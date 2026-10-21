@@ -9,32 +9,47 @@
 .lk-public-header .site-header-tools { flex-wrap:nowrap; }
 
 /* Tanıtım */
-.lk-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:28px; align-items:center; background:#fff; border-radius:32px; box-shadow:var(--soft); padding:34px; overflow:hidden; }
-.lk-hero h1 { font-size:clamp(30px,4.6vw,50px); line-height:1.08; margin:0 0 16px; color:var(--ink); }
-.lk-lead { font-size:clamp(17px,1.8vw,20px); color:var(--ink-2); margin:0 0 22px; max-width:34em; }
+/* The visitor's first page (app/landing.tsx; the learner chose design 2 "Önce dene" with the sign-up form of design 1,
+   small and next to the title): picture, title, line and "try it" beside a compact sign-up form; picture tiles that open
+   each part's free first part; what an account adds. */
+.lk-hero { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr); gap:30px; align-items:center; background:#fff; border-radius:32px; box-shadow:var(--soft); padding:28px 30px; }
+.lk-hero-art { width:min(460px,100%); height:auto; border-radius:20px; display:block; margin:0 0 10px; }
+.lk-hero h1 { font-size:clamp(28px,3.6vw,42px); line-height:1.1; margin:0 0 10px; color:var(--ink); }
+.lk-lead { font-size:clamp(16.5px,1.6vw,18px); line-height:1.55; color:var(--ink-2); margin:0 0 18px; max-width:34em; }
 .lk-hero-actions { display:flex; flex-wrap:wrap; gap:12px; }
-.lk-hero-actions.center { justify-content:center; margin-top:22px; }
-.lk-hero-actions .btn { text-decoration:none; }
-.lk-hero-note { display:flex; align-items:center; gap:8px; margin:16px 0 0; color:var(--ink-2); font-weight:600; font-size:15px; }
-.lk-hero-note svg { color:var(--green-2); }
-.lk-hero-art img { width:100%; height:auto; border-radius:24px; display:block; }
-.lk-section { margin-top:40px; }
-.lk-section > h2 { font-size:clamp(24px,3vw,32px); margin:0 0 18px; text-align:center; }
-.lk-features { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:20px; }
-/* Five parts: three cards in the first row, two wider ones in the second, so both rows are full and even. */
-.lk-feature { grid-column:span 2; }
-.lk-feature:nth-child(n+4) { grid-column:span 3; }
-.lk-feature { background:#fff; border-radius:24px; box-shadow:var(--soft); overflow:hidden; display:flex; flex-direction:column; }
-.lk-feature img { width:100%; height:auto; aspect-ratio:2/1; object-fit:contain; background:linear-gradient(180deg,#fef8ea,#fdf0d6); display:block; }
-.lk-feature div { padding:18px 20px 22px; }
-.lk-feature h3 { margin:0 0 6px; font-size:21px; }
-.lk-feature p { margin:0; color:var(--ink-2); }
-.lk-perks ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-.lk-perks li { display:flex; gap:12px; align-items:flex-start; background:#fff; border-radius:18px; box-shadow:var(--soft-2); padding:16px 18px; font-weight:600; color:var(--ink-2); }
-.lk-perks svg { color:var(--blue-2); flex-shrink:0; margin-top:1px; }
-.lk-steps ol { list-style:none; margin:0 auto; padding:0; display:grid; gap:12px; max-width:640px; }
-.lk-steps li { display:flex; gap:14px; align-items:center; background:#fff; border-radius:18px; box-shadow:var(--soft-2); padding:14px 18px; font-weight:600; }
-.lk-step-number { display:grid; place-items:center; width:38px; height:38px; flex-shrink:0; border-radius:50%; background:var(--green); color:#fff; font-weight:800; }
+.lk-hero-actions .btn { text-decoration:none; gap:8px; }
+.lk-hero-note { display:flex; align-items:center; gap:8px; margin:14px 0 0; color:var(--ink-2); font-weight:600; font-size:15px; }
+.lk-hero-note svg { color:var(--green-2); flex:none; }
+/* The form beside the title: small fields, small print. */
+.lk-hero-form { background:#fffaf0; border:2px solid #f3e2bd; border-radius:24px; padding:18px 18px 16px; scroll-margin-top:16px; }
+.lk-hero-form h2 { margin:0 0 10px; font-size:20px; color:var(--ink); }
+.lk-hero-form .lk-auth-form { gap:10px; }
+.lk-hero-form .lk-field { gap:4px; font-size:14.5px; }
+.lk-hero-form .lk-field input,.lk-hero-form .lk-password input { min-height:42px; padding:7px 12px; font-size:16px; border-radius:12px; }
+.lk-hero-form .lk-password-toggle { width:40px; }
+.lk-hero-form .lk-field small { font-size:12.5px; line-height:1.35; }
+.lk-hero-form .lk-check { gap:9px; font-size:13px; line-height:1.4; }
+.lk-hero-form .lk-check input { width:20px; height:20px; }
+.lk-hero-form .lk-submit { min-height:44px; }
+.lk-hero-form .lk-auth-switch { margin:10px 0 0; text-align:center; font-size:14.5px; }
+.lk-auth-switch a { font-weight:800; }
+.lk-section { margin-top:40px; scroll-margin-top:16px; }
+.lk-section > h2 { font-size:clamp(23px,3vw,30px); margin:0 0 18px; text-align:center; color:var(--ink); }
+.lk-parts { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
+.lk-part { height:100%; display:grid; grid-template-rows:auto auto auto 1fr; justify-items:center; gap:4px; text-align:center; background:#fff; border-radius:22px; box-shadow:var(--soft-2); padding:10px 10px 14px; color:inherit; text-decoration:none; transition:transform .15s ease,box-shadow .15s ease; }
+.lk-part:hover { transform:translateY(-2px); box-shadow:var(--soft); }
+.lk-part:focus-visible { outline:3px solid #417e7c; outline-offset:3px; }
+.lk-part img { width:100%; height:auto; aspect-ratio:4 / 3; object-fit:cover; border-radius:16px; background:#fef5e2; display:block; margin:0 0 6px; }
+.lk-part strong { color:var(--ink); font-size:16px; line-height:1.25; }
+.lk-part small { color:#b77800; font-weight:800; font-size:12.5px; margin-bottom:6px; }
+.lk-part-try,.lk-part-lock { align-self:end; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:6px 16px; border-radius:999px; font-weight:800; font-size:14px; white-space:nowrap; }
+.lk-part-try { background:#eaf8ee; border:2px solid #a8dcb6; color:#2e8b57; }
+.lk-part:hover .lk-part-try { background:#dff3e5; }
+.lk-part-lock { background:#f1f3f6; color:#5b6b7e; }
+.lk-part.locked img { filter:grayscale(.65); opacity:.78; }
+.lk-perks ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.lk-perks li { display:flex; align-items:center; gap:12px; background:#fff; border-radius:20px; box-shadow:var(--soft-2); padding:14px 16px; font-weight:700; color:var(--ink-2); line-height:1.45; }
+.lk-perks svg { flex:0 0 38px; width:38px; height:38px; padding:8px; border-radius:50%; background:#fff5d6; border:2px solid #ffd968; color:#b77800; }
 
 /* Formlar */
 .lk-auth-card,.lk-account-card,.lk-legal,.lk-account-head { background:#fff; border-radius:28px; box-shadow:var(--soft); padding:30px; }
@@ -98,11 +113,15 @@
 .site-footer-links a { display:inline-flex; align-items:center; min-height:40px; padding:0 8px; border-radius:10px; }
 
 @media (max-width:860px) {
- .lk-hero { grid-template-columns:1fr; padding:24px 20px; border-radius:26px; }
- .lk-hero-art { order:-1; }
- .lk-features { grid-template-columns:1fr; }
- .lk-feature,.lk-feature:nth-child(n+4) { grid-column:auto; }
- .lk-perks ul { grid-template-columns:1fr; }
+ .lk-hero { grid-template-columns:1fr; gap:20px; padding:18px 16px 20px; border-radius:26px; text-align:center; }
+ .lk-hero-art { margin-inline:auto; }
+ .lk-lead { margin-inline:auto; }
+ .lk-hero-actions,.lk-hero-note { justify-content:center; }
+ .lk-hero-form { text-align:start; padding:16px 14px 14px; }
+ .lk-parts { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+ .lk-parts > li:last-child { grid-column:span 2; }
+ .lk-parts > li:last-child img { aspect-ratio:3 / 1; }
+ .lk-perks ul { grid-template-columns:1fr; gap:10px; }
 }
 @media (max-width:560px) {
  .lk-public-main { padding:18px 14px 44px; }
@@ -125,11 +144,6 @@
 .guest-lock:hover, .guest-lock:focus-visible { background:#e6eaf1; color:var(--ink); }
 /* A part for members: its pictures fade; the lock stays clear. */
 .guest-locked img, .guest-locked .vault-category-art, .guest-locked .lb-toc-photo, .guest-locked .game-icon { filter:grayscale(.7); opacity:.7; }
-/* Landing: "Üye olmadan dene" under the hero buttons and on every part a visitor can try. */
-.lk-try-link, .lk-feature-try { display:inline-flex; align-items:center; gap:6px; min-height:44px; color:var(--blue-2); font-weight:800; text-decoration:none; }
-.lk-try-link { margin-top:6px; }
-.lk-try-link:hover, .lk-feature-try:hover { text-decoration:underline; }
-.lk-try-text { margin:-4px 0 16px; color:var(--ink-2); }
 .game-card.guest-locked { text-decoration:none; color:inherit; }
 .guest-card-lock { margin-inline-start:auto; flex:none; color:#4b5b70; }
 a[data-guest-locked], a[data-guest-locked] * { text-decoration:none; color:inherit; }

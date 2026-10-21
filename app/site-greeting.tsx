@@ -1,6 +1,8 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
-import {germanMoment,momentSayings,PART_NOUN,WEEKDAYS,type PartOfDay} from '@/lib/german-time';
+import {useCallback,useEffect,useRef,useState} from 'react';
+import {germanMoment,PART_NOUN,WEEKDAYS,type PartOfDay} from '@/lib/german-time';
+import {clockDigits,clockSayings,turkishTime,type ClockSaying} from '@/lib/clock-sayings';
+import {clockText,EXPLAIN_KEY,KIND_KEY,type ClockCopyKey} from '@/lib/clock-copy';
 import {greetingText,type GreetingCopyKey} from '@/lib/greeting-copy';
 import type {VaultLanguage} from '@/lib/object-vault-copy';
 import {usePaulMotion} from './paul-hoca';
@@ -37,40 +39,76 @@ export function AnalogClock({date,seconds=true,className=''}:{date:Date;seconds?
  </svg>;
 }
 
+type Info={saying:ClockSaying;index:number;total:number;hour:number;minute:number};
+
 /**
  * The header's clock (the learner asked: no frame, only the clock, the day and the part of the day, placed neatly):
  * an analog clock for the learner's own time (ticking second hand with motion on; no digits), the weekday in German
- * (Mittwoch) and the part of the day with a small picture (Morgen, Vormittag, Mittag, Nachmittag, Abend, Nacht). Each
- * tap says another German sentence about now (the learner asked, 21 October 2026: no window, a different saying on
- * every tap): the time officially and in everyday speech, a greeting, the day, the date, the week. The sentence shows
- * for a moment under the clock. Before the page knows the learner's clock it keeps the place empty.
+ * (Mittwoch) and the part of the day with a small picture (Morgen, Vormittag, Mittag, Nachmittag, Abend, Nacht).
+ * Each tap says the time of now in the next correct German way (the learner's plan, 22 October 2026, lib/clock-sayings.ts):
+ * formal, everyday, from the half hour, approximate — read aloud, and shown in a small box under the clock with its
+ * kind and number (2/4), the meaning (Turkish sentence, or the time) and a short explanation. After the last one it
+ * starts again; when the minute changes the list starts anew. Regional ways (viertel vier, dreiviertel vier) are in
+ * the list too (the learner asked: no switch, every way). A tap outside or Escape closes the box. Before the page
+ * knows the clock it stays empty.
  */
-export function SiteGreeting({language,line}:{language:VaultLanguage;line:string}){
+export function SiteGreeting({language}:{language:VaultLanguage;line?:string}){
  const motion=usePaulMotion();
  const [now,setNow]=useState<Date|null>(null);
- const [said,setSaid]=useState('');
- const turn=useRef(0);const hide=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const [info,setInfo]=useState<Info|null>(null);
+ const [place,setPlace]=useState<{top:number;left:number;width:number}|null>(null);
+ const turn=useRef({key:'',index:0});const hide=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const button=useRef<HTMLButtonElement>(null);const box=useRef<HTMLDivElement>(null);
  const speech=useGermanSpeech('de');
  // Every second with motion on (the clock's second hand), every 15 s without.
  useEffect(()=>{const tick=()=>setNow(new Date());tick();const timer=setInterval(tick,motion?1000:15000);return()=>clearInterval(timer);},[motion]);
  useEffect(()=>()=>{if(hide.current)clearTimeout(hide.current);},[]);
+ const close=useCallback(()=>{if(hide.current)clearTimeout(hide.current);setInfo(null);},[]);
+ const later=useCallback(()=>{if(hide.current)clearTimeout(hide.current);hide.current=setTimeout(()=>setInfo(null),12000);},[]);
+ useEffect(()=>{
+  if(!info)return;
+  const outside=(event:PointerEvent)=>{const target=event.target as Node;if(!box.current?.contains(target)&&!button.current?.contains(target))close();};
+  const key=(event:KeyboardEvent)=>{if(event.key==='Escape')close();};
+  document.addEventListener('pointerdown',outside);document.addEventListener('keydown',key);
+  return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',key);};
+ },[info,close]);
  const t=(key:GreetingCopyKey)=>greetingText(language,key);
  if(!now)return <span className="site-greeting site-greeting-waiting" aria-hidden="true"/>;
  const moment=germanMoment(now);
  const time=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
- function say(){
-  const list=momentSayings(new Date());const sentence=list[turn.current%list.length];turn.current+=1;
-  speech.speak(sentence);setSaid(sentence);
-  if(hide.current)clearTimeout(hide.current);hide.current=setTimeout(()=>setSaid(''),5000);
+ function measure(){
+  const rect=button.current?.getBoundingClientRect();if(!rect)return;
+  const view=document.documentElement.clientWidth;const width=Math.min(340,view-24);
+  setPlace({top:Math.round(rect.bottom+8),left:Math.round(Math.min(Math.max(12,rect.left+rect.width/2-width/2),view-width-12)),width});
  }
- return <button type="button" className="site-greeting site-greeting-button" title={t('tapToHear')} aria-label={t('tapToHear')+' · '+WEEKDAYS[now.getDay()]+', '+PART_NOUN[moment.part]+', '+time} onClick={say} data-site-greeting={moment.part}>
-  <AnalogClock date={now} seconds={motion}/>
-  <span className="site-greeting-words" lang="de" dir="ltr">
-   <strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>
-   <span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>
-   <span className="lk-visually-hidden">{time}</span>
-  </span>
-  {/* The sentence just said, for a moment below the clock (it is read out, so screen readers need no second copy). */}
-  <span className={'sg-said'+(said?' shown':'')} aria-hidden="true" lang="de" dir="ltr" title={line} data-site-greeting-said>{said}</span>
- </button>;
+ function say(){
+  const date=new Date();const hour=date.getHours(),minute=date.getMinutes();const key=`${hour}:${minute}`;
+  // A new minute starts the list again from the first way.
+  if(turn.current.key!==key)turn.current={key,index:0};
+  const list=clockSayings(hour,minute);const index=turn.current.index%list.length;const saying=list[index];
+  turn.current.index=index+1;
+  measure();speech.speak(saying.de);setInfo({saying,index,total:list.length,hour,minute});later();
+ }
+ const c=(key:ClockCopyKey,params?:Record<string,string|number>)=>clockText(language,key,params);
+ const meaning=(item:Info)=>language==='tr'?turkishTime(item.saying,item.hour,item.minute):(item.saying.kind==='approx'?'≈ ':'= ')+clockDigits(item.hour,item.minute);
+ // "halb vier" is 3:30: the half hour of the hour now (12 hours), named after the next one.
+ const explain=(item:Info)=>{const s=item.saying,h12=item.hour%12||12;
+  return c(EXPLAIN_KEY[s.pattern],{next:s.next,halfTime:clockDigits(h12,30),n:s.minutes,time:clockDigits(h12,item.minute)});};
+ return <>
+  <button ref={button} type="button" className="site-greeting site-greeting-button" title={t('tapToHear')} aria-label={t('tapToHear')+' · '+WEEKDAYS[now.getDay()]+', '+PART_NOUN[moment.part]+', '+time} aria-expanded={!!info} onClick={say} data-site-greeting={moment.part}>
+   <AnalogClock date={now} seconds={motion}/>
+   <span className="site-greeting-words" lang="de" dir="ltr">
+    <strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>
+    <span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>
+    <span className="lk-visually-hidden">{time}</span>
+   </span>
+  </button>
+  {/* The way just said, under the clock (fixed on the screen: the header cuts off what reaches outside it). */}
+  {info&&place&&<div ref={box} className="sg-info" role="status" aria-live="polite" style={{top:place.top,left:place.left,width:place.width}} onPointerEnter={()=>{if(hide.current)clearTimeout(hide.current);}} onPointerLeave={later} data-clock-info={info.saying.kind}>
+   <div className="sg-info-top"><span className={'sg-kind kind-'+info.saying.kind}>{c(KIND_KEY[info.saying.kind])}</span><span className="sg-count" dir="ltr">{info.index+1}/{info.total}</span></div>
+   <p className="sg-info-de" lang="de" dir="ltr">{info.saying.de}</p>
+   <p className="sg-info-meaning" dir={language==='tr'?undefined:'ltr'}>{meaning(info)}</p>
+   <p className="sg-info-why">{explain(info)}</p>
+  </div>}
+ </>;
 }

@@ -456,6 +456,10 @@ test('Fiil Atölyesi: four parts in book order, each verb in turn: card, meaning
  // The top shows only the title (no lead text, photo or start button) and no "0 / 19 fiil" card: the map shows where the learner is.
  assert.ok(!page.includes("t('workshopLead')")&&!page.includes('verb-polaroid')&&!page.includes('verb-path-enter'),'plain title on top');
  assert.ok(!page.includes('verb-path-panel')&&!page.includes('className="verb-bubble"'),'no path card under the title');
+ // The site check (ci/smoke.cjs) finds the workshop by this mark and opens a part with its start button: without them the deploy stops.
+ assert.ok(page.includes('<section className="verb-home" aria-labelledby="vault-heading" data-verb-workshop="">'),'workshop mark for the site check');
+ const smoke=fs.readFileSync('ci/smoke.cjs','utf8');
+ assert.ok(!smoke.includes('.verb-path-enter')&&smoke.includes('[data-verb-part-start]')&&fs.readFileSync('app/verb-workshop.tsx','utf8').includes('data-verb-part-start={family.id}'),'site check uses the part start button');
  assert.ok(page.includes('<span className="verb-hero-badge" aria-hidden="true"><NavIcon name="verbs"/></span>')&&page.includes('className="verb-hero-sub"'));
  assert.ok(page.includes('<SiteHeader ')&&page.includes('<LearnCard ')&&page.includes('<PathStepper '));
  assert.ok(page.includes("kind==='fit')return {text:formWithGap(option,question)")&&page.includes("task==='fit'&&verb?verb.praesens")&&page.includes("stored.includes(q.answer)?stored:"),'sentence options show the forms, the spoken answer is the form, old rounds fall back to fresh choices');

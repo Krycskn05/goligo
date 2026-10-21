@@ -10,7 +10,6 @@
 
 /* Tanıtım */
 .lk-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:28px; align-items:center; background:#fff; border-radius:32px; box-shadow:var(--soft); padding:34px; overflow:hidden; }
-.lk-eyebrow { margin:0 0 8px; color:var(--green-3); font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:14px; }
 .lk-hero h1 { font-size:clamp(30px,4.6vw,50px); line-height:1.08; margin:0 0 16px; color:var(--ink); }
 .lk-lead { font-size:clamp(17px,1.8vw,20px); color:var(--ink-2); margin:0 0 22px; max-width:34em; }
 .lk-hero-actions { display:flex; flex-wrap:wrap; gap:12px; }

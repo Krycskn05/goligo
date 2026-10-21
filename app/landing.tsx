@@ -37,7 +37,6 @@ export function LandingView({language}:{language:SiteLanguage}){
   <main id="main" tabIndex={-1} className="lk-public-main">
    <section className="lk-hero" aria-labelledby="lk-hero-title">
     <div className="lk-hero-text">
-     <p className="lk-eyebrow">{p('landingEyebrow')}</p>
      <h1 id="lk-hero-title">{p('landingTitle')}</h1>
      <p className="lk-lead">{p('landingLead')}</p>
      <div className="lk-hero-actions">

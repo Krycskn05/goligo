@@ -65,8 +65,10 @@ test('the learner\'s Goliqo logo and animations are used in many places',()=>{
  // The waving mascot and the big waving logo where the old Koko pictures were, and more.
  // The welcome box on the home page has no mascot or logo any more (the learner removed it).
  const tour=read('app/home-tour.tsx');assert.ok(!tour.includes('BrandMascot')&&!tour.includes('ht-koko')&&!tour.includes('koko-mascot'));
- // The introduction page has no big waving logo above its title any more (the learner removed it, 21 October 2026).
+ // The introduction page has no big waving logo and no "Ücretsiz Almanca ve İngilizce" line above its title any more
+ // (the learner removed both, 21 October 2026).
  assert.ok(!read('app/landing.tsx').includes('BrandLogoWave')&&!logo.includes('BrandLogoWave')&&!logo.includes('goliqo-logo-el-salla'));
+ assert.ok(!read('app/landing.tsx').includes('landingEyebrow')&&!read('lib/public-copy.ts').includes('landingEyebrow'));
  for(const page of ['app/giris/page.tsx','app/uye-ol/page.tsx'])assert.ok(read(page).includes('<BrandMascot className="lk-auth-mascot"/>'),page);
  assert.ok(read('app/account-panel.tsx').includes('<BrandMascot className="lk-account-mascot"/>'));
  assert.equal((read('app/ausbildung-study.tsx').match(/<BrandMascot className="l12-koko"\/>/g)||[]).length,2);

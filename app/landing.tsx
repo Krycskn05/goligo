@@ -2,6 +2,7 @@ import {BookOpen,CheckCircle2,Headphones,Languages,RotateCcw,Sparkles} from 'luc
 import {SITE_NAME} from '@/lib/site-brand';
 import {PublicHeader} from './public-shell';
 import {SiteFooter} from './site-footer';
+import {BrandLogoWave} from './site-logo';
 
 const features=[
  {img:'/toon/objects-hero.webp',title:'Nesne Kasası',text:'Evdeki, mutfaktaki ve işteki eşyaların adlarını özgün resimlerle öğren. Almanca ya da İngilizce çalışabilirsin.'},
@@ -24,6 +25,7 @@ export default function Landing(){
   <main id="main" tabIndex={-1} className="lk-public-main">
    <section className="lk-hero" aria-labelledby="lk-hero-title">
     <div className="lk-hero-text">
+     <BrandLogoWave className="lk-hero-logo"/>
      <p className="lk-eyebrow">Ücretsiz Almanca ve İngilizce</p>
      <h1 id="lk-hero-title">Almancayı resimlerle, sesle ve küçük adımlarla öğren.</h1>
      <p className="lk-lead">{SITE_NAME}&apos;da kelimeleri resimli kartlarla tanır, testle pekiştirir, harf bulmacasıyla yazarsın. Üye ol, ilerlemen kaybolmasın.</p>

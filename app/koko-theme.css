@@ -247,3 +247,27 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 .object-breadcrumb > :last-child:not(a):not(svg) { display:inline-flex; align-items:center; min-height:34px; padding:6px 13px; border-radius:999px; background:linear-gradient(180deg,#ffdb76,#f6b23c); color:#4a2a00; box-shadow:0 2px 0 #e59a1d; }
 @media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:32px; padding:5px 11px; } }
 @media (prefers-reduced-motion:reduce) { .object-breadcrumb a { transition:none; } .object-breadcrumb a:hover { transform:none; } }
+
+/* Goliqo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
+   shown 248 px wide); the waving mascot and the big waving logo stand in for the old Koko pictures. */
+img.site-logo-art { aspect-ratio:372/136; object-fit:contain; }
+.brand-mascot { display:block; height:auto; object-fit:contain; pointer-events:none; user-select:none; }
+.brand-logo-wave { display:block; height:auto; pointer-events:none; user-select:none; }
+.ht-koko.brand-mascot { width:170px; animation:none; }
+.lk-hero-logo { width:min(340px,100%); margin:-8px 0 10px -10px; }
+.lk-auth-card { position:relative; }
+.lk-auth-mascot { width:118px; margin:-10px auto 4px; }
+.lk-account-head { position:relative; }
+.lk-account-mascot { position:absolute; top:14px; inset-inline-end:18px; width:120px; }
+.lk-account-head h1,.lk-account-head p { padding-inline-end:130px; }
+.l12-koko.brand-mascot { width:100%; height:100%; }
+.l12-results-head .l12-koko.brand-mascot { width:130px; height:auto; animation:none; }
+.site-footer-logo { display:block; width:96px; height:auto; }
+@media (max-width:760px) {
+ .ht-koko.brand-mascot { width:132px; }
+ .lk-hero-logo { width:min(260px,100%); margin:0 0 8px -6px; }
+ .lk-auth-mascot { width:96px; }
+ .lk-account-mascot { width:86px; top:10px; inset-inline-end:10px; }
+ .lk-account-head h1,.lk-account-head p { padding-inline-end:90px; }
+ .l12-results-head .l12-koko.brand-mascot { width:104px; }
+}

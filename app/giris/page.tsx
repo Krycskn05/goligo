@@ -3,6 +3,7 @@ import {SITE_CONTACT_EMAIL,SITE_NAME} from '@/lib/site-brand';
 import {safeReturnTo} from '@/lib/member-auth';
 import AuthForm from '../auth-form';
 import {PublicPage} from '../public-shell';
+import {BrandMascot} from '../site-logo';
 export const dynamic='force-dynamic';
 export const metadata:Metadata={title:`Giriş yap · ${SITE_NAME}`,description:`${SITE_NAME} hesabına e-posta adresin ve şifrenle giriş yap.`};
 type Search=Promise<Record<string,string|string[]|undefined>>;
@@ -11,6 +12,7 @@ export default async function SignInPage({searchParams}:{searchParams:Search}){
  const registerHref=returnTo==='/'?'/uye-ol':`/uye-ol?return_to=${encodeURIComponent(returnTo)}`;
  return <PublicPage narrow>
   <section className="lk-auth-card" aria-labelledby="auth-title">
+   <BrandMascot className="lk-auth-mascot"/>
    <h1 id="auth-title">Giriş yap</h1>
    <p className="lk-auth-lead">{returnTo==='/'?'Kaldığın yerden devam etmek için giriş yap.':'Bu sayfayı açmak için giriş yap.'}</p>
    <AuthForm mode="login" returnTo={returnTo}/>

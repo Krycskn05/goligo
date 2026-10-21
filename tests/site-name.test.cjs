@@ -11,6 +11,8 @@ test('the site name is Goliqo everywhere a learner can see it',()=>{
  const manifest=JSON.parse(read('public/manifest.json'));
  assert.equal(manifest.name,'Goliqo');assert.equal(manifest.short_name,'Goliqo');
  assert.ok(read('public/favicon.svg').includes('<title>Goliqo</title>'));
+ // The browser tab shows only the name (the learner removed "Almanca ve İngilizce Eğitimi").
+ const layout=read('app/layout.tsx');assert.ok(layout.includes('  title: SITE_NAME,')&&!layout.includes('İngilizce Eğitimi'));
  for(const file of [...walk('app'),...walk('lib')].filter(file=>/\.(tsx?|json|css)$/.test(file)))
   assert.ok(!read(file).includes('LernKoko'),file+' still says LernKoko');
  const home=read('lib/home-copy.ts');
@@ -21,12 +23,41 @@ test('the site name is Goliqo everywhere a learner can see it',()=>{
  assert.ok(read('app/api/auth/route.ts').includes('filename="goliqo-verilerim.json"'));
 });
 
-test('the logo shows the book mascot with the word Goliqo',()=>{
- assert.ok(read('app/site-logo.tsx').includes('<image href="/branding/goliqo-logo.png" x="0" y="0" width="1536" height="1024"/>'));
- const png=fs.readFileSync('public/branding/goliqo-logo.png');
- assert.equal(png.toString('ascii',1,4),'PNG');
- assert.deepEqual([png.readUInt32BE(16),png.readUInt32BE(20)],[1536,1024],'same frame as the old logo, so the header crop stays');
- assert.equal(png[25],6,'RGBA: a clear background');
+/** Width, height, frame count and loop count of a WebP file. */
+function webp(file){
+ const data=fs.readFileSync(file);let frames=0,size=null,loop=null;
+ assert.equal(data.toString('ascii',8,12),'WEBP',file);
+ for(let at=12;at+8<=data.length;){
+  const tag=data.toString('ascii',at,at+4),length=data.readUInt32LE(at+4);
+  if(tag==='VP8X')size=[1+data.readUIntLE(at+12,3),1+data.readUIntLE(at+15,3)];
+  if(tag==='ANIM')loop=data.readUInt16LE(at+12);
+  if(tag==='ANMF')frames++;
+  at+=8+length+(length&1);
+ }
+ return {size,frames,loop,bytes:data.length};
+}
+
+test('the learner\'s Goliqo logo and animations are used in many places',()=>{
+ // The learner's own logo files (ChatGPT): a still logo, the gold ball bouncing onto the "i", the mascot waving.
+ const logo=read('app/site-logo.tsx');
+ for(const [file,size,frames,loop] of [['goliqo-logo.webp',[372,136],0,null],['goliqo-logo-zipla.webp',[372,136],64,1],['goliqo-logo-el-salla.webp',[480,176],50,0],['goliqo-logo-buyuk.webp',[480,176],0,null],['goliqo-maskot-el-salla.webp',[240,181],50,0],['goliqo-maskot.webp',[240,181],0,null]]){
+  const info=webp('public/branding/'+file);
+  assert.deepEqual(info.size,size,file);assert.equal(info.frames,frames,file);if(loop!==null)assert.equal(info.loop,loop,file+' loop');
+  assert.ok(info.bytes<700*1024,file+' stays small: '+info.bytes);
+  assert.ok(logo.includes("'/branding/"+file+"'"),file+' is used');
+ }
+ // Header (every page): the still logo; the bounce plays once on the first page of a visit, after the page is ready.
+ assert.ok(logo.includes('<img className="site-logo-art" src={bounce&&motion?BRAND.logoBounce:BRAND.logo} alt="" width={372} height={136}'));
+ assert.ok(logo.includes("try{if(sessionStorage.getItem(BOUNCE_KEY))return;}catch{return;}")&&logo.includes('image.src=BRAND.logoBounce;'));
+ assert.ok(logo.includes('return ready&&motion;'),'animations only with motion on, after the still picture');
+ // The waving mascot and the big waving logo where the old Koko pictures were, and more.
+ assert.ok(read('app/home-tour.tsx').includes('<BrandMascot className="ht-koko"/>'));
+ assert.ok(read('app/landing.tsx').includes('<BrandLogoWave className="lk-hero-logo"/>'));
+ for(const page of ['app/giris/page.tsx','app/uye-ol/page.tsx'])assert.ok(read(page).includes('<BrandMascot className="lk-auth-mascot"/>'),page);
+ assert.ok(read('app/account-panel.tsx').includes('<BrandMascot className="lk-account-mascot"/>'));
+ assert.equal((read('app/ausbildung-study.tsx').match(/<BrandMascot className="l12-koko"\/>/g)||[]).length,2);
+ assert.ok(read('app/site-footer.tsx').includes('<img className="site-footer-logo" src="/branding/goliqo-logo.webp"'));
+ for(const file of ['app/home-tour.tsx','app/ausbildung-study.tsx'])assert.ok(!read(file).includes('koko-mascot.png'),file);
 });
 
 test('internal names stay, so saved settings, sign-ins and data keep working',()=>{

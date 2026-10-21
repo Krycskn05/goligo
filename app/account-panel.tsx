@@ -1,6 +1,7 @@
 'use client';
 import {useState,type FormEvent,type ReactNode} from 'react';
 import {Download,KeyRound,Loader2,LogOut,Trash2,UserRound} from 'lucide-react';
+import {BrandMascot} from './site-logo';
 
 type Props={name:string;email:string;since:string};
 type Result={ok?:boolean;error?:string;field?:string;name?:string};
@@ -42,6 +43,7 @@ export default function AccountPanel({name:initialName,email,since}:Props){
  const spin=(key:string)=>busy===key?<Loader2 className="lk-spin" size={18} aria-hidden="true"/>:null;
  return <div className="lk-account" data-account>
   <header className="lk-account-head">
+   <BrandMascot className="lk-account-mascot"/>
    <h1>Hesabım</h1>
    <p><strong data-account-name>{name}</strong><span data-account-email>{email}</span><small>{since} tarihinden beri üye</small></p>
    <div className="lk-account-actions"><a className="btn small" href="/">Derslere dön</a><button type="button" className="btn secondary small" onClick={()=>void logout()} disabled={!!busy} data-account-logout>{spin('logout')||<LogOut size={17} aria-hidden="true"/>}Çıkış yap</button></div>

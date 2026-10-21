@@ -15,7 +15,8 @@ import "./paul-hoca.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} · Almanca ve İngilizce Eğitimi`,
+  // Only the site name in the browser tab (the learner removed the tagline after it).
+  title: SITE_NAME,
   applicationName: SITE_NAME,
   description: "Almanca ve İngilizce eğitim seçenekleri, ünite ve konu başlıkları, özgün resimli Nesne Kasası, testler ve harf bulmacaları. Learn German and English with picture vocabulary tests and letter puzzles.",
   // Koko on a dark background: browser tab, phone home screen (apple-touch-icon) and installed app (manifest).

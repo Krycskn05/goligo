@@ -139,7 +139,9 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse}:{langu
   }catch(e){fail(e,'saveError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
- function next(){if(mutation.current||!session||!feedback)return;stopFeedback();setIndex(i=>i+1);clearAnswer();focus();if(index+1>=session.questions.length){answerAudio.complete();void refresh();}}
+ // "Sonraki dinleme" (listening round): the next word is heard at once, as the learner asked; it is started in this tap
+ // so phones allow the sound, and the picture choices open after it as with the listen button.
+ function next(){if(mutation.current||!session||!feedback)return;stopFeedback();const following=session.mode==='listen'?questionMap.get(session.questions[index+1]?.id??''):undefined;setIndex(i=>i+1);clearAnswer();focus();if(following?.audio){setHeardQuestionId(following.id);speech.speak(following.audio);}if(index+1>=session.questions.length){answerAudio.complete();void refresh();}}
  const options=q?(session?.questions[index]?.options??q.options??[]):[];
  // Word puzzles: the learner chooses der/die/das and spells the noun (the article is no longer given away).
  const articleSplit=course==='de'&&session?.mode==='write'&&q&&!articleQuestion?/^(der|die|das) (.+)$/.exec(q.answer):null;

@@ -13,6 +13,7 @@ import {useLanguageSwitch} from './language-switch';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
+import {BrandMascot} from './site-logo';
 import {RasterArt,TopicArt} from './toon-art';
 import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
 import {ProgressMeter} from './progress-ui';
@@ -22,11 +23,10 @@ import {LISTEN_CHANGED,ListenTask,listenResult,tasksByNumber,useListenPlayer} fr
 
 const unit=courseUnits.find(item=>item.id==='book-12')!;
 const partParam=(value:string|null):L12PartId|null=>value&&lessonPartMap.has(value as L12PartId)?value as L12PartId:null;
-export const KOKO_SRC='/branding/koko-mascot.png';
-/** The picture of each part (public/toon/lektion12); the „Alles klar?" test shows Koko. */
+/** The picture of each part (public/toon/lektion12); the „Alles klar?" test shows the Goliqo mascot waving. */
 function PartArt({part}:{part:L12Part}){
  const picture=partPictures[part.id];
- return picture?<RasterArt art={picture} title={part.de}/>:<img className="l12-koko" src={KOKO_SRC} alt="" width={400} height={329}/>;
+ return picture?<RasterArt art={picture} title={part.de}/>:<BrandMascot className="l12-koko"/>;
 }
 const stepLabel:Record<L12Step,string>={kelimeler:'Kelimeler',konu:'Konu anlatımı',alistirmalar:'Alıştırmalar',dinleme:'Dinleme'};
 const stepGo:Record<L12Step,string>={kelimeler:'Kelimelere geç',konu:'Konu anlatımına geç',alistirmalar:'Alıştırmalara geç',dinleme:'Dinlemeye geç'};
@@ -243,7 +243,7 @@ function Results({part,scores,onJump,onOpen,language}:{part:L12Part;scores:L12Sc
  const percent=test?Math.round(test.points*100/test.max):progress.percent;
  const praise=!progress.tried?'Alıştırmaları yaptıkça sonuçların burada görünür.':left?`Güzel gidiyor! ${left} alıştırma daha var.`:percent>=90?'Harika iş çıkardın!':percent>=60?'Çok iyi, biraz daha tekrar!':'Yanlışlara bir daha bak, sonra tekrar dene.';
  return <section className="panel object-results l12-results" aria-labelledby="l12-results">
-  <div className="l12-results-head"><img className="l12-koko" src={KOKO_SRC} alt="" width={400} height={329}/><div><span className="eyebrow" lang="de">{part.de}</span><h2 id="l12-results" tabIndex={-1}>{praise}</h2>
+  <div className="l12-results-head"><BrandMascot className="l12-koko"/><div><span className="eyebrow" lang="de">{part.de}</span><h2 id="l12-results" tabIndex={-1}>{praise}</h2>
    {test?<p className="vault-result-score">{String(test.points).replace('.',',')} / {test.max} Punkte</p>:<p className="vault-result-score">{progress.learned} / {progress.total} doğru</p>}</div></div>
   {!test&&<ProgressMeter progress={progress} language={language} label={part.de}/>}
   <ol className="l12-result-list">{part.exercises.map((exercise,i)=>{const score=scores[exercise.id];const count=exerciseAnswerCount(exercise);const perfect=!!score&&score.right>=score.total;return <li key={exercise.id}><button type="button" onClick={()=>onJump(i)}>

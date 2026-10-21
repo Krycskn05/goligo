@@ -21,7 +21,7 @@
 .lk-section > h2 { font-size:clamp(24px,3vw,32px); margin:0 0 18px; text-align:center; }
 .lk-features { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
 .lk-feature { background:#fff; border-radius:24px; box-shadow:var(--soft); overflow:hidden; display:flex; flex-direction:column; }
-.lk-feature img { width:100%; aspect-ratio:16/10; object-fit:cover; background:var(--sky-1); display:block; }
+.lk-feature img { width:100%; height:auto; aspect-ratio:2/1; object-fit:contain; background:#fef5e2; display:block; }
 .lk-feature div { padding:18px 20px 22px; }
 .lk-feature h3 { margin:0 0 6px; font-size:21px; }
 .lk-feature p { margin:0; color:var(--ink-2); }
@@ -83,7 +83,9 @@
 .lk-legal strong { color:var(--ink); }
 .lk-legal-date { color:var(--ink-3) !important; font-size:15px; margin:0 0 18px; }
 .lk-legal code { background:var(--sky-1); padding:1px 6px; border-radius:6px; font-size:.92em; }
-.site-footer-links { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+.site-footer-links { display:flex; gap:4px 8px; flex-wrap:wrap; justify-content:center; }
+/* Big enough to tap on a phone (about 40px high). */
+.site-footer-links a { display:inline-flex; align-items:center; min-height:40px; padding:0 8px; border-radius:10px; }
 
 @media (max-width:860px) {
  .lk-hero { grid-template-columns:1fr; padding:24px 20px; border-radius:26px; }

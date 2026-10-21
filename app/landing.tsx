@@ -4,10 +4,11 @@ import {PublicHeader} from './public-shell';
 import {SiteFooter} from './site-footer';
 import {BrandLogoWave} from './site-logo';
 
+// The same pictures as the cards on the home page (the learner's menu pictures).
 const features=[
- {img:'/toon/objects-hero.webp',title:'Nesne Kasası',text:'Evdeki, mutfaktaki ve işteki eşyaların adlarını özgün resimlerle öğren. Almanca ya da İngilizce çalışabilirsin.'},
- {img:'/verbs/anrufen.webp',title:'Fiil Atölyesi',text:'Fiiller tek tek ilerler: kart, anlam testi, yazım, geçmiş hali (Partizip II) ve onun yazımı. Yanlışlarını ayrı bir turda yeniden çalışırsın.'},
- {img:'/toon/learning-topics-hero.webp',title:'A1.1 ve A1.2 konuları',text:'Ünite ünite konular ve Ev ve Yaşam alıştırmaları: test, yazarak pekiştirme ve harf bulmacaları.'},
+ {img:'/toon/home/vault.webp',title:'Nesne Kasası',text:'Evdeki, mutfaktaki ve işteki eşyaların adlarını özgün resimlerle öğren. Almanca ya da İngilizce çalışabilirsin.'},
+ {img:'/toon/home/verbs.webp',title:'Fiil Atölyesi',text:'Fiiller tek tek ilerler: kart, anlam testi, yazım, geçmiş hali (Partizip II) ve onun yazımı. Yanlışlarını ayrı bir turda yeniden çalışırsın.'},
+ {img:'/toon/home/units.webp',title:'A1.1 ve A1.2 konuları',text:'Ünite ünite konular ve Ev ve Yaşam alıştırmaları: test, yazarak pekiştirme ve harf bulmacaları.'},
 ];
 const perks=[
  {icon:Headphones,text:'Cevaptan sonra doğru cevabın söylenişini duyarsın.'},
@@ -42,7 +43,7 @@ export default function Landing(){
     <h2 id="lk-features-title">Neler var?</h2>
     <div className="lk-features">
      {features.map(item=><article key={item.title} className="lk-feature">
-      <img src={item.img} alt="" loading="lazy"/>
+      <img src={item.img} alt="" width={1200} height={600} loading="lazy"/>
       <div><h3>{item.title}</h3><p>{item.text}</p></div>
      </article>)}
     </div>

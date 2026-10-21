@@ -58,9 +58,11 @@
  .nb-tabs button:hover:not(.active) { transform:translateY(6px); }
  .nb-tabs strong { font-size:21px; }
  .nb-tabs span { font-size:14px; }
- .nb-spiral { inset-inline-start:14px; inset-inline-end:14px; }
- .nb-page { padding:40px 16px 26px 40px; background:linear-gradient(90deg,transparent 26px,var(--nb-margin) 26px,var(--nb-margin) 28px,transparent 28px),repeating-linear-gradient(180deg,transparent 0 33px,var(--nb-line) 33px 34px); }
- [dir=rtl] .nb-page { padding:40px 40px 26px 16px; background:linear-gradient(270deg,transparent 26px,var(--nb-margin) 26px,var(--nb-margin) 28px,transparent 28px),repeating-linear-gradient(180deg,transparent 0 33px,var(--nb-line) 33px 34px); }
+ /* Phone: the two tabs fill the width, so the spiral rings would sit on them; the tabs alone top the notebook. */
+ .nb-tabs { position:relative; top:auto; inset-inline-end:auto; z-index:3; }
+ .nb-spiral { display:none; }
+ .nb-page { padding:30px 16px 26px 40px; background:linear-gradient(90deg,transparent 26px,var(--nb-margin) 26px,var(--nb-margin) 28px,transparent 28px),repeating-linear-gradient(180deg,transparent 0 33px,var(--nb-line) 33px 34px); }
+ [dir=rtl] .nb-page { padding:30px 40px 26px 16px; background:linear-gradient(270deg,transparent 26px,var(--nb-margin) 26px,var(--nb-margin) 28px,transparent 28px),repeating-linear-gradient(180deg,transparent 0 33px,var(--nb-line) 33px 34px); }
  .nb-title { font-size:24px; margin-bottom:22px; }
  .nb-grid { grid-template-columns:minmax(0,1fr); gap:28px; }
  .nb-photo { height:200px; }

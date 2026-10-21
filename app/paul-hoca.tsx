@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {EFFECTS_CHANGED,EFFECTS_KEY,motionAllowed,playLearningSound} from '@/lib/learning-effects';
 import type {PaulSoundId} from '@/lib/effect-sounds';
 
@@ -59,31 +59,37 @@ export function PaulHoca({pose,className='',sound,once}:{pose:PaulPose;className
 const QUIET_PAGES=/^\/(yonetim|giris|uye-ol|gizlilik|kullanim-kosullari)(\/|$)/;
 /** First visit 9 s after a page opens, then one every 75 s: every other visit he waves (so a wave every 2.5 min). */
 export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_GAP_MS=PEEK_EVERY_MS/2,PEEK_SHOW_MS=3600;
-/** Where he comes from, in turn: the bottom corners, the middle of the bottom edge and both sides of the screen. */
-export const PEEK_SPOTS=['bottom-right','left','bottom-center','right','bottom-left'] as const;
+/** The four edges of the screen he comes from: from the top he hangs upside down, from a side he leans in sideways,
+ * always with his head towards the middle of the screen (the learner asked). */
+export const PEEK_EDGES=['bottom','top','left','right'] as const;
+export type PeekEdge=typeof PEEK_EDGES[number];
 /** Between two waves he shows one of his other animations, in turn (the raised finger stays for wrong answers). */
 export const PEEK_OTHER_POSES:readonly PaulPose[]=['correct','cheer','think','tip','desk'];
-const VISIT_KEY='lernkoko-paul-visit';
+const VISIT_KEY='lernkoko-paul-visit',EDGE_KEY='lernkoko-paul-edge';
 /** The n-th visit in this browser session: even visits wave, odd ones bring the next other animation. */
-export function peekVisit(n:number):{pose:PaulPose;spot:typeof PEEK_SPOTS[number]}{
- return {pose:n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length],spot:PEEK_SPOTS[n%PEEK_SPOTS.length]};
+export function peekPose(n:number):PaulPose{return n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length];}
+/** Any point of any edge (12–88 % along it), never the same edge twice in a row. `random` is Math.random in the page. */
+export function peekPlace(lastEdge:string|null,random:()=>number=Math.random):{edge:PeekEdge;at:number}{
+ const edges=PEEK_EDGES.filter(edge=>edge!==lastEdge);
+ return {edge:edges[Math.floor(random()*edges.length)%edges.length],at:Math.round(12+random()*76)};
 }
 /** Something is going on (Paul's answer badge, a speaking voice, an open window): Paul waits for a quieter moment. */
 function busyScreen(){
- if(document.hidden||document.querySelector('.lk-reaction-layer,dialog[open],.ig-backdrop'))return true;
+ if(document.hidden||document.querySelector('.lk-reaction-layer,dialog[open],.ig-backdrop,.sg-backdrop'))return true;
  try{if(window.speechSynthesis?.speaking||window.speechSynthesis?.pending)return true;}catch{}
  return [...document.querySelectorAll('audio')].some(audio=>!audio.paused);
 }
 /**
- * Now and then Paul pops up somewhere on the screen (9 s after a page opens, then every 75 s): from a bottom corner,
- * the middle of the bottom edge or one side, each time from another place. Every other visit he waves; in between he
- * shows his other animations in turn (thumbs up, clapping, thinking, pointing at his board, drumming on the desk).
- * He never blocks a tap (pointer-events: none), waits while something else is happening, stays away when motion is
- * off, and says hello with a sound only on his first visit in a browser session; the other visits are silent.
+ * Now and then Paul pops up somewhere on the screen (9 s after a page opens, then every 75 s): from any point of any
+ * edge — bottom, top, left or right, never the same edge twice in a row — turned so that his head points into the
+ * screen (upside down from the top). Every other visit he waves; in between he shows his other animations in turn
+ * (thumbs up, clapping, thinking, pointing at his board, drumming on the desk). He never blocks a tap
+ * (pointer-events: none), waits while something else is happening, stays away when motion is off, and says hello with
+ * a sound only on his first visit in a browser session; the other visits are silent.
  */
 export function PaulPeek(){
  const motion=usePaulMotion();
- const [visit,setVisit]=useState<{n:number;pose:PaulPose;spot:string}|null>(null);
+ const [visit,setVisit]=useState<{n:number;pose:PaulPose;edge:PeekEdge;at:number}|null>(null);
  const timers=useRef<ReturnType<typeof setTimeout>[]>([]);
  useEffect(()=>{
   if(!motion||QUIET_PAGES.test(window.location.pathname))return;
@@ -91,17 +97,19 @@ export function PaulPeek(){
   const count=()=>{try{return Number(sessionStorage.getItem(VISIT_KEY))||0;}catch{return 0;}};
   const peek=()=>{
    if(busyScreen()){later(peek,12000);return;}
-   const n=count();const next=peekVisit(n);
-   try{sessionStorage.setItem(VISIT_KEY,String(n+1));}catch{}
-   setVisit({n,...next});
-   if(next.pose==='hello')try{if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}}catch{}
+   const n=count();const pose=peekPose(n);
+   let last:string|null=null;try{last=sessionStorage.getItem(EDGE_KEY);}catch{}
+   const place=peekPlace(last);
+   try{sessionStorage.setItem(VISIT_KEY,String(n+1));sessionStorage.setItem(EDGE_KEY,place.edge);}catch{}
+   setVisit({n,pose,...place});
+   if(pose==='hello')try{if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}}catch{}
    // Fetch the next animation early, so it is ready when he comes again.
-   try{const image=new Image();image.src=PAUL_PICTURES[peekVisit(n+1).pose];}catch{}
+   try{const image=new Image();image.src=PAUL_PICTURES[peekPose(n+1)];}catch{}
    later(()=>setVisit(null),PEEK_SHOW_MS);later(peek,PEEK_GAP_MS);
   };
   later(peek,PEEK_FIRST_MS);
   return()=>{timers.current.forEach(clearTimeout);timers.current=[];setVisit(null);};
  },[motion]);
  if(!visit)return null;
- return <div key={visit.n} className={'paul-peek peek-'+visit.spot+' pose-'+visit.pose} aria-hidden="true"><img src={PAUL_PICTURES[visit.pose]} alt="" width={224} height={224} decoding="async" draggable={false}/></div>;
+ return <div key={visit.n} className={'paul-peek edge-'+visit.edge+' pose-'+visit.pose} style={{'--peek-at':visit.at+'%'} as CSSProperties} aria-hidden="true"><img src={PAUL_PICTURES[visit.pose]} alt="" width={224} height={224} decoding="async" draggable={false}/></div>;
 }

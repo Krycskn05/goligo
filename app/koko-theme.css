@@ -189,11 +189,11 @@ strong { font-weight:700; }
 }
 @media (prefers-reduced-motion:reduce) { .vault-category-card:hover,.toon-topic-card:hover,.toon-app .btn:hover:enabled,.object-option:hover:enabled,.practice-mode-button:hover:enabled { transform:none; } }
 
-/* Header: Koko says hello. Pale sky, colourful round buttons and a few small stars (no clouds). */
-.toon-app .work-header.site-header,.work-header.logo-header.site-header { position:relative; overflow:hidden; background:linear-gradient(180deg,#dff0ff 0,#f3f9ff 55%,#fff 100%); }
-.site-greeting { position:relative; margin:0; padding:8px 13px; background:#fff; border:2px solid #cfe3f7; border-radius:18px; box-shadow:0 4px 0 #e2eef9; color:var(--ink-2); font-size:14px; line-height:1.35; font-weight:500; max-width:280px; }
+/* Header: the Goliqo logo on a warm beige base (the learner asked), colourful round buttons and a few small stars. */
+.toon-app .work-header.site-header,.work-header.logo-header.site-header { position:relative; overflow:hidden; background:linear-gradient(180deg,#f5e4c3 0,#f9ecd3 55%,#fcf4e4 100%); border-color:#efdcb7; box-shadow:0 10px 26px rgba(150,110,50,.12),inset 0 1px 0 #fff8ea; }
+.site-greeting { position:relative; margin:0; padding:8px 13px; background:#fff; border:2px solid #ead7b0; border-radius:18px; box-shadow:0 4px 0 #eedfc2; color:var(--ink-2); font-size:14px; line-height:1.35; font-weight:500; max-width:280px; }
 .site-greeting b { display:block; color:var(--blue-2); font-size:17px; font-weight:800; }
-.site-greeting::before { content:''; position:absolute; inset-inline-start:-10px; top:20px; border:8px solid transparent; border-inline-end-color:#cfe3f7; }
+.site-greeting::before { content:''; position:absolute; inset-inline-start:-10px; top:20px; border:8px solid transparent; border-inline-end-color:#ead7b0; }
 .site-greeting::after { content:''; position:absolute; inset-inline-start:-6px; top:21px; border:7px solid transparent; border-inline-end-color:#fff; }
 .site-sparkle { position:absolute; pointer-events:none; width:16px; height:16px; background:#ffc94a; clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); animation:koko-twinkle 3.2s ease-in-out infinite; }
 .site-sparkle.one { top:12px; inset-inline-end:22px; }
@@ -245,7 +245,7 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 .object-breadcrumb a:first-child[href^="/?"]::before,.object-breadcrumb a:first-child[href="/"]::before { content:""; flex:none; width:16px; height:16px; background:currentColor; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5 12 4l9 7.5'/%3E%3Cpath d='M5.5 10v9.5h13V10'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5 12 4l9 7.5'/%3E%3Cpath d='M5.5 10v9.5h13V10'/%3E%3C/svg%3E") center/contain no-repeat; }
 .object-breadcrumb > svg,.object-breadcrumb > span[aria-hidden="true"] { flex:none; color:#9fb3c6; font-size:16px; }
 .object-breadcrumb > :last-child:not(a):not(svg) { display:inline-flex; align-items:center; min-height:34px; padding:6px 13px; border-radius:999px; background:linear-gradient(180deg,#ffdb76,#f6b23c); color:#4a2a00; box-shadow:0 2px 0 #e59a1d; }
-@media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:32px; padding:5px 11px; } }
+@media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:38px; padding:5px 12px; } }
 @media (prefers-reduced-motion:reduce) { .object-breadcrumb a { transition:none; } .object-breadcrumb a:hover { transform:none; } }
 
 /* Goliqo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,
@@ -263,6 +263,8 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
 .l12-koko.brand-mascot { width:100%; height:100%; }
 .l12-results-head .l12-koko.brand-mascot { width:130px; height:auto; animation:none; }
 .site-footer-logo { display:block; width:96px; height:auto; }
+/* Phone: the footer is one centred column (logo, ©, rights, links), so nothing wraps unevenly. */
+@media (max-width:600px) { .site-copyright { flex-direction:column; gap:4px; text-align:center; } .site-footer-logo { margin-bottom:4px; } }
 @media (max-width:760px) {
  .ht-koko.brand-mascot { width:132px; }
  .lk-hero-logo { width:min(260px,100%); margin:0 0 8px -6px; }
@@ -296,7 +298,7 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
 .site-greeting-words { display:grid; gap:1px; min-width:0; }
 .site-greeting-button .analog-clock { width:60px; height:60px; flex:none; filter:drop-shadow(0 3px 4px rgba(13,159,173,.22)); }
 .site-greeting-time { color:var(--ink); font-weight:800; font-size:15px; }
-.site-greeting-button:hover { transform:translateY(-1px); box-shadow:0 5px 0 #d6e8f8; }
+.site-greeting-button:hover { transform:translateY(-1px); box-shadow:0 5px 0 #e6d3ad; }
 .site-greeting-button:focus-visible { outline:3px solid #8cc4ff; outline-offset:2px; }
 .site-greeting-facts { color:var(--ink-3); font-size:12px; font-weight:700; letter-spacing:.01em; }
 .site-greeting-say { color:var(--ink-2); font-weight:600; font-size:13px; min-height:1.35em; animation:sg-say .5s ease both; }
@@ -325,4 +327,38 @@ html[data-lernkoko-motion=reduced] .site-greeting-say { animation:none; }
  .site-greeting-facts { font-size:11px; }
  .sg-backdrop { place-items:end center; padding:0; }
  .sg-panel { width:100%; border-radius:24px 24px 0 0; padding-bottom:calc(18px + env(safe-area-inset-bottom)); }
+}
+
+/* Header layout, the same on every page (the learner asked for a symmetric site that is easy on phones):
+   wide screens one row (logo, speech bubble, site language and buttons); middle widths two full-width rows
+   (logo + bubble, then site language on the left and the buttons on the right); phones three compact rows
+   (logo + buttons, the bubble, the site language). */
+.site-header-buttons { display:flex; align-items:center; gap:10px; }
+@media (min-width:761px) and (max-width:1179px) {
+ .toon-app .work-header.site-header,.work-header.logo-header.site-header { display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-areas:"logo bubble" "tools tools"; align-items:center; column-gap:18px; row-gap:12px; border-radius:30px; }
+ .site-header .site-logo-brand { grid-area:logo; }
+ .site-header .site-greeting { grid-area:bubble; width:auto; max-width:none; justify-self:stretch; }
+ .site-header .site-header-tools { grid-area:tools; margin:0; flex-wrap:nowrap; justify-content:space-between; }
+}
+@media (max-width:760px) {
+ .toon-app .work-header.site-header,.work-header.logo-header.site-header { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"logo buttons" "bubble bubble" "lang lang"; align-items:center; gap:10px; }
+ .site-header .site-logo-brand { grid-area:logo; width:clamp(124px,40vw,176px); }
+ .site-header .site-greeting { grid-area:bubble; width:auto; max-width:none; min-width:0; }
+ .site-header .site-greeting::before,.site-header .site-greeting::after { display:none; }
+ .site-header .site-header-tools { display:contents; }
+ .site-header .site-language { grid-area:lang; width:100%; box-sizing:border-box; }
+ .site-header .site-language select { flex:1; max-width:none; }
+ .site-header .site-header-buttons { grid-area:buttons; gap:8px; }
+}
+
+/* Phones: the left menu becomes two compact columns above the page, and the progress panel moves below the page,
+   so the lesson starts near the top (the learner asked that the site is easy to use on phones). */
+@media (max-width:760px) {
+ .work-layout { display:flex; flex-direction:column; }
+ .work-layout>.work-sidebar { display:contents; }
+ .work-layout>.work-sidebar>nav { order:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:12px 10px 0; padding:0; overflow:visible; }
+ .work-layout>.work-sidebar>.ig { order:1; margin:8px 10px 0; }
+ .work-layout>main { order:2; }
+ .work-layout>.work-sidebar>.sidebar-progress { order:3; margin:0 10px 24px; }
+ .work-sidebar nav .work-nav { min-height:50px; padding:6px 10px; font-size:13px; line-height:1.2; }
 }

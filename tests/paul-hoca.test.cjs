@@ -30,7 +30,7 @@ test('seven small animated pictures of Paul Hoca with a clear background and a s
  }
  // A middle size: about 110–150 px on a computer, smaller on phones.
  const css=read('app/paul-hoca.css');
- for(const rule of ['.paul-peek { position:fixed; right:max(14px,env(safe-area-inset-right)); bottom:0; z-index:55; width:150px; height:150px; pointer-events:none;','.paul-box>.paul-hoca { width:110px; height:110px;','.lk-reaction-paul { display:block; width:140px; height:140px;','.lk-reaction-paul { width:112px; height:112px; }','.paul-peek { width:110px; height:110px; right:8px; }'])assert.ok(css.includes(rule),rule);
+ for(const rule of ['.paul-peek { --peek-size:150px; position:fixed; z-index:55; width:var(--peek-size); height:var(--peek-size); pointer-events:none;','.paul-box>.paul-hoca { width:110px; height:110px;','.lk-reaction-paul { display:block; width:140px; height:140px;','.lk-reaction-paul { width:112px; height:112px; }','.paul-peek { --peek-size:110px; }'])assert.ok(css.includes(rule),rule);
  assert.ok(read('app/layout.tsx').includes('import "./paul-hoca.css";'));
  // Motion off (site setting or the device) → the still frame.
  assert.ok(tsx.includes('<source media="(prefers-reduced-motion: reduce)" srcSet={PAUL_STILL[pose]}/>')&&tsx.includes('src={motion?PAUL_PICTURES[pose]:PAUL_STILL[pose]}'));
@@ -41,14 +41,17 @@ test('Paul pops up all over the screen now and then (waving every other time, hi
  assert.ok(!read('app/home-tour.tsx').includes('PaulHoca'));
  const tsx=read('app/paul-hoca.tsx');
  assert.ok(tsx.includes('export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_GAP_MS=PEEK_EVERY_MS/2,PEEK_SHOW_MS=3600;'),'a visit every 75 s, a wave every 2.5 min');
- assert.ok(tsx.includes("export const PEEK_SPOTS=['bottom-right','left','bottom-center','right','bottom-left'] as const;"));
+ // From any point of any edge, never the same edge twice in a row, head into the screen (the learner asked).
+ assert.ok(tsx.includes("export const PEEK_EDGES=['bottom','top','left','right'] as const;"));
+ assert.ok(tsx.includes("const edges=PEEK_EDGES.filter(edge=>edge!==lastEdge);")&&tsx.includes('at:Math.round(12+random()*76)'));
  assert.ok(tsx.includes("export const PEEK_OTHER_POSES:readonly PaulPose[]=['correct','cheer','think','tip','desk'];"),'all his other animations, the raised finger stays for wrong answers');
- assert.ok(tsx.includes("return {pose:n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length],spot:PEEK_SPOTS[n%PEEK_SPOTS.length]};"));
- assert.ok(tsx.includes("<div key={visit.n} className={'paul-peek peek-'+visit.spot+' pose-'+visit.pose} aria-hidden=\"true\"><img src={PAUL_PICTURES[visit.pose]}"));
+ assert.ok(tsx.includes("export function peekPose(n:number):PaulPose{return n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length];}"));
+ assert.ok(tsx.includes("<div key={visit.n} className={'paul-peek edge-'+visit.edge+' pose-'+visit.pose} style={{'--peek-at':visit.at+'%'} as CSSProperties} aria-hidden=\"true\"><img src={PAUL_PICTURES[visit.pose]}"));
  assert.ok(tsx.includes("later(()=>setVisit(null),PEEK_SHOW_MS);later(peek,PEEK_GAP_MS);"));
  const peekCss=read('app/paul-hoca.css');
- for(const spot of ['bottom-left','bottom-center','right','left'])assert.ok(peekCss.includes('.paul-peek.peek-'+spot+' {'),spot);
- assert.ok(peekCss.includes('@keyframes paul-peek-right')&&peekCss.includes('@keyframes paul-peek-left'));
+ for(const edge of ['bottom','top','left','right'])assert.ok(peekCss.includes('.paul-peek.edge-'+edge+' {')&&peekCss.includes('@keyframes paul-peek-'+edge+' '),edge);
+ // Head into the screen: upside down from the top, sideways from the left and the right.
+ for(const rule of ['.paul-peek.edge-top img { transform:rotate(180deg)','.paul-peek.edge-left img { transform:rotate(90deg)','.paul-peek.edge-right img { transform:rotate(-90deg)'])assert.ok(peekCss.includes(rule),rule);
  assert.ok(tsx.includes("if(busyScreen()){later(peek,12000);return;}")&&tsx.includes("if(!motion||QUIET_PAGES.test(window.location.pathname))return;"));
  assert.ok(tsx.includes("if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}"),'hello sound once per visit');
  assert.ok(read('app/paul-hoca.css').includes('@keyframes paul-peek'));

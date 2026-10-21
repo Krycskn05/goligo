@@ -28,9 +28,11 @@ export function SiteHeader({language,languages,onLanguage,homeHref,homeLabel,sho
   <SiteGreeting language={language} line={pickText(greetingLine,language)}/>
   <div className="site-header-tools">
    <label className="site-language"><Globe size={16} aria-hidden="true"/><span className="site-language-label">{label}</span><select value={language} aria-label={label} onChange={event=>onLanguage(event.target.value)}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label>
-   {showHome&&<a className="object-back site-home" href={homeHref}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
-   <EffectsSettingsButton language={language}/>
-   <a className="site-home site-account" href="/hesabim" aria-label={account} title={account}><UserRound size={19} aria-hidden="true"/></a>
+   <div className="site-header-buttons">
+    {showHome&&<a className="object-back site-home" href={homeHref}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
+    <EffectsSettingsButton language={language}/>
+    <a className="site-home site-account" href="/hesabim" aria-label={account} title={account}><UserRound size={19} aria-hidden="true"/></a>
+   </div>
   </div>
  </header>;
 }

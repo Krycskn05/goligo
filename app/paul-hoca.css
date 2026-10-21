@@ -2,33 +2,25 @@
 .paul-hoca { display:block; flex-shrink:0; width:120px; height:120px; pointer-events:none; user-select:none; }
 .paul-hoca img { display:block; width:100%; height:100%; object-fit:contain; }
 
-/* Now and then Paul pops up somewhere on the screen and goes away again (PaulPeek, 3.6 s): from a bottom corner or
-   the middle of the bottom edge he rises up; from a side he leans in. He never takes a tap (pointer-events:none). */
-.paul-peek { position:fixed; right:max(14px,env(safe-area-inset-right)); bottom:0; z-index:55; width:150px; height:150px; pointer-events:none; animation:paul-peek 3.6s cubic-bezier(.3,1.25,.5,1) both; }
-.paul-peek img { display:block; width:100%; height:100%; object-fit:contain; transform:translateY(6px); filter:drop-shadow(0 6px 14px rgba(28,82,130,.18)); }
-@keyframes paul-peek {
- 0% { transform:translateY(105%) rotate(4deg); }
- 13% { transform:translateY(-3%) rotate(-2deg); }
- 19%,82% { transform:translateY(0) rotate(0); }
- 100% { transform:translateY(105%) rotate(3deg); }
-}
-.paul-peek.peek-bottom-left { right:auto; left:max(14px,env(safe-area-inset-left)); }
-.paul-peek.peek-bottom-center { right:auto; left:calc(50% - 75px); }
-.paul-peek.peek-right { bottom:auto; top:38vh; right:0; animation-name:paul-peek-right; }
-.paul-peek.peek-left { bottom:auto; top:38vh; right:auto; left:0; animation-name:paul-peek-left; }
-.paul-peek.peek-right img,.paul-peek.peek-left img { transform:none; }
-@keyframes paul-peek-right {
- 0% { transform:translateX(110%) rotate(-10deg); }
- 13% { transform:translateX(-4%) rotate(-7deg); }
- 19%,82% { transform:translateX(6%) rotate(-8deg); }
- 100% { transform:translateX(110%) rotate(-10deg); }
-}
-@keyframes paul-peek-left {
- 0% { transform:translateX(-110%) rotate(10deg); }
- 13% { transform:translateX(4%) rotate(7deg); }
- 19%,82% { transform:translateX(-6%) rotate(8deg); }
- 100% { transform:translateX(-110%) rotate(10deg); }
-}
+/* Now and then Paul pops up at any point of any edge and goes away again (PaulPeek, 3.6 s), turned so that his head
+   points into the screen: from the bottom upright, from the top upside down, from the left and the right sideways.
+   --peek-at is where along the edge (12–88 %). He never takes a tap (pointer-events:none). */
+.paul-peek { --peek-size:150px; position:fixed; z-index:55; width:var(--peek-size); height:var(--peek-size); pointer-events:none; animation:3.6s cubic-bezier(.3,1.25,.5,1) both; }
+.paul-peek img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 6px 14px rgba(28,82,130,.18)); }
+.paul-peek.edge-bottom,.paul-peek.edge-top { left:clamp(8px,calc(var(--peek-at) - var(--peek-size)/2),calc(100vw - var(--peek-size) - 8px)); }
+.paul-peek.edge-left,.paul-peek.edge-right { top:clamp(8px,calc(var(--peek-at) - var(--peek-size)/2),calc(100vh - var(--peek-size) - 8px)); }
+.paul-peek.edge-bottom { bottom:0; animation-name:paul-peek-bottom; }
+.paul-peek.edge-top { top:0; animation-name:paul-peek-top; }
+.paul-peek.edge-left { left:0; animation-name:paul-peek-left; }
+.paul-peek.edge-right { right:0; animation-name:paul-peek-right; }
+.paul-peek.edge-bottom img { transform:translateY(6px); }
+.paul-peek.edge-top img { transform:rotate(180deg) translateY(6px); }
+.paul-peek.edge-left img { transform:rotate(90deg) translateY(6px); }
+.paul-peek.edge-right img { transform:rotate(-90deg) translateY(6px); }
+@keyframes paul-peek-bottom { 0% { transform:translateY(105%) rotate(4deg); } 13% { transform:translateY(-3%) rotate(-2deg); } 19%,82% { transform:translateY(0) rotate(0); } 100% { transform:translateY(105%) rotate(3deg); } }
+@keyframes paul-peek-top { 0% { transform:translateY(-105%) rotate(-4deg); } 13% { transform:translateY(3%) rotate(2deg); } 19%,82% { transform:translateY(0) rotate(0); } 100% { transform:translateY(-105%) rotate(-3deg); } }
+@keyframes paul-peek-left { 0% { transform:translateX(-105%) rotate(4deg); } 13% { transform:translateX(3%) rotate(-2deg); } 19%,82% { transform:translateX(0) rotate(0); } 100% { transform:translateX(-105%) rotate(3deg); } }
+@keyframes paul-peek-right { 0% { transform:translateX(105%) rotate(-4deg); } 13% { transform:translateX(-3%) rotate(2deg); } 19%,82% { transform:translateX(0) rotate(0); } 100% { transform:translateX(105%) rotate(-3deg); } }
 
 /* Hints and rule boxes: the text first, Paul at the end pointing at his little board */
 .paul-box { display:flex; align-items:center; gap:12px; }
@@ -55,11 +47,7 @@
 
 @media (max-width:760px) {
  .paul-hoca { width:96px; height:96px; }
- .paul-peek { width:110px; height:110px; right:8px; }
- .paul-peek.peek-bottom-left { left:8px; }
- .paul-peek.peek-bottom-center { left:calc(50% - 55px); }
- .paul-peek.peek-right { right:0; }
- .paul-peek.peek-left { left:0; }
+ .paul-peek { --peek-size:110px; }
  .paul-box>.paul-hoca { width:84px; height:84px; }
  .verb-mistakes-head .paul-hoca { width:88px; height:88px; }
  .lk-reaction-paul { width:112px; height:112px; }

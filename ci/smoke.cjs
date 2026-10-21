@@ -54,7 +54,7 @@ async function memberFlow(browser) {
     await m.screenshot({ path: path.join(OUT, "20-telefon-uye-ol.png") });
     await m.click('button[type="submit"]');
     const text = await errorText();
-    return [/kabul/.test(text) && new URL(m.url()).pathname === "/uye-ol", text];
+    return [/akzeptieren|kabul/.test(text) && new URL(m.url()).pathname === "/uye-ol", text];
   });
   const joined = await step("Uyelik: uye olunca istenen sayfaya donuluyor (/fiiller)", async () => {
     await m.check('input[name="accept"]');
@@ -93,7 +93,7 @@ async function memberFlow(browser) {
     await m.click('button[type="submit"]');
     const text = await errorText();
     await m.screenshot({ path: path.join(OUT, "23-telefon-giris-hatasi.png") });
-    return [/yanlış/.test(text) && new URL(m.url()).pathname === "/giris", text];
+    return [/falsch|yanlış/.test(text) && new URL(m.url()).pathname === "/giris", text];
   });
   await step("Uyelik: dogru sifreyle giris yapinca istenen sayfaya donuluyor", async () => {
     await m.fill('input[name="password"]', password);
@@ -114,34 +114,37 @@ async function memberFlow(browser) {
   await ctx.close();
 }
 
-// Site dili (ogrenci istedi): telefonun dili, yoksa Almanca; secilen dil cerezde kalir; yasal sayfalar da her dilde.
+// Site dili (ogrenci istedi): ana dil Almanca (telefonun dili ne olursa olsun); herkes uye olmadan site dilini
+// degistirebilir, secilen dil cerezde kalir; yasal sayfalar da her dilde.
 async function languageFlow(browser) {
-  const look = async (locale, url, shot) => {
-    const ctx = await browser.newContext({ ...devices["iPhone 13"], locale });
-    const page = await ctx.newPage();
-    await page.goto(BASE + url, { waitUntil: "networkidle", timeout: 90000 });
-    await page.waitForTimeout(800);
-    await page.screenshot({ path: path.join(OUT, shot) });
-    const info = await page.evaluate(() => ({ lang: document.querySelector(".lk-public")?.getAttribute("lang"), dir: document.querySelector(".lk-public")?.getAttribute("dir"), h1: document.querySelector("h1")?.textContent?.trim(), note: !!document.querySelector("[data-legal-translation]") }));
-    return { ctx, page, info };
+  const ctx = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
+  const page = await ctx.newPage();
+  const info = () => page.evaluate(() => ({ lang: document.querySelector(".lk-public")?.getAttribute("lang"), dir: document.querySelector(".lk-public")?.getAttribute("dir"), h1: document.querySelector("h1")?.textContent?.trim(), note: !!document.querySelector("[data-legal-translation]") }));
+  const choose = async (language) => {
+    await Promise.all([page.waitForEvent("framenavigated"), page.selectOption("[data-public-language] select", language)]);
+    await page.waitForLoadState("networkidle");
   };
   try {
-    const sw = await look("sw-KE", "/giris", "30-dil-svahili-almanca.png");
-    record("Dil: sitede olmayan telefon dili Almanca aciliyor", sw.info.lang === "de" && sw.info.h1 === "Anmelden", JSON.stringify(sw.info));
-    await sw.ctx.close();
-    const ar = await look("ar-EG", "/gizlilik", "31-dil-arapca-gizlilik.png");
-    record("Dil: Arapca telefonda gizlilik metni Arapca ve sagdan sola", ar.info.lang === "ar" && ar.info.dir === "rtl" && ar.info.note, JSON.stringify(ar.info));
-    await Promise.all([ar.page.waitForLoadState("load"), ar.page.waitForEvent("framenavigated"), ar.page.selectOption("[data-public-language] select", "uk")]);
-    await ar.page.waitForLoadState("networkidle");
-    const after = await ar.page.evaluate(() => document.querySelector(".lk-public")?.getAttribute("lang"));
-    const cookie = (await ar.ctx.cookies()).find((c) => c.name === "goligo-dil");
-    await ar.page.screenshot({ path: path.join(OUT, "32-dil-ukraynaca-secildi.png") });
-    record("Dil: secilen dil kaliyor (cerez) ve sayfa o dilde", after === "uk" && cookie?.value === "uk", `sayfa ${after}, cerez ${cookie?.value}`);
-    await ar.ctx.close();
-    const tr = await look("tr-TR", "/kullanim-kosullari", "33-dil-turkce-kosullar.png");
-    record("Dil: Turkce asil metin, ceviri notu yok", tr.info.lang === "tr" && !tr.info.note, JSON.stringify(tr.info));
-    await tr.ctx.close();
+    for (const [url, h1] of [["/", null], ["/giris", "Anmelden"], ["/uye-ol", "Kostenlos registrieren"]]) {
+      await page.goto(BASE + url, { waitUntil: "networkidle", timeout: 90000 });
+      const shown = await info();
+      record(`Dil: ${url} Turkce telefonda da Almanca aciliyor`, shown.lang === "de" && (!h1 || shown.h1 === h1), JSON.stringify(shown));
+    }
+    await page.screenshot({ path: path.join(OUT, "30-dil-uye-ol-almanca.png") });
+    await choose("ar");
+    const ar = await info();
+    const cookie = (await ctx.cookies()).find((c) => c.name === "goligo-dil");
+    await page.screenshot({ path: path.join(OUT, "31-dil-arapca-secildi.png") });
+    record("Dil: uye olmadan Arapca secilebiliyor (sagdan sola, cerezde kaliyor)", ar.lang === "ar" && ar.dir === "rtl" && cookie?.value === "ar", `${JSON.stringify(ar)}, cerez ${cookie?.value}`);
+    await page.goto(BASE + "/gizlilik", { waitUntil: "networkidle", timeout: 90000 });
+    const privacy = await info();
+    record("Dil: secilen dil gizlilik metninde de (ceviri notuyla)", privacy.lang === "ar" && privacy.note, JSON.stringify(privacy));
+    await choose("tr");
+    const tr = await info();
+    await page.screenshot({ path: path.join(OUT, "32-dil-turkce-gizlilik.png") });
+    record("Dil: Turkce asil metin, ceviri notu yok", tr.lang === "tr" && !tr.note, JSON.stringify(tr));
   } catch (e) { record("Dil kontrolu", false, String((e && e.message) || e).slice(0, 200)); }
+  await ctx.close();
 }
 
 (async () => {

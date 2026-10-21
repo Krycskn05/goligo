@@ -29,7 +29,7 @@ test('the eight icons are small, sharp and see-through',()=>{
 
 test('they are used in the header, the sound settings, the clock, the tour and Hesabım',()=>{
  const header=read('app/site-header.tsx');
- assert.ok(header.includes('<label className="site-language"><TopIcon name="language" size={26}/>')&&header.includes('<TopIcon name="account" size={30}/></a>'));
+ assert.ok(header.includes('<label className="site-language"><TopIcon name="language" size={26}/>')&&read('app/account-menu.tsx').includes('<TopIcon name="account" size={30}/></button>'));
  const effects=read('app/learning-effects.tsx');
  // The sound button shows the speaker, crossed out while the sound effects are off.
  assert.ok(effects.includes("<TopIcon name={enabled?'sounds':'soundsOff'} size={30}/>")&&effects.includes('window.addEventListener(EFFECTS_CHANGED,sync)'));

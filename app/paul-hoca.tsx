@@ -75,7 +75,7 @@ export function peekPlace(lastEdge:string|null,random:()=>number=Math.random):{e
 }
 /** Something is going on (Paul's answer badge, a speaking voice, an open window): Paul waits for a quieter moment. */
 function busyScreen(){
- if(document.hidden||document.querySelector('.lk-reaction-layer,dialog[open],.ig-backdrop,.sg-backdrop'))return true;
+ if(document.hidden||document.querySelector('.lk-reaction-layer,dialog[open],.ig-backdrop,.sg-backdrop,.st-layer'))return true;
  try{if(window.speechSynthesis?.speaking||window.speechSynthesis?.pending)return true;}catch{}
  return [...document.querySelectorAll('audio')].some(audio=>!audio.paused);
 }

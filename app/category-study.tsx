@@ -23,6 +23,7 @@ import {housingProgress,type TopicProgress} from '@/lib/progress';
 import {ProgressMeter,SidebarProgress} from './progress-ui';
 import {HomeTour} from './home-tour';
 import {InstallGuide} from './install-guide';
+import {SiteTour} from './site-tour';
 
 /** home = the welcome page at "/" (Koko's tour of the site); units = the units catalogue at /konular. */
 export type HomePage='home'|'units';
@@ -60,7 +61,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse}
   <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}>{course==='de'&&<a className={'work-nav'+(home?' active':' object-nav-link')} href="/" aria-current={home?'page':undefined}><NavIcon name="home"/>{vaultText(language,'home')}</a>}<a className={'work-nav'+(home?' object-nav-link':' active')} href={home?'/konular':'#curriculum'} aria-current={home?undefined:'page'}><NavIcon name="units"/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><NavIcon name="vault"/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<><a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><NavIcon name="verbs"/>{verbText(language,'workshopTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=oyunlar" data-verb-section-link="games"><NavIcon name="games"/>{verbText(language,'gamesTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=yanlislar" data-verb-section-link="mistakes"><NavIcon name="mistakes"/>{verbText(language,'mistakesTitle')}</a></>}</nav><InstallGuide language={language}/>{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}</aside>
    <main id="main" className="work-main" tabIndex={-1}>
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}
-    {home?<HomeTour language={language}/>:<>
+    {home?<><HomeTour language={language}/><SiteTour language={language}/></>:<>
     <section className="toon-hero"><div><span className="eyebrow">{learningText(language,course)}</span><h1 id="work-heading" tabIndex={-1}>{c(language,'catalogTitle')}</h1></div><div className="toon-hero-art"><HeroArt/></div></section>
     {/* The catalogue as a spiral notebook: level tabs, ruled paper, unit photos taped onto the page. */}
     <section id="curriculum" className="nb" aria-labelledby="curriculum-heading">

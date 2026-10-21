@@ -1,6 +1,7 @@
 'use client';
 import {useRef,useState,type FormEvent} from 'react';
 import {Eye,EyeOff,Loader2} from 'lucide-react';
+import {TOUR_KEY} from '@/lib/site-tour';
 
 type Mode='login'|'register';
 type Field='name'|'email'|'password'|'accept';
@@ -21,7 +22,8 @@ export default function AuthForm({mode,returnTo}:Props){
   try{
    const response=await fetch('/api/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),credentials:'same-origin'});
    const result=await response.json().catch(()=>({})) as {ok?:boolean;error?:string;field?:Field;returnTo?:string};
-   if(response.ok&&result.ok){window.location.assign(result.returnTo||'/');return;}
+   // A new member always gets the welcome tour (sounds first), even on a browser that has seen it before.
+   if(response.ok&&result.ok){if(register){try{localStorage.removeItem(TOUR_KEY);}catch{}}window.location.assign(result.returnTo||'/');return;}
    setError(result.error||'Bir sorun oluştu. Yeniden dene.');setField(result.field??null);
    const target=result.field?form.current?.querySelector<HTMLInputElement>(`[name="${result.field}"]`):null;target?.focus();
   }catch{setError('Bağlantı kurulamadı. İnternetini kontrol edip yeniden dene.');}

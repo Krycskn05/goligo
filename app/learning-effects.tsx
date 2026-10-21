@@ -13,7 +13,8 @@ import {PAUL_PICTURES,PaulPeek,playPaulSound,type PaulPose} from './paul-hoca';
 
 // Buttons and links that open another view get a soft gust of wind instead of a tap.
 const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-feature,.vault-category-open,.vault-back-categories,.object-exit,.progress-topic,.toon-level-switch button,.nb-tabs button';
-const SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
+/** The three speaking speeds of the site voices (also offered in the welcome tour, app/site-tour.tsx). */
+export const VOICE_SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
 const OPEN_EFFECTS='lernkoko-open-effects';
 /** Paul Hoca reacts in the answer badge: "Harika!" — he drums on the desk (the learner chose it), "Bir daha
@@ -117,7 +118,7 @@ export default function LearningEffects() {
     <div className="lk-voice-grid" role="radiogroup" aria-labelledby="lk-voice-title">
      {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={currentVoice===voice.id} className={'lk-voice-chip '+voice.gender+(currentVoice===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceGreeting(voice))}><span className="lk-voice-avatar" aria-hidden="true">{voice.name[0]}</span><span><strong>{voice.name}</strong><small>{text(voice.gender==='female'?'voiceFemale':'voiceMale')}</small></span></button>)}
     </div>
-    <div className="lk-voice-speed" role="group" aria-label={text('voiceSpeed')}><span>{text('voiceSpeed')}</span>{SPEEDS.map(([value,key])=><button type="button" key={value} aria-pressed={speech.rate===value} className={speech.rate===value?'active':''} onClick={()=>{speech.setRate(value);setMessage('saved');}}>{text(key)}</button>)}</div>
+    <div className="lk-voice-speed" role="group" aria-label={text('voiceSpeed')}><span>{text('voiceSpeed')}</span>{VOICE_SPEEDS.map(([value,key])=><button type="button" key={value} aria-pressed={speech.rate===value} className={speech.rate===value?'active':''} onClick={()=>{speech.setRate(value);setMessage('saved');}}>{text(key)}</button>)}</div>
     <button type="button" className="lk-preview-button lk-voice-preview" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();previewStop.current?.();setPlaying(null);const voice=speech.siteVoices.find(item=>item.id===currentVoice);speech.speak(voice?voiceGreeting(voice):germanSpeechPreview);}}>{speech.busy?<Square size={15}/>:<Play size={15}/>} {text(speech.busy?'voiceStop':'voicePreview')}</button>
    </section>
    <h3 className="lk-effects-subtitle"><Sparkles size={17}/>{text('effectsTitle')}</h3>

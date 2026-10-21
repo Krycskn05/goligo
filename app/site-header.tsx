@@ -9,8 +9,8 @@ import type {VaultLanguage,VaultTranslations} from '@/lib/object-vault-copy';
 import {pickText} from '@/lib/site-languages';
 
 /** "My account", "Site language" and Koko's line, ordered like the site languages; later languages read them from their language pack. */
-const accountLabel:VaultTranslations=['Hesabım','Mein Konto','My account','حسابي','Мій акаунт','Mon compte','Mi cuenta','Мой аккаунт','حساب من','Moje konto','Il mio account','Minha conta'];
-const siteLanguageLabel:VaultTranslations=['Site dili','Seitensprache','Site language','لغة الموقع','Мова сайту','Langue du site','Idioma del sitio','Язык сайта','زبان سایت','Język strony','Lingua del sito','Idioma do site'];
+export const accountLabel:VaultTranslations=['Hesabım','Mein Konto','My account','حسابي','Мій акаунт','Mon compte','Mi cuenta','Мой аккаунт','حساب من','Moje konto','Il mio account','Minha conta'];
+export const siteLanguageLabel:VaultTranslations=['Site dili','Seitensprache','Site language','لغة الموقع','Мова сайту','Langue du site','Idioma del sitio','Язык сайта','زبان سایت','Język strony','Lingua del sito','Idioma do site'];
 /** The friendly line of the speech bubble in the site language (shown until the page knows the clock, then in its window). */
 const greetingLine:VaultTranslations=['Bugün de birlikte öğrenelim.','Lass uns heute zusammen lernen.','Let’s learn together today.','لنتعلّم معًا اليوم.','Повчімося сьогодні разом.','Apprenons ensemble aujourd’hui.','Aprendamos juntos hoy.','Давай сегодня учиться вместе.','امروز هم با هم یاد بگیریم.','Uczmy się dziś razem.','Impariamo insieme oggi.','Vamos aprender juntos hoje.'];
 type Props={language:VaultLanguage;languages:readonly {id:string;label:string}[];onLanguage:(id:string)=>void;homeHref:string;homeLabel:string;stats?:StudyStats|null;showHome?:boolean};

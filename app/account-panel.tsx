@@ -1,6 +1,6 @@
 'use client';
 import {useState,type FormEvent,type ReactNode} from 'react';
-import {Download,KeyRound,Loader2,LogOut,Trash2,UserRound} from 'lucide-react';
+import {Compass,Download,KeyRound,Loader2,LogOut,Trash2,UserRound} from 'lucide-react';
 import {BrandMascot} from './site-logo';
 
 type Props={name:string;email:string;since:string};
@@ -24,7 +24,7 @@ function Card({icon,title,children}:{icon:ReactNode;title:string;children:ReactN
  return <section className="lk-account-card"><h2>{icon}{title}</h2>{children}</section>;
 }
 
-/** Hesabım: ad, şifre, verilerimi indir, çıkış ve hesabı silme. */
+/** Hesabım: ad, şifre, site turu, verilerimi indir, çıkış ve hesabı silme. */
 export default function AccountPanel({name:initialName,email,since}:Props){
  const [name,setName]=useState(initialName);
  const [busy,setBusy]=useState<string|null>(null);
@@ -64,6 +64,12 @@ export default function AccountPanel({name:initialName,email,since}:Props){
     <Status error={errors.password??''} done={done.password??''}/>
     <button className="btn secondary small" type="submit" disabled={!!busy}>{spin('password')}Şifreyi değiştir</button>
    </form>
+  </Card>
+
+  {/* The welcome tour again: the sounds first, then the header and the menu (app/site-tour.tsx on the home page). */}
+  <Card icon={<Compass size={20} aria-hidden="true"/>} title="Site turu">
+   <p>Sesleri yeniden seçmek ve siteyi baştan tanımak için turu başlat.</p>
+   <a className="btn secondary small" href="/?tur=1" data-account-tour>Site turunu başlat</a>
   </Card>
 
   <Card icon={<Download size={20} aria-hidden="true"/>} title="Verilerim">

@@ -12,7 +12,8 @@ test('the home page introduces the site; the units catalogue moved to /konular',
  assert.ok(page.includes('<StudyApp page="home" />')&&page.includes('<Landing />'),'members see the introduction, visitors the landing page');
  assert.ok(read('app/konular/page.tsx').includes('<StudyApp page="units"/>'));
  const home=read('app/category-study.tsx');
- assert.ok(home.includes('{home?<HomeTour language={language}/>:<>'),'the introduction replaces the catalogue on the home page');
+ // (with the welcome tour beside it, app/site-tour.tsx)
+ assert.ok(home.includes('{home?<><HomeTour language={language}/><SiteTour language={language}/></>:<>'),'the introduction replaces the catalogue on the home page');
  // The introduction shows no progress: no sidebar progress panel and no progress requests on the home page.
  assert.ok(home.includes("{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress ")&&home.includes("if(course!=='de'||home){setSnapshot(null);return;}"));
  // The menu starts with "Ana sayfa"; "Üniteler ve konular" opens /konular from the home page.

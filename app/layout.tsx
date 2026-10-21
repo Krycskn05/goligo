@@ -12,6 +12,7 @@ import "./lesson-book.css";
 import "./home-tour.css";
 import "./admin.css";
 import "./paul-hoca.css";
+import "./site-tour.css";
 import LearningEffects from './learning-effects';
 
 export const metadata: Metadata = {

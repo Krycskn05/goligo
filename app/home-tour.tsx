@@ -1,7 +1,6 @@
 'use client';
 import type {ReactNode} from 'react';
 import {NavIcon,type NavIconName} from './nav-icons';
-import {PaulHoca} from './paul-hoca';
 import {HeroArt} from './toon-art';
 import type {StudyLanguage} from '@/lib/study-languages';
 import {homeText,type HomeCopyKey} from '@/lib/home-copy';
@@ -30,7 +29,7 @@ function siteParts(language:StudyLanguage):Part[]{
 
 /**
  * The home page a signed-in learner sees first (design "Resimli tanıtım", as the learner chose): it only
- * introduces the site — Koko and Paul Hoca, a welcome and a short text, then one picture card per main part of the site
+ * introduces the site — Koko, a welcome and a short text, then one picture card per main part of the site
  * (the items of the left menu; the lessons inside them are not shown here).
  * The whole card is the link. Nothing to study or track here; the units catalogue is at /konular.
  */
@@ -38,8 +37,7 @@ export function HomeTour({language}:{language:StudyLanguage}){
  const h=(key:HomeCopyKey)=>homeText(language,key);
  return <div className="ht" data-home-tour="">
   <section className="ht-hero" aria-labelledby="work-heading">
-   {/* Koko and Paul Hoca (waving with his book) welcome the learner; Paul says hello with a sound once per visit. */}
-   <div className="ht-hosts"><img className="ht-koko" src={KOKO_PICTURE} alt="" width={400} height={319}/><PaulHoca pose="hello" sound="appear" once="lernkoko-paul-hello"/></div>
+   <img className="ht-koko" src={KOKO_PICTURE} alt="" width={400} height={319}/>
    <h1 id="work-heading" tabIndex={-1}>{h('welcome')}</h1>
    <p>{h('about')}</p>
   </section>

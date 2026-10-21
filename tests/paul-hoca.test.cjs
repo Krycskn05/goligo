@@ -30,20 +30,27 @@ test('seven small animated pictures of Paul Hoca with a clear background and a s
  }
  // A middle size: about 110–150 px on a computer, smaller on phones.
  const css=read('app/paul-hoca.css');
- for(const rule of ['.ht-hosts .paul-hoca { width:150px; height:150px;','.paul-box>.paul-hoca { width:110px; height:110px;','.lk-reaction-paul { display:block; width:140px; height:140px;','.lk-reaction-paul { width:112px; height:112px; }'])assert.ok(css.includes(rule),rule);
+ for(const rule of ['.paul-peek { position:fixed; right:max(14px,env(safe-area-inset-right)); bottom:0; z-index:55; width:150px; height:150px; pointer-events:none;','.paul-box>.paul-hoca { width:110px; height:110px;','.lk-reaction-paul { display:block; width:140px; height:140px;','.lk-reaction-paul { width:112px; height:112px; }','.paul-peek { width:110px; height:110px; right:8px; }'])assert.ok(css.includes(rule),rule);
  assert.ok(read('app/layout.tsx').includes('import "./paul-hoca.css";'));
  // Motion off (site setting or the device) → the still frame.
  assert.ok(tsx.includes('<source media="(prefers-reduced-motion: reduce)" srcSet={PAUL_STILL[pose]}/>')&&tsx.includes('src={motion?PAUL_PICTURES[pose]:PAUL_STILL[pose]}'));
 });
 
-test('Paul shows up on the home page, in the answer badge, at hints and rules and on Yanlışlarım',()=>{
- assert.ok(read('app/home-tour.tsx').includes('<PaulHoca pose="hello" sound="appear" once="lernkoko-paul-hello"/>'));
+test('Paul waves from the bottom-right corner now and then, and shows up in the answer badge, at hints and rules and on Yanlışlarım',()=>{
+ // Not next to the welcome text any more (the learner asked): he comes up from the corner on every study page.
+ assert.ok(!read('app/home-tour.tsx').includes('PaulHoca'));
+ const tsx=read('app/paul-hoca.tsx');
+ assert.ok(tsx.includes('export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_SHOW_MS=3600;')&&tsx.includes('<div key={visit} className="paul-peek" aria-hidden="true"><img src={PAUL_PICTURES.hello}'));
+ assert.ok(tsx.includes("if(busyScreen()){later(peek,12000);return;}")&&tsx.includes("if(!motion||QUIET_PAGES.test(window.location.pathname))return;"));
+ assert.ok(tsx.includes("if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}"),'hello sound once per visit');
+ assert.ok(read('app/paul-hoca.css').includes('@keyframes paul-peek'));
  const effects=read('app/learning-effects.tsx');
  assert.ok(effects.includes('<img className="lk-reaction-paul" src={PAUL_PICTURES[reaction.pose]}'));
- assert.ok(effects.includes("const pose:PaulPose=kind==='complete'?(cheerTurn++%2?'desk':'cheer'):kind;")&&effects.includes("if(kind==='complete')playPaulSound(pose);"));
- assert.ok(effects.includes('const REACTION_MS={correct:1900,wrong:2100,complete:2600} as const;'));
+ // "Harika!": Paul drums on the desk (the learner chose it); wrong: raised finger; end of a round: clapping with applause.
+ assert.ok(effects.includes("const REACTION_POSE:Record<LearningReaction,PaulPose>={correct:'desk',wrong:'wrong',complete:'cheer'};")&&effects.includes("if(kind==='complete')playPaulSound(pose);"));
+ assert.ok(effects.includes('const REACTION_MS={correct:2000,wrong:2100,complete:2600} as const;')&&effects.includes('<PaulPeek/>'));
  const css=read('app/paul-hoca.css');
- for(const [kind,ms] of [['correct','1.9s'],['wrong','2.1s'],['complete','2.6s']])assert.ok(css.includes('.kind-'+kind+' .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge '+ms+' both; }'),kind);
+ for(const [kind,ms] of [['correct','2s'],['wrong','2.1s'],['complete','2.6s']])assert.ok(css.includes('.kind-'+kind+' .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge '+ms+' both; }'),kind);
  assert.ok(read('app/verb-games.tsx').includes('</ul></div><PaulHoca pose="tip"/></div>'));
  const vault=read('app/object-study.tsx');
  assert.equal((vault.match(/<PaulHoca pose="tip"\/>/g)||[]).length,2);
@@ -56,7 +63,8 @@ test('Paul\'s sounds are effects, never speech, and follow the sound settings',a
  const tsx=read('app/paul-hoca.tsx');
  assert.ok(tsx.includes("export const PAUL_SOUNDS:Partial<Record<PaulPose,PaulSoundId>>={hello:'paulHello',tip:'paulTip',think:'paulHmm',cheer:'paulClap',desk:'paulDrum'};"));
  assert.ok(tsx.includes('playLearningSound(id)'),'through the sound settings (on/off, volume)');
- for(const word of ['speak(','speechSynthesis','useGermanSpeech'])assert.ok(!tsx.includes(word),word);
+ // He only checks whether a voice is speaking (to wait for a quiet moment); he never speaks himself.
+ for(const word of ['speak(','SpeechSynthesisUtterance','useGermanSpeech'])assert.ok(!tsx.includes(word),word);
  // Correct and wrong answers keep only their own effect sound (then the right answer is read): Paul adds none there.
  assert.ok(!tsx.includes('correct:\'paul')&&!tsx.includes('wrong:\'paul'));
  const sounds=read('scripts/sounds/make-sounds.mjs');

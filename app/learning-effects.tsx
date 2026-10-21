@@ -9,17 +9,18 @@ import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
 import {isVaultLanguage,type VaultLanguage} from '@/lib/object-vault-copy';
 import {defaultEffects,EFFECTS_CHANGED,EFFECTS_KEY,LEARNING_REACTION,readEffects,saveEffects,motionAllowed,playLearningSound,canPlayEffects,stopAllEffects,warmEffects,type EffectsPreferences,type LearningReaction} from '@/lib/learning-effects';
 import {languageDirection,loadLanguagePack} from '@/lib/site-languages';
-import {PAUL_PICTURES,playPaulSound,type PaulPose} from './paul-hoca';
+import {PAUL_PICTURES,PaulPeek,playPaulSound,type PaulPose} from './paul-hoca';
 
 // Buttons and links that open another view get a soft gust of wind instead of a tap.
 const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-feature,.vault-category-open,.vault-back-categories,.object-exit,.progress-topic,.toon-level-switch button,.nb-tabs button';
 const SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
 const OPEN_EFFECTS='lernkoko-open-effects';
-/** Paul Hoca reacts in the answer badge: thumbs up, a gentle raised finger, and at the end of a round he claps or drums
- * on the desk (in turn), with applause or drumming. The badge stays long enough to see his animation. */
-const REACTION_MS={correct:1900,wrong:2100,complete:2600} as const;
-let cheerTurn=0;
+/** Paul Hoca reacts in the answer badge: "Harika!" — he drums on the desk (the learner chose it), "Bir daha
+ * deneyelim" — a gentle raised finger, end of a round — he claps, with applause. Right and wrong answers keep only
+ * their own effect sound (then the right answer is read). The badge stays long enough to see his animation. */
+const REACTION_MS={correct:2000,wrong:2100,complete:2600} as const;
+const REACTION_POSE:Record<LearningReaction,PaulPose>={correct:'desk',wrong:'wrong',complete:'cheer'};
 /** The sound groups of the dialog: the moment, its title and the sounds to choose from (the first is the default). */
 const soundGroups=[
  {key:'tap',title:'chooseTap',ids:tapChoiceIds},
@@ -69,7 +70,7 @@ export default function LearningEffects() {
    const kind=(event as CustomEvent<LearningReaction>).detail;
    if(!['correct','wrong','complete'].includes(kind)||document.hidden||!motionAllowed())return;
    if(reactionTimer.current)clearTimeout(reactionTimer.current);
-   const pose:PaulPose=kind==='complete'?(cheerTurn++%2?'desk':'cheer'):kind;
+   const pose=REACTION_POSE[kind];
    setReaction({kind,id:++sequence.current,pose});reactionTimer.current=setTimeout(()=>setReaction(null),REACTION_MS[kind]);
    if(kind==='complete')playPaulSound(pose);
   };
@@ -86,7 +87,7 @@ export default function LearningEffects() {
    setTimeout(()=>{if(target.dataset.lkTap===String(mark)){target.classList.remove('lk-tap-pop');delete target.dataset.lkTap;}},440);
   };
   // After the first tap: fetch the sounds and Paul's answer pictures, so his first reaction shows at once.
-  const warm=()=>{warmEffects();for(const pose of ['correct','wrong','cheer','desk'] as const){const picture=new Image();picture.decoding='async';picture.src=PAUL_PICTURES[pose];}};
+  const warm=()=>{warmEffects();for(const pose of ['desk','wrong','cheer','hello'] as const){const picture=new Image();picture.decoding='async';picture.src=PAUL_PICTURES[pose];}};
   const visibility=()=>{if(document.hidden){stopAllEffects();previewStop.current?.();setPlaying(null);setReaction(null);}};
   window.addEventListener(EFFECTS_CHANGED,sync);window.addEventListener('storage',storage);window.addEventListener(OPEN_EFFECTS,open);window.addEventListener(LEARNING_REACTION,feedback);
   document.addEventListener('click',tap,true);document.addEventListener('pointerdown',warm,{once:true,capture:true});document.addEventListener('visibilitychange',visibility);media.addEventListener('change',sync);
@@ -101,6 +102,7 @@ export default function LearningEffects() {
  function close(){previewStop.current?.();previewStop.current=null;setPlaying(null);speech.stop();dialog.current?.close();}
  const confetti=reaction&&reaction.kind!=='wrong';
  return <>
+  <PaulPeek/>
   {reaction&&<div key={reaction.id} className={'lk-reaction-layer '+(reaction.kind==='wrong'?'retry':'celebrate')+' kind-'+reaction.kind} aria-hidden="true">
    <div className="lk-reaction-badge"><img className="lk-reaction-paul" src={PAUL_PICTURES[reaction.pose]} alt="" width={224} height={224} decoding="async"/><strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
    {confetti&&Array.from({length:reaction.kind==='complete'?24:14},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%430)-215}px`,'--lk-y':`${85+i*43%175}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={14} fill="currentColor"/>:null}</span>)}

@@ -16,7 +16,7 @@ test('the sounds come first, then the header, the menu and "Hazırsın!"',()=>{
  assert.equal(tour.TOUR_STEPS[0].target,null);assert.equal(tour.TOUR_STEPS.at(-1).target,null);
  // Every lit part is a real part of the home page.
  const header=read('app/site-header.tsx'),greeting=read('app/site-greeting.tsx'),home=read('app/category-study.tsx'),effects=read('app/learning-effects.tsx'),install=read('app/install-guide.tsx');
- assert.ok(greeting.includes('className="site-greeting site-greeting-button"')&&header.includes('className="site-language"')&&effects.includes('className="lk-effects-button"')&&header.includes('className="site-home site-account"'));
+ assert.ok(greeting.includes('className="site-greeting site-greeting-button"')&&header.includes('className="site-language"')&&effects.includes('className="lk-effects-button"')&&read('app/account-menu.tsx').includes('className="site-home site-account"')&&header.includes('<AccountMenu'));
  assert.ok(home.includes("href={home?'/konular':'#curriculum'}")&&home.includes("href={'/ev-esyalar?learn='+course}")&&home.includes('verb-nav-link')&&home.includes('data-verb-section-link="games"')&&home.includes('data-verb-section-link="mistakes"')&&install.includes('ig-trigger'));
 });
 

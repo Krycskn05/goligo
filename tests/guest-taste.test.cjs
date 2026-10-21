@@ -77,7 +77,7 @@ test('pages: the first part opens, the rest carries a lock and the sign-up, ever
  assert.ok(read('app/object-study.tsx').includes('if(guest&&id!==GUEST_OBJECT_GROUP)return <article'));
  assert.ok(read('app/housing-study.tsx').includes('const lockedSection=(id:HousingSection|\'all\')=>guest&&id!==GUEST_HOUSING_SECTION;'));
  assert.ok(read('app/ausbildung-study.tsx').includes('{current&&step&&guest&&current.id!==GUEST_L12_PART?'));
- assert.ok(read('app/site-header.tsx').includes("href={guest?'/giris':'/hesabim'}"));
+ assert.ok(read('app/site-header.tsx').includes('<AccountMenu language={language} guest={guest}/>')&&read('app/account-menu.tsx').includes("href:'/giris?return_to='+encodeURIComponent(back)"),'a visitor gets sign in and sign up in the account menu');
  const shared=read('app/guest-taste.tsx');assert.ok(shared.includes("'/uye-ol?return_to='+encodeURIComponent(back)"));
  // The landing page offers the try-out on every part but Yanlışlarım.
  const landing=read('app/landing.tsx');for(const href of ['/konular','/ev-esyalar','/fiiller',"/fiiller?bolum=oyunlar"])assert.ok(landing.includes("href:'"+href+"'"),href);

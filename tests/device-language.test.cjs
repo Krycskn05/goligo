@@ -1,6 +1,6 @@
-// The site's main language is German: the introduction, sign in and sign up pages open in German, and anybody can change
-// the site language without signing up (the learner asked); the pages a visitor sees before signing in — the legal pages
-// too — come in every site language (the learner asked: all 31).
+// Which language a visitor sees: a language chosen on the site, otherwise the phone's or browser's language when the
+// site has it (the learner asked, 22 October 2026), otherwise German; anybody can change the site language without signing
+// up; the pages a visitor sees before signing in — the legal pages too — come in every site language (all 31).
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR to compiled lib directory.');
 const load=name=>require(path.join(compiled,name+'.js'));
@@ -8,14 +8,26 @@ const device=load('device-language');const site=load('site-languages');const pub
 const read=file=>fs.readFileSync(file,'utf8');
 const ids=site.siteLanguages.map(item=>item.id);
 
-test('German unless the visitor chose another language; the phone language is not used',()=>{
+test('a chosen language wins; otherwise the phone or browser language when the site has it; otherwise German',()=>{
+ // The learner asked (22 October 2026): on the first visit the site opens in the device's language.
  assert.equal(device.DEFAULT_SITE_LANGUAGE,'de');
  assert.equal(device.chooseSiteLanguage('uk'),'uk');assert.equal(device.chooseSiteLanguage('xx'),'de');assert.equal(device.chooseSiteLanguage(null),'de');assert.equal(device.chooseSiteLanguage('constructor'),'de');
- assert.equal(device.requestLanguage('a=1; goligo-dil=ar; b=2'),'ar','the choice is kept in a cookie for the server pages');
- assert.equal(device.requestLanguage('goligo-dil=xx'),'de','a strange cookie is ignored');
+ assert.equal(device.chooseSiteLanguage('uk','tr'),'uk','a choice made on the site beats the phone');assert.equal(device.chooseSiteLanguage(null,'tr'),'tr');assert.equal(device.chooseSiteLanguage('xx','ar'),'ar');
+ // Phone and browser language tags.
+ for(const [tag,language] of [['tr-TR','tr'],['tr','tr'],['de-AT','de'],['en_GB','en'],['pt-PT','pt'],['ar-SA','ar'],['uk-UA','uk'],['zh-Hans-CN','zh'],['zh-TW','zh'],['sr-Latn-RS','hbs'],['hr','hbs'],['bs-BA','hbs'],['fa-IR','fa'],['fa-AF','prs'],['prs','prs'],['kmr','ku'],['ku','ku'],['nl-BE','nl'],['cs-CZ','cs'],['so','so']])assert.equal(device.tagLanguage(tag),language,tag);
+ for(const tag of ['sv-SE','ckb','*','','constructor','__proto__','x','toString',null])assert.equal(device.tagLanguage(tag),null,String(tag));
+ assert.equal(device.deviceLanguage(['sv-SE','nb','tr-TR','en-US']),'tr','the first language the site has');assert.equal(device.deviceLanguage(['sv-SE']),null);assert.equal(device.deviceLanguage([]),null);
+ assert.deepEqual(device.acceptedLanguages('sv-SE,sv;q=0.9,tr;q=0.8,en;q=0.7,*;q=0.5'),['sv-SE','sv','tr','en','*']);
+ assert.deepEqual(device.acceptedLanguages('en;q=0.2, tr, de;q=0'),['tr','en'],'by weight; q=0 is left out');assert.deepEqual(device.acceptedLanguages(null),[]);
+ // On the server: the cookie, then the browser's languages, then German.
+ assert.equal(device.requestLanguage('a=1; goligo-dil=ar; b=2','tr-TR,tr;q=0.9'),'ar','the choice is kept in a cookie for the server pages');
+ assert.equal(device.requestLanguage(null,'tr-TR,tr;q=0.9,en;q=0.8'),'tr');assert.equal(device.requestLanguage('lk_session=abc','sv-SE,uk;q=0.5'),'uk');
+ assert.equal(device.requestLanguage('goligo-dil=xx','sv'),'de','a strange cookie and a language the site lacks give German');
  assert.equal(device.requestLanguage(null),'de');assert.equal(device.requestLanguage('lk_session=abc'),'de');
  assert.equal(device.languageCookie('uk'),'goligo-dil=uk; Path=/; Max-Age=31536000; SameSite=Lax');
- const code=read('lib/device-language.ts');assert.ok(!code.includes('navigator.language')&&!code.includes('accept-language')&&!read('app/page-language.ts').includes('accept-language'),'no phone or browser language');
+ assert.ok(read('lib/device-language.ts').includes('deviceLanguage(navigator.languages?.length?navigator.languages:[navigator.language])'),'the browser pages read the device languages');
+ assert.ok(read('app/page-language.ts').includes("requestLanguage(list.get('cookie'),list.get('accept-language'))"),'the server pages read Accept-Language');
+ assert.ok(read('app/api/auth/route.ts').includes("requestLanguage(request.headers.get('cookie'),request.headers.get('accept-language'))"),'the reset email too');
 });
 
 test('every page starts in the saved language (German otherwise) and keeps a new choice for the server pages',()=>{
@@ -63,7 +75,8 @@ test('the legal pages: the Turkish original, a translation note elsewhere, the l
  assert.ok(parts.includes("{language!=='tr'&&<p className=\"lk-legal-note\" data-legal-translation>{text('translationNote')}</p>}"));
  assert.ok(privacy.includes("rich('whatLanguageCookie',{code:()=><code>{LANGUAGE_COOKIE}</code>})")&&privacy.includes('<LegalDate language={language}/>')&&terms.includes('<LegalDate language={language}/>'));
  assert.ok(read('lib/legal-copy.ts').includes("'{b}Dil çerezi:{/b} seçilen site dili {code} adlı bir çerezde saklanır"));
- assert.equal(read('app/legal.tsx').match(/LEGAL_UPDATED='([^']+)'/)[1],'2026-10-21');
+ assert.equal(read('app/legal.tsx').match(/LEGAL_UPDATED='([^']+)'/)[1],'2026-10-22');
+ assert.ok(privacy.includes("<li>{rich('whatDeviceLanguage')}</li>"),'the privacy page says the device language is read and nothing is kept');
  // Every legal key is used on a page.
  const used=privacy+terms+parts+read('app/legal.tsx')+read('app/gizlilik/page.tsx')+read('app/kullanim-kosullari/page.tsx');
  for(const key of Object.keys(legal.legalCopy))assert.ok(used.includes(`'${key}'`),key);

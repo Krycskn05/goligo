@@ -15,7 +15,12 @@ export function useAnswerSound(){
  const stop=useCallback(()=>{generation.current++;cancel.current?.();cancel.current=null;},[]);
  const play=useCallback((kind:'correct'|'wrong'|'complete',after?:()=>void)=>{
   stop();const token=++generation.current;learningReaction(kind);
-  const chosen=readEffects();cancel.current=playLearningSound(kind==='wrong'?chosen.wrong:kind==='correct'?chosen.correct:chosen.complete,()=>{if(generation.current!==token)return;cancel.current=null;after?.();});
+  const chosen=readEffects();
+  // "Harika!": the chosen correct sound and Paul Hoca drumming on the desk play together; the right answer is read
+  // only after both have ended (no sound under the voice).
+  const sounds=kind==='correct'?[chosen.correct,'paulDrum' as const]:[kind==='wrong'?chosen.wrong:chosen.complete];
+  let left=sounds.length;const done=()=>{if(--left>0||generation.current!==token)return;cancel.current=null;after?.();};
+  const stops=sounds.map(id=>playLearningSound(id,done));cancel.current=()=>stops.forEach(item=>item());
  },[stop]);
  const wrong=useCallback((after?:()=>void)=>play('wrong',after),[play]);
  const correct=useCallback((after?:()=>void)=>play('correct',after),[play]);

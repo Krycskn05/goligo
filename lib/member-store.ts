@@ -1,4 +1,4 @@
-// LernKoko üyelik kayıtları (Cloudflare D1). Tablolar: migration/database/members.sql.
+// Goliqo üyelik kayıtları (Cloudflare D1). Tablolar: migration/database/members.sql.
 import { SESSION_MS, newToken, tokenHash, validToken } from './member-auth';
 
 /** D1'in burada kullanılan kısmı (testlerde node:sqlite ile taklit edilir). */

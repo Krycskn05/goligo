@@ -31,7 +31,7 @@ export default async function AdminPage({searchParams}:{searchParams:Search}){
   const [overview,areas,members,mistakes,sessions]=await Promise.all([loadOverview(db,now),loadAreas(db),loadMembers(db,now),loadTopMistakes(db,20),loadSessions(db,30)]);
   const accuracy=percent(overview.correct,overview.answers);
   return <PublicPage signedIn><div className="adm" data-admin-panel="overview">
-   <header className="adm-head"><div><span className="eyebrow">LernKoko</span><h1>Yönetici paneli</h1><p>Üyelerin ne çalıştığı, ne zaman girdiği ve nerede zorlandığı. Saatler Berlin saatiyle.</p></div>
+   <header className="adm-head"><div><span className="eyebrow">{SITE_NAME}</span><h1>Yönetici paneli</h1><p>Üyelerin ne çalıştığı, ne zaman girdiği ve nerede zorlandığı. Saatler Berlin saatiyle.</p></div>
     <nav className="adm-jump" aria-label="Bölümler"><a href="#uyeler">Üyeler</a><a href="#yanlislar">Zorlanılan sorular</a><a href="#son">Son çalışmalar</a></nav></header>
    <section className="adm-cards" aria-label="Özet">
     <Stat label="Üye" value={overview.members} note={`Son 7 günde ${overview.new7} yeni · 30 günde ${overview.new30}`}/>

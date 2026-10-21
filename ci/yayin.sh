@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# LernKoko'yu Koray'ın KENDİ Cloudflare hesabına yayınlar (GitHub Actions'ta çalışır).
+# Goliqo'yu Koray'ın KENDİ Cloudflare hesabına yayınlar (GitHub Actions'ta çalışır).
 # ChatGPT Sites projesine hiçbir şey göndermez, ona dokunmaz.
 #
 # CLOUDFLARE_API_TOKEN yoksa yalnızca DENEME yapar: paket hazırlanır, yayın yapılmaz.

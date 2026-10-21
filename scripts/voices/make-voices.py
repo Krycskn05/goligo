@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render LernKoko's German texts with the Supertonic 3 preset voices.
+"""Render Goliqo's German texts with the Supertonic 3 preset voices.
 
 Usage: make-voices.py TEXTS.json OUTPUT_DIR
 

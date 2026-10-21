@@ -1,4 +1,4 @@
-// LernKoko sound effects: original, playful cartoon sounds synthesised from
+// Goliqo sound effects: original, playful cartoon sounds synthesised from
 // scratch (marimba, celesta, glockenspiel, bubbles, wind, slide whistle,
 // spring, brass and retro chip tones). No recordings or samples are used.
 // Several sounds for each moment: the learner chooses one in "Sesler ve animasyonlar".
@@ -183,7 +183,8 @@ export const soundDesigns={
  paulTip:()=>{const b=track(.75);glock(b,0,C7,.6,.3);glock(b,.09,G6,.45,.36);bubble(b,.02,900,.06,.3,1.6);return finish(reverb(b,.2),.5);},
  paulHmm:()=>{const b=track(.95);slideWhistle(b,0,.3,430,470,.5,13);slideWhistle(b,.36,.36,470,760,.55,17);return finish(reverb(b,.12),.48);},
  paulClap:()=>{const b=track(1.55);const r=random(91);for(let i=0;i<14;i++){const t=i*.095+r()*.02;clap(b,t,.8+.2*r(),91+i);if(i%3===1)clap(b,t+.03+r()*.02,.5,191+i);}sparkle(b,.9,.5,6,.1,93);return finish(reverb(b,.24),.62);},
- paulDrum:()=>{const b=track(1.55);[[0,1],[.13,.8],[.3,1],[.43,.8],[.6,1],[.69,.8],[.78,.85],[1.02,1.2],[1.22,1.3]].forEach(([t,a],i)=>knock(b,t,a,i%2?128:116,71+i));sparkle(b,1.22,.28,4,.08,97);return finish(reverb(b,.14),.66);},
+ // "Harika!": a quick drum roll on the desk and two firm knocks, short enough that the right answer is read soon after.
+ paulDrum:()=>{const b=track(1.05);[[0,.9],[.09,.75],[.18,.9],[.27,.75],[.36,.9],[.45,.8],[.62,1.25],[.76,1.35]].forEach(([t,a],i)=>knock(b,t,a,i%2?128:116,71+i));sparkle(b,.76,.24,4,.08,97);return finish(reverb(b,.12),.66);},
  completeMarimba:()=>{const b=track(1.6);marimba(b,0,C4,.7,.25);marimba(b,.16,C4,.7,.25);marimba(b,.32,G4,.7,.25);[C5,E5,G5,C6].forEach(f=>marimba(b,.48,f,.45,.8));glock(b,.48,C7,.25,.8);return finish(reverb(b,.2),.72);},
 };
 export const soundIds=Object.keys(soundDesigns);
@@ -198,5 +199,5 @@ export function renderSounds(folder){
 if(process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1])){
  const folder=process.argv[2]??'public/sfx';
  const durations=renderSounds(folder);
- console.log('LernKoko sesleri hazır:',Object.entries(durations).map(([id,s])=>id+' '+s+'s').join(', '));
+ console.log('Goliqo sesleri hazır:',Object.entries(durations).map(([id,s])=>id+' '+s+'s').join(', '));
 }

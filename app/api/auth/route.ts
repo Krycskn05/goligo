@@ -35,7 +35,7 @@ export async function GET(request:Request){
   const member=await memberForToken(db,sessionToken(request));
   if(url.searchParams.get('export')==='1'){
    if(!member)return signedOut();
-   return new Response(JSON.stringify(await exportMember(db,member),null,2),{headers:{'Content-Type':'application/json; charset=utf-8','Content-Disposition':'attachment; filename="lernkoko-verilerim.json"','Cache-Control':'no-store'}});
+   return new Response(JSON.stringify(await exportMember(db,member),null,2),{headers:{'Content-Type':'application/json; charset=utf-8','Content-Disposition':'attachment; filename="goliqo-verilerim.json"','Cache-Control':'no-store'}});
   }
   return json({member:member?{name:member.name,email:member.email,createdAt:member.created_at}:null});
  }catch(error){return failure(error);}

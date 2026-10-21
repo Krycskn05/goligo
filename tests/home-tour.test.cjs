@@ -60,10 +60,10 @@ const pngSize=file=>{const data=fs.readFileSync(file);assert.equal(data.toString
 test('the site has the Koko app icon for the browser tab, the phone home screen and the installed app',()=>{
  const layout=read('app/layout.tsx');
  assert.ok(layout.includes('<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />')&&layout.includes('<link rel="manifest" href="/manifest.json" />'));
- assert.ok(layout.includes('<meta name="apple-mobile-web-app-title" content={SITE_NAME} />'),'the name under the icon is LernKoko');
+ assert.ok(layout.includes('<meta name="apple-mobile-web-app-title" content={SITE_NAME} />'),'the name under the icon is Goliqo');
  assert.deepEqual(pngSize('public/apple-touch-icon.png'),[180,180]);
  const manifest=JSON.parse(read('public/manifest.json'));
- assert.equal(manifest.name,'LernKoko');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
+ assert.equal(manifest.name,'Goliqo');assert.equal(manifest.short_name,'Goliqo');assert.equal(manifest.start_url,'/');assert.equal(manifest.display,'standalone');
  const sizes=Object.fromEntries(manifest.icons.map(icon=>[icon.src,pngSize('public'+icon.src).join('x')]));
  assert.deepEqual(sizes,{'/icons/icon-192.png':'192x192','/icons/icon-512.png':'512x512','/icons/icon-maskable-512.png':'512x512'});
  assert.ok(manifest.icons.some(icon=>icon.purpose==='maskable'));
@@ -73,7 +73,7 @@ test('the site has the Koko app icon for the browser tab, the phone home screen 
  for(const file of ['/manifest.json','/apple-touch-icon.png','/favicon.ico','/favicon.svg',...manifest.icons.map(icon=>icon.src)])assert.ok(auth.isPublicPath(file),file);
 });
 
-test('"Uygulama olarak indir" in the left menu explains how to add LernKoko to the phone',()=>{
+test('"Uygulama olarak indir" in the left menu explains how to add Goliqo to the phone',()=>{
  // A menu button right under the left menu (home page and units page), not in the welcome card.
  const home=read('app/category-study.tsx');
  const aside=home.slice(home.indexOf('<aside className="work-sidebar">'),home.indexOf('</aside>'));

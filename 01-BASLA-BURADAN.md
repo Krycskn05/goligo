@@ -1,4 +1,4 @@
-# LernKoko — Claude Code için kaynak arşivi
+# Goliqo — Claude Code için kaynak arşivi
 
 Bu arşiv, 13 Ekim 2026 tarihinde yayımdaki **36. sürümün** kaynaklarını içerir.
 Kaynak commit: a13884802cce48ea38a14ad775a272918c359330
@@ -32,7 +32,7 @@ Node.js **24 LTS** ve Corepack/pnpm kullan. Projenin asıl gereksinimi Node.js
 22.13 veya üzeridir; paket yöneticisinin kilitli sürümü pnpm 11.25.0'dır.
 Windows'ta bash kullanan eski kurulum betikleri yerine aşağıdaki pnpm yolunu kullan.
 
-ZIP'i aç, terminalde LernKoko klasörüne gir:
+ZIP'i aç, terminalde Goliqo klasörüne gir:
 
     corepack enable
     corepack prepare pnpm@11.25.0 --activate
@@ -67,10 +67,10 @@ kopyalama. Mac'e Linux node_modules klasörü taşımak yerine bağımlılıklar
 
 ## Claude Code'a verilecek ilk görev
 
-Claude Code'u LernKoko klasöründe aç ve şu metni kullan:
+Claude Code'u Goliqo klasöründe aç ve şu metni kullan:
 
 > Önce CLAUDE.md, 01-BASLA-BURADAN.md ve migration/ dosyalarını oku.
-> Bu LernKoko'nun yayımdaki 36. sürümünün bağımsız kaynak kopyasıdır.
+> Bu Goliqo'nun yayımdaki 36. sürümünün bağımsız kaynak kopyasıdır.
 > Mevcut ChatGPT Sites projesine push, deploy veya veri yazma.
 > Bağımlılıkları kilit dosyasıyla kur, projeyi yerelde çalıştır ve
 > yeni barındırma ile kimlik doğrulama için gereken değişiklikleri belirle.

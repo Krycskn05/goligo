@@ -36,11 +36,19 @@ test('seven small animated pictures of Paul Hoca with a clear background and a s
  assert.ok(tsx.includes('<source media="(prefers-reduced-motion: reduce)" srcSet={PAUL_STILL[pose]}/>')&&tsx.includes('src={motion?PAUL_PICTURES[pose]:PAUL_STILL[pose]}'));
 });
 
-test('Paul waves from the bottom-right corner now and then, and shows up in the answer badge, at hints and rules and on Yanlışlarım',()=>{
- // Not next to the welcome text any more (the learner asked): he comes up from the corner on every study page.
+test('Paul pops up all over the screen now and then (waving every other time, his other animations in between), and shows up in the answer badge, at hints and rules and on Yanlışlarım',()=>{
+ // Not next to the welcome text any more (the learner asked): he comes up on every study page, each time from another place.
  assert.ok(!read('app/home-tour.tsx').includes('PaulHoca'));
  const tsx=read('app/paul-hoca.tsx');
- assert.ok(tsx.includes('export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_SHOW_MS=3600;')&&tsx.includes('<div key={visit} className="paul-peek" aria-hidden="true"><img src={PAUL_PICTURES.hello}'));
+ assert.ok(tsx.includes('export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_GAP_MS=PEEK_EVERY_MS/2,PEEK_SHOW_MS=3600;'),'a visit every 75 s, a wave every 2.5 min');
+ assert.ok(tsx.includes("export const PEEK_SPOTS=['bottom-right','left','bottom-center','right','bottom-left'] as const;"));
+ assert.ok(tsx.includes("export const PEEK_OTHER_POSES:readonly PaulPose[]=['correct','cheer','think','tip','desk'];"),'all his other animations, the raised finger stays for wrong answers');
+ assert.ok(tsx.includes("return {pose:n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length],spot:PEEK_SPOTS[n%PEEK_SPOTS.length]};"));
+ assert.ok(tsx.includes("<div key={visit.n} className={'paul-peek peek-'+visit.spot+' pose-'+visit.pose} aria-hidden=\"true\"><img src={PAUL_PICTURES[visit.pose]}"));
+ assert.ok(tsx.includes("later(()=>setVisit(null),PEEK_SHOW_MS);later(peek,PEEK_GAP_MS);"));
+ const peekCss=read('app/paul-hoca.css');
+ for(const spot of ['bottom-left','bottom-center','right','left'])assert.ok(peekCss.includes('.paul-peek.peek-'+spot+' {'),spot);
+ assert.ok(peekCss.includes('@keyframes paul-peek-right')&&peekCss.includes('@keyframes paul-peek-left'));
  assert.ok(tsx.includes("if(busyScreen()){later(peek,12000);return;}")&&tsx.includes("if(!motion||QUIET_PAGES.test(window.location.pathname))return;"));
  assert.ok(tsx.includes("if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}"),'hello sound once per visit');
  assert.ok(read('app/paul-hoca.css').includes('@keyframes paul-peek'));
@@ -65,8 +73,14 @@ test('Paul\'s sounds are effects, never speech, and follow the sound settings',a
  assert.ok(tsx.includes('playLearningSound(id)'),'through the sound settings (on/off, volume)');
  // He only checks whether a voice is speaking (to wait for a quiet moment); he never speaks himself.
  for(const word of ['speak(','SpeechSynthesisUtterance','useGermanSpeech'])assert.ok(!tsx.includes(word),word);
- // Correct and wrong answers keep only their own effect sound (then the right answer is read): Paul adds none there.
+ // "Harika!": the chosen correct sound and Paul's desk drumming play together (the learner asked); the right answer is
+ // read only after both have ended. A wrong answer keeps only its own sound.
  assert.ok(!tsx.includes('correct:\'paul')&&!tsx.includes('wrong:\'paul'));
+ const answer=read('app/study-shared.tsx');
+ assert.ok(answer.includes("const sounds=kind==='correct'?[chosen.correct,'paulDrum' as const]:[kind==='wrong'?chosen.wrong:chosen.complete];"));
+ assert.ok(answer.includes("let left=sounds.length;const done=()=>{if(--left>0||generation.current!==token)return;cancel.current=null;after?.();};"));
+ const drum=require('node:fs').readFileSync('lib/effect-sounds.ts','utf8');
+ assert.ok(/paulDrum:\[[^\]]*start:\.76,duration:\.14/.test(drum),'a short drum: the answer is read about one second later');
  const sounds=read('scripts/sounds/make-sounds.mjs');
  for(const id of ['paulHello','paulTip','paulHmm','paulClap','paulDrum'])assert.ok(sounds.includes(' '+id+':()=>'),id);
 });

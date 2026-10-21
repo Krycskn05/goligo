@@ -1,4 +1,4 @@
-// LernKoko duman testi: yerel geliştirme sunucusunu (http://localhost:5173)
+// Goliqo duman testi: yerel geliştirme sunucusunu (http://localhost:5173)
 // gerçek bir tarayıcıyla açar, ekran görüntüsü alır; üyelik akışını (üye ol, çıkış,
 // giriş, Hesabım, hesabı silme) yerel bir deneme hesabıyla dener ve kayıt API'sini
 // yerel giriş taklidiyle (local_seedy) dener. Yalnızca yerel veritabanına yazar.

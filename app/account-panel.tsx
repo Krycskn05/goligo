@@ -23,8 +23,8 @@ function Status({error,done}:{error:string;done:string}){
  return done?<p className="lk-form-done" role="status">{done}</p>:null;
 }
 
-function Card({icon,title,children}:{icon:ReactNode;title:string;children:ReactNode}){
- return <section className="lk-account-card"><h2>{icon}{title}</h2>{children}</section>;
+function Card({icon,title,id,children}:{icon:ReactNode;title:string;id?:string;children:ReactNode}){
+ return <section className="lk-account-card" id={id}><h2>{icon}{title}</h2>{children}</section>;
 }
 
 /** Hesabım: ad, şifre, site turu, verilerimi indir, çıkış ve hesabı silme; sayfanın dilinde (`texts` sunucudan gelir). */
@@ -60,7 +60,8 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
    </form>
   </Card>
 
-  <Card icon={<KeyRound size={20} aria-hidden="true"/>} title={texts.changePassword}>
+  {/* The header's account menu links here (app/account-menu.tsx: /hesabim#sifre). */}
+  <Card icon={<KeyRound size={20} aria-hidden="true"/>} title={texts.changePassword} id="sifre">
    <form className="lk-auth-form" onSubmit={password} data-account-password>
     <label className="lk-field"><span>{texts.currentPassword}</span><input name="current" type="password" autoComplete="current-password" required maxLength={128}/></label>
     <label className="lk-field"><span>{texts.newPassword}</span><input name="next" type="password" autoComplete="new-password" required minLength={8} maxLength={128}/><small>{texts.minChars}</small></label>

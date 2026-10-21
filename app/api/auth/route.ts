@@ -116,7 +116,7 @@ export async function POST(request:Request){
    const member=await memberByEmail(db,email);
    if(member){
     const mailer=getMailer();if(!mailer)throw new Error('E-posta gönderimi (EMAIL bağlantısı) yok');
-    const language=isSiteLanguage(body.language)?body.language:requestLanguage(request.headers.get('cookie'));
+    const language=isSiteLanguage(body.language)?body.language:requestLanguage(request.headers.get('cookie'),request.headers.get('accept-language'));
     const resetToken=await createPasswordReset(db,member.id,now);
     await mailer.send(await resetMail(language,member.email,member.name,resetLink(url.origin,resetToken)));
    }

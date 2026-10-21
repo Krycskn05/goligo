@@ -76,6 +76,8 @@
 .lk-account-actions { display:flex; flex-wrap:wrap; gap:10px; }
 .lk-account-actions .btn,.lk-account-card .btn { text-decoration:none; justify-self:start; }
 .lk-account-card h2 { display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:21px; }
+.lk-account-card { scroll-margin-top:16px; }
+.lk-account-card:target { box-shadow:0 0 0 3px #ffd968,var(--soft); }
 .lk-account-card h2 svg { color:var(--blue-2); }
 .lk-account-card p { color:var(--ink-2); margin:0 0 14px; }
 .lk-danger summary { cursor:pointer; color:#a3284a; font-weight:800; min-height:44px; display:inline-flex; align-items:center; }

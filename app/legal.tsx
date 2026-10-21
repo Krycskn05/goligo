@@ -2,7 +2,7 @@ import {SITE_CONTACT_EMAIL} from '@/lib/site-brand';
 import {legalText} from '@/lib/legal-copy';
 import {languageLocale,type SiteLanguage} from '@/lib/site-languages';
 /** Gizlilik metni ve kullanım koşullarının son güncelleme tarihi (dil çerezi eklendi). */
-export const LEGAL_UPDATED='2026-10-21';
+export const LEGAL_UPDATED='2026-10-22';
 /** A date with its month name in the page's language ("21 Ekim 2026", "21. Oktober 2026" …); 21.10.2026 where the
  * browser or server has no month names for the language. */
 export function longDate(date:Date,language:SiteLanguage){

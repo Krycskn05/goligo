@@ -190,7 +190,7 @@ strong { font-weight:700; }
 @media (prefers-reduced-motion:reduce) { .vault-category-card:hover,.toon-topic-card:hover,.toon-app .btn:hover:enabled,.object-option:hover:enabled,.practice-mode-button:hover:enabled { transform:none; } }
 
 /* Header: the Goliqo logo on a warm beige base (the learner asked), colourful round buttons and a few small stars. */
-.toon-app .work-header.site-header,.work-header.logo-header.site-header { position:relative; overflow:hidden; background:linear-gradient(180deg,#f5e4c3 0,#f9ecd3 55%,#fcf4e4 100%); border-color:#efdcb7; box-shadow:0 10px 26px rgba(150,110,50,.12),inset 0 1px 0 #fff8ea; }
+.toon-app .work-header.site-header,.work-header.logo-header.site-header { position:relative; overflow:hidden; backdrop-filter:none; -webkit-backdrop-filter:none; background:linear-gradient(180deg,#f5e4c3 0,#f9ecd3 55%,#fcf4e4 100%); border-color:#efdcb7; box-shadow:0 10px 26px rgba(150,110,50,.12),inset 0 1px 0 #fff8ea; }
 /* The header clock (app/site-greeting.tsx): no frame (the learner asked), right on the beige header. */
 .site-greeting { position:relative; margin:0; padding:4px 10px 4px 4px; background:none; border:0; border-radius:20px; box-shadow:none; color:var(--ink); line-height:1.15; }
 .site-greeting-waiting { display:block; width:190px; height:68px; }
@@ -206,8 +206,9 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 .site-header .site-language select:hover { background:rgba(255,255,255,.55); }
 .site-header .lk-effects-button { background:#fff5d6; border:2px solid #ffd968; box-shadow:0 4px 0 #f5df9c; color:#b77800; }
 .site-header .lk-effects-button:hover { background:#ffefc2; }
-.site-header .site-account { background:#ffeef3; border:2px solid #ffb3c6; box-shadow:0 4px 0 #f7cdd8; color:#e05c80; }
-.site-header .site-account:hover { background:#ffe3eb; }
+/* The account button wears the sound button's yellow (the learner asked, 22 October 2026: not pink). */
+.site-header .site-account { background:#fff5d6; border:2px solid #ffd968; box-shadow:0 4px 0 #f5df9c; color:#b77800; cursor:pointer; }
+.site-header .site-account:hover,.site-header .site-account[aria-expanded=true] { background:#ffefc2; }
 .site-header .site-home:not(.site-account),.logo-header.site-header .object-back { background:#eaf8ee; border:2px solid #a8dcb6; box-shadow:0 4px 0 #cdebd5; color:#2e8b57; }
 .site-header .lk-effects-button:hover,.site-header .site-home:hover { transform:translateY(-1px); }
 @media (prefers-reduced-motion:reduce) { .site-sparkle { animation:none; } }
@@ -325,6 +326,26 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
    (logo + bubble, then site language on the left and the buttons on the right); phones three compact rows
    (logo + buttons, the bubble, the site language). */
 .site-header-buttons { display:flex; align-items:center; gap:10px; }
+/* The account menu (app/account-menu.tsx): under the button, its parts come in one after another. The list is fixed on
+   the screen because the header cuts off what reaches outside it; the header's background is solid, so it needs no
+   backdrop blur (a blur would hold the fixed list inside the header). */
+.site-account-menu { position:relative; display:inline-flex; }
+.site-account-list { position:fixed; z-index:80; width:max-content; min-width:220px; max-width:min(300px,calc(100vw - 32px)); margin:0; padding:8px; list-style:none; display:grid; gap:4px; background:#fffdf6; border:2px solid #ffd968; border-radius:20px; box-shadow:0 6px 0 #f5df9c,0 18px 34px rgba(31,59,92,.16); }
+.site-account-list[hidden] { display:none; }
+.site-account-list::before { content:""; position:absolute; top:-8px; inset-inline-end:16px; width:14px; height:14px; background:#fffdf6; border-top:2px solid #ffd968; border-inline-start:2px solid #ffd968; transform:rotate(45deg); border-start-start-radius:3px; }
+[dir=rtl] .site-account-list::before { transform:rotate(-45deg); }
+.site-account-list li { animation:site-account-in .26s cubic-bezier(.2,.9,.3,1.2) both; }
+.site-account-list a,.site-account-list button { display:flex; align-items:center; gap:12px; width:100%; min-height:46px; padding:6px 12px 6px 6px; border:0; border-radius:14px; background:transparent; color:#1f3b5c; font:inherit; font-size:15px; font-weight:700; text-align:start; text-decoration:none; cursor:pointer; }
+[dir=rtl] .site-account-list a,[dir=rtl] .site-account-list button { padding:6px 6px 6px 12px; }
+.site-account-list a:hover,.site-account-list button:hover,.site-account-list a:focus-visible,.site-account-list button:focus-visible { background:#fff1c7; }
+.site-account-list a:focus-visible,.site-account-list button:focus-visible { outline:3px solid #417e7c; outline-offset:1px; }
+.site-account-list button:disabled { opacity:.7; cursor:wait; }
+.site-account-icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 34px; width:34px; height:34px; border-radius:50%; background:#fff5d6; border:2px solid #ffd968; color:#b77800; }
+.site-account-list [data-account-item=sign-out] { border-top:1px dashed #f1d98f; margin-top:2px; padding-top:4px; }
+.site-account-list [data-account-item=sign-out] .site-account-icon { background:#fff0ec; border-color:#ffc2b3; color:#d4573a; }
+@keyframes site-account-in { from { opacity:0; transform:translateY(-8px) scale(.97); } to { opacity:1; transform:none; } }
+html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
+@media (prefers-reduced-motion:reduce) { .site-account-list li { animation:none; } }
 @media (min-width:761px) and (max-width:1179px) {
  .toon-app .work-header.site-header,.work-header.logo-header.site-header { display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-areas:"logo bubble" "tools tools"; align-items:center; column-gap:18px; row-gap:12px; border-radius:30px; }
  .site-header .site-logo-brand { grid-area:logo; }

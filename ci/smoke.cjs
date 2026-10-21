@@ -84,7 +84,9 @@ async function memberFlow(browser) {
     await m.waitForLoadState("networkidle");
     const landing = await m.locator("[data-landing]").count();
     const r = await m.request.get(BASE + "/api/study");
-    return [landing === 1 && r.status() === 401, `tanitim ${landing}, kayitlar HTTP ${r.status()}`];
+    const body = await r.json().catch(() => ({}));
+    const closed = body.guest === true && (body.sessions || []).length === 0 && (body.reviews || []).length === 0;
+    return [landing === 1 && closed, `tanitim ${landing}, kayitlar HTTP ${r.status()} misafir ${body.guest === true}`];
   });
   await step("Uyelik: yanlis sifreyle giris olmuyor", async () => {
     await go("/giris?return_to=%2Fhesabim");
@@ -114,8 +116,8 @@ async function memberFlow(browser) {
   await ctx.close();
 }
 
-// Site dili (ogrenci istedi): ana dil Almanca (telefonun dili ne olursa olsun); herkes uye olmadan site dilini
-// degistirebilir, secilen dil cerezde kalir; yasal sayfalar da her dilde.
+// Site dili (ogrenci istedi, 22 Ekim 2026): ilk girişte telefonun ya da bilgisayarin dili (sitede varsa), yoksa Almanca;
+// herkes uye olmadan site dilini degistirebilir, secilen dil cerezde kalir; yasal sayfalar da her dilde.
 async function languageFlow(browser) {
   const ctx = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const page = await ctx.newPage();
@@ -125,12 +127,21 @@ async function languageFlow(browser) {
     await page.waitForLoadState("networkidle");
   };
   try {
-    for (const [url, h1] of [["/", null], ["/giris", "Anmelden"], ["/uye-ol", "Kostenlos registrieren"]]) {
+    for (const [url, h1] of [["/", null], ["/giris", "Giriş yap"], ["/uye-ol", "Ücretsiz üye ol"]]) {
       await page.goto(BASE + url, { waitUntil: "networkidle", timeout: 90000 });
       const shown = await info();
-      record(`Dil: ${url} Turkce telefonda da Almanca aciliyor`, shown.lang === "de" && (!h1 || shown.h1 === h1), JSON.stringify(shown));
+      record(`Dil: ${url} Turkce telefonda Turkce aciliyor`, shown.lang === "tr" && (!h1 || shown.h1 === h1), JSON.stringify(shown));
     }
-    await page.screenshot({ path: path.join(OUT, "30-dil-uye-ol-almanca.png") });
+    await page.screenshot({ path: path.join(OUT, "30-dil-uye-ol-telefon-dili.png") });
+    {
+      // Sitede olmayan bir telefon dili (Isvecce): Almanca.
+      const other = await browser.newContext({ ...devices["iPhone 13"], locale: "sv-SE" });
+      const sv = await other.newPage();
+      await sv.goto(BASE + "/uye-ol", { waitUntil: "networkidle", timeout: 90000 });
+      const shown = await sv.evaluate(() => ({ lang: document.querySelector(".lk-public")?.getAttribute("lang"), h1: document.querySelector("h1")?.textContent?.trim() }));
+      record("Dil: sitede olmayan telefon dilinde (Isvecce) Almanca aciliyor", shown.lang === "de" && shown.h1 === "Kostenlos registrieren", JSON.stringify(shown));
+      await other.close();
+    }
     // Dil paketinden okunan bir dil (Rusca): sunucu paketi yukleyip sayfayi o dilde yaziyor (Ingilizceye dusmuyor).
     await choose("ru");
     const ru = await info();
@@ -187,24 +198,34 @@ async function languageFlow(browser) {
   page.on("console", (m) => { if (m.type() === "error" && !m.text().startsWith("Failed to load resource")) errors.push("console: " + m.text()); });
   page.on("response", (r) => { const u = r.url(); if (r.status() >= 400 && !u.includes("/voices/") && !(r.status() === 401 && u.includes("/api/"))) errors.push(`yuklenemedi ${r.status()}: ${u.replace(BASE, "")}`); });
 
-  // Girissiz ziyaretci: tanitim sayfasini ve yasal sayfalari gorur; ders sayfalari giris sayfasina yonlenir.
+  // Girissiz ziyaretci: tanitim sayfasini ve yasal sayfalari gorur; ders sayfalari tadimlik olarak acilir (ogrenci istedi,
+  // 21 Ekim 2026: her bolumun ilk kismi acik, ust kisimda "uye olmadan deniyorsun" notu); Hesabim giris ister.
   await visit(page, "/", "01-tanitim.png", errors);
   record("Girissiz ana sayfada tanitim ve uye ol dugmesi var",
     (await page.locator("[data-landing]").count()) === 1 && (await page.locator("[data-landing-register]").count()) === 1, "");
-  for (const target of ["/ev-esyalar", "/fiiller", "/a1-2/ev-ve-yasam", "/hesabim"]) {
+  for (const target of ["/ev-esyalar", "/fiiller", "/a1-2/ev-ve-yasam"]) {
     await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
     const at = new URL(page.url());
-    record(`Girissiz ${target} giris sayfasina yonleniyor`, at.pathname === "/giris" && at.searchParams.get("return_to") === target, page.url());
+    const banner = await page.locator("[data-guest-banner]").count();
+    record(`Girissiz ${target} tadimlik olarak aciliyor`, at.pathname === target && banner === 1, `${page.url()} · not ${banner}`);
+  }
+  {
+    await page.goto(BASE + "/hesabim", { waitUntil: "networkidle", timeout: 90000 });
+    const at = new URL(page.url());
+    record("Girissiz /hesabim giris sayfasina yonleniyor", at.pathname === "/giris" && at.searchParams.get("return_to") === "/hesabim", page.url());
   }
   await visit(page, "/giris", "01b-giris.png", errors);
   await visit(page, "/uye-ol", "01c-uye-ol.png", errors);
   await visit(page, "/gizlilik", "01d-gizlilik.png", errors);
   await visit(page, "/kullanim-kosullari", "01e-kullanim-kosullari.png", errors);
 
-  const anon = await page.request.get(BASE + "/api/study");
-  record("Girissiz kayit istegi reddediliyor (401 beklenir)", anon.status() === 401, `HTTP ${anon.status()}`);
-  const spoofed = await page.request.get(BASE + "/api/study", { headers: { "oai-authenticated-user-id": "local_seedy", "oai-authenticated-user-email": "seedy@sites.test" } });
-  record("Sahte kimlik basligi ise yaramiyor (401 beklenir)", spoofed.status() === 401, `HTTP ${spoofed.status()}`);
+  // Girissiz kayit istegi: bos misafir cevabi (kimsenin kaydi yok); yazma istekleri (not, yildiz) 401.
+  const guestAnswer = async (response) => { const body = await response.json().catch(() => ({})); return { status: response.status(), guest: body.guest === true, empty: (body.reviews || []).length === 0 && (body.sessions || []).length === 0 && Object.keys(body.notes || {}).length === 0 }; };
+  const anon = await guestAnswer(await page.request.get(BASE + "/api/study"));
+  const note = await page.request.post(BASE + "/api/study", { headers: { origin: BASE, "content-type": "application/json" }, data: { action: "note", key: "tour", value: "done" } });
+  record("Girissiz kayit istegi bos misafir cevabi aliyor, yazma 401", anon.status === 200 && anon.guest && anon.empty && note.status() === 401, `${JSON.stringify(anon)}, not HTTP ${note.status()}`);
+  const spoofed = await guestAnswer(await page.request.get(BASE + "/api/study", { headers: { "oai-authenticated-user-id": "local_seedy", "oai-authenticated-user-email": "seedy@sites.test" } }));
+  record("Sahte kimlik basligi ise yaramiyor (yine misafir)", spoofed.status === 200 && spoofed.guest && spoofed.empty, JSON.stringify(spoofed));
 
   await memberFlow(browser);
   await languageFlow(browser);

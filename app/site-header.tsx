@@ -1,8 +1,9 @@
 'use client';
-import {Globe,House,UserRound} from 'lucide-react';
+import {House} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {SiteLogo} from './site-logo';
 import {SiteGreeting} from './site-greeting';
+import {TopIcon} from './top-icons';
 import {EffectsSettingsButton} from './learning-effects';
 import type {StudyStats} from '@/lib/progress';
 import type {VaultLanguage,VaultTranslations} from '@/lib/object-vault-copy';
@@ -27,11 +28,11 @@ export function SiteHeader({language,languages,onLanguage,homeHref,homeLabel,sho
   <a className="work-brand site-logo-brand" href={homeHref} aria-label={SITE_NAME+' · '+homeLabel}><SiteLogo/></a>
   <SiteGreeting language={language} line={pickText(greetingLine,language)}/>
   <div className="site-header-tools">
-   <label className="site-language"><Globe size={16} aria-hidden="true"/><span className="site-language-label">{label}</span><select value={language} aria-label={label} onChange={event=>onLanguage(event.target.value)}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label>
+   <label className="site-language"><TopIcon name="language" size={26}/><span className="site-language-label">{label}</span><select value={language} aria-label={label} onChange={event=>onLanguage(event.target.value)}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label>
    <div className="site-header-buttons">
     {showHome&&<a className="object-back site-home" href={homeHref}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
     <EffectsSettingsButton language={language}/>
-    <a className="site-home site-account" href="/hesabim" aria-label={account} title={account}><UserRound size={19} aria-hidden="true"/></a>
+    <a className="site-home site-account" href="/hesabim" aria-label={account} title={account}><TopIcon name="account" size={30}/></a>
    </div>
   </div>
  </header>;

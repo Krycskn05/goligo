@@ -1,6 +1,7 @@
 'use client';
 import {useState,type FormEvent,type ReactNode} from 'react';
-import {Compass,Download,KeyRound,Loader2,LogOut,Trash2,UserRound} from 'lucide-react';
+import {Compass,Download,KeyRound,Loader2,LogOut,Trash2} from 'lucide-react';
+import {TopIcon} from './top-icons';
 import {BrandMascot} from './site-logo';
 
 type Props={name:string;email:string;since:string};
@@ -49,7 +50,7 @@ export default function AccountPanel({name:initialName,email,since}:Props){
    <div className="lk-account-actions"><a className="btn small" href="/">Derslere dön</a><button type="button" className="btn secondary small" onClick={()=>void logout()} disabled={!!busy} data-account-logout>{spin('logout')||<LogOut size={17} aria-hidden="true"/>}Çıkış yap</button></div>
   </header>
 
-  <Card icon={<UserRound size={20} aria-hidden="true"/>} title="Adın">
+  <Card icon={<TopIcon name="account" size={26}/>} title="Adın">
    <form className="lk-auth-form" onSubmit={rename}>
     <label className="lk-field"><span>Görünen ad</span><input name="name" type="text" autoComplete="name" required maxLength={60} defaultValue={name}/></label>
     <Status error={errors.name??''} done={done.name??''}/>

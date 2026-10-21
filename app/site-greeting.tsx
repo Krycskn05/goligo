@@ -2,16 +2,25 @@
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {X} from 'lucide-react';
-import {germanMoment,PART_NOUN,WEEKDAYS,MONTHS,isoWeek,type Phrase} from '@/lib/german-time';
+import {germanMoment,PART_NOUN,WEEKDAYS,MONTHS,isoWeek,type GreetingNote,type PartOfDay} from '@/lib/german-time';
 import {greetingText,type GreetingCopyKey} from '@/lib/greeting-copy';
 import type {VaultLanguage} from '@/lib/object-vault-copy';
 import {languageDirection} from '@/lib/site-languages';
 import {usePaulMotion} from './paul-hoca';
+import {TopIcon,type TopIconName} from './top-icons';
 
-/** One short German line about now: the part of the day, weekday, date and KW (the time is the clock and the words). */
-function facts(date:Date){
- const part=PART_NOUN[germanMoment(date).part];
- return `${part} · ${WEEKDAYS[date.getDay()]}, ${date.getDate()}. ${MONTHS[date.getMonth()]} · KW ${isoWeek(date)}`;
+/** A small coloured picture for the part of the day: the sun rising, high, with a cloud in the afternoon, setting, and
+ * the moon at night. */
+export function PartOfDayIcon({part}:{part:PartOfDay}){
+ const sun=(cx:number,cy:number,r:number)=><g><circle cx={cx} cy={cy} r={r} fill="#f6bd47" stroke="#e8962c" strokeWidth="1.6"/>{Array.from({length:8},(_,i)=><line key={i} x1={cx} y1={cy-r-2.2} x2={cx} y2={cy-r-4.4} stroke="#e8962c" strokeWidth="1.8" strokeLinecap="round" transform={`rotate(${i*45} ${cx} ${cy})`}/>)}</g>;
+ const horizon=(color:string)=><g><path d="M6 16a6 6 0 0 1 12 0z" fill={color} stroke="#e8742c" strokeWidth="1.6" strokeLinejoin="round"/>{[-60,-30,0,30,60].map(angle=><line key={angle} x1="12" y1="7.6" x2="12" y2="5.2" stroke="#e8742c" strokeWidth="1.8" strokeLinecap="round" transform={`rotate(${angle} 12 16)`}/>)}<line x1="3" y1="16.5" x2="21" y2="16.5" stroke="#d9822b" strokeWidth="1.8" strokeLinecap="round"/><line x1="7" y1="20" x2="17" y2="20" stroke="#e9b26a" strokeWidth="1.6" strokeLinecap="round"/></g>;
+ return <svg className={'sg-part-icon part-'+part} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  {part==='morgen'&&horizon('#ffd36b')}
+  {(part==='vormittag'||part==='mittag')&&sun(12,12,5)}
+  {part==='nachmittag'&&<>{sun(9.5,9.5,4.2)}<path d="M9 19.5h9.2a3.3 3.3 0 0 0 .2-6.6 4.4 4.4 0 0 0-8.3 1.3A2.7 2.7 0 0 0 9 19.5z" fill="#fff" stroke="#8fb3d9" strokeWidth="1.6" strokeLinejoin="round"/></>}
+  {part==='abend'&&horizon('#ff9f5a')}
+  {part==='nacht'&&<><path d="M15.5 3.8a8.3 8.3 0 1 0 4.9 13.9A7 7 0 0 1 15.5 3.8z" fill="#ffe08a" stroke="#d9a520" strokeWidth="1.6" strokeLinejoin="round"/><path d="M18.6 4.2l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#8fb3d9"/></>}
+ </svg>;
 }
 
 /** A small analog clock for the learner's own time (the learner asked for it instead of digits): turquoise rim, mango
@@ -30,20 +39,25 @@ export function AnalogClock({date,seconds=true,className=''}:{date:Date;seconds?
  </svg>;
 }
 
+/** The learner's top-menu icons for the groups of the window (the part of the day has its own small picture). */
+const GROUP_ICONS:Partial<Record<GreetingCopyKey,TopIconName>>={greeting:'voice',day:'calendar',week:'calendar',time:'clock'};
+
+/** The date line of the window: part of the day, weekday, date and KW. */
+function facts(date:Date){
+ const part=PART_NOUN[germanMoment(date).part];
+ return `${part} · ${WEEKDAYS[date.getDay()]}, ${date.getDate()}. ${MONTHS[date.getMonth()]} · KW ${isoWeek(date)}`;
+}
+
 /**
- * The header's speech bubble (the learner asked): an analog clock, a German greeting for the learner's own clock
- * (Guten Morgen, Guten Tag, Mahlzeit, Guten Nachmittag, Guten Abend, Hallo du Nachteule), the time in words, always up
- * to date (Es ist zwanzig nach vier.), one line with the part of the day, day, date and calendar week (no digital
- * time), and one more German sentence about now. Every line says it another correct way on each page load and
- * every minute. A tap
- * opens a window with all the ways to say it (greeting, time of day, day and date, week, time — official and
- * everyday), with short notes in the site language. Before the page knows the clock it says "Hallo!".
+ * The header's clock (the learner asked: no frame, only the clock, the day and the part of the day, placed neatly):
+ * an analog clock for the learner's own time (ticking second hand with motion on; no digits), the weekday in German
+ * (Mittwoch) and the part of the day with a small picture (Morgen, Vormittag, Mittag, Nachmittag, Abend, Nacht). A
+ * tap opens a window with all the ways to say it (greeting, time of day, day and date, week, time — official and
+ * everyday), with short notes in the site language. Before the page knows the learner's clock it keeps the place empty.
  */
 export function SiteGreeting({language,line}:{language:VaultLanguage;line:string}){
  const motion=usePaulMotion();
  const [now,setNow]=useState<Date|null>(null);
- // A different start on every page load, so the bubble says it another way each time (the learner asked).
- const [seed]=useState(()=>Math.floor(Math.random()*997));
  const [open,setOpen]=useState(false);
  const button=useRef<HTMLButtonElement>(null);
  const closeButton=useRef<HTMLButtonElement>(null);
@@ -57,35 +71,26 @@ export function SiteGreeting({language,line}:{language:VaultLanguage;line:string
   return()=>{document.removeEventListener('keydown',key);button.current?.focus();};
  },[open]);
  const t=(key:GreetingCopyKey)=>greetingText(language,key);
- if(!now)return <p className="site-greeting"><b lang="de" dir="ltr">Hallo!</b><span lang={language}>{line}</span></p>;
+ if(!now)return <span className="site-greeting site-greeting-waiting" aria-hidden="true"/>;
  const moment=germanMoment(now);
- // Each line picks one of its correct alternatives: another one on every page load and every minute (the learner
- // asked) — the greeting (not the goodbye "Gute Nacht!"), the time in words (no digits: the clock shows them) and one
- // more sentence about the part of the day, the day, the date or the week.
- const minute=Math.floor(now.getTime()/60000);
- const pick=<T,>(list:readonly T[],salt:number)=>list[(seed*salt+minute)%list.length];
- const greeting=pick(moment.greetings.filter(item=>!item.note||item.note==='everyday'||item.note==='north'||item.note==='lunch'),1);
- const spoken=pick(moment.time.filter(item=>!/\d/.test(item.de)),7);
- const sayings:Phrase[]=[...moment.partPhrases,...moment.day,...moment.week];
- const saying=pick(sayings,13);
- const groups:[GreetingCopyKey,Phrase[]][]=[['greeting',moment.greetings],['partOfDay',moment.partPhrases],['day',moment.day],['week',moment.week],['time',moment.time]];
+ const groups:[GreetingCopyKey,{de:string;note?:GreetingNote}[]][]=[['greeting',moment.greetings],['partOfDay',moment.partPhrases],['day',moment.day],['week',moment.week],['time',moment.time]];
+ const time=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
  return <>
   <button ref={button} type="button" className="site-greeting site-greeting-button" aria-haspopup="dialog" aria-expanded={open} title={t('open')} onClick={()=>setOpen(true)} data-site-greeting={moment.part}>
    <AnalogClock date={now} seconds={motion}/>
-   <span className="site-greeting-words">
-    <b lang="de" dir="ltr">{greeting.de}</b>
-    <span className="site-greeting-time" lang="de" dir="ltr">{spoken.de}</span>
-    <span className="site-greeting-facts" lang="de" dir="ltr">{facts(now)}</span>
-    <span key={saying.de} className="site-greeting-say" lang="de" dir="ltr" aria-hidden="true">{saying.de}</span>
+   <span className="site-greeting-words" lang="de" dir="ltr">
+    <strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>
+    <span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>
+    <span className="lk-visually-hidden">{time}</span>
    </span>
   </button>
   {open&&createPortal(<div className="sg-backdrop" onPointerDown={event=>{if(event.target===event.currentTarget)setOpen(false);}}>
    <section className="sg-panel" role="dialog" aria-modal="true" aria-labelledby="sg-title" lang={language} dir={languageDirection(language)}>
     <button ref={closeButton} type="button" className="sg-close" aria-label={t('close')} onClick={()=>setOpen(false)}><X size={18} aria-hidden="true"/></button>
-    <h2 id="sg-title">{t('panelTitle')}</h2>
+    <h2 id="sg-title"><TopIcon name="clock" size={30}/>{t('panelTitle')}</h2>
     <p className="sg-now" lang="de" dir="ltr">{facts(now)}</p>
     {groups.map(([key,phrases])=><div key={key} className={'sg-group sg-'+key} data-greeting-group={key}>
-     <h3>{t(key)}</h3>
+     <h3>{key==='partOfDay'?<PartOfDayIcon part={moment.part}/>:<TopIcon name={GROUP_ICONS[key]??'clock'} size={22}/>}{t(key)}</h3>
      {key==='time'&&<AnalogClock date={now} seconds={motion} className="sg-clock"/>}
      <ul>{phrases.map(item=><li key={item.de}><span lang="de" dir="ltr">{item.de}</span>{item.note&&<small>{t(item.note)}</small>}</li>)}</ul>
      {key==='week'&&<p className="sg-hint">{t('kw')}</p>}

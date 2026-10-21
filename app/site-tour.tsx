@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useLayoutEffect,useRef,useState,type CSSProperties} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowLeft,ArrowRight,Check,Play,Square,Volume2,VolumeX,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,Check,Play,Square,Volume2,X} from 'lucide-react';
 import {TOUR_STEPS,TOUR_KEY,TOUR_DONE,TOUR_PARAM,shouldStartTour,placeTip,type Box,type TipPlace,type TourStepId} from '@/lib/site-tour';
 import {tourText,type TourCopyKey} from '@/lib/tour-copy';
 import {effectsText} from '@/lib/effects-copy';
@@ -17,6 +17,7 @@ import {useGermanSpeech} from './study-shared';
 import {VOICE_SPEEDS} from './learning-effects';
 import {PAUL_PICTURES,PAUL_STILL,usePaulMotion,type PaulPose} from './paul-hoca';
 import {accountLabel,siteLanguageLabel} from './site-header';
+import {TopIcon} from './top-icons';
 
 type Step={id:TourStepId;target:string|null};
 type Spot={step:TourStepId;hole:Box;radius:number;place:TipPlace};
@@ -71,7 +72,7 @@ function SoundChoices({language}:{language:StudyLanguage}){
  }
  return <div className="st-sounds" data-no-effects="">
   <section aria-labelledby="st-voice-title">
-   <h3 id="st-voice-title">{tourText(language,'voiceQuestion')}</h3>
+   <h3 id="st-voice-title"><TopIcon name="voice" size={24}/>{tourText(language,'voiceQuestion')}</h3>
    {speech.siteVoicesState==='loading'&&<p className="st-note">{e('voiceLoading')}</p>}
    {speech.siteVoicesState==='unavailable'&&<p className="st-note">{e('voiceFallback')}</p>}
    <div className="st-voices" role="radiogroup" aria-labelledby="st-voice-title">
@@ -86,7 +87,7 @@ function SoundChoices({language}:{language:StudyLanguage}){
    <button type="button" className="st-listen" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();const voice=speech.siteVoices.find(item=>item.id===current);if(voice)speech.speak(voiceGreeting(voice));}} disabled={!speech.siteVoices.length}>{speech.busy?<Square size={14} aria-hidden="true"/>:<Play size={14} aria-hidden="true"/>}{e('listen')}</button>
   </section>
   <label className="st-switch">
-   <span>{preferences.enabled?<Volume2 size={18} aria-hidden="true"/>:<VolumeX size={18} aria-hidden="true"/>}<span><strong>{e('enabled')}</strong><small>{tourText(language,'effectsNote')}</small></span></span>
+   <span><TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={28}/><span><strong>{e('enabled')}</strong><small>{tourText(language,'effectsNote')}</small></span></span>
    <input type="checkbox" role="switch" checked={preferences.enabled} onChange={event=>update({enabled:event.target.checked})}/>
   </label>
   <section className="st-row">

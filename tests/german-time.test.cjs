@@ -48,26 +48,29 @@ test('day, date and week sentences',()=>{
  assert.deepEqual(de(g.weekPhrases(new Date(2026,9,21))),['Wir haben die 43. Kalenderwoche.','Wir haben KW 43.','Wir sind in der 43. Woche.','Das ist die dreiundvierzigste Woche des Jahres.']);
 });
 
-test('the header bubble and its window',()=>{
+test('the header clock and its window',()=>{
  const header=fs.readFileSync('app/site-header.tsx','utf8'),bubble=fs.readFileSync('app/site-greeting.tsx','utf8');
  assert.ok(header.includes('<SiteGreeting language={language} line={pickText(greetingLine,language)}/>'));
- assert.ok(bubble.includes('if(!now)return <p className="site-greeting"><b lang="de" dir="ltr">Hallo!</b>'),'"Hallo!" until the page knows the clock');
- // Another correct way on every page load and every minute (the learner asked), never the goodbye "Gute Nacht!".
- assert.ok(bubble.includes('const [seed]=useState(()=>Math.floor(Math.random()*997));')&&bubble.includes('const minute=Math.floor(now.getTime()/60000);'));
- assert.ok(bubble.includes('const pick=<T,>(list:readonly T[],salt:number)=>list[(seed*salt+minute)%list.length];'));
- assert.ok(bubble.includes("moment.greetings.filter(item=>!item.note||item.note==='everyday'||item.note==='north'||item.note==='lunch')"),'greetings only');
- assert.ok(bubble.includes("const spoken=pick(moment.time.filter(item=>!/\\d/.test(item.de)),7);"),'the time in words, no digits');
- // An analog clock and the time in words, always up to date; no digital time in the bubble (the learner asked).
- assert.ok(bubble.includes('<AnalogClock date={now} seconds={motion}/>')&&bubble.includes('<span className="site-greeting-time" lang="de" dir="ltr">{spoken.de}</span>'));
+ assert.ok(bubble.includes('if(!now)return <span className="site-greeting site-greeting-waiting" aria-hidden="true"/>;'),'the place stays empty until the page knows the clock');
+ // Only the clock, the day and the part of the day, without a frame (the learner asked); no greeting, week or
+ // sentences in the header any more — they are in the window.
+ assert.ok(bubble.includes('<AnalogClock date={now} seconds={motion}/>'));
+ assert.ok(bubble.includes('<strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>'));
+ assert.ok(bubble.includes("<span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>"));
+ for(const gone of ['site-greeting-time','site-greeting-facts','site-greeting-say','Math.random'])assert.ok(!bubble.includes(gone),gone);
  assert.ok(bubble.includes('setInterval(tick,motion?1000:15000)'),'the clock ticks every second');
- assert.ok(!/function facts[^}]*getHours/.test(bubble),'the facts line has no digits');
  assert.ok(bubble.includes('transform={`rotate(${angle} 50 50)`}')&&bubble.includes('const hourAngle=(h+m/60)*30,minuteAngle=(m+sec/60)*6,secondAngle=sec*6;'));
+ for(const part of ['morgen','vormittag','mittag','nachmittag','abend','nacht'])assert.ok(bubble.includes(part),'a picture for '+part);
  assert.ok(bubble.includes("['greeting',moment.greetings],['partOfDay',moment.partPhrases],['day',moment.day],['week',moment.week],['time',moment.time]"));
  assert.ok(bubble.includes('createPortal(')&&bubble.includes('role="dialog" aria-modal="true"')&&bubble.includes("event.key==='Escape'"));
  for(const word of ['speak(','SpeechSynthesis','useGermanSpeech'])assert.ok(!bubble.includes(word),'nothing is read aloud: '+word);
+ const css=fs.readFileSync('app/koko-theme.css','utf8');
+ assert.ok(css.includes('.site-greeting { position:relative; margin:0; padding:4px 10px 4px 4px; background:none; border:0;'),'no frame');
+ assert.ok(!css.includes('.site-greeting::before')&&!css.includes('.site-greeting::after'),'no speech-bubble tail');
+ for(const rule of ['.site-greeting-button {','.site-greeting-day {','.site-greeting-part {','.site-greeting-button .analog-clock {','.sg-clock {','.sg-backdrop {','.sg-panel {','.sg-group h3 {'])assert.ok(css.includes(rule),rule);
+ // Placed neatly: wide screens in the middle, middle widths on the right above the buttons, phones centred.
+ assert.ok(css.includes(' .site-header .site-greeting { margin-inline:auto; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:end; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:center; }'));
  // Texts in every site language (12 in the tuples, the others in their language pack).
  for(const id of site.siteLanguages.map(item=>item.id))for(const key of Object.keys(copy.greetingCopy))assert.ok(copy.greetingText(id,key).trim(),key+' '+id);
  for(const id of ['bg','zh','ti','ur'])for(const key of Object.keys(copy.greetingCopy)){const pack=JSON.parse(fs.readFileSync('lib/language-packs/'+id+'.json','utf8'));assert.ok(pack[copy.greetingCopy[key][2]],key+' in '+id);}
- const css=fs.readFileSync('app/koko-theme.css','utf8');
- for(const rule of ['.site-greeting-button {','.site-greeting-say {','.site-greeting-time {','.site-greeting-button .analog-clock {','.sg-clock {','.sg-backdrop {','.sg-panel {','.sg-group h3 {'])assert.ok(css.includes(rule),rule);
 });

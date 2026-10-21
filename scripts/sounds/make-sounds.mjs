@@ -103,6 +103,19 @@ export function knock(out,t0,amp,f=120,seed=71){
  for(let n=0;n<length;n++){const t=n/SR;const freq=f*(1+.7*Math.exp(-t/.012));phase+=TAU*freq/SR;out[start+n]+=amp*Math.exp(-t/.055)*Math.sin(phase);}
  marimba(out,t0,f*3.1,amp*.35,.05);click(out,t0,amp*.5,.005,seed);
 }
+/**
+ * Knuckles on a wooden desk, for Paul Hoca's "Harika!" (the learner chose it): the desk's hollow wooden ring in the
+ * 200–2400 Hz range plus a short band-passed noise tap, so it is heard on phone and laptop speakers too.
+ */
+export function woodKnock(out,t0,amp,variant=0,seed=71){
+ const s=1+.04*variant;const start=at(t0);
+ for(const [f,a,d] of [[205*s,.55,.045],[430*s,1,.03],[870*s,.6,.018],[1420*s,.35,.011],[2380*s,.22,.007]]){
+  const length=Math.min(out.length-start,Math.ceil(d*9*SR));
+  for(let n=0;n<length;n++)out[start+n]+=amp*a*Math.min(1,n/(.0004*SR))*Math.exp(-n/(d*SR))*Math.sin(TAU*f*n/SR);
+ }
+ const rnd=random(seed),length=Math.min(out.length-start,at(.018)),k=2*Math.sin(Math.PI*1800/SR);let low=0,band=0;
+ for(let n=0;n<length;n++){const x=n/length;const high=(rnd()*2-1)-low-.5*band;band+=k*high;low+=k*band;out[start+n]+=amp*1.4*band*(1-x)**3;}
+}
 /** Small room reverb (Schroeder/Freeverb style) mixed into the dry signal. */
 export function reverb(dry,wet,size=.78){
  const combs=[1116,1188,1277,1356,1422,1491,1557,1617].map(d=>({buf:new Float32Array(d),i:0,low:0}));
@@ -183,8 +196,9 @@ export const soundDesigns={
  paulTip:()=>{const b=track(.75);glock(b,0,C7,.6,.3);glock(b,.09,G6,.45,.36);bubble(b,.02,900,.06,.3,1.6);return finish(reverb(b,.2),.5);},
  paulHmm:()=>{const b=track(.95);slideWhistle(b,0,.3,430,470,.5,13);slideWhistle(b,.36,.36,470,760,.55,17);return finish(reverb(b,.12),.48);},
  paulClap:()=>{const b=track(1.55);const r=random(91);for(let i=0;i<14;i++){const t=i*.095+r()*.02;clap(b,t,.8+.2*r(),91+i);if(i%3===1)clap(b,t+.03+r()*.02,.5,191+i);}sparkle(b,.9,.5,6,.1,93);return finish(reverb(b,.24),.62);},
- // "Harika!": a quick drum roll on the desk and two firm knocks, short enough that the right answer is read soon after.
- paulDrum:()=>{const b=track(1.05);[[0,.9],[.09,.75],[.18,.9],[.27,.75],[.36,.9],[.45,.8],[.62,1.25],[.76,1.35]].forEach(([t,a],i)=>knock(b,t,a,i%2?128:116,71+i));sparkle(b,.76,.24,4,.08,97);return finish(reverb(b,.12),.66);},
+ // "Harika!": a quick roll of knuckles on the wooden desk and two firm knocks (option A, the learner chose it after
+ // listening: the old low thud was hardly heard on phone speakers), short enough that the right answer is read soon after.
+ paulDrum:()=>{const b=track(1.05);[[0,.8],[.09,.65],[.18,.8],[.27,.65],[.36,.8],[.45,.7],[.62,1.15],[.76,1.3]].forEach(([t,a],i)=>woodKnock(b,t,a,i%2,71+i));return finish(reverb(b,.1),.78);},
  completeMarimba:()=>{const b=track(1.6);marimba(b,0,C4,.7,.25);marimba(b,.16,C4,.7,.25);marimba(b,.32,G4,.7,.25);[C5,E5,G5,C6].forEach(f=>marimba(b,.48,f,.45,.8));glock(b,.48,C7,.25,.8);return finish(reverb(b,.2),.72);},
 };
 export const soundIds=Object.keys(soundDesigns);

@@ -83,4 +83,11 @@ test('Paul\'s sounds are effects, never speech, and follow the sound settings',a
  assert.ok(/paulDrum:\[[^\]]*start:\.76,duration:\.14/.test(drum),'a short drum: the answer is read about one second later');
  const sounds=read('scripts/sounds/make-sounds.mjs');
  for(const id of ['paulHello','paulTip','paulHmm','paulClap','paulDrum'])assert.ok(sounds.includes(' '+id+':()=>'),id);
+ // The desk knock is a wooden knock heard on phone speakers (the learner chose option A), not the old low thud.
+ assert.ok(sounds.includes("forEach(([t,a],i)=>woodKnock(b,t,a,i%2,71+i));return finish(reverb(b,.1),.78);}"),'paulDrum uses woodKnock');
+ const {soundDesigns}=await import(require('node:url').pathToFileURL(require('node:path').resolve('scripts/sounds/make-sounds.mjs')).href);
+ const knocks=soundDesigns.paulDrum();let low=0,all=0;
+ // energy through a gentle 300 Hz low-pass against all energy: the new knock 0.37, the old low thud 0.77
+ let lp=0;const k=1-Math.exp(-2*Math.PI*300/44100);for(const v of knocks){lp+=k*(v-lp);low+=lp*lp;all+=v*v;}
+ assert.ok(low/all<0.5,'most of the knock is above 300 Hz (the old thud had 0.77): '+(low/all).toFixed(2));
 });

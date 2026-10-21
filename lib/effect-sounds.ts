@@ -53,7 +53,7 @@ export const soundRecipes:Record<SoundId,readonly SoundNote[]> = {
  paulTip:[{f:2093,start:0,duration:.3,gain:.06,type:'sine'},{f:1568,start:.09,duration:.36,gain:.05,type:'sine'}],
  paulHmm:[{f:430,end:470,start:0,duration:.3,gain:.05,type:'sine'},{f:470,end:760,start:.36,duration:.36,gain:.05,type:'sine'}],
  paulClap:[{f:1500,start:0,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.2,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.4,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.6,duration:.05,gain:.03,type:'triangle'}],
- paulDrum:[{f:120,start:0,duration:.08,gain:.1,type:'sine'},{f:130,start:.09,duration:.08,gain:.09,type:'sine'},{f:120,start:.18,duration:.08,gain:.1,type:'sine'},{f:130,start:.27,duration:.08,gain:.09,type:'sine'},{f:120,start:.36,duration:.08,gain:.1,type:'sine'},{f:120,start:.62,duration:.12,gain:.12,type:'sine'},{f:120,start:.76,duration:.14,gain:.12,type:'sine'}],
+ paulDrum:[{f:430,start:0,duration:.06,gain:.1,type:'triangle'},{f:447,start:.09,duration:.06,gain:.08,type:'triangle'},{f:430,start:.18,duration:.06,gain:.1,type:'triangle'},{f:447,start:.27,duration:.06,gain:.08,type:'triangle'},{f:430,start:.36,duration:.06,gain:.1,type:'triangle'},{f:430,start:.62,duration:.1,gain:.13,type:'triangle'},{f:447,start:.76,duration:.14,gain:.14,type:'triangle'}],
  completeMarimba:[{f:261.63,start:0,duration:.15,gain:.1,type:'triangle'},{f:261.63,start:.16,duration:.15,gain:.1,type:'triangle'},{f:392,start:.32,duration:.15,gain:.1,type:'triangle'},{f:523.25,start:.48,duration:.8,gain:.1,type:'triangle'},{f:1046.5,start:.48,duration:.8,gain:.05,type:'sine'}],
 };
 export const soundDuration = (id:SoundId) => Math.max(...soundRecipes[id].map(note=>note.start+note.duration))+.04;

@@ -7,10 +7,12 @@ const models=require(path.resolve('art/werkzeug/models.cjs'));const tools=requir
 function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).toString(),'RIFF');assert.equal(b.slice(8,12).toString(),'WEBP');const kind=b.slice(12,16).toString();
  if(kind==='VP8X')return [b.readUIntLE(24,3)+1,b.readUIntLE(27,3)+1];if(kind==='VP8 ')return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];throw Error(file+' '+kind);}
 
-// Body parts and health things come from the learner's own picture sheets (21 October 2026), not from shader models.
-const sheetTopics=new Set(['objects-body','objects-health']);
+// Body parts and health things (21 October 2026) and the 3D sheets (22 October 2026) come from the learner's own
+// picture sheets, not from shader models: the picture file starts with the category's prefix.
+const sheetPrefix={'objects-body':'koerper-','objects-health':'gesundheit-','objects-food':'essen-','objects-drinks':'getraenke-','objects-cooking':'kueche-','objects-school':'schule-','objects-outdoors':'draussen-'};
+const sheetTopics=new Set(Object.keys(sheetPrefix));
 test('every Nesne Kasası object has a picture: the classic pictures, the tool pictures and the learner\'s body and health sheets',()=>{
- const ids=objects.objectVocabulary.map(word=>word.id);assert.equal(ids.length,143);
+ const ids=objects.objectVocabulary.map(word=>word.id);assert.equal(ids.length,295);
  assert.deepEqual(Object.keys(art).sort(),[...ids].sort());
  for(const id of ids){
   const entry=art[id];const file=path.join('public',entry.src);assert.ok(fs.existsSync(file),id);
@@ -18,7 +20,7 @@ test('every Nesne Kasası object has a picture: the classic pictures, the tool p
   assert.ok(entry.crop.x>=0&&entry.crop.y>=0&&entry.crop.x+entry.crop.width<=entry.width+0.5&&entry.crop.y+entry.crop.height<=entry.height+0.5,id);
   // The 15 tools use the learner's new pictures; the other objects keep the classic pictures they liked.
   const word=objects.objectWordMap.get(id);
-  if(sheetTopics.has(word.topic))assert.deepEqual(entry,{src:'/objects/toon/'+(word.topic==='objects-body'?'koerper-':'gesundheit-')+id+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
+  if(sheetTopics.has(word.topic))assert.deepEqual(entry,{src:'/objects/toon/'+sheetPrefix[word.topic]+id+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
   else if(tools[id])assert.deepEqual(entry,{src:'/objects/toon/werkzeug-'+id+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
   else assert.match(entry.src,/^\/objects\/toon\/(atlas-0[1-6]|moving-[a-z]+|building-[a-z]+)\.webp$/,id);
  }

@@ -1571,5 +1571,1677 @@
       "width": 512,
       "height": 512
     }
+  },
+  "ei": {
+    "src": "/objects/toon/essen-ei.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "spiegelei": {
+    "src": "/objects/toon/essen-spiegelei.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "brot": {
+    "src": "/objects/toon/essen-brot.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "brotscheibe": {
+    "src": "/objects/toon/essen-brotscheibe.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "broetchen": {
+    "src": "/objects/toon/essen-broetchen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "baguette": {
+    "src": "/objects/toon/essen-baguette.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "brezel": {
+    "src": "/objects/toon/essen-brezel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "butter": {
+    "src": "/objects/toon/essen-butter.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "marmelade": {
+    "src": "/objects/toon/essen-marmelade.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zucker": {
+    "src": "/objects/toon/essen-zucker.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "wuerfelzucker": {
+    "src": "/objects/toon/essen-wuerfelzucker.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "salz": {
+    "src": "/objects/toon/essen-salz.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pfeffer": {
+    "src": "/objects/toon/essen-pfeffer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "essig": {
+    "src": "/objects/toon/essen-essig.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "oel": {
+    "src": "/objects/toon/essen-oel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kaese": {
+    "src": "/objects/toon/essen-kaese.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bratwurst": {
+    "src": "/objects/toon/essen-bratwurst.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "wuerstchen": {
+    "src": "/objects/toon/essen-wuerstchen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "salami": {
+    "src": "/objects/toon/essen-salami.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schinken": {
+    "src": "/objects/toon/essen-schinken.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "fleisch": {
+    "src": "/objects/toon/essen-fleisch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kotelett": {
+    "src": "/objects/toon/essen-kotelett.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "braten": {
+    "src": "/objects/toon/essen-braten.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schnitzel": {
+    "src": "/objects/toon/essen-schnitzel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "haehnchen": {
+    "src": "/objects/toon/essen-haehnchen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "sardine": {
+    "src": "/objects/toon/essen-sardine.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "nudeln": {
+    "src": "/objects/toon/essen-nudeln.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "spaghetti": {
+    "src": "/objects/toon/essen-spaghetti.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "reis": {
+    "src": "/objects/toon/essen-reis.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "sosse": {
+    "src": "/objects/toon/essen-sosse.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "suppe": {
+    "src": "/objects/toon/essen-suppe.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pudding": {
+    "src": "/objects/toon/essen-pudding.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pommes": {
+    "src": "/objects/toon/essen-pommes.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pizza": {
+    "src": "/objects/toon/essen-pizza.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "wurstbrot": {
+    "src": "/objects/toon/essen-wurstbrot.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kaesebrot": {
+    "src": "/objects/toon/essen-kaesebrot.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kuchen": {
+    "src": "/objects/toon/essen-kuchen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "torte": {
+    "src": "/objects/toon/essen-torte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "nuss": {
+    "src": "/objects/toon/essen-nuss.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "gemuese": {
+    "src": "/objects/toon/essen-gemuese.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "salat": {
+    "src": "/objects/toon/essen-salat.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kartoffel": {
+    "src": "/objects/toon/essen-kartoffel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "erbse": {
+    "src": "/objects/toon/essen-erbse.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tomate": {
+    "src": "/objects/toon/essen-tomate.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "gurke": {
+    "src": "/objects/toon/essen-gurke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zwiebel": {
+    "src": "/objects/toon/essen-zwiebel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "blumenkohl": {
+    "src": "/objects/toon/essen-blumenkohl.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "karotte": {
+    "src": "/objects/toon/essen-karotte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "birne": {
+    "src": "/objects/toon/essen-birne.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "banane": {
+    "src": "/objects/toon/essen-banane.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "traube": {
+    "src": "/objects/toon/essen-traube.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zitrone": {
+    "src": "/objects/toon/essen-zitrone.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "orange": {
+    "src": "/objects/toon/essen-orange.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kirsche": {
+    "src": "/objects/toon/essen-kirsche.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "erdbeere": {
+    "src": "/objects/toon/essen-erdbeere.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kaffee": {
+    "src": "/objects/toon/getraenke-kaffee.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tee": {
+    "src": "/objects/toon/getraenke-tee.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "milch": {
+    "src": "/objects/toon/getraenke-milch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "wasser": {
+    "src": "/objects/toon/getraenke-wasser.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "apfelsaft": {
+    "src": "/objects/toon/getraenke-apfelsaft.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "orangensaft": {
+    "src": "/objects/toon/getraenke-orangensaft.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "wein": {
+    "src": "/objects/toon/getraenke-wein.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "rotwein": {
+    "src": "/objects/toon/getraenke-rotwein.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "weisswein": {
+    "src": "/objects/toon/getraenke-weisswein.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bier": {
+    "src": "/objects/toon/getraenke-bier.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "untertasse": {
+    "src": "/objects/toon/getraenke-untertasse.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schuessel": {
+    "src": "/objects/toon/getraenke-schuessel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "glas": {
+    "src": "/objects/toon/getraenke-glas.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "weinglas": {
+    "src": "/objects/toon/getraenke-weinglas.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bierglas": {
+    "src": "/objects/toon/getraenke-bierglas.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "krug": {
+    "src": "/objects/toon/getraenke-krug.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kaffeekanne": {
+    "src": "/objects/toon/getraenke-kaffeekanne.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "milchkaennchen": {
+    "src": "/objects/toon/getraenke-milchkaennchen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "eierbecher": {
+    "src": "/objects/toon/getraenke-eierbecher.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "salzstreuer": {
+    "src": "/objects/toon/getraenke-salzstreuer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pfeffermuehle": {
+    "src": "/objects/toon/getraenke-pfeffermuehle.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zuckerdose": {
+    "src": "/objects/toon/getraenke-zuckerdose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zuckerzange": {
+    "src": "/objects/toon/getraenke-zuckerzange.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "butterdose": {
+    "src": "/objects/toon/getraenke-butterdose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "sossenschuessel": {
+    "src": "/objects/toon/getraenke-sossenschuessel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "serviette": {
+    "src": "/objects/toon/getraenke-serviette.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "brotkorb": {
+    "src": "/objects/toon/getraenke-brotkorb.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "speisekarte": {
+    "src": "/objects/toon/getraenke-speisekarte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "gabel": {
+    "src": "/objects/toon/getraenke-gabel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "messer": {
+    "src": "/objects/toon/getraenke-messer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "loeffel": {
+    "src": "/objects/toon/getraenke-loeffel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "teeloeffel": {
+    "src": "/objects/toon/getraenke-teeloeffel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "pfanne": {
+    "src": "/objects/toon/kueche-pfanne.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "topf": {
+    "src": "/objects/toon/kueche-topf.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "deckel": {
+    "src": "/objects/toon/kueche-deckel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "sieb": {
+    "src": "/objects/toon/kueche-sieb.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schneebesen": {
+    "src": "/objects/toon/kueche-schneebesen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zitronenpresse": {
+    "src": "/objects/toon/kueche-zitronenpresse.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schneidebrett": {
+    "src": "/objects/toon/kueche-schneidebrett.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "fleischwolf": {
+    "src": "/objects/toon/kueche-fleischwolf.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kaffeemaschine": {
+    "src": "/objects/toon/kueche-kaffeemaschine.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "mixer": {
+    "src": "/objects/toon/kueche-mixer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "brotschneidemaschine": {
+    "src": "/objects/toon/kueche-brotschneidemaschine.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "korkenzieher": {
+    "src": "/objects/toon/kueche-korkenzieher.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "dosenoeffner": {
+    "src": "/objects/toon/kueche-dosenoeffner.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "flaschenoeffner": {
+    "src": "/objects/toon/kueche-flaschenoeffner.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "dose": {
+    "src": "/objects/toon/kueche-dose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "einmachglas": {
+    "src": "/objects/toon/kueche-einmachglas.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "milchtuete": {
+    "src": "/objects/toon/kueche-milchtuete.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tube": {
+    "src": "/objects/toon/kueche-tube.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "korken": {
+    "src": "/objects/toon/kueche-korken.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kronkorken": {
+    "src": "/objects/toon/kueche-kronkorken.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "eierschale": {
+    "src": "/objects/toon/kueche-eierschale.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "strohhalm": {
+    "src": "/objects/toon/kueche-strohhalm.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tafel": {
+    "src": "/objects/toon/schule-tafel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kreide": {
+    "src": "/objects/toon/schule-kreide.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schwamm": {
+    "src": "/objects/toon/schule-schwamm.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tuer": {
+    "src": "/objects/toon/schule-tuer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tuerklinke": {
+    "src": "/objects/toon/schule-tuerklinke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "ecke": {
+    "src": "/objects/toon/schule-ecke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "decke": {
+    "src": "/objects/toon/schule-decke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "fussboden": {
+    "src": "/objects/toon/schule-fussboden.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "lichtschalter": {
+    "src": "/objects/toon/schule-lichtschalter.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "papierkorb": {
+    "src": "/objects/toon/schule-papierkorb.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "landkarte": {
+    "src": "/objects/toon/schule-landkarte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "buch": {
+    "src": "/objects/toon/schule-buch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "heft": {
+    "src": "/objects/toon/schule-heft.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "woerterbuch": {
+    "src": "/objects/toon/schule-woerterbuch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bleistift": {
+    "src": "/objects/toon/schule-bleistift.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "buntstift": {
+    "src": "/objects/toon/schule-buntstift.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kugelschreiber": {
+    "src": "/objects/toon/schule-kugelschreiber.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "fueller": {
+    "src": "/objects/toon/schule-fueller.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "radiergummi": {
+    "src": "/objects/toon/schule-radiergummi.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "lineal": {
+    "src": "/objects/toon/schule-lineal.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "tasche": {
+    "src": "/objects/toon/schule-tasche.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "rucksack": {
+    "src": "/objects/toon/schule-rucksack.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "lehrer": {
+    "src": "/objects/toon/schule-lehrer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schueler": {
+    "src": "/objects/toon/schule-schueler.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schuelerin": {
+    "src": "/objects/toon/schule-schuelerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "foto": {
+    "src": "/objects/toon/schule-foto.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "radio": {
+    "src": "/objects/toon/schule-radio.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kassettenrekorder": {
+    "src": "/objects/toon/schule-kassettenrekorder.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "baum": {
+    "src": "/objects/toon/draussen-baum.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "blume": {
+    "src": "/objects/toon/draussen-blume.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "gras": {
+    "src": "/objects/toon/draussen-gras.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "schmetterling": {
+    "src": "/objects/toon/draussen-schmetterling.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "maus": {
+    "src": "/objects/toon/draussen-maus.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "stadt": {
+    "src": "/objects/toon/draussen-stadt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "turm": {
+    "src": "/objects/toon/draussen-turm.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zaun": {
+    "src": "/objects/toon/draussen-zaun.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "bank": {
+    "src": "/objects/toon/draussen-bank.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "ball": {
+    "src": "/objects/toon/draussen-ball.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "unfall": {
+    "src": "/objects/toon/draussen-unfall.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kuss": {
+    "src": "/objects/toon/draussen-kuss.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "picknickdecke": {
+    "src": "/objects/toon/draussen-picknickdecke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "rock": {
+    "src": "/objects/toon/draussen-rock.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "zahn": {
+    "src": "/objects/toon/koerper-zahn.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
   }
 }

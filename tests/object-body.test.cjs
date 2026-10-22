@@ -4,7 +4,7 @@ const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_C
 const load=name=>require(path.join(compiled,name+'.js'));
 const objects=load('object-course'),practice=load('object-practice'),translations=load('object-translations'),subgroups=load('object-subgroups'),articles=load('article-challenges'),copy=load('object-vault-copy'),study=load('study'),english=load('english-objects'),site=load('site-languages');
 const art=JSON.parse(fs.readFileSync('lib/object-toon-art.json','utf8'));
-const body={arm:'der Arm',auge:'das Auge',bauch:'der Bauch',bein:'das Bein',brust:'die Brust',daumen:'der Daumen',finger:'der Finger',fuss:'der Fuß',ellbogen:'der Ellbogen',haar:'das Haar',hals:'der Hals',hand:'die Hand',knie:'das Knie',kopf:'der Kopf',mund:'der Mund',nase:'die Nase',ohr:'das Ohr',schulter:'die Schulter',zeh:'der Zeh',koerper:'der Körper'};
+const body={arm:'der Arm',auge:'das Auge',bauch:'der Bauch',bein:'das Bein',brust:'die Brust',daumen:'der Daumen',finger:'der Finger',fuss:'der Fuß',ellbogen:'der Ellbogen',haar:'das Haar',hals:'der Hals',hand:'die Hand',knie:'das Knie',kopf:'der Kopf',mund:'der Mund',nase:'die Nase',ohr:'das Ohr',schulter:'die Schulter',zeh:'der Zeh',koerper:'der Körper',zahn:'der Zahn'};
 const health={verband:'der Verband',pflaster:'das Pflaster',verbandskasten:'der Verbandskasten',waermflasche:'die Wärmflasche',salbe:'die Salbe',hustensaft:'der Hustensaft',tablette:'die Tablette',kapsel:'die Kapsel',schere:'die Schere',fieberthermometer:'das Fieberthermometer',spritze:'die Spritze',stethoskop:'das Stethoskop',rollstuhl:'der Rollstuhl',trage:'die Trage',kruecke:'die Krücke',gips:'der Gips'};
 const groups={'objects-body':[body,'koerper-','groupBody','hand'],'objects-health':[health,'gesundheit-','groupHealth','verbandskasten']};
 const languages=copy.vaultLanguages.map(item=>item.id);
@@ -12,7 +12,7 @@ const languages=copy.vaultLanguages.map(item=>item.id);
 function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).toString(),'RIFF');assert.equal(b.slice(8,12).toString(),'WEBP');const kind=b.slice(12,16).toString();
  if(kind==='VP8X')return [b.readUIntLE(24,3)+1,b.readUIntLE(27,3)+1];if(kind==='VP8 ')return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];throw Error(file+' '+kind);}
 
-test('two new categories: 20 body parts (Vücut) and 16 health things (Sağlık ve ilk yardım)',()=>{
+test('two new categories: 21 body parts (Vücut, with der Zahn from the 3D sheets) and 16 health things (Sağlık ve ilk yardım)',()=>{
  const page=fs.readFileSync('app/object-study.tsx','utf8');
  for(const [topic,[words,,key,picture]] of Object.entries(groups)){
   assert(objects.objectGroups.some(group=>group.id===topic),topic);

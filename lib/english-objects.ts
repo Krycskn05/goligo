@@ -2,7 +2,11 @@ import type {Question} from './course';
 import {objectVocabulary} from './object-course';
 import {objectMeanings} from './object-translations';
 import type {Review} from './study';
-const preferred:Record<string,string>={heizung:'radiator',herd:'stove',regal:'shelf',schrank:'wardrobe',waschbecken:'washbasin',treppe:'stairs',bild:'painting',kissen:'pillow',umzugswagen:'moving truck'};
+const preferred:Record<string,string>={heizung:'radiator',herd:'stove',regal:'shelf',schrank:'wardrobe',waschbecken:'washbasin',treppe:'stairs',bild:'painting',kissen:'pillow',umzugswagen:'moving truck',
+ sardine:'sardines',erbse:'peas',orange:'orange',kirsche:'cherries',buntstift:'coloured pencils'};
+// Gap sentences: "These are ___." for plural names, "This is ___." (no a/an) for things you cannot count.
+const pluralNames=new Set(['treppe','brille','schere','wuerfelzucker','sardine','pommes','gemuese','erbse','traube','kirsche','zuckerzange','buntstift']);
+const uncountableNames=new Set(['geruest','haar','salbe','hustensaft','brot','butter','marmelade','zucker','salz','pfeffer','essig','oel','kaese','salami','schinken','fleisch','nudeln','spaghetti','reis','sosse','suppe','pudding','kaffee','tee','milch','wasser','apfelsaft','orangensaft','wein','rotwein','weisswein','bier','kreide','gras']);
 export function englishObjectName(id:string){return preferred[id]??objectMeanings[id]?.[0].split(' / ')[0]??'';}
 export const englishObjectQuestions:Question[]=objectVocabulary.flatMap((word,index)=>{
  const answer=englishObjectName(word.id);if(!answer)throw new Error('Missing English object name: '+word.id);
@@ -10,7 +14,7 @@ export const englishObjectQuestions:Question[]=objectVocabulary.flatMap((word,in
  const other=objectVocabulary.filter(w=>w.id!==word.id&&w.topic===word.topic);
  const wrong=[...new Set([...other.slice(index%Math.max(1,other.length-3)),...other,...objectVocabulary.filter(w=>w.id!==word.id)].map(w=>englishObjectName(w.id)))].filter(value=>value&&value!==answer).slice(0,3);
  const base={topic:'en-'+word.topic,objectId:word.id,answer,accepted:synonyms,answerTr:word.tr,explanation:answer+' = '+word.tr+'.',explanationEn:'The object in the picture is '+answer+'.',image:{src:word.image,alt:word.tr,caption:'Original object illustration',...(word.crop?{crop:word.crop}:{})}};
- const plural=['treppe','brille','schere'].includes(word.id);const uncountable=['geruest','haar','salbe','hustensaft'].includes(word.id);
+ const plural=pluralNames.has(word.id);const uncountable=uncountableNames.has(word.id);
  const prefix=plural?'These are ':uncountable?'This is ':'This is '+(/^[aeiou]/i.test(answer)?'an ':'a ');
  const excluded=new Set([word.id,...(word.id==='lastwagen'?['umzugswagen']:word.id==='umzugswagen'?['lastwagen']:[])]);
  const pictures=objectVocabulary.filter(w=>!excluded.has(w.id));

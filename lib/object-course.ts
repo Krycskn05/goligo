@@ -6,6 +6,7 @@ import {movingObjectAdditions} from './object-moving-additions';
 import {buildingObjectAdditions} from './object-building-additions';
 import {toolObjectAdditions} from './object-tool-additions';
 import {bodyObjectAdditions} from './object-body-additions';
+import {everydayObjectAdditions} from './object-everyday-additions';
 
 export type ObjectCrop={x:number;y:number;width:number;height:number;sheetWidth:number;sheetHeight:number};
 export type SceneKey='building'|'moving';
@@ -22,6 +23,11 @@ export const objectGroups=[
  {id:'objects-moving',title:'Taşınma ve günlük eşyalar',de:'Umzug und Alltag',subtitle:'Taşınma ve günlük eşyalar'},
  {id:'objects-body',title:'Vücut',de:'Der Körper',subtitle:'Baş, gövde, kollar ve bacaklar'},
  {id:'objects-health',title:'Sağlık ve ilk yardım',de:'Gesundheit und Erste Hilfe',subtitle:'İlk yardım, ilaçlar ve tıbbi araçlar'},
+ {id:'objects-food',title:'Yiyecekler',de:'Lebensmittel',subtitle:'Kahvaltılıklar, et, sebze ve meyve'},
+ {id:'objects-drinks',title:'İçecekler ve sofra',de:'Getränke und Geschirr',subtitle:'İçecekler, sofra eşyaları ve çatal bıçak'},
+ {id:'objects-cooking',title:'Mutfak araçları ve ambalajlar',de:'Küchengeräte und Verpackungen',subtitle:'Mutfak gereçleri, aletler ve ambalajlar'},
+ {id:'objects-school',title:'Okul ve sınıf',de:'Schule und Klassenzimmer',subtitle:'Sınıf, okul eşyaları ve kişiler'},
+ {id:'objects-outdoors',title:'Doğa, şehir ve diğerleri',de:'Natur, Stadt und mehr',subtitle:'Doğa, şehir ve günlük kavramlar'},
 ];
 type Spec=[string,string,string,string,string,string?];
 const house:Spec[]=[
@@ -80,7 +86,7 @@ const objectCategory:Record<string,string>={
  brett:'objects-building',
  pflanze:'objects-nature',palme:'objects-nature',blumentopf:'objects-nature',kaktus:'objects-nature',vogel:'objects-nature',vogelkaefig:'objects-nature',feder:'objects-nature',fisch:'objects-nature',aquarium:'objects-nature',
 };
-export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions]
+export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions,...everydayObjectAdditions]
  .map(word=>objectCategory[word.id]?{...word,topic:objectCategory[word.id]}:word);
 export const objectWordMap=new Map(objectVocabulary.map(w=>[w.id,w]));
 export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:number;height:number;marks:SceneMark[]}[]=[
@@ -94,7 +100,17 @@ const imageOf=(w:ObjectWord)=>({src:w.image,alt:w.tr,caption:w.crop?'Yüklediği
 // a whole head also shows the eyes and the nose).
 const nearPairs:[string,string[]][]=[['daumen',['finger','hand']],['finger',['daumen','hand']],['hand',['finger','daumen','arm']],['arm',['hand','ellbogen','schulter']],['ellbogen',['arm']],['schulter',['arm','koerper']],
  ['fuss',['zeh','bein']],['zeh',['fuss']],['bein',['knie','fuss','koerper']],['knie',['bein']],['kopf',['auge','ohr','nase','mund','haar','hals']],['hals',['kopf']],['brust',['koerper','bauch']],['bauch',['koerper','brust']],['koerper',['arm','auge','bauch','bein','brust','daumen','finger','fuss','ellbogen','haar','hals','hand','knie','kopf','mund','nase','ohr','schulter','zeh']],
- ['verband',['gips','verbandskasten']],['gips',['verband']],['verbandskasten',['verband','pflaster','schere']],['tablette',['kapsel']],['kapsel',['tablette']]];
+ ['verband',['gips','verbandskasten']],['gips',['verband']],['verbandskasten',['verband','pflaster','schere']],['tablette',['kapsel']],['kapsel',['tablette']],['zahn',['mund']],
+ // The 3D sheets (22 October 2026): pictures that look alike, or where one word is the general word for the other.
+ ['ei',['spiegelei','eierschale']],['brot',['broetchen','baguette','brotscheibe']],['brotscheibe',['wurstbrot','kaesebrot']],['zucker',['wuerfelzucker','salz']],
+ ['bratwurst',['wuerstchen']],['fleisch',['braten','kotelett','schinken']],['nudeln',['spaghetti']],['kuchen',['torte']],['gemuese',['karotte','gurke','erbse','tomate','zwiebel','blumenkohl','kartoffel','salat']],
+ ['salat',['blumenkohl']],['kaese',['kaesebrot']],
+ ['wein',['rotwein','weisswein']],['rotwein',['weisswein']],['glas',['bierglas','weinglas']],['krug',['milchkaennchen']],['loeffel',['teeloeffel']],['zuckerdose',['butterdose']],
+ ['dose',['einmachglas']],['korken',['kronkorken']],['flaschenoeffner',['dosenoeffner','korkenzieher']],['topf',['deckel']],['mixer',['schneebesen']],
+ ['buch',['heft','woerterbuch']],['heft',['woerterbuch']],['bleistift',['buntstift']],['kugelschreiber',['fueller']],['radio',['kassettenrekorder']],['tuer',['tuerklinke']],
+ ['tafel',['kreide']],['tasche',['rucksack']],['schueler',['schuelerin']],['decke',['ecke','fussboden']],['blume',['gras']],['stadt',['turm']]];
+// Categories whose wrong choices come from the same category (an eye among other body parts, a fork among tableware).
+const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors']);
 const nearObjects:Record<string,string[]>={};
 for(const [id,others] of nearPairs)for(const other of others){(nearObjects[id]??=[]).push(other);(nearObjects[other]??=[]).push(id);}
 function distractors(w:ObjectWord){
@@ -102,9 +118,9 @@ function distractors(w:ObjectWord){
  const excluded=new Set([w.id,...(w.id==='lastwagen'?['umzugswagen']:w.id==='umzugswagen'?['lastwagen']:[])]);
  const same=objectVocabulary.filter(x=>x.topic===w.topic&&!excluded.has(x.id));
  const all=[...same,...objectVocabulary.filter(x=>x.topic!==w.topic&&!excluded.has(x.id))];
- // Body parts and health things take their wrong choices from their own category (an eye among other body
- // parts, not among building tools); the older categories keep the choices they always had.
- if(w.topic==='objects-body'||w.topic==='objects-health'){
+ // Body parts, health things and the 3D-sheet categories take their wrong choices from their own category (an eye
+ // among other body parts, not among building tools); the older categories keep the choices they always had.
+ if(ownChoices.has(w.topic)){
   const near=new Set(nearObjects[w.id]??[]);const at=objectVocabulary.filter(x=>x.topic===w.topic).indexOf(w);
   const picked=[...same.slice(at),...same.slice(0,at)].filter(x=>!near.has(x.id)).slice(0,3);
   // The whole body shows every body part: its wrong choices come from the health things.

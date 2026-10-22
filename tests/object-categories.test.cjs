@@ -12,15 +12,20 @@ const categories={
  'objects-building':'geruest zementmischer zementsack schubkarre schlauch kabel schild brett leiter schaufel maurerkelle',
  'objects-nature':'pflanze palme blumentopf kaktus vogel vogelkaefig feder fisch aquarium',
  'objects-moving':'karton umzugswagen lastwagen seil kette rad regenschirm schirmstaender brille zeitschrift bogen pfeil',
- 'objects-body':'arm auge bauch bein brust daumen finger fuss ellbogen haar hals hand knie kopf mund nase ohr schulter zeh koerper',
+ 'objects-body':'arm auge bauch bein brust daumen finger fuss ellbogen haar hals hand knie kopf mund nase ohr schulter zeh koerper zahn',
  'objects-health':'verband pflaster verbandskasten waermflasche salbe hustensaft tablette kapsel schere fieberthermometer spritze stethoskop rollstuhl trage kruecke gips',
+ 'objects-food':'ei spiegelei brot brotscheibe broetchen baguette brezel butter marmelade zucker wuerfelzucker salz pfeffer essig oel kaese bratwurst wuerstchen salami schinken fleisch kotelett braten schnitzel haehnchen sardine nudeln spaghetti reis sosse suppe pudding pommes pizza wurstbrot kaesebrot kuchen torte nuss gemuese salat kartoffel erbse tomate gurke zwiebel blumenkohl karotte birne banane traube zitrone orange kirsche erdbeere',
+ 'objects-drinks':'kaffee tee milch wasser apfelsaft orangensaft wein rotwein weisswein bier untertasse schuessel glas weinglas bierglas krug kaffeekanne milchkaennchen eierbecher salzstreuer pfeffermuehle zuckerdose zuckerzange butterdose sossenschuessel serviette brotkorb speisekarte gabel messer loeffel teeloeffel',
+ 'objects-cooking':'pfanne topf deckel sieb schneebesen zitronenpresse schneidebrett fleischwolf kaffeemaschine mixer brotschneidemaschine korkenzieher dosenoeffner flaschenoeffner dose einmachglas milchtuete tube korken kronkorken eierschale strohhalm',
+ 'objects-school':'tafel kreide schwamm tuer tuerklinke ecke decke fussboden lichtschalter papierkorb landkarte buch heft woerterbuch bleistift buntstift kugelschreiber fueller radiergummi lineal tasche rucksack lehrer schueler schuelerin foto radio kassettenrekorder',
+ 'objects-outdoors':'baum blume gras schmetterling maus stadt turm zaun bank ball unfall kuss picknickdecke rock',
 };
-const keys={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth'};
+const keys={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors'};
 
-test('the 143 vault objects are sorted into ten categories by meaning',()=>{
+test('the 295 vault objects are sorted into fifteen categories by meaning',()=>{
  assert.deepEqual(objects.objectGroups.map(group=>group.id),Object.keys(categories));
  const expected=Object.entries(categories).flatMap(([topic,ids])=>ids.split(' ').map(id=>[id,topic]));
- assert.equal(expected.length,143);assert.equal(objects.objectVocabulary.length,143);
+ assert.equal(expected.length,295);assert.equal(objects.objectVocabulary.length,295);
  for(const [id,topic] of expected){const word=objects.objectWordMap.get(id);assert(word,id);assert.equal(word.topic,topic,id);}
  for(const word of objects.objectVocabulary)for(const kind of ['picture','write','hear-picture']){const q=course.questionMap.get('obj-'+kind+'-'+word.id);assert(q,kind+' '+word.id);assert.equal(q.topic,word.topic);}
  for(const word of objects.objectVocabulary){const groups=subgroups.objectSubgroups.filter(group=>group.wordIds.includes(word.id));assert.equal(groups.length,1,word.id);assert.equal(groups[0].parent,word.topic,word.id);}

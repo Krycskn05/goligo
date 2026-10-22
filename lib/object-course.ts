@@ -103,12 +103,12 @@ const nearPairs:[string,string[]][]=[['daumen',['finger','hand']],['finger',['da
  ['verband',['gips','verbandskasten']],['gips',['verband']],['verbandskasten',['verband','pflaster','schere']],['tablette',['kapsel']],['kapsel',['tablette']],['zahn',['mund']],
  // The 3D sheets (22 October 2026): pictures that look alike, or where one word is the general word for the other.
  ['ei',['spiegelei','eierschale']],['brot',['broetchen','baguette','brotscheibe']],['brotscheibe',['wurstbrot','kaesebrot']],['zucker',['wuerfelzucker','salz']],
- ['bratwurst',['wuerstchen']],['fleisch',['braten','kotelett','schinken']],['nudeln',['spaghetti']],['kuchen',['torte']],['gemuese',['karotte','gurke','erbse','tomate','zwiebel','blumenkohl','kartoffel','salat']],
+ ['bratwurst',['wuerstchen','salami','wurstbrot']],['fleisch',['braten','kotelett','schinken']],['nudeln',['spaghetti']],['kuchen',['torte']],['gemuese',['karotte','gurke','erbse','tomate','zwiebel','blumenkohl','kartoffel','salat']],
  ['salat',['blumenkohl']],['kaese',['kaesebrot']],
- ['wein',['rotwein','weisswein']],['rotwein',['weisswein']],['glas',['bierglas','weinglas']],['krug',['milchkaennchen']],['loeffel',['teeloeffel']],['zuckerdose',['butterdose']],
+ ['apfelsaft',['orangensaft']],['wein',['rotwein','weisswein']],['rotwein',['weisswein']],['glas',['bierglas','weinglas']],['krug',['milchkaennchen','kaffeekanne']],['loeffel',['teeloeffel']],['zuckerdose',['butterdose']],
  ['dose',['einmachglas']],['korken',['kronkorken']],['flaschenoeffner',['dosenoeffner','korkenzieher']],['topf',['deckel']],['mixer',['schneebesen']],
  ['buch',['heft','woerterbuch']],['heft',['woerterbuch']],['bleistift',['buntstift']],['kugelschreiber',['fueller']],['radio',['kassettenrekorder']],['tuer',['tuerklinke']],
- ['tafel',['kreide']],['tasche',['rucksack']],['schueler',['schuelerin']],['decke',['ecke','fussboden']],['blume',['gras']],['stadt',['turm']]];
+ ['tafel',['kreide','schwamm']],['tasche',['rucksack']],['schueler',['schuelerin']],['decke',['ecke','fussboden']],['blume',['gras']],['stadt',['turm']]];
 // Categories whose wrong choices come from the same category (an eye among other body parts, a fork among tableware).
 const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors']);
 const nearObjects:Record<string,string[]>={};

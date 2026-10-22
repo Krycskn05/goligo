@@ -3,9 +3,9 @@ import {objectVocabulary} from './object-course';
 import {objectMeanings} from './object-translations';
 import type {Review} from './study';
 const preferred:Record<string,string>={heizung:'radiator',herd:'stove',regal:'shelf',schrank:'wardrobe',waschbecken:'washbasin',treppe:'stairs',bild:'painting',kissen:'pillow',umzugswagen:'moving truck',
- sardine:'sardines',erbse:'peas',orange:'orange',kirsche:'cherries',buntstift:'coloured pencils'};
+ erbse:'peas',orange:'orange',kirsche:'cherries'};
 // Gap sentences: "These are ___." for plural names, "This is ___." (no a/an) for things you cannot count.
-const pluralNames=new Set(['treppe','brille','schere','wuerfelzucker','sardine','pommes','gemuese','erbse','traube','kirsche','zuckerzange','buntstift']);
+const pluralNames=new Set(['treppe','brille','schere','wuerfelzucker','pommes','gemuese','erbse','traube','kirsche','zuckerzange']);
 const uncountableNames=new Set(['geruest','haar','salbe','hustensaft','brot','butter','marmelade','zucker','salz','pfeffer','essig','oel','kaese','salami','schinken','fleisch','nudeln','spaghetti','reis','sosse','suppe','pudding','kaffee','tee','milch','wasser','apfelsaft','orangensaft','wein','rotwein','weisswein','bier','kreide','gras']);
 export function englishObjectName(id:string){return preferred[id]??objectMeanings[id]?.[0].split(' / ')[0]??'';}
 export const englishObjectQuestions:Question[]=objectVocabulary.flatMap((word,index)=>{

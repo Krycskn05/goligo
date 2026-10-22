@@ -32,7 +32,10 @@ test('five new categories with 151 objects, plus der Zahn in Vücut; the picture
  for(const [id,topic] of Object.entries({tasse:'objects-kitchen',teller:'objects-kitchen',teekanne:'objects-kitchen',flasche:'objects-kitchen',tischdecke:'objects-kitchen',apfel:'objects-kitchen',tisch:'objects-furniture',stuhl:'objects-furniture',lampe:'objects-furniture',bild:'objects-furniture',fenster:'objects-house',steckdose:'objects-house',fisch:'objects-nature',eimer:'objects-tools',schere:'objects-health',verband:'objects-health',hand:'objects-body',fuss:'objects-body'}))
   assert.equal(objects.objectWordMap.get(id).topic,topic,id+' keeps its category');
  const de=id=>objects.objectWordMap.get(id).de;
- assert.equal(de('decke'),'die Decke');assert.equal(de('bank'),'die Bank');assert.equal(de('buntstift'),'der Buntstift');assert.equal(de('nudeln'),'die Nudeln');assert.equal(de('oel'),'das Öl');assert.equal(de('weisswein'),'der Weißwein');
+ // The learner's own list (22 October 2026) gives the German names and Turkish meanings; the IDs stay as they were.
+ const tr=id=>objects.objectWordMap.get(id).tr;
+ for(const [id,name] of Object.entries({decke:'die Decke',bank:'die Bank',nudeln:'die Nudeln',oel:'das Öl',weisswein:'der Weißwein',wuerfelzucker:'der Zuckerwürfel',bratwurst:'die Wurst',sardine:'die Fischkonserve',sosse:'die Sauce',pommes:'die Pommes frites',traube:'die Weintraube',apfelsaft:'der Saft',krug:'die Kanne',sossenschuessel:'die Sauciere',mixer:'das Handrührgerät',milchtuete:'die Packung',ecke:'die Wand',schwamm:'der Tafelschwamm',buntstift:'der Stiftebecher',papierkorb:'der Mülleimer'}))assert.equal(de(id),name,id);
+ assert.equal(tr('brezel'),'Alman simidi / pretzel');assert.equal(tr('buntstift'),'kalemlik');assert.equal(tr('schuelerin'),'kız / kadın öğrenci');assert.equal(tr('ecke'),'duvar');
 });
 
 test('every new object has its own 512 px picture, meanings in all 31 site languages, a description and one sub-topic',()=>{
@@ -84,6 +87,7 @@ test('articles: plurals, compound words, -chen words and the plural-only words',
  const rule=id=>logic.articleRule(id,objects.objectWordMap.get(id).de);
  for(const id of ['broetchen','wuerstchen','haehnchen'])assert.equal(rule(id).key,'diminutive',id);
  assert.equal(rule('milchkaennchen').key,'compound');
+ assert.equal(rule('mixer').key,'compound');assert.equal(rule('milchtuete').key,'suffix');
  for(const id of ['nudeln','spaghetti','pommes']){const r=rule(id);assert.equal(r.key,'plural',id);assert.equal(r.x,objects.objectWordMap.get(id).de);assert(!course.questionMap.get('obj-puzzle-plural-'+id),id+' has no plural puzzle');}
  assert.equal(rule('essig').key,'masculineEnding');assert.equal(rule('schmetterling').key,'masculineEnding');assert.equal(rule('kotelett').key,'neuterEnding');
  for(const language of languages)assert(logic.articleRuleText(language,rule('broetchen')).includes('das Brötchen'),language);

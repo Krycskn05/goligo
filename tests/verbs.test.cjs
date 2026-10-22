@@ -248,7 +248,7 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  assert.match(fs.readFileSync('app/progress-ui.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/layout.tsx','utf8'),/verbs\.css/);
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(page.includes("const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';"));
+ assert.ok(page.includes("const pronunciation=task==='fit'&&verb?verb.praesens:q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';"),'only the correct answer (in the round of every mistake an article puzzle says the whole word)');
  assert.ok(page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'));
  // The question audio is played only from the listen buttons.
  assert.equal((page.match(/speech\.speak\(q\.audio/g)||[]).length,1);

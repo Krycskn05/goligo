@@ -142,3 +142,17 @@ test('Paul keeps off the answers on phones; pages wait for the chosen language; 
  for(const file of ['app/object-study.tsx','app/verb-study.tsx','app/housing-study.tsx'])assert.ok(/<StartWait show=\{busy&&!session\} text=\{\w+\(/.test(read(file)),file);
  everyLanguage(load('object-vault-copy').vaultCopy?.preparing??Function('return '+read('lib/object-vault-copy.ts').match(/^  preparing:(\[.*\]),$/m)[1])(),'preparing');
 });
+
+test('Yanlışlarım: every mistake of the site in one round',()=>{
+ const study=load('study'),progress=load('progress'),housing=load('housing-course');
+ const verb=progress.verbProgressIds('verbs-all')[0],object=progress.objectProgressIds('all')[3],home=housing.housingQuestions[2].id;
+ const reviews=[verb,object,home].map(id=>({question_id:id,seen:2,wrong_count:1,streak:0,due_at:0}));
+ const ids=progress.allMistakeIds(reviews,[verb]);assert.deepEqual([...ids].sort(),[verb,object,home].sort());
+ assert.deepEqual(study.selectQuestions('review','all',ids.length,reviews,ids,'de').map(q=>q.id).sort(),[verb,object,home].sort(),'the server round takes every part');
+ assert.ok(!study.selectQuestions('review','all',20,reviews,undefined,'de').some(q=>q.id===verb),'other review rounds stay as they were');
+ const page=read('app/verb-study.tsx');
+ assert.ok(page.includes("api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:MISTAKES_MODE,topic:'all',count:allMistakes.length,onlyIds:allMistakes}"));
+ assert.ok(page.includes("const q=everyMistake||verbModePredicate(")&&page.includes('</section>:q&&everyMistake?<section className="object-practice picture-quiz-practice verb-practice mixed-practice">'));
+ assert.ok(page.includes('data-mistakes-all-start={allMistakes.length}')&&page.includes("{t('mistakesAllStart',{n:allMistakes.length})}"));
+ everyLanguage(load('verb-copy').verbCopy.mistakesAllStart,'mistakesAllStart');
+});

@@ -552,3 +552,7 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .mistake-words li { padding:4px 10px; border-radius:999px; background:#fff; border:1px solid #f3c9c3; font-weight:700; font-size:14px; color:var(--ink); }
 .mistake-words li.more { background:transparent; border-style:dashed; color:var(--ink-2); }
 .verb-section-head:empty { display:none; }
+/* "Hepsini tek turda çalış": one round of every mistake of the site. */
+.mistakes-all-start { justify-self:start; min-height:54px; font-size:17px; }
+.mixed-practice .mixed-question .vault-writing-form { display:grid; gap:8px; }
+.mixed-practice .mixed-question .writing-input { min-height:48px; font-size:18px; }

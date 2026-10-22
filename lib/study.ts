@@ -22,7 +22,9 @@ export type SessionSummary={id:string;mode:string;topic:string;created_at:number
 export type Snapshot={reviews:Review[];notes:Record<string,string>;sessions:SessionSummary[];activePictureSessionId?:string|null;activeVerbSessionId?:string|null;stats?:StudyStats};
 export function selectQuestions(mode:string,topic:string,count:number,reviews:Review[],onlyIds?:string[],course:LearningLanguage=topic.startsWith('en-')?'en':'de'):Question[]{
  const byId=new Map(reviews.map(r=>[r.question_id,r]));const only=onlyIds?new Set(onlyIds):null;const curriculum=curriculumTopicIds(topic);
- const source=course==='en'?englishQuestions:questions;const sourceTopics=course==='en'?englishTopics:topics;
+ // Yanlışlarım's one round of every mistake (review of the whole site with the chosen ids) also takes the verbs.
+ const everyPart=course==='de'&&mode==='review'&&topic==='all'&&!!onlyIds;
+ const source=course==='en'?englishQuestions:everyPart?[...questions,...verbQuestions]:questions;const sourceTopics=course==='en'?englishTopics:topics;
  const rank=(q:Question)=>{const r=byId.get(q.id);if(!r)return 100;if(r.wrong_count&&r.streak<3)return 200+r.wrong_count*5-r.streak*5;if(r.due_at<=Date.now())return 80;return 20-r.seen;};
  // Fiiller rounds: open mistakes first, then new and due questions; never the same verb twice in a row.
  if(isVerbTopic(topic)){
@@ -43,6 +45,7 @@ export function selectQuestions(mode:string,topic:string,count:number,reviews:Re
  else if(mode==='sentence')pool=pool.filter(q=>q.practice==='sentence');
  else if(mode==='visual')pool=pool.filter(q=>!!q.image);
  else if(mode!=='mixed')pool=pool.filter(q=>q.kind===mode);
+ if(everyPart)return shuffle(pool).slice(0,count);
  pool=shuffle(pool).sort((a,b)=>rank(b)-rank(a));
  const result:Question[]=[];const used=new Set<string>();
  const take=(q:Question)=>{if(!used.has(q.id)&&result.length<count){result.push(q);used.add(q.id);}};

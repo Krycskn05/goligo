@@ -439,6 +439,8 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .toon-app:has(.object-question) .letter-puzzle .puzzle-hint { font-size:12.5px; line-height:1.35; margin-bottom:6px; }
  .toon-app:has(.object-question) .letter-bank-heading,
  .toon-app:has(.object-question) .puzzle-keyboard-tip { display:none; }
+ /* Ev ve Yaşam: a lower picture during a test as well. */
+ .toon-app:has(.object-question) .housing-question-art { height:clamp(96px,18vh,200px); margin:6px auto 10px; }
  /* Listening: the two buttons in one low row (the question already says what to do) and smaller answer pictures. */
  .toon-app:has(.object-question) .vault-listen-player { padding:10px; gap:6px; }
  .toon-app:has(.object-question) .vault-listen-player>svg,

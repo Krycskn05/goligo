@@ -114,3 +114,14 @@ export function partMistakes(reviews:readonly Review[]){
  const housing=housingQuestions.filter(q=>isHousingMistake(byId.get(q.id)));
  return {vault:{count:vault.length,words},housing:{count:housing.length}};
 }
+
+/**
+ * Every open mistake of the site for Yanlışlarım's one round (the learner asked to practise them all together,
+ * 22 October 2026): Fiil Atölyesi (as its own mistakes list), Nesne Kasası and Ev ve Yaşam.
+ */
+export function allMistakeIds(reviews:readonly Review[],verbIds:readonly string[]){
+ const byId=new Map(reviews.map(row=>[row.question_id,row]));
+ const vault=objectQuestions.filter(q=>isVaultExercise(q)&&isObjectMistake(byId.get(q.id))).map(q=>q.id);
+ const housing=housingQuestions.filter(q=>isHousingMistake(byId.get(q.id))).map(q=>q.id);
+ return [...verbIds,...vault,...housing];
+}

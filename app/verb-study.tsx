@@ -4,6 +4,10 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
+import {housingMeaning,type HousingExercise} from '@/lib/housing-course';
+import {housingIllustration} from '@/lib/housing-illustrations';
+import {objectMeaning} from '@/lib/object-translations';
+import {ObjectArt,RasterArt} from './toon-art';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
@@ -30,7 +34,7 @@ import {SiteHeader} from './site-header';
 import {NavIcon} from './nav-icons';
 import {housingText} from '@/lib/housing-copy';
 import {PaulHoca} from './paul-hoca';
-import {verbProgress,learnedVerbs,partMistakes} from '@/lib/progress';
+import {verbProgress,learnedVerbs,partMistakes,allMistakeIds} from '@/lib/progress';
 import {RoundReward} from './progress-ui';
 import {progressText} from '@/lib/progress-copy';
 import {GUEST_GAMES,GUEST_VERB_PART} from '@/lib/guest-parts';
@@ -85,11 +89,13 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const mutation=useRef(false);const mounted=useRef(true);
  const pendingAnswer=useRef<{questionId:string;answer:string}|null>(null);
  const candidate=session?.questions[index]?lookup(session.questions[index].id):undefined;
- const q=verbModePredicate(session?.mode??WORKSHOP_MODE)(candidate)?candidate:undefined;
+ // Yanlışlarım's one round of every mistake (topic 'all') also has Nesne Kasası and Ev ve Yaşam questions.
+ const everyMistake=session?.mode===MISTAKES_MODE&&session.topic==='all';
+ const q=everyMistake||verbModePredicate(session?.mode??WORKSHOP_MODE)(candidate)?candidate:undefined;
  const verb=q?.verbId?verbMap.get(q.verbId):undefined;
  const task=q?.verbTask;
  // Only the correct answer is spoken after the effect, never the question. The sentence task answers with the Präsens form.
- const pronunciation=task==='fit'&&verb?verb.praesens:q?.answer??'';
+ const pronunciation=task==='fit'&&verb?verb.praesens:q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';
  // An older round of the whole path ends after part 1; every other round at its last question.
  const end=session?roundEnd(session):0;
  const finished=!!session&&index>=end;
@@ -111,6 +117,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const stickers=verbStatus(snapshot.sessions);
  // Yanlışlarım: workshop questions whose last answer was wrong; one right answer takes a question off the list.
  const otherMistakes=ready&&section==='mistakes'?partMistakes(snapshot.reviews):null;
+ const allMistakes=ready&&section==='mistakes'?allMistakeIds(snapshot.reviews,workshopMistakeIds(snapshot.reviews)):[];
  const mistakeIds=ready?workshopMistakeIds(snapshot.reviews):[];const mistakeVerbList=mistakeVerbs(mistakeIds);
  const mistakesRound=session?.mode===MISTAKES_MODE;
  const roundFamily:VerbFamily=(session&&verbFamilyOf(lookup(session.questions[0]?.id??'')?.verbId??''))||verbFamilies[0];
@@ -158,6 +165,15 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
    }
    const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
    if(!mounted.current)return;openSession(data.session);
+  }catch(e){fail(e,'startError');}
+  finally{mutation.current=false;if(mounted.current)setBusy(false);}
+ }
+ /** Every open mistake of the site in one round (Fiil Atölyesi, Nesne Kasası, Ev ve Yaşam; the learner asked). */
+ async function startAllMistakes(){
+  if(mutation.current||!allMistakes.length)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();speech.prepare();
+  try{
+   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:MISTAKES_MODE,topic:'all',count:allMistakes.length,onlyIds:allMistakes},'','de');
+   if(!mounted.current)return;setView(null);openSession(data.session);
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
@@ -226,6 +242,37 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   const kind=question.verbTask??'';
   return kind==='praesens'||kind==='write-praesens'||kind==='perfekt'||kind==='write-perfekt'?item.subject+' '+question.answer:kind==='fit'?praesensForm(item):kind==='write-partizip'?question.answer:item.display;
  }
+ // The round of every mistake (Yanlışlarım): Nesne Kasası and Ev ve Yaşam questions, drawn here in a simple way —
+ // picture or word, the four choices, der/die/das, or a line to write; then the right answer and its meaning.
+ const isHousingQuestion=(question:Question)=>question.topic.startsWith('book-11');
+ function otherAnswer(question:Question){return isHousingQuestion(question)?(question as HousingExercise).resultDe:question.articlePuzzle?question.articlePuzzle.fullAnswer:question.answer;}
+ function otherMeaning(question:Question){return isHousingQuestion(question)?housingMeaning(question as HousingExercise,language):question.objectId?objectMeaning(question.objectId,language):'';}
+ function otherQuestion(question:Question){
+  const housing=isHousingQuestion(question);const hq=question as HousingExercise;
+  const listen=question.kind==='listen';const write=question.kind==='write';const articles=!!question.articlePuzzle;
+  const title=housing?(write?housingText(language,question.gap?'gap':question.writingTask==='word'?'word':'sentence'):v('testDetail')):listen?v('listenPrompt'):articles?v('puzzleArticlePrompt'):write?v('writePrompt'):v('questionPrompt');
+  const pictureOf=new Map((question.options??[]).map((option,i)=>[option,question.pictureOptions?.[i]]));
+  const locked=!!feedback||actionDisabled||!!pendingAnswer.current;
+  return <article className={'object-question panel mixed-question'+(feedback?' answered':'')}>
+   <h1 id="object-question-heading" tabIndex={-1}>{title}</h1>
+   {housing?<div className="housing-question-art"><RasterArt art={housingIllustration(hq)} title={v('questionImage')}/></div>:question.objectId&&!listen?<div className="object-picture"><ObjectArt id={question.objectId} title={otherMeaning(question)}/></div>:null}
+   {housing&&<p className="housing-cue">{language==='de'?hq.cueDe:otherMeaning(question)}</p>}
+   {question.gap&&<p className="vault-gap-sentence" lang="de" dir="ltr">{question.gap}</p>}
+   {housing&&write&&question.wordBank&&<div className="housing-word-bank"><small>{housingText(language,'wordBank')}</small><p lang="de" dir="ltr">{question.wordBank.join(' · ')}</p></div>}
+   {listen&&<div className="vault-listen-player"><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===question.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div></div>}
+   {articles?<div className="article-bank" role="group" aria-label={v('puzzleArticlePrompt')} dir="ltr" lang="de">{['der','die','das'].map(value=><button type="button" key={value} className={'article-choice '+(feedback?(value===question.answer?'right':feedback.answer===value?'wrong':''):'')} disabled={locked} onClick={()=>void submit(value)}>{value}</button>)}</div>
+   :write?<form className="vault-writing-form" onSubmit={event=>{event.preventDefault();void submit(String(new FormData(event.currentTarget).get('answer')??''));}}><label className="field-label" htmlFor="mixed-answer">{v('yourAnswer')}</label><input key={question.id} id="mixed-answer" name="answer" className="writing-input" lang="de" dir="ltr" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} maxLength={300} readOnly={!!feedback||!!pendingAnswer.current} disabled={actionDisabled}/>{!feedback&&<button type="submit" className="btn check-button" disabled={actionDisabled}>{v('checkAnswer')}</button>}</form>
+   :<div className={'object-options picture-word-options'+(listen&&question.pictureOptions?' pictures vault-listening-options':'')} role="group" aria-labelledby="object-question-heading">{options.map((option,i)=>{const picture=listen?pictureOf.get(option):undefined;return <button key={option} type="button" className={'object-option '+(feedback&&option===question.answer?'right ':'')+(feedback&&!feedback.correct&&feedback.answer===option?'wrong ':'')} disabled={locked||(listen&&heardQuestionId!==question.id)} onClick={()=>void submit(option)}><span className="object-option-number">{String.fromCharCode(65+i)}</span>{picture?<div className="object-picture small"><ObjectArt id={picture} title={objectMeaning(picture,language)}/></div>:<span className="picture-option-word" lang="de" dir="ltr">{option}</span>}{feedback&&option===question.answer&&<CheckCircle2 size={20}/>}</button>;})}</div>}
+   {busy&&!feedback&&<p className="picture-quiz-saving" role="status"><Loader2 size={16} className="spinner"/>{v('savingAnswer')}</p>}
+   {feedback&&<div id="object-feedback" tabIndex={-1} className={'object-feedback '+(feedback.correct?'success':'retry')} role="status" aria-live="polite">
+    <h2>{feedback.correct?<CheckCircle2 size={23}/>:<X size={23}/>} {v(feedback.correct?'correct':write?'wrongAnswer':'wrong')}</h2>
+    <p>{v('correctAnswer')}: <strong lang="de" dir="ltr">{otherAnswer(question)}</strong></p>
+    {otherMeaning(question)&&<p className="housing-translation">{otherMeaning(question)}</p>}
+    {!feedback.correct&&<p>{v('yourAnswer')}: <span lang="de" dir="ltr">{feedback.answer}</span></p>}
+    <div className="object-actions"><button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{v('repeatAudio')}</button><button type="button" className="btn object-next" disabled={busy} onClick={next}>{v(index+1===end?'viewResults':'nextQuestion')}<ArrowRight size={18} className="vault-direction-icon"/></button></div>
+   </div>}
+  </article>;
+ }
  /** The forms shown after an answer: only what the stage teaches (meaning: the verb; Perfekt: sie/er hat/ist …). */
  function verbForms(item:Verb,task?:VerbTask){
   const stage=learnStage(task);
@@ -284,9 +331,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
     <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('partDone',{n:roundFamily.number,total:roundFamily.verbs.length}):mistakesRound?t('mistakesTitle'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:end})}</p>
     <RoundReward answers={session.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
     {guest&&<GuestMore language={language} back={back}/>}
-    {mistakesRound&&!mistakeIds.length&&<p className="verb-mistakes-done" role="status"><CheckCircle2 size={18}/>{t('mistakesAllDone')}</p>}
-    <div className="object-actions">{mistakesRound?mistakeIds.length>0&&<button type="button" className="btn" disabled={busy} onClick={()=>void startMistakes()}><RotateCcw size={18}/>{t('mistakesLeft',{n:mistakeIds.length})}</button>:<button type="button" className="btn" disabled={busy} onClick={()=>void enterPart(roundFamily,true)}><RotateCcw size={18}/>{t('workshopRestart')}</button>}<button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
-    {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:null;})}
+    {mistakesRound&&!(everyMistake?allMistakes:mistakeIds).length&&<p className="verb-mistakes-done" role="status"><CheckCircle2 size={18}/>{t('mistakesAllDone')}</p>}
+    <div className="object-actions">{everyMistake?allMistakes.length>0&&<button type="button" className="btn" disabled={busy} onClick={()=>void startAllMistakes()}><RotateCcw size={18}/>{t('mistakesAllStart',{n:allMistakes.length})}</button>:mistakesRound?mistakeIds.length>0&&<button type="button" className="btn" disabled={busy} onClick={()=>void startMistakes()}><RotateCcw size={18}/>{t('mistakesLeft',{n:mistakeIds.length})}</button>:<button type="button" className="btn" disabled={busy} onClick={()=>void enterPart(roundFamily,true)}><RotateCcw size={18}/>{t('workshopRestart')}</button>}<button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
+    {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:item?<div className="object-result-row verb-result-row" key={a.id}><div><strong lang="de" dir="ltr">{otherAnswer(item)}</strong> <span className="verb-forms-meaning">{otherMeaning(item)}</span><small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: <span lang="de" dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
     <div className="object-practice-top"><span className="object-pill">{t('workshopTitle')}</span><span>{v('progress',{n:index+1,total:end})}</span>{!guest&&<button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
@@ -317,6 +364,10 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
      </div>}
      </>}
     </article>}
+   </section>:q&&everyMistake?<section className="object-practice picture-quiz-practice verb-practice mixed-practice">
+    <div className="object-practice-top"><span className="object-pill">{isHousingQuestion(q)?housingText(language,'title'):v('vaultTitle')}</span><span>{v('progress',{n:index+1,total:end})}</span><button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
+    <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
+    {otherQuestion(q)}
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
    game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
    section==='games'?<section className="verb-section" aria-labelledby="verb-section-heading" data-verb-section="games">
@@ -333,6 +384,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
      <div className="verb-mistakes-head"><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1><PaulHoca pose="think" sound="appear"/></div>
      {/* Every part's mistakes on one page (the learner asked): Fiil Atölyesi here, then Nesne Kasası and Ev ve Yaşam. */}
      <p className="verb-mistakes-all">{t('mistakesAllLead')}</p>
+     {allMistakes.length>0&&<button type="button" className="btn mistakes-all-start" disabled={busy||!ready} onClick={()=>void startAllMistakes()} data-mistakes-all-start={allMistakes.length}><RotateCcw size={20}/>{t('mistakesAllStart',{n:allMistakes.length})}</button>}
      <h2 className="mistake-part-title"><NavIcon name="verbs"/>{t('workshopTitle')}{mistakeIds.length>0&&<span className="verb-mistakes-count">{mistakeIds.length}</span>}</h2>
      {mistakeIds.length>0?<>
       <p className="verb-mistakes-lead">{t('mistakesLead',{n:mistakeIds.length})}</p>

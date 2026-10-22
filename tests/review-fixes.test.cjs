@@ -110,4 +110,5 @@ test('phones: the speed choices in one even row under their title; der / die / d
  assert.ok(css.includes('.lk-voice-speed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}')&&css.includes('.lk-voice-speed>span{grid-column:1/-1;'));
  assert.ok(theme.includes('.article-choice { min-height:48px;')&&theme.includes('.verb-aux-choice { min-height:48px; }'));
  assert.ok(read('app/learning-effects.tsx').includes("{message?text(message):''}")&&css.includes('.lk-effects-message:empty{display:none}'),'no empty line above Kapat');
+ assert.ok(read('app/learning-effects.tsx').includes('<div className="lk-volume-row"><label className="lk-volume-label"')&&css.includes('.lk-effects-panel .lk-sound-group{margin:0;border-radius:0;border-top-width:0}'),'small phones: the Efektler tab fits');
 });

@@ -132,7 +132,7 @@ export default function LearningEffects() {
    </section>
    <section className="lk-effects-panel" id="lk-panel-effects" role="tabpanel" aria-labelledby="lk-tab-effects" hidden={tab!=='effects'}>
     <div className="lk-effects-switches"><label><span><TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={26}/> {text('enabled')}</span><input type="checkbox" checked={preferences.enabled} onChange={event=>update({enabled:event.target.checked})}/></label></div>
-    <label className="lk-volume-label" htmlFor="lk-volume"><span>{text('volume')}</span><output>{Math.round(preferences.volume*100)}%</output></label><input id="lk-volume" className="lk-volume" type="range" min="0" max="100" step="5" value={Math.round(preferences.volume*100)} onChange={event=>update({volume:Number(event.target.value)/100})}/>
+    <div className="lk-volume-row"><label className="lk-volume-label" htmlFor="lk-volume"><span>{text('volume')}</span><output>{Math.round(preferences.volume*100)}%</output></label><input id="lk-volume" className="lk-volume" type="range" min="0" max="100" step="5" value={Math.round(preferences.volume*100)} onChange={event=>update({volume:Number(event.target.value)/100})}/></div>
     {/* One group for each moment (tap, page change, correct, end of a round, wrong); each sound can be heard and chosen. */}
     {soundGroups.map(group=>{const chosen=preferences[group.key];return <details className="lk-sound-group" key={group.key} data-sound-group={group.key}><summary><span>{text(group.title)}</span><small>{text(soundName(chosen))}</small><ChevronDown size={17} aria-hidden="true"/></summary><fieldset className="lk-wrong-sounds"><legend className="lk-visually-hidden">{text(group.title)}</legend>{group.ids.map(id=><div className={'lk-sound-row '+(chosen===id?'selected':'')} key={id}><button type="button" className="lk-choose-sound" aria-pressed={chosen===id} aria-label={text('choose')+' · '+text(soundName(id))} onClick={()=>{update({[group.key]:id} as Partial<EffectsPreferences>);preview(id);setMessage('saved');}}><span className="lk-radio" aria-hidden="true">{chosen===id&&<Check size={14}/>}</span><span>{text(soundName(id))}</span>{chosen===id&&<small>{text('chosen')}</small>}</button><button type="button" className="lk-preview-button" disabled={preferences.volume===0} aria-label={text('listen')+' · '+text(soundName(id))} onClick={()=>preview(id)}>{playing===id?<Volume2 size={16}/>:<Play size={15}/>} {text('listen')}</button></div>)}</fieldset></details>;})}
    </section>
@@ -140,7 +140,7 @@ export default function LearningEffects() {
     <div className="lk-effects-switches"><label><span><TopIcon name="animations" size={26}/> {text('motion')}</span><input type="checkbox" checked={preferences.motion} onChange={event=>update({motion:event.target.checked})}/></label></div>
     {systemReduced&&<p className="lk-effects-note">{text('reduced')}</p>}
    </section>
-   <div className="lk-effects-foot"><p className="lk-effects-note lk-effects-message" role="status" aria-live="polite">{message?text(message):'\u00a0'}</p>
+   <div className="lk-effects-foot"><p className="lk-effects-note lk-effects-message" role="status" aria-live="polite">{message?text(message):''}</p>
    <button type="button" className="lk-effects-done" onClick={close}>{text('close')}<Check size={17}/></button></div>
   </dialog>
  </>;

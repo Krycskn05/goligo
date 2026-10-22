@@ -455,3 +455,7 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .toon-app:has(.object-question) .work-layout>.work-sidebar,
  .toon-app:has(.verb-game) .work-layout>.work-sidebar { display:none; }
 }
+
+/* der / die / das (and haben / sein, the prefix choice) are about 48 px high, easy to tap with a finger (the learner asked). */
+.article-choice { min-height:48px; min-width:64px; padding:0 16px; font-size:18px; }
+.verb-aux-choice { min-height:48px; }

@@ -74,3 +74,26 @@ html[data-lernkoko-motion=reduced] .lk-voice-chip.selected .lk-voice-avatar{anim
 .lk-effects-foot .lk-effects-message{margin:0 0 8px}
 @media (max-width:420px){.lk-effects-tabs button{flex-direction:column;gap:2px;font-size:12px}}
 .lk-effects-dialog .lk-voice-section{margin-bottom:0;border-bottom:0}
+/* Speaking speed: the title on its own line, the three choices side by side with the same width (at 375 px "Normal"
+   fell to a second line; the learner asked). Small phones: a shorter top and bottom so more of the panel shows. */
+.lk-voice-speed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.lk-voice-speed>span{grid-column:1/-1;margin:0 0 2px}
+.lk-voice-speed button{min-height:44px;padding:6px 4px;font-size:13px}
+.lk-effects-message:empty{display:none}
+@media (max-width:400px){
+ .lk-effects-top{gap:8px;padding-top:12px;padding-bottom:8px;margin-bottom:10px}
+ .lk-effects-head h2{font-size:17px}
+ .lk-effects-foot{margin-top:10px;padding-top:6px;padding-bottom:10px}
+ .lk-effects-foot .lk-effects-message{margin-bottom:6px}
+}
+/* Small phones: the volume in one row and the five sounds as one joined list, so the Efektler tab fits the screen. */
+@media (max-width:400px){
+ .lk-volume-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px;margin:10px 0 8px}
+ .lk-volume-row .lk-volume-label{margin:0;gap:6px}
+ .lk-volume-row .lk-volume{margin:0}
+ .lk-effects-panel .lk-sound-group{margin:0;border-radius:0;border-top-width:0}
+ .lk-effects-panel .lk-sound-group:first-of-type{border-top-width:1px;border-radius:14px 14px 0 0}
+ .lk-effects-panel .lk-sound-group:last-of-type{border-radius:0 0 14px 14px}
+ .lk-sound-group>summary{min-height:46px;padding:6px 12px;font-size:13.5px}
+ .lk-sound-group>summary small{font-size:11.5px}
+}

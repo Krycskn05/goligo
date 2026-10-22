@@ -79,7 +79,8 @@ test('progress copy is complete in every vault language',()=>{
   for(const [i,value] of values.entries()){assert(value.trim(),key+':'+languages[i]);assert.equal(value.match(/\{\w+\}/g)?.sort().join()??'',placeholders,key+':'+languages[i]);}
  }
  assert.equal(copy.progressText('tr','level',{n:3}),'Seviye 3');
- assert.equal(copy.progressText('de','learned',{n:4,total:9}),'Gelernt: 4/9');
+ assert.equal(copy.progressText('de','learned',{n:4,total:9}),'Erledigte Übungen: 4/9');
+ assert.equal(copy.progressText('tr','learned',{n:80,total:936}),'Tamamlanan alıştırma: 80/936','exercises, not words (the learner asked)');
  assert.equal(copy.formatPercent(41,'tr'),'%41');
  assert.equal(copy.formatPercent(41,'en'),'41%');
  // Every site language (the later ones read the stage names from their language pack).
@@ -125,7 +126,7 @@ test('home, Ev ve Yaşam and Nesne Kasası show the progress interface',()=>{
  assert(home.includes("'stats=1&tz='+new Date().getTimezoneOffset()"));
  // The progress sits at the bottom of the left menu (after Üniteler ve konular, Nesne Kasası, Fiiller), not in the main column or the header.
  const aside=home.slice(home.indexOf('<aside className="work-sidebar">'),home.indexOf('</aside>'));
- assert(aside.indexOf('</nav>')<aside.indexOf('<SidebarProgress '),'progress under the menu');
+ assert(aside.indexOf('<SiteMenu ')>=0&&aside.indexOf('<SiteMenu ')<aside.indexOf('<SidebarProgress '),'progress under the menu');
  const main=home.slice(home.indexOf('<main id="main"'),home.indexOf('</main>'));
  assert(!main.includes('<SidebarProgress')&&!home.includes('<ProgressSummaryPanel'),'no progress panel in the main column');
  const header=fs.readFileSync('app/site-header.tsx','utf8');

@@ -7,13 +7,16 @@ import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib
 import {languageDirection} from '@/lib/site-languages';
 import {courseUnits} from '@/lib/textbook-curriculum';
 import {housingText} from '@/lib/housing-copy';
-import {AUSBILDUNG_PATH,lessonParts,lessonPartMap,turkishNote,type L12Part,type L12PartId,type L12Word} from '@/lib/ausbildung-course';
-import {hoerenTasks,type HoerenTask} from '@/lib/ausbildung-hoeren';
+import {AUSBILDUNG_PATH,lessonPartMap,turkishNote,type L12Part,type L12PartId,type L12Word} from '@/lib/ausbildung-course';
+import type {HoerenTask} from '@/lib/ausbildung-hoeren';
 import {exerciseAnswerCount,isCheckable,isStep,isWordSection,lessonProgress,partProgress,partSteps,testPoints,type L12ScoreMap,type L12Step} from '@/lib/ausbildung-progress';
 import {useLanguageSwitch} from './language-switch';
+import {L12Provider,useL12,type L12Texts} from './l12-i18n';
+import {hasL12Pack,loadL12Pack} from '@/lib/l12-i18n';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
+import {SiteMenuAside} from './site-menu';
 import {BrandMascot} from './site-logo';
 import {RasterArt,TopicArt} from './toon-art';
 import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
@@ -22,7 +25,7 @@ import {LessonBook} from './lesson-book';
 import {GUEST_L12_PART} from '@/lib/guest-parts';
 import {GuestBanner,GuestLock,GuestMore} from './guest-taste';
 import {ExerciseView,Flashcards,LessonBlocks,Rich,TeachingCard,readKnown,readScores,teachingCards,type Speech} from './ausbildung-ui';
-import {LISTEN_CHANGED,ListenTask,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
+import {LISTEN_CHANGED,ListenTask,listenResult,useListenPlayer} from './ausbildung-listen';
 
 const unit=courseUnits.find(item=>item.id==='book-12')!;
 const partParam=(value:string|null):L12PartId|null=>value&&lessonPartMap.has(value as L12PartId)?value as L12PartId:null;
@@ -31,8 +34,10 @@ function PartArt({part}:{part:L12Part}){
  const picture=partPictures[part.id];
  return picture?<RasterArt art={picture} title={part.de}/>:<BrandMascot className="l12-koko"/>;
 }
-const stepLabel:Record<L12Step,string>={kelimeler:'Kelimeler',konu:'Konu anlatımı',alistirmalar:'Alıştırmalar',dinleme:'Dinleme'};
-const stepGo:Record<L12Step,string>={kelimeler:'Kelimelere geç',konu:'Konu anlatımına geç',alistirmalar:'Alıştırmalara geç',dinleme:'Dinlemeye geç'};
+/** Marks a Turkish text of this page that is shown through `t` later (lib/l12-i18n.ts lists them for the packs). */
+const ui=(text:string)=>text;
+const stepLabel:Record<L12Step,string>={kelimeler:ui('Kelimeler'),konu:ui('Konu anlatımı'),alistirmalar:ui('Alıştırmalar'),dinleme:ui('Dinleme')};
+const stepGo:Record<L12Step,string>={kelimeler:ui('Kelimelere geç'),konu:ui('Konu anlatımına geç'),alistirmalar:ui('Alıştırmalara geç'),dinleme:ui('Dinlemeye geç')};
 const StepIcon=({step,size=18}:{step:L12Step;size?:number})=>step==='kelimeler'?<Layers size={size} aria-hidden="true"/>:step==='konu'?<BookOpen size={size} aria-hidden="true"/>:step==='alistirmalar'?<PenLine size={size} aria-hidden="true"/>:<Headphones size={size} aria-hidden="true"/>;
 
 /** Where the learner was last (part, step, exercise), so the overview can offer "continue". */
@@ -53,11 +58,11 @@ function partWords(part:L12Part):L12Word[]{
 /** `guest`: a visitor without an account (app/a1-2/ausbildung/page.tsx) — Teil A is open, the other parts ask to sign up. */
 export default function AusbildungStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
- const switchLanguage=useLanguageSwitch(setLanguage);
+ const switchLanguage=useLanguageSwitch(setLanguage,loadL12Pack);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 · Ausbildung · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <AusbildungLesson language={language} onLanguage={switchLanguage} guest={guest}/>;
+ return <L12Provider language={language}><AusbildungLesson language={language} onLanguage={switchLanguage} guest={guest}/></L12Provider>;
 }
 
 type Route={part:L12PartId|null;step:L12Step|null};
@@ -83,35 +88,38 @@ export function AusbildungLesson({language,onLanguage,guest=false}:{language:Stu
   try{const url=new URL(window.location.href);url.searchParams.delete('bolum');url.searchParams.delete('adim');if(part){url.searchParams.set('bolum',part);if(nextStep)url.searchParams.set('adim',nextStep);}url.hash='';window.history.pushState(null,'',url);}catch{}
   requestAnimationFrame(()=>{window.scrollTo({top:0,behavior:'instant'});document.getElementById('l12-heading')?.focus({preventScroll:true});});
  },[german,refresh]);
- const current=route.part?lessonPartMap.get(route.part):undefined;
+ const {partMap}=useL12();
+ const current=route.part?partMap.get(route.part):undefined;
  const step=current?(route.step&&partSteps(current).includes(route.step)?route.step:partSteps(current)[0]):null;
  const unitName=translate(unit.names,language);
  return <div className="category-app toon-app housing-app l12-app" lang={language} dir={languageDirection(language)}>
   <a className="skip-link" href="#l12-main">{housingText(language,'back')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){german.stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={housingText(language,'back')} guest={guest}/>
-  <main id="l12-main" className="object-page housing-page l12-page" lang="tr" dir="ltr">
+  <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
+  <main id="l12-main" className="object-page housing-page l12-page" lang={language} dir={languageDirection(language)}>
    <div className="object-breadcrumb"><a href="/konular?level=A1.2">A1.2</a><span aria-hidden="true">›</span>{current?<><a href={AUSBILDUNG_PATH} onClick={event=>{event.preventDefault();open(null);}}>Lektion 12 · Ausbildung</a><span aria-hidden="true">›</span><span>{current.de}</span></>:<span>Lektion 12 · Ausbildung</span>}</div>
    {guest&&<GuestBanner language={language} back={AUSBILDUNG_PATH}/>}
-   {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
+   {language!=='tr'&&!hasL12Pack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
    {german.warning&&<p className="object-alert" role="status">{german.warning}</p>}
    {current&&step&&guest&&current.id!==GUEST_L12_PART?<section className="panel" aria-labelledby="l12-heading" data-guest-part={current.id}><h1 id="l12-heading" tabIndex={-1} lang="de">{current.title}</h1><GuestMore language={language} back={AUSBILDUNG_PATH}/></section>:current&&step?<PartPage key={current.id} part={current} step={step} scores={scores} tick={tick} speech={speech} onScore={refresh} onOpen={open} language={language}/>:<Overview unitName={unitName} scores={scores} tick={tick} onOpen={open} language={language} guest={guest}/>}
-  </main>
+  </main></div>
   <SiteFooter language={language}/>
  </div>;
 }
 
 /* ---------- Overview ---------- */
 
-function partSummary(part:L12Part){
+function partSummary(part:L12Part,t:L12Texts['t']){
  const words=partWords(part).length;const exercises=part.exercises.length;const listen=part.listen?.length??0;
- return [words?words+' kelime':'',exercises?exercises+' alıştırma':'',listen?listen+' dinleme':''].filter(Boolean).join(' · ');
+ return [words?t('{n} kelime',{n:words}):'',exercises?t('{n} alıştırma',{n:exercises}):'',listen?t('{n} dinleme',{n:listen}):''].filter(Boolean).join(' · ');
 }
 /** What Lektion 12 teaches, ticked off on the overview's left page. */
-const GOALS=['Ne yapabildiğini anlat: *Ich kann gut kochen.*','Planını söyle: *Ich will eine Ausbildung machen.*','Geçmişi anlat: *Ich bin nach Berlin gekommen.*','Zamanı söyle: *seit 2019 · vor zwei Jahren · in einem Jahr*','Resmî e-posta yaz: *Sehr geehrte Damen und Herren, …*'];
+const GOALS=[ui('Ne yapabildiğini anlat: *Ich kann gut kochen.*'),ui('Planını söyle: *Ich will eine Ausbildung machen.*'),ui('Geçmişi anlat: *Ich bin nach Berlin gekommen.*'),ui('Zamanı söyle: *seit 2019 · vor zwei Jahren · in einem Jahr*'),ui('Resmî e-posta yaz: *Sehr geehrte Damen und Herren, …*')];
 function Overview({unitName,scores,tick,onOpen,language,guest=false}:{unitName:string;scores:L12ScoreMap;tick:number;onOpen:(part:L12PartId,step?:L12Step)=>void;language:StudyLanguage;guest?:boolean}){
+ const {t,parts:lessonParts,partMap,tasks:hoerenTasks}=useL12();
  const [last,setLast]=useState<Last|null>(null);const [listened,setListened]=useState(0);
- useEffect(()=>{setLast(readLast());setListened(hoerenTasks.filter(task=>listenResult(task)).length);},[tick]);
- const lastPart=last?lessonPartMap.get(last.part):undefined;
+ useEffect(()=>{setLast(readLast());setListened(hoerenTasks.filter(task=>listenResult(task)).length);},[tick,hoerenTasks]);
+ const lastPart=last?partMap.get(last.part):undefined;
  const total=lessonProgress(scores);
  // One line of the contents page: badge, taped picture, title, what is inside, progress.
  // The guest taste: only Teil A opens; the other rows carry a lock and lead to the sign-up card.
@@ -119,7 +127,7 @@ function Overview({unitName,scores,tick,onOpen,language,guest=false}:{unitName:s
   <button type="button" className="lb-toc-open" onClick={()=>onOpen(part.id)}>
    <span className="lb-toc-badge" aria-hidden="true">{part.badge}</span>
    <span className="lb-toc-photo" aria-hidden="true"><PartArt part={part}/></span>
-   <span className="lb-toc-text"><strong lang="de" dir="ltr">{part.title}</strong><small><Rich text={part.card??part.lead}/></small><span className="lb-toc-meta">{partSummary(part)}</span></span>
+   <span className="lb-toc-text"><strong lang="de" dir="ltr">{part.title}</strong><small><Rich text={part.card??part.lead}/></small><span className="lb-toc-meta">{partSummary(part,t)}</span></span>
    <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
   </button>
   {locked?<GuestLock language={language} back={AUSBILDUNG_PATH}/>:part.id==='test'?<TestBadge part={part} scores={scores}/>:<ProgressMeter progress={partProgress(part,scores)} language={language} label={part.de} compact/>}
@@ -129,52 +137,53 @@ function Overview({unitName,scores,tick,onOpen,language,guest=false}:{unitName:s
    <span className="eyebrow" lang="de">A1.2 · Lektion 12 · Ausbildung</span>
    <h1 id="l12-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
    <p className="lb-sub" lang="de">Was wollen Sie noch lernen?</p>
-   <p className="lb-lead">Meslek eğitimi, staj ve hayat hikâyeni anlatmak: <Rich text="*können / wollen*, Perfekt mit *sein*, *seit / vor / in* ve resmî e-posta."/></p>
+   <p className="lb-lead">{t('Meslek eğitimi, staj ve hayat hikâyeni anlatmak:')} <Rich text={t('*können / wollen*, Perfekt mit *sein*, *seit / vor / in* ve resmî e-posta.')}/></p>
    <figure className="lb-photo"><TopicArt id="book-12" title={unitName}/></figure>
    <div className="lb-notes">
     <button type="button" className="housing-feature lb-note l12-resume" onClick={()=>last&&!(guest&&last.part!==GUEST_L12_PART)?onOpen(last.part,last.step):onOpen('a','kelimeler')}>
      <span className="housing-letter l12-letter" aria-hidden="true"><Play size={24}/></span>
-     <div><h2>{last?'Kaldığın yerden devam et':'Derse başla'}</h2><p>{lastPart&&last?lastPart.de+' · '+stepLabel[last.step]:'Teil A · Kelimeler'}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
+     <div><h2>{last?t('Kaldığın yerden devam et'):t('Derse başla')}</h2><p>{lastPart&&last?lastPart.de+' · '+t(stepLabel[last.step]):'Teil A · '+t('Kelimeler')}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <a className="housing-feature lb-note l12-listen-feature" href={AUSBILDUNG_PATH+'/hoeren'}>
      <span className="l12-feature-art" aria-hidden="true"><RasterArt art={hoerenPicture} title="Hören"/></span>
-     <div><h2>Hören · 14 dinleme</h2><p>{listened?`${listened} / ${hoerenTasks.length} bölüm yapıldı`:'Diyalogları dinle, soruları cevapla.'}</p></div>
+     <div><h2>Hören · {t('{n} dinleme',{n:hoerenTasks.length})}</h2><p>{listened?t('{done} / {total} bölüm yapıldı',{done:listened,total:hoerenTasks.length}):t('Diyalogları dinle, soruları cevapla.')}</p></div>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </a>
    </div>
-   <section className="lb-goals" aria-labelledby="l12-goals"><h2 id="l12-goals">Bu ünitede</h2><ul>{GOALS.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
+   <section className="lb-goals" aria-labelledby="l12-goals"><h2 id="l12-goals">{t('Bu ünitede')}</h2><ul>{GOALS.map(goal=><li key={goal}><span><Rich text={t(goal)}/></span></li>)}</ul></section>
   </>} right={<>
-   <h2 className="lb-heading"><span lang="de">Inhalt</span><small>İçindekiler</small></h2>
+   <h2 className="lb-heading">{t('İçindekiler')}</h2>
    <ol className="lb-toc">{lessonParts.slice(0,4).map(row)}</ol>
-   <h3 className="lb-subheading">Ünite sonu</h3>
+   <h3 className="lb-subheading">{t('Ünite sonu')}</h3>
    <ol className="lb-toc">{lessonParts.slice(4).map(row)}</ol>
   </>}/>
  </section>;
 }
 function TestBadge({part,scores}:{part:L12Part;scores:L12ScoreMap}){
- const result=testPoints(part,scores);
- return <p className="l12-test-badge">{result.checked?<><Trophy size={17} aria-hidden="true"/><strong>{String(result.points).replace('.',',')} / {result.max} Punkte</strong>{result.checked<result.total?<small> · {result.total-result.checked} bölüm kaldı</small>:null}</>:<><Trophy size={17} aria-hidden="true"/>Henüz yapılmadı · {result.max} Punkte</>}</p>;
+ const {t}=useL12();const result=testPoints(part,scores);
+ return <p className="l12-test-badge">{result.checked?<><Trophy size={17} aria-hidden="true"/><strong>{String(result.points).replace('.',',')} / {result.max} Punkte</strong>{result.checked<result.total?<small> · {t('{n} bölüm kaldı',{n:result.total-result.checked})}</small>:null}</>:<><Trophy size={17} aria-hidden="true"/>{t('Henüz yapılmadı')} · {result.max} Punkte</>}</p>;
 }
 
 /* ---------- One part ---------- */
 
 function PartPage({part,step,scores,tick,speech,onScore,onOpen,language}:{part:L12Part;step:L12Step;scores:L12ScoreMap;tick:number;speech:Speech;onScore:()=>void;onOpen:(part:L12PartId|null,step?:L12Step)=>void;language:StudyLanguage}){
+ const {t,parts:lessonParts,taskMap}=useL12();
  const steps=partSteps(part);const at=steps.indexOf(step);const nextStep=steps[at+1];
  const index=lessonParts.findIndex(item=>item.id===part.id);const nextPart=lessonParts[index+1];
  const words=useMemo(()=>partWords(part),[part]);
  const [known,setKnown]=useState<Set<string>>(new Set());const [seen,setSeen]=useState<Record<string,boolean>>({});const [listened,setListened]=useState(0);
- useEffect(()=>{setKnown(readKnown(part.id));setSeen(readSeen());setListened((part.listen??[]).filter(number=>{const task=tasksByNumber.get(number);return task&&listenResult(task);}).length);},[part,tick]);
+ useEffect(()=>{setKnown(readKnown(part.id));setSeen(readSeen());setListened((part.listen??[]).filter(number=>{const task=taskMap.get(number);return task&&listenResult(task);}).length);},[part,tick,taskMap]);
  const checkable=part.exercises.filter(isCheckable);const checked=checkable.filter(exercise=>scores[exercise.id]).length;
  const detail:Record<L12Step,string>={
-  kelimeler:`${known.size} / ${words.length} biliyorum`,
-  konu:seen[part.id]?'Okundu':`${teachingCards(part.sections.filter(section=>!isWordSection(section.id))).length} kart`,
-  alistirmalar:checkable.length?`${checked} / ${checkable.length} yapıldı`:`${part.exercises.length} yazma görevi`,
-  dinleme:`${listened} / ${part.listen?.length??0} yapıldı`,
+  kelimeler:t('{known} / {total} biliyorum',{known:known.size,total:words.length}),
+  konu:seen[part.id]?t('Okundu'):t('{n} kart',{n:teachingCards(part.sections.filter(section=>!isWordSection(section.id))).length}),
+  alistirmalar:checkable.length?t('{done} / {total} yapıldı',{done:checked,total:checkable.length}):t('{n} yazma görevi',{n:part.exercises.length}),
+  dinleme:t('{done} / {total} yapıldı',{done:listened,total:part.listen?.length??0}),
  };
  const done:Record<L12Step,boolean>={kelimeler:words.length>0&&known.size>=words.length,konu:!!seen[part.id],alistirmalar:checkable.length>0&&checked>=checkable.length,dinleme:!!part.listen&&listened>=part.listen.length};
  const goNext=()=>{if(step==='konu')markSeen(part.id);if(nextStep)onOpen(part.id,nextStep);else if(nextPart)onOpen(nextPart.id);else onOpen(null);};
- const nextText=nextStep?stepGo[nextStep]:nextPart?'Sonraki bölüm: '+nextPart.de:'Lektion 12\'ye dön';
+ const nextText=nextStep?t(stepGo[nextStep]):nextPart?t('Sonraki bölüm: {part}',{part:nextPart.de}):t("Lektion 12'ye dön");
  const previousPart=lessonParts[index-1];
  return <section className="l12-part" aria-labelledby="l12-heading">
   <LessonBook variant="wide" className={steps.length>1?'lb-tabbed':''} left={<div className="lb-sticky">
@@ -184,33 +193,33 @@ function PartPage({part,step,scores,tick,speech,onScore,onOpen,language}:{part:L
    <p className="lb-lead"><Rich text={part.lead}/></p>
    <figure className="lb-photo"><PartArt part={part}/></figure>
    {part.id==='test'?<TestBadge part={part} scores={scores}/>:<ProgressMeter progress={partProgress(part,scores)} language={language} label={part.de} compact/>}
-   <nav className="lb-pager" aria-label="Bölümler">{previousPart?<button type="button" className="text-button" onClick={()=>onOpen(previousPart.id)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{previousPart.de}</button>:<span/>}{nextPart?<button type="button" className="text-button" onClick={()=>onOpen(nextPart.id)}>{nextPart.de}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:null}</nav>
+   <nav className="lb-pager" aria-label={t('Bölümler')}>{previousPart?<button type="button" className="text-button" onClick={()=>onOpen(previousPart.id)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{previousPart.de}</button>:<span/>}{nextPart?<button type="button" className="text-button" onClick={()=>onOpen(nextPart.id)}>{nextPart.de}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:null}</nav>
   </div>} right={<>
-   {steps.length>1&&<nav className="l12-steps" aria-label="Bölümün adımları"><ol>{steps.map((item,i)=><li key={item}><button type="button" className={'l12-step'+(item===step?' active':'')+(done[item]?' done':'')} aria-current={item===step?'step':undefined} onClick={()=>onOpen(part.id,item)}>
+   {steps.length>1&&<nav className="l12-steps" aria-label={t('Bölümün adımları')}><ol>{steps.map((item,i)=><li key={item}><button type="button" className={'l12-step'+(item===step?' active':'')+(done[item]?' done':'')} aria-current={item===step?'step':undefined} onClick={()=>onOpen(part.id,item)}>
     <span className="l12-step-number" aria-hidden="true">{done[item]?<Check size={16}/>:i+1}</span>
-    <span className="l12-step-text"><strong><StepIcon step={item} size={15}/>{stepLabel[item]}</strong><small>{detail[item]}</small></span>
+    <span className="l12-step-text"><strong><StepIcon step={item} size={15}/>{t(stepLabel[item])}</strong><small>{detail[item]}</small></span>
    </button></li>)}</ol></nav>}
    <div className="l12-step-page">
     {step==='kelimeler'&&<WordsStep part={part} words={words} known={known} speech={speech} onKnown={setKnown}/>}
     {step==='konu'&&<TopicStep part={part} speech={speech}/>}
     {step==='alistirmalar'&&<ExerciseRunner part={part} scores={scores} onScore={onScore} onOpen={onOpen} language={language}/>}
     {step==='dinleme'&&<ListenStep part={part}/>}
-    {step!=='alistirmalar'&&<div className="panel housing-lesson-next l12-next"><p>{step==='kelimeler'?'Kelimeleri dinledin, kartlarla denedin mi? Şimdi konuyu öğrenelim.':step==='konu'?'Konuyu okudun. Şimdi alıştırmalarla pekiştir.':'Dinleme bitti.'+(nextPart?' Sıradaki bölüme geçebilirsin.':'')}</p><button type="button" className="btn" onClick={goNext}>{nextText}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button></div>}
+    {step!=='alistirmalar'&&<div className="panel housing-lesson-next l12-next"><p>{step==='kelimeler'?t('Kelimeleri dinledin, kartlarla denedin mi? Şimdi konuyu öğrenelim.'):step==='konu'?t('Konuyu okudun. Şimdi alıştırmalarla pekiştir.'):t('Dinleme bitti.')+(nextPart?' '+t('Sıradaki bölüme geçebilirsin.'):'')}</p><button type="button" className="btn" onClick={goNext}>{nextText}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button></div>}
    </div>
   </>}/>
  </section>;
 }
 
 function WordsStep({part,words,known,speech,onKnown}:{part:L12Part;words:L12Word[];known:Set<string>;speech:Speech;onKnown:(known:Set<string>)=>void}){
- const [cards,setCards]=useState(false);
+ const {t}=useL12();const [cards,setCards]=useState(false);
  const sections=part.sections.filter(section=>isWordSection(section.id));
  const intro=sections.flatMap(section=>{const first=section.blocks.findIndex(block=>block.t!=='p');return section.blocks.slice(0,first<0?section.blocks.length:first);});
  const rest=sections.map(section=>{const first=section.blocks.findIndex(block=>block.t!=='p');return {...section,blocks:first<0?[]:section.blocks.slice(first)};});
  const list=teachingCards(rest);
  return <div className="l12-step-body">
   <div className="panel l12-words-head">
-   <div><h2><Layers size={22} aria-hidden="true"/>Kelimeler</h2>{intro.length?<LessonBlocks blocks={intro} speech={speech}/>:<p className="l12-p">Her kelimeyi dinle ve sesli tekrar et.</p>}</div>
-   <div className="l12-words-cta"><button type="button" className="btn orange" onClick={()=>setCards(value=>!value)} aria-pressed={cards}><Layers size={18} aria-hidden="true"/>{cards?'Listeye dön':'Kartlarla çalış'}</button><small>{known.size} / {words.length} kelimeyi biliyorsun</small></div>
+   <div><h2><Layers size={22} aria-hidden="true"/>{t('Kelimeler')}</h2>{intro.length?<LessonBlocks blocks={intro} speech={speech}/>:<p className="l12-p">{t('Her kelimeyi dinle ve sesli tekrar et.')}</p>}</div>
+   <div className="l12-words-cta"><button type="button" className="btn orange" onClick={()=>setCards(value=>!value)} aria-pressed={cards}><Layers size={18} aria-hidden="true"/>{cards?t('Listeye dön'):t('Kartlarla çalış')}</button><small>{t('{known} / {total} kelimeyi biliyorsun',{known:known.size,total:words.length})}</small></div>
   </div>
   {cards?<Flashcards id={part.id} words={words} speech={speech} onClose={()=>setCards(false)} onChange={onKnown}/>:list.map((card,i)=><TeachingCard key={i} card={card} speech={speech} known={known}/>)}
  </div>;
@@ -223,7 +232,7 @@ function TopicStep({part,speech}:{part:L12Part;speech:Speech}){
 }
 
 function ExerciseRunner({part,scores,onScore,onOpen,language}:{part:L12Part;scores:L12ScoreMap;onScore:()=>void;onOpen:(part:L12PartId|null,step?:L12Step)=>void;language:StudyLanguage}){
- const exercises=part.exercises;const total=exercises.length;
+ const {t}=useL12();const exercises=part.exercises;const total=exercises.length;
  const [index,setIndex]=useState(0);const [results,setResults]=useState(false);const sound=useAnswerSound();
  useEffect(()=>{let saved=NaN;try{saved=Number(localStorage.getItem(exKey(part.id)));}catch{}if(Number.isInteger(saved)&&saved>=0&&saved<total)setIndex(saved);else{const first=exercises.findIndex(exercise=>!scores[exercise.id]&&isCheckable(exercise));setIndex(first<0?0:first);}
  // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -233,43 +242,44 @@ function ExerciseRunner({part,scores,onScore,onOpen,language}:{part:L12Part;scor
  const exercise=exercises[index];const checkedCount=exercises.filter(item=>scores[item.id]).length;
  return <div className="l12-runner">
   <div className="object-practice l12-practice">
-   <div className="object-practice-top"><span className="object-pill"><PenLine size={14} aria-hidden="true"/>{part.de} · Alıştırmalar</span><span>{results?'Sonuç':`${index+1} / ${total}`}</span></div>
-   <progress max={total} value={checkedCount} aria-label={`${checkedCount} / ${total} alıştırma yapıldı`}/>
-   <nav className="l12-dots" aria-label="Alıştırmalar">{exercises.map((item,i)=>{const score=scores[item.id];const state=!score?'':score.total>0&&score.right===score.total?' perfect':isCheckable(item)?' partial':' perfect';return <button type="button" key={item.id} className={'l12-dot'+state+(i===index&&!results?' current':'')} aria-current={i===index&&!results?'step':undefined} aria-label={`Alıştırma ${i+1}: ${item.title}`} title={item.title} onClick={()=>go(i)}>{i+1}</button>;})}<button type="button" className={'l12-dot l12-dot-finish'+(results?' current':'')} aria-label="Sonuç" title="Sonuç" onClick={finish}><Trophy size={15} aria-hidden="true"/></button></nav>
+   <div className="object-practice-top"><span className="object-pill"><PenLine size={14} aria-hidden="true"/>{part.de} · {t('Alıştırmalar')}</span><span>{results?t('Sonuç'):`${index+1} / ${total}`}</span></div>
+   <progress max={total} value={checkedCount} aria-label={t('{done} / {total} alıştırma yapıldı',{done:checkedCount,total})}/>
+   <nav className="l12-dots" aria-label={t('Alıştırmalar')}>{exercises.map((item,i)=>{const score=scores[item.id];const state=!score?'':score.total>0&&score.right===score.total?' perfect':isCheckable(item)?' partial':' perfect';return <button type="button" key={item.id} className={'l12-dot'+state+(i===index&&!results?' current':'')} aria-current={i===index&&!results?'step':undefined} aria-label={t('Alıştırma {n}',{n:i+1})+': '+item.title} title={item.title} onClick={()=>go(i)}>{i+1}</button>;})}<button type="button" className={'l12-dot l12-dot-finish'+(results?' current':'')} aria-label={t('Sonuç')} title={t('Sonuç')} onClick={finish}><Trophy size={15} aria-hidden="true"/></button></nav>
   </div>
-  {results?<Results part={part} scores={scores} onJump={go} onOpen={onOpen} language={language}/>:<ExerciseView key={exercise.id} exercise={exercise} number={index+1} total={total} onScore={onScore} onNext={()=>index<total-1?go(index+1):finish()} nextLabel={index<total-1?'Sonraki alıştırma':'Sonucu gör'}/>}
+  {results?<Results part={part} scores={scores} onJump={go} onOpen={onOpen} language={language}/>:<ExerciseView key={exercise.id} exercise={exercise} number={index+1} total={total} onScore={onScore} onNext={()=>index<total-1?go(index+1):finish()} nextLabel={index<total-1?t('Sonraki alıştırma'):t('Sonucu gör')}/>}
  </div>;
 }
 
 function Results({part,scores,onJump,onOpen,language}:{part:L12Part;scores:L12ScoreMap;onJump:(index:number)=>void;onOpen:(part:L12PartId|null,step?:L12Step)=>void;language:StudyLanguage}){
+ const {t,parts:lessonParts}=useL12();
  const progress=partProgress(part,scores);const index=lessonParts.findIndex(item=>item.id===part.id);const nextPart=lessonParts[index+1];
  const firstOpen=part.exercises.findIndex(exercise=>{const score=scores[exercise.id];return isCheckable(exercise)&&(!score||score.right<score.total);});
  const test=part.id==='test'?testPoints(part,scores):null;
  const left=part.exercises.filter(exercise=>isCheckable(exercise)&&!scores[exercise.id]).length;
  const percent=test?Math.round(test.points*100/test.max):progress.percent;
- const praise=!progress.tried?'Alıştırmaları yaptıkça sonuçların burada görünür.':left?`Güzel gidiyor! ${left} alıştırma daha var.`:percent>=90?'Harika iş çıkardın!':percent>=60?'Çok iyi, biraz daha tekrar!':'Yanlışlara bir daha bak, sonra tekrar dene.';
+ const praise=!progress.tried?t('Alıştırmaları yaptıkça sonuçların burada görünür.'):left?t('Güzel gidiyor! {n} alıştırma daha var.',{n:left}):percent>=90?t('Harika iş çıkardın!'):percent>=60?t('Çok iyi, biraz daha tekrar!'):t('Yanlışlara bir daha bak, sonra tekrar dene.');
  return <section className="panel object-results l12-results" aria-labelledby="l12-results">
   <div className="l12-results-head"><BrandMascot className="l12-koko"/><div><span className="eyebrow" lang="de">{part.de}</span><h2 id="l12-results" tabIndex={-1}>{praise}</h2>
-   {test?<p className="vault-result-score">{String(test.points).replace('.',',')} / {test.max} Punkte</p>:<p className="vault-result-score">{progress.learned} / {progress.total} doğru</p>}</div></div>
+   {test?<p className="vault-result-score">{String(test.points).replace('.',',')} / {test.max} Punkte</p>:<p className="vault-result-score">{t('{right} / {total} doğru',{right:progress.learned,total:progress.total})}</p>}</div></div>
   {!test&&<ProgressMeter progress={progress} language={language} label={part.de}/>}
   <ol className="l12-result-list">{part.exercises.map((exercise,i)=>{const score=scores[exercise.id];const count=exerciseAnswerCount(exercise);const perfect=!!score&&score.right>=score.total;return <li key={exercise.id}><button type="button" onClick={()=>onJump(i)}>
    <span className={'l12-result-mark'+(score?(perfect||!count?' perfect':' partial'):'')} aria-hidden="true">{score&&(perfect||!count)?<Check size={15}/>:i+1}</span>
    <span className="l12-result-title" lang="de">{exercise.title}</span>
-   <span className="l12-result-score">{!count?'Yazma':score?(exercise.points!==undefined&&score.points!==undefined?`${String(score.points).replace('.',',')} / ${String(exercise.points).replace('.',',')} P.`:`${score.right} / ${score.total}`):'—'}</span>
+   <span className="l12-result-score">{!count?t('Yazma'):score?(exercise.points!==undefined&&score.points!==undefined?`${String(score.points).replace('.',',')} / ${String(exercise.points).replace('.',',')} P.`:`${score.right} / ${score.total}`):'—'}</span>
   </button></li>;})}</ol>
   {part.after&&<LessonBlocks blocks={part.after} speech={{speak:()=>{},busy:false}}/>}
   <div className="object-actions">
-   {firstOpen>=0&&<button type="button" className="btn secondary" onClick={()=>onJump(firstOpen)}><RotateCcw size={18} aria-hidden="true"/>Eksikleri tamamla</button>}
-   {part.listen?<button type="button" className="btn" onClick={()=>onOpen(part.id,'dinleme')}><Headphones size={18} aria-hidden="true"/>Dinlemeye geç</button>:nextPart?<button type="button" className="btn" onClick={()=>onOpen(nextPart.id)}>Sonraki bölüm: {nextPart.de}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>:<button type="button" className="btn" onClick={()=>onOpen(null)}>Lektion 12'ye dön</button>}
+   {firstOpen>=0&&<button type="button" className="btn secondary" onClick={()=>onJump(firstOpen)}><RotateCcw size={18} aria-hidden="true"/>{t('Eksikleri tamamla')}</button>}
+   {part.listen?<button type="button" className="btn" onClick={()=>onOpen(part.id,'dinleme')}><Headphones size={18} aria-hidden="true"/>{t('Dinlemeye geç')}</button>:nextPart?<button type="button" className="btn" onClick={()=>onOpen(nextPart.id)}>{t('Sonraki bölüm: {part}',{part:nextPart.de})}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>:<button type="button" className="btn" onClick={()=>onOpen(null)}>{t("Lektion 12'ye dön")}</button>}
   </div>
  </section>;
 }
 
 function ListenStep({part}:{part:L12Part}){
- const player=useListenPlayer();
- const tasks=(part.listen??[]).map(number=>tasksByNumber.get(number)).filter((task):task is HoerenTask=>!!task);
+ const {t,taskMap}=useL12();const player=useListenPlayer();
+ const tasks=(part.listen??[]).map(number=>taskMap.get(number)).filter((task):task is HoerenTask=>!!task);
  return <div className="l12-step-body">
-  <div className="panel l12-listen-head"><div><h2><Headphones size={22} aria-hidden="true"/>Dinleme</h2><p className="l12-p">Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku. Dinlerken cümle cümle geri ve ileri gidebilir, hızı 0,5x ile 2x arasında seçebilirsin.</p></div></div>
+  <div className="panel l12-listen-head"><div><h2><Headphones size={22} aria-hidden="true"/>{t('Dinleme')}</h2><p className="l12-p">{t('Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku. Dinlerken cümle cümle geri ve ileri gidebilir, hızı 0,5x ile 2x arasında seçebilirsin.')}</p></div></div>
   {player.warning&&<p className="object-alert" role="status">{player.warning}</p>}
   {tasks.map(task=><ListenTask key={task.id} task={task} player={player}/>)}
  </div>;

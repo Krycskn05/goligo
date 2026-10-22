@@ -218,6 +218,8 @@ async function languageFlow(browser) {
   await visit(page, "/uye-ol", "01c-uye-ol.png", errors);
   await visit(page, "/gizlilik", "01d-gizlilik.png", errors);
   await visit(page, "/kullanim-kosullari", "01e-kullanim-kosullari.png", errors);
+  await visit(page, "/impressum", "01f-impressum.png", errors);
+  record("Impressum acik, Almanca ve altbilgide baglantisi var", (await page.locator("[data-impressum]").count()) === 1 && /Angaben gemäß/.test((await page.locator("[data-impressum]").textContent()) || "") && (await page.locator("[data-footer-impressum]").count()) === 1, "");
 
   // Girissiz kayit istegi: bos misafir cevabi (kimsenin kaydi yok); yazma istekleri (not, yildiz) 401.
   const guestAnswer = async (response) => { const body = await response.json().catch(() => ({})); return { status: response.status(), guest: body.guest === true, empty: (body.reviews || []).length === 0 && (body.sessions || []).length === 0 && Object.keys(body.notes || {}).length === 0 }; };

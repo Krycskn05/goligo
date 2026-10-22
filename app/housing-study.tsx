@@ -18,6 +18,7 @@ import {TopicArt,RasterArt} from './toon-art';
 import {housingIllustration,housingSceneArt,housingSectionScene} from '@/lib/housing-illustrations';
 import {PracticeModes} from './practice-modes';
 import {SiteFooter} from './site-footer';
+import {SiteMenuAside} from './site-menu';
 import {SiteHeader} from './site-header';
 import {HousingLessonNotes} from './housing-lesson';
 import {housingProgress} from '@/lib/progress';
@@ -118,6 +119,7 @@ export function HousingWorkshop({language,onLanguage,guest=false}:{language:Stud
  return <div className="category-app toon-app housing-app" lang={language} dir={languageDirection(language)}>
   <a className="skip-link" href="#housing-main">{v('home')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref="/konular?level=A1.2" homeLabel={h('back')} stats={snapshot.stats} guest={guest}/>
+  <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
   <main id="housing-main" className="object-page housing-page">
    <div className="object-breadcrumb"><a href="/konular?level=A1.2">A1.2</a><span aria-hidden="true">›</span><span>{h('title')}</span></div>
    {guest&&<GuestBanner language={language} back={back}/>}
@@ -151,10 +153,10 @@ export function HousingWorkshop({language,onLanguage,guest=false}:{language:Stud
     <figure className="lb-photo"><TopicArt id="book-11" title={h('title')}/></figure>
     <div className="lb-notes">{opener('all','housing-feature lb-note'+(guest?' guest-locked':''),<><span className="housing-letter">A–D</span><div><h2>{h('all')}</h2><p>{h('exercises',{n:housingPool('all','write').length})}</p>{ready&&<ProgressMeter progress={housingProgress('all',snapshot.reviews)} language={language} label={h('all')} compact/>}</div><ArrowRight size={20}/></>)}{!guest&&<button type="button" className="housing-feature lb-note" disabled={busy||!ready||!resumeId} onClick={()=>{if(resumeId)void resume(resumeId);}}><span className="housing-letter"><RotateCcw size={24}/></span><div><h2>{v('resume')}</h2><p>{saved?h('progress',{n:saved.answered,total:saved.total}):!ready?v('loading'):v('noSavedTest')}</p></div><ArrowRight size={20}/></button>}</div>
    </>} right={<>
-    <h2 className="lb-heading"><span lang="de" dir="ltr">Inhalt</span></h2>
+    <h2 className="lb-heading">{h('contents')}</h2>
     {/* The contents page: one line per section A–D (picture, German title, meaning, progress). */}
     <ol className="lb-toc">{housingSections.map(item=><li className={'lb-toc-row'+(lockedSection(item.id)?' guest-locked':'')} data-housing-section={item.id} key={item.id}>{opener(item.id,'housing-card-open',<><span className="lb-toc-badge" aria-hidden="true">{item.id.toUpperCase()}</span><span className="lb-toc-photo" aria-hidden="true"><RasterArt art={housingSceneArt[housingSectionScene[item.id]]} title={translate(item.title,language)}/></span><span className="lb-toc-text"><strong lang="de" dir="ltr">{item.de}</strong><small>{translate(item.title,language)}</small></span><ArrowRight size={20}/></>)}{ready&&<ProgressMeter progress={housingProgress(item.id,snapshot.reviews)} language={language} label={item.id.toUpperCase()+' · '+translate(item.title,language)} compact/>}{lockedSection(item.id)?<GuestLock language={language} back={back} className="housing-card-bottom"/>:<button type="button" className="housing-card-bottom" disabled={busy} onClick={()=>choose(item.id)}><span>{h('exercises',{n:housingPool(item.id,'write').length})}</span><ArrowRight size={16}/></button>}</li>)}</ol>
    </>}/></section>}
-  </main><SiteFooter language={language}/>
+  </main></div><SiteFooter language={language}/>
  </div>;
 }

@@ -8,6 +8,9 @@ import {vaultText} from '@/lib/object-vault-copy';
 import {verbText} from '@/lib/verb-copy';
 import {objectVocabulary} from '@/lib/object-course';
 import {verbs} from '@/lib/verb-course';
+import {gameIds} from '@/lib/verb-games';
+import {gameNameList} from '@/lib/game-names';
+import {fillText} from '@/lib/copy-fill';
 import {nextPictureChange,pickPictures,type PicturePick} from '@/lib/site-pictures';
 
 type Part={id:string;icon:NavIconName;href:string;title:string;de:string;text:string;art:ReactNode};
@@ -20,10 +23,10 @@ function siteParts(language:StudyLanguage,pictures:PicturePick):Part[]{
  const art=(id:keyof PicturePick)=><img src={pictures[id]} alt="" width={1200} height={600} loading="lazy" decoding="async"/>;
  return [
   {id:'units',icon:'units',href:'/konular',title:c(language,'catalogTitle'),de:'A1.1 · A1.2',text:h('unitsText'),art:art('units')},
-  {id:'vault',icon:'vault',href:'/ev-esyalar?learn=de',title:vaultText(language,'vaultTitle'),de:objectVocabulary.length+' Gegenstände',text:h('vaultText'),art:art('vault')},
-  {id:'verbs',icon:'verbs',href:'/fiiller',title:verbText(language,'workshopTitle'),de:verbs.length+' Verben',text:h('verbsText'),art:art('verbs')},
-  {id:'games',icon:'games',href:'/fiiller?bolum=oyunlar',title:verbText(language,'gamesTitle'),de:'Spiele',text:h('gamesText'),art:art('games')},
-  {id:'mistakes',icon:'mistakes',href:'/fiiller?bolum=yanlislar',title:verbText(language,'mistakesTitle'),de:'Fehler',text:h('mistakesText'),art:art('mistakes')},
+  {id:'vault',icon:'vault',href:'/ev-esyalar?learn=de',title:vaultText(language,'vaultTitle'),de:vaultText(language,'objectsCount',{n:objectVocabulary.length}),text:h('vaultText'),art:art('vault')},
+  {id:'verbs',icon:'verbs',href:'/fiiller',title:verbText(language,'workshopTitle'),de:verbText(language,'verbsCount',{n:verbs.length}),text:h('verbsText'),art:art('verbs')},
+  {id:'games',icon:'games',href:'/fiiller?bolum=oyunlar',title:verbText(language,'gamesTitle'),de:verbText(language,'gamesCount',{n:gameIds.length}),text:fillText(h('gamesText'),{n:gameIds.length,names:gameNameList(language)}),art:art('games')},
+  {id:'mistakes',icon:'mistakes',href:'/fiiller?bolum=yanlislar',title:verbText(language,'mistakesTitle'),de:verbText(language,'reviewShort'),text:h('mistakesText'),art:art('mistakes')},
  ];
 }
 
@@ -48,7 +51,7 @@ export function HomeTour({language}:{language:StudyLanguage}){
    <a className="ht-card panel" href={part.href}>
     <span className="ht-art" aria-hidden="true">{part.art}</span>
     <span className="ht-name"><NavIcon name={part.icon}/><strong>{part.title}</strong></span>
-    <small lang="de" dir="ltr">{part.de}</small>
+    <small>{part.de}</small>
     <span className="ht-text">{part.text}</span>
    </a>
   </li>)}</ul>

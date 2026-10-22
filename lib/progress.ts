@@ -54,6 +54,19 @@ export function verbProgressIds(topic:string){
  return verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&isVerbExercise(q)).map(q=>q.id);
 }
 export function verbProgress(topic:string,reviews:readonly Review[]){return topicProgress(verbProgressIds(topic),reviews);}
+/**
+ * Verbs learned: a verb counts once every one of its exercises counts as learned (as topicProgress). Shown next to the
+ * exercise count so the two numbers are not mixed up ("72 fiil" next to "80/936" read like 80 verbs; the learner asked).
+ */
+export function learnedVerbs(topic:string,reviews:readonly Review[]){
+ const byId=new Map(reviews.map(row=>[row.question_id,row]));const verbsSeen=new Map<string,boolean>();
+ for(const q of verbQuestions){
+  if(!q.verbId||!inVerbTopic(q.topic,topic)||!isVerbExercise(q))continue;
+  const row=byId.get(q.id);const done=!!row&&row.seen>0&&row.streak>=1;
+  verbsSeen.set(q.verbId,(verbsSeen.get(q.verbId)??true)&&done);
+ }
+ return {learned:[...verbsSeen.values()].filter(Boolean).length,total:verbsSeen.size};
+}
 export function housingProgress(section:HousingSection|'all',reviews:readonly Review[]){return topicProgress(housingProgressIds(section),reviews);}
 export function objectProgress(group:string,reviews:readonly Review[]){return topicProgress(objectProgressIds(group),reviews);}
 

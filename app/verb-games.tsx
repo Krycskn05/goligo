@@ -8,17 +8,12 @@ import {MatchPreview,useMatchPreview} from './object-games';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {PaulHoca} from './paul-hoca';
-import {gameText,type GameCopyKey} from '@/lib/game-copy';
 import {RainGame,CatchGame,QuickGame,SearchGame,RescueGame,PluralGame,type GameFeedback} from './object-games';
 
 type Feedback=GameFeedback;
 type Props={game:GameId;language:VaultLanguage;topic:string;onTopic:(topic:string)=>void;onExit:()=>void;feedback:Feedback};
-const verbGameTitle:Partial<Record<GameId,VerbCopyKey>>={sentence:'gameSentence',aux:'gameAux',build:'gameBuild',match:'gameMatch'};
-const newGameCopy:Partial<Record<GameId,[GameCopyKey,GameCopyKey]>>={rain:['gameRain','gameRainDetail'],catch:['gameCatch','gameCatchDetail'],quick:['gameQuick','gameQuickDetail'],search:['gameSearch','gameSearchDetail'],rescue:['gameRescue','gameRescueDetail'],plural:['gamePlural','gamePluralDetail']};
-const verbGameDetail:Partial<Record<GameId,VerbCopyKey>>={sentence:'gameSentenceDetail',aux:'gameAuxDetail',build:'gameBuildDetail'};
-/** A game's name and one line about it, in the site language. */
-export function gameName(game:GameId,language:VaultLanguage){const own=newGameCopy[game];return own?gameText(language,own[0]):verbText(language,verbGameTitle[game]!);}
-export function gameDetail(game:GameId,language:VaultLanguage){const own=newGameCopy[game];return own?gameText(language,own[1]):game==='match'?gameText(language,'gameMatchCard'):verbText(language,verbGameDetail[game]!);}
+export {gameName,gameDetail} from '@/lib/game-names';
+import {gameName} from '@/lib/game-names';
 
 function readBest(key:string):number|null{try{const value=Number(localStorage.getItem(key));return Number.isFinite(value)&&value>0?value:null;}catch{return null;}}
 function saveBest(key:string,value:number,lowerIsBetter=false){const best=readBest(key);if(best===null||(lowerIsBetter?value<best:value>best)){try{localStorage.setItem(key,String(value));}catch{}return value;}return best;}

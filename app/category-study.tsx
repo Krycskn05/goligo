@@ -2,7 +2,6 @@
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useEffect,useState} from 'react';
 import {Clock} from 'lucide-react';
-import {NavIcon} from './nav-icons';
 import {SITE_NAME} from '@/lib/site-brand';
 import {courseUnits,type CourseLevel} from '@/lib/textbook-curriculum';
 import {englishCourseUnits} from '@/lib/english-course';
@@ -24,6 +23,7 @@ import {housingProgress,type TopicProgress} from '@/lib/progress';
 import {ProgressMeter,SidebarProgress} from './progress-ui';
 import {HomeTour} from './home-tour';
 import {InstallGuide} from './install-guide';
+import {SiteMenu} from './site-menu';
 import {SiteTour} from './site-tour';
 import {GuestBanner} from './guest-taste';
 
@@ -61,7 +61,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  return <div className="category-app toon-app" dir={languageDirection(language)} lang={language}>
   <a className="skip-link" href="#main">{t(language,'skip')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref={'/?learn='+course} homeLabel={t(language,'home')} showHome={false} guest={guest}/>
-  <div className="work-layout"><aside className="work-sidebar"><nav aria-label={t(language,'home')}>{course==='de'&&<a className={'work-nav'+(home?' active':' object-nav-link')} href="/" aria-current={home?'page':undefined}><NavIcon name="home"/>{vaultText(language,'home')}</a>}<a className={'work-nav'+(home?' object-nav-link':' active')} href={home?'/konular':'#curriculum'} aria-current={home?undefined:'page'}><NavIcon name="units"/>{c(language,'catalogTitle')}</a><a className="work-nav object-nav-link" href={'/ev-esyalar?learn='+course}><NavIcon name="vault"/>{vaultText(language,'vaultTitle')}</a>{course==='de'&&<><a className="work-nav object-nav-link verb-nav-link" href="/fiiller"><NavIcon name="verbs"/>{verbText(language,'workshopTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=oyunlar" data-verb-section-link="games"><NavIcon name="games"/>{verbText(language,'gamesTitle')}</a><a className="work-nav object-nav-link" href="/fiiller?bolum=yanlislar" data-verb-section-link="mistakes"><NavIcon name="mistakes"/>{verbText(language,'mistakesTitle')}</a></>}</nav><InstallGuide language={language}/>{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}</aside>
+  <div className="work-layout"><aside className="work-sidebar"><SiteMenu language={language} current={home?'home':'units'} course={course} unitsHref={home?'/konular':'#curriculum'}/><InstallGuide language={language}/>{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress stats={snapshot.stats} reviews={snapshot.reviews} language={language} housingLabel={housingText(language,'title')} vaultLabel={vaultText(language,'vaultTitle')} verbsLabel={verbText(language,'verbsTitle')}/>}</aside>
    <main id="main" className="work-main" tabIndex={-1}>
     {guest&&<GuestBanner language={language} back="/konular"/>}
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}

@@ -60,3 +60,17 @@ html[data-lernkoko-motion=reduced] .toon-topic-card:hover,html[data-lernkoko-mot
 @keyframes lk-tap-squash{0%{scale:1}22%{scale:1.05 .9}48%{scale:.96 1.05}70%{scale:1.02 .98}100%{scale:1}}
 @media (prefers-reduced-motion:reduce){.lk-voice-chip,.lk-voice-chip.selected .lk-voice-avatar,.lk-tap-pop{animation:none!important;transition:none!important}}
 html[data-lernkoko-motion=reduced] .lk-voice-chip.selected .lk-voice-avatar{animation:none}
+/* Three tabs (Telaffuz, Efektler, Animasyonlar) instead of one long panel; the title with ✕ and the tabs stay on top and
+   "Kapat" stays at the bottom while the panel scrolls (the learner asked, 22 October 2026). */
+.lk-effects-dialog{padding-top:0;padding-bottom:0}
+.lk-effects-top{position:sticky;top:0;z-index:3;display:grid;gap:12px;margin:0 -4px 14px;padding:18px 4px 12px;background:#fffdf6;border-bottom:1px solid #ece4cf}
+.lk-effects-top .lk-effects-head{margin:0}
+.lk-effects-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:4px;border-radius:16px;background:#f3eedf}
+.lk-effects-tabs button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:6px 8px;border:0;border-radius:12px;background:transparent;color:#4d6a62;font:inherit;font-size:13.5px;font-weight:700;line-height:1.15;cursor:pointer}
+.lk-effects-tabs button.active{background:#fff;color:#1f3b5c;box-shadow:0 2px 6px #193c4222}
+.lk-effects-tabs button:focus-visible{outline:3px solid #8cc4ff;outline-offset:1px}
+.lk-effects-panel[hidden],.lk-voice-section[hidden]{display:none}
+.lk-effects-foot{position:sticky;bottom:0;z-index:3;margin:14px -4px 0;padding:8px 4px 16px;background:#fffdf6;border-top:1px solid #ece4cf}
+.lk-effects-foot .lk-effects-message{margin:0 0 8px}
+@media (max-width:420px){.lk-effects-tabs button{flex-direction:column;gap:2px;font-size:12px}}
+.lk-effects-dialog .lk-voice-section{margin-bottom:0;border-bottom:0}

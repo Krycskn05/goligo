@@ -47,6 +47,8 @@ export default function LearningEffects() {
  const [systemReduced,setSystemReduced]=useState(false);
  const [playing,setPlaying]=useState<SoundId|null>(null);
  const [message,setMessage]=useState<EffectsCopyKey|null>(null);
+ // Three tabs instead of one long panel (the learner asked, 22 October 2026): Telaffuz, Efektler, Animasyonlar.
+ const [tab,setTab]=useState<'voice'|'effects'|'motion'>('voice');
  const [reaction,setReaction]=useState<{kind:LearningReaction;id:number;pose:PaulPose}|null>(null);
  const dialog=useRef<HTMLDialogElement>(null);
  const previewStop=useRef<(()=>void)|null>(null);
@@ -113,8 +115,11 @@ export default function LearningEffects() {
    {confetti&&Array.from({length:reaction.kind==='complete'?24:14},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%430)-215}px`,'--lk-y':`${85+i*43%175}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={14} fill="currentColor"/>:null}</span>)}
   </div>}
   <dialog ref={dialog} className="lk-effects-dialog" aria-labelledby="lk-effects-title" lang={language} dir={languageDirection(language)} data-no-effects onClose={()=>{previewStop.current?.();setPlaying(null);speech.stop();}} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();}}}>
+   <div className="lk-effects-top">
    <div className="lk-effects-head"><div><TopIcon name="sounds" size={32}/><h2 id="lk-effects-title">{text('settings')}</h2></div><button type="button" className="lk-effects-close" aria-label={text('close')} onClick={close}><X size={21}/></button></div>
-   <section className="lk-voice-section" aria-labelledby="lk-voice-title">
+   <div className="lk-effects-tabs" role="tablist" aria-label={text('settings')}>{([['voice','tabVoice','voice'],['effects','tabEffects','sounds'],['motion','tabMotion','animations']] as const).map(([id,key,icon])=><button type="button" role="tab" key={id} id={'lk-tab-'+id} aria-selected={tab===id} aria-controls={'lk-panel-'+id} className={tab===id?'active':''} onClick={()=>setTab(id)}><TopIcon name={icon} size={22}/>{text(key)}</button>)}</div>
+   </div>
+   <section className="lk-voice-section" id="lk-panel-voice" role="tabpanel" aria-labelledby="lk-tab-voice" hidden={tab!=='voice'}>
     <h3 id="lk-voice-title"><TopIcon name="voice" size={26}/>{text('voiceTitle')}</h3>
     <p className="lk-effects-note">{text('voiceHint')}</p>
     {speech.siteVoicesState==='loading'&&<p className="lk-effects-note">{text('voiceLoading')}</p>}
@@ -125,14 +130,18 @@ export default function LearningEffects() {
     <div className="lk-voice-speed" role="group" aria-label={text('voiceSpeed')}><span>{text('voiceSpeed')}</span>{VOICE_SPEEDS.map(([value,key])=><button type="button" key={value} aria-pressed={speech.rate===value} className={speech.rate===value?'active':''} onClick={()=>{speech.setRate(value);setMessage('saved');}}>{text(key)}</button>)}</div>
     <button type="button" className="lk-preview-button lk-voice-preview" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();previewStop.current?.();setPlaying(null);const voice=speech.siteVoices.find(item=>item.id===currentVoice);speech.speak(voice?voiceGreeting(voice):germanSpeechPreview);}}>{speech.busy?<Square size={15}/>:<Play size={15}/>} {text(speech.busy?'voiceStop':'voicePreview')}</button>
    </section>
-   <h3 className="lk-effects-subtitle"><TopIcon name="animations" size={26}/>{text('effectsTitle')}</h3>
-   <div className="lk-effects-switches"><label><span><TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={26}/> {text('enabled')}</span><input type="checkbox" checked={preferences.enabled} onChange={event=>update({enabled:event.target.checked})}/></label><label><span><TopIcon name="animations" size={26}/> {text('motion')}</span><input type="checkbox" checked={preferences.motion} onChange={event=>update({motion:event.target.checked})}/></label></div>
-   <label className="lk-volume-label" htmlFor="lk-volume"><span>{text('volume')}</span><output>{Math.round(preferences.volume*100)}%</output></label><input id="lk-volume" className="lk-volume" type="range" min="0" max="100" step="5" value={Math.round(preferences.volume*100)} onChange={event=>update({volume:Number(event.target.value)/100})}/>
-   {/* One group for each moment (tap, page change, correct, end of a round, wrong); each sound can be heard and chosen. */}
-   {soundGroups.map(group=>{const chosen=preferences[group.key];return <details className="lk-sound-group" key={group.key} data-sound-group={group.key}><summary><span>{text(group.title)}</span><small>{text(soundName(chosen))}</small><ChevronDown size={17} aria-hidden="true"/></summary><fieldset className="lk-wrong-sounds"><legend className="lk-visually-hidden">{text(group.title)}</legend>{group.ids.map(id=><div className={'lk-sound-row '+(chosen===id?'selected':'')} key={id}><button type="button" className="lk-choose-sound" aria-pressed={chosen===id} aria-label={text('choose')+' · '+text(soundName(id))} onClick={()=>{update({[group.key]:id} as Partial<EffectsPreferences>);preview(id);setMessage('saved');}}><span className="lk-radio" aria-hidden="true">{chosen===id&&<Check size={14}/>}</span><span>{text(soundName(id))}</span>{chosen===id&&<small>{text('chosen')}</small>}</button><button type="button" className="lk-preview-button" disabled={preferences.volume===0} aria-label={text('listen')+' · '+text(soundName(id))} onClick={()=>preview(id)}>{playing===id?<Volume2 size={16}/>:<Play size={15}/>} {text('listen')}</button></div>)}</fieldset></details>;})}
-   {systemReduced&&<p className="lk-effects-note">{text('reduced')}</p>}
-   <p className="lk-effects-note lk-effects-message" role="status" aria-live="polite">{message?text(message):'\u00a0'}</p>
-   <button type="button" className="lk-effects-done" onClick={close}>{text('close')}<Check size={17}/></button>
+   <section className="lk-effects-panel" id="lk-panel-effects" role="tabpanel" aria-labelledby="lk-tab-effects" hidden={tab!=='effects'}>
+    <div className="lk-effects-switches"><label><span><TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={26}/> {text('enabled')}</span><input type="checkbox" checked={preferences.enabled} onChange={event=>update({enabled:event.target.checked})}/></label></div>
+    <label className="lk-volume-label" htmlFor="lk-volume"><span>{text('volume')}</span><output>{Math.round(preferences.volume*100)}%</output></label><input id="lk-volume" className="lk-volume" type="range" min="0" max="100" step="5" value={Math.round(preferences.volume*100)} onChange={event=>update({volume:Number(event.target.value)/100})}/>
+    {/* One group for each moment (tap, page change, correct, end of a round, wrong); each sound can be heard and chosen. */}
+    {soundGroups.map(group=>{const chosen=preferences[group.key];return <details className="lk-sound-group" key={group.key} data-sound-group={group.key}><summary><span>{text(group.title)}</span><small>{text(soundName(chosen))}</small><ChevronDown size={17} aria-hidden="true"/></summary><fieldset className="lk-wrong-sounds"><legend className="lk-visually-hidden">{text(group.title)}</legend>{group.ids.map(id=><div className={'lk-sound-row '+(chosen===id?'selected':'')} key={id}><button type="button" className="lk-choose-sound" aria-pressed={chosen===id} aria-label={text('choose')+' · '+text(soundName(id))} onClick={()=>{update({[group.key]:id} as Partial<EffectsPreferences>);preview(id);setMessage('saved');}}><span className="lk-radio" aria-hidden="true">{chosen===id&&<Check size={14}/>}</span><span>{text(soundName(id))}</span>{chosen===id&&<small>{text('chosen')}</small>}</button><button type="button" className="lk-preview-button" disabled={preferences.volume===0} aria-label={text('listen')+' · '+text(soundName(id))} onClick={()=>preview(id)}>{playing===id?<Volume2 size={16}/>:<Play size={15}/>} {text('listen')}</button></div>)}</fieldset></details>;})}
+   </section>
+   <section className="lk-effects-panel" id="lk-panel-motion" role="tabpanel" aria-labelledby="lk-tab-motion" hidden={tab!=='motion'}>
+    <div className="lk-effects-switches"><label><span><TopIcon name="animations" size={26}/> {text('motion')}</span><input type="checkbox" checked={preferences.motion} onChange={event=>update({motion:event.target.checked})}/></label></div>
+    {systemReduced&&<p className="lk-effects-note">{text('reduced')}</p>}
+   </section>
+   <div className="lk-effects-foot"><p className="lk-effects-note lk-effects-message" role="status" aria-live="polite">{message?text(message):'\u00a0'}</p>
+   <button type="button" className="lk-effects-done" onClick={close}>{text('close')}<Check size={17}/></button></div>
   </dialog>
  </>;
 }

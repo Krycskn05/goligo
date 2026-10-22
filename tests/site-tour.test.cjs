@@ -17,7 +17,8 @@ test('the sounds come first, then the header, the menu and "Hazırsın!"',()=>{
  // Every lit part is a real part of the home page.
  const header=read('app/site-header.tsx'),greeting=read('app/site-greeting.tsx'),home=read('app/category-study.tsx'),effects=read('app/learning-effects.tsx'),install=read('app/install-guide.tsx');
  assert.ok(greeting.includes('className="site-greeting site-greeting-button"')&&header.includes('className="site-language"')&&effects.includes('className="lk-effects-button"')&&read('app/account-menu.tsx').includes('className="site-home site-account"')&&header.includes('<AccountMenu'));
- assert.ok(home.includes("href={home?'/konular':'#curriculum'}")&&home.includes("href={'/ev-esyalar?learn='+course}")&&home.includes('verb-nav-link')&&home.includes('data-verb-section-link="games"')&&home.includes('data-verb-section-link="mistakes"')&&install.includes('ig-trigger'));
+ const menu=read('app/site-menu.tsx');
+ assert.ok(home.includes("unitsHref={home?'/konular':'#curriculum'}")&&menu.includes("href={'/ev-esyalar?learn='+course}")&&menu.includes('verb-nav-link')&&menu.includes('data-verb-section-link="games"')&&menu.includes('data-verb-section-link="mistakes"')&&install.includes('ig-trigger'));
 });
 
 test('shown once per member (the account remembers it); ?tur=1 starts it again',()=>{

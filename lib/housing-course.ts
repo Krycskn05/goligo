@@ -88,7 +88,10 @@ const aGaps:[string,string,string,Translations][]=[
  ['euer-zimmer','Ist ___ Zimmer dunkel?','euer',tx('Sizin odanız karanlık mı?','Is your room dark?','هل غرفتكم مظلمة؟','Ваша кімната темна?','Votre chambre est-elle sombre ?')],
  ['eure-stuehle','Sind ___ Stühle neu?','eure',tx('Sizin sandalyeleriniz yeni mi?','Are your chairs new?','هل كراسيكم جديدة؟','Ваші стільці нові?','Vos chaises sont-elles neuves ?')],
 ];
-for(const [id,gap,answer,meaning] of aGaps)add('a',1,'possessive-'+id,answer,meaning,'possessive',{gap,cueDe:gap+(id.startsWith('euer')||id.startsWith('eure')?' (ihr)':' (wir)')});
+// "Sizin" is both ihr (euer / eure) and the polite Sie (Ihr / Ihre), and the gap does not say which: both are right
+// (a learner wrote "Ihre" for "Ist ___ Wohnung teuer?", 22 October 2026). The IDs stay the same.
+const politeForm:Record<string,string>={euer:'Ihr',eure:'Ihre'};
+for(const [id,gap,answer,meaning] of aGaps)add('a',1,'possessive-'+id,answer,meaning,'possessive',{gap,cueDe:gap+(id.startsWith('euer')||id.startsWith('eure')?' (ihr)':' (wir)'),...(politeForm[answer]?{accepted:[politeForm[answer]]}:{})});
 
 const sentence=(section:HousingSection,step:number,id:string,de:string,meaning:Translations,rule:HousingRule='order')=>add(section,step,id,de,meaning,rule,{cueDe:'Bilde einen Satz aus den Wörtern.',wordBank:de.replace(/[.!?]/g,'').split(' ').reverse()});
 sentence('a',3,'two-rooms','Unsere Wohnung hat zwei Zimmer.',tx('Bizim dairemizde iki oda var.','Our flat has two rooms.','في شقتنا غرفتان.','У нашій квартирі дві кімнати.','Notre appartement a deux pièces.'));

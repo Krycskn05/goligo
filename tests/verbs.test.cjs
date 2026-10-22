@@ -244,7 +244,7 @@ test('Yanlışlarım: the workshop mistakes make their own round, and a right an
 
 test('the page is linked from home, only the correct answer is spoken, and verb audio is in the voice list',()=>{
  assert.match(fs.readFileSync('app/fiiller/page.tsx','utf8'),/VerbStudy/);
- assert.match(fs.readFileSync('app/category-study.tsx','utf8'),/href="\/fiiller"/);
+ assert.match(fs.readFileSync('app/site-menu.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/progress-ui.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/layout.tsx','utf8'),/verbs\.css/);
  const page=fs.readFileSync('app/verb-study.tsx','utf8');

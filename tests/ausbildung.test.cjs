@@ -108,6 +108,8 @@ test('the chapter page, the listening page and the catalogue link are wired up',
  for(const file of ['app/housing-study.tsx','app/ausbildung-hoeren.tsx'])assert(fs.readFileSync(file,'utf8').includes('<LessonBook'),file);
  const notes=fs.readFileSync('app/housing-lesson.tsx','utf8');assert(notes.includes('lb-spread')&&notes.includes('lb-rings')&&!notes.includes("from './lesson-book'"),'lesson notes write the notebook markup themselves');
  assert(fs.readFileSync('app/ausbildung-hoeren.tsx','utf8').includes('className="lb-index"'));
+ // Topic pages are written straight onto the ruled page (no card boxes; sentence parts underlined).
+ const bookCss=fs.readFileSync('app/lesson-book.css','utf8');assert(bookCss.includes('.lb .housing-lesson-stack>.housing-teaching-card')&&bookCss.includes('border-bottom:3px solid #9fd39a'));
  const {siteLanguages}=load('site-languages');const {turkishNote}=load('ausbildung-course');
  for(const language of siteLanguages)if(language.id!=='tr')assert(turkishNote[language.id],language.id);
 });
@@ -136,7 +138,7 @@ test('every Lektion 12 picture belongs to a part, a word or a speaker and its fi
 
 test('the listening player can go back and forward a sentence and play at 0.5x–2x',()=>{
  const source=fs.readFileSync('app/ausbildung-listen.tsx','utf8');
- for(const piece of ['aria-label="Önceki cümle"','aria-label="Sonraki cümle"','className="l12-seek"','LISTEN_SPEEDS=[0.5,0.75,1,1.5,2]','player.pause','player.resume','player.seek('])assert(source.includes(piece),piece);
+ for(const piece of ["aria-label={t('Önceki cümle')}","aria-label={t('Sonraki cümle')}",'className="l12-seek"','LISTEN_SPEEDS=[0.5,0.75,1,1.5,2]','player.pause','player.resume','player.seek('])assert(source.includes(piece),piece);
  // The speed reaches both the natural clips and the device voice.
  const voices=load('site-voices');const audio={setAttribute(){},pause(){},play(){return Promise.resolve();}};
  voices.createClipPlayer(()=>audio).play('/voices/x.mp3',voices.SITE_CLIP_BASE_RATE,{onStart(){},onEnd(){},onError(){}},2);

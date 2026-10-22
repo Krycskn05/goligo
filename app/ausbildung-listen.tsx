@@ -6,6 +6,7 @@ import {hoerenTasks,questionSpeech,speakerVoice,type HoerenQuestion,type HoerenT
 import {speakerPicture} from '@/lib/ausbildung-art';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {PaulHoca} from './paul-hoca';
+import {useL12} from './l12-i18n';
 
 type Item={text:string;voice?:string};
 type Line={who:string;text:string};
@@ -66,7 +67,8 @@ export type ListenPlayer=ReturnType<typeof useListenPlayer>;
 const speedLabel=(value:number)=>String(value).replace('.',',')+'x';
 
 export function SpeedToggle({player}:{player:ListenPlayer}){
- return <div className="l12-speed" role="group" aria-label="Okuma hızı"><span>Hız</span>{LISTEN_SPEEDS.map(value=><button type="button" key={value} aria-pressed={player.speed===value} className={player.speed===value?'active':''} onClick={()=>player.setSpeed(value)}>{speedLabel(value)}</button>)}</div>;
+ const {t}=useL12();
+ return <div className="l12-speed" role="group" aria-label={t('Okuma hızı')}><span>{t('Hız')}</span>{LISTEN_SPEEDS.map(value=><button type="button" key={value} aria-pressed={player.speed===value} className={player.speed===value?'active':''} onClick={()=>player.setSpeed(value)}>{speedLabel(value)}</button>)}</div>;
 }
 
 type Answers=Record<number,string>;
@@ -95,6 +97,7 @@ export function SpeakerFace({who}:{who:string}){
 }
 
 export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;player:ListenPlayer;onNext?:()=>void;nextLabel?:string}){
+ const {t}=useL12();
  const [answers,setAnswers]=useState<Answers>({});const [checked,setChecked]=useState(false);const [transcript,setTranscript]=useState(false);const [loadedFor,setLoadedFor]=useState<string|null>(null);
  useEffect(()=>{let saved:Saved|null=null;try{saved=JSON.parse(localStorage.getItem(storage(task.id))??'null') as Saved|null;}catch{}setAnswers(saved?.a??{});setChecked(!!saved?.c);setTranscript(false);setLoadedFor(task.id);},[task.id]);
  useEffect(()=>{if(loadedFor!==task.id)return;try{localStorage.setItem(storage(task.id),JSON.stringify({a:answers,c:checked}));}catch{}window.dispatchEvent(new Event(LISTEN_CHANGED));},[answers,checked,loadedFor,task.id]);
@@ -109,38 +112,38 @@ export function ListenTask({task,player,onNext,nextLabel}:{task:HoerenTask;playe
   <div className="housing-cue l12-hint paul-box"><p className="paul-box-text">{task.hint}</p><PaulHoca pose="tip"/></div>
   {task.lines&&<div className="vault-listen-player l12-player">
    <span className="l12-player-icon" aria-hidden="true"><Headphones size={26}/></span>
-   <div className="l12-player-text"><strong aria-live="polite">{here?'Cümle '+(here.index+1)+' / '+here.total+(here.paused?' · duraklatıldı':''):'Önce metni görmeden dinle'}</strong><span className="l12-faces" lang="de">{[...new Set(task.lines.map(line=>line.who))].map(who=><span key={who} className={'l12-face-chip'+(who===speaker?' speaking':'')}><SpeakerFace who={who}/>{who}</span>)}</span></div>
+   <div className="l12-player-text"><strong aria-live="polite">{here?t('Cümle {n} / {total}',{n:here.index+1,total:here.total})+(here.paused?' · '+t('duraklatıldı'):''):t('Önce metni görmeden dinle')}</strong><span className="l12-faces" lang="de">{[...new Set(task.lines.map(line=>line.who))].map(who=><span key={who} className={'l12-face-chip'+(who===speaker?' speaking':'')}><SpeakerFace who={who}/>{who}</span>)}</span></div>
    <div className="l12-player-controls">
-    <button type="button" className="l12-jump" aria-label="Önceki cümle" title="Önceki cümle" disabled={!here} onClick={()=>here&&player.seek(here.index-1)}><SkipBack size={20} aria-hidden="true"/></button>
-    {active?<button type="button" className="btn secondary" onClick={player.pause}><Pause size={18} aria-hidden="true"/>Duraklat</button>:here?<button type="button" className="btn" onClick={player.resume}><Play size={18} aria-hidden="true"/>Devam et</button>:<button type="button" className="btn" disabled={player.busy&&!!player.playing} onClick={()=>player.play(key,task.lines!)}><Play size={18} aria-hidden="true"/>Dinle</button>}
-    <button type="button" className="l12-jump" aria-label="Sonraki cümle" title="Sonraki cümle" disabled={!here||here.index>=here.total-1} onClick={()=>here&&player.seek(here.index+1)}><SkipForward size={20} aria-hidden="true"/></button>
+    <button type="button" className="l12-jump" aria-label={t('Önceki cümle')} title={t('Önceki cümle')} disabled={!here} onClick={()=>here&&player.seek(here.index-1)}><SkipBack size={20} aria-hidden="true"/></button>
+    {active?<button type="button" className="btn secondary" onClick={player.pause}><Pause size={18} aria-hidden="true"/>{t('Duraklat')}</button>:here?<button type="button" className="btn" onClick={player.resume}><Play size={18} aria-hidden="true"/>{t('Devam et')}</button>:<button type="button" className="btn" disabled={player.busy&&!!player.playing} onClick={()=>player.play(key,task.lines!)}><Play size={18} aria-hidden="true"/>{t('Dinle')}</button>}
+    <button type="button" className="l12-jump" aria-label={t('Sonraki cümle')} title={t('Sonraki cümle')} disabled={!here||here.index>=here.total-1} onClick={()=>here&&player.seek(here.index+1)}><SkipForward size={20} aria-hidden="true"/></button>
    </div>
-   <div className="l12-seek" role="group" aria-label="Cümleye git">{task.lines.map((line,i)=><button type="button" key={i} className={'l12-seek-step'+(here&&i===here.index?' current':here&&i<here.index?' done':'')} aria-label={`Cümle ${i+1} · ${line.who}`} title={`Cümle ${i+1} · ${line.who}`} aria-current={here&&i===here.index?'step':undefined} onClick={()=>here?player.seek(i):player.play(key,task.lines!,i)}/>)}</div>
-   <div className="l12-player-foot">{here?<button type="button" className="text-button" onClick={()=>player.play(key,task.lines!)}><RotateCcw size={15} aria-hidden="true"/>Baştan dinle</button>:<span/>}<SpeedToggle player={player}/></div>
+   <div className="l12-seek" role="group" aria-label={t('Cümleye git')}>{task.lines.map((line,i)=><button type="button" key={i} className={'l12-seek-step'+(here&&i===here.index?' current':here&&i<here.index?' done':'')} aria-label={t('Cümle {n}',{n:i+1})+' · '+line.who} title={t('Cümle {n}',{n:i+1})+' · '+line.who} aria-current={here&&i===here.index?'step':undefined} onClick={()=>here?player.seek(i):player.play(key,task.lines!,i)}/>)}</div>
+   <div className="l12-player-foot">{here?<button type="button" className="text-button" onClick={()=>player.play(key,task.lines!)}><RotateCcw size={15} aria-hidden="true"/>{t('Baştan dinle')}</button>:<span/>}<SpeedToggle player={player}/></div>
   </div>}
   {!task.lines&&<div className="l12-dict-speed"><SpeedToggle player={player}/></div>}
   <ol className="l12-items">{task.questions.map((q,i)=>{const given=answers[i]??'';const ok=checked&&isRight(q,given);const bad=checked&&!ok;const say=questionSpeech(q);const sayKey=key+':'+i;
    return <li key={i} className={'l12-item'+(ok?' ok':bad?' bad':'')}>
     <span className="l12-item-number" aria-hidden="true">{ok?<Check size={15}/>:bad?<X size={15}/>:i+1}</span>
     <div className="l12-item-body">
-     {say&&<div className="l12-item-listen">{player.playing===sayKey?<button type="button" className="btn secondary small" onClick={player.stop}><Square size={15} aria-hidden="true"/>Durdur</button>:<button type="button" className="btn secondary small" disabled={player.busy&&!!player.playing} onClick={()=>player.play(sayKey,[{who:'Sprecher',text:say}])}><Play size={16} aria-hidden="true"/>{q.type==='dict'||q.type==='mc'?(q.label??'Cümle '+(i+1)):'Dinle'}</button>}</div>}
+     {say&&<div className="l12-item-listen">{player.playing===sayKey?<button type="button" className="btn secondary small" onClick={player.stop}><Square size={15} aria-hidden="true"/>{t('Durdur')}</button>:<button type="button" className="btn secondary small" disabled={player.busy&&!!player.playing} onClick={()=>player.play(sayKey,[{who:'Sprecher',text:say}])}><Play size={16} aria-hidden="true"/>{q.type==='dict'||q.type==='mc'?(q.label??t('Cümle {n}',{n:i+1})):t('Dinle')}</button>}</div>}
      {q.type==='rf'&&<div className="l12-choice-row two"><p className="l12-prompt" lang="de">{plain(q.text)}</p><div className="l12-options" role="radiogroup" aria-label={q.text}>{['richtig','falsch'].map(option=><button type="button" key={option} role="radio" aria-checked={given===option} lang="de" className={'l12-option'+(given===option?' selected':'')+(checked&&option===q.answer?' right':'')+(checked&&given===option&&option!==q.answer?' wrong':'')} onClick={()=>set(i,option)}>{option}</button>)}</div></div>}
      {q.type==='mc'&&<div className="l12-choice-row"><p className="l12-prompt" lang="de">{plain(q.text)}</p><div className="l12-options l12-options-stack" role="radiogroup" aria-label={q.text}>{q.options.map((option,j)=><button type="button" key={option} role="radio" aria-checked={given===String(j)} className={'l12-option'+(given===String(j)?' selected':'')+(checked&&j===q.answer?' right':'')+(checked&&given===String(j)&&j!==q.answer?' wrong':'')} onClick={()=>set(i,String(j))} lang="de"><span className="object-option-number">{String.fromCharCode(97+j)}</span>{option}</button>)}</div></div>}
      {q.type==='select'&&<div className="l12-choice-row"><p className="l12-prompt" lang="de">{plain(q.text)}</p><div className="l12-options" role="radiogroup" aria-label={q.text}>{q.options.map(option=><button type="button" key={option} role="radio" aria-checked={given===option} lang="de" className={'l12-option'+(given===option?' selected':'')+(checked&&option===q.answer?' right':'')+(checked&&given===option&&option!==q.answer?' wrong':'')} onClick={()=>set(i,option)}>{option}</button>)}</div></div>}
-     {(q.type==='text'||q.type==='dict')&&<>{q.type==='text'&&<p className="l12-prompt" lang="de">{plain(q.text)}</p>}<input type="text" className={'writing-input l12-line'+(ok?' ok':bad?' bad':'')} lang="de" dir="ltr" inputMode={q.numeric?'numeric':'text'} value={given} placeholder={q.placeholder??(q.type==='dict'?'Duyduğunu buraya yaz':'Cevabını yaz')} aria-label={q.type==='dict'?(q.label??'Cümle '+(i+1)):q.text} autoComplete="off" autoCapitalize="sentences" spellCheck={false} onChange={event=>set(i,event.target.value)}/></>}
-     {bad&&<p className="l12-solution"><span>{given?'Doğrusu:':'Boş kaldı. Doğrusu:'}</span> <strong lang="de" dir="ltr">{answerText(q)}</strong></p>}
+     {(q.type==='text'||q.type==='dict')&&<>{q.type==='text'&&<p className="l12-prompt" lang="de">{plain(q.text)}</p>}<input type="text" className={'writing-input l12-line'+(ok?' ok':bad?' bad':'')} lang="de" dir="ltr" inputMode={q.numeric?'numeric':'text'} value={given} placeholder={q.placeholder??(q.type==='dict'?t('Duyduğunu buraya yaz'):t('Cevabını yaz'))} aria-label={q.type==='dict'?(q.label??t('Cümle {n}',{n:i+1})):q.text} autoComplete="off" autoCapitalize="sentences" spellCheck={false} onChange={event=>set(i,event.target.value)}/></>}
+     {bad&&<p className="l12-solution"><span>{given?t('Doğrusu:'):t('Boş kaldı. Doğrusu:')}</span> <strong lang="de" dir="ltr">{answerText(q)}</strong></p>}
     </div>
    </li>;})}</ol>
   {checked?<div className={'object-feedback l12-feedback '+(perfect?'success':'retry')} role="status" aria-live="polite">
-   <h2>{perfect?<CheckCircle2 size={23} aria-hidden="true"/>:<RotateCcw size={22} aria-hidden="true"/>} {perfect?'Harika, hepsi doğru!':`${right} / ${total} doğru`}</h2>
-   <p>Şimdi metni aç ve dinlerken oku.</p>
-   <div className="object-actions"><button type="button" className="btn secondary" aria-pressed={transcript} onClick={()=>setTranscript(value=>!value)}>{transcript?<EyeOff size={18} aria-hidden="true"/>:<Eye size={18} aria-hidden="true"/>}{transcript?'Metni gizle':'Metni göster'}</button>{onNext&&<button type="button" className="btn" onClick={onNext}>{nextLabel??'Devam'}</button>}</div>
+   <h2>{perfect?<CheckCircle2 size={23} aria-hidden="true"/>:<RotateCcw size={22} aria-hidden="true"/>} {perfect?t('Harika, hepsi doğru!'):t('{right} / {total} doğru',{right,total})}</h2>
+   <p>{t('Şimdi metni aç ve dinlerken oku.')}</p>
+   <div className="object-actions"><button type="button" className="btn secondary" aria-pressed={transcript} onClick={()=>setTranscript(value=>!value)}>{transcript?<EyeOff size={18} aria-hidden="true"/>:<Eye size={18} aria-hidden="true"/>}{transcript?t('Metni gizle'):t('Metni göster')}</button>{onNext&&<button type="button" className="btn" onClick={onNext}>{nextLabel??t('Devam')}</button>}</div>
   </div>:<div className="object-actions l12-actions">
-   <button type="button" className="btn check-button" disabled={!answered} onClick={()=>{sound.prepare();if(perfect)sound.correct();else sound.wrong();setChecked(true);}}><Check size={18} aria-hidden="true"/>Kontrol et</button>
-   <button type="button" className="btn secondary small" aria-pressed={transcript} onClick={()=>setTranscript(value=>!value)}>{transcript?<EyeOff size={17} aria-hidden="true"/>:<Eye size={17} aria-hidden="true"/>}{transcript?'Metni gizle':'Metni göster'}</button>
+   <button type="button" className="btn check-button" disabled={!answered} onClick={()=>{sound.prepare();if(perfect)sound.correct();else sound.wrong();setChecked(true);}}><Check size={18} aria-hidden="true"/>{t('Kontrol et')}</button>
+   <button type="button" className="btn secondary small" aria-pressed={transcript} onClick={()=>setTranscript(value=>!value)}>{transcript?<EyeOff size={17} aria-hidden="true"/>:<Eye size={17} aria-hidden="true"/>}{transcript?t('Metni gizle'):t('Metni göster')}</button>
   </div>}
   {transcript&&<div className="l12-transcript" lang="de" dir="ltr">{task.lines?task.lines.map((line,i)=><div key={i} className={'l12-line'+(line.who===task.lines![0].who?'':' alt')+(here?.index===i?' current':'')}><SpeakerFace who={line.who}/><p className="l12-bubble"><b>{line.who}</b>{line.show??line.text}</p></div>):<ol>{task.questions.map((q,i)=><li key={i}>{q.type==='mc'?q.say:q.type==='dict'?q.answer+(q.say&&q.say!==q.answer?' – '+q.say:''):answerText(q)}</li>)}</ol>}</div>}
-  {(answered||checked)&&<button type="button" className="text-button l12-reset" onClick={()=>{setAnswers({});setChecked(false);setTranscript(false);}}><RotateCcw size={15} aria-hidden="true"/>Bu bölümü sıfırla</button>}
+  {(answered||checked)&&<button type="button" className="text-button l12-reset" onClick={()=>{setAnswers({});setChecked(false);setTranscript(false);}}><RotateCcw size={15} aria-hidden="true"/>{t('Bu bölümü sıfırla')}</button>}
  </article>;
 }
 

@@ -92,8 +92,8 @@ export function SiteGreeting({language}:{language:VaultLanguage;line?:string}){
  const c=(key:ClockCopyKey,params?:Record<string,string|number>)=>clockText(language,key,params);
  const meaning=(item:Info)=>language==='tr'?turkishTime(item.saying,item.hour,item.minute):(item.saying.kind==='approx'?'≈ ':'= ')+clockDigits(item.hour,item.minute);
  // "halb vier" is 3:30: the half hour of the hour now (12 hours), named after the next one.
- const explain=(item:Info)=>{const s=item.saying,h12=item.hour%12||12;
-  return c(EXPLAIN_KEY[s.pattern],{next:s.next,halfTime:clockDigits(h12,30),n:s.minutes,time:clockDigits(h12,item.minute)});};
+ const explain=(item:Info)=>{const s=item.saying,h12=item.hour%12||12,key=EXPLAIN_KEY[s.pattern];
+  return key?c(key,{next:s.next,halfTime:clockDigits(h12,30),n:s.minutes,time:clockDigits(h12,item.minute)}):'';};
  return <>
   <button ref={button} type="button" className="site-greeting site-greeting-button" title={t('tapToHear')} aria-label={t('tapToHear')+' · '+WEEKDAYS[now.getDay()]+', '+PART_NOUN[moment.part]+', '+time} aria-expanded={!!info} onClick={say} data-site-greeting={moment.part}>
    <AnalogClock date={now} seconds={motion}/>
@@ -108,7 +108,7 @@ export function SiteGreeting({language}:{language:VaultLanguage;line?:string}){
    <div className="sg-info-top"><span className={'sg-kind kind-'+info.saying.kind}>{c(KIND_KEY[info.saying.kind])}</span><span className="sg-count" dir="ltr">{info.index+1}/{info.total}</span></div>
    <p className="sg-info-de" lang="de" dir="ltr">{info.saying.de}</p>
    <p className="sg-info-meaning" dir={language==='tr'?undefined:'ltr'}>{meaning(info)}</p>
-   <p className="sg-info-why">{explain(info)}</p>
+   {explain(info)&&<p className="sg-info-why">{explain(info)}</p>}
   </div>}
  </>;
 }

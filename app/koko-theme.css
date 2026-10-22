@@ -405,3 +405,53 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 }
 /* Nesne Kasası: "Hepsini baştan çöz" under the start buttons (like "Baştan başla" in Fiil Atölyesi). */
 .vault-restart-all { display:inline-flex; align-items:center; gap:6px; min-height:40px; margin-top:4px; color:#5f7f9f; font-size:14px; font-weight:700; }
+
+/* During a test (a question card on the page): a slim header with only the logo and the round buttons, no breadcrumb
+   (the ✕ of the test leads back), a smaller picture and lower answer buttons, so the question and all four answers fit
+   on one phone screen (the learner asked, 22 October 2026). */
+.toon-app:has(.object-question) .site-header .site-greeting,
+.toon-app:has(.object-question) .site-header .site-language,
+.toon-app:has(.object-question) .site-header .site-sparkle,
+.toon-app:has(.object-question) .object-breadcrumb { display:none; }
+.toon-app:has(.object-question) .work-header.site-header { display:flex; align-items:center; gap:10px; padding-block:8px; }
+.toon-app:has(.object-question) .site-header .site-logo-brand { width:clamp(104px,28vw,150px); }
+.toon-app:has(.object-question) .site-header .site-header-tools { display:flex; width:auto; margin-inline-start:auto; }
+.toon-app:has(.object-question) .object-practice { margin-top:8px; }
+.toon-app:has(.object-question) .object-practice-top { margin-bottom:10px; }
+.toon-app:has(.object-question) .object-question .object-picture { margin:10px auto; }
+.toon-app:has(.object-question) .object-question .object-picture:not(.small)>.toon-art { max-height:clamp(120px,27vh,280px); }
+.toon-app:has(.object-question) .object-question .object-picture:not(.small) img { max-height:clamp(120px,27vh,280px); }
+@media (max-width:760px) {
+ .toon-app:has(.object-question) .work-header.site-header { margin-top:6px; border-radius:20px; padding:6px 10px; }
+ .toon-app:has(.object-question) .site-header .site-header-buttons { gap:6px; }
+ .toon-app:has(.object-question) .object-question.panel { padding:14px 12px 16px; }
+ .toon-app:has(.object-question) .object-question h1 { font-size:18px; line-height:1.35; margin-bottom:6px; }
+ .toon-app:has(.object-question) .object-question .object-picture { margin:6px auto 10px; }
+ .toon-app:has(.object-question) .picture-word-options .object-option { min-height:56px; padding:8px 9px; }
+ .toon-app:has(.object-question) .object-options .object-option { min-height:52px; }
+ /* Writing: a smaller picture, the tips in small type and the letters right under the boxes. */
+ .toon-app:has(.object-question) .object-question:has(form) .object-picture:not(.small)>.toon-art,
+ .toon-app:has(.object-question) .object-question:has(form) .object-picture:not(.small) img { max-height:clamp(80px,15vh,200px); }
+ .toon-app:has(.object-question) .vault-article-choice { gap:4px 10px; margin:2px 0 4px; }
+ .toon-app:has(.object-question) .vault-article-choice .verb-aux-label { font-size:13px; }
+ .toon-app:has(.object-question) .object-question:has(form) .object-picture { margin:4px auto 6px; }
+ .toon-app:has(.object-question) .object-question:has(form) .vault-hint-wrap .text-button { min-height:32px; }
+ .toon-app:has(.object-question) .letter-puzzle .puzzle-hint { font-size:12.5px; line-height:1.35; margin-bottom:6px; }
+ .toon-app:has(.object-question) .letter-bank-heading,
+ .toon-app:has(.object-question) .puzzle-keyboard-tip { display:none; }
+ /* Listening: the two buttons in one low row (the question already says what to do) and smaller answer pictures. */
+ .toon-app:has(.object-question) .vault-listen-player { padding:10px; gap:6px; }
+ .toon-app:has(.object-question) .vault-listen-player>svg,
+ .toon-app:has(.object-question) .vault-listen-player>p { display:none; }
+ .toon-app:has(.object-question) .vault-listening-options .object-picture .toon-art { height:clamp(72px,14vh,136px); max-height:none; }
+ .toon-app:has(.object-question) .vault-listening-options .object-option { min-height:0; padding:6px; }
+}
+
+/* The same left menu on every part of the site (app/site-menu.tsx; the learner asked, 22 October 2026). The section
+   pages keep their own page width inside the menu layout; on phones the menu goes away while a test or a game is open,
+   so the question and its answers stay on one screen. */
+.site-layout>main.object-page { min-width:0; width:100%; }
+@media (max-width:760px) {
+ .toon-app:has(.object-question) .work-layout>.work-sidebar,
+ .toon-app:has(.verb-game) .work-layout>.work-sidebar { display:none; }
+}

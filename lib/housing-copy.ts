@@ -35,6 +35,7 @@ export const housingCopy={
  pages:['Kitap sayfaları {pages}','Buchseiten {pages}','Book pages {pages}','صفحات الكتاب {pages}','Сторінки підручника {pages}','Pages du livre {pages}'],
  trapWhy:['Tuzak neydi?','Wo war die Falle?','What was the trap?','أين كان الفخ؟','У чому була пастка?','Où était le piège ?'],
  back:['A1.2 ünitelerine dön','Zurück zu A1.2','Back to A1.2 units','العودة إلى وحدات A1.2','Повернутися до A1.2','Retour aux unités A1.2'],
+ contents:['İçindekiler','Inhalt','Contents','المحتويات','Зміст','Sommaire'],
 } satisfies Record<string,Translations>;
 export type HousingCopyKey=keyof typeof housingCopy;
 export function housingText(language:StudyLanguage,key:HousingCopyKey,params:Record<string,string|number>={}){return translate(housingCopy[key],language).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??''));}

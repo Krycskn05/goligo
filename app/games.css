@@ -1,21 +1,34 @@
 /* Oyunlar: the game cards and the new games (app/object-games.tsx). Colours follow koko-theme.css; der blue, die red,
    das green as in the Lektion 12 word tiles. */
-.game-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:14px; }
-.game-card { display:flex; align-items:center; gap:14px; min-height:86px; padding:14px 16px; border-radius:22px; border:2px solid #fff; background:#fff; box-shadow:0 4px 14px rgba(28,82,130,.08); color:var(--ink); text-align:start; cursor:pointer; font:inherit; transition:transform .15s ease, border-color .15s ease; }
-.game-card:hover:not(:disabled) { border-color:#cfe3f7; transform:translateY(-1px); }
-.game-card:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
-.game-card-text { display:grid; gap:3px; min-width:0; }
-.game-card-text strong { font-size:17px; color:#1f3b5c; }
-.game-card-text small { color:var(--ink-2); font-size:13.5px; line-height:1.35; }
-.game-icon { flex:none; display:grid; place-items:center; width:54px; height:54px; border-radius:17px; color:#fff; box-shadow:0 3px 0 rgba(0,0,0,.12); }
-.game-icon-match { background:linear-gradient(180deg,#7ab8f5,#2f7fd6); }
-.game-icon-rain { background:linear-gradient(180deg,#8fd3ff,#3a9fd8); }
-.game-icon-catch { background:linear-gradient(180deg,#c39bf3,#8a5bd6); }
-.game-icon-quick { background:linear-gradient(180deg,#ffb36b,#ef7d24); }
-.game-icon-search { background:linear-gradient(180deg,#7fd99a,#3a9a4a); }
-.game-icon-rescue { background:linear-gradient(180deg,#ff9fb2,#e0506c); }
-.game-icon-plural { background:linear-gradient(180deg,#ffd76a,#e9a91c); }
-
+/* The game cards: big colourful cards with the learner's drawing of Koko for each game, the level and length, and a
+   play button (design 1 of the three the learner was shown, 22 October 2026). */
+.game-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-top:14px; }
+.game-card { --c:#2f7fd6; --bg:#e3f0ff; position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 14px 16px; border-radius:26px; border:3px solid #fff; background:linear-gradient(180deg,var(--bg) 0,#fff 78%); box-shadow:0 6px 0 var(--c),0 10px 24px rgba(28,82,130,.12); color:var(--ink); text-align:center; text-decoration:none; cursor:pointer; font:inherit; transition:transform .15s ease, box-shadow .15s ease; }
+.game-card:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 9px 0 var(--c),0 14px 28px rgba(28,82,130,.16); }
+.game-card:active:not(:disabled) { transform:translateY(2px); box-shadow:0 3px 0 var(--c),0 6px 14px rgba(28,82,130,.12); }
+.game-card:focus-visible { outline:3px solid var(--blue-2); outline-offset:3px; }
+.game-icon { display:block; width:min(170px,100%); aspect-ratio:1; transition:transform .25s ease; }
+.game-icon img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 8px 10px rgba(0,0,0,.15)); }
+.game-card:nth-child(odd) .game-icon { transform:rotate(-3deg); }
+.game-card:nth-child(even) .game-icon { transform:rotate(3deg); }
+.game-card:hover:not(:disabled) .game-icon { transform:rotate(0) scale(1.05); }
+.game-card-text { display:grid; gap:4px; min-width:0; }
+.game-card-text strong { font-size:19px; line-height:1.2; color:var(--ink); }
+.game-card-text small { color:var(--ink-2); font-size:14px; line-height:1.35; }
+.game-card-meta { display:inline-flex; padding:2px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--bg); color:var(--c); font-size:12.5px; font-weight:800; }
+.game-card-play { display:inline-flex; align-items:center; gap:6px; margin-top:auto; padding:8px 18px; border-radius:999px; background:var(--c); color:#fff; font-weight:800; font-size:15px; box-shadow:0 3px 0 rgba(0,0,0,.15); }
+.game-card-play svg { fill:currentColor; }
+.game-card-meta { margin-bottom:6px; }
+.game-card.guest-locked .game-card-play { background:#9aa8b8; }
+.game-card.guest-locked .game-card-play svg { fill:none; }
+.game-match { --c:#2f7fd6; --bg:#e3f0ff; }
+.game-rain { --c:#2b8fca; --bg:#e2f5ff; }
+.game-catch { --c:#8a5bd6; --bg:#f1e9ff; }
+.game-quick { --c:#e5711a; --bg:#fff0e1; }
+.game-search { --c:#3a9a4a; --bg:#e5f7e8; }
+.game-rescue { --c:#d9445f; --bg:#ffe8ed; }
+.game-plural { --c:#c98a06; --bg:#fff5d6; }
+@media (prefers-reduced-motion:reduce) { .game-card, .game-icon { transition:none; } .game-card:nth-child(n) .game-icon { transform:none; } }
 .game-start { display:grid; justify-items:center; gap:14px; padding:26px 10px; text-align:center; color:var(--ink-2); font-size:17px; }
 .game-start p { margin:0; max-width:32em; }
 .game-picture { display:block; width:100%; aspect-ratio:1; }
@@ -133,7 +146,12 @@
 .game-over .quick-mistakes { margin:6px auto 0; }
 
 @media (max-width:560px) {
- .game-card { min-height:78px; padding:12px 14px; }
+ .game-cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+ .game-card { padding:8px 8px 14px; border-radius:22px; gap:5px; }
+ .game-icon { width:min(124px,100%); }
+ .game-card-text strong { font-size:16px; }
+ .game-card-text small { display:none; }
+ .game-card-play { padding:6px 14px; font-size:14px; }
  .rain-sky { height:clamp(230px,40vh,320px); }
  .rain-bucket { min-height:60px; font-size:23px; }
  .rescue-stage { gap:8px; }

@@ -25,6 +25,7 @@ import {ENGLISH_COURSE_ENABLED,activeLearningLanguage,learningText,saveLearningL
 import {isStudyLanguage} from '@/lib/study-languages';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
+import {SiteMenuAside} from './site-menu';
 import {SiteHeader} from './site-header';
 import {objectProgress} from '@/lib/progress';
 import {ProgressMeter,RoundReward} from './progress-ui';
@@ -170,6 +171,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  return <div className="category-app object-app toon-app picture-quiz-app vault-app" lang={language} dir={vaultDirection(language)}>
   <a className="skip-link" href="#object-main">{text('skipContent')}</a>
   <SiteHeader language={language} languages={vaultLanguages} onLanguage={value=>{if(isVaultLanguage(value)){stopFeedback();onLanguage(value);}}} homeHref={'/?learn='+course} homeLabel={text('home')} stats={snapshot.stats} guest={guest}/>
+  <div className="work-layout site-layout"><SiteMenuAside language={language} current={'vault'} course={course}/>
   <main id="object-main" className="object-page">
    {onCourse&&<CourseSelector course={course} language={isStudyLanguage(language)?language:'en'} disabled={busy} onChange={onCourse}/>}
    <div className="object-breadcrumb"><a href={'/?learn='+course}>{text('home')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{text('vaultTitle')}</span></div>
@@ -214,6 +216,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     </div>
     <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
    </section>}
-  </main><SiteFooter language={language}/>
+  </main></div><SiteFooter language={language}/>
  </div>;
 }

@@ -8,4 +8,7 @@ export const SITE_DOMAIN = 'goliqo.com';
  */
 export const OLD_SITE_HOSTS: readonly string[] = ['goligo.kooraycoskun.workers.dev', 'lernkoko.kooraycoskun.workers.dev'];
 /** Gizlilik ve kullanım koşulları sayfalarında gösterilen iletişim adresi (boşsa "yakında eklenecek" yazar). */
-export const SITE_CONTACT_EMAIL = '';
+export const SITE_CONTACT_EMAIL = 'info@goliqo.com';
+/** The legal notice (app/impressum, § 5 DDG), as the learner gave it, 22 October 2026: for now only the city as the
+ * address (the learner will add the street later). Mail to info@goliqo.com is forwarded by Cloudflare Email Routing. */
+export const IMPRESSUM = { name: 'Koray Coşkun', address: ['Berlin'] as readonly string[], email: SITE_CONTACT_EMAIL };

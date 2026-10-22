@@ -23,10 +23,10 @@ import {pageLanguage} from './page-language';
 function features(language:SiteLanguage):{part:PicturePart;title:string;de:string;href?:string}[]{
  return [
   {part:'units',title:c(language,'catalogTitle'),de:'A1.1 · A1.2',href:'/konular'},
-  {part:'vault',title:vaultText(language,'vaultTitle'),de:objectVocabulary.length+' Gegenstände',href:'/ev-esyalar'},
-  {part:'verbs',title:verbText(language,'workshopTitle'),de:verbs.length+' Verben',href:'/fiiller'},
-  {part:'games',title:verbText(language,'gamesTitle'),de:gameIds.length+' Spiele',href:'/fiiller?bolum=oyunlar'},
-  {part:'mistakes',title:verbText(language,'mistakesTitle'),de:'Fehler'},
+  {part:'vault',title:vaultText(language,'vaultTitle'),de:vaultText(language,'objectsCount',{n:objectVocabulary.length}),href:'/ev-esyalar'},
+  {part:'verbs',title:verbText(language,'workshopTitle'),de:verbText(language,'verbsCount',{n:verbs.length}),href:'/fiiller'},
+  {part:'games',title:verbText(language,'gamesTitle'),de:verbText(language,'gamesCount',{n:gameIds.length}),href:'/fiiller?bolum=oyunlar'},
+  {part:'mistakes',title:verbText(language,'mistakesTitle'),de:verbText(language,'reviewShort')},
  ];
 }
 // What an account adds (texts of lib/public-copy.ts).
@@ -73,7 +73,7 @@ export function LandingView({language}:{language:SiteLanguage}){
       <a className={'lk-part'+(item.href?'':' locked')} href={item.href??'#uye-ol'} data-landing-try={item.href?item.part:undefined} data-landing-locked={item.href?undefined:item.part}>
        <img src={pictures[item.part]} alt="" width={1200} height={600} loading="lazy"/>
        <strong>{item.title}</strong>
-       <small lang="de" dir="ltr">{item.de}</small>
+       <small>{item.de}</small>
        {item.href?<span className="lk-part-try">{g('guestTryShort')}</span>:<span className="lk-part-lock"><Lock size={14} aria-hidden="true"/>{g('guestLocked')}</span>}
       </a>
      </li>)}

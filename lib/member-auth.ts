@@ -161,7 +161,7 @@ export const RESET_MINUTES = 60;
 export const RESET_MS = RESET_MINUTES * 60 * 1000;
 
 /** Giriş yapmadan açılabilen sayfalar: tanıtım, giriş, üye ol, şifre yenileme ve yasal metinler. */
-export const PUBLIC_PAGES = new Set(['/', '/giris', '/uye-ol', RESET_PAGE, '/gizlilik', '/kullanim-kosullari']);
+export const PUBLIC_PAGES = new Set(['/', '/giris', '/uye-ol', RESET_PAGE, '/gizlilik', '/kullanim-kosullari', '/impressum']);
 /** Giriş ve çıkış adresleri (dönüş adresi olarak kullanılmaz). */
 export const AUTH_PATHS = new Set(['/giris', '/uye-ol', RESET_PAGE, '/cikis', '/signin-with-chatgpt', '/signout-with-chatgpt', '/auth/login', '/auth/logout', '/callback']);
 

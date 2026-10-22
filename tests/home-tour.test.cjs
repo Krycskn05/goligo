@@ -17,8 +17,9 @@ test('the home page introduces the site; the units catalogue moved to /konular',
  // The introduction shows no progress: no sidebar progress panel and no progress requests on the home page.
  assert.ok(home.includes("{course==='de'&&!home&&snapshot?.stats&&<SidebarProgress ")&&home.includes("if(course!=='de'||home){setSnapshot(null);return;}"));
  // The menu starts with "Ana sayfa"; "Üniteler ve konular" opens /konular from the home page.
- const nav=home.slice(home.indexOf('<nav '),home.indexOf('</nav>'));
- assert.ok(nav.indexOf('href="/"')<nav.indexOf("href={home?'/konular':'#curriculum'}"));
+ // The menu is app/site-menu.tsx (the same on every page, 22 October 2026).
+ const nav=read('app/site-menu.tsx');
+ assert.ok(nav.indexOf('href="/"')<nav.indexOf('href={unitsHref}')&&home.includes("<SiteMenu language={language} current={home?'home':'units'} course={course} unitsHref={home?'/konular':'#curriculum'}/>"));
  assert.ok(nav.includes('<NavIcon name="home"/>{vaultText(language,\'home\')}'));
  // Old links to "/?level=A1.2" still reach the catalogue.
  assert.ok(home.includes("window.location.replace('/konular?level='+level)"));
@@ -37,7 +38,7 @@ test('the introduction has one picture card per main part of the left menu, in m
  const parts=[...tour.matchAll(/\{id:'(\w+)',icon:'(\w+)',href:([^,]+),/g)].map(m=>[m[1],m[3]]);
  assert.deepEqual(parts,[['units',"'/konular'"],['vault',"'/ev-esyalar?learn=de'"],['verbs',"'/fiiller'"],['games',"'/fiiller?bolum=oyunlar'"],['mistakes',"'/fiiller?bolum=yanlislar'"]]);
  // The same parts and links as the left menu, and none of the lessons inside them (Ev ve Yaşam, Ausbildung).
- const menu=read('app/category-study.tsx');
+ const menu=read('app/site-menu.tsx');
  for(const href of ['/ev-esyalar?learn=','/fiiller','/fiiller?bolum=oyunlar','/fiiller?bolum=yanlislar'])assert.ok(menu.includes(href),href);
  for(const lesson of ['/a1-2/ev-ve-yasam','AUSBILDUNG_PATH','housing','ausbildung'])assert.ok(!tour.includes(lesson),lesson);
  // The whole card is the link; the picture is decoration.
@@ -78,7 +79,8 @@ test('"Uygulama olarak indir" in the left menu explains how to add Goliqo to the
  // A menu button right under the left menu (home page and units page), not in the welcome card.
  const home=read('app/category-study.tsx');
  const aside=home.slice(home.indexOf('<aside className="work-sidebar">'),home.indexOf('</aside>'));
- assert.ok(aside.indexOf('</nav><InstallGuide language={language}/>')>0);
+ assert.ok(aside.indexOf("unitsHref={home?'/konular':'#curriculum'}/><InstallGuide language={language}/>")>0);
+ assert.ok(read('app/site-menu.tsx').includes('<aside className="work-sidebar"><SiteMenu language={language} current={current} course={course}/><InstallGuide language={language}/></aside>'),'the same on every page');
  assert.ok(!read('app/home-tour.tsx').includes('InstallGuide'));
  assert.equal(homeCopy.homeCopy.installButton[0],'Uygulama olarak indir');
  const guide=read('app/install-guide.tsx');

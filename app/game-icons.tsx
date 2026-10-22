@@ -1,6 +1,5 @@
-import {CloudRain,Ear,Layers,LayoutGrid,PartyPopper,Search,Timer} from 'lucide-react';
 import type {GameId} from '@/lib/verb-games';
+import {gamePicture} from '@/lib/game-names';
 
-/** The round coloured sign on each game card of the Oyunlar page. */
-const icons:Partial<Record<GameId,typeof Search>>={match:LayoutGrid,rain:CloudRain,catch:Ear,quick:Timer,search:Search,rescue:PartyPopper,plural:Layers};
-export function GameIcon({game}:{game:GameId}){const Icon=icons[game]??LayoutGrid;return <span className={'game-icon game-icon-'+game} aria-hidden="true"><Icon size={26}/></span>;}
+/** The picture on each game card of the Oyunlar page: the learner's drawing of Koko for that game (22 October 2026). */
+export function GameIcon({game}:{game:GameId}){return <span className={'game-icon game-icon-'+game} aria-hidden="true"><img src={gamePicture(game)} alt="" width={400} height={400} loading="lazy" decoding="async"/></span>;}

@@ -54,6 +54,7 @@ test('the Turkish meaning and the explanation',()=>{
  assert.equal(at(3,30,1),'Saat üç buçuk.');assert.equal(at(3,45,1),'Saat dörde çeyrek var.');assert.equal(at(3,15,1),'Saat üçü çeyrek geçiyor.');
  assert.equal(at(3,50,1),'Saat dörde on var.');assert.equal(at(3,0,2),'Saat tam üç.');assert.equal(at(3,2,2),'Saat üçü birkaç dakika geçiyor.');
  const fill=(language,h,m,i)=>{const s=clock.clockSayings(h,m)[i],h12=h%12||12;return copy.clockText(language,copy.EXPLAIN_KEY[s.pattern],{next:s.next,halfTime:clock.clockDigits(h12,30),n:s.minutes,time:clock.clockDigits(h12,m)});};
+ assert.equal(copy.EXPLAIN_KEY.formal,undefined,'no explanation under the formal ways (the learner asked)');
  assert.equal(fill('tr',3,20,2),'„halb vier“ = 3:30. Bundan 10 dakika öncesi 3:20.','the plan\'s explanation');
  assert.equal(fill('tr',15,40,2),'„halb vier“ = 3:30. Bundan 10 dakika sonrası 3:40.');
  assert.equal(fill('de',3,30,1),'„halb vier“ = 3:30: Die halbe Stunde zählt schon zur nächsten Stunde.');

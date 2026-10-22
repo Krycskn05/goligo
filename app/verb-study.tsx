@@ -2,7 +2,7 @@
 import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Lock,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
 import {verbFamilies,verbFamilyOf,familyTitle,type VerbFamily} from '@/lib/verb-families';
@@ -12,6 +12,7 @@ import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separableP
 import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox,gameName,gameDetail} from './verb-games';
 import {GameIcon} from './game-icons';
+import {GAME_LEVEL,gameLength} from '@/lib/game-names';
 import {LearnCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
@@ -23,10 +24,11 @@ import {readVaultLanguage,saveVaultLanguage} from '@/lib/vault-language-preferen
 import {useLanguageSwitch} from './language-switch';
 import {LetterPuzzle} from './letter-puzzle';
 import {SiteFooter} from './site-footer';
+import {SiteMenuAside} from './site-menu';
 import {SiteHeader} from './site-header';
 import {NavIcon} from './nav-icons';
 import {PaulHoca} from './paul-hoca';
-import {verbProgress} from '@/lib/progress';
+import {verbProgress,learnedVerbs} from '@/lib/progress';
 import {RoundReward} from './progress-ui';
 import {progressText} from '@/lib/progress-copy';
 import {GUEST_GAMES,GUEST_VERB_PART} from '@/lib/guest-parts';
@@ -261,12 +263,14 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
  // A test answer opens the result card in place of the question; a spelling answer keeps the puzzle with a short note.
  const answered=!!feedback&&!writing;
  const overall=ready?verbProgress('verbs-all',snapshot.reviews):null;
+ const verbsDone=ready?learnedVerbs('verbs-all',snapshot.reviews):null;
  // "Fiil Atölyesi" → first word plain, the rest in the accent colour.
  const titleWords=(()=>{const words=t('workshopTitle').split(' ');return {head:words[0],tail:words.slice(1).join(' ')};})();
 
  return <div className="category-app object-app toon-app picture-quiz-app vault-app verb-app" lang={language} dir={dir}>
   <a className="skip-link" href="#object-main">{v('skipContent')}</a>
   <SiteHeader language={language} languages={vaultLanguages} onLanguage={value=>{if(isVaultLanguage(value)){stopFeedback();onLanguage(value);}}} homeHref="/?learn=de" homeLabel={v('home')} stats={snapshot.stats} guest={guest}/>
+  <div className="work-layout site-layout"><SiteMenuAside language={language} current={section==='games'?'games':section==='mistakes'?'mistakes':'verbs'}/>
   <main id="object-main" className="object-page">
    <div className="object-breadcrumb"><a href="/?learn=de">{v('home')}</a><ChevronRight size={14} className="vault-direction-icon"/>{section?<><a href="/fiiller" onClick={event=>{event.preventDefault();closeSection();}}>{t('workshopTitle')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{t(section==='games'?'gamesTitle':'mistakesTitle')}</span></>:<span>{t('workshopTitle')}</span>}</div>
    {guest&&<GuestBanner language={language} back={back}/>}
@@ -313,7 +317,7 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
    game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
    section==='games'?<section className="verb-section" aria-labelledby="verb-section-heading" data-verb-section="games">
     <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button><h1 id="verb-section-heading" tabIndex={-1}>{t('gamesTitle')}</h1></div>
-    <div className="game-cards verb-section-games">{gameIds.map(id=>guest&&!GUEST_GAMES.includes(id)?<a key={id} className={'game-card game-'+id+' guest-locked'} href={guestSignUp(back)} data-verb-game-card={id} data-guest-locked><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{guestText(language,'guestLocked')}</small></span><Lock className="guest-card-lock" size={18} aria-hidden="true"/></a>:<button type="button" key={id} className={'game-card game-'+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{gameDetail(id,language)}</small></span></button>)}</div>
+    <div className="game-cards verb-section-games">{gameIds.map(id=>guest&&!GUEST_GAMES.includes(id)?<a key={id} className={'game-card game-'+id+' guest-locked'} href={guestSignUp(back)} data-verb-game-card={id} data-guest-locked><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{guestText(language,'guestLocked')}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Lock size={16} aria-hidden="true"/>{t('play')}</span></a>:<button type="button" key={id} className={'game-card game-'+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{gameDetail(id,language)}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Play size={16} aria-hidden="true"/>{t('play')}</span></button>)}</div>
    </section>:
    section==='mistakes'&&guest?<section className="verb-section" data-verb-section="mistakes">
     <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1></div>
@@ -344,7 +348,7 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
      <span className="verb-hero-badge" aria-hidden="true"><NavIcon name="verbs"/></span>
      <div className="verb-hero-words">
       <h1 id="vault-heading" tabIndex={-1} className="verb-hero-title">{titleWords.head}{titleWords.tail&&<> <span className="k">{titleWords.tail}</span></>}</h1>
-      <p className="verb-hero-sub" lang="de" dir="ltr">{workshopVerbs.length} Verben · {parts.length} Teile</p>
+      <p className="verb-hero-sub">{t('verbsCount',{n:workshopVerbs.length})} · {t('partsCount',{n:parts.length})}</p>
      </div>
     </div>
     <section className="verb-map" aria-labelledby="verb-map-heading">
@@ -371,13 +375,15 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
      })}
     </section>
     <article className="panel verb-collection">
-     <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}{overall&&<> · {progressText(language,'learned',{n:overall.learned,total:overall.total})}</>}</p>
+     <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}</p>
+     {/* Two counts, each with its own name: whole verbs learned and single exercises done (the learner asked). */}
+     {overall&&verbsDone&&<p className="verb-collection-counts"><span>{t('verbsLearned',{n:verbsDone.learned,total:verbsDone.total})}</span><span>{progressText(language,'learned',{n:overall.learned,total:overall.total})}</span></p>}
      <div className="verb-stickers">{workshopVerbs.map(item=>{const done=stickers.get(item.id);return <img key={item.id} className={done?.perfekt?'got full':done?.meaning?'got':'missing'} src={verbPicture(item)??''} alt={item.display} title={item.display+(done?.perfekt?' · '+perfektLabel(item):'')} width={96} height={96} loading="lazy" decoding="async"/>;})}</div>
     </article>
     <details className="verb-list verb-fold"><summary><span>{t('verbList')} · {verbs.length}</span><ChevronDown className="verb-fold-icon" size={20} aria-hidden="true"/></summary>
      <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr" className={kindClass(item)}>{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
     </details>
    </section>}
-  </main><SiteFooter language={language}/>
+  </main></div><SiteFooter language={language}/>
  </div>;
 }

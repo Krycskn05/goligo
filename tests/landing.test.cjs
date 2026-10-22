@@ -10,8 +10,9 @@ test('picture, title and try it beside a small sign-up form; picture tiles for e
  const order=['<img src={pictures.welcome}','<h1 id="lk-hero-title">','data-landing-try-top','<div className="lk-hero-form" id="uye-ol" data-landing-register>','<AuthForm mode="register" returnTo="/" texts={authFormTexts(language)}/>','<ul className="lk-parts">','lk-perks'];
  let at=-1;for(const piece of order){const next=page.indexOf(piece);assert.ok(next>at,piece);at=next;}
  assert.equal(page.split('data-landing-register').length-1,1,'one sign-up button for the site check');
- assert.ok(page.includes("{part:'mistakes',title:verbText(language,'mistakesTitle'),de:'Fehler'}")&&page.includes("href={item.href??'#uye-ol'}"),'Yanlışlarım needs an account: its tile leads to the form');
- assert.ok(page.includes("de:objectVocabulary.length+' Gegenstände'")&&page.includes("de:verbs.length+' Verben'")&&page.includes("de:gameIds.length+' Spiele'"),'the counts follow the site');
+ assert.ok(page.includes("{part:'mistakes',title:verbText(language,'mistakesTitle'),de:verbText(language,'reviewShort')}")&&page.includes("href={item.href??'#uye-ol'}"),'Yanlışlarım needs an account: its tile leads to the form');
+ assert.ok(page.includes("de:vaultText(language,'objectsCount',{n:objectVocabulary.length})")&&page.includes("de:verbText(language,'verbsCount',{n:verbs.length})")&&page.includes("de:verbText(language,'gamesCount',{n:gameIds.length})"),'the counts follow the site, in the site language');
+ assert.ok(!page.includes('lang="de" dir="ltr">{item.de}'),'no German labels in the interface (the learner asked)');
  for(const key of ['perkProgress','step3','perkStreak'])assert.ok(page.includes(`key:'${key}'`),key);
  const css=read('app/members.css');
  assert.ok(css.includes('.lk-parts { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr));')&&css.includes('.lk-parts { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }'),'five tiles in a row, two on phones');

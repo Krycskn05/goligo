@@ -78,7 +78,7 @@ test('the legal pages: the Turkish original, a translation note elsewhere, the l
  assert.equal(read('app/legal.tsx').match(/LEGAL_UPDATED='([^']+)'/)[1],'2026-10-22');
  assert.ok(privacy.includes("<li>{rich('whatDeviceLanguage')}</li>"),'the privacy page says the device language is read and nothing is kept');
  // Every legal key is used on a page.
- const used=privacy+terms+parts+read('app/legal.tsx')+read('app/gizlilik/page.tsx')+read('app/kullanim-kosullari/page.tsx');
+ const used=privacy+terms+parts+read('app/legal.tsx')+read('app/gizlilik/page.tsx')+read('app/kullanim-kosullari/page.tsx')+read('app/impressum/page.tsx');
  for(const key of Object.keys(legal.legalCopy))assert.ok(used.includes(`'${key}'`),key);
 });
 

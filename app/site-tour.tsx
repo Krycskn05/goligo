@@ -9,6 +9,9 @@ import {homeText} from '@/lib/home-copy';
 import {c} from '@/lib/category-copy';
 import {vaultText} from '@/lib/object-vault-copy';
 import {verbText} from '@/lib/verb-copy';
+import {gameIds} from '@/lib/verb-games';
+import {gameNameList} from '@/lib/game-names';
+import {fillText} from '@/lib/copy-fill';
 import {languageDirection,pickText} from '@/lib/site-languages';
 import type {StudyLanguage} from '@/lib/study-languages';
 import {EFFECTS_CHANGED,canPlayEffects,playLearningSound,readEffects,saveEffects,stopAllEffects,type EffectsPreferences} from '@/lib/learning-effects';
@@ -34,7 +37,7 @@ function stepCopy(id:TourStepId,language:StudyLanguage):[string,string]{
   case 'units':return [c(language,'catalogTitle'),homeText(language,'unitsText')];
   case 'vault':return [vaultText(language,'vaultTitle'),homeText(language,'vaultText')];
   case 'verbs':return [verbText(language,'workshopTitle'),homeText(language,'verbsText')];
-  case 'games':return [verbText(language,'gamesTitle'),homeText(language,'gamesText')];
+  case 'games':return [verbText(language,'gamesTitle'),fillText(homeText(language,'gamesText'),{n:gameIds.length,names:gameNameList(language)})];
   case 'mistakes':return [verbText(language,'mistakesTitle'),homeText(language,'mistakesText')];
   case 'install':return [homeText(language,'installButton'),homeText(language,'installLead')];
   case 'done':return [t('doneTitle'),t('doneText')];

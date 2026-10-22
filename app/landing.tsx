@@ -25,7 +25,7 @@ function features(language:SiteLanguage):{part:PicturePart;title:string;de:strin
   {part:'units',title:c(language,'catalogTitle'),de:'A1.1 · A1.2',href:'/konular'},
   {part:'vault',title:vaultText(language,'vaultTitle'),de:vaultText(language,'objectsCount',{n:objectVocabulary.length}),href:'/ev-esyalar'},
   {part:'verbs',title:verbText(language,'workshopTitle'),de:verbText(language,'verbsCount',{n:verbs.length}),href:'/fiiller'},
-  {part:'games',title:verbText(language,'gamesTitle'),de:verbText(language,'gamesCount',{n:gameIds.length}),href:'/fiiller?bolum=oyunlar'},
+  {part:'games',title:verbText(language,'gamesTitle'),de:verbText(language,'gamesCount',{n:gameIds.length}),href:'/oyunlar'},
   {part:'mistakes',title:verbText(language,'mistakesTitle'),de:verbText(language,'reviewShort')},
  ];
 }

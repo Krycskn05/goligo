@@ -26,6 +26,7 @@ import {isStudyLanguage} from '@/lib/study-languages';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
+import {StartWait} from './start-wait';
 import {SiteHeader} from './site-header';
 import {objectProgress} from '@/lib/progress';
 import {ProgressMeter,RoundReward} from './progress-ui';
@@ -77,6 +78,9 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  const [nounArticle,setNounArticle]=useState('');const [articleWarning,setArticleWarning]=useState(false);const [showHint,setShowHint]=useState(false);
  const speech=useGermanSpeech(course);const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
  const mutation=useRef(false);const mounted=useRef(true);
+ // From Yanlışlarım (/yanlislarim): ?tekrar=1 opens all objects, where the mistakes can be practised (once).
+ const reviewLink=useRef(false);
+ useEffect(()=>{if(!ready||reviewLink.current)return;reviewLink.current=true;if(new URLSearchParams(window.location.search).get('tekrar')==='1')chooseCategory('all');},[ready]);// eslint-disable-line react-hooks/exhaustive-deps
  const pendingStart=useRef<{key:string;id:string;ids:string[];topic:string}|null>(null);
  const pendingAnswer=useRef<{questionId:string;answer:string}|null>(null);
  const reviews=snapshot.reviews.filter(r=>modePredicate(practiceMode)(questionMap.get(r.question_id)));
@@ -216,6 +220,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     </div>
     <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
    </section>}
-  </main></div><SiteFooter language={language}/>
+  </main></div><StartWait show={busy&&!session} text={text('preparing')}/><SiteFooter language={language}/>
  </div>;
 }

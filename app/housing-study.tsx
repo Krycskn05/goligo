@@ -19,6 +19,7 @@ import {housingIllustration,housingSceneArt,housingSectionScene} from '@/lib/hou
 import {PracticeModes} from './practice-modes';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
+import {StartWait} from './start-wait';
 import {SiteHeader} from './site-header';
 import {HousingLessonNotes} from './housing-lesson';
 import {housingProgress} from '@/lib/progress';
@@ -35,6 +36,9 @@ export default function HousingStudy({guest=false}:{guest?:boolean}){
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title=housingText(language,'title')+' · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
+ // Nothing is drawn until the chosen language is in place, so the page never shows German first (the learner saw it
+ // switch, 22 October 2026) — as on the other parts of the site.
+ if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
  return <HousingWorkshop language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 export function HousingWorkshop({language,onLanguage,guest=false}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest?:boolean}){
@@ -47,6 +51,9 @@ export function HousingWorkshop({language,onLanguage,guest=false}:{language:Stud
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);const [feedback,setFeedback]=useState<Answer|null>(null);
  const [selected,setSelected]=useState('');const [freeText,setFreeText]=useState('');const [requestedResume,setRequestedResume]=useState<string|null>(null);
  const mounted=useRef(true);const mutation=useRef(false);
+ // From Yanlışlarım (/yanlislarim): ?tekrar=1 opens A–D Karma tekrar, where the mistakes can be practised (once).
+ const reviewLink=useRef(false);
+ useEffect(()=>{if(!ready||reviewLink.current)return;reviewLink.current=true;if(new URLSearchParams(window.location.search).get('tekrar')==='1')choose('all');},[ready]);// eslint-disable-line react-hooks/exhaustive-deps
  const pendingStart=useRef<{key:string;id:string;ids:string[];topic:string;reviewOnly:boolean;onlyIds?:string[]}|null>(null);
  const pendingAnswer=useRef<{questionId:string;answer:string}|null>(null);
  const speech=useGermanSpeech('de');const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
@@ -157,6 +164,6 @@ export function HousingWorkshop({language,onLanguage,guest=false}:{language:Stud
     {/* The contents page: one line per section A–D (picture, German title, meaning, progress). */}
     <ol className="lb-toc">{housingSections.map(item=><li className={'lb-toc-row'+(lockedSection(item.id)?' guest-locked':'')} data-housing-section={item.id} key={item.id}>{opener(item.id,'housing-card-open',<><span className="lb-toc-badge" aria-hidden="true">{item.id.toUpperCase()}</span><span className="lb-toc-photo" aria-hidden="true"><RasterArt art={housingSceneArt[housingSectionScene[item.id]]} title={translate(item.title,language)}/></span><span className="lb-toc-text"><strong lang="de" dir="ltr">{item.de}</strong><small>{translate(item.title,language)}</small></span><ArrowRight size={20}/></>)}{ready&&<ProgressMeter progress={housingProgress(item.id,snapshot.reviews)} language={language} label={item.id.toUpperCase()+' · '+translate(item.title,language)} compact/>}{lockedSection(item.id)?<GuestLock language={language} back={back} className="housing-card-bottom"/>:<button type="button" className="housing-card-bottom" disabled={busy} onClick={()=>choose(item.id)}><span>{h('exercises',{n:housingPool(item.id,'write').length})}</span><ArrowRight size={16}/></button>}</li>)}</ol>
    </>}/></section>}
-  </main></div><SiteFooter language={language}/>
+  </main></div><StartWait show={busy&&!session} text={vaultText(language,'preparing')}/><SiteFooter language={language}/>
  </div>;
 }

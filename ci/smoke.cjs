@@ -376,8 +376,8 @@ async function languageFlow(browser) {
     // Ornek cumlelerin anlami site dilinde yazilir; site dili Almanca (varsayilan) iken anlam satiri olmaz.
     const pageLang = await p2.evaluate(() => document.documentElement.lang);
     info("Telefon: fiil kartinda ornek cumlelerin anlami site dilinde", pageLang === "de" ? meanings === 0 : meanings === 9, `site dili ${pageLang}, ${meanings} anlam satiri`);
-    // Yanlislarim: ana sayfanin sol menusunden acilir (/fiiller?bolum=yanlislar); yanlis varsa ayri bir turda calisilir.
-    await p2.goto(BASE + "/fiiller?bolum=yanlislar", { waitUntil: "networkidle", timeout: 90000 });
+    // Yanlislarim: kendi bolumu (/yanlislarim); fiil yanlislari varsa ayri bir turda calisilir, diger bolumlerin yanlislari da orada listelenir.
+    await p2.goto(BASE + "/yanlislarim", { waitUntil: "networkidle", timeout: 90000 });
     await p2.waitForSelector("[data-verb-mistakes]", { timeout: 20000 });
     const open = Number(await p2.locator("[data-verb-mistakes]").first().getAttribute("data-verb-mistakes"));
     await p2.locator("[data-verb-mistakes]").first().scrollIntoViewIfNeeded();
@@ -401,8 +401,12 @@ async function languageFlow(browser) {
     const gameErrors = [];
     p2.on("pageerror", (e) => gameErrors.push(e.message));
     const opened = [];
+    // Eski adres yeni bolume gider (Oyunlar artik kendi bolumu).
+    await p2.goto(BASE + "/fiiller?bolum=oyunlar", { waitUntil: "networkidle", timeout: 90000 });
+    await p2.waitForURL((u) => new URL(u).pathname === "/oyunlar", { timeout: 20000 }).catch(() => {});
+    record("Eski /fiiller?bolum=oyunlar adresi /oyunlar bolumune gidiyor", new URL(p2.url()).pathname === "/oyunlar", p2.url());
     for (const id of ["rain", "catch", "quick", "search", "rescue", "plural"]) {
-      await p2.goto(BASE + "/fiiller?bolum=oyunlar", { waitUntil: "networkidle", timeout: 90000 });
+      await p2.goto(BASE + "/oyunlar", { waitUntil: "networkidle", timeout: 90000 });
       if (!opened.length) record("Oyunlar: yedi oyun listeleniyor", (await p2.locator("[data-verb-game-card]").count()) === 7, `${await p2.locator("[data-verb-game-card]").count()} oyun`);
       await p2.locator(`[data-verb-game-card="${id}"]`).click();
       if (await p2.locator("[data-game-start]").count()) await p2.locator("[data-game-start]").click();

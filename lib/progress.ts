@@ -1,8 +1,8 @@
 import type {Question} from './course';
 import type {Review} from './study';
-import {housingQuestions,type HousingSection} from './housing-course';
-import {objectQuestions} from './object-course';
-import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion} from './object-practice';
+import {housingQuestions,isHousingMistake,type HousingSection} from './housing-course';
+import {objectQuestions,objectWordMap} from './object-course';
+import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake} from './object-practice';
 import {verbQuestions,inVerbTopic} from './verb-course';
 import {isVerbExercise} from './verb-practice';
 
@@ -100,4 +100,17 @@ export function progressSummary(stats:StudyStats,dailyGoal=DAILY_GOAL):ProgressS
 export function roundXp(answers:readonly {correct:number|boolean}[]){
  const correct=answers.filter(answer=>!!answer.correct).length;
  return xpFor(answers.length,correct);
+}
+
+/**
+ * Mistakes in the other parts, for Yanlışlarım (/yanlislarim, the learner asked for every mistake in one place,
+ * 22 October 2026): Nesne Kasası (with the German words, each once) and Ev ve Yaşam. The same rule as in those parts:
+ * a wrong answer that was not answered right three times since.
+ */
+export function partMistakes(reviews:readonly Review[]){
+ const byId=new Map(reviews.map(row=>[row.question_id,row]));
+ const vault=objectQuestions.filter(q=>isVaultExercise(q)&&isObjectMistake(byId.get(q.id)));
+ const words=[...new Set(vault.map(q=>q.objectId).filter((id):id is string=>!!id))].map(id=>objectWordMap.get(id)?.de).filter((de):de is string=>!!de);
+ const housing=housingQuestions.filter(q=>isHousingMistake(byId.get(q.id)));
+ return {vault:{count:vault.length,words},housing:{count:housing.length}};
 }

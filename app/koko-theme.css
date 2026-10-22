@@ -459,3 +459,10 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 /* der / die / das (and haben / sein, the prefix choice) are about 48 px high, easy to tap with a finger (the learner asked). */
 .article-choice { min-height:48px; min-width:64px; padding:0 16px; font-size:18px; }
 .verb-aux-choice { min-height:48px; }
+
+/* "Alıştırma hazırlanıyor…" (app/start-wait.tsx) while a round starts. */
+.start-wait { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 18px); z-index:70; display:inline-flex; align-items:center; gap:10px; margin:0; padding:12px 20px; border-radius:999px; background:#1f3b5c; color:#fff; font-weight:800; font-size:15px; box-shadow:0 10px 30px rgba(28,82,130,.3); transform:translateX(-50%); white-space:nowrap; animation:start-wait-in .2s ease both; }
+.start-wait-spin { animation:start-wait-spin .9s linear infinite; }
+@keyframes start-wait-spin { to { transform:rotate(360deg); } }
+@keyframes start-wait-in { from { opacity:0; transform:translate(-50%,10px); } }
+@media (prefers-reduced-motion:reduce) { .start-wait, .start-wait-spin { animation:none; } }

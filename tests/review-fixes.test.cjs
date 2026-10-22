@@ -27,7 +27,7 @@ test('during a test the header is slim and the question and its answers fit on o
 
 test('one menu on every part of the site, the part you are in marked',()=>{
  const menu=read('app/site-menu.tsx');
- for(const href of ['href="/"','href={unitsHref}',"href={'/ev-esyalar?learn='+course}",'href="/fiiller"','href="/fiiller?bolum=oyunlar"','href="/fiiller?bolum=yanlislar"'])assert.ok(menu.includes(href),href);
+ for(const href of ['href="/"','href={unitsHref}',"href={'/ev-esyalar?learn='+course}",'href="/fiiller"','href="/oyunlar"','href="/yanlislarim"'])assert.ok(menu.includes(href),href);
  const pages={'app/object-study.tsx':"current={'vault'} course={course}",'app/verb-study.tsx':"current={section==='games'?'games':section==='mistakes'?'mistakes':'verbs'}",'app/housing-study.tsx':"current={'units'}",'app/ausbildung-study.tsx':"current={'units'}",'app/ausbildung-hoeren.tsx':"current={'units'}"};
  for(const [file,current] of Object.entries(pages)){const code=read(file);assert.ok(code.includes('<div className="work-layout site-layout"><SiteMenuAside language={language} '+current)&&code.includes('</main></div>'),file);}
  assert.ok(read('app/category-study.tsx').includes('<SiteMenu language={language}'));
@@ -67,6 +67,9 @@ test('"Sizin": both ihr (eure) and the polite Sie (Ihre) are right; the IDs stay
  assert.ok(!course.gradeAnswer(eure,'unsere'));
  assert.ok(course.gradeAnswer(q('housing-11-a-possessive-euer'),'Ihr')&&course.gradeAnswer(q('housing-11-a-possessive-eure-stuehle'),'Ihre')&&course.gradeAnswer(q('housing-11-a-possessive-euer-zimmer'),'Ihr'));
  assert.ok(!q('housing-11-a-possessive-unser').accepted,'"Bizim" has one answer');
+ // The four-option copy is right only with its own answer (tests/study-flow.test.cjs checks every variant of every question).
+ const choice=housing.housingQuestions.find(item=>item.id==='housing-11-a-possessive-eure-test');assert.ok(choice.options&&!choice.accepted);
+ for(const item of course.questions??[])for(const variant of item.accepted??[])assert.ok(course.gradeAnswer(item,variant),item.id+' '+variant);
 });
 
 test('the games: the learner\'s drawings, level and length on every card, a play button',()=>{
@@ -111,4 +114,31 @@ test('phones: the speed choices in one even row under their title; der / die / d
  assert.ok(theme.includes('.article-choice { min-height:48px;')&&theme.includes('.verb-aux-choice { min-height:48px; }'));
  assert.ok(read('app/learning-effects.tsx').includes("{message?text(message):''}")&&css.includes('.lk-effects-message:empty{display:none}'),'no empty line above Kapat');
  assert.ok(read('app/learning-effects.tsx').includes('<div className="lk-volume-row"><label className="lk-volume-label"')&&css.includes('.lk-effects-panel .lk-sound-group{margin:0;border-radius:0;border-top-width:0}'),'small phones: the Efektler tab fits');
+});
+
+test('Oyunlar and Yanlışlarım are parts of their own; Yanlışlarım shows the mistakes of every part',()=>{
+ for(const [file,part] of [['app/oyunlar/page.tsx','games'],['app/yanlislarim/page.tsx','mistakes']])assert.ok(read(file).includes(`<VerbStudy guest={!(await getChatGPTUser())} part="${part}"/>`),file);
+ const auth=load('member-auth');for(const page of ['/oyunlar','/yanlislarim'])assert.ok(auth.GUEST_PAGES.has(page),page);
+ const page=read('app/verb-study.tsx');
+ assert.ok(page.includes("if(value==='oyunlar'||value==='yanlislar')window.location.replace(value==='oyunlar'?'/oyunlar':'/yanlislarim');"),'old addresses move');
+ assert.ok(page.includes("{part?<span>{t(part==='games'?'gamesTitle':'mistakesTitle')}</span>:section?<>"),'Ana sayfa › Oyunlar, not under Fiil Atölyesi');
+ assert.ok(!page.includes("{t('backWorkshop')}</button>}</div>")||page.split("{!part&&<button type=\"button\" className=\"text-button verb-back\"").length===4,'no "back to the workshop" on the own pages');
+ for(const piece of ['data-mistake-part="vault"','data-mistake-part="housing"','href="/ev-esyalar?learn=de&tekrar=1"','href="/a1-2/ev-ve-yasam?tekrar=1"'])assert.ok(page.includes(piece),piece);
+ assert.ok(read('app/object-study.tsx').includes("get('tekrar')==='1')chooseCategory('all');")&&read('app/housing-study.tsx').includes("get('tekrar')==='1')choose('all');"));
+ const progress=load('progress'),objects=load('object-course'),housing=load('housing-course');
+ const vaultQ=objects.objectQuestions.find(q=>progress.objectProgressIds('all').includes(q.id));const housingQ=housing.housingQuestions[0];
+ const row=(id,wrong,streak)=>({question_id:id,seen:2,wrong_count:wrong,streak});
+ const result=progress.partMistakes([row(vaultQ.id,1,0),row(housingQ.id,2,1)]);
+ assert.equal(result.vault.count,1);assert.deepEqual(result.vault.words,[objects.objectWordMap.get(vaultQ.objectId).de]);assert.equal(result.housing.count,1);
+ assert.equal(progress.partMistakes([row(vaultQ.id,1,3)]).vault.count,0,'three right answers since: no longer a mistake');
+ const verbCopy=load('verb-copy').verbCopy;for(const key of ['mistakesAllLead','mistakesCount','mistakesOpen','mistakesNoneHere'])everyLanguage(verbCopy[key],key);
+});
+
+test('Paul keeps off the answers on phones; pages wait for the chosen language; "Alıştırma hazırlanıyor…" while a round starts',()=>{
+ const css=read('app/learning-effects.css');
+ assert.ok(css.includes('.toon-app:has(.object-question) .work-header.site-header,.toon-app:has(.verb-game) .work-header.site-header{position:sticky;top:0;z-index:30}'),'the slim header is the badge\'s place');
+ assert.ok(css.includes('body:has(.object-question) .lk-reaction-badge,body:has(.verb-game) .lk-reaction-badge{top:calc(env(safe-area-inset-top,0px) + 8px);flex-direction:row;')&&css.includes('body:has(.object-question) .paul-peek,body:has(.verb-game) .paul-peek{display:none}'));
+ for(const file of ['app/housing-study.tsx','app/category-study.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx'])assert.ok(read(file).includes('if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;'),file+': nothing in German before the chosen language');
+ for(const file of ['app/object-study.tsx','app/verb-study.tsx','app/housing-study.tsx'])assert.ok(/<StartWait show=\{busy&&!session\} text=\{\w+\(/.test(read(file)),file);
+ everyLanguage(load('object-vault-copy').vaultCopy?.preparing??Function('return '+read('lib/object-vault-copy.ts').match(/^  preparing:(\[.*\]),$/m)[1])(),'preparing');
 });

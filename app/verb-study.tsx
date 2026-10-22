@@ -25,10 +25,12 @@ import {useLanguageSwitch} from './language-switch';
 import {LetterPuzzle} from './letter-puzzle';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
+import {StartWait} from './start-wait';
 import {SiteHeader} from './site-header';
 import {NavIcon} from './nav-icons';
+import {housingText} from '@/lib/housing-copy';
 import {PaulHoca} from './paul-hoca';
-import {verbProgress,learnedVerbs} from '@/lib/progress';
+import {verbProgress,learnedVerbs,partMistakes} from '@/lib/progress';
 import {RoundReward} from './progress-ui';
 import {progressText} from '@/lib/progress-copy';
 import {GUEST_GAMES,GUEST_VERB_PART} from '@/lib/guest-parts';
@@ -50,14 +52,14 @@ function prefixOptions(verb:Verb){
  return [...turned.slice(0,hash%4),own,...turned.slice(hash%4)];
 }
 /** `guest`: a visitor without an account (app/fiiller/page.tsx) — part 1 and the first game are open, nothing is saved. */
-export default function VerbStudy({guest=false}:{guest?:boolean}){
+export default function VerbStudy({guest=false,part}:{guest?:boolean;part?:VerbSection}){
  const [language,setLanguage]=useState<VaultLanguage>('de');const [ready,setReady]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{let saved:VaultLanguage=browserLanguage();try{saved=readVaultLanguage(localStorage,saved);}catch{}switchLanguage(saved,()=>setReady(true));},[switchLanguage]);
  useEffect(()=>{if(!ready)return;try{saveVaultLanguage(localStorage,language);}catch{}},[language,ready]);
- return ready?<VerbWorkshop language={language} onLanguage={switchLanguage} guest={guest}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
+ return ready?<VerbWorkshop language={language} onLanguage={switchLanguage} guest={guest} part={part}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
 }
-export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLanguage;onLanguage:(value:VaultLanguage)=>void;guest?:boolean}){
+export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:VaultLanguage;onLanguage:(value:VaultLanguage)=>void;guest?:boolean;part?:VerbSection}){
  const v=(key:VaultCopyKey,params?:Record<string,string|number>)=>vaultText(language,key,params,'de');
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  const dir=vaultDirection(language);
@@ -73,11 +75,12 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
  const [game,setGame]=useState<GameId|null>(null);const [gameTopic,setGameTopic]=useState('verbs-all');
  // A part opened from the map (its verb list), and optionally one verb's card inside it.
  const [view,setView]=useState<{family:VerbFamily;verbId?:string}|null>(null);
- // Games and the mistakes list open from the home sidebar (/fiiller?bolum=oyunlar|yanlislar), not from the workshop page.
- const [section,setSection]=useState<VerbSection|null>(null);
- useEffect(()=>{const value=new URLSearchParams(window.location.search).get('bolum');setSection(value==='oyunlar'?'games':value==='yanlislar'?'mistakes':null);},[]);
+ // Oyunlar (/oyunlar) and Yanlışlarım (/yanlislarim) are parts of the site of their own (the learner asked, 22 October
+ // 2026): this component draws them with `part`; the old addresses /fiiller?bolum=oyunlar|yanlislar move there.
+ const [section,setSection]=useState<VerbSection|null>(part??null);
+ useEffect(()=>{if(part)return;const value=new URLSearchParams(window.location.search).get('bolum');if(value==='oyunlar'||value==='yanlislar')window.location.replace(value==='oyunlar'?'/oyunlar':'/yanlislarim');},[part]);
  // Where sign up / sign in come back to (the guest taste).
- const back=section==='games'?'/fiiller?bolum=oyunlar':section==='mistakes'?'/fiiller?bolum=yanlislar':'/fiiller';
+ const back=section==='games'?'/oyunlar':section==='mistakes'?'/yanlislarim':'/fiiller';
  const speech=useGermanSpeech('de');const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
  const mutation=useRef(false);const mounted=useRef(true);
  const pendingAnswer=useRef<{questionId:string;answer:string}|null>(null);
@@ -107,6 +110,7 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
  const parts=partsStatus(snapshot.sessions);const path=currentPart(snapshot.sessions);
  const stickers=verbStatus(snapshot.sessions);
  // Yanlışlarım: workshop questions whose last answer was wrong; one right answer takes a question off the list.
+ const otherMistakes=ready&&section==='mistakes'?partMistakes(snapshot.reviews):null;
  const mistakeIds=ready?workshopMistakeIds(snapshot.reviews):[];const mistakeVerbList=mistakeVerbs(mistakeIds);
  const mistakesRound=session?.mode===MISTAKES_MODE;
  const roundFamily:VerbFamily=(session&&verbFamilyOf(lookup(session.questions[0]?.id??'')?.verbId??''))||verbFamilies[0];
@@ -272,7 +276,7 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
   <SiteHeader language={language} languages={vaultLanguages} onLanguage={value=>{if(isVaultLanguage(value)){stopFeedback();onLanguage(value);}}} homeHref="/?learn=de" homeLabel={v('home')} stats={snapshot.stats} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={section==='games'?'games':section==='mistakes'?'mistakes':'verbs'}/>
   <main id="object-main" className="object-page">
-   <div className="object-breadcrumb"><a href="/?learn=de">{v('home')}</a><ChevronRight size={14} className="vault-direction-icon"/>{section?<><a href="/fiiller" onClick={event=>{event.preventDefault();closeSection();}}>{t('workshopTitle')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{t(section==='games'?'gamesTitle':'mistakesTitle')}</span></>:<span>{t('workshopTitle')}</span>}</div>
+   <div className="object-breadcrumb"><a href="/?learn=de">{v('home')}</a><ChevronRight size={14} className="vault-direction-icon"/>{part?<span>{t(part==='games'?'gamesTitle':'mistakesTitle')}</span>:section?<><a href="/fiiller" onClick={event=>{event.preventDefault();closeSection();}}>{t('workshopTitle')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{t(section==='games'?'gamesTitle':'mistakesTitle')}</span></>:<span>{t('workshopTitle')}</span>}</div>
    {guest&&<GuestBanner language={language} back={back}/>}
    {error&&<div className="object-alert" role="alert"><p>{errorText(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{v('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}
@@ -316,23 +320,42 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
    game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
    section==='games'?<section className="verb-section" aria-labelledby="verb-section-heading" data-verb-section="games">
-    <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button><h1 id="verb-section-heading" tabIndex={-1}>{t('gamesTitle')}</h1></div>
+    <div className="verb-section-head">{!part&&<button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button>}<h1 id="verb-section-heading" tabIndex={-1}>{t('gamesTitle')}</h1></div>
     <div className="game-cards verb-section-games">{gameIds.map(id=>guest&&!GUEST_GAMES.includes(id)?<a key={id} className={'game-card game-'+id+' guest-locked'} href={guestSignUp(back)} data-verb-game-card={id} data-guest-locked><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{guestText(language,'guestLocked')}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Lock size={16} aria-hidden="true"/>{t('play')}</span></a>:<button type="button" key={id} className={'game-card game-'+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{gameDetail(id,language)}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Play size={16} aria-hidden="true"/>{t('play')}</span></button>)}</div>
    </section>:
    section==='mistakes'&&guest?<section className="verb-section" data-verb-section="mistakes">
-    <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1></div>
+    <div className="verb-section-head">{!part&&<button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button>}<h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1></div>
     <GuestMore language={language} back={back}/>
    </section>:
    section==='mistakes'?<section className="verb-section" data-verb-section="mistakes">
-    <div className="verb-section-head"><button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button></div>
+    <div className="verb-section-head">{!part&&<button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button>}</div>
      <article className="panel verb-mistakes" aria-labelledby="verb-section-heading" data-verb-mistakes={mistakeIds.length}>
-     <div className="verb-mistakes-head"><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1>{mistakeIds.length>0&&<span className="verb-mistakes-count">{mistakeIds.length}</span>}<PaulHoca pose="think" sound="appear"/></div>
+     <div className="verb-mistakes-head"><h1 id="verb-section-heading" tabIndex={-1}>{t('mistakesTitle')}</h1><PaulHoca pose="think" sound="appear"/></div>
+     {/* Every part's mistakes on one page (the learner asked): Fiil Atölyesi here, then Nesne Kasası and Ev ve Yaşam. */}
+     <p className="verb-mistakes-all">{t('mistakesAllLead')}</p>
+     <h2 className="mistake-part-title"><NavIcon name="verbs"/>{t('workshopTitle')}{mistakeIds.length>0&&<span className="verb-mistakes-count">{mistakeIds.length}</span>}</h2>
      {mistakeIds.length>0?<>
       <p className="verb-mistakes-lead">{t('mistakesLead',{n:mistakeIds.length})}</p>
       <ul className="verb-mistakes-verbs">{mistakeVerbList.slice(0,10).map(item=><li key={item.id}><img src={verbPicture(item)??''} alt="" width={40} height={40} loading="lazy" decoding="async"/><span lang="de" dir="ltr" className={kindClass(item)}>{item.display}</span></li>)}{mistakeVerbList.length>10&&<li className="more">+{mistakeVerbList.length-10}</li>}</ul>
       <button type="button" className="btn verb-mistakes-start" disabled={busy||!ready} onClick={()=>void startMistakes()} data-verb-mistakes-start=""><RotateCcw size={18}/>{t('mistakesStart')}</button>
      </>:<p className="verb-mistakes-none"><CheckCircle2 size={18} aria-hidden="true"/>{ready?t('mistakesNone'):v('loading')}</p>}
     </article>
+    {ready&&otherMistakes&&<div className="mistake-parts">
+     <article className="panel mistake-part" data-mistake-part="vault" data-mistakes={otherMistakes.vault.count}>
+      <h2 className="mistake-part-title"><NavIcon name="vault"/>{v('vaultTitle')}{otherMistakes.vault.count>0&&<span className="verb-mistakes-count">{otherMistakes.vault.count}</span>}</h2>
+      {otherMistakes.vault.count>0?<>
+       <ul className="mistake-words" lang="de" dir="ltr">{otherMistakes.vault.words.slice(0,12).map(word=><li key={word}>{word}</li>)}{otherMistakes.vault.words.length>12&&<li className="more">+{otherMistakes.vault.words.length-12}</li>}</ul>
+       <a className="btn secondary" href="/ev-esyalar?learn=de&tekrar=1" data-mistake-open="vault"><RotateCcw size={18}/>{t('mistakesOpen')}</a>
+      </>:<p className="verb-mistakes-none"><CheckCircle2 size={18} aria-hidden="true"/>{t('mistakesNoneHere')}</p>}
+     </article>
+     <article className="panel mistake-part" data-mistake-part="housing" data-mistakes={otherMistakes.housing.count}>
+      <h2 className="mistake-part-title"><NavIcon name="units"/>{housingText(language,'title')}{otherMistakes.housing.count>0&&<span className="verb-mistakes-count">{otherMistakes.housing.count}</span>}</h2>
+      {otherMistakes.housing.count>0?<>
+       <p className="verb-mistakes-lead">{t('mistakesCount',{n:otherMistakes.housing.count})}</p>
+       <a className="btn secondary" href="/a1-2/ev-ve-yasam?tekrar=1" data-mistake-open="housing"><RotateCcw size={18}/>{t('mistakesOpen')}</a>
+      </>:<p className="verb-mistakes-none"><CheckCircle2 size={18} aria-hidden="true"/>{t('mistakesNoneHere')}</p>}
+     </article>
+    </div>}
    </section>:
    view?(()=>{
     const part=parts.find(item=>item.family.id===view.family.id)??parts[0];const members=part.family.verbs.map(id=>verbMap.get(id)!);
@@ -384,6 +407,6 @@ export function VerbWorkshop({language,onLanguage,guest=false}:{language:VaultLa
      <ol className="verb-list-rows">{verbs.map(item=><li key={item.id}><span className="verb-list-number">{item.number}</span><VerbPicture verb={item} language={language} small/><button type="button" className="verb-speak" disabled={speech.busy} aria-label={t('listenRow',{verb:item.display})} title={t('listenRow',{verb:item.display})} onClick={()=>speech.speak(verbRowSpeech(item))}><Volume2 size={17}/></button><span className="verb-list-word"><strong lang="de" dir="ltr" className={kindClass(item)}>{item.display}</strong><span lang={language} dir={dir}>{verbMeaning(item,language)}</span></span><span className="verb-list-forms" lang="de" dir="ltr"><span>{item.subject} {item.praesens}</span><span>{item.subject} {perfektLabel(item)}</span></span></li>)}</ol>
     </details>
    </section>}
-  </main></div><SiteFooter language={language}/>
+  </main></div><StartWait show={busy&&!session} text={v('preparing')}/><SiteFooter language={language}/>
  </div>;
 }

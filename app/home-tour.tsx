@@ -25,8 +25,8 @@ function siteParts(language:StudyLanguage,pictures:PicturePick):Part[]{
   {id:'units',icon:'units',href:'/konular',title:c(language,'catalogTitle'),de:'A1.1 · A1.2',text:h('unitsText'),art:art('units')},
   {id:'vault',icon:'vault',href:'/ev-esyalar?learn=de',title:vaultText(language,'vaultTitle'),de:vaultText(language,'objectsCount',{n:objectVocabulary.length}),text:h('vaultText'),art:art('vault')},
   {id:'verbs',icon:'verbs',href:'/fiiller',title:verbText(language,'workshopTitle'),de:verbText(language,'verbsCount',{n:verbs.length}),text:h('verbsText'),art:art('verbs')},
-  {id:'games',icon:'games',href:'/fiiller?bolum=oyunlar',title:verbText(language,'gamesTitle'),de:verbText(language,'gamesCount',{n:gameIds.length}),text:fillText(h('gamesText'),{n:gameIds.length,names:gameNameList(language)}),art:art('games')},
-  {id:'mistakes',icon:'mistakes',href:'/fiiller?bolum=yanlislar',title:verbText(language,'mistakesTitle'),de:verbText(language,'reviewShort'),text:h('mistakesText'),art:art('mistakes')},
+  {id:'games',icon:'games',href:'/oyunlar',title:verbText(language,'gamesTitle'),de:verbText(language,'gamesCount',{n:gameIds.length}),text:fillText(h('gamesText'),{n:gameIds.length,names:gameNameList(language)}),art:art('games')},
+  {id:'mistakes',icon:'mistakes',href:'/yanlislarim',title:verbText(language,'mistakesTitle'),de:verbText(language,'reviewShort'),text:h('mistakesText'),art:art('mistakes')},
  ];
 }
 

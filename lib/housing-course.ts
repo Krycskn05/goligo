@@ -217,7 +217,8 @@ for(const q of gapQuestions){
   const verb=housingVerbCards.find(v=>q.id.endsWith('-'+v.verb))!;wrong=[verb.verb,...housingVerbCards.filter(v=>v.participle!==q.answer).map(v=>v.participle)];
  }else wrong=gapQuestions.filter(x=>x.answer!==q.answer&&x.section===q.section).map(x=>x.answer);
  const options=[q.answer,...[...new Set(wrong)].filter(option=>option.toLocaleLowerCase('de')!==q.answer.toLocaleLowerCase('de')).slice(0,3)];
- if(options.length===4)exercises.push({...q,id:q.id+'-test',kind:'choice',options});
+ // A choice is right only with its own answer: the written variants (Ihr / Ihre) stay with the written question.
+ if(options.length===4){const {accepted:_accepted,...base}=q;exercises.push({...base,id:q.id+'-test',kind:'choice',options});}
 }
 // Tuzaklı alıştırmalar: yanlış şıklar sık yapılan hataları taklit eder. Yazma
 // sürümü (varsa) aynı tuzağı ipucusuz da sorar; ID'ler yalnızca eklenir.

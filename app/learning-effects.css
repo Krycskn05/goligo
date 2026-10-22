@@ -97,3 +97,12 @@ html[data-lernkoko-motion=reduced] .lk-voice-chip.selected .lk-voice-avatar{anim
  .lk-sound-group>summary{min-height:46px;padding:6px 12px;font-size:13.5px}
  .lk-sound-group>summary small{font-size:11.5px}
 }
+/* Phones during a test or a game: Paul's answer badge has its own place — the slim header, which stays at the top while
+   the page scrolls — so it never covers the word or the answers; Paul does not peek in from the edges then (the learner
+   asked, 22 October 2026). */
+@media (max-width:760px){
+ .toon-app:has(.object-question) .work-header.site-header,.toon-app:has(.verb-game) .work-header.site-header{position:sticky;top:0;z-index:30}
+ body:has(.object-question) .lk-reaction-badge,body:has(.verb-game) .lk-reaction-badge{top:calc(env(safe-area-inset-top,0px) + 8px);flex-direction:row;padding:4px 14px 4px 6px;gap:6px;border-radius:16px;font-size:15px;box-shadow:0 3px 0 #e0e9ca}
+ body:has(.object-question) .lk-reaction-paul,body:has(.verb-game) .lk-reaction-paul{width:44px;height:44px;margin:0}
+ body:has(.object-question) .paul-peek,body:has(.verb-game) .paul-peek{display:none}
+}

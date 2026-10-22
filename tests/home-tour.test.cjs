@@ -36,10 +36,10 @@ test('the home page introduces the site; the units catalogue moved to /konular',
 test('the introduction has one picture card per main part of the left menu, in menu order, and nothing else',()=>{
  const tour=read('app/home-tour.tsx');
  const parts=[...tour.matchAll(/\{id:'(\w+)',icon:'(\w+)',href:([^,]+),/g)].map(m=>[m[1],m[3]]);
- assert.deepEqual(parts,[['units',"'/konular'"],['vault',"'/ev-esyalar?learn=de'"],['verbs',"'/fiiller'"],['games',"'/fiiller?bolum=oyunlar'"],['mistakes',"'/fiiller?bolum=yanlislar'"]]);
+ assert.deepEqual(parts,[['units',"'/konular'"],['vault',"'/ev-esyalar?learn=de'"],['verbs',"'/fiiller'"],['games',"'/oyunlar'"],['mistakes',"'/yanlislarim'"]]);
  // The same parts and links as the left menu, and none of the lessons inside them (Ev ve Yaşam, Ausbildung).
  const menu=read('app/site-menu.tsx');
- for(const href of ['/ev-esyalar?learn=','/fiiller','/fiiller?bolum=oyunlar','/fiiller?bolum=yanlislar'])assert.ok(menu.includes(href),href);
+ for(const href of ['/ev-esyalar?learn=','/fiiller','/oyunlar','/yanlislarim'])assert.ok(menu.includes(href),href);
  for(const lesson of ['/a1-2/ev-ve-yasam','AUSBILDUNG_PATH','housing','ausbildung'])assert.ok(!tour.includes(lesson),lesson);
  // The whole card is the link; the picture is decoration.
  assert.ok(tour.includes('<a className="ht-card panel" href={part.href}>')&&tour.includes('<span className="ht-art" aria-hidden="true">'));

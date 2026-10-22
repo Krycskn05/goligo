@@ -23,8 +23,8 @@ export function SiteMenu({language,current,course='de',unitsHref='/konular'}:{la
   <a className={link('vault')} href={'/ev-esyalar?learn='+course} aria-current={here('vault')}><NavIcon name="vault"/>{vaultText(language,'vaultTitle')}</a>
   {course==='de'&&<>
    <a className={link('verbs')+' verb-nav-link'} href="/fiiller" aria-current={here('verbs')}><NavIcon name="verbs"/>{verbText(language,'workshopTitle')}</a>
-   <a className={link('games')} href="/fiiller?bolum=oyunlar" data-verb-section-link="games" aria-current={here('games')}><NavIcon name="games"/>{verbText(language,'gamesTitle')}</a>
-   <a className={link('mistakes')} href="/fiiller?bolum=yanlislar" data-verb-section-link="mistakes" aria-current={here('mistakes')}><NavIcon name="mistakes"/>{verbText(language,'mistakesTitle')}</a>
+   <a className={link('games')} href="/oyunlar" data-verb-section-link="games" aria-current={here('games')}><NavIcon name="games"/>{verbText(language,'gamesTitle')}</a>
+   <a className={link('mistakes')} href="/yanlislarim" data-verb-section-link="mistakes" aria-current={here('mistakes')}><NavIcon name="mistakes"/>{verbText(language,'mistakesTitle')}</a>
   </>}
  </nav>;
 }

@@ -1,6 +1,7 @@
 'use client';
 import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
+import {OptionText} from './option-fit';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
@@ -131,7 +132,8 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   void refresh().finally(()=>{if(mounted.current)setInitializing(false);});
   return()=>{mounted.current=false;};
  },[]);
- useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=dir;document.title=verbText(language,'workshopTitle')+' · '+SITE_NAME;stopFeedback();},[language]);
+ useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=dir;// The tab title names the part that is open (Oyunlar, Yanlışlarım), as the page's own metadata does.
+ document.title=verbText(language,part==='games'?'gamesTitle':part==='mistakes'?'mistakesTitle':'workshopTitle')+' · '+SITE_NAME;stopFeedback();},[language,part]);
  // The meanings of the example sentences come in a small file per language; load it before the first answer.
  useEffect(()=>{void loadExampleMeanings(language);},[language]);
  function stopFeedback(){answerAudio.stop();}
@@ -236,7 +238,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  }
  function optionLabel(question:Question,option:string,className='picture-option-word'){
   const label=optionText(question,option);
-  return <span className={className+(label.german?'':' verb-option-meaning')} lang={label.german?'de':language} dir={label.german?'ltr':dir}>{label.text}</span>;
+  return <OptionText text={label.text} className={className+(label.german?'':' verb-option-meaning')} lang={label.german?'de':language} dir={label.german?'ltr':dir}/>;
  }
  function correctLabel(question:Question,item:Verb){
   const kind=question.verbTask??'';
@@ -262,7 +264,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
    {listen&&<div className="vault-listen-player"><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===question.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div></div>}
    {articles?<div className="article-bank" role="group" aria-label={v('puzzleArticlePrompt')} dir="ltr" lang="de">{['der','die','das'].map(value=><button type="button" key={value} className={'article-choice '+(feedback?(value===question.answer?'right':feedback.answer===value?'wrong':''):'')} disabled={locked} onClick={()=>void submit(value)}>{value}</button>)}</div>
    :write?<form className="vault-writing-form" onSubmit={event=>{event.preventDefault();void submit(String(new FormData(event.currentTarget).get('answer')??''));}}><label className="field-label" htmlFor="mixed-answer">{v('yourAnswer')}</label><input key={question.id} id="mixed-answer" name="answer" className="writing-input" lang="de" dir="ltr" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} maxLength={300} readOnly={!!feedback||!!pendingAnswer.current} disabled={actionDisabled}/>{!feedback&&<button type="submit" className="btn check-button" disabled={actionDisabled}>{v('checkAnswer')}</button>}</form>
-   :<div className={'object-options picture-word-options'+(listen&&question.pictureOptions?' pictures vault-listening-options':'')} role="group" aria-labelledby="object-question-heading">{options.map((option,i)=>{const picture=listen?pictureOf.get(option):undefined;return <button key={option} type="button" className={'object-option '+(feedback&&option===question.answer?'right ':'')+(feedback&&!feedback.correct&&feedback.answer===option?'wrong ':'')} disabled={locked||(listen&&heardQuestionId!==question.id)} onClick={()=>void submit(option)}><span className="object-option-number">{String.fromCharCode(65+i)}</span>{picture?<div className="object-picture small"><ObjectArt id={picture} title={objectMeaning(picture,language)}/></div>:<span className="picture-option-word" lang="de" dir="ltr">{option}</span>}{feedback&&option===question.answer&&<CheckCircle2 size={20}/>}</button>;})}</div>}
+   :<div className={'object-options picture-word-options'+(listen&&question.pictureOptions?' pictures vault-listening-options':'')} role="group" aria-labelledby="object-question-heading">{options.map((option,i)=>{const picture=listen?pictureOf.get(option):undefined;return <button key={option} type="button" className={'object-option '+(feedback&&option===question.answer?'right ':'')+(feedback&&!feedback.correct&&feedback.answer===option?'wrong ':'')} disabled={locked||(listen&&heardQuestionId!==question.id)} onClick={()=>void submit(option)}><span className="object-option-number">{String.fromCharCode(65+i)}</span>{picture?<div className="object-picture small"><ObjectArt id={picture} title={objectMeaning(picture,language)}/></div>:<OptionText text={option}/>}{feedback&&option===question.answer&&<CheckCircle2 size={20}/>}</button>;})}</div>}
    {busy&&!feedback&&<p className="picture-quiz-saving" role="status"><Loader2 size={16} className="spinner"/>{v('savingAnswer')}</p>}
    {feedback&&<div id="object-feedback" tabIndex={-1} className={'object-feedback '+(feedback.correct?'success':'retry')} role="status" aria-live="polite">
     <h2>{feedback.correct?<CheckCircle2 size={23}/>:<X size={23}/>} {v(feedback.correct?'correct':write?'wrongAnswer':'wrong')}</h2>

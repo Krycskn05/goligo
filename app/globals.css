@@ -476,7 +476,15 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 .picture-quiz-rules span { display:flex; align-items:center; gap:10px; }
 .picture-quiz-rules svg { flex-shrink:0; }
 .picture-quiz-practice .object-pill { gap:6px; align-items:center; }
-.picture-word-options .picture-option-word { font-size:19px; line-height:1.5; font-weight:650; overflow-wrap:anywhere; }
+.picture-word-options .picture-option-word { font-size:19px; line-height:1.35; font-weight:650; min-width:0; flex:1 1 auto; overflow:hidden; white-space:nowrap; overflow-wrap:normal; word-break:normal; hyphens:manual; }
+/* Answer choices never break inside a word (app/option-fit.tsx): one line, else the article above the noun, else one choice per row. */
+.picture-word-options.options-stacked .picture-option-word { white-space:normal; }
+.picture-word-options .option-noun { white-space:nowrap; }
+.picture-word-options.options-stacked .option-article { display:block; font-size:.85em; line-height:1.2; }
+.picture-word-options.options-stacked .option-noun { display:block; }
+.picture-word-options { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.picture-word-options .object-option { min-width:0; }
+.picture-word-options.options-column { grid-template-columns:minmax(0,1fr); }
 .picture-word-options .object-option.selected { border-color:#52999b; background:#edf7f4; }
 .picture-word-options .object-option>svg { margin-left:auto; flex-shrink:0; }
 .picture-quiz-saving { display:flex; justify-content:center; gap:8px; font-size:13px; color:#59746a; margin:18px 0 0; }

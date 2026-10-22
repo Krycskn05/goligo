@@ -156,3 +156,20 @@ test('Yanlışlarım: every mistake of the site in one round',()=>{
  assert.ok(page.includes('data-mistakes-all-start={allMistakes.length}')&&page.includes("{t('mistakesAllStart',{n:allMistakes.length})}"));
  everyLanguage(load('verb-copy').verbCopy.mistakesAllStart,'mistakesAllStart');
 });
+
+test('the tab title of /oyunlar and /yanlislarim names that part, not Fiil Atölyesi',()=>{
+ const page=fs.readFileSync('app/verb-study.tsx','utf8');
+ assert(page.includes("document.title=verbText(language,part==='games'?'gamesTitle':part==='mistakes'?'mistakesTitle':'workshopTitle')"));
+ assert(page.includes('},[language,part]);'));
+});
+
+test('answer choices never break inside a word: one line, else the article above the noun, else one choice per row',()=>{
+ const fit=fs.readFileSync('app/option-fit.tsx','utf8');const css=fs.readFileSync('app/globals.css','utf8');
+ assert(fs.readFileSync('app/layout.tsx','utf8').includes('<OptionFit/>'),'the fitter runs on every page');
+ for(const step of ['{stacked:false,column:false','{stacked:true,column:false','{stacked:false,column:true','{stacked:true,column:true'])assert(fit.includes(step),step);
+ assert(fit.includes('<span className="option-article">')&&fit.includes('<span className="option-noun">'));
+ const rule=css.slice(css.indexOf('.picture-word-options .picture-option-word {'));
+ assert(/white-space:nowrap; overflow-wrap:normal; word-break:normal/.test(rule.slice(0,300))&&!/anywhere/.test(rule.slice(0,300)),'no break inside a word');
+ assert(css.includes('.picture-word-options { grid-template-columns:repeat(2,minmax(0,1fr)); }')&&css.includes('.picture-word-options.options-column { grid-template-columns:minmax(0,1fr); }'));
+ for(const page of ['app/object-study.tsx','app/verb-study.tsx','app/housing-study.tsx'])assert(fs.readFileSync(page,'utf8').includes('<OptionText text='),page);
+});

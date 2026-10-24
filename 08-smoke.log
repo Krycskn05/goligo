@@ -1,0 +1,75 @@
+curl: (7) Failed to connect to localhost port 5173 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to localhost port 5173 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to localhost port 5173 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to localhost port 5173 after 0 ms: Couldn't connect to server
+Site 5. denemede acildi
+GECTI  Sayfa / — HTTP 200, baslik "Goliqo", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български
+GECTI  Girissiz ana sayfada tanitim ve uye ol dugmesi var
+GECTI  Girissiz /ev-esyalar tadimlik olarak aciliyor — http://localhost:5173/ev-esyalar · not 1
+GECTI  Girissiz /fiiller tadimlik olarak aciliyor — http://localhost:5173/fiiller · not 1
+GECTI  Girissiz /a1-2/ev-ve-yasam tadimlik olarak aciliyor — http://localhost:5173/a1-2/ev-ve-yasam · not 1
+GECTI  Girissiz /a1-1/willkommen tadimlik olarak aciliyor — http://localhost:5173/a1-1/willkommen · not 1
+GECTI  Girissiz /hesabim giris sayfasina yonleniyor — http://localhost:5173/giris?return_to=%2Fhesabim
+GECTI  Sayfa /giris — HTTP 200, baslik "Giriş yap · Goliqo", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български
+GECTI  Sayfa /uye-ol — HTTP 200, baslik "Üye ol · Goliqo", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български
+GECTI  Sayfa /gizlilik — HTTP 200, baslik "Gizlilik ve kişisel veriler · Goliqo", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български
+GECTI  Sayfa /kullanim-kosullari — HTTP 200, baslik "Kullanım koşulları · Goliqo", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български
+GECTI  Sayfa /impressum — HTTP 200, baslik "Impressum · Goliqo", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български
+GECTI  Resimler onbellekte tutuluyor (public/_headers) — cache-control: no-cache — basliklar uygulanmamis olabilir
+GECTI  Impressum acik, Almanca ve altbilgide baglantisi var
+GECTI  Girissiz kayit istegi bos misafir cevabi aliyor, yazma 401 — {"status":200,"guest":true,"empty":true}, not HTTP 401
+GECTI  Sahte kimlik basligi ise yaramiyor (yine misafir) — {"status":200,"guest":true,"empty":true}
+GECTI  Uyelik: kosullar onaylanmadan hesap acilmiyor — Üye olmak için kullanım koşullarını ve gizlilik metnini kabul etmelisin.
+GECTI  Uyelik: uye olunca istenen sayfaya donuluyor (/fiiller) — http://localhost:5173/fiiller
+GECTI  Uyelik: oturum cerezi HttpOnly ve SameSite=Lax — httpOnly true, sameSite Lax
+GECTI  Uyelik: uye kendi kayitlarini okuyabiliyor — HTTP 200
+GECTI  Uyelik: Hesabim sayfasi ad ve e-postayi gosteriyor — Deneme Öğrenci · deneme-1792877426442@example.test
+GECTI  Uyelik: cikis yapinca tanitim sayfasi ve kayitlar kapali — tanitim 1, kayitlar HTTP 200 misafir true
+GECTI  Uyelik: yanlis sifreyle giris olmuyor — E-posta ya da şifre yanlış.
+GECTI  Uyelik: dogru sifreyle giris yapinca istenen sayfaya donuluyor — http://localhost:5173/hesabim
+GECTI  Uyelik: hesap silinince kayitlar gidiyor ve giris artik olmuyor — silindikten sonra giris HTTP 401
+GECTI  Uyelik sayfalarinda betik hatasi yok
+GECTI  Dil: / Turkce telefonda Turkce aciliyor — {"lang":"tr","dir":"ltr","h1":"Almancayı resimlerle, sesle ve küçük adımlarla öğren.","note":false}
+GECTI  Dil: /giris Turkce telefonda Turkce aciliyor — {"lang":"tr","dir":"ltr","h1":"Giriş yap","note":false}
+GECTI  Dil: /uye-ol Turkce telefonda Turkce aciliyor — {"lang":"tr","dir":"ltr","h1":"Ücretsiz üye ol","note":false}
+GECTI  Dil: sitede olmayan telefon dilinde (Isvecce) Almanca aciliyor — {"lang":"de","h1":"Kostenlos registrieren"}
+GECTI  Dil: dil paketi olan bir dil (Rusca) sunucuda da dogru — {"lang":"ru","dir":"ltr","h1":"Зарегистрироваться бесплатно","note":false}
+GECTI  Dil: uye olmadan Arapca secilebiliyor (sagdan sola, cerezde kaliyor) — {"lang":"ar","dir":"rtl","h1":"إنشاء حساب مجاني","note":false}, cerez ar
+GECTI  Dil: secilen dil gizlilik metninde de (ceviri notuyla) — {"lang":"ar","dir":"rtl","h1":"الخصوصية والبيانات الشخصية","note":true}
+GECTI  Dil: Turkce asil metin, ceviri notu yok — {"lang":"tr","dir":"ltr","h1":"Gizlilik ve kişisel veriler","note":false}
+GECTI  Sifremi unuttum: form calisiyor, cevap sayfanin dilinde — Bu adresle bir hesap varsa şifre yenileme bağlantısını gönderdik. Gelen kutunu ve istenmeyen e-posta klasörünü kontrol e
+GECTI  Sifre yenileme: bozuk baglanti acikca soyleniyor, sayfa aramada cikmiyor — Bu bağlantı geçersiz ya da süresi dolmuş. Giriş sayfasından yeni bir bağlantı is · noindex, nofollow
+GECTI  Uyesiz: Fiil Atolyesi'nin 1. bolumu acik, digerleri kilitli — {"banner":1,"open":1,"locked":3}
+GECTI  Uyesiz: Nesne Kasasi'nda ilk grup acik — {"banner":1,"open":1}
+GECTI  Uyesiz: kilitli kisim acilmiyor, kayit tutulmuyor — baslat HTTP 401, guest true
+GECTI  Yerel giris taklidi — son adres http://localhost:5173/ev-esyalar
+GECTI  Sayfa /ev-esyalar — HTTP 200, baslik "Nesne Kasası · Goliqo", hata 0, metin: İçeriğe geç Samstag Abend 21:30 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Sh
+GECTI  Sayfa /a1-2/ev-ve-yasam — HTTP 200, baslik "Ev ve Yaşam · Goliqo", hata 0, metin: Ana sayfa Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqi
+GECTI  Sayfa /a1-1/willkommen — HTTP 200, baslik "Lektion 1A · Willkommen! · Goliqo", hata 0, metin: Üniteler ve konular Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurm
+GECTI  Lektion 1A: kapak, 22 adim ve Uniteler sayfasinda baglanti — Kapak · 1/22
+GECTI  Lektion 1A: adim adresi aciliyor (diyalog, 6 satir, dinle dugmeleri)
+GECTI  Uniteler: Lektion 1 karti Lektion 1A'ya acliyor
+GECTI  Sayfa / — HTTP 200, baslik "Goliqo", hata 0, metin: İçeriğe geç Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Sh
+GECTI  Giris yapinca ana sayfada dersler var (tanitim yok)
+GECTI  Giristen sonra kayitlar okunuyor — HTTP 200
+GECTI  Test oturumu basliyor (veritabanina yazma) — HTTP 201, soru obj-read-zuckerzange
+GECTI  Cevap kaydediliyor ve dogru cevap donuyor — HTTP 200, dogru mu: 0
+GECTI  Kayit geri okunuyor (gecmis) — cevaplanan 1/1
+GECTI  Sayfa /fiiller — HTTP 200, baslik "Fiil Atölyesi · Goliqo", hata 0, metin: İçeriğe geç Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Sh
+GECTI  Fiil Atolyesi sayfasinda baslik ve dort bolum var — atolye 1, bolum 4
+GECTI  Telefonda tanitim sayfasi yana tasmiyor — fazla genislik 0px
+BILGI  Telefon: ogrenme karti (resim, anlam, cekim) tek ekrana sigiyor — ust 92, alt 649, ekran 664
+BILGI  Telefon: yeni fiilin karti acilinca fiil kendiliginden okunuyor — http://localhost:5173/sfx/tap.wav | http://localhost:5173/sfx/tap2.wav | tts:abfahren
+BILGI  Telefon: test sorusu tek ekrana sigiyor — ust 183, alt 476, ekran 664
+UYARI  Telefon: test sonucu ve ornek cumleler tek ekrana sigiyor — ust 99, alt 666, ekran 664
+BILGI  Telefon: yazim tek ekrana sigiyor — ust 98, alt 479, ekran 664
+BILGI  Telefon: yazim dolunca dugmeye basmadan kontrol ediliyor — ab|fahren · 5 kutu
+BILGI  Telefon: yazimdan sonra gecmis hali sorusu (hat/ist yok) — Bu fiilin geçmiş hali (Partizip II) hangisi? · geabfahren, abgefahrt, abgefahren, abfahren
+BILGI  Telefon: gecmis hali testinden sonra gecmis hali yazimi — Bu fiilin geçmiş halini (Partizip II) yaz. · adim: Geçmiş yazım
+BILGI  Telefon: bolum listesinde fiiller gorunuyor — 19 fiil
+BILGI  Telefon: fiil kartinda ornek cumlelerin anlami site dilinde — site dili tr, 9 anlam satiri
+BILGI  Telefon: Yanlislarim bolumu var ve calisiliyor — 1 yanlis · Fiil Atölyesi1 / 1
+GECTI  Eski /fiiller?bolum=oyunlar adresi /oyunlar bolumune gidiyor — http://localhost:5173/oyunlar
+GECTI  Oyunlar: yedi oyun listeleniyor — 7 oyun
+GECTI  Eslestirme: kartlar once acik, sonra kapaniyor — 12/12 acik → 0
+GECTI  Oyunlar: her oyun telefonda aciliyor ve cevap aliyor — rain, catch, quick, search, rescue, plural

@@ -1,0 +1,113 @@
+$ node scripts/sounds/make-sounds.mjs && node scripts/run-framework.mjs dev
+Goliqo sesleri hazır: tap 0.24s, tap2 0.24s, tap3 0.24s, whoosh 0.55s, correct 0.95s, complete 1.65s, soft 0.8s, beep 0.7s, retro 0.55s, low 0.95s, cartoon 0.85s, tapWood 0.22s, tapPop 0.22s, tapDrop 0.26s, tapBell 0.4s, tapChip 0.12s, pageFlip 0.177s, pageSlide 0.48s, pageHarp 0.75s, pageBubbles 0.42s, pageChip 0.17s, correctMarimba 0.95s, correctCoin 0.62s, correctDing 1.2s, correctFanfare 0.95s, correctBubbles 0.95s, completeFanfare 1.6s, completeLevel 0.89s, completeChimes 1.65s, completeHarp 1.6s, paulHello 0.85s, paulTip 0.75s, paulHmm 0.95s, paulClap 1.55s, paulDrum 1.05s, completeMarimba 1.6s
+
+  vinext dev  (Vite 8.0.13)
+
+Sites local sign-in: seedy@sites.test
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m9:29:37 PM[22m [33m[1m[vite][22m[39m [33m[2m(rsc)[22m[39m [33mwarning: client component dependency is inconsistently optimized. It's recommended to add the dependency to 'optimizeDeps.exclude'.[39m
+  Plugin: [35mrsc:use-client[39m
+  File: [36m/home/runner/work/goligo/goligo/node_modules/.pnpm/lucide-react@1.31.0_react@19.2.6/node_modules/lucide-react/dist/esm/Icon.mjs?v=c826c6fc[39m
+ GET / 200 in 1.8s (compile: 1792877371.1s, render: 1.2s)
+ GET / 200 in 93ms (compile: 1792877370.6s, render: 69ms)
+ GET /ev-esyalar 200 in 1.0s (compile: 1792877370.7s, render: 968ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 710ms
+ GET /fiiller 200 in 568ms (compile: 1792877370.7s, render: 494ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 81ms
+ GET /a1-2/ev-ve-yasam 200 in 222ms (compile: 1792877370.7s, render: 162ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 58ms
+ GET /a1-1/willkommen 200 in 243ms (compile: 1792877370.7s, render: 183ms)
+ GET /hesabim 302 in 8ms
+ GET /giris?return_to=%2Fhesabim 200 in 79ms (compile: 1792877370.7s, render: 48ms)
+ GET /giris 200 in 48ms (compile: 1792877370.6s, render: 34ms)
+ GET /uye-ol 200 in 63ms (compile: 1792877370.6s, render: 36ms)
+ GET /gizlilik 200 in 173ms (compile: 1792877370.7s, render: 61ms)
+ GET /kullanim-kosullari 200 in 77ms (compile: 1792877370.7s, render: 34ms)
+ GET /impressum 200 in 57ms (compile: 1792877370.6s, render: 34ms)
+ GET /api/study 200 in 9ms
+ POST /api/study 401 in 13ms
+ GET /api/study 200 in 8ms
+ GET /uye-ol?return_to=%2Ffiiller 200 in 46ms (compile: 1792877370.6s, render: 31ms)
+ POST /api/auth 400 in 55ms
+ POST /api/auth 201 in 42ms
+ GET /fiiller 200 in 42ms (compile: 1792877370.6s, render: 30ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 79ms
+ GET /api/study 200 in 17ms
+ GET /hesabim 200 in 144ms (compile: 1792877370.7s, render: 75ms)
+ POST /api/auth 200 in 28ms
+ GET / 200 in 95ms (compile: 1792877370.6s, render: 72ms)
+ GET /api/study 200 in 10ms
+ GET /giris?return_to=%2Fhesabim 200 in 54ms (compile: 1792877370.6s, render: 43ms)
+ POST /api/auth 401 in 56ms
+ POST /api/auth 200 in 39ms
+ GET /hesabim 200 in 60ms (compile: 1792877370.6s, render: 47ms)
+ POST /api/auth 200 in 39ms
+ GET / 200 in 65ms (compile: 1792877370.6s, render: 47ms)
+ POST /api/auth 401 in 46ms
+ GET / 200 in 87ms (compile: 1792877370.6s, render: 71ms)
+ GET /giris 200 in 57ms (compile: 1792877370.6s, render: 43ms)
+ GET /uye-ol 200 in 59ms (compile: 1792877370.6s, render: 47ms)
+ GET /uye-ol 200 in 57ms (compile: 1792877370.6s, render: 43ms)
+ GET /uye-ol 200 in 116ms (compile: 1792877370.6s, render: 99ms)
+ GET /uye-ol 200 in 47ms (compile: 1792877370.6s, render: 35ms)
+ GET /gizlilik 200 in 66ms (compile: 1792877370.6s, render: 54ms)
+ GET /gizlilik 200 in 50ms (compile: 1792877370.6s, render: 37ms)
+ GET /giris 200 in 44ms (compile: 1792877370.6s, render: 34ms)
+ POST /api/auth 200 in 26ms
+ GET /sifre-yenile?anahtar=bozuk 200 in 69ms (compile: 1792877370.7s, render: 30ms)
+ GET /fiiller 200 in 38ms (compile: 1792877370.6s, render: 25ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 50ms
+ GET /ev-esyalar 200 in 37ms (compile: 1792877370.6s, render: 26ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 24ms
+ POST /api/study 401 in 10ms
+ GET /api/study?stats=1&tz=0 200 in 7ms
+ GET /ev-esyalar 200 in 82ms (compile: 1792877370.6s, render: 64ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 45ms
+ GET /ev-esyalar 200 in 37ms (compile: 1792877370.6s, render: 27ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 38ms
+ GET /a1-2/ev-ve-yasam 200 in 49ms (compile: 1792877370.6s, render: 37ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 32ms
+ GET /a1-1/willkommen 200 in 44ms (compile: 1792877370.6s, render: 28ms)
+ GET /a1-1/willkommen?adim=diyalog 200 in 45ms (compile: 1792877370.6s, render: 25ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 83ms
+ GET / 200 in 39ms (compile: 1792877370.6s, render: 26ms)
+ GET /api/study?note=tour 200 in 39ms
+ POST /api/study?learn=de 200 in 28ms
+ GET /api/study 200 in 16ms
+ POST /api/study 201 in 40ms
+ POST /api/study 200 in 37ms
+ GET /api/study 200 in 17ms
+ GET /fiiller 200 in 38ms (compile: 1792877370.6s, render: 29ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 137ms
+ GET / 200 in 53ms (compile: 1792877370.6s, render: 37ms)
+ GET /fiiller 200 in 101ms (compile: 1792877370.6s, render: 74ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 41ms
+ GET /fiiller 200 in 67ms (compile: 1792877370.7s, render: 33ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 61ms
+ POST /api/study?learn=de 201 in 21ms
+ POST /api/study?learn=de 200 in 20ms
+ POST /api/study?learn=de 200 in 22ms
+ POST /api/study?learn=de 200 in 20ms
+ GET /fiiller 200 in 40ms (compile: 1792877370.6s, render: 29ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 61ms
+ GET /yanlislarim 200 in 62ms (compile: 1792877370.7s, render: 32ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 30ms
+ POST /api/study?learn=de 201 in 31ms
+ GET /fiiller?bolum=oyunlar 200 in 40ms (compile: 1792877370.6s, render: 29ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 75ms
+ GET /oyunlar 200 in 141ms (compile: 1792877370.7s, render: 34ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 34ms
+ GET /oyunlar 200 in 43ms (compile: 1792877370.6s, render: 32ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 47ms
+ GET /oyunlar 200 in 43ms (compile: 1792877370.6s, render: 31ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 42ms
+ GET /oyunlar 200 in 40ms (compile: 1792877370.6s, render: 30ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 45ms
+ GET /oyunlar 200 in 121ms (compile: 1792877370.7s, render: 43ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 53ms
+ GET /oyunlar 200 in 39ms (compile: 1792877370.6s, render: 26ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 67ms
+ GET /oyunlar 200 in 45ms (compile: 1792877370.6s, render: 33ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 36ms
+[2m9:32:04 PM[22m [36m[1m[vite][22m[39m [34m[2m(rsc)[22m[39m [32mhmr update [39m[2m/app/globals.css[22m
+[2m9:32:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/app/globals.css?direct[22m

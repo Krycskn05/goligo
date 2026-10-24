@@ -1,0 +1,297 @@
+[
+  {
+    "name": "Sayfa /",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Goliqo\", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български"
+  },
+  {
+    "name": "Girissiz ana sayfada tanitim ve uye ol dugmesi var",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Girissiz /ev-esyalar tadimlik olarak aciliyor",
+    "ok": true,
+    "detail": "http://localhost:5173/ev-esyalar · not 1"
+  },
+  {
+    "name": "Girissiz /fiiller tadimlik olarak aciliyor",
+    "ok": true,
+    "detail": "http://localhost:5173/fiiller · not 1"
+  },
+  {
+    "name": "Girissiz /a1-2/ev-ve-yasam tadimlik olarak aciliyor",
+    "ok": true,
+    "detail": "http://localhost:5173/a1-2/ev-ve-yasam · not 1"
+  },
+  {
+    "name": "Girissiz /a1-1/willkommen tadimlik olarak aciliyor",
+    "ok": true,
+    "detail": "http://localhost:5173/a1-1/willkommen · not 1"
+  },
+  {
+    "name": "Girissiz /hesabim giris sayfasina yonleniyor",
+    "ok": true,
+    "detail": "http://localhost:5173/giris?return_to=%2Fhesabim"
+  },
+  {
+    "name": "Sayfa /giris",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Giriş yap · Goliqo\", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български"
+  },
+  {
+    "name": "Sayfa /uye-ol",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Üye ol · Goliqo\", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български"
+  },
+  {
+    "name": "Sayfa /gizlilik",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Gizlilik ve kişisel veriler · Goliqo\", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български"
+  },
+  {
+    "name": "Sayfa /kullanim-kosullari",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Kullanım koşulları · Goliqo\", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български"
+  },
+  {
+    "name": "Sayfa /impressum",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Impressum · Goliqo\", hata 0, metin: İçeriğe geç Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqip Română Български"
+  },
+  {
+    "name": "Resimler onbellekte tutuluyor (public/_headers)",
+    "ok": true,
+    "detail": "cache-control: no-cache — basliklar uygulanmamis olabilir"
+  },
+  {
+    "name": "Impressum acik, Almanca ve altbilgide baglantisi var",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Girissiz kayit istegi bos misafir cevabi aliyor, yazma 401",
+    "ok": true,
+    "detail": "{\"status\":200,\"guest\":true,\"empty\":true}, not HTTP 401"
+  },
+  {
+    "name": "Sahte kimlik basligi ise yaramiyor (yine misafir)",
+    "ok": true,
+    "detail": "{\"status\":200,\"guest\":true,\"empty\":true}"
+  },
+  {
+    "name": "Uyelik: kosullar onaylanmadan hesap acilmiyor",
+    "ok": true,
+    "detail": "Üye olmak için kullanım koşullarını ve gizlilik metnini kabul etmelisin."
+  },
+  {
+    "name": "Uyelik: uye olunca istenen sayfaya donuluyor (/fiiller)",
+    "ok": true,
+    "detail": "http://localhost:5173/fiiller"
+  },
+  {
+    "name": "Uyelik: oturum cerezi HttpOnly ve SameSite=Lax",
+    "ok": true,
+    "detail": "httpOnly true, sameSite Lax"
+  },
+  {
+    "name": "Uyelik: uye kendi kayitlarini okuyabiliyor",
+    "ok": true,
+    "detail": "HTTP 200"
+  },
+  {
+    "name": "Uyelik: Hesabim sayfasi ad ve e-postayi gosteriyor",
+    "ok": true,
+    "detail": "Deneme Öğrenci · deneme-1792877426442@example.test"
+  },
+  {
+    "name": "Uyelik: cikis yapinca tanitim sayfasi ve kayitlar kapali",
+    "ok": true,
+    "detail": "tanitim 1, kayitlar HTTP 200 misafir true"
+  },
+  {
+    "name": "Uyelik: yanlis sifreyle giris olmuyor",
+    "ok": true,
+    "detail": "E-posta ya da şifre yanlış."
+  },
+  {
+    "name": "Uyelik: dogru sifreyle giris yapinca istenen sayfaya donuluyor",
+    "ok": true,
+    "detail": "http://localhost:5173/hesabim"
+  },
+  {
+    "name": "Uyelik: hesap silinince kayitlar gidiyor ve giris artik olmuyor",
+    "ok": true,
+    "detail": "silindikten sonra giris HTTP 401"
+  },
+  {
+    "name": "Uyelik sayfalarinda betik hatasi yok",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Dil: / Turkce telefonda Turkce aciliyor",
+    "ok": true,
+    "detail": "{\"lang\":\"tr\",\"dir\":\"ltr\",\"h1\":\"Almancayı resimlerle, sesle ve küçük adımlarla öğren.\",\"note\":false}"
+  },
+  {
+    "name": "Dil: /giris Turkce telefonda Turkce aciliyor",
+    "ok": true,
+    "detail": "{\"lang\":\"tr\",\"dir\":\"ltr\",\"h1\":\"Giriş yap\",\"note\":false}"
+  },
+  {
+    "name": "Dil: /uye-ol Turkce telefonda Turkce aciliyor",
+    "ok": true,
+    "detail": "{\"lang\":\"tr\",\"dir\":\"ltr\",\"h1\":\"Ücretsiz üye ol\",\"note\":false}"
+  },
+  {
+    "name": "Dil: sitede olmayan telefon dilinde (Isvecce) Almanca aciliyor",
+    "ok": true,
+    "detail": "{\"lang\":\"de\",\"h1\":\"Kostenlos registrieren\"}"
+  },
+  {
+    "name": "Dil: dil paketi olan bir dil (Rusca) sunucuda da dogru",
+    "ok": true,
+    "detail": "{\"lang\":\"ru\",\"dir\":\"ltr\",\"h1\":\"Зарегистрироваться бесплатно\",\"note\":false}"
+  },
+  {
+    "name": "Dil: uye olmadan Arapca secilebiliyor (sagdan sola, cerezde kaliyor)",
+    "ok": true,
+    "detail": "{\"lang\":\"ar\",\"dir\":\"rtl\",\"h1\":\"إنشاء حساب مجاني\",\"note\":false}, cerez ar"
+  },
+  {
+    "name": "Dil: secilen dil gizlilik metninde de (ceviri notuyla)",
+    "ok": true,
+    "detail": "{\"lang\":\"ar\",\"dir\":\"rtl\",\"h1\":\"الخصوصية والبيانات الشخصية\",\"note\":true}"
+  },
+  {
+    "name": "Dil: Turkce asil metin, ceviri notu yok",
+    "ok": true,
+    "detail": "{\"lang\":\"tr\",\"dir\":\"ltr\",\"h1\":\"Gizlilik ve kişisel veriler\",\"note\":false}"
+  },
+  {
+    "name": "Sifremi unuttum: form calisiyor, cevap sayfanin dilinde",
+    "ok": true,
+    "detail": "Bu adresle bir hesap varsa şifre yenileme bağlantısını gönderdik. Gelen kutunu ve istenmeyen e-posta klasörünü kontrol e"
+  },
+  {
+    "name": "Sifre yenileme: bozuk baglanti acikca soyleniyor, sayfa aramada cikmiyor",
+    "ok": true,
+    "detail": "Bu bağlantı geçersiz ya da süresi dolmuş. Giriş sayfasından yeni bir bağlantı is · noindex, nofollow"
+  },
+  {
+    "name": "Uyesiz: Fiil Atolyesi'nin 1. bolumu acik, digerleri kilitli",
+    "ok": true,
+    "detail": "{\"banner\":1,\"open\":1,\"locked\":3}"
+  },
+  {
+    "name": "Uyesiz: Nesne Kasasi'nda ilk grup acik",
+    "ok": true,
+    "detail": "{\"banner\":1,\"open\":1}"
+  },
+  {
+    "name": "Uyesiz: kilitli kisim acilmiyor, kayit tutulmuyor",
+    "ok": true,
+    "detail": "baslat HTTP 401, guest true"
+  },
+  {
+    "name": "Yerel giris taklidi",
+    "ok": true,
+    "detail": "son adres http://localhost:5173/ev-esyalar"
+  },
+  {
+    "name": "Sayfa /ev-esyalar",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Nesne Kasası · Goliqo\", hata 0, metin: İçeriğe geç Samstag Abend 21:30 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Sh"
+  },
+  {
+    "name": "Sayfa /a1-2/ev-ve-yasam",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Ev ve Yaşam · Goliqo\", hata 0, metin: Ana sayfa Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Shqi"
+  },
+  {
+    "name": "Sayfa /a1-1/willkommen",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Lektion 1A · Willkommen! · Goliqo\", hata 0, metin: Üniteler ve konular Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurm"
+  },
+  {
+    "name": "Lektion 1A: kapak, 22 adim ve Uniteler sayfasinda baglanti",
+    "ok": true,
+    "detail": "Kapak · 1/22"
+  },
+  {
+    "name": "Lektion 1A: adim adresi aciliyor (diyalog, 6 satir, dinle dugmeleri)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Uniteler: Lektion 1 karti Lektion 1A'ya acliyor",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Sayfa /",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Goliqo\", hata 0, metin: İçeriğe geç Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Sh"
+  },
+  {
+    "name": "Giris yapinca ana sayfada dersler var (tanitim yok)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Giristen sonra kayitlar okunuyor",
+    "ok": true,
+    "detail": "HTTP 200"
+  },
+  {
+    "name": "Test oturumu basliyor (veritabanina yazma)",
+    "ok": true,
+    "detail": "HTTP 201, soru obj-read-zuckerzange"
+  },
+  {
+    "name": "Cevap kaydediliyor ve dogru cevap donuyor",
+    "ok": true,
+    "detail": "HTTP 200, dogru mu: 0"
+  },
+  {
+    "name": "Kayit geri okunuyor (gecmis)",
+    "ok": true,
+    "detail": "cevaplanan 1/1"
+  },
+  {
+    "name": "Sayfa /fiiller",
+    "ok": true,
+    "detail": "HTTP 200, baslik \"Fiil Atölyesi · Goliqo\", hata 0, metin: İçeriğe geç Samstag Abend 21:31 Site dili Türkçe Deutsch English العربية Українська Français Español Русский فارسی Polski Italiano Português Kurdî (Kurmancî) Sh"
+  },
+  {
+    "name": "Fiil Atolyesi sayfasinda baslik ve dort bolum var",
+    "ok": true,
+    "detail": "atolye 1, bolum 4"
+  },
+  {
+    "name": "Telefonda tanitim sayfasi yana tasmiyor",
+    "ok": true,
+    "detail": "fazla genislik 0px"
+  },
+  {
+    "name": "Eski /fiiller?bolum=oyunlar adresi /oyunlar bolumune gidiyor",
+    "ok": true,
+    "detail": "http://localhost:5173/oyunlar"
+  },
+  {
+    "name": "Oyunlar: yedi oyun listeleniyor",
+    "ok": true,
+    "detail": "7 oyun"
+  },
+  {
+    "name": "Eslestirme: kartlar once acik, sonra kapaniyor",
+    "ok": true,
+    "detail": "12/12 acik → 0"
+  },
+  {
+    "name": "Oyunlar: her oyun telefonda aciliyor ve cevap aliyor",
+    "ok": true,
+    "detail": "rain, catch, quick, search, rescue, plural"
+  }
+]

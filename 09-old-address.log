@@ -1,0 +1,14 @@
+Eski adres: lernkoko -> https://goliqo.com
+
+ ⛅️ wrangler 4.92.0 (update available 4.152.0)
+──────────────────────────────────────────────
+Total Upload: 3.44 KiB / gzip: 1.65 KiB
+Worker Startup Time: 1 ms
+Your Worker has access to the following bindings:
+Binding                          Resource                  
+env.NEW_ORIGIN ("(hidden)")      Environment Variable      
+
+Uploaded lernkoko (1.55 sec)
+Deployed lernkoko triggers (0.59 sec)
+  https://lernkoko.kooraycoskun.workers.dev
+Current Version ID: 81b42a75-5b1a-48ad-a574-1a785e3245a0

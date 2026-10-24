@@ -1,0 +1,212 @@
+Üyelik tabloları kontrol ediliyor (migration/database/members.sql)...
+
+ ⛅️ wrangler 4.92.0 (update available 4.152.0)
+──────────────────────────────────────────────
+Resource location: remote 
+
+🌀 Executing on remote database lernkoko-db (bc8bdd18-7628-4727-9fd2-a7d6e96ac054):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 8 commands in 0.52ms
+[
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.2842
+      },
+      "duration": 0.2842,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.0624
+      },
+      "duration": 0.0624,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.034
+      },
+      "duration": 0.034,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.0278
+      },
+      "duration": 0.0278,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.0286
+      },
+      "duration": 0.0286,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.0294
+      },
+      "duration": 0.0294,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.0319
+      },
+      "duration": 0.0319,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.0243
+      },
+      "duration": 0.0243,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]
+[
+  {
+    "results": [
+      {
+        "name": "auth_attempts"
+      },
+      {
+        "name": "member_sessions"
+      },
+      {
+        "name": "members"
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "ENAM",
+      "served_by_colo": "ORD",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.3322
+      },
+      "duration": 0.3322,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 1101824,
+      "rows_read": 29,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]

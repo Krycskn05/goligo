@@ -1,0 +1,278 @@
+{
+ "started": "2026-10-24 21:29 UTC",
+ "settings": "supertonic3-de-speed0.92-steps10-v1",
+ "texts": 3241,
+ "voices": {
+  "F1": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 153.6,
+   "median_pitch_hz": 194.3,
+   "asr": [
+    {
+     "text": "Sie kommen",
+     "heard": "Sie kommen.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich bin Tarek Salim.",
+     "heard": "Ich bin Tarek Salim.",
+     "score": 1.0
+    },
+    {
+     "text": "aus Brasilien",
+     "heard": "aus Brasilien",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3241
+  },
+  "F2": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 148.0,
+   "median_pitch_hz": 186.9,
+   "asr": [
+    {
+     "text": "aus den USA",
+     "heard": "aus den USA.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich bin Nora Weiß. Ich komme aus Österreich, aus Wien.",
+     "heard": "Guten Tag, ich bin Nora Weiß, ich komme aus Österreich, aus Wien.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich heiße Omar Nasser.",
+     "heard": "Guten Tag, ich heiße Oma Nasser.",
+     "score": 0.984
+    }
+   ],
+   "asr_mean": 0.995,
+   "available": 3241
+  },
+  "F3": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 156.3,
+   "median_pitch_hz": 163.9,
+   "asr": [
+    {
+     "text": "aus Russland",
+     "heard": "aus Russland",
+     "score": 1.0
+    },
+    {
+     "text": "Herr",
+     "heard": "hell",
+     "score": 0.5
+    },
+    {
+     "text": "Woher kommen Sie, Herr Nasser?",
+     "heard": "Woher kommen Sie, Herr Nasser?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.833,
+   "available": 3241
+  },
+  "F4": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 143.0,
+   "median_pitch_hz": 190.9,
+   "asr": [
+    {
+     "text": "aus Tunesien",
+     "heard": "aus Tunesien.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich bin Sabine Krüger. Wie heißen Sie?",
+     "heard": "Guten Tag. Ich bin Sabine Krüger. Wie heißen Sie?",
+     "score": 1.0
+    },
+    {
+     "text": "aus Nigeria",
+     "heard": "aus Nerea.",
+     "score": 0.8
+    }
+   ],
+   "asr_mean": 0.933,
+   "available": 3241
+  },
+  "F5": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 149.6,
+   "median_pitch_hz": 156.9,
+   "asr": [
+    {
+     "text": "Ich heiße Tarek Salim.",
+     "heard": "Ich heiße Tarek Salim.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich bin Mei Suwan. Ich komme aus Thailand, aus Bangkok.",
+     "heard": "Guten Tag. Ich bin Mai Suwan. Ich komme aus Thailand aus Bangkok.",
+     "score": 0.984
+    },
+    {
+     "text": "Hallo. Ich heiße Rami Khalil. Ich komme aus dem Libanon, aus Beirut.",
+     "heard": "Hallo. Ich heiße Rami Khalil. Ich komme aus dem Libanon aus Beirut.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.995,
+   "available": 3241
+  },
+  "M1": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 151.4,
+   "median_pitch_hz": 131.6,
+   "asr": [
+    {
+     "text": "aus England",
+     "heard": "aus England.",
+     "score": 1.0
+    },
+    {
+     "text": "aus Deutschland",
+     "heard": "aus Deutschland.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich heiße Mira Fuchs. Und Sie?",
+     "heard": "Guten Tag. Ich heiße Mira Fuchs. Und Sie?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3241
+  },
+  "M2": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 149.4,
+   "median_pitch_hz": 85.4,
+   "asr": [
+    {
+     "text": "Ich heiße Yasemin Arslan. Ich komme aus der Türkei, aus Izmir.",
+     "heard": "Ich heiße Yasemin Arslan, ich komme aus der Türkei, aus Itzmir.",
+     "score": 0.992
+    },
+    {
+     "text": "Hallo. Ich heiße Rami Khalil. Ich komme aus dem Libanon, aus Beirut.",
+     "heard": "Hallo, ich heiße Rami Khalil, ich komme aus dem Libanon aus Beirut.",
+     "score": 1.0
+    },
+    {
+     "text": "aus Somalia",
+     "heard": "Aus Somalia.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.997,
+   "available": 3241
+  },
+  "M3": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 141.1,
+   "median_pitch_hz": 92.1,
+   "asr": [
+    {
+     "text": "aus Deutschland, aus Polen, aus Syrien",
+     "heard": "aus Deutschland, aus Polen, aus Syrien.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich bin Sabine Krüger. Wie heißen Sie?",
+     "heard": "Guten Tag, ich bin Sabine Krüger. Wie heißen Sie?",
+     "score": 1.0
+    },
+    {
+     "text": "aus Syrien",
+     "heard": "aus Syrien.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3241
+  },
+  "M4": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 148.2,
+   "median_pitch_hz": 117.0,
+   "asr": [
+    {
+     "text": "Ich bin Lena Vogt. Und Sie?",
+     "heard": "Ich bin Lena Vogt und Sie ...",
+     "score": 1.0
+    },
+    {
+     "text": "Ich heiße Tomasz Nowak. Ich komme aus Polen, aus Krakau.",
+     "heard": "Ich heiße Thomas Nowak. Ich komme aus Polen aus Krakau.",
+     "score": 0.981
+    },
+    {
+     "text": "aus dem Libanon",
+     "heard": "aus dem Libanon.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.994,
+   "available": 3241
+  },
+  "M5": {
+   "rate": 44100,
+   "rendered": 96,
+   "seconds": 152.6,
+   "median_pitch_hz": 85.1,
+   "asr": [
+    {
+     "text": "aus dem Libanon",
+     "heard": "aus dem Libanon.",
+     "score": 1.0
+    },
+    {
+     "text": "aus Tunesien",
+     "heard": "aus Tunesien.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Tag. Ich bin Sabine Krüger. Wie heißen Sie?",
+     "heard": "Guten Tag. Ich bin Sabine Krüger. Wie heißen Sie?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3241
+  }
+ },
+ "errors": [],
+ "package": "1.3.1",
+ "init_signature": "(self, model: 'str' = 'supertonic-3', model_dir: 'Optional[Union[Path, str]]' = None, auto_download: 'bool' = True, intra_op_num_threads: 'Optional[int]' = None, inter_op_num_threads: 'Optional[int]' = None)",
+ "init_used": {
+  "model": "supertonic-3",
+  "auto_download": true
+ },
+ "synthesize_signature": "(text: 'str', voice_style: 'Style', total_steps: 'int' = 8, speed: 'float' = 1.05, max_chunk_length: 'Optional[int]' = None, silence_duration: 'float' = 0.3, lang: 'Optional[str]' = None, verbose: 'bool' = False) -> 'tuple[np.ndarray, np.ndarray]'",
+ "ready_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "finished": "2026-10-24 21:55 UTC"
+}

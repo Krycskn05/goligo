@@ -75,6 +75,20 @@ test('a man is read by a man, a woman by a woman, and two people in one step nev
  assert(!page.includes('tahtaya asar'),'the classroom note is gone');
 });
 
+test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, Teil A on a wide spread with three tabs (25 October 2026)',()=>{
+ assert.deepEqual(lesson.lessonParts.map(part=>part.badge),['A','B','C','D']);
+ assert(lesson.lessonParts[0].title&&lesson.lessonParts.slice(1).every(part=>!part.title),'only Teil A is ready; B–D are shown as coming soon');
+ assert.deepEqual(lesson.stepGroups.map(group=>group.id),['konu','alistirmalar','test']);
+ assert.equal(lesson.stepGroups[0].ids.length,10);assert.equal(lesson.stepGroups[1].ids.length,9);
+ assert.equal(lesson.groupOf('diyalog').id,'konu');assert.equal(lesson.groupOf('kutu').id,'alistirmalar');assert.equal(lesson.groupOf('kapak'),undefined);
+ assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,20,'every teaching step, exercise and the test is in exactly one tab');
+ assert(lesson.unitGoals.length>=4);
+ const page=read('app/willkommen-study.tsx');
+ for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={part.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','readLastStep()','go(-1)'])assert(page.includes(piece),piece);
+ assert(page.includes('<h2 id="l1a-heading"'),'a step heading is an h2 under the notebook title');
+ const css=read('app/willkommen.css');assert(css.includes('.lb.l1a-book .l1a-soon-photo')&&css.includes('.l1a-part .lb-left .lb-photo'));
+});
+
 test('the page, its pictures, the units link, guest access and the menu',()=>{
  assert(fs.existsSync('app/a1-1/willkommen/page.tsx'));
  const page=read('app/willkommen-study.tsx');

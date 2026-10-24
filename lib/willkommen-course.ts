@@ -275,3 +275,27 @@ export function willkommenSpeechTexts():string[]{
  testQuestions.forEach(question=>add(testSpeech(question)));
  return [...out];
 }
+
+/* ---------- the notebook pages (25 October 2026: the entry looks like Lektion 11 and 12) ---------- */
+/** Lektion 1's parts on the contents page. Teil A is this lesson; B, C and D are shown as coming soon. */
+export type LessonPart={id:'a'|'b'|'c'|'d';badge:string;title?:string;lead?:string};
+export const lessonParts:LessonPart[]=[
+ {id:'a',badge:'A',title:'Guten Tag! Ich heiße …',lead:'Selamlaşma, adını söyleme ve sorma, nereden geldiğini söyleme: **aus + artikel**.'},
+ {id:'b',badge:'B'},{id:'c',badge:'C'},{id:'d',badge:'D'},
+];
+/** What Lektion 1 teaches, ticked off on the left page of the contents. */
+export const unitGoals=[
+ 'Selamlaş: **Guten Tag! · Herzlich willkommen!**',
+ 'Adını söyle: **Ich heiße … / Ich bin …**',
+ 'Adını sor: **Wie heißen Sie?**',
+ 'Nereden geldiğini söyle: **Ich komme aus …**',
+ 'Ülke ve artikel: **aus der Türkei · aus dem Irak**',
+];
+/** Teil A's steps as three index tabs on the right page (the cover and the end belong to none). */
+export type StepGroup={id:'konu'|'alistirmalar'|'test';label:string;ids:string[]};
+export const stepGroups:StepGroup[]=[
+ {id:'konu',label:'Konu anlatımı',ids:steps.filter(step=>step.kind==='teach').map(step=>step.id)},
+ {id:'alistirmalar',label:'Alıştırmalar',ids:steps.filter(step=>step.kind==='exercise').map(step=>step.id)},
+ {id:'test',label:'Test',ids:['test']},
+];
+export const groupOf=(id:string)=>stepGroups.find(group=>group.ids.includes(id));

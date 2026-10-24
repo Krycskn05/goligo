@@ -244,9 +244,12 @@ async function languageFlow(browser) {
   record("Yerel giris taklidi", new URL(page.url()).pathname === "/ev-esyalar", `son adres ${page.url()}`);
   await visit(page, "/ev-esyalar", "02-nesne-kasasi.png", errors);
   await visit(page, "/a1-2/ev-ve-yasam", "03-ev-ve-yasam.png", errors);
-  // Lektion 1A (24 October 2026): the lesson opens on its cover, the units page links to it, a step opens from its address.
-  await visit(page, "/a1-1/willkommen", "03b-lektion-1a.png", errors);
-  record("Lektion 1A: kapak, 22 adim ve Uniteler sayfasinda baglanti", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/22/.test((await page.locator(".l1a-where").textContent()) || ""), (await page.locator(".l1a-where").textContent()) || "");
+  // Lektion 1 (25 October 2026): the entry is a notebook like Lektion 11/12 (Teil A–D); Teil A opens on its cover, a step opens from its address.
+  await visit(page, "/a1-1/willkommen", "03b-lektion-1.png", errors);
+  record("Lektion 1: defter girisi (Teil A acik, B-D yakinda)", (await page.locator(".l1a-book [data-l1a-part='a'] button.lb-toc-open").count()) === 1 && (await page.locator(".l1a-book .l1a-soon").count()) === 3, "");
+  await page.locator("[data-l1a-part='a'] button.lb-toc-open").click();
+  await page.waitForTimeout(600);
+  record("Lektion 1A: kapak, 22 adim, uc sekme", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/22/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
   await page.goto(BASE + "/a1-1/willkommen?adim=diyalog", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 1A: adim adresi aciliyor (diyalog, 6 satir, dinle dugmeleri)", (await page.locator("[data-l1a-step='diyalog'] .l1a-line").count()) === 6 && (await page.locator("[data-l1a-step='diyalog'] .l12-say").count()) === 6, "");
   await page.goto(BASE + "/konular?level=A1.1", { waitUntil: "networkidle", timeout: 90000 });

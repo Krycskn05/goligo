@@ -31,4 +31,6 @@ for(const verb of verbs.verbs){add(verbs.verbRowSpeech(verb));add(verb.participl
 for(const text of load('verb-persons').workshopSpeechTexts())add(text);
 // Lektion 12 „Ausbildung": words, example sentences, sentence frames and the 14 listening sections (dialogue lines, dictations).
 for(const text of load('ausbildung-hoeren').ausbildungSpeechTexts())add(text);
+// Lektion 1A „Willkommen!“: phrases, countries, the dialogue, the people and the exercises' solutions.
+for(const text of load('willkommen-course').willkommenSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

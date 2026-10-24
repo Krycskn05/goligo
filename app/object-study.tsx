@@ -33,7 +33,7 @@ import {objectProgress} from '@/lib/progress';
 import {ProgressMeter,RoundReward} from './progress-ui';
 import {GUEST_OBJECT_GROUP} from '@/lib/guest-parts';
 import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
-import {articleRule,articleRuleText,puzzleText} from '@/lib/article-logic';
+import {puzzleText} from '@/lib/article-logic';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors'};
@@ -162,7 +162,6 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  const options=q?(session?.questions[index]?.options??q.options??[]):[];
  // Word puzzles: the learner chooses der/die/das and spells the noun (the article is no longer given away).
  const articleSplit=course==='de'&&session?.mode==='write'&&q&&!articleQuestion?/^(der|die|das) (.+)$/.exec(q.answer):null;
- function articleLogic(question:Question,word:ObjectWord){const plural=question.articlePuzzle?.variant==='plural';return articleRuleText(language,articleRule(word.id,plural?articleFullAnswer(question):word.de,plural));}
  const actionDisabled=busy||cueBusy||speech.busy;
  function answerMeaning(question:Question,word:ObjectWord){return question.articlePuzzle?<span className="object-answer-meaning"><strong lang="de" dir="ltr">{articleFullAnswer(question)}</strong><span className="object-answer-translation" lang={language}>{objectMeaning(word.id,language)} · {text('pluralLabel')}</span></span>:<ObjectAnswerMeaning word={word} language={language} course={course}/>;}
  function hearQuestion(slow=false){if(!q?.audio||busy||cueBusy)return;setHeardQuestionId(q.id);speech.speak(q.audio,slow);}
@@ -203,7 +202,8 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
      {feedback&&<div id="object-feedback" tabIndex={-1} className={'object-feedback '+(feedback.correct?'success':'retry')} role="status" aria-live="polite">
       <h2>{feedback.correct?<CheckCircle2 size={23}/>:<X size={23}/>} {text(feedback.correct?'correct':session.mode==='write'?'wrongAnswer':'wrong')}</h2><p>{text('correctAnswer')}: {answerMeaning(q,currentWord)}</p>
       {session.mode==='write'&&<p>{text('yourAnswer')}: <span lang={course} dir="ltr">{feedback.answer}</span></p>}
-      {course==='de'&&<div className="verb-rules paul-box"><div className="paul-box-text"><strong>{puzzleText(language,'ruleTitle')}</strong><p>{articleLogic(q,currentWord)}</p></div><PaulHoca pose="tip"/></div>}<button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{text('repeatAudio')}</button>
+      {/* No "Kural" (article rule) box after an answer: the learner asked for it to go (24 October 2026). */}
+      <button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>speech.speak(pronunciation)}><Volume2 size={18}/>{text('repeatAudio')}</button>
       <button type="button" className="btn object-next" disabled={busy} onClick={next}>{text(index+1===session.questions.length?'viewResults':session.mode==='write'?'nextPuzzle':session.mode==='listen'?'nextListening':'nextImage')}<ArrowRight size={18} className="vault-direction-icon"/></button>
      </div>}
     </article>

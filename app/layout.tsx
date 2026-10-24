@@ -8,6 +8,7 @@ import "./verbs.css";
 import "./koko-theme.css";
 import "./members.css";
 import "./ausbildung.css";
+import "./willkommen.css";
 import "./notebook.css";
 import "./lesson-book.css";
 import "./home-tour.css";

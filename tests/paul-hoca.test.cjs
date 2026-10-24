@@ -62,7 +62,8 @@ test('Paul pops up all over the screen now and then (waving every other time, hi
  for(const [kind,ms] of [['correct','2s'],['wrong','2.1s'],['complete','2.6s']])assert.ok(css.includes('.kind-'+kind+' .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge '+ms+' both; }'),kind);
  assert.ok(read('app/verb-games.tsx').includes('</ul></div><PaulHoca pose="tip"/></div>'));
  const vault=read('app/object-study.tsx');
- assert.equal((vault.match(/<PaulHoca pose="tip"\/>/g)||[]).length,2);
+ assert.equal((vault.match(/<PaulHoca pose="tip"\/>/g)||[]).length,1,'Paul only with the writing hint; the rule box after an answer is gone (24 October 2026)');
+ assert.ok(!vault.includes("puzzleText(language,'ruleTitle')")&&!vault.includes('articleRuleText('),'no Kural box in the vault');
  assert.ok(vault.includes("onClick={()=>setShowHint(value=>{if(!value)playPaulSound('tip');return !value;})}"),'a "pling" when the hint opens');
  assert.ok(read('app/ausbildung-ui.tsx').includes('<PaulHoca pose="tip"/>')&&read('app/ausbildung-listen.tsx').includes('<PaulHoca pose="tip"/>'));
  assert.ok(read('app/verb-study.tsx').includes('<PaulHoca pose="think" sound="appear"/>'));

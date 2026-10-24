@@ -7,7 +7,7 @@ import {studyLanguages,isStudyLanguage,type StudyLanguage} from '@/lib/study-lan
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
-import {WILLKOMMEN_PATH,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,acceptsAnswer,normalizeLoose,willkommenPictures,portraitSrc,type GapLine,type Step} from '@/lib/willkommen-course';
+import {WILLKOMMEN_PATH,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,acceptsAnswer,normalizeLoose,willkommenPictures,portraitSrc,speakerVoice,sayText,dialogueSpeaker,exerciseSpeakers,withSpeakers,matchSay,orderSay,type SayItem,type GapLine,type Step} from '@/lib/willkommen-course';
 import {L1A_STEP_KEY,readL1AScores,saveL1AScore,willkommenProgress,type L1AScoreMap} from '@/lib/willkommen-progress';
 import {useLanguageSwitch} from './language-switch';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
@@ -32,21 +32,25 @@ export default function WillkommenStudy({guest=false}:{guest?:boolean}){
  return <WillkommenLesson language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 
-/** Site speech plus "read these one after the other" (dialogues, the learner's own sentences). */
-type Speech={speak:(text:string)=>void;speakAll:(texts:string[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void};
+/** Site speech plus "read these one after the other" (dialogues, the learner's own sentences). A text with a speaker
+ * (`who`, see `speakers` in the course) is read with that person's own voice — a man by a man, a woman by a woman;
+ * everything else with the learner's chosen voice. */
+type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void};
 function useLessonSpeech():Speech&{warning?:string}{
- const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning}=german;
- const queue=useRef<string[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning,siteVoices}=german;
+ const voices=useRef(siteVoices);voices.current=siteVoices;
+ const say=useCallback((item:SayItem)=>{const who=typeof item==='string'?undefined:item.who;speak(sayText(item),false,speakerVoice(who,voices.current));},[speak]);
+ const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
  const next=useCallback(()=>{
-  const text=queue.current.shift();if(!text)return;
-  speak(text);
+  const item=queue.current.shift();if(!item)return;
+  say(item);
   // If the voice never starts (no sound support), go on after a moment so the queue never sticks.
   waiting.current=setTimeout(()=>{waiting.current=null;if(!busyRef.current)next();},1500);
- },[speak]);
+ },[say]);
  const busyRef=useRef(busy);
  useEffect(()=>{const was=busyRef.current;busyRef.current=busy;if(busy&&waiting.current){clearTimeout(waiting.current);waiting.current=null;}if(was&&!busy)next();},[busy,next]);
- const speakAll=useCallback((texts:string[])=>{stop();queue.current=texts.filter(Boolean);next();},[stop,next]);
- const speakOne=useCallback((text:string)=>{queue.current=[];speak(text);},[speak]);
+ const speakAll=useCallback((items:SayItem[])=>{stop();queue.current=items.filter(item=>sayText(item).trim());next();},[stop,next]);
+ const speakOne=useCallback((item:SayItem)=>{queue.current=[];say(item);},[say]);
  const stopAll=useCallback(()=>{queue.current=[];if(waiting.current){clearTimeout(waiting.current);waiting.current=null;}stop();},[stop]);
  useEffect(()=>()=>{if(waiting.current)clearTimeout(waiting.current);},[]);
  return useMemo(()=>({speak:speakOne,speakAll,busy,activeText,stop:stopAll,prepare,warning}),[speakOne,speakAll,busy,activeText,stopAll,prepare,warning]);
@@ -112,14 +116,14 @@ function StepView(props:StepProps){
   case 'kisiler':return <People speech={props.speech}/>;
   case 'diller':return <Languages/>;
   case 'kelimeler':return <WordList speech={props.speech}/>;
-  case 'harfler':return <GapExercise key={step.id} id={step.id} kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" lines={lettersExercise.lines} say={lettersExercise.say} {...props}/>;
+  case 'harfler':return <GapExercise key={step.id} id="harfler" kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" lines={lettersExercise.lines} say={lettersExercise.say} {...props}/>;
   case 'eslestir':return <MatchExercise key={step.id} {...props}/>;
   case 'sirala':return <OrderExercise key={step.id} {...props}/>;
-  case 'ayir':return <GapExercise key={step.id} id={step.id} kicker="Alıştırma 4 · Markieren Sie" title="Kelimeleri ayır, cümleleri yaz" lead="Bu metinde boşluk yok. 5 cümleyi ayırıp aşağıya yaz." before={<div className="l1a-glued" lang="de" dir="ltr">{gluedText}</div>} lines={gluedSentences.map(line=>({who:line.who,text:'___',answers:[line.answers]}))} wide say={gluedSay} {...props}/>;
+  case 'ayir':return <GapExercise key={step.id} id="ayir" kicker="Alıştırma 4 · Markieren Sie" title="Kelimeleri ayır, cümleleri yaz" lead="Bu metinde boşluk yok. 5 cümleyi ayırıp aşağıya yaz." before={<div className="l1a-glued" lang="de" dir="ltr">{gluedText}</div>} lines={gluedSentences.map(line=>({who:line.who,text:'___',answers:[line.answers]}))} wide say={gluedSay} {...props}/>;
   case 'aus':return <ArticleExercise key={step.id} {...props}/>;
   case 'dinle':return <ListenExercise key={step.id} {...props}/>;
-  case 'soru':return <GapExercise key={step.id} id={step.id} kicker="Alıştırma 7 · Schreiben Sie Fragen" title="Cevap var, soruyu yaz" lead="Cevaba bakıp soruyu yaz. (İpucu: Herr / Frau + soyadı ekleyebilirsin.)" lines={questionLines.flatMap(line=>[{who:'a' as const,text:'___',answers:[line.answers]},{who:'b' as const,text:line.reply,answers:[]}])} wide say={questionSay} {...props}/>;
-  case 'kutu':return <GapExercise key={step.id} id={step.id} kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+wordBox.join(' · ')} lines={boxLines} choices={wordBox} say={boxSay} {...props}/>;
+  case 'soru':return <GapExercise key={step.id} id="soru" kicker="Alıştırma 7 · Schreiben Sie Fragen" title="Cevap var, soruyu yaz" lead="Cevaba bakıp soruyu yaz. (İpucu: Herr / Frau + soyadı ekleyebilirsin.)" lines={questionLines.flatMap(line=>[{who:'a' as const,text:'___',answers:[line.answers]},{who:'b' as const,text:line.reply,answers:[]}])} wide say={questionSay} {...props}/>;
+  case 'kutu':return <GapExercise key={step.id} id="kutu" kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+wordBox.join(' · ')} lines={boxLines} choices={wordBox} say={boxSay} {...props}/>;
   case 'sen':return <OwnExercise key={step.id} {...props}/>;
   case 'test':return <TestStep key={step.id} {...props}/>;
   case 'bitti':return <End {...props}/>;
@@ -128,9 +132,9 @@ function StepView(props:StepProps){
 }
 
 /* ---------- small pieces ---------- */
-function Say({text,speech,label='Dinle',wide=false}:{text:string;speech:Speech;label?:string;wide?:boolean}){
+function Say({text,who,speech,label='Dinle',wide=false}:{text:string;who?:string;speech:Speech;label?:string;wide?:boolean}){
  const playing=speech.busy&&speech.activeText===text;
- return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={label+': '+text} title={label} onClick={()=>speech.speak(text)}><Volume2 size={18} aria-hidden="true"/>{wide&&label}</button>;
+ return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={label+': '+text} title={label} data-who={who} onClick={()=>speech.speak({text,who})}><Volume2 size={18} aria-hidden="true"/>{wide&&label}</button>;
 }
 function Phrases({items,speech}:{items:readonly (readonly [string,string])[];speech:Speech}){
  return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={de} speech={speech}/></div>)}</>;
@@ -200,18 +204,18 @@ function Verbs({speech}:{speech:Speech}){
 }
 function Dialogue({speech}:{speech:Speech}){
  return <><Heading>Diyalog: Sabine ve Omar</Heading><p className="l1a-tr">Sabine Krüger bir süpermarket işletiyor. Omar Nasser yeni geldi.</p>
-  <div className="l1a-dialogue">{dialogue.map(([who,de,tr],i)=><div className={'l1a-line '+(who==='S'?'a':'b')} key={i}><Portrait who={who==='S'?'sabine':'omar'} name={who==='S'?'Sabine':'Omar'}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={de} speech={speech}/></div>)}</div>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(dialogue.map(line=>line[1]))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button></div></>;
+  <div className="l1a-dialogue">{dialogue.map(([who,de,tr],i)=><div className={'l1a-line '+(who==='S'?'a':'b')} key={i}><Portrait who={dialogueSpeaker(who)} name={who==='S'?'Sabine':'Omar'}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={de} who={dialogueSpeaker(who)} speech={speech}/></div>)}</div>
+  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(dialogue.map(([who,de])=>({text:de,who:dialogueSpeaker(who)})))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button></div></>;
 }
 function People({speech}:{speech:Speech}){
  return <><Heading>Kişiler nereden geliyor?</Heading><p className="l1a-tr">Önce ülke, sonra şehir: <b lang="de">aus Kenia, aus Nairobi</b>.</p>
-  {people.map(p=><div className="l1a-person" key={p.key}><Portrait who={p.key} name={p.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de"><span aria-hidden="true">{p.flag} </span><span lang="de">{p.name}</span></span><span className="l1a-tr" lang="de" dir="ltr">Ich komme aus {p.land}, aus {p.city}.</span></div><Say text={personSpeech(p)} speech={speech}/></div>)}</>;
+  {people.map(p=><div className="l1a-person" key={p.key}><Portrait who={p.key} name={p.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de"><span aria-hidden="true">{p.flag} </span><span lang="de">{p.name}</span></span><span className="l1a-tr" lang="de" dir="ltr">Ich komme aus {p.land}, aus {p.city}.</span></div><Say text={personSpeech(p)} who={p.key} speech={speech}/></div>)}</>;
 }
 function Languages(){
  return <><Heading>Farklı dillerde “Guten Tag”</Heading>
   <img className="l1a-cover" src={willkommenPictures.map.src} alt="Paul Hoca dünya haritasını gösteriyor" width={willkommenPictures.map.width} height={willkommenPictures.map.height} loading="lazy" decoding="async"/>
   <table className="l1a-table"><tbody>{greetingsAround.map(([lang,greeting])=><tr key={lang}><td><b>{lang}</b></td><td>{greeting}</td></tr>)}</tbody></table>
-  <Note>Sınıfta herkes kendi dilinde “Guten Tag” yazıp tahtaya asar ve kendini tanıtır: <b lang="de">Ich heiße … Ich komme aus …</b></Note></>;
+  {/* The classroom note ("everyone writes Guten Tag in their language …") was removed at the learner's request (24 October 2026). */}</>;
 }
 function WordList({speech}:{speech:Speech}){
  return <><Heading>Kelime listesi</Heading>
@@ -225,14 +229,16 @@ function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-
 /** Finishes an exercise: saves the score, plays the sound and reads the solution after a full score. */
 function useFinish(props:StepProps){
  const {sound,speech,onScore,step}=props;
- return useCallback((right:number,total:number,say?:string[])=>{
+ return useCallback((right:number,total:number,say?:SayItem[])=>{
   onScore(step.id,right,total);
   if(right===total){sound.correct(()=>{if(say?.length)speech.speakAll(say);});}else sound.wrong();
  },[sound,speech,onScore,step.id]);
 }
 /** Gaps in a text: letters inside a word, whole sentences (wide) or a word chosen from a box. */
-function GapExercise(props:StepProps&{id:string;kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];say:string[]}){
- const {kicker,title,lead,before,lines,wide=false,choices,say,sound,speech}=props;
+function GapExercise(props:StepProps&{id:keyof typeof exerciseSpeakers;kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];say:string[]}){
+ const {id,kicker,title,lead,before,lines,wide=false,choices,sound,speech}=props;
+ // The solution is read as a little dialogue: each line by its own person (a man by a man, a woman by a woman).
+ const say=useMemo(()=>withSpeakers(props.say,exerciseSpeakers[id]),[props.say,id]);
  const gaps=useMemo(()=>lines.flatMap((line,l)=>line.answers.map((answers,g)=>({line:l,gap:g,answers}))),[lines]);
  const [values,setValues]=useState<string[]>(()=>gaps.map(()=>''));const [checked,setChecked]=useState<(boolean|null)[]>(()=>gaps.map(()=>null));
  const [feedback,setFeedback]=useState<Feedback>(null);const finish=useFinish(props);
@@ -264,7 +270,7 @@ function MatchExercise(props:StepProps){
  const [feedback,setFeedback]=useState<Feedback>(null);
  const pickRight=(i:number)=>{
   if(selected===null||done.includes(i))return;sound.prepare();speech.prepare();
-  if(i===selected){const next=[...done,i];setDone(next);setSelected(null);speech.speakAll([matchPairs[i][0],matchPairs[i][1]]);
+  if(i===selected){const next=[...done,i];setDone(next);setSelected(null);speech.speakAll(matchSay(matchPairs[i]));
    if(next.length===matchPairs.length){const right=Math.max(0,matchPairs.length-misses);setFeedback({ok:true,text:'Hepsi eşleşti!'});finish(right,matchPairs.length);}}
   else{setWrongAt(i);setMisses(m=>m+1);setFeedback({ok:false,text:'Bu ikisi uymuyor.'});sound.wrong();setTimeout(()=>setWrongAt(null),600);}
  };
@@ -284,7 +290,7 @@ function OrderExercise(props:StepProps){
  const sentence=orderSentences[round];const text=picked.map(i=>sentence[i]).join(' ');
  const check=()=>{sound.prepare();speech.prepare();const ok=text===sentence.join(' ');setState(ok?'ok':'bad');
   if(ok){const total=right+1;setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?'Tüm cümleler doğru!':'Doğru!'});
-   if(round===orderSentences.length-1)finish(total,orderSentences.length,[sentence.join(' ')]);else sound.correct(()=>speech.speak(sentence.join(' ')));}
+   if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))]);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
   else{setFeedback({ok:false,text:'Sırayı kontrol et.'});sound.wrong();}};
  const next=()=>{const r=round+1;setRound(r);setChips(shuffle(orderSentences[r].map((word,i)=>({word,i}))));setPicked([]);setState('open');setFeedback(null);};
  return <>
@@ -322,7 +328,7 @@ function ListenExercise(props:StepProps){
  return <>
   <p className="kicker" lang="de">Alıştırma 6 · Hören Sie</p><Heading>Dinle ve işaretle</Heading><p className="l1a-tr">Kişiler nereden geliyor? Önce dinle, sonra seç.</p>
   {listenItems.map((item,i)=><div className="l1a-listen" key={item.key}>
-   <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich komme …</span></div><Say text={item.text} speech={speech} wide/></div>
+   <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich komme …</span></div><Say text={item.text} who={item.key} speech={speech} wide/></div>
    <div className="l1a-opts wrap" role="group" aria-label={item.name}>{item.options.map((option,j)=><button type="button" key={option} className={'l1a-opt'+(answers[i]!==undefined&&j===item.answer?' ok':answers[i]===j?' bad':'')} disabled={answers[i]!==undefined} lang="de" onClick={()=>answer(i,j)}>{option}</button>)}</div>
    {answers[i]!==undefined&&<p className="l1a-mini">Metin: <span lang="de" dir="ltr">{item.text}</span></p>}
   </div>)}

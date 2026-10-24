@@ -5,17 +5,20 @@
  */
 export const SITE_VOICE_PREFIX='site:';
 export type SiteVoice={id:string;style:string;name:string;gender:'female'|'male'};
+/** The voices carry the names of the people of Lektion 1A (the learner asked, 25 October 2026): the voice that
+ * reads Sabine in the lesson is called Sabine in the settings too (lib/willkommen-course.ts `speakers`). Ids and
+ * styles never change, so a saved choice (for example site:F4) keeps working. */
 export const siteVoices:readonly SiteVoice[]=[
- {id:'site:F1',style:'F1',name:'Lena',gender:'female'},
- {id:'site:F2',style:'F2',name:'Mia',gender:'female'},
- {id:'site:F3',style:'F3',name:'Clara',gender:'female'},
- {id:'site:F4',style:'F4',name:'Sophie',gender:'female'},
- {id:'site:F5',style:'F5',name:'Hanna',gender:'female'},
- {id:'site:M1',style:'M1',name:'Jonas',gender:'male'},
- {id:'site:M2',style:'M2',name:'Felix',gender:'male'},
+ {id:'site:F1',style:'F1',name:'Sabine',gender:'female'},
+ {id:'site:F2',style:'F2',name:'Yasemin',gender:'female'},
+ {id:'site:F3',style:'F3',name:'Aisha',gender:'female'},
+ {id:'site:F4',style:'F4',name:'Nora',gender:'female'},
+ {id:'site:F5',style:'F5',name:'Mei',gender:'female'},
+ {id:'site:M1',style:'M1',name:'Rami',gender:'male'},
+ {id:'site:M2',style:'M2',name:'Omar',gender:'male'},
  {id:'site:M3',style:'M3',name:'Paul',gender:'male'},
- {id:'site:M4',style:'M4',name:'Lukas',gender:'male'},
- {id:'site:M5',style:'M5',name:'Max',gender:'male'},
+ {id:'site:M4',style:'M4',name:'Nikos',gender:'male'},
+ {id:'site:M5',style:'M5',name:'Tomasz',gender:'male'},
 ];
 export const DEFAULT_SITE_VOICE='site:F1';
 /** Each site voice introduces itself when it is chosen in the settings. */
@@ -79,15 +82,22 @@ export function siteClipUrl(voice:SiteVoice,text:string,value:VoiceManifest|null
  const id=value?.clips[normalizeSpeechText(text)];
  return id&&value?.voices.includes(voice.style)?`/voices/${voice.style}/${id}.mp3`:null;
 }
-/** The clips to try for a text, in order: the chosen voice, then the default voice and one more voice of
- * the same kind. New texts are rendered voice by voice, so while one voice is still missing a clip another
- * natural voice plays it; the device voice (silent on some phones) is only the very last fallback. */
+/** The clips to try for a text, in order: the chosen voice, then another voice of the same kind (a man stays a
+ * man, a woman a woman), then the default voice. New texts are rendered voice by voice, so while one voice is
+ * still missing a clip another natural voice plays it; the device voice (silent on some phones) is the very last fallback. */
 export function siteClipUrls(preference:string,text:string,value:VoiceManifest|null=manifest):string[]{
  const voice=resolveSiteVoice(preference,value);const id=value?.clips[normalizeSpeechText(text)];
  if(!voice||!id||!value)return [];
  const others=availableSiteVoices(value).filter(other=>other.id!==voice.id);
- const backups=[others.find(other=>other.id===DEFAULT_SITE_VOICE),others.find(other=>other.id!==DEFAULT_SITE_VOICE&&other.gender===voice.gender)];
- return [voice,...backups.filter((item):item is SiteVoice=>!!item)].map(item=>`/voices/${item.style}/${id}.mp3`);
+ const backups=[others.find(other=>other.gender===voice.gender),others.find(other=>other.id===DEFAULT_SITE_VOICE)];
+ const chain=[voice,...backups.filter((item):item is SiteVoice=>!!item)].filter((item,index,list)=>list.indexOf(item)===index);
+ return chain.map(item=>`/voices/${item.style}/${id}.mp3`);
+}
+/** What a voice says when it is chosen or previewed: its greeting when that clip exists (or while the clip list is
+ * still unknown), otherwise `fallback` — a sentence that has a clip — so a renamed voice is never read by the device voice. */
+export function voiceSample(voice:SiteVoice,fallback:string,value:VoiceManifest|null=manifest):string{
+ const greeting=voiceGreeting(voice);
+ return !value||siteClipUrls(voice.id,greeting,value).length?greeting:fallback;
 }
 export function clipPlaybackRate(rate:number){
  const value=rate/SITE_CLIP_BASE_RATE;
@@ -95,7 +105,8 @@ export function clipPlaybackRate(rate:number){
 }
 
 type ClipEvents={onStart:()=>void;onEnd:()=>void;onError:()=>void};
-export type ClipPlayer={unlock:()=>void;play:(url:string,rate:number,events:ClipEvents,speed?:number)=>void;stop:()=>void};
+/** `loading` says whether the current clip is still being downloaded (a slow connection), so the chosen voice is kept a little longer. */
+export type ClipPlayer={unlock:()=>void;play:(url:string,rate:number,events:ClipEvents,speed?:number)=>void;stop:()=>void;loading?:()=>boolean};
 // 50 ms of silence: playing it inside a tap lets the same element play the
 // answer later, after the sound effect (needed on iPhone and iPad).
 const SILENCE='data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACA'+'gICA'.repeat(133);
@@ -126,5 +137,7 @@ export function createClipPlayer(createAudio:()=>HTMLAudioElement=()=>new Audio(
    catch{if(mine===token){detach(audio);events.onError();}}
   },
   stop(){token++;if(element){detach(element);try{element.pause();}catch{}}},
+  // Still downloading the clip (a slow connection), not yet able to play: the chosen voice gets a little more time.
+  loading(){const audio=element;return !!audio&&!!audio.src&&audio.src!==SILENCE&&audio.networkState===2&&audio.readyState<3;},
  };
 }

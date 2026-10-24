@@ -13,6 +13,45 @@ export const willkommenPictures={
 } as const;
 export const portraitSrc=(key:string)=>'/toon/lektion1/'+key+'.webp';
 
+/* ---------- who speaks ---------- */
+/** The people of the lesson, each with a fixed site voice of their own kind: a man is read by a man's voice, a woman
+ * by a woman's, and two people in the same step never share a voice (the learner asked, 25 October 2026). "paul" is
+ * the teacher who asks the questions in the exercises. Texts without a speaker are read with the learner's chosen voice. */
+export type Speaker={key:string;name:string;gender:'female'|'male';style:string};
+export const speakers:readonly Speaker[]=[
+ {key:'sabine',name:'Sabine Krüger',gender:'female',style:'F1'},
+ {key:'yasemin',name:'Yasemin Arslan',gender:'female',style:'F2'},
+ {key:'aisha',name:'Aisha Kamau',gender:'female',style:'F3'},
+ {key:'nora',name:'Nora Weiß',gender:'female',style:'F4'},
+ {key:'mei',name:'Mei Suwan',gender:'female',style:'F5'},
+ {key:'mira',name:'Mira Fuchs',gender:'female',style:'F3'},
+ {key:'lena',name:'Lena Vogt',gender:'female',style:'F1'},
+ {key:'omar',name:'Omar Nasser',gender:'male',style:'M2'},
+ {key:'nikos',name:'Nikos Papadakis',gender:'male',style:'M4'},
+ {key:'tomasz',name:'Tomasz Nowak',gender:'male',style:'M5'},
+ {key:'rami',name:'Rami Khalil',gender:'male',style:'M1'},
+ {key:'jonas',name:'Jonas Berg',gender:'male',style:'M1'},
+ {key:'tarek',name:'Tarek Salim',gender:'male',style:'M4'},
+ {key:'paul',name:'Paul',gender:'male',style:'M3'},
+];
+/** Something to read, by someone (or by the learner's chosen voice when `who` is missing). */
+export type SayItem=string|{text:string;who?:string};
+export const sayText=(item:SayItem)=>typeof item==='string'?item:item.text;
+/** The site voice for a speaker among the voices that are available: their own voice, else another voice of their
+ * kind (never a man for a woman); nobody → undefined, the learner's chosen voice. */
+export function speakerVoice(who:string|undefined,available:readonly {id:string;style:string;gender:string}[]):string|undefined{
+ const speaker=who?speakers.find(item=>item.key===who):undefined;if(!speaker)return undefined;
+ const own=available.find(voice=>voice.style===speaker.style);if(own)return own.id;
+ const pool=available.filter(voice=>voice.gender===speaker.gender);if(!pool.length)return undefined;
+ const sameKind=speakers.filter(item=>item.gender===speaker.gender);
+ return pool[sameKind.indexOf(speaker)%pool.length].id;
+}
+/** The speaker of a sentence that names its speaker ("Ich bin Lena Vogt. Und Sie?"). */
+export function speakerOf(text:string):string|undefined{
+ const match=/\b(?:ich bin|ich heiße)\s+([^.,!?]+)/i.exec(text);if(!match)return undefined;
+ const name=match[1].trim();return speakers.find(speaker=>speaker.name===name)?.key;
+}
+
 export type Phrase=readonly [de:string,tr:string];
 /** Step 1 · Selamlaşma */
 export const greetings:Phrase[]=[['Guten Tag!','İyi günler! / Merhaba!'],['Herzlich willkommen!','Hoş geldiniz!'],['Danke!','Teşekkürler!']];
@@ -145,6 +184,14 @@ export const ownPrompts:{question:string;pattern:RegExp;placeholder:string}[]=[
  {question:'Wie heißen Sie?',pattern:/^(ich heisse|ich bin) \S+/,placeholder:'Ich heiße … / Ich bin …'},
  {question:'Woher kommen Sie?',pattern:/^ich komme aus \S+/,placeholder:'Ich komme aus …'},
 ];
+/** Who reads what in the exercises (see `speakers`): the solution lines of the gap exercises alternate a, b. */
+export const exerciseSpeakers:Record<'harfler'|'ayir'|'soru'|'kutu',{a:string;b:string}>={harfler:{a:'mira',b:'tarek'},ayir:{a:'paul',b:'lena'},soru:{a:'paul',b:'aisha'},kutu:{a:'nikos',b:'yasemin'}};
+export const withSpeakers=(say:readonly string[],who:{a:string;b:string}):SayItem[]=>say.map((text,i)=>({text,who:i%2?who.b:who.a}));
+export const dialogueSpeaker=(who:'S'|'O')=>who==='S'?'sabine':'omar';
+/** Matching: the person who introduces themselves, else the teacher asks; a named person answers. */
+export const matchSay=(pair:Phrase):SayItem[]=>[{text:pair[0],who:speakerOf(pair[0])??'paul'},{text:pair[1],who:speakerOf(pair[1])}];
+/** Word order: the named person, the teacher for a question, else the learner's chosen voice. */
+export const orderSay=(sentence:string):SayItem=>({text:sentence,who:speakerOf(sentence)??(sentence.endsWith('?')?'paul':undefined)});
 /** The test: question, options, right answer. */
 export type TestQuestion=readonly [question:string,options:string[],answer:string];
 export const testQuestions:TestQuestion[]=[

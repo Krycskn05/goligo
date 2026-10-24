@@ -25,17 +25,18 @@ test('site voice manifest: normalised lookup, default voice and safe parsing',()
  assert.equal(voices.parseVoiceManifest({voices:'F1'}),null);
  assert.deepEqual(voices.availableSiteVoices(manifest).map(v=>v.id),['site:F1','site:M2']);
  assert.equal(voices.resolveSiteVoice('',manifest).id,voices.DEFAULT_SITE_VOICE,'automatic uses the default site voice');
- assert.equal(voices.resolveSiteVoice('site:M2',manifest).name,'Felix');
+ assert.equal(voices.resolveSiteVoice('site:M2',manifest).name,'Omar');
  assert.equal(voices.resolveSiteVoice('site:F3',manifest),undefined,'a voice without clips is not used');
  assert.equal(voices.resolveSiteVoice('Anna',manifest),undefined,'a chosen device voice stays a device voice');
  assert.equal(voices.resolveSiteVoice('',null),undefined);
  const lena=voices.siteVoiceById('site:F1');
  assert.equal(voices.siteClipUrl(lena,'das   Haus',manifest),'/voices/F1/0123456789abcdef.mp3');
  assert.equal(voices.siteClipUrl(lena,'die Küche',manifest),null);
- // While a voice is still missing a new clip, the default voice and one more voice of the same kind are tried next.
+ // While a voice is still missing a new clip, another voice of the same kind and then the default voice are tried (a man stays a man, 25 October 2026).
  const full=voices.parseVoiceManifest({version:4,voices:['F1','F2','M1','M2'],clips:{'das Haus':'0123456789abcdef'}});
- assert.deepEqual(voices.siteClipUrls('site:M2','das Haus',full),['/voices/M2/0123456789abcdef.mp3','/voices/F1/0123456789abcdef.mp3','/voices/M1/0123456789abcdef.mp3']);
+ assert.deepEqual(voices.siteClipUrls('site:M2','das Haus',full),['/voices/M2/0123456789abcdef.mp3','/voices/M1/0123456789abcdef.mp3','/voices/F1/0123456789abcdef.mp3']);
  assert.deepEqual(voices.siteClipUrls('','das Haus',full),['/voices/F1/0123456789abcdef.mp3','/voices/F2/0123456789abcdef.mp3']);
+ assert.deepEqual(voices.siteClipUrls('site:F2','das Haus',full),['/voices/F2/0123456789abcdef.mp3','/voices/F1/0123456789abcdef.mp3'],'no voice twice');
  assert.deepEqual(voices.siteClipUrls('Anna','das Haus',full),[],'a chosen device voice stays a device voice');
  assert.deepEqual(voices.siteClipUrls('','die Küche',full),[]);
  assert.equal(voices.clipPlaybackRate(0.94),1);
@@ -43,7 +44,15 @@ test('site voice manifest: normalised lookup, default voice and safe parsing',()
  assert.equal(voices.clipPlaybackRate(5),1.3);
  assert.equal(voices.siteVoices.length,10);
  assert.equal(new Set(voices.siteVoices.map(v=>v.name)).size,10);
- assert.match(voices.voiceGreeting(lena),/Lena/);
+ // The voices are named after the people of Lektion 1A (25 October 2026): the voice that reads Sabine is "Sabine".
+ assert.deepEqual(voices.siteVoices.map(v=>v.name),['Sabine','Yasemin','Aisha','Nora','Mei','Rami','Omar','Paul','Nikos','Tomasz']);
+ assert.match(voices.voiceGreeting(lena),/Hallo, ich bin Sabine\./);
+ // Chosen or previewed: the greeting when its clip exists, else a sentence that has one (never the device voice for a renamed voice).
+ const greetingId='00112233aabbccdd';const withGreeting=voices.parseVoiceManifest({version:5,voices:['F1'],clips:{[voices.voiceGreeting(lena)]:greetingId,'Hallo! Schön.':'ffeeddccbbaa9988'}});
+ assert.equal(voices.voiceSample(lena,'Hallo! Schön.',withGreeting),voices.voiceGreeting(lena));
+ assert.equal(voices.voiceSample(lena,'Hallo! Schön.',manifest),'Hallo! Schön.','no greeting clip yet: the preview sentence');
+ assert.equal(voices.voiceSample(lena,'Hallo! Schön.',null),voices.voiceGreeting(lena),'clip list unknown: the greeting');
+ for(const file of ['app/learning-effects.tsx','app/site-tour.tsx']){const page=readFileSync(file,'utf8');assert.ok(page.includes('voiceSample(voice,germanSpeechPreview)')&&!page.includes('voiceGreeting('),file+' plays the sample');}
 });
 
 test('an old device-voice choice moves once to the natural site voice; later choices are kept',()=>{
@@ -98,6 +107,29 @@ test('when the chosen voice has no clip yet, another natural voice plays it befo
  s.controller.speak('du lädst ein',{voiceName:'site:M2'});t.mock.timers.tick(4100);
  assert.equal(s.plays.at(-1).url,'/voices/F1/a.mp3');s.plays.at(-1).events.onError();
  assert.equal(s.utterances.at(-1).text,'du lädst ein');
+});
+
+test('a clip that is still downloading keeps the chosen voice longer before another voice is tried',t=>{
+ let loading=true;
+ t.mock.timers.enable({apis:['setTimeout','Date']});
+ // The test player reports "still downloading" until told otherwise.
+ const synth={paused:false,speaking:false,pending:false,getVoices:()=>[{name:'Anna',lang:'de-DE',localService:true}],speak(){this.pending=true;},cancel(){this.pending=false;},resume(){}};
+ const plays=[];const player={unlock(){},play(url,rate,events){plays.push({url,rate,events});},stop(){},loading:()=>loading};
+ const controller=speech.createGermanSpeechPlayer(synth,text=>({text}),()=>{},'de',{},{player,resolve:()=>['/voices/F4/a.mp3','/voices/F1/a.mp3']});
+ t.after(()=>controller.stop());
+ controller.speak('Guten Tag!',{voiceName:'site:F4'});
+ t.mock.timers.tick(speech.CLIP_WAIT_MS+100);
+ assert.equal(plays.length,1,'Sophie is kept while her clip is still downloading');
+ t.mock.timers.tick(speech.CLIP_WAIT_MS);
+ assert.equal(plays.length,1,'still waiting for the download');
+ t.mock.timers.tick(speech.CLIP_WAIT_MAX_MS);
+ assert.equal(plays.length,2,'after the longest wait the next voice is tried');assert.equal(plays[1].url,'/voices/F1/a.mp3');
+ // A clip that is not downloading at all (nothing arrives) moves on after the short wait, as before.
+ loading=false;controller.speak('Danke!',{voiceName:'site:F4'});const before=plays.length;
+ t.mock.timers.tick(speech.CLIP_WAIT_MS+100);
+ assert.equal(plays.length,before+1);assert.equal(plays.at(-1).url,'/voices/F1/a.mp3');
+ assert.ok(speech.CLIP_WAIT_MAX_MS>speech.CLIP_WAIT_MS*2&&speech.CLIP_WAIT_MAX_MS<=15000,'a bounded wait');
+ const site=readFileSync('lib/site-voices.ts','utf8');assert.ok(site.includes('loading(){')&&site.includes('networkState===2'),'the real player reports a download in progress');
 });
 
 test('late clip events after stop or a newer request are ignored',t=>{

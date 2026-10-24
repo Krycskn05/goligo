@@ -43,6 +43,38 @@ test('scores stay in the browser and make the progress of the unit card',()=>{
  assert.deepEqual(lesson.scoredExercises.map(e=>e.id),['harfler','eslestir','sirala','ayir','aus','dinle','soru','kutu','test']);
 });
 
+test('a man is read by a man, a woman by a woman, and two people in one step never share a voice (25 October 2026)',()=>{
+ const siteVoices=load('site-voices').siteVoices;
+ const women=new Set(['sabine','yasemin','aisha','nora','mei','mira','lena']),men=new Set(['omar','nikos','tomasz','rami','jonas','tarek','paul']);
+ for(const speaker of lesson.speakers){
+  assert.equal(speaker.gender,women.has(speaker.key)?'female':'male',speaker.key);
+  const voice=siteVoices.find(voice=>voice.style===speaker.style);assert(voice,speaker.style);assert.equal(voice.gender,speaker.gender,speaker.key+' has a voice of their own kind');
+ }
+ for(const person of lesson.people)assert(lesson.speakers.some(s=>s.key===person.key&&s.name===person.name),person.key);
+ // The site voices carry these people's names: the voice that reads Omar is called Omar in the settings.
+ for(const voice of siteVoices){const speaker=lesson.speakers.find(s=>s.style===voice.style&&s.name.split(' ')[0]===voice.name);assert(speaker,voice.name+' is a person of the lesson with that voice');assert.equal(speaker.gender,voice.gender);}
+ for(const item of lesson.listenItems)assert(lesson.speakers.some(s=>s.key===item.key&&s.name===item.name),item.key);
+ // Every person's own voice is used when it is available; a missing voice is replaced by one of the same kind, never by nobody.
+ assert.equal(lesson.speakerVoice('omar',siteVoices),'site:M2');assert.equal(lesson.speakerVoice('sabine',siteVoices),'site:F1');
+ assert.equal(lesson.speakerVoice(undefined,siteVoices),undefined,'no speaker: the learner\'s chosen voice');
+ assert.equal(lesson.speakerVoice('nora',siteVoices.filter(voice=>voice.style!=='F4')),'site:F5','another woman\'s voice when Sophie is missing');
+ assert.equal(lesson.speakerVoice('rami',siteVoices.filter(voice=>voice.gender==='female')),undefined,'never a woman for a man');
+ assert.equal(lesson.speakerOf('Guten Tag. Ich bin Sabine Krüger. Wie heißen Sie?'),'sabine');assert.equal(lesson.speakerOf('Ich heiße Tarek Salim.'),'tarek');assert.equal(lesson.speakerOf('Ich komme aus Polen.'),undefined);
+ // Steps with several speakers: distinct voices within the step.
+ const styleOf=key=>lesson.speakers.find(s=>s.key===key).style;
+ const distinct=(keys,where)=>assert.equal(new Set(keys.map(styleOf)).size,keys.length,where+': '+keys.join(','));
+ distinct(lesson.dialogue.map(([who])=>lesson.dialogueSpeaker(who)).filter((k,i,a)=>a.indexOf(k)===i),'diyalog');
+ distinct(lesson.people.map(p=>p.key),'kisiler');distinct(lesson.listenItems.map(i=>i.key),'dinle');
+ for(const [id,who] of Object.entries(lesson.exerciseSpeakers))distinct([who.a,who.b],id);
+ const matchVoices=lesson.matchPairs.flatMap(pair=>lesson.matchSay(pair).map(item=>item.who).filter(Boolean));
+ assert.deepEqual(matchVoices,['paul','jonas','paul','paul','mira','tarek']);distinct(['paul','jonas','mira','tarek'],'eslestir');
+ assert.deepEqual(lesson.orderSentences.map(s=>lesson.orderSay(s.join(' ')).who),['paul',undefined,'paul','lena']);
+ assert.deepEqual(lesson.withSpeakers(lesson.boxSay,lesson.exerciseSpeakers.kutu).map(item=>item.who),['nikos','yasemin','nikos','yasemin','nikos','yasemin']);
+ const page=read('app/willkommen-study.tsx');
+ for(const piece of ['who={dialogueSpeaker(who)}','who={p.key}','who={item.key}','speakerVoice(who,voices.current)','withSpeakers(props.say,exerciseSpeakers[id])','matchSay(matchPairs[i])','orderSay(sentence'])assert(page.includes(piece),piece);
+ assert(!page.includes('tahtaya asar'),'the classroom note is gone');
+});
+
 test('the page, its pictures, the units link, guest access and the menu',()=>{
  assert(fs.existsSync('app/a1-1/willkommen/page.tsx'));
  const page=read('app/willkommen-study.tsx');

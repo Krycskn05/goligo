@@ -20,6 +20,7 @@ publish_log() {
     && git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" sesler-sonuclari) || true
 }
 
+echo "kurulum basladi $(date -u '+%F %H:%M:%S')" > "$LOGS/00-zaman.log"
 {
   echo "::group::Kurulum"
   corepack enable && corepack prepare pnpm@11.25.0 --activate &&
@@ -33,6 +34,7 @@ publish_log() {
   echo "::endgroup::"
 } 2>&1 | tee "$LOGS/01-kurulum.log"
 
+echo "kurulum bitti $(date -u '+%F %H:%M:%S')" >> "$LOGS/00-zaman.log"
 STUDY_CHECK_DIR="$ROOT/.check/lib" node scripts/voices/list-texts.cjs > "$ROOT/.voice-texts.json" || { publish_log "HATA-metinler"; exit 1; }
 echo "Seslendirilecek metin: $(node -p "require('$ROOT/.voice-texts.json').length")" | tee "$LOGS/02-metinler.log"
 
@@ -44,10 +46,13 @@ if git fetch -q --depth 1 origin sesler 2>/dev/null; then
 fi
 
 echo "::group::Python paketleri"
-{ python -m pip install -q --upgrade pip && python -m pip install -q "supertonic>=1.2.1" lameenc soundfile numpy faster-whisper; } 2>&1 | tail -n 40 > "$LOGS/03-pip.log"
+echo "pip basladi $(date -u '+%F %H:%M:%S')" > "$LOGS/03-pip.log"
+{ python -m pip install -q --upgrade pip && python -m pip install -q "supertonic>=1.2.1" lameenc soundfile numpy faster-whisper; } 2>&1 | tail -n 60 >> "$LOGS/03-pip.log"
+echo "pip bitti $(date -u '+%F %H:%M:%S')" >> "$LOGS/03-pip.log"
 echo "::endgroup::"
 
-python scripts/voices/make-voices.py "$ROOT/.voice-texts.json" "$WORK" 2>&1 | tee "$LOGS/04-uretim.log"
+echo "uretim basladi $(date -u '+%F %H:%M:%S')" | tee "$LOGS/04-uretim.log"
+python scripts/voices/make-voices.py "$ROOT/.voice-texts.json" "$WORK" 2>&1 | tee -a "$LOGS/04-uretim.log"
 if [ "${PIPESTATUS[0]}" -ne 0 ]; then publish_log "HATA-uretim"; exit 1; fi
 
 CHANGED="$(cat "$WORK/.changed" 2>/dev/null || echo 0)"

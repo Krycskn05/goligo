@@ -3,7 +3,7 @@ import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {Check,ChevronDown,Play,Square,Star,Volume2,X} from 'lucide-react';
 import {wrongSoundIds,tapChoiceIds,pageSoundIds,correctSoundIds,completeSoundIds,nextTapSound,type SoundId} from '@/lib/effect-sounds';
 import {germanSpeechPreview} from '@/lib/german-speech';
-import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGreeting} from '@/lib/site-voices';
+import {DEFAULT_SITE_VOICE,isSiteVoice,voiceSample} from '@/lib/site-voices';
 import {useGermanSpeech} from './study-shared';
 import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
 import {isVaultLanguage,type VaultLanguage} from '@/lib/object-vault-copy';
@@ -125,10 +125,10 @@ export default function LearningEffects() {
     {speech.siteVoicesState==='loading'&&<p className="lk-effects-note">{text('voiceLoading')}</p>}
     {speech.siteVoicesState==='unavailable'&&<p className="lk-effects-note">{text('voiceFallback')}</p>}
     <div className="lk-voice-grid" role="radiogroup" aria-labelledby="lk-voice-title">
-     {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={currentVoice===voice.id} className={'lk-voice-chip '+voice.gender+(currentVoice===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceGreeting(voice))}><span className="lk-voice-avatar" aria-hidden="true">{voice.name[0]}</span><span><strong>{voice.name}</strong><small>{text(voice.gender==='female'?'voiceFemale':'voiceMale')}</small></span></button>)}
+     {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={currentVoice===voice.id} className={'lk-voice-chip '+voice.gender+(currentVoice===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceSample(voice,germanSpeechPreview))}><span className="lk-voice-avatar" aria-hidden="true">{voice.name[0]}</span><span><strong>{voice.name}</strong><small>{text(voice.gender==='female'?'voiceFemale':'voiceMale')}</small></span></button>)}
     </div>
     <div className="lk-voice-speed" role="group" aria-label={text('voiceSpeed')}><span>{text('voiceSpeed')}</span>{VOICE_SPEEDS.map(([value,key])=><button type="button" key={value} aria-pressed={speech.rate===value} className={speech.rate===value?'active':''} onClick={()=>{speech.setRate(value);setMessage('saved');}}>{text(key)}</button>)}</div>
-    <button type="button" className="lk-preview-button lk-voice-preview" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();previewStop.current?.();setPlaying(null);const voice=speech.siteVoices.find(item=>item.id===currentVoice);speech.speak(voice?voiceGreeting(voice):germanSpeechPreview);}}>{speech.busy?<Square size={15}/>:<Play size={15}/>} {text(speech.busy?'voiceStop':'voicePreview')}</button>
+    <button type="button" className="lk-preview-button lk-voice-preview" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();previewStop.current?.();setPlaying(null);const voice=speech.siteVoices.find(item=>item.id===currentVoice);speech.speak(voice?voiceSample(voice,germanSpeechPreview):germanSpeechPreview);}}>{speech.busy?<Square size={15}/>:<Play size={15}/>} {text(speech.busy?'voiceStop':'voicePreview')}</button>
    </section>
    <section className="lk-effects-panel" id="lk-panel-effects" role="tabpanel" aria-labelledby="lk-tab-effects" hidden={tab!=='effects'}>
     <div className="lk-effects-switches"><label><span><TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={26}/> {text('enabled')}</span><input type="checkbox" checked={preferences.enabled} onChange={event=>update({enabled:event.target.checked})}/></label></div>

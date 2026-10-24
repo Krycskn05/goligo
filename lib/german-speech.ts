@@ -11,6 +11,10 @@ export type SpeechPlayback = {
 export const idlePlayback: SpeechPlayback = {status: 'idle', text: '', warning: ''};
 export const germanSpeechPreview='Hallo! Schön, dass du da bist. Wir lernen zusammen Deutsch. Ganz in Ruhe, Schritt für Schritt.';
 export const defaultSpeechRate=(language:'de'|'en')=>language==='de'?0.94:0.85;
+/** A natural clip that has not started after this long moves on to the next voice — unless it is still downloading,
+ * in which case the chosen voice is kept for up to CLIP_WAIT_MAX_MS in all. */
+export const CLIP_WAIT_MS=4000;
+export const CLIP_WAIT_MAX_MS=12000;
 export function studyVoices(voices:SpeechSynthesisVoice[],language:'de'|'en'='de'){return voices.filter(voice=>new RegExp('^'+language+'(?:[-_]|$)','i').test(voice.lang));}
 function germanVoiceScore(voice:SpeechSynthesisVoice){
  const name=(voice.name+' '+voice.voiceURI).toLowerCase();
@@ -140,11 +144,14 @@ export function createGermanSpeechPlayer(
     else speakWithEngine(text, rate * speed, options.voiceName);
   }
 
-  /** Natural site-voice clips: when one fails before it starts the next voice is tried; the device voice comes last. */
+  /** Natural site-voice clips: when one fails before it starts the next voice is tried; the device voice comes last.
+   * A clip that is still downloading after the short wait (a slow connection) keeps the chosen voice for up to
+   * CLIP_WAIT_MAX_MS in all, so the learner does not hear another voice just because the network is slow. */
   function playClip(text: string, urls: readonly string[], rate: number, options: {voiceName?: string}, speed = 1) {
     const token = generation;
     let started = false;
     let attempt = 0;
+    let waited = 0;
     update({status: 'loading', text, warning: ''});
     const fallback = () => {
       if (token !== generation || started) return;
@@ -152,6 +159,12 @@ export function createGermanSpeechPlayer(
       clips?.player.stop();
       if (attempt + 1 < urls.length) { attempt++; tryClip(); return; }
       speakWithEngine(text, rate * speed, isSiteVoice(options.voiceName) ? '' : options.voiceName);
+    };
+    const slow = () => {
+      if (token !== generation || started) return;
+      waited += CLIP_WAIT_MS;
+      if (waited < CLIP_WAIT_MAX_MS && clips?.player.loading?.()) { timer = setTimeout(slow, CLIP_WAIT_MS); return; }
+      fallback();
     };
     const tryClip = () => {
     clips!.player.play(urls[attempt], rate, {
@@ -174,7 +187,7 @@ export function createGermanSpeechPlayer(
         update({...idlePlayback});
       },
     }, speed);
-    if (token === generation && !started) timer = setTimeout(fallback, 4000);
+    if (token === generation && !started) { waited = 0; timer = setTimeout(slow, CLIP_WAIT_MS); }
     };
     tryClip();
   }

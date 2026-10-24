@@ -59,7 +59,7 @@ test('the tour speaks every site language and asks about the sounds',()=>{
  }
  const ui=read('app/site-tour.tsx');
  // The sound window: the ten site voices (a tap lets the voice say hello), speed, effects on/off and volume, saved at once.
- assert.ok(ui.includes('speech.siteVoices.map(voice=>')&&ui.includes('onClick={()=>chooseVoice(voice.id,voiceGreeting(voice))}'));
+ assert.ok(ui.includes('speech.siteVoices.map(voice=>')&&ui.includes('onClick={()=>chooseVoice(voice.id,voiceSample(voice,germanSpeechPreview))}'));
  assert.ok(ui.includes('VOICE_SPEEDS.map(')&&ui.includes('update({enabled:event.target.checked})')&&ui.includes('update({volume:Number(event.target.value)/100})'));
  assert.ok(ui.includes('saveEffects(next)'),'saved like the sound settings');
  // Nothing is read aloud by itself: only a tap on a voice or "Dinle" plays a sound.

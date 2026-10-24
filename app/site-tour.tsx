@@ -15,7 +15,8 @@ import {fillText} from '@/lib/copy-fill';
 import {languageDirection,pickText} from '@/lib/site-languages';
 import type {StudyLanguage} from '@/lib/study-languages';
 import {EFFECTS_CHANGED,canPlayEffects,playLearningSound,readEffects,saveEffects,stopAllEffects,type EffectsPreferences} from '@/lib/learning-effects';
-import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGreeting} from '@/lib/site-voices';
+import {DEFAULT_SITE_VOICE,isSiteVoice,voiceSample} from '@/lib/site-voices';
+import {germanSpeechPreview} from '@/lib/german-speech';
 import {api,useGermanSpeech} from './study-shared';
 import {VOICE_SPEEDS} from './learning-effects';
 import {PAUL_PICTURES,PAUL_STILL,usePaulMotion,type PaulPose} from './paul-hoca';
@@ -79,7 +80,7 @@ function SoundChoices({language}:{language:StudyLanguage}){
    {speech.siteVoicesState==='loading'&&<p className="st-note">{e('voiceLoading')}</p>}
    {speech.siteVoicesState==='unavailable'&&<p className="st-note">{e('voiceFallback')}</p>}
    <div className="st-voices" role="radiogroup" aria-labelledby="st-voice-title">
-    {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={current===voice.id} className={'st-voice '+voice.gender+(current===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceGreeting(voice))}>
+    {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={current===voice.id} className={'st-voice '+voice.gender+(current===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceSample(voice,germanSpeechPreview))}>
      <span className="st-avatar" aria-hidden="true">{voice.name[0]}</span><strong>{voice.name}</strong><small>{e(voice.gender==='female'?'voiceFemale':'voiceMale')}</small>
     </button>)}
    </div>
@@ -87,7 +88,7 @@ function SoundChoices({language}:{language:StudyLanguage}){
   <section className="st-row" aria-label={e('voiceSpeed')}>
    <h3>{e('voiceSpeed')}</h3>
    <div className="st-speeds" role="group" aria-label={e('voiceSpeed')}>{VOICE_SPEEDS.map(([value,key])=><button type="button" key={value} aria-pressed={speech.rate===value} className={speech.rate===value?'on':''} onClick={()=>speech.setRate(value)}>{e(key)}</button>)}</div>
-   <button type="button" className="st-listen" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();const voice=speech.siteVoices.find(item=>item.id===current);if(voice)speech.speak(voiceGreeting(voice));}} disabled={!speech.siteVoices.length}>{speech.busy?<Square size={14} aria-hidden="true"/>:<Play size={14} aria-hidden="true"/>}{e('listen')}</button>
+   <button type="button" className="st-listen" onClick={()=>{if(speech.busy){speech.stop();return;}stopAllEffects();const voice=speech.siteVoices.find(item=>item.id===current);if(voice)speech.speak(voiceSample(voice,germanSpeechPreview));}} disabled={!speech.siteVoices.length}>{speech.busy?<Square size={14} aria-hidden="true"/>:<Play size={14} aria-hidden="true"/>}{e('listen')}</button>
   </section>
   <label className="st-switch">
    <span><TopIcon name={preferences.enabled?'sounds':'soundsOff'} size={28}/><span><strong>{e('enabled')}</strong><small>{tourText(language,'effectsNote')}</small></span></span>

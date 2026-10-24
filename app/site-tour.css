@@ -25,7 +25,7 @@ html.st-open { overflow:hidden auto; }
 .st-count { display:block; font-size:12.5px; font-weight:800; letter-spacing:.04em; color:#c47a07; }
 .st-tip h2 { margin:0; font-size:19px; line-height:1.2; letter-spacing:-.01em; }
 .st-tip p { margin:8px 0 12px; font-size:15px; line-height:1.45; color:var(--ink-2,#3c5068); font-weight:500; }
-.st-close { position:absolute; top:10px; inset-inline-end:10px; display:grid; place-items:center; width:34px; height:34px; border:0; border-radius:50%; background:#f1ede4; color:#5b6b7f; cursor:pointer; }
+.st-close { position:absolute; top:8px; inset-inline-end:8px; display:grid; place-items:center; width:42px; height:42px; border:0; border-radius:50%; background:#f1ede4; color:#5b6b7f; cursor:pointer; }
 .st-close:hover { background:#e8e1d2; }
 
 /* Footer: the dots and the buttons */
@@ -85,7 +85,7 @@ html.st-open { overflow:hidden auto; }
 .st-switch input:checked { background:#4cb05a; }
 .st-switch input:checked::after { left:23px; }
 .st-switch input:focus-visible { outline:3px solid var(--blue-2,#2f7fd6); outline-offset:3px; }
-.st-volume { flex:1; min-width:120px; height:28px; accent-color:#0d9fad; }
+.st-volume { flex:1; min-width:120px; height:40px; accent-color:#0d9fad; }
 .st-row output { min-width:42px; font-weight:800; color:#0b7f8c; font-size:14px; }
 
 @keyframes st-fade { from { opacity:0; } }

@@ -17,11 +17,21 @@ export const BRAND={
 function useAnimated(src:string){
  const motion=usePaulMotion();const [loaded,setLoaded]=useState(false);
  useEffect(()=>{
-  if(!motion)return;
-  let alive=true;const image=new Image();image.onload=()=>{if(alive)setLoaded(true);};image.src=src;
-  return()=>{alive=false;};
+  if(!motion||!wantsAnimation())return;
+  // The animated files are big (2–3 MB): they are fetched once the page is idle, so the page itself loads first.
+  let alive=true;let image:HTMLImageElement|null=null;
+  const start=()=>{if(!alive)return;image=new Image();image.onload=()=>{if(alive)setLoaded(true);};image.src=src;};
+  const idle='requestIdleCallback' in window?window.requestIdleCallback.bind(window):null;
+  const handle=idle?idle(start,{timeout:2500}):window.setTimeout(start,600);
+  return()=>{alive=false;if(idle)window.cancelIdleCallback(handle);else clearTimeout(handle);};
  },[motion,src]);
  return loaded&&motion;
+}
+/** Not on a slow or metered connection: the still picture is enough there (the big animated file is never fetched). */
+function wantsAnimation(){
+ const connection=(navigator as Navigator&{connection?:{saveData?:boolean;effectiveType?:string}}).connection;
+ if(!connection)return true;
+ return !connection.saveData&&!/(^|-)2g$/.test(connection.effectiveType??'');
 }
 
 /**

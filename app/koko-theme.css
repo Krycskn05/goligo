@@ -33,7 +33,7 @@ strong { font-weight:700; }
 .site-header-tools { display:flex; align-items:center; gap:10px; margin-inline-start:auto; flex-wrap:wrap; justify-content:flex-end; }
 .site-language { display:inline-flex; align-items:center; gap:8px; padding:4px 8px 4px 14px; border:1px solid var(--toy-line); border-radius:999px; background:#fff; box-shadow:none; color:var(--ink-2); font-weight:700; font-size:14px; min-height:44px; }
 .site-language svg { color:var(--blue-2); flex-shrink:0; }
-.site-language select { border:0; background:transparent; font-weight:700; color:var(--ink); min-height:32px; padding:0 4px; font-size:15px; border-radius:8px; }
+.site-language select { border:0; background:transparent; font-weight:700; color:var(--ink); min-height:40px; padding:0 4px; font-size:15px; border-radius:8px; }
 .site-language select:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
 .site-progress { display:inline-flex; align-items:center; gap:8px; padding:4px 14px 4px 6px; border-radius:999px; background:#fff4d6; border:1px solid #f3dfa8; box-shadow:none; font-weight:800; color:#6a4400; font-size:14px; min-height:44px; text-decoration:none; }
 .site-progress:hover { background:#fff8e3; }
@@ -237,13 +237,13 @@ html[data-lernkoko-motion=reduced] .site-sparkle { animation:none; }
 /* "Ana sayfa › Nesne Kasası": the page path as a white pill bar with round chips, so it is easy to see and tap.
    Links are light-blue chips (the first one, the home page, with a little house); the page you are on is a gold chip. */
 .object-breadcrumb { display:flex; width:fit-content; max-width:100%; align-items:center; gap:6px; flex-wrap:wrap; padding:5px; margin:4px 0 22px; background:#fff; border:2px solid #fff; border-radius:22px; box-shadow:0 4px 14px rgba(28,82,130,.10); color:#1f3b5c; font-size:14px; font-weight:700; line-height:1.2; }
-.object-breadcrumb a { display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:6px 13px; border-radius:999px; background:#eaf4ff; color:#1f5fa8; font-weight:700; text-decoration:none; transition:background .15s,transform .15s; }
+.object-breadcrumb a { display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:6px 13px; border-radius:999px; background:#eaf4ff; color:#1f5fa8; font-weight:700; text-decoration:none; transition:background .15s,transform .15s; }
 .object-breadcrumb a:hover { background:#d6eaff; transform:translateY(-1px); }
 .object-breadcrumb a:focus-visible { outline:3px solid var(--blue-2); outline-offset:2px; }
 .object-breadcrumb a:first-child[href^="/?"]::before,.object-breadcrumb a:first-child[href="/"]::before { content:""; flex:none; width:16px; height:16px; background:currentColor; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5 12 4l9 7.5'/%3E%3Cpath d='M5.5 10v9.5h13V10'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5 12 4l9 7.5'/%3E%3Cpath d='M5.5 10v9.5h13V10'/%3E%3C/svg%3E") center/contain no-repeat; }
 .object-breadcrumb > svg,.object-breadcrumb > span[aria-hidden="true"] { flex:none; color:#9fb3c6; font-size:16px; }
-.object-breadcrumb > :last-child:not(a):not(svg) { display:inline-flex; align-items:center; min-height:34px; padding:6px 13px; border-radius:999px; background:linear-gradient(180deg,#ffdb76,#f6b23c); color:#4a2a00; box-shadow:0 2px 0 #e59a1d; }
-@media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:38px; padding:5px 12px; } }
+.object-breadcrumb > :last-child:not(a):not(svg) { display:inline-flex; align-items:center; min-height:40px; padding:6px 13px; border-radius:999px; background:linear-gradient(180deg,#ffdb76,#f6b23c); color:#4a2a00; box-shadow:0 2px 0 #e59a1d; }
+@media (max-width:520px) { .object-breadcrumb { font-size:13px; margin-bottom:16px; } .object-breadcrumb a,.object-breadcrumb > :last-child:not(a):not(svg) { min-height:40px; padding:5px 12px; } }
 @media (prefers-reduced-motion:reduce) { .object-breadcrumb a { transition:none; } .object-breadcrumb a:hover { transform:none; } }
 
 /* Goliqo logo and mascot (app/site-logo.tsx, the learner's logo files): the header logo is a picture now (372 × 136,

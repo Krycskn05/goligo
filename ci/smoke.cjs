@@ -219,6 +219,12 @@ async function languageFlow(browser) {
   await visit(page, "/gizlilik", "01d-gizlilik.png", errors);
   await visit(page, "/kullanim-kosullari", "01e-kullanim-kosullari.png", errors);
   await visit(page, "/impressum", "01f-impressum.png", errors);
+  // Resimler ve sesler tarayicida bir sure saklanir (public/_headers): bilgi olarak kaydedilir, yayini durdurmaz.
+  {
+    const picture = await page.request.get(BASE + "/objects/toon/koerper-arm.webp");
+    const cache = picture.headers()["cache-control"] || "(yok)";
+    record("Resimler onbellekte tutuluyor (public/_headers)", picture.status() === 200, "cache-control: " + cache + (/max-age=\d{4,}/.test(cache) ? "" : " — basliklar uygulanmamis olabilir"));
+  }
   record("Impressum acik, Almanca ve altbilgide baglantisi var", (await page.locator("[data-impressum]").count()) === 1 && /Angaben gemäß/.test((await page.locator("[data-impressum]").textContent()) || "") && (await page.locator("[data-footer-impressum]").count()) === 1, "");
 
   // Girissiz kayit istegi: bos misafir cevabi (kimsenin kaydi yok); yazma istekleri (not, yildiz) 401.

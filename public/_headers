@@ -1,0 +1,18 @@
+# Cloudflare Workers Assets: how long browsers keep the site's files (pictures, sounds, voices).
+# Pages and the API are never cached here; a changed picture is picked up again within a day.
+/objects/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
+/toon/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
+/paul/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
+/verbs/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
+/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/branding/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/sfx/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=2592000
+/voices/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=2592000

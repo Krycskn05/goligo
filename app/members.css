@@ -26,7 +26,7 @@
 .lk-hero-form .lk-auth-form { gap:10px; }
 .lk-hero-form .lk-field { gap:4px; font-size:14.5px; }
 .lk-hero-form .lk-field input,.lk-hero-form .lk-password input { min-height:42px; padding:7px 12px; font-size:16px; border-radius:12px; }
-.lk-hero-form .lk-password-toggle { width:40px; }
+.lk-hero-form .lk-password-toggle { width:44px; }
 .lk-hero-form .lk-field small { font-size:12.5px; line-height:1.35; }
 .lk-hero-form .lk-check { gap:9px; font-size:13px; line-height:1.4; }
 .lk-hero-form .lk-check input { width:20px; height:20px; }

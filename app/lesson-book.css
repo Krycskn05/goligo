@@ -113,7 +113,7 @@
 }
 
 /* Lektion 12 words on a wide right page: German and Turkish side by side, like a word notebook */
-@media (min-width:1000px) {
+@media (min-width:1180px) {
  .lb-wide .lb-right .l12-word-grid { grid-template-columns:minmax(0,1fr); gap:10px; }
  .lb-wide .lb-right .l12-word-text { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); align-items:center; gap:4px 16px; }
  .lb-wide .lb-right .l12-word-tr { padding-inline-start:14px; border-inline-start:1.5px dashed #d8cfbb; }
@@ -195,18 +195,19 @@
 /* the first sentence names its parts above them (instead of the old header row) */
 .lb .housing-lesson-stack .l12-frame-head + .l12-frame-row .housing-sentence-part .l12-sr { position:static; order:-1; display:block; width:auto; height:auto; margin:0; overflow:visible; clip:auto; white-space:normal; color:var(--ink-3); font-size:11px; font-weight:800; }
 
-@media (max-width:1099px) and (min-width:1000px) {
+@media (max-width:1279px) and (min-width:1180px) {
  .lb-page { padding-inline:52px 22px; }
  .lb-title { font-size:32px; }
 }
 /* Narrow two-page spreads: the tabs keep their words whole (no number circle, a tick when done) */
-@media (max-width:1199px) and (min-width:1000px) {
+@media (max-width:1379px) and (min-width:1180px) {
  .lb .l12-step { padding:10px 10px 18px; }
  .lb .l12-step .l12-step-number { display:none; }
  .lb .l12-step-text strong { font-size:14px; }
  .lb .l12-step.done .l12-step-text strong::before { content:"✓"; margin-inline-end:4px; color:#2f7a31; }
 }
-@media (max-width:999px) {
+/* Tablets and small laptops (the left menu takes 190–220 px): one page under the other, so the contents list keeps its width. */
+@media (max-width:1179px) {
  .lb .lb-spread,.lb-wide .lb-spread { grid-template-columns:minmax(0,1fr); margin-top:16px; padding:8px; border-radius:20px; }
  .lb-rings { position:absolute; top:-18px; left:22px; right:22px; height:40px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='40' viewBox='0 0 30 40'%3E%3Ccircle cx='15' cy='31' r='3.4' fill='%23cdbf9f'/%3E%3Crect x='9' y='3' width='12' height='30' rx='6' fill='none' stroke='%238ea4ba' stroke-width='4'/%3E%3Cpath d='M12 9v13' stroke='%23f2f7fc' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") left top / 30px 40px space no-repeat; }
  .lb-rings::before { display:none; }

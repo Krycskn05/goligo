@@ -61,7 +61,7 @@ test('the learner\'s Goliqo logo and animations are used in many places',()=>{
  // Header (every page): the still logo first, then the bounce again and again once it has loaded.
  assert.ok(logo.includes('<img className="site-logo-art" src={bounce?BRAND.logoBounce:BRAND.logo} alt="" width={496} height={182}'));
  assert.ok(logo.includes('const bounce=useAnimated(BRAND.logoBounce);')&&!logo.includes('sessionStorage'),'on every page, not once per visit');
- assert.ok(logo.includes('const image=new Image();image.onload=()=>{if(alive)setLoaded(true);};image.src=src;')&&logo.includes('return loaded&&motion;'),'animations only with motion on, after they have loaded');
+ assert.ok(logo.includes('image=new Image();image.onload=()=>{if(alive)setLoaded(true);};image.src=src;')&&logo.includes('return loaded&&motion;'),'animations only with motion on, after they have loaded');
  // The waving mascot and the big waving logo where the old Koko pictures were, and more.
  // The welcome box on the home page has no mascot or logo any more (the learner removed it).
  const tour=read('app/home-tour.tsx');assert.ok(!tour.includes('BrandMascot')&&!tour.includes('ht-koko')&&!tour.includes('koko-mascot'));

@@ -173,3 +173,17 @@ test('answer choices never break inside a word: one line, else the article above
  assert(css.includes('.picture-word-options { grid-template-columns:repeat(2,minmax(0,1fr)); }')&&css.includes('.picture-word-options.options-column { grid-template-columns:minmax(0,1fr); }'));
  for(const page of ['app/object-study.tsx','app/verb-study.tsx','app/housing-study.tsx'])assert(fs.readFileSync(page,'utf8').includes('<OptionText text='),page);
 });
+
+// The device sweep (24 October 2026): phones, foldables, tablets, computers.
+test('tablets show the lesson book one page under the other; touch targets are at least 40 px; files are cached',()=>{
+ const book=fs.readFileSync('app/lesson-book.css','utf8');
+ assert(book.includes('@media (max-width:1179px) {')&&!book.includes('@media (max-width:999px)'),'two pages side by side only from 1180 px (the menu takes 190–220 px)');
+ assert(book.includes('@media (min-width:1180px) {'));
+ const tour=fs.readFileSync('app/site-tour.css','utf8');assert(/\.st-close \{[^}]*width:42px; height:42px/.test(tour));assert(/\.st-volume \{[^}]*height:40px/.test(tour));
+ const theme=fs.readFileSync('app/koko-theme.css','utf8');assert(/\.site-language select \{[^}]*min-height:40px/.test(theme));assert(/\.object-breadcrumb a \{[^}]*min-height:40px/.test(theme));
+ const headers=fs.readFileSync('public/_headers','utf8');
+ for(const folder of ['/objects/*','/toon/*','/voices/*','/sfx/*','/branding/*'])assert(headers.includes(folder+'\n  Cache-Control: public, max-age='),folder);
+ assert(!/^\/(api|_next|assets)?\/?\*?$/m.test(headers),'pages and the API are never cached');
+ const logo=fs.readFileSync('app/site-logo.tsx','utf8');assert(logo.includes('requestIdleCallback')&&logo.includes('saveData'),'the big animated logo waits for an idle moment and skips slow connections');
+ assert(fs.readFileSync('ci/smoke.cjs','utf8').includes('Resimler onbellekte tutuluyor'));
+});

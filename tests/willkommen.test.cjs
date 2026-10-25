@@ -2,10 +2,10 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
-const lesson=load('willkommen-course'),lessonB=load('willkommen-b-course'),progress=load('willkommen-progress'),auth=load('member-auth');
+const lesson=load('willkommen-course'),lessonB=load('willkommen-b-course'),lessonC=load('willkommen-c-course'),progress=load('willkommen-progress'),auth=load('member-auth');
 const read=file=>fs.readFileSync(file,'utf8');
 /** The lesson's code: the page, the shared pieces and Teil B's steps. */
-const pageCode=()=>['app/willkommen-study.tsx','app/willkommen-ui.tsx','app/willkommen-b-steps.tsx'].map(read).join('\n');
+const pageCode=()=>['app/willkommen-study.tsx','app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx'].map(read).join('\n');
 
 test('22 steps in the order of the learner\'s page: cover, 10 teaching steps, 9 exercises, test, end',()=>{
  assert.equal(lesson.steps.length,22);
@@ -73,13 +73,13 @@ test('a man is read by a man, a woman by a woman, and two people in one step nev
  assert.deepEqual(lesson.orderSentences.map(s=>lesson.orderSay(s.join(' ')).who),['paul',undefined,'paul','lena']);
  assert.deepEqual(lesson.withSpeakers(lesson.boxSay,lesson.exerciseSpeakers.kutu).map(item=>item.who),['nikos','yasemin','nikos','yasemin','nikos','yasemin']);
  const page=pageCode();
- for(const piece of ['who={dialogueSpeaker(who)}','who={p.key}','who={item.key}','speakerVoice(who,voices.current)','withSpeakers(props.say,speakers)','speakers={exerciseSpeakers.kutu}','matchSay(matchPairs[i])','orderSay(sentence'])assert(page.includes(piece),piece);
+ for(const piece of ['who={dialogueSpeaker(who)}','who={p.key}','who={item.key}','speakerVoice(who,voices.current)','withSpeakers(props.say.map(','speakers)','speakers={exerciseSpeakers.kutu}','matchSay(matchPairs[i])','orderSay(sentence'])assert(page.includes(piece),piece);
  assert(!page.includes('tahtaya asar'),'the classroom note is gone');
 });
 
 test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, Teil A on a wide spread with three tabs (25 October 2026)',()=>{
  assert.deepEqual(lesson.lessonParts.map(part=>part.badge),['A','B','C','D']);
- assert(lesson.lessonParts.slice(0,2).every(part=>part.title)&&lesson.lessonParts.slice(2).every(part=>!part.title),'Teil A and B are ready; C and D are shown as coming soon');
+ assert(lesson.lessonParts.slice(0,3).every(part=>part.title)&&lesson.lessonParts.slice(3).every(part=>!part.title),'Teil A, B and C are ready; D is shown as coming soon');
  assert.deepEqual(lesson.stepGroups.map(group=>group.id),['konu','alistirmalar','test']);
  assert.equal(lesson.stepGroups[0].ids.length,10);assert.equal(lesson.stepGroups[1].ids.length,9);
  assert.equal(lesson.groupOf('diyalog').id,'konu');assert.equal(lesson.groupOf('kutu').id,'alistirmalar');assert.equal(lesson.groupOf('kapak'),undefined);
@@ -132,10 +132,10 @@ test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps
  assert(!texts.includes(''));for(const item of lessonB.spellItems('Yasemin Fuchs Weiß Jonas Vogt Nikos Papadakis'))assert(texts.includes(item.text),item.text);
  assert(read('scripts/voices/list-texts.cjs').includes("load('willkommen-b-course').willkommenBSpeechTexts()"));
  for(const file of ['kapak-b','paul-alfabe','sie-sahne','du-sahne'])assert(fs.existsSync('public/toon/lektion1/'+file+'.webp'),file);
- // Scores: their own store; the unit card adds both parts.
+ // Scores: their own store; the unit card adds the parts.
  assert.equal(progress.partKeys.b.scores,'lernkoko-l1b-scores');assert.notEqual(progress.partKeys.a.scores,progress.partKeys.b.scores);
  const both=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}}});
- assert.equal(both.total,lesson.scoredExercises.reduce((n,e)=>n+e.total,0)+lessonB.scoredExercisesB.reduce((n,e)=>n+e.total,0));assert.equal(both.learned,22);
+ assert.equal(both.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC].flat().reduce((n,e)=>n+e.total,0),'every part counts, also one not started');assert.equal(both.learned,22);
  const page=pageCode();
  for(const piece of ["params.get('teil')","url.searchParams.set('teil',part)",'StepViewB','onPart(\'b\',0)','speech.speakAll(spellItems(word))','who="yasemin"',"who:'nikos'"])assert(page.includes(piece),piece);
 });
@@ -143,6 +143,69 @@ test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps
 test('the lesson page does not draw itself again and again (no effect that depends on the new-every-render sound object)',()=>{
  const page=read('app/willkommen-study.tsx');
  assert(!/\},\[speech,sound\]\)/.test(page),'no effect or callback keyed on speech and sound');
- assert(page.includes('latest.current.speech.stop()')&&page.includes("useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b')});},[]);"));
+ assert(page.includes('latest.current.speech.stop()')&&page.includes("useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c')});},[]);"));
  const smoke=read('ci/smoke.cjs');assert(smoke.includes('sayfa bostayken kendini yeniden cizmiyor')&&smoke.includes("teil=b&adim=alfabe"));
+});
+
+test('"Bu ünitede": what units 1–3 teach, in our own words (no sentences, names or titles copied from the book)',()=>{
+ const goals=load('unit-goals');
+ for(const id of ['book-01','book-02','book-03'])assert(goals.unitGoalsFor(id).length>=8,id);
+ assert.deepEqual(lesson.unitGoals,goals.unitGoalsFor('book-01'),'Lektion 1 shows its list');
+ assert.deepEqual(goals.unitGoalsFor('book-99'),[]);
+ const all=Object.values(goals.unitGoalsById).flat().join(' ');
+ for(const copied of ['Karim','Hadid','Ich bin Koch','Wer ist das','Wir brauchen Hilfe','Ich verstehe das nicht','Ich lerne hier Deutsch','das Regal ist schön','Waschmaschine','Ich arbeite hier','Lernziele','Plurikulturalität'])assert(!all.includes(copied),copied);
+ assert(read('app/willkommen-study.tsx').includes('unitGoals.map(goal=>'));
+});
+
+test('Teil C „Guten Tag!“ (25 October 2026): 26 steps, greetings by the time of day, Wie geht’s?, the verb in position 2, writing right',()=>{
+ assert.equal(lessonC.stepsC.length,26);
+ assert.deepEqual(lessonC.stepsC.map(step=>step.kind),['cover',...Array(11).fill('teach'),...Array(12).fill('exercise'),'test','end']);
+ assert.equal(new Set(lessonC.stepsC.map(step=>step.id)).size,26,'ids are unique');
+ assert.deepEqual(lessonC.stepGroupsC.map(group=>group.ids.length),[11,12,1]);
+ assert.equal(lessonC.stepIndexC('befinden'),4);assert.equal(lessonC.moods.length,6);assert.equal(lessonC.testQuestionsC.length,12);
+ // The memory game and the learner's own sentences have no score; every other exercise and the test do.
+ const scored=lessonC.scoredExercisesC.map(e=>e.id);
+ assert(!scored.includes('memory')&&!scored.includes('sen'));assert.equal(scored.length,11);
+ for(const id of scored)assert(lessonC.stepsC.some(step=>step.id===id&&(step.kind==='exercise'||step.kind==='test')),id);
+ assert.equal(lessonC.scoredExercisesC.find(e=>e.id==='kutu').total,6);
+ for(const [question,options,answer] of lessonC.testQuestionsC)assert(options.includes(answer),question);
+ // After a test answer only the right answer is read — in German, never a Turkish answer.
+ const turkish=new Set(['Sen diyelim mi?']);
+ for(const [question,,answer,say] of lessonC.testQuestionsC){if(turkish.has(answer))assert.equal(say,'',question);else assert(say,question);}
+ for(const item of lessonC.timeQuestions)assert(lessonC.timeOptions.includes(item.answer));
+ for(const item of lessonC.moodHearing)assert(item.options[item.answer],item.name);
+ for(const item of lessonC.orderVerbSentences)assert.equal(item.words[1],item.verb,'the verb is in position 2: '+item.words.join(' '));
+ for(const row of lessonC.verbPositions)assert(row[1]&&!row[1].includes(' '),row.join(' '));
+ // Writing right: the capitals exercise counts upper and lower case, ß may be ss; the dictation is loose.
+ assert(lesson.acceptsExact('Hallo! Ich heisse Nora Weiss',lessonC.capitalLines[0].answers[0]));
+ assert(!lesson.acceptsExact('hallo! ich heiße nora weiß.',lessonC.capitalLines[0].answers[0]));
+ assert(lesson.acceptsAnswer('wie geht es ihnen',lessonC.dictationLines[3].answers[0]));
+ assert(lesson.acceptsAnswer('Tschüss! Bis bald!',lessonC.dictationLines[5].answers[0])&&lesson.acceptsAnswer('tschüs',lessonC.gluedGreetingLines[5].answers[0])&&lesson.acceptsAnswer('Tschüss',lessonC.gluedGreetingLines[5].answers[0]),'both spellings of tschüs');
+ assert.equal(lessonC.capitalLines.map(line=>line.answers[0][0]).join(' '),lessonC.capitalSay);
+ assert.equal(lessonC.lowercaseText,lessonC.capitalSay.toLowerCase());
+ assert.equal(lessonC.gluedGreetings.toLowerCase(),lessonC.gluedGreetingAnswers.join('').replace(/[!\s]/g,'').toLowerCase());
+ // Each dialogue: two people with different voices; the listening and the word box use other people again.
+ const styleOf=key=>lesson.speakers.find(s=>s.key===key).style;
+ for(const lines of [lessonC.dialogueGoodbye,lessonC.dialogueMorning,lessonC.dialoguePark,lessonC.dialogueNew]){const who=[...new Set(lines.map(line=>line.who))];assert.equal(who.length,2);assert.notEqual(styleOf(who[0]),styleOf(who[1]));}
+ assert.equal(new Set(lessonC.moodHearing.map(item=>styleOf(item.key))).size,4,'four listening voices');
+ for(const item of lessonC.moodHearing)assert(lesson.speakers.some(s=>s.key===item.key&&s.name===item.name),item.key);
+ for(const item of lessonC.dictation.filter(item=>item.who))assert.equal(item.who,'rami');
+ // Every German text is listed for the site voices.
+ const texts=lessonC.willkommenCSpeechTexts();
+ for(const text of ['Guten Morgen!','Gute Nacht!','Wie geht es Ihnen?','Wie geht’s?','na ja, es geht','Alles paletti!','Welche Sprachen sprechen Sie?','Handschlag','Hm, nicht so gut heute.','Wie heißen Sie?','Und Sie?',lessonC.capitalSay,'Ich spreche Arabisch, Französisch und ein bisschen Deutsch.','Auf Wiedersehen!'])assert(texts.includes(text),text);
+ for(const line of lessonC.boxSayC)assert(texts.includes(line),line);
+ assert(!texts.includes(''));assert(texts.every(text=>text===text.trim()));
+ assert(read('scripts/voices/list-texts.cjs').includes("load('willkommen-c-course').willkommenCSpeechTexts()"));
+ for(const picture of Object.values(lessonC.willkommenCPictures))assert(fs.existsSync('public'+picture.src),picture.src);
+ // Scores: their own store; the unit card adds all three parts.
+ assert.equal(progress.partKeys.c.scores,'lernkoko-l1c-scores');assert.equal(progress.partKeys.c.step,'lernkoko-l1c-step');
+ const all=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}},c:{test:{right:12,total:12}}});
+ assert.equal(all.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC].flat().reduce((n,e)=>n+e.total,0));assert.equal(all.learned,34);
+ const page=pageCode();
+ for(const piece of ['StepViewC','onPart(\'c\',0)','stepsC','stepGroupsC','scoredExercisesC','exact','className="l1a-memory"','className="l1a-moods"','label="Lektion 1C · Test"'])assert(page.includes(piece),piece);
+ // Listening exercises: the button's name does not give the answer away.
+ assert(page.includes("aria-label={secret?(label==='Dinle'?label:'Dinle '+label):label+': '+text}"));
+ assert.equal((page.match(/wide secret\/>/g)||[]).length,5,'A, B (two), C and the dictation rows');
+ const css=read('app/willkommen.css');for(const cls of ['.l1a-moods','.l1a-mood-emoji','.l1a-pos-row','.l1a-pos-verb','.l1a-memory','.l1a-mcard.done','.l1a-row-say','.l1a-emoji-cell','.l1a-badge'])assert(css.includes(cls),cls);
+ const smoke=read('ci/smoke.cjs');assert(smoke.includes("teil=c&adim=befinden")&&smoke.includes("data-l1a-part='c'"));
 });

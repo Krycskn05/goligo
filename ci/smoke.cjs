@@ -246,13 +246,16 @@ async function languageFlow(browser) {
   await visit(page, "/a1-2/ev-ve-yasam", "03-ev-ve-yasam.png", errors);
   // Lektion 1 (25 October 2026): the entry is a notebook like Lektion 11/12 (Teil A–D); Teil A opens on its cover, a step opens from its address.
   await visit(page, "/a1-1/willkommen", "03b-lektion-1.png", errors);
-  record("Lektion 1: defter girisi (Teil A ve B acik, C-D yakinda)", (await page.locator(".l1a-book [data-l1a-part='a'] button.lb-toc-open").count()) === 1 && (await page.locator(".l1a-book [data-l1a-part='b'] button.lb-toc-open").count()) === 1 && (await page.locator(".l1a-book .l1a-soon").count()) === 2, "");
+  record("Lektion 1: defter girisi (Teil A, B ve C acik, D yakinda)", (await page.locator(".l1a-book [data-l1a-part='a'] button.lb-toc-open").count()) === 1 && (await page.locator(".l1a-book [data-l1a-part='b'] button.lb-toc-open").count()) === 1 && (await page.locator(".l1a-book [data-l1a-part='c'] button.lb-toc-open").count()) === 1 && (await page.locator(".l1a-book .l1a-soon").count()) === 1, "");
   await page.locator("[data-l1a-part='a'] button.lb-toc-open").click();
   await page.waitForTimeout(600);
   record("Lektion 1A: kapak, 22 adim, uc sekme", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/22/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
   // Teil B (25 October 2026): a step opens from its address; the alphabet has 30 letters.
   await page.goto(BASE + "/a1-1/willkommen?teil=b&adim=alfabe", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 1B: alfabe adimi aciliyor (30 harf)", (await page.locator("[data-l1a-step='alfabe'][data-l1a-teil='b']").count()) === 1 && (await page.locator(".l1a-letter").count()) === 30, (await page.locator(".l1a-where").textContent()) || "");
+  // Teil C (25 October 2026): "Wie geht's?" shows six moods to listen to.
+  await page.goto(BASE + "/a1-1/willkommen?teil=c&adim=befinden", { waitUntil: "networkidle", timeout: 90000 });
+  record("Lektion 1C: Wie geht's adimi aciliyor (6 duygu)", (await page.locator("[data-l1a-step='befinden'][data-l1a-teil='c']").count()) === 1 && (await page.locator(".l1a-mood").count()) === 6, (await page.locator(".l1a-where").textContent()) || "");
   // The page must not draw itself again and again while idle (25 October 2026: an effect loop re-rendered it ~380 times a second).
   {
     const reads = await page.evaluate(async () => { let n = 0; const original = Storage.prototype.getItem; Storage.prototype.getItem = function (key) { if (String(key).startsWith("lernkoko-l1")) n++; return original.call(this, key); }; await new Promise((resolve) => setTimeout(resolve, 1000)); Storage.prototype.getItem = original; return n; });

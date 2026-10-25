@@ -35,4 +35,6 @@ for(const text of load('ausbildung-hoeren').ausbildungSpeechTexts())add(text);
 for(const text of load('willkommen-course').willkommenSpeechTexts())add(text);
 // Lektion 1B „Ich spreche ein bisschen Deutsch.“: languages, Sie/du, dialogues, the letters' German names, exercises, test.
 for(const text of load('willkommen-b-course').willkommenBSpeechTexts())add(text);
+// Lektion 1C „Guten Tag!“: greetings by the time of day, goodbyes, Wie geht's?, dialogues, verb position, exercises, test.
+for(const text of load('willkommen-c-course').willkommenCSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

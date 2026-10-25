@@ -4,6 +4,8 @@
  * Texts for the learner are Turkish (the site's main audience); the German is read aloud with the site voices.
  * Step and exercise ids never change (saved scores are keyed by them).
  */
+import {unitGoalsFor} from './unit-goals';
+
 export const WILLKOMMEN_PATH='/a1-1/willkommen';
 export const WILLKOMMEN_UNIT='book-01';
 /** Pictures of the lesson (public/toon/lektion1, from the learner's page). */
@@ -127,7 +129,8 @@ export const words:Phrase[]=[
 
 /* ---------- exercises ---------- */
 /** A text with gaps: `___` marks a gap; `answers[i]` lists what is accepted for gap i. */
-export type GapLine={who?:'a'|'b';text:string;answers:string[][]};
+/** `say`: a listen button before the line (dictation). */
+export type GapLine={who?:'a'|'b';text:string;answers:string[][];say?:SayItem};
 /** Exercise 1 · missing letters (the gap is part of a word: no space before it). */
 export const lettersExercise:{lines:GapLine[];say:string[]}={
  lines:[
@@ -258,6 +261,9 @@ export function normalizeLoose(text:string){
  return text.toLowerCase().replace(/ß/g,'ss').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/[.,!?;:„“”"’'\-]/g,' ').replace(/\s+/g,' ').trim();
 }
 export function acceptsAnswer(given:string,answers:readonly string[]){const value=normalizeLoose(given);return !!value&&answers.some(answer=>normalizeLoose(answer)===value);}
+/** Capital letters count (Teil C, „Groß oder klein?“): only punctuation, spacing and ß/ss do not matter. */
+export function normalizeCase(text:string){return text.replace(/ß/g,'ss').replace(/[.,!?;:„“”"’'\-]/g,' ').replace(/\s+/g,' ').trim();}
+export function acceptsExact(given:string,answers:readonly string[]){const value=normalizeCase(given);return !!value&&answers.some(answer=>normalizeCase(answer)===value);}
 
 /** Every German text the lesson speaks (rendered as site voices by scripts/voices). */
 export function willkommenSpeechTexts():string[]{
@@ -277,22 +283,16 @@ export function willkommenSpeechTexts():string[]{
 }
 
 /* ---------- the notebook pages (25 October 2026: the entry looks like Lektion 11 and 12) ---------- */
-/** Lektion 1's parts on the contents page: Teil A and B are ready (B since 25 October 2026); C and D are coming soon. */
+/** Lektion 1's parts on the contents page: Teil A, B and C are ready (B and C since 25 October 2026); D is coming soon. */
 export type LessonPart={id:'a'|'b'|'c'|'d';badge:string;title?:string;lead?:string};
 export const lessonParts:LessonPart[]=[
  {id:'a',badge:'A',title:'Guten Tag! Ich heiße …',lead:'Selamlaşma, adını söyleme ve sorma, nereden geldiğini söyleme: **aus + artikel**.'},
  {id:'b',badge:'B',title:'Ich spreche ein bisschen Deutsch.',lead:'Diller, **Sie** mi **du** mu, ich / du / Sie çekimi, alfabe ve **Ich buchstabiere: …**'},
- {id:'c',badge:'C'},{id:'d',badge:'D'},
+ {id:'c',badge:'C',title:'Guten Tag!',lead:'Günün saatine göre selam, vedalaşma, **Wie geht’s?**, fiil 2. pozisyonda ve doğru yazma.'},
+ {id:'d',badge:'D'},
 ];
-/** What Lektion 1 teaches, ticked off on the left page of the contents. */
-export const unitGoals=[
- 'Selamlaş: **Guten Tag! · Hallo! · Herzlich willkommen!**',
- 'Adını söyle ve sor: **Ich heiße … · Wie heißen Sie?**',
- 'Nereden geldiğini söyle: **Ich komme aus … · aus der Türkei**',
- 'Dillerini söyle: **Ich spreche … und ein bisschen Deutsch.**',
- 'Resmî ve samimi konuş: **Sie / du · kommen Sie? / kommst du?**',
- 'Adını harf harf söyle: **Ich buchstabiere: …**',
-];
+/** What Lektion 1 teaches ("Bu ünitede" on the left page of the contents): lib/unit-goals.ts, in our own words. */
+export const unitGoals=unitGoalsFor(WILLKOMMEN_UNIT);
 /** Teil A's steps as three index tabs on the right page (the cover and the end belong to none). */
 export type StepGroup={id:'konu'|'alistirmalar'|'test';label:string;ids:string[]};
 export const stepGroups:StepGroup[]=[

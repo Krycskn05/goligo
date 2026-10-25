@@ -50,25 +50,25 @@ export function StepViewB(props:StepProps){
 
 /* ---------- small pieces ---------- */
 /** Reads a word letter by letter (one clip per German letter name, slowly). */
-function SpellButton({word,speech,label}:{word:string;speech:Speech;label?:string}){
+export function SpellButton({word,speech,label}:{word:string;speech:Speech;label?:string}){
  return <button type="button" className={label?'btn secondary small l1a-say-wide':'l12-say'} disabled={speech.busy} aria-label={'Harf harf dinle: '+word} title="Harf harf dinle" onClick={()=>speech.speakAll(spellItems(word))}>{label?<Play size={16} aria-hidden="true"/>:<Volume2 size={18} aria-hidden="true"/>}{label}</button>;
 }
 /** A dialogue: each line with the speaker's portrait and voice; "Tümünü dinle" reads it as a conversation. */
-function DialogueLines({lines,speech}:{lines:Line[];speech:Speech}){
+export function DialogueLines({lines,speech}:{lines:Line[];speech:Speech}){
  const first=lines[0]?.who;
  return <div className="l1a-dialogue">{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}><Portrait who={line.who} name={line.who[0].toUpperCase()+line.who.slice(1)}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{line.tr}</span></div><Say text={line.say??line.de} who={line.who} speech={speech}/></div>)}</div>;
 }
-function ListenAll({lines,speech}:{lines:Line[];speech:Speech}){
+export function ListenAll({lines,speech}:{lines:Line[];speech:Speech}){
  return <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(lines.map(lineSay))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button></div>;
 }
-function Picture({src,width,height,alt}:{src:string;width:number;height:number;alt:string}){
+export function Picture({src,width,height,alt}:{src:string;width:number;height:number;alt:string}){
  return <img className="l1a-cover l1a-scene" src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async"/>;
 }
-function WordTable({items}:{items:readonly (readonly [string,string])[]}){
+export function WordTable({items}:{items:readonly (readonly [string,string])[]}){
  const rows:(readonly [string,string])[][]=[];for(let i=0;i<items.length;i+=2)rows.push(items.slice(i,i+2));
  return <table className="l1a-table"><tbody>{rows.map((row,i)=><tr key={i}>{row.map(([de,tr])=><td key={de} colSpan={1}><b lang="de">{de}</b> <span className="l1a-mini">{tr}</span></td>)}</tr>)}</tbody></table>;
 }
-function ProfileCard({card}:{card:Profile}){
+export function ProfileCard({card}:{card:Profile}){
  return <div className="l1a-profile"><Portrait who={card.who} name={card.name.split(' ')[0]}/><dl lang="de"><dt>Name:</dt><dd>{card.name}</dd><dt>Land:</dt><dd>{card.land}</dd><dt>Sprachen:</dt><dd>{card.languages}</dd></dl></div>;
 }
 
@@ -172,7 +172,7 @@ function HearExercise(props:StepProps){
   <p className="kicker" lang="de">Alıştırma 4 · Hören Sie</p><Heading>Dinle: hangi dilleri konuşuyorlar?</Heading>
   <p className="l1a-tr">Dinle, doğru olanların hepsini işaretle, sonra “Kontrol”.</p>
   {hearItems.map((item,i)=><div className="l1a-listen" key={item.key}>
-   <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich spreche …</span></div><Say text={item.text} who={item.key} speech={speech} wide/></div>
+   <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich spreche …</span></div><Say text={item.text} who={item.key} speech={speech} wide secret/></div>
    <div className="l1a-opts wrap" role="group" aria-label={item.name}>{item.options.map((option,j)=>{const on=ticked[i].includes(j);const state=checked[i]===null?'':item.answers.includes(j)?' ok':on?' bad':'';return <button type="button" key={option} className={'l1a-opt l1a-tick'+(on?' on':'')+state} aria-pressed={on} disabled={checked[i]!==null} lang="de" onClick={()=>toggle(i,j)}>{on?<Check size={15} aria-hidden="true"/>:null}{option}</button>;})}
     <button type="button" className="btn small" disabled={checked[i]!==null||!ticked[i].length} onClick={()=>check(i)}>Kontrol</button></div>
    {checked[i]!==null&&<p className={'l1a-mini'+(checked[i]?' l1a-ok-text':' l1a-bad-text')}>{checked[i]?'Doğru!':'Doğrusu yeşil olanlar.'} Metin: <span lang="de" dir="ltr">{item.text}</span></p>}
@@ -204,7 +204,7 @@ function LetterExercise(props:StepProps){
  const {speech}=props;
  // The options are shuffled once; the say buttons are made on every render (they show whether the voice is busy).
  const [options]=useState(()=>letterQuestions.map(item=>shuffle(item.options)));
- const rows=letterQuestions.map((item,i)=>({key:String(i),label:'Harf '+(i+1),before:<Say text={letterSay(item.answer)} speech={speech} label={String(i+1)} wide/>,options:options[i].map(option=>({value:option,label:option})),answer:item.answer,say:letterSay(item.answer) as SayItem}));
+ const rows=letterQuestions.map((item,i)=>({key:String(i),label:'Harf '+(i+1),before:<Say text={letterSay(item.answer)} speech={speech} label={String(i+1)} wide secret/>,options:options[i].map(option=>({value:option,label:option})),answer:item.answer,say:letterSay(item.answer) as SayItem}));
  return <ChoiceRows kicker="Alıştırma 6 · Welcher Buchstabe?" title="Dinle: hangi harf?" lead="Dinle, duyduğun harfi seç." rows={rows} {...props}/>;
 }
 /** Exercise 11 · now you: write your languages and spell your name (not scored). */
@@ -232,7 +232,7 @@ function EndB({progress,onGo,onPart}:StepProps){
   <p>Artık şunları yapabilirsin:</p>
   <ul className="l1a-list"><li><b lang="de">Ich spreche … und ein bisschen Deutsch.</b> – dillerini söyleme</li><li><b lang="de">Sie</b> ve <b lang="de">du</b> ile soru sorma</li><li><span lang="de">ich / du / Sie</span> fiil çekimi (<b lang="de">-e / -st / -en</b>)</li><li>Alfabe ve <b lang="de">Ich buchstabiere: …</b></li><li><b lang="de">Wie bitte? Wie schreibt man das?</b> – anlamadığında sorma</li><li><b lang="de">Ja, richtig! / Nein, …</b> – doğrulama</li></ul>
   <ProgressMeter progress={progress} language={'tr'} label="Lektion 1B"/>
-  <p className="l1a-tr">Bir sonraki bölüm: <b>1C</b> (yakında).</p>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexB('land-sprache'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn secondary small" onClick={()=>onPart('a',0)}>Teil A</button><button type="button" className="btn small" onClick={()=>onGo(-1)}>Lektion 1 içindekiler</button></div>
+  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil C – Guten Tag!</b></p>
+  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>onPart('c',0)}>Teil C'ye geç</button><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexB('land-sprache'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn secondary small" onClick={()=>onGo(-1)}>Lektion 1 içindekiler</button></div>
  </>;
 }

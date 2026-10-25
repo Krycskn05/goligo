@@ -10,6 +10,7 @@ import {c} from '@/lib/category-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
 import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
 import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
+import {stepsC,stepGroupsC,scoredExercisesC,testQuestionsC,wordsC,willkommenCPictures} from '@/lib/willkommen-c-course';
 import {L1_PART_KEY,partKeys,readPartScores,savePartScore,partProgressL1,lessonOneProgress,type L1AScoreMap,type L1PartId} from '@/lib/willkommen-progress';
 import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
@@ -21,13 +22,14 @@ import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
-import {useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {StepViewB} from './willkommen-b-steps';
+import {StepViewC} from './willkommen-c-steps';
 
 /**
  * Lektion 1 „Willkommen!“ (the learner's own lesson pages): the contents page is an open notebook like Lektion 11 and
- * 12 (Teil A–D); Teil A – Ich heiße … (24 October 2026, 22 steps) and Teil B – Ich spreche ein bisschen Deutsch.
- * (25 October 2026, 24 steps) open on a wide spread, one step at a time. German is read with the site voices, each
+ * 12 (Teil A–D); Teil A – Ich heiße … (24 October 2026, 22 steps), Teil B – Ich spreche ein bisschen Deutsch. (25 October 2026, 24 steps)
+ * and Teil C – Guten Tag! (25 October 2026, 26 steps) open on a wide spread, one step at a time. German is read with the site voices, each
  * person with their own voice; answers get the site's sounds and Paul; scores stay in the browser
  * (lib/willkommen-progress.ts). Teil B's steps: app/willkommen-b-steps.tsx; shared pieces: app/willkommen-ui.tsx.
  */
@@ -45,8 +47,9 @@ type PartConfig={id:L1PartId;badge:string;title:string;lead:string;steps:Step[];
 const parts:Record<L1PartId,PartConfig>={
  a:{id:'a',badge:'A',title:lessonParts[0].title??'',lead:lessonParts[0].lead??'',steps,groups:stepGroups,scored:scoredExercises,testCount:testQuestions.length,wordCount:words.length,cover:willkommenPictures.cover,coverAlt:'Süpermarket önünde tokalaşan iki kişi: Sabine ve Omar',View:StepViewA},
  b:{id:'b',badge:'B',title:lessonParts[1].title??'',lead:lessonParts[1].lead??'',steps:stepsB,groups:stepGroupsB,scored:scoredExercisesB,testCount:testQuestionsB.length,wordCount:wordsB.length,cover:willkommenBPictures.cover,coverAlt:'Dil kursu sınıfı: Paul Hoca tahtada, öğrenciler masalarında',View:StepViewB},
+ c:{id:'c',badge:'C',title:lessonParts[2].title??'',lead:lessonParts[2].lead??'',steps:stepsC,groups:stepGroupsC,scored:scoredExercisesC,testCount:testQuestionsC.length,wordCount:wordsC.length,cover:willkommenCPictures.cover,coverAlt:'Kurs binasının önünde sabah selamlaşması',View:StepViewC},
 };
-const partOrder:L1PartId[]=['a','b'];
+const partOrder:L1PartId[]=['a','b','c'];
 const isPart=(id:string):id is L1PartId=>id in parts;
 
 /** Where the learner is: a part and a step (`?teil=b&adim=<id>`; Teil A without `teil`), or the contents page (index -1). */
@@ -63,12 +66,12 @@ function readLast():Place|null{
 function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
  const [place,setPlace]=useState<Place>(()=>typeof window==='undefined'?{part:'a',index:-1}:readPlace());
- const [scores,setScores]=useState<Record<L1PartId,L1AScoreMap>>({a:{},b:{}});
+ const [scores,setScores]=useState<Record<L1PartId,L1AScoreMap>>({a:{},b:{},c:{}});
  const speech=useLessonSpeech();const sound=useAnswerSound();
  // useAnswerSound gives a new object on every render: keep the latest speech and sound in a ref, so the effects and
  // callbacks below do not run again on every render (that would be an endless update loop).
  const latest=useRef({speech,sound});latest.current={speech,sound};
- useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b')});},[]);
+ useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c')});},[]);
  useEffect(()=>{const pop=()=>{latest.current.speech.stop();latest.current.sound.stop();setPlace(readPlace());};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
  /** Opens a step of a part; a negative number opens the contents page. */
  const open=useCallback((part:L1PartId,next:number)=>{
@@ -223,7 +226,7 @@ function StepViewA(props:StepProps){
   case 'kelimeler':return <WordList speech={props.speech}/>;
   case 'harfler':return <GapExercise kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" lines={lettersExercise.lines} say={lettersExercise.say} speakers={exerciseSpeakers.harfler} {...props}/>;
   case 'eslestir':return <MatchExercise kicker="Alıştırma 2 · Verbinden Sie" title="Soruyu cevapla eşleştir" pairs={matchPairs} sayFor={i=>matchSay(matchPairs[i])} {...props}/>;
-  case 'sirala':return <OrderExercise {...props}/>;
+  case 'sirala':return <OrderExercise kicker="Alıştırma 3 · Ordnen Sie" title="Kelimeleri sıraya koy" sentences={orderSentences} sayFor={orderSay} {...props}/>;
   case 'ayir':return <GapExercise kicker="Alıştırma 4 · Markieren Sie" title="Kelimeleri ayır, cümleleri yaz" lead="Bu metinde boşluk yok. 5 cümleyi ayırıp aşağıya yaz." before={<div className="l1a-glued" lang="de" dir="ltr">{gluedText}</div>} lines={gluedSentences.map(line=>({who:line.who,text:'___',answers:[line.answers]}))} wide say={gluedSay} speakers={exerciseSpeakers.ayir} {...props}/>;
   case 'aus':return <ArticleExercise {...props}/>;
   case 'dinle':return <ListenExercise {...props}/>;
@@ -314,28 +317,6 @@ function WordList({speech}:{speech:Speech}){
 }
 
 /* ---------- Teil A's own exercises ---------- */
-function OrderExercise(props:StepProps){
- const {speech,sound}=props;const finish=useFinish(props);
- const [round,setRound]=useState(0);const [chips,setChips]=useState<{word:string;i:number}[]>(()=>shuffle(orderSentences[0].map((word,i)=>({word,i}))));
- const [picked,setPicked]=useState<number[]>([]);const [state,setState]=useState<'open'|'ok'|'bad'>('open');const [right,setRight]=useState(0);const [feedback,setFeedback]=useState<Feedback>(null);
- const sentence=orderSentences[round];const text=picked.map(i=>sentence[i]).join(' ');
- const check=()=>{sound.prepare();speech.prepare();const ok=text===sentence.join(' ');setState(ok?'ok':'bad');
-  if(ok){const total=right+1;setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?'Tüm cümleler doğru!':'Doğru!'});
-   if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))]);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
-  else{setFeedback({ok:false,text:'Sırayı kontrol et.'});sound.wrong();}};
- const next=()=>{const r=round+1;setRound(r);setChips(shuffle(orderSentences[r].map((word,i)=>({word,i}))));setPicked([]);setState('open');setFeedback(null);};
- return <>
-  <p className="kicker" lang="de">Alıştırma 3 · Ordnen Sie</p><Heading>Kelimeleri sıraya koy</Heading><p className="l1a-tr">Cümle {round+1} / {orderSentences.length}</p>
-  <div className={'l1a-answer'+(state==='ok'?' ok':state==='bad'?' bad':'')} lang="de" dir="ltr" aria-live="polite">{text}</div>
-  <div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)||state==='ok'} onClick={()=>{setPicked([...picked,chip.i]);setState('open');}}>{chip.word}</button>)}</div>
-  <div className="l1a-actions">
-   <button type="button" className="btn secondary small" disabled={!picked.length||state==='ok'} onClick={()=>{setPicked(picked.slice(0,-1));setState('open');}}><Trash2 size={16} aria-hidden="true"/>Sil</button>
-   <button type="button" className="btn small" disabled={picked.length!==sentence.length||state==='ok'} onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button>
-   {state==='ok'&&round<orderSentences.length-1&&<button type="button" className="btn small" onClick={next}>Sonraki<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
-  </div>
-  <FeedbackLine feedback={feedback}/>
- </>;
-}
 function ArticleExercise(props:StepProps){
  const {speech,sound}=props;const finish=useFinish(props);
  const [answers,setAnswers]=useState<Record<number,string>>({});const [feedback,setFeedback]=useState<Feedback>(null);
@@ -359,7 +340,7 @@ function ListenExercise(props:StepProps){
  return <>
   <p className="kicker" lang="de">Alıştırma 6 · Hören Sie</p><Heading>Dinle ve işaretle</Heading><p className="l1a-tr">Kişiler nereden geliyor? Önce dinle, sonra seç.</p>
   {listenItems.map((item,i)=><div className="l1a-listen" key={item.key}>
-   <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich komme …</span></div><Say text={item.text} who={item.key} speech={speech} wide/></div>
+   <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich komme …</span></div><Say text={item.text} who={item.key} speech={speech} wide secret/></div>
    <div className="l1a-opts wrap" role="group" aria-label={item.name}>{item.options.map((option,j)=><button type="button" key={option} className={'l1a-opt'+(answers[i]!==undefined&&j===item.answer?' ok':answers[i]===j?' bad':'')} disabled={answers[i]!==undefined} lang="de" onClick={()=>answer(i,j)}>{option}</button>)}</div>
    {answers[i]!==undefined&&<p className="l1a-mini">Metin: <span lang="de" dir="ltr">{item.text}</span></p>}
   </div>)}

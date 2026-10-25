@@ -92,7 +92,8 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  for(const gone of ['l1a-resume','l1a-test-note','Kaldığın yerden devam et','readLast('])assert(!page.includes(gone),gone);
  // No A1.1 breadcrumb (the learner asked); the contents notebook fills the screen on a computer and never makes the page scroll.
  assert(!read('app/willkommen-study.tsx').includes('className="object-breadcrumb"'));
- assert(page.includes("element.style.setProperty('--l1a-top'")&&read('app/willkommen.css').includes('.l1a-contents .lb-spread { height:calc(100vh - var(--l1a-top,230px) - 22px);'));
+ assert(page.includes("element.style.setProperty('--l1a-fill'")&&page.includes('book.style.zoom=String(zoom)')&&read('app/willkommen.css').includes('.l1a-contents .lb-spread { min-height:var(--l1a-fill,0px); }'));
+ assert(!/\.l1a-contents \.lb-page \{[^}]*overflow-y:auto/.test(read('app/willkommen.css')),'no scrolling inside the notebook');
  const css=read('app/willkommen.css');assert(css.includes('.lb.l1a-book .l1a-soon-photo')&&css.includes('.l1a-part .lb-left .lb-photo'));
 });
 

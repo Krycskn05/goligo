@@ -128,10 +128,26 @@ const worldMap=willkommenPictures.map;
 /** Left page: the unit, its picture and what Lektion 1 teaches (the resume and test notes were removed at the learner's request, 25 October 2026). Right page: Teil A–D. */
 function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record<L1PartId,L1AScoreMap>;onOpen:(part:L1PartId,index:number)=>void}){
  const unit=courseUnits.find(item=>item.id===WILLKOMMEN_UNIT);const unitName=unit?translate(unit.names,language):'Willkommen!';
- // The notebook fills the screen below the header and never makes the page scroll (the learner asked, 25 October 2026):
- // its top is measured once and on resize (a CSS variable, no state, so nothing draws again).
+ // On a computer the notebook fits the screen below the header — no scrolling at all, neither the page nor inside the
+ // notebook (the learner asked, 25 October 2026): a notebook shorter than the screen stretches to its bottom (--l1a-fill),
+ // a taller one is drawn a little smaller (CSS zoom) until it fits. Measured on load, resize and font loading; only styles
+ // change, no state, so nothing draws again.
  const box=useRef<HTMLElement>(null);
- useEffect(()=>{const element=box.current;if(!element)return;const set=()=>element.style.setProperty('--l1a-top',Math.round(element.getBoundingClientRect().top+window.scrollY)+'px');set();window.addEventListener('resize',set);return()=>window.removeEventListener('resize',set);},[]);
+ useEffect(()=>{
+  const element=box.current;const book=element?.querySelector<HTMLElement>('.lb');if(!element||!book)return;
+  let frame=0;
+  const fit=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{
+   book.style.removeProperty('zoom');element.style.removeProperty('--l1a-fill');
+   if(window.innerWidth<1180)return; // the pages stack (app/lesson-book.css): a normal page that scrolls
+   const available=window.innerHeight-(element.getBoundingClientRect().top+window.scrollY)-22;
+   let height=book.getBoundingClientRect().height;
+   if(height<=available){element.style.setProperty('--l1a-fill',Math.floor(available)+'px');return;}
+   let zoom=1;
+   for(let i=0;i<4&&height>available+1;i++){zoom=Math.max(.55,zoom*available/height);book.style.zoom=String(zoom);height=book.getBoundingClientRect().height;}
+  });};
+  fit();window.addEventListener('resize',fit);void document.fonts?.ready.then(fit);
+  return()=>{cancelAnimationFrame(frame);window.removeEventListener('resize',fit);};
+ },[language]);
  return <section className="l1a-contents" aria-labelledby="l1a-heading" ref={box}>
   <LessonBook className="l1a-book" left={<>
    <div className="l1a-intro">

@@ -15,7 +15,7 @@ import {fillText} from '@/lib/copy-fill';
 import {languageDirection,pickText} from '@/lib/site-languages';
 import type {StudyLanguage} from '@/lib/study-languages';
 import {EFFECTS_CHANGED,canPlayEffects,playLearningSound,readEffects,saveEffects,stopAllEffects,type EffectsPreferences} from '@/lib/learning-effects';
-import {DEFAULT_SITE_VOICE,isSiteVoice,voiceSample} from '@/lib/site-voices';
+import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGroups,voiceSample} from '@/lib/site-voices';
 import {germanSpeechPreview} from '@/lib/german-speech';
 import {api,useGermanSpeech} from './study-shared';
 import {VOICE_SPEEDS} from './learning-effects';
@@ -79,10 +79,14 @@ function SoundChoices({language}:{language:StudyLanguage}){
    <h3 id="st-voice-title"><TopIcon name="voice" size={24}/>{tourText(language,'voiceQuestion')}</h3>
    {speech.siteVoicesState==='loading'&&<p className="st-note">{e('voiceLoading')}</p>}
    {speech.siteVoicesState==='unavailable'&&<p className="st-note">{e('voiceFallback')}</p>}
-   <div className="st-voices" role="radiogroup" aria-labelledby="st-voice-title">
-    {speech.siteVoices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={current===voice.id} className={'st-voice '+voice.gender+(current===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceSample(voice,germanSpeechPreview))}>
-     <span className="st-avatar" aria-hidden="true">{voice.name[0]}</span><strong>{voice.name}</strong><small>{e(voice.gender==='female'?'voiceFemale':'voiceMale')}</small>
-    </button>)}
+   {/* Women and men apart, each voice with the picture of the person it reads in Lektion 1 (25 October 2026). */}
+   <div className="st-voice-groups" role="radiogroup" aria-labelledby="st-voice-title">
+    {voiceGroups(speech.siteVoices).map(group=><div className={'st-voice-group '+group.gender} key={group.gender} role="group" aria-label={e(group.gender==='female'?'voiceFemale':'voiceMale')}>
+     <p className="st-voice-group-title" aria-hidden="true">{e(group.gender==='female'?'voiceFemale':'voiceMale')}</p>
+     <div className="st-voices">{group.voices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={current===voice.id} aria-label={voice.name+' · '+e(voice.gender==='female'?'voiceFemale':'voiceMale')} className={'st-voice '+voice.gender+(current===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceSample(voice,germanSpeechPreview))}>
+      <img className="st-photo" src={voice.picture} alt="" width={40} height={40} loading="lazy" decoding="async"/><strong>{voice.name}</strong>
+     </button>)}</div>
+    </div>)}
    </div>
   </section>
   <section className="st-row" aria-label={e('voiceSpeed')}>

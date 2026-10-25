@@ -4,22 +4,27 @@
  * When a clip or the manifest is missing, speech falls back to the device voice.
  */
 export const SITE_VOICE_PREFIX='site:';
-export type SiteVoice={id:string;style:string;name:string;gender:'female'|'male'};
+export type SiteVoice={id:string;style:string;name:string;gender:'female'|'male';picture:string};
 /** The voices carry the names of the people of Lektion 1A (the learner asked, 25 October 2026): the voice that
- * reads Sabine in the lesson is called Sabine in the settings too (lib/willkommen-course.ts `speakers`). Ids and
- * styles never change, so a saved choice (for example site:F4) keeps working. */
+ * reads Sabine in the lesson is called Sabine in the settings too (lib/willkommen-course.ts `speakers`), and shows
+ * her picture. Ids and styles never change, so a saved choice (for example site:F4) keeps working. */
+const portrait=(name:string)=>'/toon/lektion1/'+name.toLowerCase()+'.webp';
 export const siteVoices:readonly SiteVoice[]=[
- {id:'site:F1',style:'F1',name:'Sabine',gender:'female'},
- {id:'site:F2',style:'F2',name:'Yasemin',gender:'female'},
- {id:'site:F3',style:'F3',name:'Aisha',gender:'female'},
- {id:'site:F4',style:'F4',name:'Nora',gender:'female'},
- {id:'site:F5',style:'F5',name:'Mei',gender:'female'},
- {id:'site:M1',style:'M1',name:'Rami',gender:'male'},
- {id:'site:M2',style:'M2',name:'Omar',gender:'male'},
- {id:'site:M3',style:'M3',name:'Paul',gender:'male'},
- {id:'site:M4',style:'M4',name:'Nikos',gender:'male'},
- {id:'site:M5',style:'M5',name:'Tomasz',gender:'male'},
+ {id:'site:F1',style:'F1',name:'Sabine',gender:'female',picture:portrait('Sabine')},
+ {id:'site:F2',style:'F2',name:'Yasemin',gender:'female',picture:portrait('Yasemin')},
+ {id:'site:F3',style:'F3',name:'Aisha',gender:'female',picture:portrait('Aisha')},
+ {id:'site:F4',style:'F4',name:'Nora',gender:'female',picture:portrait('Nora')},
+ {id:'site:F5',style:'F5',name:'Mei',gender:'female',picture:portrait('Mei')},
+ {id:'site:M1',style:'M1',name:'Rami',gender:'male',picture:portrait('Rami')},
+ {id:'site:M2',style:'M2',name:'Omar',gender:'male',picture:portrait('Omar')},
+ {id:'site:M3',style:'M3',name:'Paul',gender:'male',picture:portrait('Paul')},
+ {id:'site:M4',style:'M4',name:'Nikos',gender:'male',picture:portrait('Nikos')},
+ {id:'site:M5',style:'M5',name:'Tomasz',gender:'male',picture:portrait('Tomasz')},
 ];
+/** The voice choice shows women and men apart (the learner asked, 25 October 2026): women first, then men. */
+export function voiceGroups<T extends Pick<SiteVoice,'gender'>>(list:readonly T[]):{gender:'female'|'male';voices:T[]}[]{
+ return (['female','male'] as const).map(gender=>({gender,voices:list.filter(voice=>voice.gender===gender)})).filter(group=>group.voices.length>0);
+}
 export const DEFAULT_SITE_VOICE='site:F1';
 /** Each site voice introduces itself when it is chosen in the settings. */
 export function voiceGreeting(voice:Pick<SiteVoice,'name'>){return `Hallo, ich bin ${voice.name}. Lass uns zusammen Deutsch lernen!`;}

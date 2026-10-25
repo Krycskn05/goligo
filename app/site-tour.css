@@ -60,7 +60,14 @@ html.st-open { overflow:hidden auto; }
 .st-sounds { display:grid; gap:14px; }
 .st-sounds h3 { display:flex; align-items:center; gap:8px; margin:0 0 8px; font-size:15px; }
 .st-note { margin:0 0 8px; font-size:13px; color:#6b7c90; }
+.st-voice-groups { display:grid; gap:10px; }
+.st-voice-group-title { display:flex; align-items:center; gap:6px; margin:0 0 6px; font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:#6b7c90; }
+.st-voice-group-title::before { content:""; width:9px; height:9px; border-radius:50%; background:#e889a9; }
+.st-voice-group.male .st-voice-group-title::before { background:#5b9be0; }
 .st-voices { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+.st-photo { display:block; width:40px; height:40px; border-radius:50%; object-fit:cover; background:#fff; box-shadow:0 0 0 2px #fff,0 0 0 4px #f4bccb; }
+.st-voice.male .st-photo { box-shadow:0 0 0 2px #fff,0 0 0 4px #b3d4f2; }
+.st-voice.selected .st-photo { box-shadow:0 0 0 2px #fff,0 0 0 4px #e59a1d; }
 .st-voice { display:flex; flex-direction:column; align-items:center; gap:2px; min-height:72px; padding:7px 2px; border:2px solid #dbe8f4; border-radius:14px; background:#fff; color:var(--ink,#1f3b5c); font:inherit; font-size:13px; cursor:pointer; }
 .st-voice strong { font-weight:800; }
 .st-voice small { font-size:11px; color:#6b7c90; font-weight:600; }
@@ -104,6 +111,7 @@ html.st-open { overflow:hidden auto; }
  .st-modal .st-foot { padding:12px 14px 14px; }
  .st-voices { gap:4px; }
  .st-voice { min-height:64px; font-size:12px; padding:6px 0; }
+ .st-photo { width:34px; height:34px; }
  .st-voice small { font-size:10px; }
  .st-avatar { width:22px; height:22px; font-size:12px; }
  .st-paul { width:58px; height:58px; }

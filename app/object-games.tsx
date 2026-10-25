@@ -3,7 +3,7 @@ import {useEffect,useMemo,useRef,useState,type CSSProperties,type ReactNode} fro
 import {ArrowRight,CheckCircle2,Heart,RotateCcw,Trophy,Volume2,X} from 'lucide-react';
 import {ObjectArt} from './toon-art';
 import {objectMeaning} from '@/lib/object-translations';
-import {verbMap,verbMeaning} from '@/lib/verb-course';
+import {verbMap,verbMeaning,verbPronoun} from '@/lib/verb-course';
 import {verbPicture} from '@/lib/verb-logic';
 import {verbText} from '@/lib/verb-copy';
 import {vaultText,vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
@@ -146,7 +146,7 @@ export function QuickGame({language,feedback,onRestart}:Props){
   <div className="verb-game-status"><span className={'quick-clock'+(left<=5?' hurry':'')}>{g('secondsLeft',{n:left})}</span><span>{g('quickScore',{n:score})}</span></div>
   <div className={'quick-card'+(flash?' '+flash:'')} data-quick-card={card.key}>
    {card.kind==='object'?<Picture id={card.id} language={language}/>:picture?<span className="game-picture"><img src={picture} alt={verb?verbMeaning(verb,language):''} width={512} height={512}/></span>:null}
-   <p className="quick-text" lang="de" dir="ltr">{verb?verb.subject+' ':''}{card.shown}</p>
+   <p className="quick-text" lang="de" dir="ltr">{verb?verbPronoun(verb)+' ':''}{card.shown}</p>
   </div>
   <p className="quick-prompt">{g('quickPrompt')}</p>
   <div className="quick-buttons"><button type="button" className="btn quick-yes" onClick={()=>answer(true)} data-quick-answer="right" data-answer-tap><CheckCircle2 size={20}/>{g('answerRight')}</button><button type="button" className="btn quick-no" onClick={()=>answer(false)} data-quick-answer="wrong" data-answer-tap><X size={20}/>{g('answerWrong')}</button></div>

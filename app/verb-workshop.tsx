@@ -22,7 +22,8 @@ export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbT
 }
 /** "kind-irregular" etc.: irregular verbs are shown in their own colour wherever their name appears. */
 export function kindClass(verb:Verb){return 'kind-'+verbKindInfo(verb).kind;}
-/** Regular, irregular or modal: a small badge, and (with note) one line saying what is irregular. */
+/** Regular, irregular or modal: a small badge, and (with note) one line saying what is irregular. Not shown on the cards
+ * any more (the learner asked to take the "Düzensiz fiil · Partizip düzensiz" line off, 22 October 2026). */
 export function VerbKindBadge({verb,language,note=false}:{verb:Verb;language:VaultLanguage;note?:boolean}){
  const info=verbKindInfo(verb);const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  const label=t(info.kind==='modal'?'kindModal':info.kind==='irregular'?'kindIrregular':'kindRegular');
@@ -89,7 +90,6 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
     {stage!=='meaning'&&<p className="verb-learn-infinitive" lang="de" dir="ltr">{verb.display}</p>}
     <div className="verb-learn-title"><h1 id="verb-learn-heading" tabIndex={-1} className={'verb-learn-form'+(stage==='meaning'?' '+kindClass(verb):'')} lang="de" dir="ltr">{stage==='meaning'?verb.display:<><span className="verb-learn-subject">{verb.subject}</span> <VerbForm verb={verb} stage={stage}/></>}</h1><button type="button" className="verb-learn-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={20}/></button></div>
     <p className="verb-learn-meaning" lang={language} dir={dir}>{verbMeaning(verb,language)}</p>
-    <VerbKindBadge verb={verb} language={language} note/>
     {stage==='meaning'&&prefix&&<p className="verb-learn-note">{t('separableNote',{p:prefix})}</p>}
    </div>
   </div>
@@ -109,7 +109,7 @@ export function AnswerResult({verb,stage,language,speech,correct,status,chosen,s
   <div className="verb-result-head">
    <VerbPicture verb={verb} language={language}/>
    <div className="verb-result-text">
-    <div className="verb-result-line"><p className={'verb-result-status '+(correct?'right':'wrong')}>{correct?<CheckCircle2 size={18}/>:<X size={18}/>}{status}</p><VerbKindBadge verb={verb} language={language}/></div>
+    <div className="verb-result-line"><p className={'verb-result-status '+(correct?'right':'wrong')}>{correct?<CheckCircle2 size={18}/>:<X size={18}/>}{status}</p></div>
     <div className="verb-result-title"><strong lang="de" dir="ltr" className={stage==='meaning'&&!past?kindClass(verb):undefined}>{past?<><span className={kindClass(verb)}>{verb.display}</span> → <span className={verbKindInfo(verb).irregularPartizip?'verb-irregular-form':undefined}>{verb.participle}</span></>:stage==='meaning'?verb.display:<>{verb.subject} <VerbForm verb={verb} stage={stage}/></>}</strong><button type="button" className="verb-result-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/></button></div>
     <span className="verb-result-meaning">{form&&<b className="verb-result-infinitive" lang="de" dir="ltr">{verb.display} · </b>}<span lang={language} dir={dir}>{verbMeaning(verb,language)}</span></span>
     {chosen&&<span className="verb-result-chosen">{chosen}</span>}
@@ -196,7 +196,6 @@ export function VerbDetail({verb,family,position,total,marks,language,speech,onB
    <div className="verb-learn-text">
     <div className="verb-learn-title"><h1 id="verb-detail-heading" tabIndex={-1} className={'verb-learn-form '+kindClass(verb)} lang="de" dir="ltr">{verb.display}</h1><button type="button" className="verb-learn-speak" disabled={speech.busy} aria-label={meaningSpeech} title={meaningSpeech} onClick={()=>speech.speak(meaningSpeech)}><Volume2 size={20}/></button></div>
     <p className="verb-learn-meaning" lang={language} dir={dir}>{verbMeaning(verb,language)}</p>
-    <VerbKindBadge verb={verb} language={language} note/>
     {prefix&&<p className="verb-learn-note">{t('separableNote',{p:prefix})}</p>}
     <DoneMarks marks={marks} language={language}/>
    </div>

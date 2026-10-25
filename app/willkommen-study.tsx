@@ -1,7 +1,7 @@
 'use client';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react';
-import {ArrowLeft,ArrowRight,BookOpen,Check,Play,Trash2,Trophy,Volume2} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BookOpen,Check,Play,Trash2,Volume2} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib/study-languages';
 import {courseUnits} from '@/lib/textbook-curriculum';
@@ -11,7 +11,7 @@ import {turkishNote} from '@/lib/ausbildung-course';
 import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
 import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
 import {stepsC,stepGroupsC,scoredExercisesC,testQuestionsC,wordsC,willkommenCPictures} from '@/lib/willkommen-c-course';
-import {L1_PART_KEY,partKeys,readPartScores,savePartScore,partProgressL1,lessonOneProgress,type L1AScoreMap,type L1PartId} from '@/lib/willkommen-progress';
+import {L1_PART_KEY,partKeys,readPartScores,savePartScore,partProgressL1,type L1AScoreMap,type L1PartId} from '@/lib/willkommen-progress';
 import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
 import {useAnswerSound} from './study-shared';
@@ -58,10 +58,6 @@ function readPlace():Place{
  const params=new URLSearchParams(window.location.search);const teil=params.get('teil')??'a';const part:L1PartId=isPart(teil)?teil:'a';
  return {part,index:parts[part].steps.findIndex(step=>step.id===(params.get('adim')??''))};
 }
-/** The last step the learner opened (for "Kaldığın yerden devam et"), or null. */
-function readLast():Place|null{
- try{const saved=localStorage.getItem(L1_PART_KEY)??'a';const part:L1PartId=isPart(saved)?saved:'a';const index=parts[part].steps.findIndex(step=>step.id===(localStorage.getItem(partKeys[part].step)??''));return index>=0?{part,index}:null;}catch{return null;}
-}
 
 function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
@@ -91,7 +87,7 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
   });
  },[]);
  const go=useCallback((next:number)=>open(place.part,next),[open,place.part]);
- // The step the learner is on (also when opened from its address), for "Kaldığın yerden devam et".
+ // The step the learner is on (also when opened from its address) stays saved in the browser for later use.
  useEffect(()=>{if(place.index>=0)try{localStorage.setItem(partKeys[place.part].step,parts[place.part].steps[place.index].id);localStorage.setItem(L1_PART_KEY,place.part);}catch{}},[place]);
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:savePartScore(part,id,right,total)}));},[place.part]);
  const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
@@ -126,14 +122,9 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
 
 /* ---------- the notebook: contents page and a part's spread (like Lektion 11 and 12) ---------- */
 const worldMap=willkommenPictures.map;
-/** Left page: the unit, where to go on, the tests and what Lektion 1 teaches. Right page: Teil A–D. */
+/** Left page: the unit, its picture and what Lektion 1 teaches (the resume and test notes were removed at the learner's request, 25 October 2026). Right page: Teil A–D. */
 function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record<L1PartId,L1AScoreMap>;onOpen:(part:L1PartId,index:number)=>void}){
- const [last,setLast]=useState<Place|null>(null);useEffect(()=>{setLast(readLast());},[]);
  const unit=courseUnits.find(item=>item.id===WILLKOMMEN_UNIT);const unitName=unit?translate(unit.names,language):'Willkommen!';
- const total=lessonOneProgress(scores);
- // The test note opens the first test not taken yet (else the last part's test).
- const testPart=partOrder.find(part=>!scores[part].test)??partOrder[partOrder.length-1];
- const testIndex=(part:L1PartId)=>parts[part].steps.findIndex(step=>step.id==='test');
  return <section className="l1a-contents" aria-labelledby="l1a-heading">
   <LessonBook className="l1a-book" left={<>
    <span className="eyebrow" lang="de">A1.1 · Lektion 1 · Willkommen!</span>
@@ -141,18 +132,6 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
    <p className="lb-sub" lang="de">Guten Tag! Wie heißen Sie?</p>
    <p className="lb-lead">Selamlaşmak, kendini tanıtmak, nereden geldiğini ve hangi dilleri konuştuğunu söylemek: <b lang="de">heißen · kommen · sprechen · sein</b>, <b lang="de">Sie / du</b> ve alfabe.</p>
    <figure className="lb-photo"><img src={worldMap.src} alt="Paul Hoca dünya haritasında farklı dillerde selamları gösteriyor" width={worldMap.width} height={worldMap.height} decoding="async"/></figure>
-   <div className="lb-notes">
-    <button type="button" className="housing-feature lb-note l1a-resume" onClick={()=>last?onOpen(last.part,last.index):onOpen('a',0)}>
-     <span className="housing-letter l12-letter" aria-hidden="true"><Play size={24}/></span>
-     <div><h2>{last&&(last.index>0||last.part!=='a')?'Kaldığın yerden devam et':'Derse başla'}</h2><p lang="de">Teil {parts[last?.part??'a'].badge} · {last?parts[last.part].steps[last.index].title:'Kapak'}</p><ProgressMeter progress={total} language={language} label="Lektion 1" compact/></div>
-     <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
-    </button>
-    <button type="button" className="housing-feature lb-note l1a-test-note" onClick={()=>onOpen(testPart,testIndex(testPart))}>
-     <span className="housing-letter l12-letter" aria-hidden="true"><Trophy size={24}/></span>
-     <div><h2>Testler</h2><p>{partOrder.map(part=>{const result=scores[part].test;return `Teil ${parts[part].badge}: ${result?result.right+' / '+result.total:parts[part].testCount+' soru'}`;}).join(' · ')}</p></div>
-     <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
-    </button>
-   </div>
    <section className="lb-goals" aria-labelledby="l1a-goals"><h2 id="l1a-goals">Bu ünitede</h2><ul>{unitGoals.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
   </>} right={<>
    <h2 className="lb-heading">İçindekiler</h2>

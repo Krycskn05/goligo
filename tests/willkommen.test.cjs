@@ -86,8 +86,10 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,20,'every teaching step, exercise and the test is in exactly one tab');
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
- for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','readLast()','go(-1)'])assert(page.includes(piece),piece);
+ for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','go(-1)'])assert(page.includes(piece),piece);
  assert(page.includes('<h2 id="l1a-heading"'),'a step heading is an h2 under the notebook title');
+ // The "Kaldığın yerden devam et" and "Testler" notes were removed at the learner's request.
+ for(const gone of ['l1a-resume','l1a-test-note','Kaldığın yerden devam et','readLast('])assert(!page.includes(gone),gone);
  const css=read('app/willkommen.css');assert(css.includes('.lb.l1a-book .l1a-soon-photo')&&css.includes('.l1a-part .lb-left .lb-photo'));
 });
 

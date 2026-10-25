@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,RotateCcw,Trophy,X} from 'lucide-react';
-import {verbMap,verbMeaning,verbGroups,spokenSubject,type Verb} from '@/lib/verb-course';
+import {verbMap,verbMeaning,verbGroups,spokenSubject,verbPronoun,withPronoun,type Verb} from '@/lib/verb-course';
 import {verbPicture,verbRules,verbRuleKeys,ruleText,sentenceText,type VerbTense} from '@/lib/verb-logic';
 import {sentenceRound,sentenceCorrect,auxRound,auxCorrect,buildRound,buildCorrect,buildTarget,buildSuffix,matchRound,matchKinds,bestKey,type GameId,type MatchKind,type Tile} from '@/lib/verb-games';
 import {MatchPreview,useMatchPreview} from './object-games';
@@ -22,9 +22,11 @@ export function VerbPicture({verb,language,small=false}:{verb:Verb;language:Vaul
  const src=verbPicture(verb);
  return src?<img className={'verb-picture'+(small?' small':'')} src={src} alt={verbMeaning(verb,language)} width={512} height={512} loading="lazy" decoding="async"/>:<span className={'verb-picture verb-picture-empty'+(small?' small':'')} aria-hidden="true" lang="de" dir="ltr">{verb.display}</span>;
 }
-/** Rule lines shown after an answer, so the learner sees why the form is right; Paul Hoca points at them (no sound: the answer is being read). */
-export function RuleBox({lines,language}:{lines:string[];language:VaultLanguage}){
- return lines.length?<div className="verb-rules paul-box" lang={language} dir={vaultDirection(language)}><div className="paul-box-text"><strong>{verbText(language,'ruleTitle')}</strong><ul>{lines.map(line=><li key={line}>{line}</li>)}</ul></div><PaulHoca pose="tip"/></div>:null;
+/** Rule lines shown after an answer, so the learner sees why the form is right; Paul Hoca points at them (no sound: the answer is being read).
+ * With `verb` (the games) the book's "sie/er" becomes the verb's own pronoun, sie or er, like its picture. */
+export function RuleBox({lines,language,verb}:{lines:string[];language:VaultLanguage;verb?:Verb}){
+ const shown=verb?lines.map(line=>withPronoun(line,verb)):lines;
+ return shown.length?<div className="verb-rules paul-box" lang={language} dir={vaultDirection(language)}><div className="paul-box-text"><strong>{verbText(language,'ruleTitle')}</strong><ul>{shown.map(line=><li key={line}>{line}</li>)}</ul></div><PaulHoca pose="tip"/></div>:null;
 }
 function useTiles(){
  const [placed,setPlaced]=useState<Tile[]>([]);
@@ -97,7 +99,7 @@ function SentenceGame({language,topic,feedback,onRestart}:GameProps){
   {result===null?<button type="button" className="btn check-button" disabled={board.placed.length!==task.chunks.length||feedback.busy} onClick={check}>{vaultText(language,'checkAnswer')}<ArrowRight size={18} className="vault-direction-icon"/></button>:
   <Result correct={result} language={language}>
    <p className="verb-sentence-answer" lang="de" dir="ltr">{task.chunks.map((chunk,i)=><span key={i} className={'verb-chunk '+chunk.role}>{chunk.text}</span>)}.</p>
-   <RuleBox lines={verbRules(verb,task.tense,language)} language={language}/>
+   <RuleBox lines={verbRules(verb,task.tense,language)} language={language} verb={verb}/>
    <button type="button" className="btn object-next" onClick={next}>{verbText(language,'nextGame')}<ArrowRight size={18} className="vault-direction-icon"/></button>
   </Result>}
  </div>;
@@ -116,11 +118,11 @@ function AuxGame({language,topic,feedback,onRestart}:GameProps){
  return <div className="verb-game-body">
   <GameHeader language={language} index={index} total={tasks.length} score={score} streak={streak}/>
   <VerbPrompt verb={verb} language={language} label={verbText(language,'auxQuestion')}/>
-  <p className="verb-frame verb-game-frame" lang="de" dir="ltr">{verb.subject} <span className="verb-frame-gap">{choice??'___'}</span> {verb.participle}</p>
+  <p className="verb-frame verb-game-frame" lang="de" dir="ltr">{verbPronoun(verb)} <span className="verb-frame-gap">{choice??'___'}</span> {verb.participle}</p>
   <div className="verb-aux-big" role="group" aria-label={verbText(language,'auxQuestion')}>{(['hat','ist'] as const).map(value=><button type="button" key={value} className={'verb-aux-big-button '+value+(choice===null?'':auxCorrect(verb,value)?' right':choice===value?' wrong':'')} disabled={choice!==null||feedback.busy} onClick={()=>pick(value)} lang="de">{value}</button>)}</div>
   {choice!==null&&<Result correct={ok} language={language}>
-   <p lang="de" dir="ltr"><strong>{verb.subject} {verb.alsoIst?'hat/ist '+verb.participle:verb.perfekt}</strong></p>
-   <RuleBox lines={lines} language={language}/>
+   <p lang="de" dir="ltr"><strong>{verbPronoun(verb)} {verb.alsoIst?'hat/ist '+verb.participle:verb.perfekt}</strong></p>
+   <RuleBox lines={lines} language={language} verb={verb}/>
    <button type="button" className="btn object-next" onClick={next}>{verbText(language,'nextGame')}<ArrowRight size={18} className="vault-direction-icon"/></button>
   </Result>}
  </div>;
@@ -136,12 +138,12 @@ function BuildGame({language,topic,feedback,onRestart}:GameProps){
  const suffix=buildSuffix(task);
  return <div className="verb-game-body">
   <GameHeader language={language} index={index} total={tasks.length} score={score} streak={streak}/>
-  <VerbPrompt verb={verb} language={language} label={verbText(language,task.kind==='praesens'?'buildPraesens':'buildParticiple')}/>
+  <VerbPrompt verb={verb} language={language} label={withPronoun(verbText(language,task.kind==='praesens'?'buildPraesens':'buildParticiple'),verb)}/>
   <TileBoard tiles={task.tiles} placed={board.placed} onAdd={board.add} onRemove={board.remove} locked={result!==null} joiner="none" hint={verbText(language,'tapTiles')+' '+verbText(language,'extraPieces')} suffix={suffix||undefined}/>
   {result===null?<button type="button" className="btn check-button" disabled={!board.placed.length||feedback.busy} onClick={check}>{vaultText(language,'checkAnswer')}<ArrowRight size={18} className="vault-direction-icon"/></button>:
   <Result correct={result} language={language}>
-   <p className="verb-build-answer" lang="de" dir="ltr">{task.kind==='praesens'?verb.subject+' ':''}<strong>{task.pieces.join('·')}</strong>{suffix?' … '+suffix:''} = {task.kind==='praesens'?verb.praesens:buildTarget(task)}</p>
-   <RuleBox lines={task.kind==='praesens'?verbRules(verb,'praesens',language):verbRuleKeys(verb,'perfekt').filter(rule=>['sepGe','noGe','strong','mixed'].includes(rule.key)).map(rule=>ruleText(language,rule.key,rule.params))} language={language}/>
+   <p className="verb-build-answer" lang="de" dir="ltr">{task.kind==='praesens'?verbPronoun(verb)+' ':''}<strong>{task.pieces.join('·')}</strong>{suffix?' … '+suffix:''} = {task.kind==='praesens'?verb.praesens:buildTarget(task)}</p>
+   <RuleBox lines={task.kind==='praesens'?verbRules(verb,'praesens',language):verbRuleKeys(verb,'perfekt').filter(rule=>['sepGe','noGe','strong','mixed'].includes(rule.key)).map(rule=>ruleText(language,rule.key,rule.params))} language={language} verb={verb}/>
    <button type="button" className="btn object-next" onClick={next}>{verbText(language,'nextGame')}<ArrowRight size={18} className="vault-direction-icon"/></button>
   </Result>}
  </div>;

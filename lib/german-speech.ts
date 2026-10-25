@@ -1,5 +1,5 @@
 import {configureAudioSession} from './audio-session';
-import {isSiteVoice,type ClipPlayer} from './site-voices';
+import {isSiteVoice,SITE_VOICE_PREFIX,type ClipPlayer} from './site-voices';
 /** Pre-rendered natural clips (site voices); resolve gives the clip URLs to try in order (none: no clip). */
 export type SpeechClips={player:ClipPlayer;resolve:(text:string,voiceName:string)=>string|readonly string[]|null};
 export type SpeechPlayback = {
@@ -33,6 +33,33 @@ export function chooseStudyVoice(voices:SpeechSynthesisVoice[],language:'de'|'en
  const selected=matches.find(v=>v.name===name);if(selected)return selected;
  if(language==='de')return [...matches].sort((a,b)=>germanVoiceScore(b)-germanVoiceScore(a))[0];
  return matches.find(v=>v.name===name)??matches.find(v=>v.localService&&v.lang.toLowerCase()===locale.toLowerCase())??matches.find(v=>v.localService)??matches.find(v=>v.lang.toLowerCase()===locale.toLowerCase())??matches[0];
+}
+
+/** Common German device voices by kind (Apple, Windows, Android, Chrome), so a man's line can find a man's device voice. */
+const maleDeviceVoice=/\b(markus|yannick|stefan|conrad|martin|viktor|klaus|hans|jonas|killian|florian|ralf|bernd|male|mann|männlich)\b/;
+const femaleDeviceVoice=/\b(anna|petra|helena|katja|hedda|amala|marlene|vicki|female|frau|weiblich|google deutsch)\b/;
+export function deviceVoiceKind(voice:{name:string;voiceURI?:string}):'female'|'male'|null{
+ const name=(voice.name+' '+(voice.voiceURI??'')).toLowerCase();
+ return maleDeviceVoice.test(name)?'male':femaleDeviceVoice.test(name)?'female':null;
+}
+/** A person's pitch on a device voice of their own kind, and on a device voice of the other kind (lower for men, higher for women). */
+const ownKindPitch:Record<string,number>={F1:1,F2:1.1,F3:0.93,F4:1.05,F5:1.16,M1:1,M2:0.92,M3:1.06,M4:0.96,M5:1.1};
+const otherKindPitch:Record<string,number>={F1:1.2,F2:1.3,F3:1.15,F4:1.25,F5:1.35,M1:0.76,M2:0.68,M3:0.82,M4:0.72,M5:0.79};
+/**
+ * While a person's natural site voice has no clip yet (new texts are rendered after a push), the device voice stands in:
+ * a device voice of the same kind when the device has one, and a pitch of that person's own, so Sabine and Yasemin never
+ * sound the same and a man is not read like a woman (25 October 2026, the learner asked). Not a site voice: no change.
+ */
+export function deviceStandIn(voices:SpeechSynthesisVoice[],language:'de'|'en',siteVoiceName:string|undefined):{voice:SpeechSynthesisVoice|undefined;pitch:number}{
+ const fallback=chooseStudyVoice(voices,language,isSiteVoice(siteVoiceName)?'':siteVoiceName??'');
+ const style=isSiteVoice(siteVoiceName)?siteVoiceName!.slice(SITE_VOICE_PREFIX.length):'';
+ if(!/^[FM][0-9]$/.test(style))return {voice:fallback,pitch:1};
+ const kind=style[0]==='F'?'female':'male';
+ const same=studyVoices(voices,language).filter(voice=>deviceVoiceKind(voice)===kind&&germanVoiceScore(voice)>=0).sort((a,b)=>germanVoiceScore(b)-germanVoiceScore(a))[0];
+ if(same)return {voice:same,pitch:ownKindPitch[style]??1};
+ // Most German device voices are women's (Anna, Helena, Google Deutsch): an unknown voice counts as a woman's.
+ const fallbackKind=(fallback&&deviceVoiceKind(fallback))||'female';
+ return {voice:fallback,pitch:(fallbackKind===kind?ownKindPitch[style]:otherKindPitch[style])??1};
 }
 
 export function germanVoices(voices: SpeechSynthesisVoice[]) {
@@ -158,7 +185,7 @@ export function createGermanSpeechPlayer(
       clearTimer();
       clips?.player.stop();
       if (attempt + 1 < urls.length) { attempt++; tryClip(); return; }
-      speakWithEngine(text, rate * speed, isSiteVoice(options.voiceName) ? '' : options.voiceName);
+      speakWithEngine(text, rate * speed, options.voiceName);
     };
     const slow = () => {
       if (token !== generation || started) return;
@@ -198,7 +225,9 @@ export function createGermanSpeechPlayer(
     const token = generation;
     let index = 0;
     let retried = false;
-    let voice = chooseStudyVoice(synthesis.getVoices(), language, isSiteVoice(voiceName) ? '' : voiceName ?? '');
+    // A site voice without a clip: the device voice stands in, with that person's kind and pitch (deviceStandIn).
+    const standIn = deviceStandIn(synthesis.getVoices(), language, voiceName);
+    let voice = standIn.voice;
     update({status: 'loading', text, warning: ''});
 
     function retryPart() {
@@ -228,7 +257,7 @@ export function createGermanSpeechPlayer(
       if (voice) utterance.voice = voice;
       // If voices are still loading, let the device select a voice for de-DE.
       utterance.rate = rate;
-      utterance.pitch = 1;
+      utterance.pitch = standIn.pitch;
       utterance.volume = 1;
       const isCurrent = () => token === generation && current === utterance;
       utterance.onstart = () => {

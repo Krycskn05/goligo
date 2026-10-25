@@ -1,4 +1,4 @@
-import {verbs,verbMeaning,type Verb} from './verb-course';
+import {verbs,verbMeaning,verbPronoun,type Verb} from './verb-course';
 import type {VaultLanguage} from './object-vault-copy';
 import {sentenceChunks,sentenceDistractor,participlePieces,participleWrongPieces,praesensPieces,praesensWrongPieces,verbPicture,verbPrefix,type VerbTense,type SentenceChunk} from './verb-logic';
 
@@ -58,7 +58,7 @@ export function matchRound(topic:string,kind:MatchKind,language:VaultLanguage,pa
  for(const verb of mix(pool,random).slice(0,pairs)){
   cards.push({id:verb.id+':verb',pair:verb.id,face:'verb',text:verb.display});
   if(kind==='picture')cards.push({id:verb.id+':picture',pair:verb.id,face:'picture',text:verbMeaning(verb,language),picture:verbPicture(verb)!});
-  else if(kind==='perfekt')cards.push({id:verb.id+':perfekt',pair:verb.id,face:'perfekt',text:verb.subject+' '+(verb.alsoIst?'hat/ist '+verb.participle:verb.perfekt)});
+  else if(kind==='perfekt')cards.push({id:verb.id+':perfekt',pair:verb.id,face:'perfekt',text:verbPronoun(verb)+' '+(verb.alsoIst?'hat/ist '+verb.participle:verb.perfekt)});
   else cards.push({id:verb.id+':meaning',pair:verb.id,face:'meaning',text:verbMeaning(verb,language)});
  }
  return mix(cards,random);

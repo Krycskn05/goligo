@@ -107,8 +107,18 @@ export const verbs:Verb[]=specs.map(([display,praesens,perfekt,praesensWrong,per
 });
 export const verbMap=new Map(verbs.map(verb=>[verb.id,verb]));
 export function verbMeaning(verb:Verb,language:VaultLanguage){return pickText(verb.meanings,language);}
-/** Spoken subject: one clear singular pronoun (the page writes "sie/er"; "es" and "sie" stay as written). */
-export function spokenSubject(verb:Verb){return verb.subject==='es'?'es':verb.subject==='sie'?'sie':'er';}
+/** Verbs whose picture (public/verbs) shows a woman doing the action (looked at one by one, 25 October 2026). Every other
+ * picture shows a man, or no person at all (fliegen, gelten, herunterladen, zurückfahren: er for now). Where a picture
+ * has two people, the one who does the action counts: mitkommen = the woman who comes along, treffen = the woman. */
+export const womanInPicture:ReadonlySet<string>=new Set(['anziehen','aussehen','beginnen','bekommen','einladen','essen','geben','lesen','mitkommen','mitnehmen','rufen','schließen','schreiben','sehen','sitzen','treffen','trinken','überweisen','vergessen','verstehen','werden','ziehen','zurückgehen']);
+/** One pronoun for the verb, never "sie/er" (the learner asked, 25 October 2026): sie when the picture shows a woman, er when
+ * it shows a man; "es" (gefallen, leid|tun, weh|tun) and "sie" (scheinen: die Sonne) stay as the book writes them.
+ * The games write it before the form, and the site voices read it (the lists and the workshop still show the book's "sie/er"). */
+export function verbPronoun(verb:Verb):'sie'|'er'|'es'{return verb.subject==='es'?'es':verb.subject==='sie'||womanInPicture.has(verb.id)?'sie':'er';}
+/** A text for the games with the book's "sie/er" replaced by the verb's own pronoun (labels and rule lines in every language keep "sie/er"). */
+export function withPronoun(text:string,verb:Verb){return text.replace(/sie\/er/g,verbPronoun(verb));}
+/** Spoken subject: the verb's own pronoun, matching its picture. */
+export function spokenSubject(verb:Verb){return verbPronoun(verb);}
 /** The Perfekt as the page shows it, e.g. "hat/ist gelegen". */
 export function perfektLabel(verb:Verb){return verb.alsoIst?'hat/ist '+verb.participle:verb.perfekt;}
 /** One spoken row for the verb list: infinitive, Präsens, Perfekt. */

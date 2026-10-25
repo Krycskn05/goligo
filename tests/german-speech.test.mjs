@@ -3,7 +3,7 @@ import {test} from 'node:test';
 import {createRequire} from 'node:module';
 const compiled=process.env.STUDY_CHECK_DIR;
 assert.ok(compiled,'Set STUDY_CHECK_DIR to compiled lib directory.');
-const {createGermanSpeechPlayer,chooseGermanVoice,chooseStudyVoice,splitSpeechText,defaultSpeechRate}=createRequire(import.meta.url)(compiled+'/german-speech.js');
+const {createGermanSpeechPlayer,chooseGermanVoice,chooseStudyVoice,splitSpeechText,defaultSpeechRate,deviceStandIn,deviceVoiceKind}=createRequire(import.meta.url)(compiled+'/german-speech.js');
 
 const local={name:'Deutsch lokal',lang:'de-DE',localService:true};
 const remote={name:'Deutsch online',lang:'de-DE',localService:false};
@@ -253,4 +253,21 @@ test('skipping while replacement speech waits cancels its timer and re-primes af
  s.player.speak('der Tisch');s.player.speak('die Lampe');s.player.stop();
  t.mock.timers.tick(300);assert.equal(s.utterances.length,2);assert(!s.player.isActive());
  s.player.resetPreparation();s.player.prepare();assert.equal(s.utterances.at(-1).text,'');
+});
+
+test('a person whose natural voice has no clip yet still sounds like themselves on the device voice (25 October 2026)',t=>{
+ const anna={name:'Anna',lang:'de-DE',localService:true},markus={name:'Markus',lang:'de-DE',localService:true},google={name:'Google Deutsch',lang:'de-DE',localService:false};
+ assert.equal(deviceVoiceKind(anna),'female');assert.equal(deviceVoiceKind(markus),'male');assert.equal(deviceVoiceKind(google),'female');assert.equal(deviceVoiceKind(local),null);
+ // A man's line takes a man's device voice when there is one; women take a woman's.
+ assert.equal(deviceStandIn([anna,markus],'de','site:M2').voice,markus);assert.equal(deviceStandIn([anna,markus],'de','site:F2').voice,anna);
+ // Two women never share a pitch; on a woman's voice only, men are read clearly lower.
+ const women=['F1','F2','F3','F4','F5'].map(style=>deviceStandIn([anna],'de','site:'+style).pitch);assert.equal(new Set(women).size,5);
+ const men=['M1','M2','M3','M4','M5'].map(style=>deviceStandIn([anna],'de','site:'+style).pitch);assert.equal(new Set(men).size,5);assert(men.every(pitch=>pitch<0.85),men.join());
+ assert(['M1','M2','M3','M4','M5'].map(style=>deviceStandIn([anna,markus],'de','site:'+style).pitch).every(pitch=>pitch>0.9),'a man\'s own device voice keeps a natural pitch');
+ // Not a site voice (the learner's own device voice): unchanged.
+ assert.deepEqual(deviceStandIn([anna,markus],'de','Markus'),{voice:markus,pitch:1});assert.equal(deviceStandIn([anna],'de','').pitch,1);
+ // The player uses it when a site voice has no clip.
+ const s=setup(t,[anna,markus]);s.player.speak('Hallo Yasemin!',{voiceName:'site:F2'});
+ assert.equal(s.utterances[0].voice,anna);assert.equal(s.utterances[0].pitch,deviceStandIn([anna,markus],'de','site:F2').pitch);
+ s.start();s.end();s.player.speak('Guten Tag.',{voiceName:'site:M2'});assert.equal(s.utterances.at(-1).voice,markus);
 });

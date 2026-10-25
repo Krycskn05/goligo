@@ -260,8 +260,9 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  const persons=load('verb-persons');const spoken=persons.workshopSpeechTexts();
  for(const text of spoken)assert.ok(texts.has(text),text);
  const fahren=verbs.verbMap.get('einladen');
- assert.deepEqual(persons.conjugationRows(fahren).map(row=>row.spoken),['ich lade ein','du lädst ein','er lädt ein','wir laden ein','ihr ladet ein','sie laden ein']);
- assert.equal(persons.learnSpeech(fahren,'meaning'),'einladen');assert.equal(persons.learnSpeech(fahren,'perfekt'),'er hat eingeladen');
+ // einladen's picture shows a woman, so the third person is read with sie (25 October 2026).
+ assert.deepEqual(persons.conjugationRows(fahren).map(row=>row.spoken),['ich lade ein','du lädst ein','sie lädt ein','wir laden ein','ihr ladet ein','sie laden ein']);
+ assert.equal(persons.learnSpeech(fahren,'meaning'),'einladen');assert.equal(persons.learnSpeech(fahren,'perfekt'),'sie hat eingeladen');
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
  assert.ok(cards.includes('const rows=conjugationRows(verb);')&&cards.includes('onClick={()=>speech.speak(spoken)}')&&cards.includes('const spoken=learnSpeech(verb,stage);')&&cards.includes('onClick={()=>speech.speak(row.text)}'),'the cards speak exactly these texts');
  // A new verb's card says the verb by itself, once (a natural clip exists for it); closing the card stops it, taps ready the voice.
@@ -585,7 +586,7 @@ test('the cards say regular, irregular or modal; irregular names and forms get t
  for(const language of languages)for(const key of ['kindIrregular','kindRegular','kindModal','kindModalNote','partVerbsTitle','partVerbsLead','backToPart','prevVerb','nextVerb','verbDoneMeaning','verbDonePerfekt','verbNotDone'])assert.ok(copy.verbText(language,key).trim(),language+' '+key);
  for(const language of languages){assert.ok(copy.verbText(language,'kindStem',{verb:'du fährst'}).includes('du fährst'));assert.ok(copy.verbText(language,'kindPartizip',{verb:'gefahren'}).includes('gefahren'));assert.ok(copy.verbText(language,'partOpen',{n:2}).includes('2'));}
  const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');const css=fs.readFileSync('app/verbs.css','utf8');
- assert.ok(cards.includes('className="verb-irregular-form"'),'the irregular forms in the note are coloured');assert.ok(cards.includes('<VerbKindBadge verb={verb} language={language} note/>')&&cards.includes("className={'verb-conj-cell'+(irregular(pronoun)?' irregular':'')}"),'the card shows the badge and the changed forms');
+ assert.ok(!cards.includes('<VerbKindBadge '),'no "Düzensiz fiil · Partizip düzensiz" line on the cards (the learner asked)');assert.ok(cards.includes("className={'verb-conj-cell'+(irregular(pronoun)?' irregular':'')}"),'the changed forms stay coloured in the table');
  assert.match(css,/\.verb-irregular-form \{ color:#7a2fc0; \}/);
 });
 test('a part opens its verb list with what is done; a verb opens its own card',()=>{
@@ -620,4 +621,29 @@ test('letter puzzles: a wrong letter goes back and counts, hints help, a full wo
  assert.ok(ui.includes("if(letterFits(puzzle,index,token.letter,strictCase,course))place(index,tokenId);else miss(index,token.letter);"),'right letters go in, wrong ones shake');
  assert.ok(ui.includes('onClick={hint}'),'hint button');
  for(const language of languages)for(const key of ['puzzleHintButton','puzzleHintAria','puzzleMistakes','puzzleMistakeNote','letterBankHint'])assert.ok(load('object-vault-copy').vaultText(language,key,{n:2}).trim(),language+' '+key);
+});
+
+test('games write one pronoun for a verb, like its picture: sie for a woman, er for a man, never "sie/er" (25 October 2026)',()=>{
+ const games=load('verb-games'),objectGames=load('object-games'),logic=load('verb-logic');
+ for(const verb of verbs.verbs){
+  const pronoun=verbs.verbPronoun(verb);
+  assert.ok(['sie','er','es'].includes(pronoun),verb.id);
+  assert.equal(verbs.spokenSubject(verb),pronoun,'the voice reads the same pronoun: '+verb.id);
+  if(verb.subject!=='sie/er')assert.equal(pronoun,verb.subject,'es and scheinen (die Sonne) stay as the book writes them: '+verb.id);
+ }
+ for(const id of verbs.womanInPicture){const verb=verbs.verbMap.get(id);assert.ok(verb,id);assert.ok(logic.verbPicture(verb),id+' has a picture');assert.equal(verbs.verbPronoun(verb),'sie',id);}
+ assert.equal(verbs.verbPronoun(verbs.verbMap.get('beginnen')),'sie');assert.equal(verbs.verbPronoun(verbs.verbMap.get('abfahren')),'er');
+ assert.equal(verbs.verbPronoun(verbs.verbMap.get('essen')),'sie');assert.equal(verbs.verbPronoun(verbs.verbMap.get('schlafen')),'er');
+ assert.equal(verbs.verbPronoun(verbs.verbMap.get('scheinen')),'sie');assert.equal(verbs.verbPronoun(verbs.verbMap.get('gefallen')),'es');
+ assert.equal(course.questionMap.get('verb-hear-perfekt-beginnen').audio,'sie hat begonnen');
+ assert.equal(verbs.withPronoun('Build the Präsens form for sie/er',verbs.verbMap.get('lesen')),'Build the Präsens form for sie');
+ assert.equal(verbs.withPronoun('Präsens\'te sie/er için e → i veya ie olur (sieht).',verbs.verbMap.get('geben')),'Präsens\'te sie için e → i veya ie olur (sieht).');
+ // Matching cards: "sie hat begonnen", never "sie/er hat …".
+ for(let round=0;round<6;round++)for(const card of games.matchRound('verbs-all','perfekt','tr'))if(card.face==='perfekt'){assert.ok(!card.text.includes('sie/er'),card.text);assert.ok(card.text.startsWith(verbs.verbPronoun(verbs.verbMap.get(card.pair))+' '),card.text);}
+ assert.ok(objectGames.quickDeck(80).some(card=>card.kind==='verb'));
+ const verbGames=fs.readFileSync('app/verb-games.tsx','utf8'),quick=fs.readFileSync('app/object-games.tsx','utf8');
+ for(const code of [verbGames,quick,fs.readFileSync('lib/verb-games.ts','utf8')])assert.ok(!code.includes('verb.subject'),'the games never show the book\'s "sie/er"');
+ assert.ok(quick.includes("{verb?verbPronoun(verb)+' ':''}{card.shown}"),'Hızlı karar: the pronoun before the Perfekt form');
+ for(const piece of ['{verbPronoun(verb)} <span className="verb-frame-gap">','<strong>{verbPronoun(verb)} {verb.alsoIst','withPronoun(verbText(language,task.kind===\'praesens\'?\'buildPraesens\':\'buildParticiple\'),verb)',"{task.kind==='praesens'?verbPronoun(verb)+' ':''}",'lines.map(line=>withPronoun(line,verb))'])assert.ok(verbGames.includes(piece),piece);
+ assert.equal((verbGames.match(/language=\{language\} verb=\{verb\}\/>/g)||[]).length,3,'the three games pass the verb to their rule boxes');
 });

@@ -92,6 +92,50 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
  .l1a-match>div:first-child { border-bottom:1.5px dashed var(--toy-line,#dce5da); margin-bottom:6px; }
  .l1a-note .l1a-paul { width:68px; height:68px; }
 }
+/* Teil B (25 October 2026): languages, Sie/du, the verb grid, the alphabet, a profile card, ticks and names. */
+.l1a-scene { background:#fff; max-height:300px; object-fit:contain; }
+.l1a-into { display:inline-flex; align-items:center; gap:4px; margin-inline-end:8px; white-space:nowrap; }
+.l1a-into .l12-say { width:34px; height:34px; }
+.l1a-langs { display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:8px; margin:8px 0; }
+.l1a-lang { min-height:62px; align-content:center; }
+.l1a-lang b { font-size:15px; overflow-wrap:anywhere; }
+.l1a-two { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:10px 0; }
+.l1a-two>div { padding:10px 12px; border-radius:14px; background:#eaf4ff; }
+.l1a-two>div+div { background:#fff4d6; }
+.l1a-two p { margin:0; }
+.l1a-two-head { font-size:15px; color:var(--ink); margin-bottom:4px !important; }
+.l1a-sie-du td { width:50%; }
+.l1a-sie-du td .l12-say { vertical-align:middle; width:34px; height:34px; margin-inline-start:4px; }
+.l1a-scroll { overflow-x:auto; }
+.l1a-verb-grid th,.l1a-verb-grid td { text-align:center; white-space:nowrap; }
+.l1a-verb-grid td:first-child,.l1a-verb-grid th:first-child { text-align:start; }
+.l1a-verb-grid td b { color:var(--blue-2,#2f7fd6); }
+.l1a-abc { display:grid; grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); gap:6px; margin:10px 0; }
+.l1a-letter { display:grid; justify-items:center; gap:2px; min-height:58px; padding:6px 2px; border:2px solid var(--toy-line,#dce5da); border-radius:12px; background:#fff; color:var(--ink); font:inherit; line-height:1.15; cursor:pointer; }
+.l1a-letter b { font-size:22px; }
+.l1a-letter small { font-size:11px; color:var(--ink-3,#5b7590); }
+.l1a-letter.hard { border-color:var(--blue,#7cc4ff); background:#f3f9ff; }
+.l1a-letter.playing,.l1a-letter:hover { border-color:var(--blue-2,#2f7fd6); }
+.l1a-profile { display:flex; align-items:center; gap:14px; margin:10px 0; padding:12px 14px; border:2px dashed var(--toy-line,#dce5da); border-radius:16px; background:#fffdf6; }
+.l1a-profile dl { display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 10px; margin:0; font-size:15px; }
+.l1a-profile dt { font-weight:800; color:var(--ink-3,#5b7590); }
+.l1a-profile dd { margin:0; font-weight:700; color:var(--ink); }
+.l1a-spell-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+.l1a-tick { display:inline-flex; align-items:center; gap:4px; }
+.l1a-tick.on { border-color:var(--blue-2,#2f7fd6); background:#eaf4ff; }
+.l1a-ok-text { color:#2f7a31; font-weight:700; }
+.l1a-bad-text { color:#a63d2a; font-weight:700; }
+.l1a-name-row { flex-wrap:nowrap; }
+.l1a-name-gap { width:9em !important; }
+.l1a-arow.wide { display:grid; grid-template-columns:minmax(0,1fr); gap:6px; }
+.l1a-statement { display:flex; align-items:center; gap:8px; }
+.l1a-reply { font-weight:700; color:#2f7a31; }
+@media (max-width:520px) {
+ .l1a-two { grid-template-columns:1fr; }
+ .l1a-langs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .l1a-abc { grid-template-columns:repeat(5,minmax(0,1fr)); }
+ .l1a-profile { align-items:flex-start; }
+}
 /* The notebook (25 October 2026, like Lektion 11 and 12; markup LessonBook, styles app/lesson-book.css):
    the contents page lists Teil A–D, Teil A opens on a wide spread with three index tabs above the step. */
 .lb.l1a-book .lb-photo img { display:block; width:100%; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:2px; }

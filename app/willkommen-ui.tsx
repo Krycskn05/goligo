@@ -1,0 +1,167 @@
+'use client';
+import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
+import {Check,RotateCcw,Volume2} from 'lucide-react';
+import type {StudyLanguage} from '@/lib/study-languages';
+import type {TopicProgress} from '@/lib/progress';
+import {acceptsAnswer,portraitSrc,sayText,speakerVoice,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
+import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
+import {useAnswerSound,useGermanSpeech} from './study-shared';
+import {PaulHoca} from './paul-hoca';
+
+/*
+ * Pieces shared by Lektion 1's lesson pages (Teil A in app/willkommen-study.tsx, Teil B in app/willkommen-b-steps.tsx):
+ * speech with a voice per person, the say button, headings and notes, and the exercise types both parts use.
+ */
+
+/** Site speech plus "read these one after the other" (dialogues, spelling, the learner's own sentences). A text with a
+ * speaker (`who`, see `speakers` in lib/willkommen-course.ts) is read with that person's own voice — a man by a man, a
+ * woman by a woman; everything else with the learner's chosen voice. `slow` reads slowly (letters when spelling). */
+export type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void};
+export function useLessonSpeech():Speech&{warning?:string}{
+ const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning,siteVoices}=german;
+ const voices=useRef(siteVoices);voices.current=siteVoices;
+ const say=useCallback((item:SayItem)=>{const who=typeof item==='string'?undefined:item.who;const slow=typeof item!=='string'&&!!item.slow;speak(sayText(item),slow,speakerVoice(who,voices.current));},[speak]);
+ const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const busyRef=useRef(busy);
+ const next=useCallback(()=>{
+  const item=queue.current.shift();if(!item)return;
+  say(item);
+  // If the voice never starts (no sound support), go on after a moment so the queue never sticks.
+  waiting.current=setTimeout(()=>{waiting.current=null;if(!busyRef.current)next();},1500);
+ },[say]);
+ useEffect(()=>{const was=busyRef.current;busyRef.current=busy;if(busy&&waiting.current){clearTimeout(waiting.current);waiting.current=null;}if(was&&!busy)next();},[busy,next]);
+ const speakAll=useCallback((items:SayItem[])=>{stop();queue.current=items.filter(item=>sayText(item).trim());next();},[stop,next]);
+ const speakOne=useCallback((item:SayItem)=>{queue.current=[];say(item);},[say]);
+ const stopAll=useCallback(()=>{queue.current=[];if(waiting.current){clearTimeout(waiting.current);waiting.current=null;}stop();},[stop]);
+ useEffect(()=>()=>{if(waiting.current)clearTimeout(waiting.current);},[]);
+ return useMemo(()=>({speak:speakOne,speakAll,busy,activeText,stop:stopAll,prepare,warning}),[speakOne,speakAll,busy,activeText,stopAll,prepare,warning]);
+}
+
+export type Sound=ReturnType<typeof useAnswerSound>;
+/** What every step gets: `onGo` opens a step of the same part (a negative number: the contents page), `onPart` a step of another part. */
+export type StepProps={step:Step;speech:Speech;sound:Sound;scores:L1AScoreMap;progress:TopicProgress;onScore:(id:string,right:number,total:number)=>void;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;language:StudyLanguage};
+
+/* ---------- small pieces ---------- */
+export function Say({text,who,slow,speech,label='Dinle',wide=false}:{text:string;who?:string;slow?:boolean;speech:Speech;label?:string;wide?:boolean}){
+ const playing=speech.busy&&speech.activeText===text;
+ return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={label+': '+text} title={label} data-who={who} onClick={()=>speech.speak({text,who,slow})}><Volume2 size={18} aria-hidden="true"/>{wide&&label}</button>;
+}
+export function Phrases({items,speech}:{items:readonly (readonly [string,string])[];speech:Speech}){
+ return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={de} speech={speech}/></div>)}</>;
+}
+export const Note=({children}:{children:ReactNode})=><div className="l1a-note"><PaulHoca pose="tip" className="l1a-paul"/><p>{children}</p></div>;
+/** `**bold**` inside a text. */
+export function Rich({text}:{text:string}){const parts=text.split(/(\*\*[^*]+\*\*)/g);return <>{parts.map((part,i)=>part.startsWith('**')&&part.endsWith('**')&&part.length>4?<b key={i}>{part.slice(2,-2)}</b>:part)}</>;}
+/** A step's heading (h2: the notebook's left page holds the h1 title of the part). */
+export function Heading({children}:{children:ReactNode}){return <h2 id="l1a-heading" tabIndex={-1} className="l1a-heading">{children}</h2>;}
+export function Portrait({who,name}:{who:string;name:string}){return <img className="l1a-portrait" src={portraitSrc(who)} alt={name} width={64} height={64} loading="lazy" decoding="async"/>;}
+export function shuffle<T>(list:readonly T[]):T[]{const out=list.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;}
+
+/* ---------- exercises ---------- */
+export type Feedback={ok:boolean;text:string}|null;
+export function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?.text??''}</p>;}
+/** Finishes an exercise: saves the score, plays the sound and reads the solution after a full score. */
+export function useFinish(props:StepProps){
+ const {sound,speech,onScore,step}=props;
+ return useCallback((right:number,total:number,say?:SayItem[])=>{
+  onScore(step.id,right,total);
+  if(right===total){sound.correct(()=>{if(say?.length)speech.speakAll(say);});}else sound.wrong();
+ },[sound,speech,onScore,step.id]);
+}
+/** Gaps in a text: letters inside a word, whole sentences (wide) or a word chosen from a box. `speakers` read the
+ * solution as a little dialogue (lines alternate a, b), each line by its own person. */
+export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];say:string[];speakers?:{a:string;b:string}}){
+ const {kicker,title,lead,before,lines,wide=false,choices,sound,speech,speakers}=props;
+ const say=useMemo(()=>speakers?withSpeakers(props.say,speakers):props.say,[props.say,speakers]);
+ const gaps=useMemo(()=>lines.flatMap((line,l)=>line.answers.map((answers,g)=>({line:l,gap:g,answers}))),[lines]);
+ const [values,setValues]=useState<string[]>(()=>gaps.map(()=>''));const [checked,setChecked]=useState<(boolean|null)[]>(()=>gaps.map(()=>null));
+ const [feedback,setFeedback]=useState<Feedback>(null);const finish=useFinish(props);
+ const at=(l:number,g:number)=>gaps.findIndex(item=>item.line===l&&item.gap===g);
+ const check=()=>{
+  sound.prepare();speech.prepare();
+  const result=gaps.map((gap,i)=>acceptsAnswer(values[i],gap.answers));setChecked(result);
+  const right=result.filter(Boolean).length;
+  setFeedback(right===gaps.length?{ok:true,text:'Hepsi doğru!'}:{ok:false,text:`${right} / ${gaps.length} doğru. Kırmızıları düzelt; doğrusu yanında yazıyor.`});
+  finish(right,gaps.length,say);
+ };
+ const reveal=()=>{setValues(gaps.map(gap=>gap.answers[0]));setChecked(gaps.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
+ const field=(l:number,g:number)=>{const i=at(l,g);const state=checked[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
+  const input=choices?<select className={cls} value={values[i]} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);const ok=acceptsAnswer(event.target.value,gaps[i].answers);const nextChecked=checked.slice();nextChecked[i]=event.target.value?ok:null;setChecked(nextChecked);}}><option value="">…</option>{choices.map(word=><option key={word} value={word}>{word}</option>)}</select>
+   :<input className={cls} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const nextChecked=checked.slice();nextChecked[i]=null;setChecked(nextChecked);}}}/>;
+  return <span className="l1a-gap-wrap" key={g}>{input}{state===false&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
+ const line=(item:GapLine,l:number)=>{const parts=item.text.split('___');return <span className="l1a-de l1a-gap-text" lang="de" dir="ltr">{parts.map((part,g)=><span key={g}>{part}{g<parts.length-1&&field(l,g)}</span>)}</span>;};
+ return <>
+  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
+  <div className="l1a-dialogue">{lines.map((item,l)=>item.who?<div className={'l1a-line '+item.who} key={l}><div className="l1a-bubble">{line(item,l)}</div></div>:<div className="l1a-row" key={l}>{line(item,l)}</div>)}</div>
+  <div className="l1a-actions"><button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={reveal}>Cevapları göster</button></div>
+  <FeedbackLine feedback={feedback}/>
+ </>;
+}
+/** Matching: tap left, then right; a right pair is read (`sayFor`). */
+export function MatchExercise(props:StepProps&{kicker:string;title:string;lead?:string;pairs:readonly (readonly [string,string])[];sayFor:(index:number)=>SayItem[]}){
+ const {speech,sound,pairs,sayFor,kicker,title,lead='Önce soldan, sonra sağdan dokun.'}=props;const finish=useFinish(props);
+ const [order]=useState(()=>shuffle(pairs.map((_,i)=>i)));
+ const [selected,setSelected]=useState<number|null>(null);const [done,setDone]=useState<number[]>([]);const [wrongAt,setWrongAt]=useState<number|null>(null);const [misses,setMisses]=useState(0);
+ const [feedback,setFeedback]=useState<Feedback>(null);
+ const pickRight=(i:number)=>{
+  if(selected===null||done.includes(i))return;sound.prepare();speech.prepare();
+  if(i===selected){const next=[...done,i];setDone(next);setSelected(null);speech.speakAll(sayFor(i));
+   if(next.length===pairs.length){const right=Math.max(0,pairs.length-misses);setFeedback({ok:true,text:'Hepsi eşleşti!'});finish(right,pairs.length);}}
+  else{setWrongAt(i);setMisses(m=>m+1);setFeedback({ok:false,text:'Bu ikisi uymuyor.'});sound.wrong();setTimeout(()=>setWrongAt(null),600);}
+ };
+ return <>
+  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">{lead}</p>
+  <div className="l1a-match">
+   <div>{pairs.map((pair,i)=><button type="button" key={i} className={'l1a-mbtn'+(selected===i?' sel':'')+(done.includes(i)?' done':'')} disabled={done.includes(i)} aria-pressed={selected===i} lang="de" dir="ltr" onClick={()=>setSelected(i)}>{pair[0]}</button>)}</div>
+   <div>{order.map(i=><button type="button" key={i} className={'l1a-mbtn'+(done.includes(i)?' done':'')+(wrongAt===i?' bad':'')} disabled={done.includes(i)} lang="de" dir="ltr" onClick={()=>pickRight(i)}>{pairs[i][1]}</button>)}</div>
+  </div>
+  <FeedbackLine feedback={feedback}/>
+ </>;
+}
+/** One choice per row (Sie or du, which letter, right or not …): the row is read after the answer (`say`), and
+ * `reveal` appears once the row is answered. */
+export type ChoiceRow={key:string;before?:ReactNode;after?:ReactNode;options:{value:string;label:string}[];answer:string;say?:SayItem;reveal?:ReactNode;label:string};
+export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;rows:ChoiceRow[];wide?:boolean}){
+ const {speech,sound,rows,kicker,title,lead,before,wide=false}=props;const finish=useFinish(props);
+ const [answers,setAnswers]=useState<Record<number,string>>({});const [feedback,setFeedback]=useState<Feedback>(null);
+ const answer=(i:number,value:string)=>{if(answers[i]!==undefined)return;sound.prepare();speech.prepare();
+  const next={...answers,[i]:value};setAnswers(next);const row=rows[i];const ok=value===row.answer;
+  const done=Object.keys(next).length;const right=rows.filter((item,j)=>next[j]===item.answer).length;
+  const say=()=>{if(row.say)speech.speak(row.say);};
+  if(done===rows.length){setFeedback({ok:right===rows.length,text:`${right} / ${rows.length} doğru`});finish(right,rows.length,row.say?[row.say]:undefined);}
+  else if(ok)sound.correct(say);else sound.wrong(say);};
+ return <>
+  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
+  {rows.map((row,i)=><div className={'l1a-arow'+(wide?' wide':'')} key={row.key} data-done={answers[i]!==undefined?'':undefined}>
+   {row.before}
+   <div className="l1a-opts" role="group" aria-label={row.label}>{row.options.map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang="de" onClick={()=>answer(i,option.value)}>{option.label}</button>)}</div>
+   {row.after}
+   {answers[i]!==undefined&&row.reveal}
+  </div>)}
+  <FeedbackLine feedback={feedback}/>
+ </>;
+}
+/** The test: one question at a time, the right answer is read after the sound (`sayFor`, nothing for a Turkish answer). */
+export function TestStep(props:StepProps&{label:string;questions:readonly (readonly [string,string[],string,...unknown[]])[];sayFor:(index:number)=>string}){
+ const {speech,sound,onScore,step,questions,sayFor,label}=props;
+ const [i,setI]=useState(0);const [score,setScore]=useState(0);const [picked,setPicked]=useState<string|null>(null);const [options,setOptions]=useState(()=>shuffle(questions[0][1]));const [over,setOver]=useState(false);
+ const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
+ const question=questions[i];
+ const answer=(option:string)=>{if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);const ok=option===question[2];const total=score+(ok?1:0);setScore(total);
+  const say=sayFor(i);const after=()=>{if(say)speech.speak(say);};if(ok)sound.correct(after);else sound.wrong(after);
+  timer.current=setTimeout(()=>{if(i+1<questions.length){setI(i+1);setPicked(null);setOptions(shuffle(questions[i+1][1]));}else{setOver(true);onScore(step.id,total,questions.length);if(total===questions.length)sound.complete();}},1600);};
+ const again=()=>{setI(0);setScore(0);setPicked(null);setOptions(shuffle(questions[0][1]));setOver(false);};
+ if(over){const percent=Math.round(score/questions.length*100);return <>
+  <p className="kicker" lang="de">{label}</p><Heading>Sonuç</Heading>
+  <p className="l1a-score">{score} / {questions.length}</p>
+  <p className="l1a-big">{percent>=80?'Harika! Bu konuyu öğrendin.':percent>=60?'İyi. Yanlışlarına bir daha bak.':'Konuyu bir kez daha oku, sonra tekrar dene.'}</p>
+  {percent>=80&&<PaulHoca pose="cheer" className="l1a-paul-big"/>}
+  <div className="l1a-actions"><button type="button" className="btn" onClick={again}><RotateCcw size={18} aria-hidden="true"/>Testi tekrarla</button></div></>;}
+ return <>
+  <p className="kicker" lang="de">{label}</p><Heading>Soru {i+1} / {questions.length}</Heading>
+  <p className="l1a-question" lang={/[çğışİ]|hangisi|nedir|nasıl|ne demek|cevap/.test(question[0])?'tr':'de'}>{question[0]}</p>
+  <div className="l1a-opts column" role="group" aria-label={'Soru '+(i+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr'} onClick={()=>answer(option)}>{option}</button>)}</div>
+  <p className="l1a-mini">Puan: {score}</p>
+ </>;
+}

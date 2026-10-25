@@ -33,4 +33,6 @@ for(const text of load('verb-persons').workshopSpeechTexts())add(text);
 for(const text of load('ausbildung-hoeren').ausbildungSpeechTexts())add(text);
 // Lektion 1A „Willkommen!“: phrases, countries, the dialogue, the people and the exercises' solutions.
 for(const text of load('willkommen-course').willkommenSpeechTexts())add(text);
+// Lektion 1B „Ich spreche ein bisschen Deutsch.“: languages, Sie/du, dialogues, the letters' German names, exercises, test.
+for(const text of load('willkommen-b-course').willkommenBSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

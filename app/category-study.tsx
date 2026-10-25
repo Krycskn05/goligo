@@ -55,9 +55,9 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  useEffect(()=>{if(course!=='de'||home){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course,home]);
  // Lektion 12 keeps its progress in this browser; its helpers load only when the catalogue needs them.
  const [ausbildung,setAusbildung]=useState<TopicProgress|null>(null);
- // Lektion 1A keeps its scores in the browser (lib/willkommen-progress.ts): read them here for the unit card.
+ // Lektion 1 (Teil A and B) keeps its scores in the browser (lib/willkommen-progress.ts): read them here for the unit card.
  const [willkommen,setWillkommen]=useState<TopicProgress|null>(null);
- useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readL1AScores,willkommenProgress})=>{if(alive)setWillkommen(willkommenProgress(readL1AScores()));}).catch(()=>{});return()=>{alive=false;};},[course,home]);
+ useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home]);
  useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
  const units=allUnits.filter(unit=>unit.level===level);

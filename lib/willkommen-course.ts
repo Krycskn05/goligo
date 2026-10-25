@@ -34,8 +34,8 @@ export const speakers:readonly Speaker[]=[
  {key:'tarek',name:'Tarek Salim',gender:'male',style:'M4'},
  {key:'paul',name:'Paul',gender:'male',style:'M3'},
 ];
-/** Something to read, by someone (or by the learner's chosen voice when `who` is missing). */
-export type SayItem=string|{text:string;who?:string};
+/** Something to read, by someone (or by the learner's chosen voice when `who` is missing); `slow` for spelling. */
+export type SayItem=string|{text:string;who?:string;slow?:boolean};
 export const sayText=(item:SayItem)=>typeof item==='string'?item:item.text;
 /** The site voice for a speaker among the voices that are available: their own voice, else another voice of their
  * kind (never a man for a woman); nobody → undefined, the learner's chosen voice. */
@@ -277,19 +277,21 @@ export function willkommenSpeechTexts():string[]{
 }
 
 /* ---------- the notebook pages (25 October 2026: the entry looks like Lektion 11 and 12) ---------- */
-/** Lektion 1's parts on the contents page. Teil A is this lesson; B, C and D are shown as coming soon. */
+/** Lektion 1's parts on the contents page: Teil A and B are ready (B since 25 October 2026); C and D are coming soon. */
 export type LessonPart={id:'a'|'b'|'c'|'d';badge:string;title?:string;lead?:string};
 export const lessonParts:LessonPart[]=[
  {id:'a',badge:'A',title:'Guten Tag! Ich heiße …',lead:'Selamlaşma, adını söyleme ve sorma, nereden geldiğini söyleme: **aus + artikel**.'},
- {id:'b',badge:'B'},{id:'c',badge:'C'},{id:'d',badge:'D'},
+ {id:'b',badge:'B',title:'Ich spreche ein bisschen Deutsch.',lead:'Diller, **Sie** mi **du** mu, ich / du / Sie çekimi, alfabe ve **Ich buchstabiere: …**'},
+ {id:'c',badge:'C'},{id:'d',badge:'D'},
 ];
 /** What Lektion 1 teaches, ticked off on the left page of the contents. */
 export const unitGoals=[
- 'Selamlaş: **Guten Tag! · Herzlich willkommen!**',
- 'Adını söyle: **Ich heiße … / Ich bin …**',
- 'Adını sor: **Wie heißen Sie?**',
- 'Nereden geldiğini söyle: **Ich komme aus …**',
- 'Ülke ve artikel: **aus der Türkei · aus dem Irak**',
+ 'Selamlaş: **Guten Tag! · Hallo! · Herzlich willkommen!**',
+ 'Adını söyle ve sor: **Ich heiße … · Wie heißen Sie?**',
+ 'Nereden geldiğini söyle: **Ich komme aus … · aus der Türkei**',
+ 'Dillerini söyle: **Ich spreche … und ein bisschen Deutsch.**',
+ 'Resmî ve samimi konuş: **Sie / du · kommen Sie? / kommst du?**',
+ 'Adını harf harf söyle: **Ich buchstabiere: …**',
 ];
 /** Teil A's steps as three index tabs on the right page (the cover and the end belong to none). */
 export type StepGroup={id:'konu'|'alistirmalar'|'test';label:string;ids:string[]};

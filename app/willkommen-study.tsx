@@ -1,17 +1,19 @@
 'use client';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
-import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
-import {ArrowLeft,ArrowRight,BookOpen,Check,Play,RotateCcw,Trash2,Trophy,Volume2,X} from 'lucide-react';
+import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react';
+import {ArrowLeft,ArrowRight,BookOpen,Check,Play,Trash2,Trophy,Volume2} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib/study-languages';
 import {courseUnits} from '@/lib/textbook-curriculum';
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
-import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,acceptsAnswer,normalizeLoose,willkommenPictures,portraitSrc,speakerVoice,sayText,dialogueSpeaker,exerciseSpeakers,withSpeakers,matchSay,orderSay,type SayItem,type GapLine,type Step,type StepGroup} from '@/lib/willkommen-course';
-import {L1A_STEP_KEY,readL1AScores,saveL1AScore,willkommenProgress,type L1AScoreMap} from '@/lib/willkommen-progress';
+import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
+import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
+import {L1_PART_KEY,partKeys,readPartScores,savePartScore,partProgressL1,lessonOneProgress,type L1AScoreMap,type L1PartId} from '@/lib/willkommen-progress';
+import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
-import {useAnswerSound,useGermanSpeech} from './study-shared';
+import {useAnswerSound} from './study-shared';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
@@ -19,59 +21,64 @@ import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
+import {useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {StepViewB} from './willkommen-b-steps';
 
 /**
- * Lektion 1 „Willkommen!“, Teil A – Ich heiße … (the learner's own lesson page, 24 October 2026): 22 steps, one at
- * a time — the cover, ten short teaching steps, nine exercises, a test and the end. German is read with the site
- * voices; answers get the site's sounds and Paul; scores stay in the browser (lib/willkommen-progress.ts).
+ * Lektion 1 „Willkommen!“ (the learner's own lesson pages): the contents page is an open notebook like Lektion 11 and
+ * 12 (Teil A–D); Teil A – Ich heiße … (24 October 2026, 22 steps) and Teil B – Ich spreche ein bisschen Deutsch.
+ * (25 October 2026, 24 steps) open on a wide spread, one step at a time. German is read with the site voices, each
+ * person with their own voice; answers get the site's sounds and Paul; scores stay in the browser
+ * (lib/willkommen-progress.ts). Teil B's steps: app/willkommen-b-steps.tsx; shared pieces: app/willkommen-ui.tsx.
  */
 export default function WillkommenStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
- useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 1A · Willkommen! · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
+ useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 1 · Willkommen! · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
  return <WillkommenLesson language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 
-/** Site speech plus "read these one after the other" (dialogues, the learner's own sentences). A text with a speaker
- * (`who`, see `speakers` in the course) is read with that person's own voice — a man by a man, a woman by a woman;
- * everything else with the learner's chosen voice. */
-type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void};
-function useLessonSpeech():Speech&{warning?:string}{
- const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning,siteVoices}=german;
- const voices=useRef(siteVoices);voices.current=siteVoices;
- const say=useCallback((item:SayItem)=>{const who=typeof item==='string'?undefined:item.who;speak(sayText(item),false,speakerVoice(who,voices.current));},[speak]);
- const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
- const next=useCallback(()=>{
-  const item=queue.current.shift();if(!item)return;
-  say(item);
-  // If the voice never starts (no sound support), go on after a moment so the queue never sticks.
-  waiting.current=setTimeout(()=>{waiting.current=null;if(!busyRef.current)next();},1500);
- },[say]);
- const busyRef=useRef(busy);
- useEffect(()=>{const was=busyRef.current;busyRef.current=busy;if(busy&&waiting.current){clearTimeout(waiting.current);waiting.current=null;}if(was&&!busy)next();},[busy,next]);
- const speakAll=useCallback((items:SayItem[])=>{stop();queue.current=items.filter(item=>sayText(item).trim());next();},[stop,next]);
- const speakOne=useCallback((item:SayItem)=>{queue.current=[];say(item);},[say]);
- const stopAll=useCallback(()=>{queue.current=[];if(waiting.current){clearTimeout(waiting.current);waiting.current=null;}stop();},[stop]);
- useEffect(()=>()=>{if(waiting.current)clearTimeout(waiting.current);},[]);
- return useMemo(()=>({speak:speakOne,speakAll,busy,activeText,stop:stopAll,prepare,warning}),[speakOne,speakAll,busy,activeText,stopAll,prepare,warning]);
-}
+/** A part with a lesson: its steps, tabs, scored exercises, picture and step views. */
+type PartConfig={id:L1PartId;badge:string;title:string;lead:string;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode};
+const parts:Record<L1PartId,PartConfig>={
+ a:{id:'a',badge:'A',title:lessonParts[0].title??'',lead:lessonParts[0].lead??'',steps,groups:stepGroups,scored:scoredExercises,testCount:testQuestions.length,wordCount:words.length,cover:willkommenPictures.cover,coverAlt:'Süpermarket önünde tokalaşan iki kişi: Sabine ve Omar',View:StepViewA},
+ b:{id:'b',badge:'B',title:lessonParts[1].title??'',lead:lessonParts[1].lead??'',steps:stepsB,groups:stepGroupsB,scored:scoredExercisesB,testCount:testQuestionsB.length,wordCount:wordsB.length,cover:willkommenBPictures.cover,coverAlt:'Dil kursu sınıfı: Paul Hoca tahtada, öğrenciler masalarında',View:StepViewB},
+};
+const partOrder:L1PartId[]=['a','b'];
+const isPart=(id:string):id is L1PartId=>id in parts;
 
-/** The step in the address (`?adim=<id>`), or -1: the contents page (the notebook like Lektion 11 and 12). */
-function readStep():number{return stepIndex(new URLSearchParams(window.location.search).get('adim')??'');}
-/** The last step the learner opened (for "Kaldığın yerden devam et"), or -1. */
-function readLastStep():number{try{return stepIndex(localStorage.getItem(L1A_STEP_KEY)??'');}catch{return -1;}}
+/** Where the learner is: a part and a step (`?teil=b&adim=<id>`; Teil A without `teil`), or the contents page (index -1). */
+type Place={part:L1PartId;index:number};
+function readPlace():Place{
+ const params=new URLSearchParams(window.location.search);const teil=params.get('teil')??'a';const part:L1PartId=isPart(teil)?teil:'a';
+ return {part,index:parts[part].steps.findIndex(step=>step.id===(params.get('adim')??''))};
+}
+/** The last step the learner opened (for "Kaldığın yerden devam et"), or null. */
+function readLast():Place|null{
+ try{const saved=localStorage.getItem(L1_PART_KEY)??'a';const part:L1PartId=isPart(saved)?saved:'a';const index=parts[part].steps.findIndex(step=>step.id===(localStorage.getItem(partKeys[part].step)??''));return index>=0?{part,index}:null;}catch{return null;}
+}
 
 function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
- const [index,setIndex]=useState(()=>typeof window==='undefined'?-1:readStep());const [scores,setScores]=useState<L1AScoreMap>({});
+ const [place,setPlace]=useState<Place>(()=>typeof window==='undefined'?{part:'a',index:-1}:readPlace());
+ const [scores,setScores]=useState<Record<L1PartId,L1AScoreMap>>({a:{},b:{}});
  const speech=useLessonSpeech();const sound=useAnswerSound();
- useEffect(()=>{setScores(readL1AScores());const pop=()=>{speech.stop();sound.stop();setIndex(readStep());};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[speech,sound]);
- /** Opens a step of Teil A; a negative number opens the contents page. */
- const go=useCallback((next:number)=>{
-  const target=next<0?-1:Math.min(steps.length-1,next);speech.stop();sound.stop();setIndex(target);
-  try{const url=new URL(window.location.href);if(target<0)url.searchParams.delete('adim');else url.searchParams.set('adim',steps[target].id);window.history.pushState(null,'',url);}catch{}
+ // useAnswerSound gives a new object on every render: keep the latest speech and sound in a ref, so the effects and
+ // callbacks below do not run again on every render (that would be an endless update loop).
+ const latest=useRef({speech,sound});latest.current={speech,sound};
+ useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b')});},[]);
+ useEffect(()=>{const pop=()=>{latest.current.speech.stop();latest.current.sound.stop();setPlace(readPlace());};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
+ /** Opens a step of a part; a negative number opens the contents page. */
+ const open=useCallback((part:L1PartId,next:number)=>{
+  const target=next<0?-1:Math.min(parts[part].steps.length-1,next);latest.current.speech.stop();latest.current.sound.stop();setPlace({part,index:target});
+  try{
+   const url=new URL(window.location.href);
+   if(target<0){url.searchParams.delete('adim');url.searchParams.delete('teil');}
+   else{if(part==='a')url.searchParams.delete('teil');else url.searchParams.set('teil',part);url.searchParams.set('adim',parts[part].steps[target].id);}
+   window.history.pushState(null,'',url);
+  }catch{}
   requestAnimationFrame(()=>{
    // A step: bring the tabs and the step into view (on a phone the notebook's left page and the menu sit above them).
    const tabs=target>=0?document.getElementById('l1a-tabs'):null;
@@ -79,31 +86,33 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
    else{const top=tabs.getBoundingClientRect().top;if(top<0||top>window.innerHeight*0.45)tabs.scrollIntoView({block:'start',behavior:'instant'});}
    document.getElementById('l1a-heading')?.focus({preventScroll:true});
   });
- },[speech,sound]);
+ },[]);
+ const go=useCallback((next:number)=>open(place.part,next),[open,place.part]);
  // The step the learner is on (also when opened from its address), for "Kaldığın yerden devam et".
- useEffect(()=>{if(index>=0)try{localStorage.setItem(L1A_STEP_KEY,steps[index].id);}catch{}},[index]);
- const score=useCallback((id:string,right:number,total:number)=>setScores(saveL1AScore(id,right,total)),[]);
- const step=index>=0?steps[index]:null;const progress=willkommenProgress(scores);
- const dir=languageDirection(language);
+ useEffect(()=>{if(place.index>=0)try{localStorage.setItem(partKeys[place.part].step,parts[place.part].steps[place.index].id);localStorage.setItem(L1_PART_KEY,place.part);}catch{}},[place]);
+ const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:savePartScore(part,id,right,total)}));},[place.part]);
+ const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
+ const progress=partProgressL1(place.part,scores[place.part]);
+ const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app" lang={language} dir={dir}>
   <a className="skip-link" href="#l1a-main">{c(language,'catalogTitle')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){speech.stop();onLanguage(value);}}} homeHref="/konular?level=A1.1" homeLabel={c(language,'catalogTitle')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current="units"/>
   <main id="l1a-main" className="object-page housing-page l1a-page" lang={language} dir={dir}>
-   <div className="object-breadcrumb"><a href="/konular?level=A1.1">A1.1</a><span aria-hidden="true">›</span>{step?<><a href={WILLKOMMEN_PATH} lang="de" onClick={event=>{event.preventDefault();go(-1);}}>Lektion 1 · Willkommen!</a><span aria-hidden="true">›</span><span lang="de">Teil A</span></>:<span lang="de">Lektion 1 · Willkommen!</span>}</div>
+   <div className="object-breadcrumb"><a href="/konular?level=A1.1">A1.1</a><span aria-hidden="true">›</span>{step?<><a href={WILLKOMMEN_PATH} lang="de" onClick={event=>{event.preventDefault();go(-1);}}>Lektion 1 · Willkommen!</a><span aria-hidden="true">›</span><span lang="de">Teil {config.badge}</span></>:<span lang="de">Lektion 1 · Willkommen!</span>}</div>
    {guest&&<GuestBanner language={language} back={WILLKOMMEN_PATH}/>}
    {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
    {speech.warning&&<p className="object-alert" role="status">{speech.warning}</p>}
-   {!step?<Contents language={language} scores={scores} progress={progress} onGo={go}/>:<PartBook step={step} scores={scores} progress={progress} language={language} onGo={go}>
-    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id}>
+   {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} scores={scores[place.part]} progress={progress} language={language} onGo={go} onPart={open}>
+    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id}>
      <header className="l1a-top">
-      <div className="l1a-top-row"><span className="eyebrow">{groupOf(step.id)?.label??'Teil A'}</span><span className="l1a-where">{step.title} · {index+1}/{steps.length}</span></div>
-      <div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/steps.length*100)+'%'}}/></div>
+      <div className="l1a-top-row"><span className="eyebrow">{config.groups.find(group=>group.ids.includes(step.id))?.label??'Teil '+config.badge}</span><span className="l1a-where">{step.title} · {index+1}/{config.steps.length}</span></div>
+      <div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>
      </header>
-     <StepView step={step} speech={speech} sound={sound} scores={scores} progress={progress} onScore={score} onGo={go} language={language}/>
+     <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={open} language={language}/>
      <nav className="l1a-pager" aria-label="Adımlar">
       <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{index===0?'İçindekiler':'Geri'}</button>
-      <button type="button" className="btn" onClick={()=>go(index===steps.length-1?-1:index+1)}>{index===steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
+      <button type="button" className="btn" onClick={()=>go(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
      </nav>
     </section>
    </PartBook>}
@@ -112,75 +121,83 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
  </div>;
 }
 
-/* ---------- the notebook: contents page and Teil A (like Lektion 11 and 12) ---------- */
-const cover=willkommenPictures.cover,worldMap=willkommenPictures.map;
-const exerciseIds=scoredExercises.filter(exercise=>exercise.id!=='test').map(exercise=>exercise.id);
-/** Left page: the unit, where to go on, the test and what Lektion 1 teaches. Right page: Teil A–D. */
-function Contents({language,scores,progress,onGo}:{language:StudyLanguage;scores:L1AScoreMap;progress:ReturnType<typeof willkommenProgress>;onGo:(index:number)=>void}){
- const [last,setLast]=useState(-1);useEffect(()=>{setLast(readLastStep());},[]);
+/* ---------- the notebook: contents page and a part's spread (like Lektion 11 and 12) ---------- */
+const worldMap=willkommenPictures.map;
+/** Left page: the unit, where to go on, the tests and what Lektion 1 teaches. Right page: Teil A–D. */
+function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record<L1PartId,L1AScoreMap>;onOpen:(part:L1PartId,index:number)=>void}){
+ const [last,setLast]=useState<Place|null>(null);useEffect(()=>{setLast(readLast());},[]);
  const unit=courseUnits.find(item=>item.id===WILLKOMMEN_UNIT);const unitName=unit?translate(unit.names,language):'Willkommen!';
- const test=scores.test;
+ const total=lessonOneProgress(scores);
+ // The test note opens the first test not taken yet (else the last part's test).
+ const testPart=partOrder.find(part=>!scores[part].test)??partOrder[partOrder.length-1];
+ const testIndex=(part:L1PartId)=>parts[part].steps.findIndex(step=>step.id==='test');
  return <section className="l1a-contents" aria-labelledby="l1a-heading">
   <LessonBook className="l1a-book" left={<>
    <span className="eyebrow" lang="de">A1.1 · Lektion 1 · Willkommen!</span>
    <h1 id="l1a-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
    <p className="lb-sub" lang="de">Guten Tag! Wie heißen Sie?</p>
-   <p className="lb-lead">Selamlaşmak, kendini tanıtmak ve nereden geldiğini söylemek: <b lang="de">heißen · kommen · sein</b> ve <b lang="de">aus + ülke</b>.</p>
+   <p className="lb-lead">Selamlaşmak, kendini tanıtmak, nereden geldiğini ve hangi dilleri konuştuğunu söylemek: <b lang="de">heißen · kommen · sprechen · sein</b>, <b lang="de">Sie / du</b> ve alfabe.</p>
    <figure className="lb-photo"><img src={worldMap.src} alt="Paul Hoca dünya haritasında farklı dillerde selamları gösteriyor" width={worldMap.width} height={worldMap.height} decoding="async"/></figure>
    <div className="lb-notes">
-    <button type="button" className="housing-feature lb-note l1a-resume" onClick={()=>onGo(last>=0?last:0)}>
+    <button type="button" className="housing-feature lb-note l1a-resume" onClick={()=>last?onOpen(last.part,last.index):onOpen('a',0)}>
      <span className="housing-letter l12-letter" aria-hidden="true"><Play size={24}/></span>
-     <div><h2>{last>0?'Kaldığın yerden devam et':'Derse başla'}</h2><p lang="de">Teil A · {last>=0?steps[last].title:'Kapak'}</p><ProgressMeter progress={progress} language={language} label="Lektion 1" compact/></div>
+     <div><h2>{last&&(last.index>0||last.part!=='a')?'Kaldığın yerden devam et':'Derse başla'}</h2><p lang="de">Teil {parts[last?.part??'a'].badge} · {last?parts[last.part].steps[last.index].title:'Kapak'}</p><ProgressMeter progress={total} language={language} label="Lektion 1" compact/></div>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
-    <button type="button" className="housing-feature lb-note l1a-test-note" onClick={()=>onGo(stepIndex('test'))}>
+    <button type="button" className="housing-feature lb-note l1a-test-note" onClick={()=>onOpen(testPart,testIndex(testPart))}>
      <span className="housing-letter l12-letter" aria-hidden="true"><Trophy size={24}/></span>
-     <div><h2>Test · {testQuestions.length} soru</h2><p>{test?`En iyi sonucun: ${test.right} / ${test.total}`:'Teil A’yı 10 soruyla dene.'}</p></div>
+     <div><h2>Testler</h2><p>{partOrder.map(part=>{const result=scores[part].test;return `Teil ${parts[part].badge}: ${result?result.right+' / '+result.total:parts[part].testCount+' soru'}`;}).join(' · ')}</p></div>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
    </div>
    <section className="lb-goals" aria-labelledby="l1a-goals"><h2 id="l1a-goals">Bu ünitede</h2><ul>{unitGoals.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
   </>} right={<>
    <h2 className="lb-heading">İçindekiler</h2>
-   <ol className="lb-toc">{lessonParts.map(part=>part.title?<li className="lb-toc-row" data-l1a-part={part.id} key={part.id}>
-    <button type="button" className="lb-toc-open" onClick={()=>onGo(0)}>
-     <span className="lb-toc-badge" aria-hidden="true">{part.badge}</span>
-     <span className="lb-toc-photo" aria-hidden="true"><img src={cover.src} alt="" width={cover.width} height={cover.height} decoding="async"/></span>
-     <span className="lb-toc-text"><strong lang="de" dir="ltr">{part.title}</strong><small><Rich text={part.lead??''}/></small><span className="lb-toc-meta">{words.length} kelime · {exerciseIds.length+1} alıştırma · {testQuestions.length} soruluk test</span></span>
+   <ol className="lb-toc">{lessonParts.map(row=>{const config=isPart(row.id)?parts[row.id]:null;return config?<li className="lb-toc-row" data-l1a-part={row.id} key={row.id}>
+    <button type="button" className="lb-toc-open" onClick={()=>onOpen(config.id,0)}>
+     <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>
+     <span className="lb-toc-photo" aria-hidden="true"><img src={config.cover.src} alt="" width={config.cover.width} height={config.cover.height} decoding="async"/></span>
+     <span className="lb-toc-text"><strong lang="de" dir="ltr">{config.title}</strong><small><Rich text={config.lead}/></small><span className="lb-toc-meta">{config.wordCount} kelime · {config.groups[1].ids.length} alıştırma · {config.testCount} soruluk test</span></span>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
-    <ProgressMeter progress={progress} language={language} label={'Teil '+part.badge} compact/>
-   </li>:<li className="lb-toc-row l1a-soon" data-l1a-part={part.id} key={part.id} aria-disabled="true">
+    <ProgressMeter progress={partProgressL1(config.id,scores[config.id])} language={language} label={'Teil '+row.badge} compact/>
+   </li>:<li className="lb-toc-row l1a-soon" data-l1a-part={row.id} key={row.id} aria-disabled="true">
     <div className="lb-toc-open">
-     <span className="lb-toc-badge" aria-hidden="true">{part.badge}</span>
-     <span className="lb-toc-photo l1a-soon-photo" aria-hidden="true">{part.badge}</span>
-     <span className="lb-toc-text"><strong lang="de">Teil {part.badge}</strong><small>Bu bölüm yakında eklenecek.</small><span className="lb-toc-meta l1a-soon-tag">Yakında</span></span>
+     <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>
+     <span className="lb-toc-photo l1a-soon-photo" aria-hidden="true">{row.badge}</span>
+     <span className="lb-toc-text"><strong lang="de">Teil {row.badge}</strong><small>Bu bölüm yakında eklenecek.</small><span className="lb-toc-meta l1a-soon-tag">Yakında</span></span>
     </div>
-   </li>)}</ol>
+   </li>;})}</ol>
   </>}/>
  </section>;
 }
-/** Teil A on the notebook: the left page stays (title, picture, progress); the right page has three index tabs and the step. */
-function PartBook({step,scores,progress,language,onGo,children}:{step:Step;scores:L1AScoreMap;progress:ReturnType<typeof willkommenProgress>;language:StudyLanguage;onGo:(index:number)=>void;children:ReactNode}){
- const group=groupOf(step.id);const part=lessonParts[0];
+/** A part on the notebook: the left page stays (title, picture, progress, the other parts); the right page has three index tabs and the step. */
+function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{config:PartConfig;step:Step;scores:L1AScoreMap;progress:TopicProgress;language:StudyLanguage;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;children:ReactNode}){
+ const group=config.groups.find(item=>item.ids.includes(step.id));
+ const exerciseIds=config.scored.filter(exercise=>exercise.id!=='test').map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
  const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:!!scores.test};
  const detail:Record<StepGroup['id'],string>={
-  konu:`${stepGroups[0].ids.length} kısa adım`,
-  alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${stepGroups[1].ids.length} alıştırma`,
-  test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${testQuestions.length} soru`,
+  konu:`${config.groups[0].ids.length} kısa adım`,
+  alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
+  test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${config.testCount} soru`,
  };
+ const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
+ const nextSoon=!next?lessonParts[lessonParts.findIndex(row=>row.id===config.id)+1]:undefined;
  return <section className="l1a-part" aria-labelledby="l1a-part-title">
   <LessonBook variant="wide" className="l1a-book lb-tabbed" left={<div className="lb-sticky">
    <button type="button" className="text-button vault-back-categories" onClick={()=>onGo(-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Lektion 1</button>
-   <span className="eyebrow" lang="de">A1.1 · 1 · Teil A</span>
-   <h1 id="l1a-part-title" lang="de" className="lb-title">{part.title}</h1>
-   <p className="lb-lead"><Rich text={part.lead??''}/></p>
-   <figure className="lb-photo"><img src={cover.src} alt="Süpermarket önünde tokalaşan iki kişi: Sabine ve Omar" width={cover.width} height={cover.height} decoding="async"/></figure>
-   <ProgressMeter progress={progress} language={language} label="Teil A" compact/>
-   <nav className="lb-pager" aria-label="Bölümler"><span/><span className="l1a-next-soon" lang="de">Teil B · <span lang="tr">yakında</span></span></nav>
+   <span className="eyebrow" lang="de">A1.1 · 1 · Teil {config.badge}</span>
+   <h1 id="l1a-part-title" lang="de" className="lb-title">{config.title}</h1>
+   <p className="lb-lead"><Rich text={config.lead}/></p>
+   <figure className="lb-photo"><img src={config.cover.src} alt={config.coverAlt} width={config.cover.width} height={config.cover.height} decoding="async"/></figure>
+   <ProgressMeter progress={progress} language={language} label={'Teil '+config.badge} compact/>
+   <nav className="lb-pager" aria-label="Bölümler">
+    {previous?<button type="button" className="text-button" onClick={()=>onPart(previous,0)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>Teil {parts[previous].badge}</button>:<span/>}
+    {next?<button type="button" className="text-button" onClick={()=>onPart(next,0)}>Teil {parts[next].badge}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:nextSoon?<span className="l1a-next-soon" lang="de">Teil {nextSoon.badge} · <span lang="tr">yakında</span></span>:null}
+   </nav>
   </div>} right={<>
-   <nav className="l12-steps" id="l1a-tabs" aria-label="Teil A bölümleri"><ol>{stepGroups.map((item,i)=><li key={item.id}><button type="button" className={'l12-step'+(group?.id===item.id?' active':'')+(done[item.id]?' done':'')} aria-current={group?.id===item.id?'step':undefined} data-l1a-tab={item.id} onClick={()=>onGo(stepIndex(item.ids[0]))}>
+   <nav className="l12-steps" id="l1a-tabs" aria-label={'Teil '+config.badge+' bölümleri'}><ol>{config.groups.map((item,i)=><li key={item.id}><button type="button" className={'l12-step'+(group?.id===item.id?' active':'')+(done[item.id]?' done':'')} aria-current={group?.id===item.id?'step':undefined} data-l1a-tab={item.id} onClick={()=>onGo(config.steps.findIndex(entry=>entry.id===item.ids[0]))}>
     <span className="l12-step-number" aria-hidden="true">{done[item.id]?<Check size={16}/>:i+1}</span>
     <span className="l12-step-text"><strong>{item.label}</strong><small>{detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
@@ -189,9 +206,8 @@ function PartBook({step,scores,progress,language,onGo,children}:{step:Step;score
  </section>;
 }
 
-type Sound=ReturnType<typeof useAnswerSound>;
-type StepProps={step:Step;speech:Speech;sound:Sound;scores:L1AScoreMap;progress:ReturnType<typeof willkommenProgress>;onScore:(id:string,right:number,total:number)=>void;onGo:(index:number)=>void;language:StudyLanguage};
-function StepView(props:StepProps){
+/* ---------- Teil A's steps ---------- */
+function StepViewA(props:StepProps){
  const {step}=props;
  switch(step.id){
   case 'kapak':return <Cover {...props}/>;
@@ -205,37 +221,21 @@ function StepView(props:StepProps){
   case 'kisiler':return <People speech={props.speech}/>;
   case 'diller':return <Languages/>;
   case 'kelimeler':return <WordList speech={props.speech}/>;
-  case 'harfler':return <GapExercise key={step.id} id="harfler" kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" lines={lettersExercise.lines} say={lettersExercise.say} {...props}/>;
-  case 'eslestir':return <MatchExercise key={step.id} {...props}/>;
-  case 'sirala':return <OrderExercise key={step.id} {...props}/>;
-  case 'ayir':return <GapExercise key={step.id} id="ayir" kicker="Alıştırma 4 · Markieren Sie" title="Kelimeleri ayır, cümleleri yaz" lead="Bu metinde boşluk yok. 5 cümleyi ayırıp aşağıya yaz." before={<div className="l1a-glued" lang="de" dir="ltr">{gluedText}</div>} lines={gluedSentences.map(line=>({who:line.who,text:'___',answers:[line.answers]}))} wide say={gluedSay} {...props}/>;
-  case 'aus':return <ArticleExercise key={step.id} {...props}/>;
-  case 'dinle':return <ListenExercise key={step.id} {...props}/>;
-  case 'soru':return <GapExercise key={step.id} id="soru" kicker="Alıştırma 7 · Schreiben Sie Fragen" title="Cevap var, soruyu yaz" lead="Cevaba bakıp soruyu yaz. (İpucu: Herr / Frau + soyadı ekleyebilirsin.)" lines={questionLines.flatMap(line=>[{who:'a' as const,text:'___',answers:[line.answers]},{who:'b' as const,text:line.reply,answers:[]}])} wide say={questionSay} {...props}/>;
-  case 'kutu':return <GapExercise key={step.id} id="kutu" kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+wordBox.join(' · ')} lines={boxLines} choices={wordBox} say={boxSay} {...props}/>;
-  case 'sen':return <OwnExercise key={step.id} {...props}/>;
-  case 'test':return <TestStep key={step.id} {...props}/>;
+  case 'harfler':return <GapExercise kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" lines={lettersExercise.lines} say={lettersExercise.say} speakers={exerciseSpeakers.harfler} {...props}/>;
+  case 'eslestir':return <MatchExercise kicker="Alıştırma 2 · Verbinden Sie" title="Soruyu cevapla eşleştir" pairs={matchPairs} sayFor={i=>matchSay(matchPairs[i])} {...props}/>;
+  case 'sirala':return <OrderExercise {...props}/>;
+  case 'ayir':return <GapExercise kicker="Alıştırma 4 · Markieren Sie" title="Kelimeleri ayır, cümleleri yaz" lead="Bu metinde boşluk yok. 5 cümleyi ayırıp aşağıya yaz." before={<div className="l1a-glued" lang="de" dir="ltr">{gluedText}</div>} lines={gluedSentences.map(line=>({who:line.who,text:'___',answers:[line.answers]}))} wide say={gluedSay} speakers={exerciseSpeakers.ayir} {...props}/>;
+  case 'aus':return <ArticleExercise {...props}/>;
+  case 'dinle':return <ListenExercise {...props}/>;
+  case 'soru':return <GapExercise kicker="Alıştırma 7 · Schreiben Sie Fragen" title="Cevap var, soruyu yaz" lead="Cevaba bakıp soruyu yaz. (İpucu: Herr / Frau + soyadı ekleyebilirsin.)" lines={questionLines.flatMap(line=>[{who:'a' as const,text:'___',answers:[line.answers]},{who:'b' as const,text:line.reply,answers:[]}])} wide say={questionSay} speakers={exerciseSpeakers.soru} {...props}/>;
+  case 'kutu':return <GapExercise kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+wordBox.join(' · ')} lines={boxLines} choices={wordBox} say={boxSay} speakers={exerciseSpeakers.kutu} {...props}/>;
+  case 'sen':return <OwnExercise {...props}/>;
+  case 'test':return <TestStep label="Lektion 1A · Test" questions={testQuestions} sayFor={i=>testSpeech(testQuestions[i])} {...props}/>;
   case 'bitti':return <End {...props}/>;
  }
  return null;
 }
 
-/* ---------- small pieces ---------- */
-function Say({text,who,speech,label='Dinle',wide=false}:{text:string;who?:string;speech:Speech;label?:string;wide?:boolean}){
- const playing=speech.busy&&speech.activeText===text;
- return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={label+': '+text} title={label} data-who={who} onClick={()=>speech.speak({text,who})}><Volume2 size={18} aria-hidden="true"/>{wide&&label}</button>;
-}
-function Phrases({items,speech}:{items:readonly (readonly [string,string])[];speech:Speech}){
- return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={de} speech={speech}/></div>)}</>;
-}
-const Note=({children}:{children:ReactNode})=><div className="l1a-note"><PaulHoca pose="tip" className="l1a-paul"/><p>{children}</p></div>;
-/** `**bold**` inside a text. */
-function Rich({text}:{text:string}){const parts=text.split(/(\*\*[^*]+\*\*)/g);return <>{parts.map((part,i)=>part.startsWith('**')&&part.endsWith('**')&&part.length>4?<b key={i}>{part.slice(2,-2)}</b>:part)}</>;}
-/** A step's heading (h2: the notebook's left page holds the h1 „Teil A“ title). */
-function Heading({children}:{children:ReactNode}){return <h2 id="l1a-heading" tabIndex={-1} className="l1a-heading">{children}</h2>;}
-function Portrait({who,name}:{who:string;name:string}){return <img className="l1a-portrait" src={portraitSrc(who)} alt={name} width={64} height={64} loading="lazy" decoding="async"/>;}
-
-/* ---------- teaching steps ---------- */
 function Cover({progress,onGo,scores}:StepProps){
  const started=Object.keys(scores).length>0;
  return <>
@@ -313,66 +313,7 @@ function WordList({speech}:{speech:Speech}){
   <p className="l1a-tr">Konu bitti. Şimdi alıştırmalar başlıyor.</p></>;
 }
 
-/* ---------- exercises ---------- */
-type Feedback={ok:boolean;text:string}|null;
-function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?.text??''}</p>;}
-/** Finishes an exercise: saves the score, plays the sound and reads the solution after a full score. */
-function useFinish(props:StepProps){
- const {sound,speech,onScore,step}=props;
- return useCallback((right:number,total:number,say?:SayItem[])=>{
-  onScore(step.id,right,total);
-  if(right===total){sound.correct(()=>{if(say?.length)speech.speakAll(say);});}else sound.wrong();
- },[sound,speech,onScore,step.id]);
-}
-/** Gaps in a text: letters inside a word, whole sentences (wide) or a word chosen from a box. */
-function GapExercise(props:StepProps&{id:keyof typeof exerciseSpeakers;kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];say:string[]}){
- const {id,kicker,title,lead,before,lines,wide=false,choices,sound,speech}=props;
- // The solution is read as a little dialogue: each line by its own person (a man by a man, a woman by a woman).
- const say=useMemo(()=>withSpeakers(props.say,exerciseSpeakers[id]),[props.say,id]);
- const gaps=useMemo(()=>lines.flatMap((line,l)=>line.answers.map((answers,g)=>({line:l,gap:g,answers}))),[lines]);
- const [values,setValues]=useState<string[]>(()=>gaps.map(()=>''));const [checked,setChecked]=useState<(boolean|null)[]>(()=>gaps.map(()=>null));
- const [feedback,setFeedback]=useState<Feedback>(null);const finish=useFinish(props);
- const at=(l:number,g:number)=>gaps.findIndex(item=>item.line===l&&item.gap===g);
- const check=()=>{
-  sound.prepare();speech.prepare();
-  const result=gaps.map((gap,i)=>acceptsAnswer(values[i],gap.answers));setChecked(result);
-  const right=result.filter(Boolean).length;
-  setFeedback(right===gaps.length?{ok:true,text:'Hepsi doğru!'}:{ok:false,text:`${right} / ${gaps.length} doğru. Kırmızıları düzelt; doğrusu yanında yazıyor.`});
-  finish(right,gaps.length,say);
- };
- const reveal=()=>{setValues(gaps.map(gap=>gap.answers[0]));setChecked(gaps.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
- const field=(l:number,g:number)=>{const i=at(l,g);const state=checked[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
-  const input=choices?<select className={cls} value={values[i]} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);const ok=acceptsAnswer(event.target.value,gaps[i].answers);const nextChecked=checked.slice();nextChecked[i]=event.target.value?ok:null;setChecked(nextChecked);}}><option value="">…</option>{choices.map(word=><option key={word} value={word}>{word}</option>)}</select>
-   :<input className={cls} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const nextChecked=checked.slice();nextChecked[i]=null;setChecked(nextChecked);}}}/>;
-  return <span className="l1a-gap-wrap" key={g}>{input}{state===false&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
- const line=(item:GapLine,l:number)=>{const parts=item.text.split('___');return <span className="l1a-de l1a-gap-text" lang="de" dir="ltr">{parts.map((part,g)=><span key={g}>{part}{g<parts.length-1&&field(l,g)}</span>)}</span>;};
- return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
-  <div className="l1a-dialogue">{lines.map((item,l)=>item.who?<div className={'l1a-line '+item.who} key={l}><div className="l1a-bubble">{line(item,l)}</div></div>:<div className="l1a-row" key={l}>{line(item,l)}</div>)}</div>
-  <div className="l1a-actions"><button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={reveal}>Cevapları göster</button></div>
-  <FeedbackLine feedback={feedback}/>
- </>;
-}
-function MatchExercise(props:StepProps){
- const {speech,sound}=props;const finish=useFinish(props);
- const [order]=useState(()=>shuffle(matchPairs.map((_,i)=>i)));
- const [selected,setSelected]=useState<number|null>(null);const [done,setDone]=useState<number[]>([]);const [wrongAt,setWrongAt]=useState<number|null>(null);const [misses,setMisses]=useState(0);
- const [feedback,setFeedback]=useState<Feedback>(null);
- const pickRight=(i:number)=>{
-  if(selected===null||done.includes(i))return;sound.prepare();speech.prepare();
-  if(i===selected){const next=[...done,i];setDone(next);setSelected(null);speech.speakAll(matchSay(matchPairs[i]));
-   if(next.length===matchPairs.length){const right=Math.max(0,matchPairs.length-misses);setFeedback({ok:true,text:'Hepsi eşleşti!'});finish(right,matchPairs.length);}}
-  else{setWrongAt(i);setMisses(m=>m+1);setFeedback({ok:false,text:'Bu ikisi uymuyor.'});sound.wrong();setTimeout(()=>setWrongAt(null),600);}
- };
- return <>
-  <p className="kicker" lang="de">Alıştırma 2 · Verbinden Sie</p><Heading>Soruyu cevapla eşleştir</Heading><p className="l1a-tr">Önce soldan, sonra sağdan dokun.</p>
-  <div className="l1a-match">
-   <div>{matchPairs.map((pair,i)=><button type="button" key={i} className={'l1a-mbtn'+(selected===i?' sel':'')+(done.includes(i)?' done':'')} disabled={done.includes(i)} aria-pressed={selected===i} lang="de" dir="ltr" onClick={()=>setSelected(i)}>{pair[0]}</button>)}</div>
-   <div>{order.map(i=><button type="button" key={i} className={'l1a-mbtn'+(done.includes(i)?' done':'')+(wrongAt===i?' bad':'')} disabled={done.includes(i)} lang="de" dir="ltr" onClick={()=>pickRight(i)}>{matchPairs[i][1]}</button>)}</div>
-  </div>
-  <FeedbackLine feedback={feedback}/>
- </>;
-}
+/* ---------- Teil A's own exercises ---------- */
 function OrderExercise(props:StepProps){
  const {speech,sound}=props;const finish=useFinish(props);
  const [round,setRound]=useState(0);const [chips,setChips]=useState<{word:string;i:number}[]>(()=>shuffle(orderSentences[0].map((word,i)=>({word,i}))));
@@ -438,38 +379,14 @@ function OwnExercise({speech}:StepProps){
   <Note>Hatırla: Türkiye → <b lang="de">aus der Türkei</b>, Irak → <b lang="de">aus dem Irak</b>, Almanya → <b lang="de">aus Deutschland</b>.</Note>
  </>;
 }
-function TestStep(props:StepProps){
- const {speech,sound,onScore,step}=props;
- const [i,setI]=useState(0);const [score,setScore]=useState(0);const [picked,setPicked]=useState<string|null>(null);const [options,setOptions]=useState(()=>shuffle(testQuestions[0][1]));const [over,setOver]=useState(false);
- const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
- useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
- const question=testQuestions[i];
- const answer=(option:string)=>{if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);const ok=option===question[2];const total=score+(ok?1:0);setScore(total);
-  const say=testSpeech(question);const after=()=>{if(say)speech.speak(say);};if(ok)sound.correct(after);else sound.wrong(after);
-  timer.current=setTimeout(()=>{if(i+1<testQuestions.length){setI(i+1);setPicked(null);setOptions(shuffle(testQuestions[i+1][1]));}else{setOver(true);onScore(step.id,total,testQuestions.length);if(total===testQuestions.length)sound.complete();}},1600);};
- const again=()=>{setI(0);setScore(0);setPicked(null);setOptions(shuffle(testQuestions[0][1]));setOver(false);};
- if(over){const percent=Math.round(score/testQuestions.length*100);return <>
-  <p className="kicker" lang="de">Lektion 1A · Test</p><Heading>Sonuç</Heading>
-  <p className="l1a-score">{score} / {testQuestions.length}</p>
-  <p className="l1a-big">{percent>=80?'Harika! Bu konuyu öğrendin.':percent>=60?'İyi. Yanlışlarına bir daha bak.':'Konuyu bir kez daha oku, sonra tekrar dene.'}</p>
-  {percent>=80&&<PaulHoca pose="cheer" className="l1a-paul-big"/>}
-  <div className="l1a-actions"><button type="button" className="btn" onClick={again}><RotateCcw size={18} aria-hidden="true"/>Testi tekrarla</button></div></>;}
- return <>
-  <p className="kicker" lang="de">Lektion 1A · Test</p><Heading>Soru {i+1} / {testQuestions.length}</Heading>
-  <p className="l1a-question" lang={/[çğışöüİ]|hangisi|nedir|nasıl/.test(question[0])?'tr':'de'}>{question[0]}</p>
-  <div className="l1a-opts column" role="group" aria-label={'Soru '+(i+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler)/.test(option)?'de':'tr'} onClick={()=>answer(option)}>{option}</button>)}</div>
-  <p className="l1a-mini">Puan: {score}</p>
- </>;
-}
-function End({progress,onGo}:StepProps){
+function End({progress,onGo,onPart}:StepProps){
  return <>
   <Heading>Lektion 1A tamam! 🎉</Heading>
   <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
   <p>Artık şunları söyleyebilirsin:</p>
   <ul className="l1a-list" lang="de"><li><b>Guten Tag!</b> <span lang="tr">– selamlaşma</span></li><li><b>Ich heiße … / Ich bin …</b> <span lang="tr">– adını söyleme</span></li><li><b>Wie heißen Sie?</b> <span lang="tr">– ad sorma</span></li><li><b>Ich komme aus …</b> <span lang="tr">– nereden geldiğini söyleme</span></li><li><b>Woher kommen Sie?</b> <span lang="tr">– nereden sorma</span></li><li><b>aus der Türkei, aus dem Irak, aus den USA</b> <span lang="tr">– artikelli ülkeler</span></li></ul>
   <ProgressMeter progress={progress} language={'tr'} label="Lektion 1A"/>
-  <p className="l1a-tr">Bir sonraki bölüm: <b>1B</b> (yakında).</p>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndex('harfler'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn small" onClick={()=>onGo(-1)}><BookOpen size={16} aria-hidden="true"/>Lektion 1 içindekiler</button></div>
+  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil B – Ich spreche ein bisschen Deutsch.</b></p>
+  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>onPart('b',0)}>Teil B'ye geç<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndex('harfler'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn secondary small" onClick={()=>onGo(-1)}><BookOpen size={16} aria-hidden="true"/>Lektion 1 içindekiler</button></div>
  </>;
 }
-function shuffle<T>(list:readonly T[]):T[]{const out=list.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;}

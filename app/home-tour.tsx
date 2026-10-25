@@ -31,9 +31,9 @@ function siteParts(language:StudyLanguage,pictures:PicturePick):Part[]{
 }
 
 /**
- * The home page a signed-in learner sees first (design "Resimli tanıtım", as the learner chose): it only
- * introduces the site — a welcome and a short text (no picture above it: the learner removed it), then one picture card per main part of the site
- * (the items of the left menu; the lessons inside them are not shown here).
+ * The home page a signed-in learner sees first (design "Resimli tanıtım", as the learner chose): one picture card per
+ * main part of the site (the items of the left menu; the lessons inside them are not shown here), all on one screen —
+ * the welcome box and the heading above the cards were removed at the learner's request (25 October 2026).
  * The whole card is the link. Nothing to study or track here; the units catalogue is at /konular.
  */
 export function HomeTour({language}:{language:StudyLanguage}){
@@ -42,11 +42,9 @@ export function HomeTour({language}:{language:StudyLanguage}){
  // While the page stays open, the next pictures come at the next half hour.
  useEffect(()=>{let timer:ReturnType<typeof setTimeout>;const next=()=>{timer=setTimeout(()=>{setPictures(pickPictures());next();},nextPictureChange()+500);};next();return()=>clearTimeout(timer);},[]);
  return <div className="ht" data-home-tour="">
-  <section className="ht-hero" aria-labelledby="work-heading">
-   <h1 id="work-heading" tabIndex={-1}>{h('welcome')}</h1>
-   <p>{h('about')}</p>
-  </section>
-  <h2 className="ht-title">{h('tourTitle')}</h2>
+  {/* The welcome box and the "Sitede neler var?" heading were removed (the learner asked, 25 October 2026): the cards fill
+      one screen. The page keeps its heading for screen readers. */}
+  <h1 id="work-heading" className="sr-only" tabIndex={-1}>{h('welcome')}</h1>
   <ul className="ht-grid">{siteParts(language,pictures).map(part=><li key={part.id} data-home-part={part.id}>
    <a className="ht-card panel" href={part.href}>
     <span className="ht-art" aria-hidden="true">{part.art}</span>

@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState,type ReactNode} from 'react';
-import {Play,RotateCcw,Volume2} from 'lucide-react';
+import {ArrowRight,Play,RotateCcw,Volume2} from 'lucide-react';
 import {normalizeLoose} from '@/lib/willkommen-course';
 import {
  willkommenCPictures,timeGreetings,hellos,goodbyes,dialogueGoodbye,moods,howAreYou,dialogueMorning,dialoguePark,bonusAnswers,verbPositions,positionSay,
@@ -187,7 +187,7 @@ function EndC({progress,onGo,onPart}:StepProps){
   <p>Artık şunları yapabilirsin:</p>
   <ul className="l1a-list"><li>Günün saatine göre selam vermek</li><li>Resmî ve samimi vedalaşmak</li><li><b lang="de">Wie geht es dir / Ihnen?</b> sorup cevaplamak</li><li>Fiili 2. pozisyona koymak</li><li>Nokta, soru işareti ve büyük harfleri doğru kullanmak</li><li>Kendini 4–5 cümleyle tanıtmak</li></ul>
   <ProgressMeter progress={progress} language={'tr'} label="Lektion 1C"/>
-  <p className="l1a-tr">Bir sonraki bölüm: <b>1D</b> (yakında).</p>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexC('tageszeit-uebung'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn secondary small" onClick={()=>onPart('b',0)}>Teil B</button><button type="button" className="btn small" onClick={()=>onGo(-1)}>Lektion 1 içindekiler</button></div>
+  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil D – Ich bin neu hier.</b></p>
+  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>onPart('d',0)}>Teil D'ye geç<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexC('tageszeit-uebung'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn secondary small" onClick={()=>onGo(-1)}>Lektion 1 içindekiler</button></div>
  </>;
 }

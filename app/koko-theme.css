@@ -146,6 +146,13 @@ strong { font-weight:700; }
 .toon-card-number { background:#fff; color:var(--blue-2); border:1px solid var(--toy-line); box-shadow:none; border-radius:999px; font-weight:800; }
 .work-sidebar { background:transparent; border:0; }
 .work-sidebar nav { display:grid; gap:8px; }
+/* A low computer screen: the menu gets shorter so the page does not scroll for it (the learner asked, 25 October 2026). */
+@media (min-width:1001px) and (max-height:860px) {
+ .work-sidebar { padding-top:1rem; padding-bottom:1rem; }
+ .work-sidebar nav { gap:6px; }
+ .work-sidebar .work-nav { min-height:0; padding:.38rem .8rem; }
+ .work-sidebar .work-nav .nav-icon.has-picture { width:32px; height:32px; }
+}
 .toon-app .work-nav,.work-nav { background:#fff; border:1px solid var(--toy-line); border-radius:999px; color:var(--ink-2); box-shadow:none; font-weight:700; }
 .toon-app .work-nav.active,.work-nav.active { background:linear-gradient(180deg,#ffe8a3,#f6c46b); color:#5b3600; border-color:#fff; box-shadow:var(--soft-2); }
 .toon-app .work-nav:hover { background:#f3f9ff; }

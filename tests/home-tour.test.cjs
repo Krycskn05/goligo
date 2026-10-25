@@ -126,3 +126,11 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  assert.ok(landing.includes('const pictures=pickPictures();')&&landing.includes('<img src={pictures.welcome}')&&landing.includes('<img src={pictures[item.part]}'));
  for(const src of ['/toon/landing/karsilama.webp','/toon/landing/karsilama-2.webp','/toon/landing/karsilama-3.webp'])assert.deepEqual(size('public'+src),[1400,700],src);
 });
+
+test('the home page is only the cards, on one screen (25 October 2026: the welcome box and the heading were removed)',()=>{
+ const tour=fs.readFileSync('app/home-tour.tsx','utf8'),css=fs.readFileSync('app/home-tour.css','utf8');
+ assert.ok(!tour.includes('className="ht-hero"')&&!tour.includes('className="ht-title"'),'no welcome box, no "Sitede neler var?"');
+ assert.ok(tour.includes('<h1 id="work-heading" className="sr-only" tabIndex={-1}>'),'the page heading stays for screen readers');
+ assert.ok(css.includes('.ht-art { height:clamp(84px,calc((100vh - 560px) / 2),170px);')&&css.includes('-webkit-line-clamp:3'));
+ assert.ok(fs.readFileSync('app/koko-theme.css','utf8').includes('@media (min-width:1001px) and (max-height:860px) {'),'a low screen gets a shorter menu');
+});

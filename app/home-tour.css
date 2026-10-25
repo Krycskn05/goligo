@@ -24,7 +24,17 @@
 .ht-card small { color:#c06a22; font-weight:700; font-size:12.5px; }
 .ht-text { color:var(--ink-2); font-size:14.5px; line-height:1.55; }
 
-@media (max-width:1100px) { .ht-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+/* On a computer the five cards fill one screen (the learner asked, 25 October 2026: no scrolling down): two rows,
+   the pictures take what height is left, the texts are short. */
+@media (min-width:761px) {
+ .ht-grid { gap:14px; }
+ .ht-card { gap:4px; padding:10px 12px 12px; }
+ .ht-art { height:clamp(84px,calc((100vh - 560px) / 2),170px); height:clamp(84px,calc((100dvh - 560px) / 2),170px); }
+ .ht-name { margin-top:2px; }
+ .ht-name strong { font-size:17px; }
+ .ht-text { font-size:13.5px; line-height:1.45; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+}
+@media (max-width:1100px) and (min-width:761px) { .ht-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .ht-text { -webkit-line-clamp:2; } }
 @media (max-width:760px) {
  .ht-hero { padding:22px 18px 24px; }
  .ht-koko { width:120px; }

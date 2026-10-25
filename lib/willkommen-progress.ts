@@ -2,9 +2,10 @@ import {starsFor,stageFor,type TopicProgress} from './progress';
 import {scoredExercises} from './willkommen-course';
 import {scoredExercisesB} from './willkommen-b-course';
 import {scoredExercisesC} from './willkommen-c-course';
+import {scoredExercisesD} from './willkommen-d-course';
 
-/** Lektion 1's parts that have lessons (Teil A since 24 October, Teil B and C since 25 October 2026). */
-export type L1PartId='a'|'b'|'c';
+/** Lektion 1's parts (Teil A since 24 October, Teil B, C and D since 25 October 2026). */
+export type L1PartId='a'|'b'|'c'|'d';
 /** Scores of a part, kept in the browser (right answers of every scored exercise, by step id). */
 export type L1AScoreMap=Record<string,{right:number;total:number}>;
 export const L1A_SCORES_KEY='lernkoko-l1a-scores';
@@ -13,10 +14,12 @@ export const L1B_SCORES_KEY='lernkoko-l1b-scores';
 export const L1B_STEP_KEY='lernkoko-l1b-step';
 export const L1C_SCORES_KEY='lernkoko-l1c-scores';
 export const L1C_STEP_KEY='lernkoko-l1c-step';
+export const L1D_SCORES_KEY='lernkoko-l1d-scores';
+export const L1D_STEP_KEY='lernkoko-l1d-step';
 /** The part the learner opened last ("Kaldığın yerden devam et" on the contents page). */
 export const L1_PART_KEY='lernkoko-l1-part';
-export const partKeys:Record<L1PartId,{scores:string;step:string}>={a:{scores:L1A_SCORES_KEY,step:L1A_STEP_KEY},b:{scores:L1B_SCORES_KEY,step:L1B_STEP_KEY},c:{scores:L1C_SCORES_KEY,step:L1C_STEP_KEY}};
-export const partScored:Record<L1PartId,{id:string;total:number}[]>={a:scoredExercises,b:scoredExercisesB,c:scoredExercisesC};
+export const partKeys:Record<L1PartId,{scores:string;step:string}>={a:{scores:L1A_SCORES_KEY,step:L1A_STEP_KEY},b:{scores:L1B_SCORES_KEY,step:L1B_STEP_KEY},c:{scores:L1C_SCORES_KEY,step:L1C_STEP_KEY},d:{scores:L1D_SCORES_KEY,step:L1D_STEP_KEY}};
+export const partScored:Record<L1PartId,{id:string;total:number}[]>={a:scoredExercises,b:scoredExercisesB,c:scoredExercisesC,d:scoredExercisesD};
 
 export function readPartScores(part:L1PartId):L1AScoreMap{
  try{const value=JSON.parse(localStorage.getItem(partKeys[part].scores)??'{}');return value&&typeof value==='object'?value as L1AScoreMap:{};}catch{return {};}
@@ -52,4 +55,4 @@ export function lessonOneProgress(all:Partial<Record<L1PartId,L1AScoreMap>>):Top
  for(const part of Object.keys(partScored) as L1PartId[])for(const [id,score] of Object.entries(all[part]??{}))scores[part+':'+id]=score;
  return progressOf(list,scores);
 }
-export function readLessonOneProgress():TopicProgress{return lessonOneProgress({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c')});}
+export function readLessonOneProgress():TopicProgress{return lessonOneProgress({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c'),d:readPartScores('d')});}

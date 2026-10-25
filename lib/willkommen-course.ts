@@ -283,13 +283,13 @@ export function willkommenSpeechTexts():string[]{
 }
 
 /* ---------- the notebook pages (25 October 2026: the entry looks like Lektion 11 and 12) ---------- */
-/** Lektion 1's parts on the contents page: Teil A, B and C are ready (B and C since 25 October 2026); D is coming soon. */
+/** Lektion 1's parts on the contents page: Teil A–D (B, C and D since 25 October 2026). A part without a title is shown as coming soon. */
 export type LessonPart={id:'a'|'b'|'c'|'d';badge:string;title?:string;lead?:string};
 export const lessonParts:LessonPart[]=[
  {id:'a',badge:'A',title:'Guten Tag! Ich heiße …',lead:'Selamlaşma, adını söyleme ve sorma, nereden geldiğini söyleme: **aus + artikel**.'},
  {id:'b',badge:'B',title:'Ich spreche ein bisschen Deutsch.',lead:'Diller, **Sie** mi **du** mu, ich / du / Sie çekimi, alfabe ve **Ich buchstabiere: …**'},
  {id:'c',badge:'C',title:'Guten Tag!',lead:'Günün saatine göre selam, vedalaşma, **Wie geht’s?**, fiil 2. pozisyonda ve doğru yazma.'},
- {id:'d',badge:'D'},
+ {id:'d',badge:'D',title:'Ich bin neu hier.',lead:'Çizgi roman: yeni komşuyla tanışma, en önemli cümleler, ezber stratejisi, Lektion 1 özeti ve **Alles klar?**'},
 ];
 /** What Lektion 1 teaches ("Bu ünitede" on the left page of the contents): lib/unit-goals.ts, in our own words. */
 export const unitGoals=unitGoalsFor(WILLKOMMEN_UNIT);

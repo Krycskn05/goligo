@@ -2,10 +2,10 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
-const lesson=load('willkommen-course'),lessonB=load('willkommen-b-course'),lessonC=load('willkommen-c-course'),progress=load('willkommen-progress'),auth=load('member-auth');
+const lesson=load('willkommen-course'),lessonB=load('willkommen-b-course'),lessonC=load('willkommen-c-course'),lessonD=load('willkommen-d-course'),progress=load('willkommen-progress'),auth=load('member-auth');
 const read=file=>fs.readFileSync(file,'utf8');
 /** The lesson's code: the page, the shared pieces and Teil B's steps. */
-const pageCode=()=>['app/willkommen-study.tsx','app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx'].map(read).join('\n');
+const pageCode=()=>['app/willkommen-study.tsx','app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx','app/willkommen-d-steps.tsx'].map(read).join('\n');
 
 test('22 steps in the order of the learner\'s page: cover, 10 teaching steps, 9 exercises, test, end',()=>{
  assert.equal(lesson.steps.length,22);
@@ -79,17 +79,20 @@ test('a man is read by a man, a woman by a woman, and two people in one step nev
 
 test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, Teil A on a wide spread with three tabs (25 October 2026)',()=>{
  assert.deepEqual(lesson.lessonParts.map(part=>part.badge),['A','B','C','D']);
- assert(lesson.lessonParts.slice(0,3).every(part=>part.title)&&lesson.lessonParts.slice(3).every(part=>!part.title),'Teil A, B and C are ready; D is shown as coming soon');
+ assert(lesson.lessonParts.every(part=>part.title&&part.lead),'Teil A–D are all ready');
  assert.deepEqual(lesson.stepGroups.map(group=>group.id),['konu','alistirmalar','test']);
  assert.equal(lesson.stepGroups[0].ids.length,10);assert.equal(lesson.stepGroups[1].ids.length,9);
  assert.equal(lesson.groupOf('diyalog').id,'konu');assert.equal(lesson.groupOf('kutu').id,'alistirmalar');assert.equal(lesson.groupOf('kapak'),undefined);
  assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,20,'every teaching step, exercise and the test is in exactly one tab');
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
- for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','go(-1)'])assert(page.includes(piece),piece);
+ for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);
  assert(page.includes('<h2 id="l1a-heading"'),'a step heading is an h2 under the notebook title');
  // The "Kaldığın yerden devam et" and "Testler" notes were removed at the learner's request.
  for(const gone of ['l1a-resume','l1a-test-note','Kaldığın yerden devam et','readLast('])assert(!page.includes(gone),gone);
+ // No A1.1 breadcrumb (the learner asked); the contents notebook fills the screen on a computer and never makes the page scroll.
+ assert(!read('app/willkommen-study.tsx').includes('className="object-breadcrumb"'));
+ assert(page.includes("element.style.setProperty('--l1a-top'")&&read('app/willkommen.css').includes('.l1a-contents .lb-spread { height:calc(100vh - var(--l1a-top,230px) - 22px);'));
  const css=read('app/willkommen.css');assert(css.includes('.lb.l1a-book .l1a-soon-photo')&&css.includes('.l1a-part .lb-left .lb-photo'));
 });
 
@@ -137,7 +140,7 @@ test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps
  // Scores: their own store; the unit card adds the parts.
  assert.equal(progress.partKeys.b.scores,'lernkoko-l1b-scores');assert.notEqual(progress.partKeys.a.scores,progress.partKeys.b.scores);
  const both=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}}});
- assert.equal(both.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC].flat().reduce((n,e)=>n+e.total,0),'every part counts, also one not started');assert.equal(both.learned,22);
+ assert.equal(both.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC,lessonD.scoredExercisesD].flat().reduce((n,e)=>n+e.total,0),'every part counts, also one not started');assert.equal(both.learned,22);
  const page=pageCode();
  for(const piece of ["params.get('teil')","url.searchParams.set('teil',part)",'StepViewB','onPart(\'b\',0)','speech.speakAll(spellItems(word))','who="yasemin"',"who:'nikos'"])assert(page.includes(piece),piece);
 });
@@ -145,7 +148,7 @@ test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps
 test('the lesson page does not draw itself again and again (no effect that depends on the new-every-render sound object)',()=>{
  const page=read('app/willkommen-study.tsx');
  assert(!/\},\[speech,sound\]\)/.test(page),'no effect or callback keyed on speech and sound');
- assert(page.includes('latest.current.speech.stop()')&&page.includes("useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c')});},[]);"));
+ assert(page.includes('latest.current.speech.stop()')&&page.includes("useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c'),d:readPartScores('d')});},[]);"));
  const smoke=read('ci/smoke.cjs');assert(smoke.includes('sayfa bostayken kendini yeniden cizmiyor')&&smoke.includes("teil=b&adim=alfabe"));
 });
 
@@ -202,12 +205,46 @@ test('Teil C „Guten Tag!“ (25 October 2026): 26 steps, greetings by the time
  // Scores: their own store; the unit card adds all three parts.
  assert.equal(progress.partKeys.c.scores,'lernkoko-l1c-scores');assert.equal(progress.partKeys.c.step,'lernkoko-l1c-step');
  const all=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}},c:{test:{right:12,total:12}}});
- assert.equal(all.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC].flat().reduce((n,e)=>n+e.total,0));assert.equal(all.learned,34);
+ assert.equal(all.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC,lessonD.scoredExercisesD].flat().reduce((n,e)=>n+e.total,0));assert.equal(all.learned,34);
  const page=pageCode();
  for(const piece of ['StepViewC','onPart(\'c\',0)','stepsC','stepGroupsC','scoredExercisesC','exact','className="l1a-memory"','className="l1a-moods"','label="Lektion 1C · Test"'])assert(page.includes(piece),piece);
  // Listening exercises: the button's name does not give the answer away.
  assert(page.includes("aria-label={secret?(label==='Dinle'?label:'Dinle '+label):label+': '+text}"));
  assert.equal((page.match(/wide secret\/>/g)||[]).length,5,'A, B (two), C and the dictation rows');
  const css=read('app/willkommen.css');for(const cls of ['.l1a-moods','.l1a-mood-emoji','.l1a-pos-row','.l1a-pos-verb','.l1a-memory','.l1a-mcard.done','.l1a-row-say','.l1a-emoji-cell','.l1a-badge'])assert(css.includes(cls),cls);
- const smoke=read('ci/smoke.cjs');assert(smoke.includes("teil=c&adim=befinden")&&smoke.includes("data-l1a-part='c'"));
+ const smoke=read('ci/smoke.cjs');assert(smoke.includes("teil=c&adim=befinden")&&smoke.includes('.lb-toc-row button.lb-toc-open").count()) === 4'));
+});
+
+test('Teil D „Ich bin neu hier.“ (25 October 2026): the comic, the summary, Alles klar? with points, and the end of Lektion 1',()=>{
+ assert.equal(lessonD.stepsD.length,16);assert.equal(new Set(lessonD.stepsD.map(step=>step.id)).size,16,'ids are unique');
+ assert.deepEqual(lessonD.stepGroupsD.map(group=>group.ids.length),[5,3,6]);
+ for(const group of lessonD.stepGroupsD)for(const id of group.ids)assert(lessonD.stepIndexD(id)>0,id);
+ assert.deepEqual(lessonD.scoredExercisesD.map(e=>[e.id,e.total]),[['tamamla',8],['ich',10],['wortschatz',5],['grammatik',8],['kommunikation',6],['steckbrief',4],['test',15]]);
+ // Alles klar?: the points of each section are the number of its answers (38 in all, like the book's page).
+ for(const section of lessonD.checkSections)assert.equal(lessonD.scoredExercisesD.find(e=>e.id===section.id).total,section.points,section.id);
+ assert.equal(lessonD.checkPoints,38);
+ for(const [question,options,answer] of lessonD.testQuestionsD)assert(options.includes(answer),question);
+ // After a test answer only the right answer is read — in German, never a Turkish answer; the letter J by its German name.
+ for(const [question,,answer,say] of lessonD.testQuestionsD){if(['Efendim? / Pardon?','Burada yeniyim.'].includes(answer))assert.equal(say,'',question);else assert(say&&!/[ıİşŞğĞçÇ]/.test(say),question);}
+ assert.equal(lessonD.testQuestionsD.find(q=>q[2]==='yot')[3],'Jot');
+ // The exercises: the filled lines are what is read; the box answers are in the box.
+ assert.equal(lessonD.filledLine({text:'___ ___, Frau Arslan?',answers:[['Sehr gut, danke.'],['Woher kommen Sie']]}),'Sehr gut, danke. Woher kommen Sie, Frau Arslan?');
+ for(const line of lessonD.comicGapLines)for(const answers of line.answers)assert(lessonD.comicBox.includes(answers[0]),answers[0]);
+ for(const line of lessonD.vocabLines)for(const answers of line.answers)assert(lessonD.vocabBox.includes(answers[0]),answers[0]);
+ assert.equal(lessonD.ichSentences.filter(item=>item.ich).length,4);for(const item of lessonD.ichSentences)assert.equal(item.ich,/^Ich\b/.test(item.text),item.text);
+ assert(lesson.acceptsAnswer('ich heisse',lessonD.talkLines[1].answers[0])&&lesson.acceptsAnswer('arabisch französisch und ein bisschen deutsch',lessonD.profileLines[1].answers[0])&&lesson.acceptsAnswer('Deutsch und Englisch',lessonD.profileLines[3].answers[0]));
+ assert.equal(lessonD.importantSay('Ich spreche … und ein bisschen Deutsch.'),'Ich spreche und ein bisschen Deutsch.');
+ // Voices: the comic is Nora and Yasemin, each with her own voice; no Turkish words go to the German voices.
+ const styleOf=key=>lesson.speakers.find(s=>s.key===key).style;
+ const who=[...new Set(lessonD.comicLines.map(line=>line.who))];assert.deepEqual(who,['nora','yasemin']);assert.notEqual(styleOf('nora'),styleOf('yasemin'));
+ const texts=lessonD.willkommenDSpeechTexts();
+ for(const text of ['Guten Tag! Ich bin neu hier.','Herzlich willkommen! Ich bin Nora Weiß. Wie heißen Sie?','Ich spreche ein bisschen Türkisch.','Oh, super! Bis bald, Frau Weiß!','ich komme, du kommst, Sie kommen','ich bin, du bist, Sie sind','Ich bin Rami Khalil. Ich komme aus dem Libanon. Und Sie?','Sind Sie Herr Khalil? Richtig?','Jot','auswendig lernen','die Nachbarin'])assert(texts.includes(text),text);
+ assert(!texts.includes('')&&texts.every(text=>!/(Hoş|Teşekkür)/.test(text)),'no Turkish in the German voice list');
+ assert(read('scripts/voices/list-texts.cjs').includes("load('willkommen-d-course').willkommenDSpeechTexts()"));
+ const pics=lessonD.willkommenDPictures;for(const picture of [pics.cover,...pics.comic,pics.strategy,pics.trophy])assert(fs.existsSync('public'+picture.src),picture.src);
+ assert.equal(progress.partKeys.d.scores,'lernkoko-l1d-scores');assert.deepEqual(Object.keys(progress.partScored),['a','b','c','d']);
+ const page=pageCode();
+ for(const piece of ['StepViewD','onPart(\'d\',0)',"partOrder:L1PartId[]=['a','b','c','d']",'testDetail:scores=>','config.groups[2].ids.includes(exercise.id)','speakers={{a:\'nora\',b:\'yasemin\'}}','speakers={{a:\'nora\',b:\'rami\'}}','className="l1a-panel"','Bitte noch üben!'])assert(page.includes(piece),piece);
+ const css=read('app/willkommen.css');for(const cls of ['.l1a-panel-num','.l1a-say-list','.l1a-points'])assert(css.includes(cls),cls);
+ const smoke=read('ci/smoke.cjs');assert(smoke.includes("teil=d&adim=cizgi-roman"));
 });

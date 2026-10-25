@@ -11,6 +11,7 @@ import {turkishNote} from '@/lib/ausbildung-course';
 import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
 import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
 import {stepsC,stepGroupsC,scoredExercisesC,testQuestionsC,wordsC,willkommenCPictures} from '@/lib/willkommen-c-course';
+import {stepsD,stepGroupsD,scoredExercisesD,testQuestionsD,wordsD,willkommenDPictures,checkPoints} from '@/lib/willkommen-d-course';
 import {L1_PART_KEY,partKeys,readPartScores,savePartScore,partProgressL1,type L1AScoreMap,type L1PartId} from '@/lib/willkommen-progress';
 import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
@@ -25,11 +26,12 @@ import {LessonBook} from './lesson-book';
 import {useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {StepViewB} from './willkommen-b-steps';
 import {StepViewC} from './willkommen-c-steps';
+import {StepViewD} from './willkommen-d-steps';
 
 /**
  * Lektion 1 „Willkommen!“ (the learner's own lesson pages): the contents page is an open notebook like Lektion 11 and
  * 12 (Teil A–D); Teil A – Ich heiße … (24 October 2026, 22 steps), Teil B – Ich spreche ein bisschen Deutsch. (25 October 2026, 24 steps)
- * and Teil C – Guten Tag! (25 October 2026, 26 steps) open on a wide spread, one step at a time. German is read with the site voices, each
+ * Teil C – Guten Tag! (25 October 2026, 26 steps) and Teil D – Ich bin neu hier. (25 October 2026, 16 steps) open on a wide spread, one step at a time. German is read with the site voices, each
  * person with their own voice; answers get the site's sounds and Paul; scores stay in the browser
  * (lib/willkommen-progress.ts). Teil B's steps: app/willkommen-b-steps.tsx; shared pieces: app/willkommen-ui.tsx.
  */
@@ -43,13 +45,14 @@ export default function WillkommenStudy({guest=false}:{guest?:boolean}){
 }
 
 /** A part with a lesson: its steps, tabs, scored exercises, picture and step views. */
-type PartConfig={id:L1PartId;badge:string;title:string;lead:string;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode};
+type PartConfig={id:L1PartId;badge:string;title:string;lead:string;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode;testDetail?:(scores:L1AScoreMap)=>string};
 const parts:Record<L1PartId,PartConfig>={
  a:{id:'a',badge:'A',title:lessonParts[0].title??'',lead:lessonParts[0].lead??'',steps,groups:stepGroups,scored:scoredExercises,testCount:testQuestions.length,wordCount:words.length,cover:willkommenPictures.cover,coverAlt:'Süpermarket önünde tokalaşan iki kişi: Sabine ve Omar',View:StepViewA},
  b:{id:'b',badge:'B',title:lessonParts[1].title??'',lead:lessonParts[1].lead??'',steps:stepsB,groups:stepGroupsB,scored:scoredExercisesB,testCount:testQuestionsB.length,wordCount:wordsB.length,cover:willkommenBPictures.cover,coverAlt:'Dil kursu sınıfı: Paul Hoca tahtada, öğrenciler masalarında',View:StepViewB},
  c:{id:'c',badge:'C',title:lessonParts[2].title??'',lead:lessonParts[2].lead??'',steps:stepsC,groups:stepGroupsC,scored:scoredExercisesC,testCount:testQuestionsC.length,wordCount:wordsC.length,cover:willkommenCPictures.cover,coverAlt:'Kurs binasının önünde sabah selamlaşması',View:StepViewC},
+ d:{id:'d',badge:'D',title:lessonParts[3].title??'',lead:lessonParts[3].lead??'',steps:stepsD,groups:stepGroupsD,scored:scoredExercisesD,testCount:testQuestionsD.length,wordCount:wordsD.length,cover:willkommenDPictures.cover,coverAlt:'Yasemin taşınıyor: apartman kapısının önünde elinde kutuyla',View:StepViewD,testDetail:scores=>{const sections=['wortschatz','grammatik','kommunikation','steckbrief','test'].filter(id=>scores[id]);return sections.length?`${sections.length} / 5 bölüm yapıldı`:`${checkPoints} puan`;}},
 };
-const partOrder:L1PartId[]=['a','b','c'];
+const partOrder:L1PartId[]=['a','b','c','d'];
 const isPart=(id:string):id is L1PartId=>id in parts;
 
 /** Where the learner is: a part and a step (`?teil=b&adim=<id>`; Teil A without `teil`), or the contents page (index -1). */
@@ -62,12 +65,12 @@ function readPlace():Place{
 function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
  const [place,setPlace]=useState<Place>(()=>typeof window==='undefined'?{part:'a',index:-1}:readPlace());
- const [scores,setScores]=useState<Record<L1PartId,L1AScoreMap>>({a:{},b:{},c:{}});
+ const [scores,setScores]=useState<Record<L1PartId,L1AScoreMap>>({a:{},b:{},c:{},d:{}});
  const speech=useLessonSpeech();const sound=useAnswerSound();
  // useAnswerSound gives a new object on every render: keep the latest speech and sound in a ref, so the effects and
  // callbacks below do not run again on every render (that would be an endless update loop).
  const latest=useRef({speech,sound});latest.current={speech,sound};
- useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c')});},[]);
+ useEffect(()=>{setScores({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c'),d:readPartScores('d')});},[]);
  useEffect(()=>{const pop=()=>{latest.current.speech.stop();latest.current.sound.stop();setPlace(readPlace());};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
  /** Opens a step of a part; a negative number opens the contents page. */
  const open=useCallback((part:L1PartId,next:number)=>{
@@ -98,7 +101,7 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){speech.stop();onLanguage(value);}}} homeHref="/konular?level=A1.1" homeLabel={c(language,'catalogTitle')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current="units"/>
   <main id="l1a-main" className="object-page housing-page l1a-page" lang={language} dir={dir}>
-   <div className="object-breadcrumb"><a href="/konular?level=A1.1">A1.1</a><span aria-hidden="true">›</span>{step?<><a href={WILLKOMMEN_PATH} lang="de" onClick={event=>{event.preventDefault();go(-1);}}>Lektion 1 · Willkommen!</a><span aria-hidden="true">›</span><span lang="de">Teil {config.badge}</span></>:<span lang="de">Lektion 1 · Willkommen!</span>}</div>
+   {/* No breadcrumb (the learner asked, 25 October 2026): the menu's Üniteler and the notebook's own Lektion 1 button lead back. */}
    {guest&&<GuestBanner language={language} back={WILLKOMMEN_PATH}/>}
    {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
    {speech.warning&&<p className="object-alert" role="status">{speech.warning}</p>}
@@ -125,13 +128,21 @@ const worldMap=willkommenPictures.map;
 /** Left page: the unit, its picture and what Lektion 1 teaches (the resume and test notes were removed at the learner's request, 25 October 2026). Right page: Teil A–D. */
 function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record<L1PartId,L1AScoreMap>;onOpen:(part:L1PartId,index:number)=>void}){
  const unit=courseUnits.find(item=>item.id===WILLKOMMEN_UNIT);const unitName=unit?translate(unit.names,language):'Willkommen!';
- return <section className="l1a-contents" aria-labelledby="l1a-heading">
+ // The notebook fills the screen below the header and never makes the page scroll (the learner asked, 25 October 2026):
+ // its top is measured once and on resize (a CSS variable, no state, so nothing draws again).
+ const box=useRef<HTMLElement>(null);
+ useEffect(()=>{const element=box.current;if(!element)return;const set=()=>element.style.setProperty('--l1a-top',Math.round(element.getBoundingClientRect().top+window.scrollY)+'px');set();window.addEventListener('resize',set);return()=>window.removeEventListener('resize',set);},[]);
+ return <section className="l1a-contents" aria-labelledby="l1a-heading" ref={box}>
   <LessonBook className="l1a-book" left={<>
-   <span className="eyebrow" lang="de">A1.1 · Lektion 1 · Willkommen!</span>
-   <h1 id="l1a-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
-   <p className="lb-sub" lang="de">Guten Tag! Wie heißen Sie?</p>
-   <p className="lb-lead">Selamlaşmak, kendini tanıtmak, nereden geldiğini ve hangi dilleri konuştuğunu söylemek: <b lang="de">heißen · kommen · sprechen · sein</b>, <b lang="de">Sie / du</b> ve alfabe.</p>
-   <figure className="lb-photo"><img src={worldMap.src} alt="Paul Hoca dünya haritasında farklı dillerde selamları gösteriyor" width={worldMap.width} height={worldMap.height} decoding="async"/></figure>
+   <div className="l1a-intro">
+    <div className="l1a-intro-text">
+     <span className="eyebrow" lang="de">A1.1 · Lektion 1 · Willkommen!</span>
+     <h1 id="l1a-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
+     <p className="lb-sub" lang="de">Guten Tag! Wie heißen Sie?</p>
+     <p className="lb-lead">Selamlaşmak, kendini tanıtmak, nereden geldiğini ve hangi dilleri konuştuğunu söylemek: <b lang="de">heißen · kommen · sprechen · sein</b>, <b lang="de">Sie / du</b> ve alfabe.</p>
+    </div>
+    <figure className="lb-photo"><img src={worldMap.src} alt="Paul Hoca dünya haritasında farklı dillerde selamları gösteriyor" width={worldMap.width} height={worldMap.height} decoding="async"/></figure>
+   </div>
    <section className="lb-goals" aria-labelledby="l1a-goals"><h2 id="l1a-goals">Bu ünitede</h2><ul>{unitGoals.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
   </>} right={<>
    <h2 className="lb-heading">İçindekiler</h2>
@@ -156,13 +167,15 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
 /** A part on the notebook: the left page stays (title, picture, progress, the other parts); the right page has three index tabs and the step. */
 function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{config:PartConfig;step:Step;scores:L1AScoreMap;progress:TopicProgress;language:StudyLanguage;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;children:ReactNode}){
  const group=config.groups.find(item=>item.ids.includes(step.id));
- const exerciseIds=config.scored.filter(exercise=>exercise.id!=='test').map(exercise=>exercise.id);
+ // The second tab's scored exercises and the third tab's (Teil A–C: the test; Teil D: the sections of "Alles klar?").
+ const exerciseIds=config.scored.filter(exercise=>config.groups[1].ids.includes(exercise.id)).map(exercise=>exercise.id);
+ const testIds=config.scored.filter(exercise=>config.groups[2].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
- const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:!!scores.test};
+ const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id])};
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
-  test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${config.testCount} soru`,
+  test:config.testDetail?config.testDetail(scores):scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${config.testCount} soru`,
  };
  const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
  const nextSoon=!next?lessonParts[lessonParts.findIndex(row=>row.id===config.id)+1]:undefined;

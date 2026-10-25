@@ -37,4 +37,6 @@ for(const text of load('willkommen-course').willkommenSpeechTexts())add(text);
 for(const text of load('willkommen-b-course').willkommenBSpeechTexts())add(text);
 // Lektion 1C „Guten Tag!“: greetings by the time of day, goodbyes, Wie geht's?, dialogues, verb position, exercises, test.
 for(const text of load('willkommen-c-course').willkommenCSpeechTexts())add(text);
+// Lektion 1D „Ich bin neu hier.“: the comic, the important sentences, the summary of Lektion 1, exercises, Alles klar? and the test.
+for(const text of load('willkommen-d-course').willkommenDSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

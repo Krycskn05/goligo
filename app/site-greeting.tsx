@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {germanMoment,PART_NOUN,WEEKDAYS,type PartOfDay} from '@/lib/german-time';
+import {germanMoment,MONTHS,PART_NOUN,WEEKDAYS,type PartOfDay} from '@/lib/german-time';
 import {clockDigits,clockSayings,turkishTime,type ClockSaying} from '@/lib/clock-sayings';
 import {clockText,EXPLAIN_KEY,KIND_KEY,type ClockCopyKey} from '@/lib/clock-copy';
 import {greetingText,type GreetingCopyKey} from '@/lib/greeting-copy';
@@ -39,12 +39,23 @@ export function AnalogClock({date,seconds=true,className=''}:{date:Date;seconds?
  </svg>;
 }
 
+/** The short German month on the calendar leaf of the header (OKT for Oktober). */
+export const MONTH_SHORT=['JAN','FEB','MÄR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DEZ'];
+
+/** A small calendar leaf for today (the learner chose it, 29 October 2026): the month short on an orange strip and the
+ * day of the month under it. */
+export function DateLeaf({date}:{date:Date}){
+ return <span className="sg-leaf" aria-hidden="true"><span className="sg-leaf-month">{MONTH_SHORT[date.getMonth()]}</span><span className="sg-leaf-day">{date.getDate()}</span></span>;
+}
+
 type Info={saying:ClockSaying;index:number;total:number;hour:number;minute:number};
 
 /**
  * The header's clock (the learner asked: no frame, only the clock, the day and the part of the day, placed neatly):
  * an analog clock for the learner's own time (ticking second hand with motion on; no digits), the weekday in German
  * (Mittwoch) and the part of the day with a small picture (Morgen, Vormittag, Mittag, Nachmittag, Abend, Nacht).
+ * Since 29 October 2026 (the learner chose design 3 of five, with the clock moved to the other side) a calendar leaf
+ * with the month and the day of the month comes first and the clock last: leaf, weekday, part of the day, clock.
  * Each tap says the time of now in the next correct German way (the learner's plan, 22 October 2026, lib/clock-sayings.ts):
  * formal, everyday, from the half hour, approximate — read aloud, and shown in a small box under the clock with its
  * kind and number (2/4), the meaning (Turkish sentence, or the time) and a short explanation. After the last one it
@@ -95,13 +106,14 @@ export function SiteGreeting({language}:{language:VaultLanguage;line?:string}){
  const explain=(item:Info)=>{const s=item.saying,h12=item.hour%12||12,key=EXPLAIN_KEY[s.pattern];
   return key?c(key,{next:s.next,halfTime:clockDigits(h12,30),n:s.minutes,time:clockDigits(h12,item.minute)}):'';};
  return <>
-  <button ref={button} type="button" className="site-greeting site-greeting-button" title={t('tapToHear')} aria-label={t('tapToHear')+' · '+WEEKDAYS[now.getDay()]+', '+PART_NOUN[moment.part]+', '+time} aria-expanded={!!info} onClick={say} data-site-greeting={moment.part}>
-   <AnalogClock date={now} seconds={motion}/>
+  <button ref={button} type="button" className="site-greeting site-greeting-button" title={t('tapToHear')} aria-label={t('tapToHear')+' · '+WEEKDAYS[now.getDay()]+', '+now.getDate()+'. '+MONTHS[now.getMonth()]+', '+PART_NOUN[moment.part]+', '+time} aria-expanded={!!info} onClick={say} data-site-greeting={moment.part}>
+   <DateLeaf date={now}/>
    <span className="site-greeting-words" lang="de" dir="ltr">
     <strong className="site-greeting-day"><TopIcon name="calendar" size={24} className="sg-day-icon"/>{WEEKDAYS[now.getDay()]}</strong>
     <span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>
-    <span className="lk-visually-hidden">{time}</span>
+    <span className="lk-visually-hidden">{now.getDate()}. {MONTHS[now.getMonth()]}, {time}</span>
    </span>
+   <AnalogClock date={now} seconds={motion}/>
   </button>
   {/* The way just said, under the clock (fixed on the screen: the header cuts off what reaches outside it). */}
   {info&&place&&<div ref={box} className="sg-info" role="status" aria-live="polite" style={{top:place.top,left:place.left,width:place.width}} onPointerEnter={()=>{if(hide.current)clearTimeout(hide.current);}} onPointerLeave={later} data-clock-info={info.saying.kind}>

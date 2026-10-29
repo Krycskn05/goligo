@@ -174,7 +174,7 @@ export function isAssetPath(pathname: string): boolean {
  * Pages a visitor without an account may open for the guest taste (lib/guest-taste.ts): the first part of each is open,
  * the rest asks to sign up. Hesabım and the admin page stay for members.
  */
-export const GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/oyunlar', '/yanlislarim', '/a1-2/ev-ve-yasam', '/a1-2/ausbildung', '/a1-2/ausbildung/hoeren', '/a1-1/willkommen']);
+export const GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/oyunlar', '/yanlislarim', '/a1-2/ev-ve-yasam', '/a1-2/ausbildung', '/a1-2/ausbildung/hoeren', '/a1-1/willkommen', '/a1-2/wege-in-der-stadt']);
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PAGES.has(pathname) || GUEST_PAGES.has(pathname) || pathname === '/api' || pathname.startsWith('/api/') || isAssetPath(pathname);

@@ -40,5 +40,16 @@ export const unitGoalsById:Record<string,string[]>={
   'Gramer: artikeller **der / das / die**, **er / es / sie**',
   'Telaffuz: **a, e, i, o, u** · İpucu: kelime kartlarıyla ve sözlükle çalış',
  ],
+ // Lektion 15 „Wege in der Stadt“ (Teil A since 30 October 2026, from the learner's lesson page)
+ 'book-15':[
+  'Bir binada yolu sor ve tarif et: **Wo ist …? · Gehen Sie nach links.**',
+  'Danışmada yardım iste: **Können Sie mir bitte helfen?**',
+  'Katları söyle: **im Erdgeschoss · im ersten Stock · im Keller**',
+  'Hangi daireye gideceğini söyle: **zum / zur** + **müssen**',
+  'Bir şeyin olup olmadığını sor: **Gibt es hier einen Aufzug?**',
+  'Resmî daireleri tanı: Bürgerbüro, Ausländerbehörde, Führerscheinstelle',
+  'Bilgi panosunu oku, anladığını kontrol et: **Also …? – Ja, genau!**',
+  'Telaffuz: **Ach-Laut** ve **Ich-Laut**, uzun kelimelerde vurgu ilk parçada',
+ ],
 };
 export const unitGoalsFor=(unitId:string)=>unitGoalsById[unitId]??[];

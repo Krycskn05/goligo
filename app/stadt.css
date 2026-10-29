@@ -1,0 +1,103 @@
+/* Lektion 15 „Wege in der Stadt“ (app/stadt-study.tsx, app/stadt-a-steps.tsx): the lesson uses Lektion 1's look
+   (the l1a-* styles of app/willkommen.css); these are only its own pieces — article colours, word rows, the house
+   with its floors, the information boards, the rules and the choice gaps. Phone first. */
+.l15-der { color:#1f5fae; font-weight:800; }
+.l15-die { color:#c0392b; font-weight:800; }
+.l15-das { color:#2e7d32; font-weight:800; }
+.l15-legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin:8px 0 6px; font-size:13px; }
+.l15-legend span { padding:2px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--toy-line,#dce5da); }
+.l15-scene { max-height:320px; background:transparent; box-shadow:none; }
+.l15-emoji { flex:none; width:36px; font-size:26px; line-height:1; text-align:center; }
+/* word rows: emoji, the word with its article colour, plural, meaning, example, listen */
+.l15-words { list-style:none; margin:8px 0; padding:0; display:grid; gap:8px; }
+.l15-word { display:flex; align-items:center; gap:12px; padding:10px 12px; border:2px solid var(--toy-line,#dce5da); border-radius:16px; background:#fff; }
+.l15-word-text { flex:1; min-width:0; display:grid; gap:1px; }
+.l15-plural { font-size:13px; font-weight:700; color:var(--ink-3,#5b7590); }
+.l15-word-tr { font-size:15px; color:var(--ink-2,#3d5a7a); }
+.l15-example { font-size:14px; font-style:italic; color:var(--ink-3,#5b7590); }
+.l1a-phrase-text .l15-example { margin-top:1px; }
+/* dialogues: the name above the line; the translation can be hidden */
+.l15-name { display:block; font-size:12px; font-weight:800; letter-spacing:.03em; color:var(--ink-3,#5b7590); }
+.l15-hide-tr .l1a-bubble .l1a-tr { display:none; }
+/* long German words (Ausländerbehörde) break at a syllable, not anywhere */
+.l15-app .l1a-bubble .l1a-de,.l15-app .l15-word .l1a-de,.l15-app .l1a-phrase .l1a-de { overflow-wrap:break-word; hyphens:auto; -webkit-hyphens:auto; }
+.l15-cast { list-style:none; display:flex; flex-wrap:wrap; gap:10px 14px; margin:8px 0; padding:0; }
+.l15-cast li { display:grid; justify-items:center; gap:4px; width:72px; font-size:13px; font-weight:800; color:var(--ink-2,#3d5a7a); text-align:center; }
+/* the information board of a building */
+.l15-board { margin:12px 0; border:2px solid #1e6b5c; border-radius:14px; overflow:hidden; background:#f3f8f6; }
+.l15-board-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 12px; background:#1e6b5c; color:#fff; font-size:13px; font-weight:800; letter-spacing:.08em; }
+.l15-board-head b { font-size:12px; letter-spacing:.03em; opacity:.92; text-align:end; }
+.l15-board-row { display:grid; grid-template-columns:44px minmax(0,1fr) minmax(0,1fr); align-items:center; gap:6px; padding:8px 10px; border-top:1px solid #cfe0d9; }
+.l15-board-floor { display:grid; justify-items:center; font-size:24px; font-weight:800; line-height:1; color:#1e6b5c; }
+.l15-board-floor small { font-size:10px; letter-spacing:.04em; margin-top:2px; }
+.l15-board-side { display:grid; gap:2px; min-width:0; font-size:14px; font-weight:700; color:var(--ink,#1f3b5c); overflow-wrap:anywhere; }
+.l15-board-end { text-align:end; }
+.l15-board-arrow { color:#1e6b5c; font-weight:800; }
+.l15-board-foot { margin:0; padding:6px 12px 8px; border-top:1px solid #cfe0d9; font-size:13px; color:var(--ink-3,#5b7590); }
+/* short rules: the form on the left, what it means on the right */
+.l15-rule { display:grid; gap:6px; margin:10px 0; padding:10px 12px; border-radius:14px; background:#eaf4ff; }
+.l15-rule>div { display:grid; grid-template-columns:minmax(84px,auto) minmax(0,1fr); gap:4px 12px; align-items:baseline; }
+.l15-rule dt { margin:0; color:var(--ink,#1f3b5c); }
+.l15-rule dd { margin:0; line-height:1.45; }
+.l15-rule-art { flex:none; min-width:52px; font-size:15px; }
+.l15-warn { margin:10px 0; padding:10px 12px; border-radius:14px; border-inline-start:4px solid #c0392b; background:#fff2ed; line-height:1.5; }
+.l15-same { margin:6px 0 10px; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px; }
+.l15-same li { padding:4px 12px; border-radius:999px; background:#fff; border:1.5px solid var(--toy-line,#dce5da); font-weight:700; color:var(--ink,#1f3b5c); }
+.l15-irregular { font-size:15px; }
+.l15-tasks td { vertical-align:top; }
+.l15-sounds td .l12-say { width:34px; height:34px; }
+.l15-sounds td:nth-child(2) { border-inline-end:1.5px dashed var(--toy-line,#dce5da); }
+.l15-stress { text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:3px; text-decoration-color:var(--blue,#7cc4ff); }
+/* the house: tap a floor to hear it */
+.l15-house { display:block; width:100%; max-width:380px; height:auto; margin:8px auto 12px; }
+.l15-house .l15-floor { cursor:pointer; outline:none; }
+.l15-house .l15-floor rect:not(.l15-hit) { fill:#fff; stroke:var(--blue-2,#2f7fd6); stroke-width:2; }
+.l15-house .l15-hit { fill:transparent; stroke:none; }
+.l15-house .l15-floor:hover rect:not(.l15-hit),.l15-house .l15-floor.on rect:not(.l15-hit),.l15-house .l15-floor:focus-visible rect:not(.l15-hit) { fill:#eaf4ff; }
+.l15-house .l15-floor:focus-visible .l15-hit { stroke:var(--blue-2,#2f7fd6); stroke-width:2; stroke-dasharray:4 3; }
+.l15-house .l15-floor-short { fill:var(--ink,#1f3b5c); font-weight:800; font-size:13px; font-family:inherit; }
+.l15-house .l15-floor-label { fill:var(--ink-2,#3d5a7a); font-weight:700; font-size:13px; font-family:inherit; }
+.l15-house .l15-floor.on .l15-floor-label { fill:var(--blue-2,#2f7fd6); font-weight:800; }
+.l15-house .l15-roof { fill:#dbe7f3; stroke:var(--blue-2,#2f7fd6); stroke-width:2; }
+.l15-house .l15-earth { fill:#efe6d6; }
+.l15-house .l15-ground { stroke:#8fb98b; stroke-width:4; }
+.l15-house .l15-tree { fill:#8fb98b; }
+.l15-house .l15-trunk { fill:#a08b6a; }
+/* choices inside sentences */
+.l15-choice-list { display:grid; gap:4px; margin:8px 0; }
+.l15-choice-row { padding:10px 0; border-bottom:1px solid var(--toy-line,#dce5da); }
+.l15-choice-row:last-child { border-bottom:0; }
+.l15-choice-prompt { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.l15-choice-prompt .l1a-de { font-size:16px; }
+.l15-choice-text { font-weight:700; color:var(--ink,#1f3b5c); line-height:2.4; overflow-wrap:anywhere; }
+.l15-row-ok { display:inline-block; margin-inline-start:6px; color:#2f7a31; vertical-align:middle; }
+select.l1a-gap.l15-select { width:auto; min-width:5.5em; max-width:100%; min-height:38px; padding:4px 6px; font-size:16px; vertical-align:middle; }
+.l15-choice-dialogue .l15-choice-text { display:block; font-size:17px; line-height:1.55; }
+.l15-choice-dialogue select.l15-select { margin:3px 0; }
+.l15-articles .l1a-opt { min-width:64px; text-align:center; }
+.l15-row-sentence { font-weight:700; color:var(--ink,#1f3b5c); }
+.l15-row-text { display:inline-flex; align-items:center; flex-wrap:wrap; gap:6px; font-weight:700; color:var(--ink,#1f3b5c); }
+.l15-hear { margin:0; padding:6px 10px; flex:1; min-width:0; }
+.l15-hear .l1a-de { flex:1; min-width:0; }
+.l15-floor-row { flex-wrap:nowrap; }
+.l15-floor-tag { flex:none; width:56px; font-size:16px; color:var(--ink,#1f3b5c); }
+.l15-floor-field { flex:1; min-width:0; display:block; }
+.l15-floor-field .l1a-hint { display:block; margin:2px 0 0; }
+.l1a-test-listen { margin:0 0 12px; }
+/* Alıştırma 1: the pictures (emoji) are big */
+[data-l15-step='eslestir'] .l1a-match>div:first-child .l1a-mbtn { font-size:28px; line-height:1; text-align:center; }
+@media (max-width:520px) {
+ .l15-word { gap:8px; padding:8px 10px; }
+ .l15-emoji { width:30px; font-size:22px; }
+ .l15-board-row { grid-template-columns:36px minmax(0,1fr) minmax(0,1fr); padding:7px 8px; }
+ .l15-board-side { font-size:13px; }
+ .l15-rule>div { grid-template-columns:auto minmax(0,1fr); gap:2px 10px; }
+ .l15-rule dt { max-width:9.5em; }
+ .l15-sounds .l1a-de { font-size:15px; white-space:nowrap; }
+ .l15-sounds td { padding:6px 3px; }
+ .l15-sounds td .l12-say { width:32px; height:32px; }
+ .l15-cast li { width:64px; font-size:12px; }
+ .l15-floor-tag { width:48px; }
+ [data-l15-step='eslestir'] .l1a-match>div:first-child { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+ [data-l15-step='eslestir'] .l1a-match>div:first-child .l1a-mbtn { margin:0; padding:8px 4px; }
+}

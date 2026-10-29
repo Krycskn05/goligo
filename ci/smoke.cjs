@@ -203,7 +203,7 @@ async function languageFlow(browser) {
   await visit(page, "/", "01-tanitim.png", errors);
   record("Girissiz ana sayfada tanitim ve uye ol dugmesi var",
     (await page.locator("[data-landing]").count()) === 1 && (await page.locator("[data-landing-register]").count()) === 1, "");
-  for (const target of ["/ev-esyalar", "/fiiller", "/a1-2/ev-ve-yasam", "/a1-1/willkommen"]) {
+  for (const target of ["/ev-esyalar", "/fiiller", "/a1-2/ev-ve-yasam", "/a1-1/willkommen", "/a1-2/wege-in-der-stadt"]) {
     await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
     const at = new URL(page.url());
     const banner = await page.locator("[data-guest-banner]").count();
@@ -266,6 +266,36 @@ async function languageFlow(browser) {
   }
   await page.goto(BASE + "/a1-1/willkommen?adim=diyalog", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 1A: adim adresi aciliyor (diyalog, 6 satir, dinle dugmeleri)", (await page.locator("[data-l1a-step='diyalog'] .l1a-line").count()) === 6 && (await page.locator("[data-l1a-step='diyalog'] .l12-say").count()) === 6, "");
+  // Lektion 15 „Wege in der Stadt“ (30 October 2026): a notebook like Lektion 1 (Teil A open, B–D coming); Teil A has 24 steps.
+  await visit(page, "/a1-2/wege-in-der-stadt", "03c-lektion-15.png", errors);
+  record("Lektion 15: defter girisi (Teil A acik, B-D yakinda)", (await page.locator(".l15-book .lb-toc-row button.lb-toc-open").count()) === 1 && (await page.locator(".l15-book .l1a-soon").count()) === 3, "");
+  await page.locator("[data-l15-part='a'] button.lb-toc-open").click();
+  await page.waitForTimeout(600);
+  record("Lektion 15A: kapak, 24 adim, uc sekme", (await page.locator("[data-l15-step='kapak']").count()) === 1 && /1\/24/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
+  await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=diyalog-amt", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: path.join(OUT, "03d-lektion-15a-diyalog.png"), fullPage: true });
+  record("Lektion 15A: diyalog adimi aciliyor (pano, 15 satir, dinle dugmeleri)", (await page.locator("[data-l15-step='diyalog-amt'] .l15-board").count()) === 1 && (await page.locator("[data-l15-step='diyalog-amt'] .l1a-line").count()) === 15 && (await page.locator("[data-l15-step='diyalog-amt'] .l1a-line .l12-say").count()) === 15, "");
+  await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=katlar", { waitUntil: "networkidle", timeout: 90000 });
+  record("Lektion 15A: katlar adimi aciliyor (bina, 7 kat ve cati)", (await page.locator("[data-l15-step='katlar'] .l15-house .l15-floor").count()) === 8, "");
+  await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=wohin", { waitUntil: "networkidle", timeout: 90000 });
+  {
+    const gaps = page.locator("[data-l15-step='wohin'] select");
+    await gaps.nth(0).selectOption("Sie"); await gaps.nth(1).selectOption("zur");
+    record("Lektion 15A: secimler hemen kontrol ediliyor (yesil / kirmizi)", (await gaps.count()) === 21 && (await page.locator("[data-l15-step='wohin'] select.ok").count()) === 1 && (await page.locator("[data-l15-step='wohin'] select.bad").count()) === 1, "");
+  }
+  {
+    const mobile = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
+    const phone = await mobile.newPage();
+    await phone.goto(BASE + "/a1-2/wege-in-der-stadt?adim=rami", { waitUntil: "networkidle", timeout: 90000 });
+    await phone.waitForTimeout(1200);
+    await phone.screenshot({ path: path.join(OUT, "03e-telefon-lektion-15a.png"), fullPage: true });
+    const wide = await phone.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    record("Lektion 15A telefonda yana tasmiyor", wide <= 1, wide + " px");
+    await mobile.close();
+  }
+  await page.goto(BASE + "/konular?level=A1.2", { waitUntil: "networkidle", timeout: 90000 });
+  record("Uniteler: Lektion 15 karti Lektion 15A'ya aciliyor", (await page.locator("[data-unit='book-15'] a.housing-open[href='/a1-2/wege-in-der-stadt']").count()) === 1, "");
   await page.goto(BASE + "/konular?level=A1.1", { waitUntil: "networkidle", timeout: 90000 });
   record("Uniteler: Lektion 1 karti Lektion 1A'ya acliyor", (await page.locator("[data-unit='book-01'] a.housing-open[href='/a1-1/willkommen']").count()) === 1, "");
   await visit(page, "/", "01-ana-sayfa.png", errors);

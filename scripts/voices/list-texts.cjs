@@ -39,4 +39,6 @@ for(const text of load('willkommen-b-course').willkommenBSpeechTexts())add(text)
 for(const text of load('willkommen-c-course').willkommenCSpeechTexts())add(text);
 // Lektion 1D „Ich bin neu hier.“: the comic, the important sentences, the summary of Lektion 1, exercises, Alles klar? and the test.
 for(const text of load('willkommen-d-course').willkommenDSpeechTexts())add(text);
+// Lektion 15A „Gehen Sie die Treppe hoch.“: words, floors, directions, es gibt, Ach/Ich, the dialogues, exercises and the test.
+for(const text of load('stadt-course').stadtSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

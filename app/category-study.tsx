@@ -57,6 +57,9 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const [ausbildung,setAusbildung]=useState<TopicProgress|null>(null);
  // Lektion 1 (Teil A and B) keeps its scores in the browser (lib/willkommen-progress.ts): read them here for the unit card.
  const [willkommen,setWillkommen]=useState<TopicProgress|null>(null);
+ // Lektion 15 (Teil A since 30 October 2026) keeps its scores in the browser, too (lib/stadt-progress.ts).
+ const [stadt,setStadt]=useState<TopicProgress|null>(null);
+ useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home]);
  useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home]);
  useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
@@ -77,7 +80,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
       <div className="nb-spiral" aria-hidden="true">{Array.from({length:30},(_,i)=><span key={i}/>)}</div>
       <div className="nb-page">
        <h2 id="curriculum-heading" className="nb-title">{level} · {c(language,'categories')}</h2>
-       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-01'?'/a1-1/willkommen':unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':null:null;const progress=course!=='de'?null:unit.id==='book-01'?willkommen:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:null;
+       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-01'?'/a1-1/willkommen':unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':unit.id==='book-15'?'/a1-2/wege-in-der-stadt':null:null;const progress=course!=='de'?null:unit.id==='book-01'?willkommen:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:unit.id==='book-15'?stadt:null;
         return <li className={'nb-card tape-'+(i%4)+(lesson?' has-lesson':'')} key={unit.id} data-unit={unit.id}>
          <span className="nb-tape" aria-hidden="true"/>
          <div className="nb-photo"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/></div>

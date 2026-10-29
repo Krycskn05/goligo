@@ -145,7 +145,7 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
 }
 /** One choice per row (Sie or du, which letter, right or not …): the row is read after the answer (`say`), and
  * `reveal` appears once the row is answered. */
-export type ChoiceRow={key:string;before?:ReactNode;after?:ReactNode;options:{value:string;label:string}[];answer:string;say?:SayItem;reveal?:ReactNode;label:string};
+export type ChoiceRow={key:string;before?:ReactNode;after?:ReactNode;options:{value:string;label:string}[];answer:string;say?:SayItem;reveal?:ReactNode;label:string;optionLang?:string};
 export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;rows:ChoiceRow[];wide?:boolean}){
  const {speech,sound,rows,kicker,title,lead,before,wide=false}=props;const finish=useFinish(props);
  const [answers,setAnswers]=useState<Record<number,string>>({});const [feedback,setFeedback]=useState<Feedback>(null);
@@ -159,16 +159,18 @@ export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:str
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
   {rows.map((row,i)=><div className={'l1a-arow'+(wide?' wide':'')} key={row.key} data-done={answers[i]!==undefined?'':undefined}>
    {row.before}
-   <div className="l1a-opts" role="group" aria-label={row.label}>{row.options.map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang="de" onClick={()=>answer(i,option.value)}>{option.label}</button>)}</div>
+   <div className="l1a-opts" role="group" aria-label={row.label}>{row.options.map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang={row.optionLang??'de'} onClick={()=>answer(i,option.value)}>{option.label}</button>)}</div>
    {row.after}
    {answers[i]!==undefined&&row.reveal}
   </div>)}
   <FeedbackLine feedback={feedback}/>
  </>;
 }
-/** The test: one question at a time, the right answer is read after the sound (`sayFor`, nothing for a Turkish answer). */
-export function TestStep(props:StepProps&{label:string;questions:readonly (readonly [string,string[],string,...unknown[]])[];sayFor:(index:number)=>string}){
- const {speech,sound,onScore,step,questions,sayFor,label}=props;
+/** The test: one question at a time, the right answer is read after the sound (`sayFor`, nothing for a Turkish answer).
+ * `listen`: a listening question gets a listen button (Lektion 15A); `langOf`: the language of a question or option
+ * when the lesson knows it better than the guess below. */
+export function TestStep(props:StepProps&{label:string;questions:readonly (readonly [string,string[],string,...unknown[]])[];sayFor:(index:number)=>SayItem;listen?:(index:number)=>SayItem|undefined;langOf?:(text:string)=>'de'|'tr'}){
+ const {speech,sound,onScore,step,questions,sayFor,label,listen,langOf}=props;
  const [i,setI]=useState(0);const [score,setScore]=useState(0);const [picked,setPicked]=useState<string|null>(null);const [options,setOptions]=useState(()=>shuffle(questions[0][1]));const [over,setOver]=useState(false);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
  useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
@@ -185,8 +187,9 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
   <div className="l1a-actions"><button type="button" className="btn" onClick={again}><RotateCcw size={18} aria-hidden="true"/>Testi tekrarla</button></div></>;}
  return <>
   <p className="kicker" lang="de">{label}</p><Heading>Soru {i+1} / {questions.length}</Heading>
-  <p className="l1a-question" lang={/[çğışİ]|hangisi|nedir|nasıl|ne demek|cevap/.test(question[0])?'tr':'de'}>{question[0]}</p>
-  <div className="l1a-opts column" role="group" aria-label={'Soru '+(i+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr'} onClick={()=>answer(option)}>{option}</button>)}</div>
+  <p className="l1a-question" lang={langOf?langOf(question[0]):/[çğışİ]|hangisi|nedir|nasıl|ne demek|cevap/.test(question[0])?'tr':'de'}>{question[0]}</p>
+  {(()=>{const heard=listen?.(i);return heard?<div className="l1a-actions l1a-test-listen"><Say text={typeof heard==='string'?heard:heard.text} who={typeof heard==='string'?undefined:heard.who} speech={speech} secret wide/></div>:null;})()}
+  <div className="l1a-opts column" role="group" aria-label={'Soru '+(i+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={langOf?langOf(option):/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr'} onClick={()=>answer(option)}>{option}</button>)}</div>
   <p className="l1a-mini">Puan: {score}</p>
  </>;
 }

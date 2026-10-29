@@ -466,37 +466,38 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 .vault-restart-all { display:inline-flex; align-items:center; gap:6px; min-height:40px; margin-top:4px; color:#5f7f9f; font-size:14px; font-weight:700; }
 
 /* Header "Tek satır şerit" (the learner chose option B of three drafts, 29 October 2026: "incelt"): one thin row on every
-   width — on computers about 57 px high (was 113 px), on phones about 46 px. A smaller logo, the clock with the day and
+   width — on computers about 64 px high (was 113 px; first 57 px, then a little bigger at the learner's wish), on phones
+   about 50 px. A smaller logo, the clock with the day and
    the part of the day inside a small white capsule (one line on wide screens, two small lines on phones), the site
    language as a small pill with the globe and the language name (no "Site dili" label; on phones still the round button
    with TR) and smaller round buttons. The visitor pages (.lk-public-header) keep their own header; during a test the
    slim test header below still wins. */
 @media (min-width:761px) {
- .toon-app .work-header.site-header:not(.lk-public-header),.work-header.logo-header.site-header:not(.lk-public-header) { display:flex; flex-wrap:nowrap; align-items:center; gap:14px; padding:5px 12px 5px 18px; border-radius:999px; }
- .site-header:not(.lk-public-header) .site-logo-brand { flex:none; width:122px; min-width:0; }
- .site-header:not(.lk-public-header) .site-greeting { margin-inline:auto; padding:3px 16px 3px 3px; background:rgba(255,255,255,.62); border:1px solid #efdcb7; border-radius:999px; }
+ .toon-app .work-header.site-header:not(.lk-public-header),.work-header.logo-header.site-header:not(.lk-public-header) { display:flex; flex-wrap:nowrap; align-items:center; gap:14px; padding:6px 14px 6px 20px; border-radius:999px; }
+ .site-header:not(.lk-public-header) .site-logo-brand { flex:none; width:138px; min-width:0; }
+ .site-header:not(.lk-public-header) .site-greeting { margin-inline:auto; padding:3px 18px 3px 3px; background:rgba(255,255,255,.62); border:1px solid #efdcb7; border-radius:999px; }
  .site-header:not(.lk-public-header) .site-greeting-button:hover { background:#fff; }
  .site-header:not(.lk-public-header) .site-greeting-button { gap:9px; }
- .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { width:32px; height:32px; filter:none; }
+ .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { width:36px; height:36px; filter:none; }
  .site-header:not(.lk-public-header) .site-greeting-words { display:flex; align-items:center; gap:8px; white-space:nowrap; }
- .site-header:not(.lk-public-header) .site-greeting-day { font-size:16px; }
+ .site-header:not(.lk-public-header) .site-greeting-day { font-size:17px; }
  .site-header:not(.lk-public-header) .site-greeting-day .sg-day-icon { display:none; }
- .site-header:not(.lk-public-header) .site-greeting-part { font-size:14px; }
+ .site-header:not(.lk-public-header) .site-greeting-part { font-size:15px; }
  .site-header:not(.lk-public-header) .site-greeting-part::before { content:""; width:5px; height:5px; border-radius:50%; background:#e2c48a; margin-inline-end:4px; }
- .site-header:not(.lk-public-header) .site-greeting-part .sg-part-icon { width:18px; height:18px; }
- .site-header:not(.lk-public-header) .site-greeting-waiting { width:230px; height:40px; }
+ .site-header:not(.lk-public-header) .site-greeting-part .sg-part-icon { width:20px; height:20px; }
+ .site-header:not(.lk-public-header) .site-greeting-waiting { width:290px; height:44px; }
  .site-header:not(.lk-public-header) .site-header-tools { flex-wrap:nowrap; margin:0; gap:8px; }
  .site-header:not(.lk-public-header) .site-header-buttons { gap:8px; }
  .site-header:not(.lk-public-header) .site-language-label { display:none; }
- .site-header:not(.lk-public-header) .site-language { min-height:36px; gap:3px; padding:2px 6px 2px 8px; background:rgba(255,255,255,.62); border:1px solid #efdcb7; border-radius:999px; }
- .site-header:not(.lk-public-header) .site-language .top-icon { width:22px; height:22px; margin:0; }
- .site-header:not(.lk-public-header) .site-language select { min-height:0; padding:2px 4px; font-size:14.5px; }
- .site-header:not(.lk-public-header) .site-home,.site-header:not(.lk-public-header) .object-back,.site-header:not(.lk-public-header) .lk-effects-button { width:36px; height:36px; min-height:36px; border-width:1.5px; }
+ .site-header:not(.lk-public-header) .site-language { min-height:40px; gap:3px; padding:2px 6px 2px 8px; background:rgba(255,255,255,.62); border:1px solid #efdcb7; border-radius:999px; }
+ .site-header:not(.lk-public-header) .site-language .top-icon { width:24px; height:24px; margin:0; }
+ .site-header:not(.lk-public-header) .site-language select { min-height:0; padding:2px 4px; font-size:15px; }
+ .site-header:not(.lk-public-header) .site-home,.site-header:not(.lk-public-header) .object-back,.site-header:not(.lk-public-header) .lk-effects-button { width:40px; height:40px; min-height:40px; border-width:1.5px; }
  .site-header:not(.lk-public-header) .lk-effects-button,.site-header:not(.lk-public-header) .site-account { box-shadow:0 2px 0 #f5df9c; }
  .site-header:not(.lk-public-header) .lk-effects-button:not([data-effects-on]) { box-shadow:0 2px 0 #dfe4ea; }
  .site-header:not(.lk-public-header) .site-home:not(.site-account),.site-header:not(.lk-public-header) .object-back { box-shadow:0 2px 0 #cdebd5; }
- .site-header:not(.lk-public-header) .site-home:not(.site-account) svg,.site-header:not(.lk-public-header) .object-back svg { width:17px; height:17px; }
- .site-header:not(.lk-public-header) .lk-effects-button .top-icon,.site-header:not(.lk-public-header) .site-account .top-icon { width:24px; height:24px; }
+ .site-header:not(.lk-public-header) .site-home:not(.site-account) svg,.site-header:not(.lk-public-header) .object-back svg { width:19px; height:19px; }
+ .site-header:not(.lk-public-header) .lk-effects-button .top-icon,.site-header:not(.lk-public-header) .site-account .top-icon { width:26px; height:26px; }
  .site-header:not(.lk-public-header) .site-sparkle.one { top:5px; inset-inline-end:10px; width:10px; height:10px; }
  .site-header:not(.lk-public-header) .site-sparkle.two,.site-header:not(.lk-public-header) .site-sparkle.three { display:none; }
 }
@@ -509,24 +510,31 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .site-header:not(.lk-public-header) .site-language-code { display:block; position:absolute; bottom:-5px; inset-inline-end:-6px; min-width:20px; padding:1px 4px; border-radius:999px; background:#0d9fad; border:2px solid #fcf4e4; color:#fff; font-size:9px; font-weight:900; line-height:1.3; letter-spacing:.02em; text-align:center; pointer-events:none; }
 }
 @media (max-width:760px) {
- .toon-app .work-header.site-header:not(.lk-public-header),.work-header.logo-header.site-header:not(.lk-public-header) { padding:5px 8px 5px 10px; }
+ .toon-app .work-header.site-header:not(.lk-public-header),.work-header.logo-header.site-header:not(.lk-public-header) { padding:6px 8px 6px 10px; }
  .site-header:not(.lk-public-header) .site-logo-brand { width:clamp(66px,19vw,110px); }
  .site-header:not(.lk-public-header) .site-greeting { padding:2px 9px 2px 2px; background:rgba(255,255,255,.62); border:1px solid #efdcb7; border-radius:999px; }
  .site-header:not(.lk-public-header) .site-greeting-button { gap:5px; }
- .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { width:24px; height:24px; filter:none; }
+ .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { width:27px; height:27px; filter:none; }
  .site-header:not(.lk-public-header) .site-greeting-words { gap:0; line-height:1.05; }
  .site-header:not(.lk-public-header) .site-greeting-day { font-size:13px; }
  .site-header:not(.lk-public-header) .site-greeting-part { gap:3px; font-size:11px; }
  .site-header:not(.lk-public-header) .site-greeting-part .sg-part-icon { width:13px; height:13px; }
  .site-header:not(.lk-public-header) .site-greeting-waiting { width:104px; height:30px; }
  .site-header:not(.lk-public-header) .site-header-buttons { gap:5px; }
- .site-header:not(.lk-public-header) .site-home,.site-header:not(.lk-public-header) .object-back,.site-header:not(.lk-public-header) .lk-effects-button,.site-header:not(.lk-public-header) .site-language { width:34px; height:34px; min-height:34px; border-width:1.5px; }
+ .site-header:not(.lk-public-header) .site-home,.site-header:not(.lk-public-header) .object-back,.site-header:not(.lk-public-header) .lk-effects-button,.site-header:not(.lk-public-header) .site-language { width:36px; height:36px; min-height:36px; border-width:1.5px; }
  .site-header:not(.lk-public-header) .lk-effects-button,.site-header:not(.lk-public-header) .site-account { box-shadow:0 2px 0 #f5df9c; }
  .site-header:not(.lk-public-header) .lk-effects-button:not([data-effects-on]) { box-shadow:0 2px 0 #dfe4ea; }
  .site-header:not(.lk-public-header) .site-home:not(.site-account),.site-header:not(.lk-public-header) .object-back { box-shadow:0 2px 0 #cdebd5; }
  .site-header:not(.lk-public-header) .site-language { box-shadow:0 2px 0 #cdeef1; }
- .site-header:not(.lk-public-header) .lk-effects-button .top-icon,.site-header:not(.lk-public-header) .site-account .top-icon,.site-header:not(.lk-public-header) .site-language .top-icon { width:22px; height:22px; }
+ .site-header:not(.lk-public-header) .lk-effects-button .top-icon,.site-header:not(.lk-public-header) .site-account .top-icon,.site-header:not(.lk-public-header) .site-language .top-icon { width:23px; height:23px; }
  .site-header:not(.lk-public-header) .site-language-code { bottom:-5px; inset-inline-end:-6px; min-width:20px; font-size:9px; }
+}
+
+/* Very narrow phones keep the slimmer sizes of the first thin header, so the row still fits. */
+@media (max-width:360px) {
+ .site-header:not(.lk-public-header) .site-logo-brand { width:64px; }
+ .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { width:24px; height:24px; }
+ .site-header:not(.lk-public-header) .site-home,.site-header:not(.lk-public-header) .object-back,.site-header:not(.lk-public-header) .lk-effects-button,.site-header:not(.lk-public-header) .site-language { width:34px; height:34px; min-height:34px; }
 }
 
 /* During a test (a question card on the page): a slim header with only the logo and the round buttons, no breadcrumb
@@ -591,3 +599,35 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 @keyframes start-wait-spin { to { transform:rotate(360deg); } }
 @keyframes start-wait-in { from { opacity:0; transform:translate(-50%,10px); } }
 @media (prefers-reduced-motion:reduce) { .start-wait, .start-wait-spin { animation:none; } }
+
+/* The date on the header clock (app/site-greeting.tsx; the learner chose design 3 "Takvim yaprağı" of five drafts,
+   29 October 2026, with the clock moved to the other side): a small calendar leaf first — the German month short on an
+   orange strip (OKT), the day of the month under it — then the weekday and the part of the day, the clock at the end.
+   The capsule is mirrored to match: a little room before the leaf, the round clock close to the end. */
+.sg-leaf { flex:none; display:grid; grid-template-rows:auto 1fr; width:34px; height:36px; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 0 0 1.5px #f0c9a8,0 2px 0 #f0d9bd; text-align:center; }
+.sg-leaf-month { display:block; background:linear-gradient(180deg,#f28a4b,#e8742c); color:#fff; font-size:9px; font-weight:800; letter-spacing:.06em; line-height:12px; }
+.sg-leaf-day { display:grid; place-items:center; color:var(--ink); font-size:17px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+@media (min-width:761px) {
+ .site-header:not(.lk-public-header) .site-greeting { padding-block:3px; padding-inline:8px 3px; }
+}
+@media (max-width:760px) {
+ .site-header:not(.lk-public-header) .site-greeting { padding-block:2px; padding-inline:5px 2px; }
+ .sg-leaf { width:25px; height:27px; border-radius:6px; }
+ .sg-leaf-month { font-size:7px; line-height:9px; }
+ .sg-leaf-day { font-size:13px; }
+}
+/* Below 381 px the clock face is hidden: the capsule ends with the words. */
+@media (max-width:380px) {
+ .site-header:not(.lk-public-header) .site-greeting { padding-inline:4px 9px; }
+}
+/* The narrowest phones: a smaller leaf and no picture before the part of the day, so the row still fits. */
+@media (max-width:340px) {
+ .site-header:not(.lk-public-header) .site-logo-brand { width:58px; }
+ .site-header:not(.lk-public-header) .site-greeting { padding-inline:2px 4px; }
+ .site-header:not(.lk-public-header) .site-greeting-button { gap:4px; }
+ .sg-leaf { width:21px; height:24px; border-radius:5px; }
+ .sg-leaf-month { font-size:6.5px; line-height:8px; }
+ .sg-leaf-day { font-size:12px; }
+ .site-header:not(.lk-public-header) .site-greeting-day { font-size:11.5px; }
+ .site-header:not(.lk-public-header) .site-greeting-part .sg-part-icon { display:none; }
+}

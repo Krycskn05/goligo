@@ -30,7 +30,7 @@ export function SiteHeader({language,languages,onLanguage,homeHref,homeLabel,sho
   <a className="work-brand site-logo-brand" href={homeHref} aria-label={SITE_NAME+' · '+homeLabel}><SiteLogo/></a>
   <SiteGreeting language={language} line={pickText(greetingLine,language)}/>
   <div className="site-header-tools">
-   <label className="site-language"><TopIcon name="language" size={26}/><span className="site-language-label">{label}</span><select value={language} aria-label={label} onChange={event=>onLanguage(event.target.value)}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label>
+   <label className="site-language"><TopIcon name="language" size={26}/><span className="site-language-label">{label}</span><span className="site-language-code" aria-hidden="true">{language.toUpperCase()}</span><select value={language} aria-label={label} onChange={event=>onLanguage(event.target.value)}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label>
    <div className="site-header-buttons">
     {showHome&&<a className="object-back site-home" href={homeHref}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
     <EffectsSettingsButton language={language}/>

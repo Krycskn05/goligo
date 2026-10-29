@@ -70,8 +70,9 @@ test('the header clock: every tap says another German sentence about now',()=>{
  assert.ok(!css.includes('.site-greeting::before')&&!css.includes('.site-greeting::after'),'no speech-bubble tail');
  for(const rule of ['.site-greeting-button {','.site-greeting-day {','.site-greeting-part {','.site-greeting-button .analog-clock {','.sg-info {','.sg-info-de {'])assert.ok(css.includes(rule),rule);
  for(const gone of ['.sg-backdrop','.sg-panel','.sg-group'])assert.ok(!css.includes(gone),gone);
- // Placed neatly: wide screens in the middle, middle widths on the right above the buttons, phones centred.
- assert.ok(css.includes(' .site-header .site-greeting { margin-inline:auto; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:end; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:center; }'));
+ // Placed neatly: wide screens in the middle, middle widths on the right above the buttons, phones in the middle of
+ // the one thin row (tests/header-row.test.cjs).
+ assert.ok(css.includes(' .site-header .site-greeting { margin-inline:auto; }')&&css.includes(' .site-header .site-greeting { grid-area:bubble; justify-self:end; }')&&css.includes(' .site-header .site-greeting { flex:none; margin-inline:auto;'));
  // Texts in every site language (12 in the tuples, the others in their language pack).
  for(const id of site.siteLanguages.map(item=>item.id))for(const key of Object.keys(copy.greetingCopy))assert.ok(copy.greetingText(id,key).trim(),key+' '+id);
  for(const id of ['bg','zh','ti','ur'])for(const key of Object.keys(copy.greetingCopy)){const pack=JSON.parse(fs.readFileSync('lib/language-packs/'+id+'.json','utf8'));assert.ok(pack[copy.greetingCopy[key][2]],key+' in '+id);}

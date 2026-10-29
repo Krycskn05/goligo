@@ -24,17 +24,41 @@
 .ht-card small { color:#c06a22; font-weight:700; font-size:12.5px; }
 .ht-text { color:var(--ink-2); font-size:14.5px; line-height:1.55; }
 
-/* On a computer the five cards fill one screen (the learner asked, 25 October 2026: no scrolling down): two rows,
-   the pictures take what height is left, the texts are short. */
+/* On a computer the whole home page is one screen (the learner asked, 25 October 2026, and again 29 October 2026 after
+   the header grew: no scrolling down). The page is exactly as high as the window: the header, the two rows of cards and
+   a slim footer; the pictures take the height that is left (at most their own 2 : 1 shape, so a tall window leaves
+   room under the cards instead of stretching them). Every card has the same text block (name, count line, three text
+   lines), so the pictures in a row stay equally high. Only a very low window (under 600 px) still scrolls a little. */
 @media (min-width:761px) {
- .ht-grid { gap:14px; }
- .ht-card { gap:4px; padding:10px 12px 12px; }
- .ht-art { height:clamp(84px,calc((100vh - 560px) / 2),170px); height:clamp(84px,calc((100dvh - 560px) / 2),170px); }
+ .category-app:has(.ht) { display:flex; flex-direction:column; height:100vh; height:100dvh; min-height:600px; }
+ .category-app:has(.ht)>.work-header { flex:none; }
+ .category-app:has(.ht)>.work-layout { flex:1 1 0; min-height:0; width:100%; }
+ .category-app:has(.ht) .work-sidebar { max-height:100%; overflow-y:auto; }
+ .category-app:has(.ht) .work-main { display:flex; flex-direction:column; min-height:0; padding-bottom:12px; }
+ .category-app:has(.ht)>.site-copyright { flex:none; padding:6px 20px 8px; }
+ .category-app:has(.ht) .site-footer-logo { width:80px; }
+ .category-app:has(.ht) .site-footer-links a { min-height:30px; }
+ .ht { flex:1 1 0; min-height:0; grid-template-rows:minmax(0,1fr); }
+ .ht-grid { height:100%; gap:14px; grid-template-rows:repeat(2,minmax(0,auto)); align-content:start; }
+ .ht-grid>li { display:flex; min-width:0; min-height:0; }
+ .ht-card { flex:1; min-width:0; min-height:0; display:flex; flex-direction:column; gap:4px; padding:10px 12px 12px; overflow:hidden; container-type:inline-size; }
+ .ht-card>* { flex:none; }
+ .ht .ht-art,.ht .ht-grid>li:first-child .ht-art { flex:0 1 auto; width:100%; height:50cqw; min-height:64px; aspect-ratio:auto; }
+ .ht .ht-grid>li:first-child .ht-art { height:calc(25cqw - 10.5px); }
  .ht-name { margin-top:2px; }
  .ht-name strong { font-size:17px; }
- .ht-text { font-size:13.5px; line-height:1.45; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+ .ht-text { font-size:13.5px; line-height:1.45; min-height:calc(3 * 1.45em); display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
 }
-@media (max-width:1100px) and (min-width:761px) { .ht-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .ht-text { -webkit-line-clamp:2; } }
+/* A low window (a small laptop): two text lines, so the pictures keep more height. The shorter left menu of low computer
+   screens (app/koko-theme.css) is used on the home page from 761 px, so the menu fits beside the cards on tablets too. */
+@media (min-width:761px) and (max-height:700px) { .ht-text { min-height:calc(2 * 1.45em); -webkit-line-clamp:2; } }
+@media (min-width:761px) and (max-height:860px) {
+ .category-app:has(.ht) .work-sidebar { padding-top:1rem; padding-bottom:1rem; }
+ .category-app:has(.ht) .work-sidebar nav { gap:6px; }
+ .category-app:has(.ht) .work-sidebar .work-nav { min-height:0; padding:.38rem .8rem; }
+ .category-app:has(.ht) .work-sidebar .work-nav .nav-icon.has-picture { width:32px; height:32px; }
+}
+@media (max-width:1100px) and (min-width:761px) { .ht-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .ht-text { min-height:calc(2 * 1.45em); -webkit-line-clamp:2; } }
 @media (max-width:760px) {
  .ht-hero { padding:22px 18px 24px; }
  .ht-koko { width:120px; }

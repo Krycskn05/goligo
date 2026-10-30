@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
-import {ArrowRight,Check,RotateCcw,Trash2,Volume2} from 'lucide-react';
+import {ArrowRight,Check,Lock,RotateCcw,Trash2,Volume2} from 'lucide-react';
 import type {StudyLanguage} from '@/lib/study-languages';
 import type {TopicProgress} from '@/lib/progress';
 import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
@@ -97,10 +97,43 @@ export function useFinish(props:StepProps){
   if(right===total){sound.correct(()=>{if(say?.length)speech.speakAll(say);});}else sound.wrong();
  },[sound,speech,onScore,step.id]);
 }
+/** Exercises go in order (the learner asked, 30 October 2026): an exercise opens once the ones before it are done, and
+ * the test and Konuş open once every exercise of the part is done. Steps already done stay open. `open` is the first
+ * exercise still to do (null when all are done). */
+export function exerciseLock(groups:readonly {id:string;ids:readonly string[]}[],steps:readonly {id:string}[],scores:L1AScoreMap){
+ const exercises=groups.find(group=>group.id==='alistirmalar')?.ids??[];
+ const open=exercises.find(id=>!scores[id])??null;
+ const locked=new Set<string>();
+ if(open){
+  exercises.slice(exercises.indexOf(open)+1).forEach(id=>{if(!scores[id])locked.add(id);});
+  groups.filter(group=>group.id==='test'||group.id==='konus').forEach(group=>group.ids.forEach(id=>locked.add(id)));
+ }
+ return {open,openIndex:open?steps.findIndex(step=>step.id===open):-1,locked,isExercise:(id:string)=>exercises.includes(id)};
+}
+/** What a locked step shows instead of itself (opened from its address or an old bookmark). */
+export function LockedStep({openLabel,onOpen}:{openLabel:string;onOpen:()=>void}){
+ return <div className="l1a-locked" role="status"><span className="l1a-locked-icon" aria-hidden="true"><Lock size={26}/></span>
+  <p>Bu bölüm henüz kilitli. Önce alıştırmaları sırayla bitir.</p>
+  <button type="button" className="btn small" onClick={onOpen}>Sıradaki alıştırma: {openLabel}</button></div>;
+}
+/** A typed gap as one cell per missing letter inside the word (the learner chose it, 30 October 2026, option A). One real
+ * input lies over the cells, so the phone keyboard, deleting and pasting work as usual; the caret always stays at the end. */
+function LetterCells({value,size,state,label,exact,inputRef,onChange}:{value:string;size:number;state:boolean|null;label:string;exact:boolean;inputRef:(element:HTMLInputElement|null)=>void;onChange:(value:string)=>void}){
+ const [focus,setFocus]=useState(false);
+ const letters=Array.from(value);const count=Math.max(size,letters.length);
+ const toEnd=(element:HTMLInputElement)=>{const end=element.value.length;try{element.setSelectionRange(end,end);}catch{}};
+ return <span className={'l1a-cells'+(state===true?' ok':state===false?' bad':'')+(focus?' focus':'')}>
+  {Array.from({length:count},(_,k)=><i key={k} className={focus&&state!==true&&k===Math.min(letters.length,count-1)?'cur':undefined} aria-hidden="true">{letters[k]??''}</i>)}
+  <input ref={inputRef} className="l1a-cells-input" value={value} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" autoCorrect="off" spellCheck={false} maxLength={size+3} aria-label={label}
+   onFocus={event=>{setFocus(true);const element=event.currentTarget;requestAnimationFrame(()=>toEnd(element));}} onBlur={()=>setFocus(false)}
+   onClick={event=>toEnd(event.currentTarget)} onChange={event=>onChange(event.target.value)}/>
+ </span>;
+}
 /** Gaps in a text: letters inside a word, whole sentences (wide) or a word chosen from a box. `speakers` read the
  * solution as a little dialogue (lines alternate a, b), each line by its own person. */
-export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];bank?:boolean;say:SayItem[];speakers?:{a:string;b:string};exact?:boolean}){
- const {kicker,title,before,lines,wide=false,choices,bank=false,sound,speech,speakers,exact=false}=props;
+export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];bank?:boolean;say:SayItem[];speakers?:{a:string;b:string};exact?:boolean;cells?:boolean}){
+ const {kicker,title,before,lines,wide=false,choices,bank=false,sound,speech,speakers,exact=false,cells=false}=props;
+ const refs=useRef<(HTMLInputElement|null)[]>([]);
  const accepts=exact?acceptsExact:acceptsAnswer;
  const say=useMemo(()=>speakers?withSpeakers(props.say.map(item=>typeof item==='string'?item:item.text),speakers):props.say,[props.say,speakers]);
  const gaps=useMemo(()=>lines.flatMap((line,l)=>line.answers.map((answers,g)=>({line:l,gap:g,answers}))),[lines]);
@@ -110,23 +143,35 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
  const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);
  const lead=bank&&box?'Kelimeler: '+box.join(' · '):props.lead;
  const at=(l:number,g:number)=>gaps.findIndex(item=>item.line===l&&item.gap===g);
- const check=()=>{
+ const check=(list:string[]=values)=>{
   sound.prepare();speech.prepare();
-  const result=gaps.map((gap,i)=>accepts(values[i],gap.answers));setChecked(result);
+  const result=gaps.map((gap,i)=>accepts(list[i],gap.answers));setChecked(result);
   const right=result.filter(Boolean).length;
   setFeedback(right===gaps.length?{ok:true,text:'Hepsi doğru!'}:{ok:false,text:`${right} / ${gaps.length} doğru. Kırmızıları düzelt; doğrusu yanında yazıyor.`});
   finish(right,gaps.length,say);
  };
+ // Letter cells: a word turns green as soon as it is right and the next empty gap opens; when every gap is right the
+ // exercise is checked at once (no extra tap). A wrong word is shown only by "Kontrol et".
+ const typeCells=(i:number,text:string)=>{
+  const next=values.slice();next[i]=text;setValues(next);
+  const ok=Array.from(text).length>=Array.from(gaps[i].answers[0]).length&&accepts(text,gaps[i].answers);
+  const nextChecked=checked.slice();nextChecked[i]=ok?true:null;setChecked(nextChecked);
+  if(!ok)return;
+  if(nextChecked.every(value=>value===true)){check(next);return;}
+  const after=nextChecked.findIndex((value,k)=>k>i&&value!==true);const target=after>=0?after:nextChecked.findIndex(value=>value!==true);
+  if(target>=0)refs.current[target]?.focus();
+ };
  const reveal=()=>{setValues(gaps.map(gap=>gap.answers[0]));setChecked(gaps.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
  const field=(l:number,g:number)=>{const i=at(l,g);const state=checked[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
   const input=choices?<select className={cls} value={values[i]} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);const ok=accepts(event.target.value,gaps[i].answers);const nextChecked=checked.slice();nextChecked[i]=event.target.value?ok:null;setChecked(nextChecked);}}><option value="">…</option>{(box??choices).map(word=><option key={word} value={word}>{word}</option>)}</select>
+   :cells&&!wide?<LetterCells value={values[i]} size={Array.from(gaps[i].answers[0]).length} state={state} label={`Boşluk ${i+1}`} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
    :<input className={cls} value={values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const nextChecked=checked.slice();nextChecked[i]=null;setChecked(nextChecked);}}}/>;
   return <span className="l1a-gap-wrap" key={g}>{input}{state===false&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
  const line=(item:GapLine,l:number)=>{const parts=item.text.split('___');return <span className="l1a-de l1a-gap-text" lang="de" dir="ltr">{parts.map((part,g)=><span key={g}>{part}{g<parts.length-1&&field(l,g)}</span>)}</span>;};
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
   <div className="l1a-dialogue">{lines.map((item,l)=>item.who?<div className={'l1a-line '+item.who} key={l}><div className="l1a-bubble">{line(item,l)}</div></div>:<div className={'l1a-row'+(item.say?' l1a-row-say':'')} key={l}>{item.say&&<Say text={sayText(item.say)} who={typeof item.say==='string'?undefined:item.say.who} speech={speech} label={String(l+1)} wide secret/>}{line(item,l)}</div>)}</div>
-  <div className="l1a-actions"><button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={reveal}>Cevapları göster</button></div>
+  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>check()}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={reveal}>Cevapları göster</button></div>
   <FeedbackLine feedback={feedback}/>
  </>;
 }
@@ -269,7 +314,7 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
  * scroll it with a finger, or with the mouse wheel on a computer; a tap opens a step. A done exercise shows a tick.
  * `track`: the same steps inside the card's blue progress bar instead (the learner chose it, 30 October 2026, option C):
  * done steps and the open step are filled blue; an edge fades only where more steps are hidden behind it. */
-export type StripItem={id:string;index:number;number:number;label:string};
+export type StripItem={id:string;index:number;number:number;label:string;locked?:boolean};
 export function StepStrip({items,current,scores,onOpen,label,track=false}:{items:StripItem[];current:string;scores:L1AScoreMap;onOpen:(index:number)=>void;label:string;track?:boolean}){
  const row=useRef<HTMLDivElement>(null);
  useEffect(()=>{const element=row.current;if(!element)return;const on=element.querySelector<HTMLElement>('.l1a-strip-pill.on');if(on)element.scrollLeft=on.offsetLeft-(element.clientWidth-on.offsetWidth)/2;},[current]);
@@ -281,5 +326,5 @@ export function StepStrip({items,current,scores,onOpen,label,track=false}:{items
   edges();element.addEventListener('scroll',edges,{passive:true});window.addEventListener('resize',edges);
   return()=>{element.removeEventListener('scroll',edges);window.removeEventListener('resize',edges);};
  },[track,current]);
- return <nav className={'l1a-strip'+(track?' l1a-track':'')} ref={row} aria-label={label}>{items.map(item=>{const done=!!scores[item.id]&&item.id!==current;return <button type="button" key={item.id} className={'l1a-strip-pill'+(item.id===current?' on':'')+(done?' done':'')} aria-current={item.id===current?'step':undefined} onClick={()=>onOpen(item.index)}><b aria-hidden="true">{done?<Check size={13}/>:item.number}</b>{item.label}</button>;})}</nav>;
+ return <nav className={'l1a-strip'+(track?' l1a-track':'')} ref={row} aria-label={label}>{items.map(item=>{const done=!!scores[item.id]&&item.id!==current;return <button type="button" key={item.id} className={'l1a-strip-pill'+(item.id===current?' on':'')+(done?' done':'')+(item.locked?' locked':'')} aria-current={item.id===current?'step':undefined} title={item.locked?'Önce önceki alıştırmaları bitir':undefined} onClick={()=>onOpen(item.index)}><b aria-hidden="true">{item.locked?<Lock size={12}/>:done?<Check size={13}/>:item.number}</b>{item.label}</button>;})}</nav>;
 }

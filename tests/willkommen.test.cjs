@@ -86,6 +86,11 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  assert.equal(lesson.groupOf('diyalog').id,'konu');assert.equal(lesson.groupOf('kutu').id,'alistirmalar');assert.equal(lesson.groupOf('kapak'),undefined);
  assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,20,'every teaching step, exercise, the test and the talk is in exactly one tab');
  for(const [lang] of lesson.greetingsAround)assert(lesson.greetingVoices[lang]?.lang&&lesson.greetingVoices[lang].say,'greeting read in its own language: '+lang);
+ // Exercises in order; Test and Konuş after all exercises (30 October 2026); the letters exercise uses letter cells.
+ const ui=read('app/willkommen-ui.tsx');
+ assert(ui.includes('export function exerciseLock(')&&ui.includes('export function LockedStep(')&&ui.includes('function LetterCells('));
+ for(const file of ['app/willkommen-study.tsx','app/stadt-study.tsx']){const code=read(file);for(const piece of ['const lock=exerciseLock(config.groups,config.steps,scores[place.part]);','if(mustFinish&&step){setLockNote(step.id);return;}','{stepLocked?<LockedStep','tabLocked(item.id)'])assert(code.includes(piece),file+': '+piece);}
+ assert(read('app/willkommen-study.tsx').includes('title="Eksik harfleri tamamla" cells lines={lettersExercise.lines}'));
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
  for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);

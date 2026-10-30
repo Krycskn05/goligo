@@ -1,7 +1,7 @@
 'use client';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react';
-import {ArrowLeft,ArrowRight,BookOpen,Check} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BookOpen,Check,Lock} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib/study-languages';
 import {courseUnits} from '@/lib/textbook-curriculum';
@@ -22,7 +22,7 @@ import {ProgressMeter} from './progress-ui';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
 import {TopicArt} from './toon-art';
-import {useLessonSpeech,Rich,StepStrip,type StepProps} from './willkommen-ui';
+import {useLessonSpeech,Rich,StepStrip,exerciseLock,LockedStep,type StepProps} from './willkommen-ui';
 import {StepViewL15A} from './stadt-a-steps';
 import {useSyncVersion} from './lesson-sync';
 
@@ -94,8 +94,10 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
  // first (the learner asked, 30 October 2026); `useInnerNext` in app/willkommen-ui.tsx registers it.
  const innerNext=useRef<(()=>boolean)|null>(null);
  const setInnerNext=useCallback((next:(()=>boolean)|null)=>{innerNext.current=next;},[]);
+ const [lockNote,setLockNote]=useState<string|null>(null);
  const forward=(next:number)=>{
   if(innerNext.current?.()){requestAnimationFrame(()=>{const heading=document.getElementById('l1a-heading');if(heading&&heading.getBoundingClientRect().top<0)heading.scrollIntoView({block:'start',behavior:'smooth'});});return;}
+  if(mustFinish&&step){setLockNote(step.id);return;}
   go(next);
  };
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:saveL15Score(part,id,right,total)}));},[place.part]);
@@ -108,6 +110,11 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
  // the cover and one-step tabs keep the plain bar.
  const stepGroup=step?config.groups.find(item=>item.ids.includes(step.id)):undefined;
  const trackGroup=stepGroup&&stepGroup.ids.length>1?stepGroup:undefined;
+ // Exercises in order; the test and Konuş after all of them (the learner asked, 30 October 2026).
+ const lock=exerciseLock(config.groups,config.steps,scores[place.part]);
+ const stepLocked=!!step&&lock.locked.has(step.id);
+ const mustFinish=!!step&&lock.isExercise(step.id)&&!scores[place.part][step.id];
+ const openLabel=lock.open?(stepShortA[lock.open]??config.steps[lock.openIndex]?.title??''):'';
  const progress=partProgressL15(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app l15-app" lang={language} dir={dir}>
@@ -122,14 +129,15 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l15-step={step.id} data-l15-teil={config.id}>
      <header className="l1a-top">
       <div className="l1a-top-row"><span className="eyebrow">{stepGroup?.label??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{step.title} · {index+1}/{config.steps.length}</>}</span></div>
-      {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:stepShortA[id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>
+      {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:stepShortA[id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
       :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
      </header>
-     <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l15'+place.part+'-run'}/>
+     {stepLocked?<LockedStep openLabel={openLabel} onOpen={()=>go(lock.openIndex)}/>:<View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l15'+place.part+'-run'}/>}
      <nav className="l1a-pager" aria-label="Adımlar">
       <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{index===0?'İçindekiler':'Geri'}</button>
-      <button type="button" className="btn" onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
+      <button type="button" className={'btn'+(mustFinish?' l1a-next-locked':'')} aria-describedby={mustFinish&&lockNote===step.id?'l1a-lock-note':undefined} onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
      </nav>
+     {mustFinish&&lockNote===step.id&&<p className="l1a-lock-note" id="l1a-lock-note" role="status"><Lock size={15} aria-hidden="true"/>Önce bu alıştırmayı bitir, sonra sıradakine geçebilirsin.</p>}
     </section>
    </PartBook>}
   </main></div>
@@ -199,6 +207,8 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const testIds=config.scored.filter(exercise=>config.groups[2].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
  const done:Record<StepGroup['id'],boolean>={konu:config.groups[0].ids.every(id=>scores[id]),alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:!!scores.konus};
+ const lock=exerciseLock(config.groups,config.steps,scores);
+ const tabLocked=(id:StepGroup['id'])=>!!lock.open&&(id==='test'||id==='konus');
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
@@ -220,9 +230,9 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
     {next?<button type="button" className="text-button" onClick={()=>onPart(next,0)}>Teil {parts[next].badge}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:nextSoon?<span className="l1a-next-soon" lang="de">Teil {nextSoon.badge} · <span lang="tr">yakında</span></span>:null}
    </nav>
   </div>} right={<>
-   <nav className="l12-steps" id="l1a-tabs" aria-label={'Teil '+config.badge+' bölümleri'}><ol>{config.groups.map((item,i)=><li key={item.id}><button type="button" className={'l12-step'+(group?.id===item.id?' active':'')+(done[item.id]?' done':'')} aria-current={group?.id===item.id?'step':undefined} data-l15-tab={item.id} onClick={()=>onGo(config.steps.findIndex(entry=>entry.id===item.ids[0]))}>
-    <span className="l12-step-number" aria-hidden="true">{done[item.id]?<Check size={16}/>:i+1}</span>
-    <span className="l12-step-text"><strong>{item.label}</strong><small>{detail[item.id]}</small></span>
+   <nav className="l12-steps" id="l1a-tabs" aria-label={'Teil '+config.badge+' bölümleri'}><ol>{config.groups.map((item,i)=><li key={item.id}><button type="button" className={'l12-step'+(group?.id===item.id?' active':'')+(done[item.id]?' done':'')+(tabLocked(item.id)?' locked':'')} aria-current={group?.id===item.id?'step':undefined} data-l15-tab={item.id} title={tabLocked(item.id)?'Önce alıştırmaları bitir':undefined} onClick={()=>onGo(tabLocked(item.id)?lock.openIndex:config.steps.findIndex(entry=>entry.id===item.ids[0]))}>
+    <span className="l12-step-number" aria-hidden="true">{tabLocked(item.id)?<Lock size={15}/>:done[item.id]?<Check size={16}/>:i+1}</span>
+    <span className="l12-step-text"><strong>{item.label}</strong><small>{tabLocked(item.id)?'Önce alıştırmalar':detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
    {children}
   </>}/>

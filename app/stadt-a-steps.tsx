@@ -114,8 +114,7 @@ function Rule({rows}:{rows:readonly (readonly [ReactNode,ReactNode])[]}){
 }
 
 /* ---------- teaching steps ---------- */
-function CoverA({progress,scores}:StepProps){
- const started=Object.keys(scores).length>0;
+function CoverA(_props:StepProps){ // the part's progress is on the left page (no second bar here, 30 October 2026)
  return <>
   <p className="kicker" lang="de">Lektion 15 · Wege in der Stadt</p>
   <Heading><span lang="de">A — Gehen Sie die Treppe hoch.</span></Heading>
@@ -133,7 +132,6 @@ function CoverA({progress,scores}:StepProps){
   <h2 className="l1a-h2">Bu dersteki kişiler</h2>
   <ul className="l15-cast">{castA.map(key=><li key={key}><Portrait who={key} name={personName(key)}/><span>{personName(key)}</span></li>)}</ul>
   <p className="l1a-mini">Her kişinin kendi sesi var: kadınları kadın sesi, erkekleri erkek sesi okur.</p>
-  {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 15A"/>}
  </>;
 }
 function BuildingWords({speech}:{speech:Speech}){

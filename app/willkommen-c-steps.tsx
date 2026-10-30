@@ -60,14 +60,12 @@ function PhraseRow({de,tr,badge,emoji,speech}:{de:string;tr:ReactNode;badge?:str
 }
 
 /* ---------- teaching steps ---------- */
-function CoverC({progress,scores}:StepProps){
- const started=Object.keys(scores).length>0;
+function CoverC(_props:StepProps){ // the part's progress is on the left page (no second bar here, 30 October 2026)
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">C — Guten Tag!</span></Heading>
   <p>Bu derste öğreneceklerin:</p>
   <ul className="l1a-list"><li>Günün saatine göre selam: <b lang="de">Guten Morgen / Tag / Abend</b></li><li>Vedalaşma: <b lang="de">Auf Wiedersehen, Tschüs, Bis bald</b></li><li>Hâl hatır: <b lang="de">Wie geht es dir? / Wie geht es Ihnen?</b></li><li>Fiil her zaman 2. pozisyonda</li><li>Doğru yazma: nokta, soru işareti, büyük harf</li></ul>
-  {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1C"/>}
  </>;
 }
 function TimeOfDay({speech}:{speech:Speech}){

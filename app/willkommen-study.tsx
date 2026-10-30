@@ -290,15 +290,13 @@ function StepViewA(props:StepProps){
  return null;
 }
 
-function Cover({progress,scores}:StepProps){
- const started=Object.keys(scores).length>0;
+function Cover(_props:StepProps){ // the part's progress is on the left page (no second bar here, 30 October 2026)
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">A — Ich heiße …</span></Heading>
   {/* The cover picture is on the notebook's left page now. */}
   <p>Bu derste öğreneceklerin:</p>
   <ul className="l1a-list"><li>Selamlaşma: <b lang="de">Guten Tag!</b></li><li>Adını söylemek ve sormak</li><li>Nereden geldiğini söylemek</li><li>Ülke adları ve <b lang="de">aus</b></li></ul>
-  {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1A"/>}
  </>;
 }
 function Teach({title,phrases,note,speech}:{title:string;phrases:readonly (readonly [string,string])[];note?:ReactNode;speech:Speech}){

@@ -43,14 +43,12 @@ export function StepViewD(props:StepProps){
 }
 
 /* ---------- teaching steps ---------- */
-function CoverD({progress,scores}:StepProps){
- const started=Object.keys(scores).length>0;
+function CoverD(_props:StepProps){ // the part's progress is on the left page (no second bar here, 30 October 2026)
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">D — Ich bin neu hier.</span></Heading>
   <p>Bu bölümde:</p>
   <ul className="l1a-list"><li>Çizgi roman: yeni komşuyla tanışma</li><li>Lektion 1’in en önemli cümleleri ve ezber stratejisi</li><li>Lektion 1 özeti</li><li><b lang="de">Alles klar?</b> — puanlı bölüm sınavı</li></ul>
-  {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1D"/>}
  </>;
 }
 function Comic({speech}:{speech:Speech}){

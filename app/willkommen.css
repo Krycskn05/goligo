@@ -229,6 +229,26 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .lb.l1a-book .l1a-soon-tag { justify-self:start; margin-top:2px; padding:2px 10px; border-radius:999px; background:#fff3a6; color:#8a5a00; }
 .lb.l1a-book .l1a-next-soon { color:var(--ink-3); font-size:14px; font-weight:700; }
 .lb.l1a-book .l1a-card { margin:0; }
+/* No spiral in the lesson notebooks; the two pages meet in a soft fold, and a part's cover fits one screen on a computer
+   (the learner asked, 30 October 2026): a tighter left page and no second progress bar on the cover. */
+.lb.l1a-book .lb-rings { background:none; min-width:0; }
+.lb.l1a-book .lb-rings::before { display:none; }
+@media (min-width:1180px) {
+ .lb.l1a-book .lb-spread { grid-template-columns:minmax(0,1fr) 0px minmax(0,1fr); }
+ .lb-wide.l1a-book .lb-spread { grid-template-columns:minmax(0,9fr) 0px minmax(0,16fr); }
+ .lb.l1a-book .lb-left { box-shadow:inset -18px 0 22px -18px rgba(120,96,50,.35); }
+ .lb.l1a-book .lb-right { box-shadow:inset 18px 0 22px -18px rgba(120,96,50,.3); }
+ .lb.l1a-book .lb-left:dir(rtl) { box-shadow:inset 18px 0 22px -18px rgba(120,96,50,.35); }
+ .lb.l1a-book .lb-right:dir(rtl) { box-shadow:inset -18px 0 22px -18px rgba(120,96,50,.3); }
+ .l1a-part .lb.l1a-book .lb-left { padding:26px 24px 20px 62px; }
+ .l1a-part .lb.l1a-book .lb-left:dir(rtl) { padding:26px 62px 20px 24px; }
+ .l1a-part .lb.l1a-book .lb-title { font-size:30px; margin:4px 0 8px; }
+ .l1a-part .lb.l1a-book .lb-lead { font-size:15px; line-height:1.55; }
+ .l1a-part .lb.l1a-book .lb-photo { width:min(100%,250px); margin:14px auto 12px; }
+ .l1a-part .lb.l1a-book .vault-back-categories { margin:0 0 6px; }
+ .l1a-part .lb.l1a-book .lb-pager { margin-top:10px; padding-top:8px; }
+}
+@media (max-width:1179px) { .lb.l1a-book .lb-rings { display:none; } }
 /* After the cover the left page folds back over the rings and one wide page stays (the learner chose it, 30 October 2026,
    option A). Folding: the page turns away first, then the right page widens; back to the cover it is the other way round. */
 .l1a-part .lb.l1a-book .lb-spread { transition:grid-template-columns .5s ease; }

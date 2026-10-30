@@ -76,14 +76,12 @@ export function ProfileCard({card}:{card:Profile}){
 }
 
 /* ---------- teaching steps ---------- */
-function CoverB({progress,scores}:StepProps){
- const started=Object.keys(scores).length>0;
+function CoverB(_props:StepProps){ // the part's progress is on the left page (no second bar here, 30 October 2026)
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">B — Ich spreche ein bisschen Deutsch.</span></Heading>
   <p>Bu derste öğreneceklerin:</p>
   <ul className="l1a-list"><li>Hangi dilleri konuştuğunu söylemek: <b lang="de">Ich spreche …</b></li><li><b lang="de">Sie</b> mi, <b lang="de">du</b> mu? Resmî ve samimi konuşma</li><li>Fiil çekimi: <span lang="de">ich / du / Sie</span></li><li>Alfabe ve adını harf harf söylemek</li><li>Anlamadığında sormak: <b lang="de">Wie bitte?</b></li></ul>
-  {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1B"/>}
  </>;
 }
 function Languages({speech}:{speech:Speech}){

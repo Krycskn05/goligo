@@ -89,7 +89,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
          <span className="nb-num" lang={course} dir="ltr">{course==='de'?'Lektion':'Unit'} {unit.number}</span>
          <h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}
          {progress&&<ProgressMeter progress={progress} language={language} label={title} compact/>}
-         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
+         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
         </li>;})}</ul>
       </div>
      </div>

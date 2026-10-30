@@ -300,7 +300,7 @@ function Origin({speech}:{speech:Speech}){
   <Phrases items={originPhrases.slice(0,2)} speech={speech}/>
   <p className="l1a-tr">Soyadıyla sorabilirsin:</p><Phrases items={[originPhrases[2]]} speech={speech}/>
   <p className="l1a-tr">Ülkeden sonra şehri de söyleyebilirsin:</p><Phrases items={[originPhrases[3]]} speech={speech}/>
-  <table className="l1a-table"><tbody><tr><td><b lang="de">woher</b></td><td>nereden</td><td><b lang="de">kommen</b></td><td>gelmek</td><td><b lang="de">aus</b></td><td>-den / -dan</td></tr></tbody></table></>;
+  <table className="l1a-table"><tbody><tr><td><b lang="de">woher</b></td><td>nereden</td></tr><tr><td><b lang="de">kommen</b></td><td>gelmek</td></tr><tr><td><b lang="de">aus</b></td><td>-den / -dan</td></tr></tbody></table></>;
 }
 function Countries({speech}:{speech:Speech}){
  const flag=(c:readonly [string,string,string,string],art:boolean)=><button type="button" key={c[1]} className={'l1a-flag'+(art?' art':'')+(speech.busy&&speech.activeText===c[3]?' playing':'')} onClick={()=>speech.speak(c[3])} aria-label={'Dinle: '+c[3]}><span className="l1a-flag-emoji" aria-hidden="true">{c[0]}</span><b lang="de">{c[1]}</b><small>{c[2]}</small></button>;

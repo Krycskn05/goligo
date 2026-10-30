@@ -57,13 +57,16 @@ s_site() {
   [ "$ok" -eq 1 ] || { echo "Site 3 dakikada acilmadi"; tail -n 80 "$OUT/07-dev-server.log"; return 1; }
   # Playwright'ın indirilmesi bazen ağ yüzünden takılıyor: 3 kez dener (bir kez "Playwright kurulamadi" yayını durdurmuştu).
   local pw=0
+  # 30 Ekim 2026: üç deneme de olmadı ve neden görünmedi; artık çıktı 08b-playwright.log'a yazılır, sistem paketleri
+  # (--with-deps, apt) kurulamazsa tarayıcı onlarsız kurulur (GitHub'ın Ubuntu makinesinde bu paketler zaten var).
   for i in 1 2 3; do
     if (mkdir -p /tmp/pw && cd /tmp/pw && { [ -f package.json ] || npm init -y >/dev/null; } \
-      && npm i --no-audit --no-fund playwright@1.55.1 >/dev/null \
-      && npx playwright install --with-deps chromium >/dev/null 2>&1); then pw=1; break; fi
+      && npm i --no-audit --no-fund playwright@1.55.1 >>"$OUT/08b-playwright.log" 2>&1 \
+      && { npx playwright install --with-deps chromium >>"$OUT/08b-playwright.log" 2>&1 \
+        || npx playwright install chromium >>"$OUT/08b-playwright.log" 2>&1; }); then pw=1; break; fi
     echo "Playwright kurulumu ${i}. denemede olmadi, yeniden deneniyor"; sleep 15
   done
-  [ "$pw" -eq 1 ] || { echo "Playwright kurulamadi"; return 1; }
+  [ "$pw" -eq 1 ] || { echo "Playwright kurulamadi"; tail -n 30 "$OUT/08b-playwright.log"; return 1; }
   LOGS="$OUT" NODE_PATH=/tmp/pw/node_modules node ci/smoke.cjs
 }
 

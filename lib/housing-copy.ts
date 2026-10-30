@@ -3,6 +3,8 @@ export const housingCopy={
  title:['Ev ve Yaşam','Wohnen','Home and Living','البيت والحياة','Дім і життя','Habitat et vie quotidienne'],
  intro:['Kitabındaki A–D sırasıyla öğren. Harfleri tamamla, boşlukları doldur ve cümlelerini yaz.','Lerne in der Reihenfolge A–D. Ergänze Buchstaben und Lücken und schreibe Sätze.','Follow sections A–D. Complete letters and gaps, then write sentences.','تعلّم بالترتيب A–D وأكمل الحروف والفراغات واكتب جملاً.','Навчайся за розділами A–D: доповнюй літери й пропуски та пиши речення.','Suis les sections A–D : complète les lettres et les blancs, puis écris des phrases.'],
  open:['A–D bölümlerini çalış','Abschnitte A–D üben','Study sections A–D','ادرس الأقسام A–D','Вивчати розділи A–D','Étudier les sections A–D'],
+ /** A unit where only Teil A is ready so far (Lektion 15). */
+ openA:['A bölümünü çalış','Abschnitt A üben','Study section A','ادرس القسم A','Вивчати розділ A','Étudier la section A'],
  all:['A–D · Karma tekrar','A–D · Gemischte Wiederholung','A–D · Mixed review','A–D · مراجعة مختلطة','A–D · Змішане повторення','A–D · Révision mixte'],
  allSteps:['Bölümün tamamı','Ganzer Abschnitt','Whole section','القسم كله','Увесь розділ','Toute la section'],
  steps:['Kitaptaki alt başlık','Unterthema im Buch','Book subtopic','العنوان الفرعي في الكتاب','Підтема з підручника','Sous-partie du livre'],

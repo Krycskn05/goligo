@@ -249,3 +249,18 @@ test('Teil D „Ich bin neu hier.“ (25 October 2026): the comic, the summary, 
  const css=read('app/willkommen.css');for(const cls of ['.l1a-panel-num','.l1a-say-list','.l1a-points'])assert(css.includes(cls),cls);
  const smoke=read('ci/smoke.cjs');assert(smoke.includes("teil=d&adim=cizgi-roman"));
 });
+
+test('phone check (30 October 2026): words wrap between words, dialogue bubbles get the line, Lektion 15 card opens Teil A',()=>{
+ const css=read('app/willkommen.css');
+ assert(css.includes('.l1a-table td,.l1a-table th,.l1a-table b,.l1a-table .l1a-de { overflow-wrap:break-word; }'),'lesson tables do not split words (the global td rule says anywhere)');
+ assert(/@media \(max-width:520px\) \{\n \.l1a-line:has\(> \.l1a-portrait\) \{ display:grid; grid-template-columns:44px minmax\(0,1fr\)/.test(css),'phone dialogue line: portrait column, bubble takes the rest');
+ assert(css.includes('.l1a-line.b:has(> .l1a-portrait) { grid-template-columns:minmax(0,1fr) 44px; }'),'the other speaker is mirrored');
+ assert(css.includes('.l1a-person:has(> .l1a-say-wide) { flex-wrap:wrap;'),'a wide Dinle button goes under the name');
+ assert(/@media \(max-width:360px\) \{[^}]*\n \.l1a-table \{ font-size:14px; \}\n \.l1a-words,\.l1a-words tbody \{ display:block; \}/.test(css),'narrowest phones stack the word lists');
+ assert(!/\.l1a-pos-row \{ display:grid;[^}]*overflow-wrap:anywhere/.test(css),'verb-position rows wrap between words');
+ assert(read('app/ausbildung.css').includes('.l12-app { hyphenate-limit-chars:10 4 4;'),'only long words are hyphenated');
+ const origin=read('app/willkommen-study.tsx').match(/function Origin[\s\S]*?<\/table>/)[0];
+ assert.equal((origin.match(/<tr>/g)||[]).length,3,'woher / kommen / aus: one pair per row');
+ assert.equal(load('housing-copy').housingCopy.openA.length,6);
+ assert(read('app/category-study.tsx').includes("housingText(language,unit.id==='book-15'?'openA':'open')"));
+});

@@ -117,7 +117,7 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .l1a-letter.hard { border-color:var(--blue,#7cc4ff); background:#f3f9ff; }
 .l1a-letter.playing,.l1a-letter:hover { border-color:var(--blue-2,#2f7fd6); }
 .l1a-profile { display:flex; align-items:center; gap:14px; margin:10px 0; padding:12px 14px; border:2px dashed var(--toy-line,#dce5da); border-radius:16px; background:#fffdf6; }
-.l1a-profile dl { display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 10px; margin:0; font-size:15px; }
+.l1a-profile dl { flex:1; min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 10px; margin:0; font-size:15px; }
 .l1a-profile dt { font-weight:800; color:var(--ink-3,#5b7590); }
 .l1a-profile dd { margin:0; font-weight:700; color:var(--ink); }
 .l1a-spell-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
@@ -146,7 +146,7 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .l1a-mood-emoji { font-size:32px; line-height:1; }
 .l1a-mood.playing,.l1a-mood:hover { border-color:var(--blue,#7cc4ff); background:#f3f9ff; }
 .l1a-positions { display:grid; gap:4px; margin:10px 0; }
-.l1a-pos-row { display:grid; grid-template-columns:minmax(0,1fr) 128px minmax(0,1.2fr) 40px; align-items:center; gap:6px; padding:6px 8px; border-radius:12px; background:#fff; border:1.5px solid var(--toy-line,#dce5da); font-weight:700; color:var(--ink); overflow-wrap:anywhere; }
+.l1a-pos-row { display:grid; grid-template-columns:minmax(min-content,1fr) 128px minmax(min-content,1.2fr) 40px; align-items:center; gap:6px; padding:6px 8px; border-radius:12px; background:#fff; border:1.5px solid var(--toy-line,#dce5da); font-weight:700; color:var(--ink); overflow-wrap:break-word; }
 .l1a-pos-row .l12-say { width:34px; height:34px; }
 .l1a-pos-head { background:transparent; border-color:transparent; font-size:12px; font-weight:800; color:var(--ink-3,#5b7590); }
 .l1a-pos-verb { justify-self:start; padding:2px 10px; border-radius:999px; background:#fff3a6; color:#7a4b00; font-weight:800; white-space:nowrap; }
@@ -165,7 +165,7 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 @media (max-width:520px) {
  .l1a-moods { grid-template-columns:repeat(2,minmax(0,1fr)); }
  .l1a-memory { grid-template-columns:repeat(3,minmax(0,1fr)); }
- .l1a-pos-row { grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr) 34px; gap:4px; padding:6px; font-size:14px; }
+ .l1a-pos-row { grid-template-columns:minmax(min-content,1fr) 96px minmax(min-content,1fr) 34px; gap:4px; padding:6px; font-size:14px; }
  .l1a-pos-head>span:nth-child(2) { white-space:normal; }
  .l1a-pos-verb { padding:2px 6px; }
  .l1a-emoji { width:30px; font-size:24px; }
@@ -300,3 +300,35 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 @media (max-width:1179px) { .lb.l1a-book .l12-steps ol:has(> li:nth-child(4)) { grid-template-columns:repeat(2,minmax(0,1fr)); } .lb.l1a-book .l12-steps ol:has(> li:nth-child(4)) .l12-step { flex-direction:row; align-items:center; } }
 @media (prefers-reduced-motion:reduce) { .l1a-talk-wait span,.l1a-talk-mic.on { animation:none; } }
 @media (prefers-reduced-motion:reduce) { .l1a-bar i { transition:none; } }
+/* Phone check (30 October 2026): words wrap between words, not inside them ("wo|her", "Handschla|g", "Kommunikatio|n"),
+   and dialogue bubbles get the width of the line (they were 133 px wide, so "einen" broke as "ei-nen"). */
+.l1a-table td,.l1a-table th,.l1a-table b,.l1a-table .l1a-de { overflow-wrap:break-word; }
+@media (max-width:520px) {
+ .l1a-line:has(> .l1a-portrait) { display:grid; grid-template-columns:44px minmax(0,1fr); column-gap:8px; row-gap:6px; align-items:start; }
+ .l1a-line:has(> .l1a-portrait) > .l1a-portrait { grid-column:1; grid-row:1; width:44px; height:44px; }
+ .l1a-line:has(> .l1a-portrait) > .l1a-bubble { grid-column:2; grid-row:1 / span 2; }
+ .l1a-line:has(> .l1a-portrait) > .l12-say { grid-column:1; grid-row:2; justify-self:center; margin-top:0; width:38px; height:38px; }
+ .l1a-line.b:has(> .l1a-portrait) { grid-template-columns:minmax(0,1fr) 44px; }
+ .l1a-line.b:has(> .l1a-portrait) > .l1a-portrait,.l1a-line.b:has(> .l1a-portrait) > .l12-say { grid-column:2; }
+ .l1a-line.b:has(> .l1a-portrait) > .l1a-bubble { grid-column:1; }
+ .l1a-person:has(> .l1a-say-wide) { flex-wrap:wrap; row-gap:8px; }
+ .l1a-person:has(> .l1a-say-wide) > .l1a-phrase-text { flex-basis:150px; }
+ .l1a-person > .l1a-say-wide { margin-inline-start:68px; }
+ .l1a-table td,.l1a-table th { padding:8px 4px; }
+ .l1a-words td:last-child { width:40px; }
+ .l1a-words .l12-say { width:36px; height:36px; }
+}
+@media (max-width:360px) {
+ /* the narrowest phones: the meaning goes under the German word, the listen button stays on the right */
+ .l1a-table { font-size:14px; }
+ .l1a-words,.l1a-words tbody { display:block; }
+ .l1a-words tr { display:grid; grid-template-columns:minmax(0,1fr) 40px; align-items:center; column-gap:4px; padding:6px 0; border-bottom:1px solid var(--toy-line,#dce5da); }
+ .l1a-words td { display:block; padding:0 4px; border:0; }
+ .l1a-words td:nth-child(2) { grid-row:2; grid-column:1; }
+ .l1a-words td:last-child { grid-row:1 / span 2; grid-column:2; width:auto; }
+ .l1a-pos-row { grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr) 30px; overflow-wrap:anywhere; font-size:13px; }
+ .l1a-pos-row .l12-say { width:30px; height:30px; }
+ .l1a-into { white-space:normal; }
+ .l1a-lang b { font-size:13px; }
+ .l1a-profile { flex-direction:column; }
+}

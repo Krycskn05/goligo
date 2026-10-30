@@ -1,0 +1,13 @@
+Anahtar özeti: 53 karakter, biçim: uygun, not: boşluklar temizlendi
+
+ ⛅️ wrangler 4.92.0
+───────────────────
+Getting User settings...
+👋 You are logged in with an User API Token, associated with the email kooraycoskun@gmail.com.
+ℹ️  The API Token is read from the CLOUDFLARE_API_TOKEN environment variable.
+┌──────────────────────────────────┬──────────────────────────────────┐
+│ Account Name                     │ Account ID                       │
+├──────────────────────────────────┼──────────────────────────────────┤
+│ Kooraycoskun@gmail.com's Account │ 0a6c54cf57b27b54097f9fe4b6f59923 │
+└──────────────────────────────────┴──────────────────────────────────┘
+🔓 To see token permissions visit https://dash.cloudflare.com/profile/api-tokens.

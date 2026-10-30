@@ -1,0 +1,10 @@
+Adres: https://goligo.kooraycoskun.workers.dev
+/ -> HTTP 308 https://goliqo.com/
+/giris -> HTTP 308 https://goliqo.com/giris
+/api/study -> HTTP 308 https://goliqo.com/api/study
+/ev-esyalar -> HTTP 308 https://goliqo.com/ev-esyalar
+Site adresi: https://goliqo.com
+https://goliqo.com/ -> HTTP 200 
+https://goliqo.com/giris -> HTTP 200 
+https://goliqo.com/ev-esyalar -> HTTP 200 
+https://www.goliqo.com/ -> HTTP 301 https://goliqo.com/

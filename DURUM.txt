@@ -1,0 +1,12 @@
+1-pnpm=basarili
+2-kurulum=basarili
+mod=YAYIN (worker: goligo, d1: lernkoko-db)
+3-hesap=basarili
+4-d1=basarili
+5-sesler=basarili
+5-derleme=basarili
+6-sema=basarili
+6-uyelik=basarili
+7-yayin=basarili
+8-kontrol=basarili
+9-eski-adres=basarili

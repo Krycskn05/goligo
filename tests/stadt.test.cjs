@@ -120,6 +120,20 @@ test('İleri at the bottom goes on inside an exercise that shows one item at a t
  // Kelimeyi kur (next word), Cümleyi kur (next sentence) and the role play (next question) take İleri first.
  assert.equal((steps.match(/useInnerNext\(props\.setInnerNext,/g)||[]).length,2);assert(ui.includes('useInnerNext(props.setInnerNext,()=>{'));
  assert(page.includes('setInnerNext={setInnerNext}')&&page.includes('if(innerNext.current?.())')&&page.includes('onClick={()=>forward('));
- // Lektion 1 passes no setInnerNext: its İleri stays the next step.
- assert(!read('app/willkommen-study.tsx').includes('setInnerNext'));
+ // Every lesson (30 October 2026): Lektion 1 passes it too, and the test goes to its next question.
+ const l1=read('app/willkommen-study.tsx');assert(l1.includes('setInnerNext={setInnerNext}')&&l1.includes('if(innerNext.current?.())')&&l1.includes('onClick={()=>forward('));
+ assert(ui.includes("useInnerNext(props.setInnerNext,()=>{if(over)return false;if(picked===null){setWait(true);return true;}advance(i,score);return true;});"));
+ // A tap on İleri by mistake loses nothing: an unanswered question, an unbuilt word or sentence stays (a short note shows).
+ for(const note of ["'Önce cümleyi kur.'",'Önce bir cevap seç.'])assert(ui.includes(note),note);assert(steps.includes("'Önce kelimeyi kur.'")&&steps.includes("'Önce bir cevap seç.'"));
+ assert(!/if\(round<(buildWords|roleQuestions|orderSentences)\.length-1\)\{(open\(round\+1\)|next\(\));return true;\}/.test(ui+steps),'nothing is skipped');
+});
+
+test('a test or a one-at-a-time exercise left in the middle goes on where it was (30 October 2026)',()=>{
+ const ui=read('app/willkommen-ui.tsx'),steps=read('app/stadt-a-steps.tsx');
+ for(const piece of ['export function readRun<T>(','export function saveRun(','export function useRunSave(','runKey?:string'])assert(ui.includes(piece),piece);
+ // TestStep and OrderExercise (every lesson), Kelimeyi kur and the role play (Lektion 15A) keep their run.
+ assert.equal((ui.match(/useRunSave\(runKey,step\.id,/g)||[]).length,2);assert.equal((steps.match(/useRunSave\(runKey,step\.id,/g)||[]).length,2);
+ assert(read('app/willkommen-study.tsx').includes("runKey={'lernkoko-l1'+place.part+'-run'}")&&read('app/stadt-study.tsx').includes("runKey={'lernkoko-l15'+place.part+'-run'}"));
+ // Leaving right after the last test answer still saves the result.
+ assert(ui.includes('pending.current?.()')&&ui.includes('pending.current=()=>onScore(step.id,total,questions.length)'));
 });

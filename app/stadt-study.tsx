@@ -114,7 +114,7 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
       <div className="l1a-top-row"><span className="eyebrow">{config.groups.find(group=>group.ids.includes(step.id))?.label??'Teil '+config.badge}</span><span className="l1a-where">{step.title} · {index+1}/{config.steps.length}</span></div>
       <div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>
      </header>
-     <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext}/>
+     <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l15'+place.part+'-run'}/>
      <nav className="l1a-pager" aria-label="Adımlar">
       <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{index===0?'İçindekiler':'Geri'}</button>
       <button type="button" className="btn" onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>

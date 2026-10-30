@@ -13,7 +13,7 @@ import {
 } from '@/lib/stadt-course';
 import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,useInnerNext,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -306,13 +306,23 @@ function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactN
 }
 /** Alıştırma 2 · build the long word from its parts, then choose its article (it comes from the last part). */
 function BuildExercise(props:StepProps){
- const {speech,sound,onScore,step}=props;
+ const {speech,sound,onScore,step,runKey}=props;
  const makeChips=(r:number)=>{const item=buildWords[r];const others=shuffle(buildWords.filter((_,j)=>j!==r).flatMap(word=>word.parts).filter(part=>!item.parts.includes(part))).slice(0,3);return shuffle([...item.parts,...others]).map((part,i)=>({part,i}));};
- const [round,setRound]=useState(0);const [chips,setChips]=useState(()=>makeChips(0));
- const [picked,setPicked]=useState<number[]>([]);const [stage,setStage]=useState<'parts'|'article'|'done'>('parts');
- const [wrongParts,setWrongParts]=useState(false);const [wrongArticles,setWrongArticles]=useState<string[]>([]);
- const [right,setRight]=useState(0);const [over,setOver]=useState(false);const [feedback,setFeedback]=useState<Feedback>(null);
- const missed=useRef(false);
+ // Left in the middle, it goes on at its word (a finished word: at the next one).
+ type Run={round:number;right:number;chips:{part:string;i:number}[];picked:number[];stage:'parts'|'article'|'done';wrongArticles:string[];missed:boolean};
+ const [saved]=useState(()=>readRun<Run>(runKey,step.id,value=>{
+  const round=Number(value.round),right=Number(value.right);if(!(round>=0&&round<buildWords.length)||!(right>=0&&right<=round+1))return null;
+  const chips=Array.isArray(value.chips)?value.chips as Run['chips']:[];if(!buildWords[round].parts.every(part=>chips.some(chip=>chip.part===part)))return null;
+  if(value.stage==='done')return round+1<buildWords.length?{round:round+1,right,chips:makeChips(round+1),picked:[],stage:'parts',wrongArticles:[],missed:false}:null;
+  const stage=value.stage==='article'?'article':'parts';
+  return {round,right,chips,picked:stage==='parts'&&Array.isArray(value.picked)?value.picked as number[]:[],stage,wrongArticles:Array.isArray(value.wrongArticles)?value.wrongArticles as string[]:[],missed:!!value.missed};
+ }));
+ const [round,setRound]=useState(saved?.round??0);const [chips,setChips]=useState(()=>saved?.chips??makeChips(0));
+ const [picked,setPicked]=useState<number[]>(saved?.picked??[]);const [stage,setStage]=useState<'parts'|'article'|'done'>(saved?.stage??'parts');
+ const [wrongParts,setWrongParts]=useState(false);const [wrongArticles,setWrongArticles]=useState<string[]>(saved?.wrongArticles??[]);
+ const [right,setRight]=useState(saved?.right??0);const [over,setOver]=useState(false);const [feedback,setFeedback]=useState<Feedback>(null);
+ const missed=useRef(saved?.missed??false);
+ useRunSave(runKey,step.id,!over&&(round>0||picked.length>0||stage!=='parts')?{round,right,chips,picked,stage,wrongArticles,missed:missed.current}:null);
  const item=buildWords[round];const partOf=(i:number)=>chips.find(chip=>chip.i===i)?.part??'';
  const pick=(i:number)=>{
   if(stage!=='parts'||picked.includes(i)||picked.length>=item.parts.length)return;sound.prepare();speech.prepare();
@@ -333,12 +343,12 @@ function BuildExercise(props:StepProps){
  };
  const open=(r:number)=>{setRound(r);setChips(makeChips(r));setPicked([]);setStage('parts');setWrongParts(false);setWrongArticles([]);setFeedback(null);missed.current=false;};
  const restart=()=>{setRight(0);setOver(false);open(0);};
- // İleri at the bottom opens the next word (the learner asked, 30 October 2026: it went on to the next exercise); an
- // unfinished word is skipped and does not count; after the last word İleri opens the next step.
+ // İleri at the bottom opens the next word once this one is built (the learner asked, 30 October 2026: it went on to the
+ // next exercise); a tap by mistake loses nothing. After the last word İleri opens the next step.
  useInnerNext(props.setInnerNext,()=>{
   if(over)return false;
-  if(round<buildWords.length-1){open(round+1);return true;}
-  setOver(true);setStage('done');setFeedback({ok:right===buildWords.length,text:`${right} / ${buildWords.length} kelime ilk denemede doğru.`});onScore(step.id,right,buildWords.length);return true;
+  if(stage==='done'){open(round+1);return true;}
+  setFeedback({ok:false,text:'Önce kelimeyi kur.'});return true;
  });
  return <>
   <p className="kicker" lang="de">Alıştırma 2 · Bilden Sie Wörter</p><Heading>Kelimeyi kur</Heading>
@@ -421,25 +431,34 @@ function AchIchExercise(props:StepProps){
 }
 /** Alıştırma 11 · role play: the learner is Sabine; Mei asks, the school's board has the answer. */
 function RoleExercise(props:StepProps){
- const {speech,sound,onScore,step}=props;
- const [round,setRound]=useState(0);const [options,setOptions]=useState(()=>shuffle(roleQuestions[0].options));
- const [picked,setPicked]=useState<string|null>(null);const [right,setRight]=useState(0);const [over,setOver]=useState(false);
+ const {speech,sound,onScore,step,runKey}=props;
+ // Left in the middle, it goes on at Mei's question (an answered one: at the next).
+ type Run={round:number;right:number;options:string[];picked:string|null};
+ const [saved]=useState(()=>readRun<Run>(runKey,step.id,value=>{
+  const round=Number(value.round),right=Number(value.right);if(!(round>=0&&round<roleQuestions.length)||!(right>=0&&right<=round+1))return null;
+  if(typeof value.picked==='string')return round+1<roleQuestions.length?{round:round+1,right,options:shuffle(roleQuestions[round+1].options),picked:null}:null;
+  const options=Array.isArray(value.options)&&value.options.length===roleQuestions[round].options.length&&roleQuestions[round].options.every(o=>(value.options as string[]).includes(o))?value.options as string[]:shuffle(roleQuestions[round].options);
+  return {round,right,options,picked:null};
+ }));
+ const [round,setRound]=useState(saved?.round??0);const [options,setOptions]=useState(()=>saved?.options??shuffle(roleQuestions[0].options));
+ const [picked,setPicked]=useState<string|null>(null);const [right,setRight]=useState(saved?.right??0);const [over,setOver]=useState(false);const [wait,setWait]=useState(false);
+ useRunSave(runKey,step.id,!over&&(round>0||picked!==null)?{round,right,options,picked}:null);
  const item=roleQuestions[round];const answer=item.options[0];
  const choose=(option:string)=>{
-  if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);
+  if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);setWait(false);
   const ok=option===answer;const total=right+(ok?1:0);setRight(total);
   const after=()=>speech.speak({text:answer,who:'sabine'});if(ok)sound.correct(after);else sound.wrong(after);
   if(round===roleQuestions.length-1){setOver(true);onScore(step.id,total,roleQuestions.length);}
  };
- const next=()=>{const r=round+1;setRound(r);setOptions(shuffle(roleQuestions[r].options));setPicked(null);};
+ const next=()=>{const r=round+1;setRound(r);setOptions(shuffle(roleQuestions[r].options));setPicked(null);setWait(false);};
  const again=()=>{setRound(0);setOptions(shuffle(roleQuestions[0].options));setPicked(null);setRight(0);setOver(false);};
- // İleri at the bottom opens Mei's next question (an unanswered one is skipped); after the last one the next step.
+ // İleri at the bottom opens Mei's next question once this one is answered; after the last one the next step.
  useInnerNext(props.setInnerNext,()=>{
   if(over)return false;
-  if(round<roleQuestions.length-1){next();return true;}
-  setOver(true);onScore(step.id,right,roleQuestions.length);return true;
+  if(picked!==null){next();return true;}
+  setWait(true);return true;
  });
- const feedback:Feedback=over?{ok:right===roleQuestions.length,text:right===roleQuestions.length?`Harika, Mei yolunu buldu! ${right} / ${roleQuestions.length}`:`${right} / ${roleQuestions.length} doğru`}:picked===null?null:picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
+ const feedback:Feedback=over?{ok:right===roleQuestions.length,text:right===roleQuestions.length?`Harika, Mei yolunu buldu! ${right} / ${roleQuestions.length}`:`${right} / ${roleQuestions.length} doğru`}:picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
  return <>
   <p className="kicker" lang="de">Alıştırma 11 · Rollenspiel</p><Heading>Sabine sensin!</Heading>
   <p className="l1a-tr">Mei girişte soru soruyor. Panoya bak ve doğru cevabı seç.</p>

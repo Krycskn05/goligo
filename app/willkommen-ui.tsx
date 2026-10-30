@@ -39,14 +39,33 @@ export function useLessonSpeech():Speech&{warning?:string}{
 
 export type Sound=ReturnType<typeof useAnswerSound>;
 /** What every step gets: `onGo` opens a step of the same part (a negative number: the contents page), `onPart` a step of another part. */
-export type StepProps={step:Step;speech:Speech;sound:Sound;scores:L1AScoreMap;progress:TopicProgress;onScore:(id:string,right:number,total:number)=>void;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;language:StudyLanguage;setInnerNext?:(next:(()=>boolean)|null)=>void};
-/** The page's "İleri" goes on inside an exercise that shows one item at a time (Lektion 15A, the learner asked, 30 October
- * 2026): `next` returns true when it opened the exercise's next item (or ended it), false when the exercise is over and the
- * page may open the next step. Pages that pass no `setInnerNext` (Lektion 1) keep İleri as the next step. */
+export type StepProps={step:Step;speech:Speech;sound:Sound;scores:L1AScoreMap;progress:TopicProgress;onScore:(id:string,right:number,total:number)=>void;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;language:StudyLanguage;setInnerNext?:(next:(()=>boolean)|null)=>void;runKey?:string};
+/** The page's "İleri" goes on inside an exercise that shows one item at a time (the learner asked, 30 October 2026, first
+ * for Lektion 15A, then for every lesson): `next` returns true when it opened the exercise's next item (or ended it), false
+ * when the exercise is over and the page may open the next step. Lektion 1 and 15 pass `setInnerNext`. */
 export function useInnerNext(setInnerNext:StepProps['setInnerNext'],next:()=>boolean){
  const latest=useRef(next);latest.current=next;
  useEffect(()=>{if(!setInnerNext)return;setInnerNext(()=>latest.current());return()=>setInnerNext(null);},[setInnerNext]);
 }
+/** An exercise or a test that was left in the middle goes on where it was (the learner asked, 30 October 2026): its state
+ * stays in the browser under the page's `runKey` (lernkoko-l1a-run, lernkoko-l15a-run …) and the step id, and is
+ * dropped once it is finished. `fix` checks a saved state against the lesson (and may move it on); null = start anew. */
+export function readRun<T>(key:string|undefined,id:string,fix:(value:Record<string,unknown>)=>T|null):T|null{
+ if(!key)return null;
+ try{const all=JSON.parse(localStorage.getItem(key)??'{}');const value=all&&typeof all==='object'?all[id]:null;return value&&typeof value==='object'?fix(value):null;}catch{return null;}
+}
+export function saveRun(key:string|undefined,id:string,value:unknown){
+ if(!key)return;
+ try{const all=JSON.parse(localStorage.getItem(key)??'{}');const next=all&&typeof all==='object'?all:{};
+  if(value==null)delete next[id];else next[id]=value;
+  if(Object.keys(next).length)localStorage.setItem(key,JSON.stringify(next));else localStorage.removeItem(key);}catch{}
+}
+/** Saves a run whenever it changes (null: not started yet, or finished). */
+export function useRunSave(key:string|undefined,id:string,value:unknown){
+ const text=JSON.stringify(value??null);
+ useEffect(()=>{saveRun(key,id,JSON.parse(text));},[key,id,text]);
+}
+const sameItems=(a:unknown,b:readonly string[])=>Array.isArray(a)&&a.length===b.length&&b.every(item=>a.includes(item));
 
 /* ---------- small pieces ---------- */
 /** A listen button. `secret`: a listening exercise, so the button's name does not give the answer away. */
@@ -129,21 +148,32 @@ export function MatchExercise(props:StepProps&{kicker:string;title:string;lead?:
 }
 /** Word order: tap the chips in order; a right sentence is read (`sayFor`); `verbs` names the verb in position 2 in the feedback. */
 export function OrderExercise(props:StepProps&{kicker:string;title:string;sentences:string[][];sayFor:(sentence:string)=>SayItem;verbs?:string[]}){
- const {speech,sound,sentences:orderSentences,sayFor:orderSay,kicker,title,verbs}=props;const finish=useFinish(props);
- const [round,setRound]=useState(0);const [chips,setChips]=useState<{word:string;i:number}[]>(()=>shuffle(orderSentences[0].map((word,i)=>({word,i}))));
- const [picked,setPicked]=useState<number[]>([]);const [state,setState]=useState<'open'|'ok'|'bad'>('open');const [right,setRight]=useState(0);const [feedback,setFeedback]=useState<Feedback>(null);
+ const {speech,sound,sentences:orderSentences,sayFor:orderSay,kicker,title,verbs,runKey,step}=props;const finish=useFinish(props);
+ const deal=(r:number)=>shuffle(orderSentences[r].map((word,i)=>({word,i})));
+ // A sentence game left in the middle goes on at its sentence; a solved sentence goes on at the next one.
+ type Run={round:number;right:number;picked:number[];chips:{word:string;i:number}[];state:'open'|'ok'|'bad'};
+ const [saved]=useState(()=>readRun<Run>(runKey,step.id,value=>{
+  const round=Number(value.round),right=Number(value.right);if(!(round>=0&&round<orderSentences.length)||!(right>=0&&right<=round+1))return null;
+  const chips=Array.isArray(value.chips)?value.chips as Run['chips']:[];if(chips.map(chip=>chip.word).sort().join(' ')!==orderSentences[round].slice().sort().join(' '))return null;
+  if(value.state==='ok')return round+1<orderSentences.length?{round:round+1,right,picked:[],chips:deal(round+1),state:'open'}:null;
+  const picked=Array.isArray(value.picked)?(value.picked as number[]).filter(i=>chips.some(chip=>chip.i===i)):[];
+  return {round,right,picked,chips,state:value.state==='bad'?'bad':'open'};
+ }));
+ const [round,setRound]=useState(saved?.round??0);const [chips,setChips]=useState<{word:string;i:number}[]>(()=>saved?.chips??deal(0));
+ const [picked,setPicked]=useState<number[]>(saved?.picked??[]);const [state,setState]=useState<'open'|'ok'|'bad'>(saved?.state??'open');const [right,setRight]=useState(saved?.right??0);const [feedback,setFeedback]=useState<Feedback>(null);
  const sentence=orderSentences[round];const text=picked.map(i=>sentence[i]).join(' ');
+ const ended=state==='ok'&&round===orderSentences.length-1;
+ useRunSave(runKey,step.id,!ended&&(round>0||picked.length>0||state!=='open')?{round,right,picked,chips,state}:null);
  const check=()=>{sound.prepare();speech.prepare();const ok=text===sentence.join(' ');setState(ok?'ok':'bad');
   if(ok){const total=right+1;setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?'Tüm cümleler doğru!':verbs?.[round]?`Doğru! Fiil „${verbs[round]}“ 2. pozisyonda.`:'Doğru!'});
    if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))]);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
   else{setFeedback({ok:false,text:verbs?'Fiil 2. sırada mı? Sırayı kontrol et.':'Sırayı kontrol et.'});sound.wrong();}};
- const next=()=>{const r=round+1;setRound(r);setChips(shuffle(orderSentences[r].map((word,i)=>({word,i}))));setPicked([]);setState('open');setFeedback(null);};
- // İleri at the bottom (Lektion 15A): the next sentence (an unsolved one is skipped); after the last one the next step.
- const ended=useRef(false);if(state==='ok'&&round===orderSentences.length-1)ended.current=true;
+ const next=()=>{const r=round+1;setRound(r);setChips(deal(r));setPicked([]);setState('open');setFeedback(null);};
+ // İleri at the bottom: the next sentence once this one is right (a tap by mistake loses nothing); after the last one the next step.
  useInnerNext(props.setInnerNext,()=>{
-  if(ended.current)return false;
-  if(round<orderSentences.length-1){next();return true;}
-  ended.current=true;setFeedback({ok:false,text:`${right} / ${orderSentences.length} cümle doğru`});finish(right,orderSentences.length);return true;
+  if(ended)return false;
+  if(state==='ok'){next();return true;}
+  setFeedback({ok:false,text:'Önce cümleyi kur.'});return true;
  });
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">Cümle {round+1} / {orderSentences.length}</p>
@@ -184,15 +214,33 @@ export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:str
  * `listen`: a listening question gets a listen button (Lektion 15A); `langOf`: the language of a question or option
  * when the lesson knows it better than the guess below. */
 export function TestStep(props:StepProps&{label:string;questions:readonly (readonly [string,string[],string,...unknown[]])[];sayFor:(index:number)=>SayItem;listen?:(index:number)=>SayItem|undefined;langOf?:(text:string)=>'de'|'tr'}){
- const {speech,sound,onScore,step,questions,sayFor,label,listen,langOf}=props;
- const [i,setI]=useState(0);const [score,setScore]=useState(0);const [picked,setPicked]=useState<string|null>(null);const [options,setOptions]=useState(()=>shuffle(questions[0][1]));const [over,setOver]=useState(false);
+ const {speech,sound,onScore,step,questions,sayFor,label,listen,langOf,runKey}=props;
+ // A test left in the middle goes on at its question (the learner asked, 30 October 2026); an answered question goes on at the next one.
+ type Run={i:number;score:number;picked:string|null;options:string[]};
+ const [saved]=useState(()=>readRun<Run>(runKey,step.id,value=>{
+  const i=Number(value.i),score=Number(value.score);if(!(i>=0&&i<questions.length)||!(score>=0&&score<=i+1))return null;
+  if(typeof value.picked==='string')return i+1<questions.length?{i:i+1,score,picked:null,options:shuffle(questions[i+1][1])}:null;
+  return sameItems(value.options,questions[i][1])?{i,score,picked:null,options:value.options as string[]}:null;
+ }));
+ const [i,setI]=useState(saved?.i??0);const [score,setScore]=useState(saved?.score??0);const [picked,setPicked]=useState<string|null>(null);const [options,setOptions]=useState(()=>saved?.options??shuffle(questions[0][1]));const [over,setOver]=useState(false);
+ const [wait,setWait]=useState(false);
+ useRunSave(runKey,step.id,!over&&(i>0||picked!==null)?{i,score,picked,options}:null);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
- useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
+ // Leaving right after the last answer still saves the result.
+ const pending=useRef<(()=>void)|null>(null);
+ useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);pending.current?.();},[]);
  const question=questions[i];
- const answer=(option:string)=>{if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);const ok=option===question[2];const total=score+(ok?1:0);setScore(total);
+ const answer=(option:string)=>{if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);setWait(false);const ok=option===question[2];const total=score+(ok?1:0);setScore(total);
   const say=sayFor(i);const after=()=>{if(say)speech.speak(say);};if(ok)sound.correct(after);else sound.wrong(after);
-  timer.current=setTimeout(()=>{if(i+1<questions.length){setI(i+1);setPicked(null);setOptions(shuffle(questions[i+1][1]));}else{setOver(true);onScore(step.id,total,questions.length);if(total===questions.length)sound.complete();}},1600);};
- const again=()=>{setI(0);setScore(0);setPicked(null);setOptions(shuffle(questions[0][1]));setOver(false);};
+  if(i+1>=questions.length)pending.current=()=>onScore(step.id,total,questions.length);
+  timer.current=setTimeout(()=>advance(i,total),1600);};
+ /** The next question (or the result after the last one). */
+ const advance=(from:number,total:number)=>{if(timer.current){clearTimeout(timer.current);timer.current=null;}pending.current=null;
+  if(from+1<questions.length){setI(from+1);setPicked(null);setOptions(shuffle(questions[from+1][1]));}else{setOver(true);onScore(step.id,total,questions.length);if(total===questions.length)sound.complete();}};
+ // İleri at the bottom (the learner asked, 30 October 2026): the next question once this one is answered; a tap by
+ // mistake before answering loses nothing. On the result page İleri opens the next step.
+ useInnerNext(props.setInnerNext,()=>{if(over)return false;if(picked===null){setWait(true);return true;}advance(i,score);return true;});
+ const again=()=>{setI(0);setScore(0);setPicked(null);setOptions(shuffle(questions[0][1]));setOver(false);setWait(false);};
  if(over){const percent=Math.round(score/questions.length*100);return <>
   <p className="kicker" lang="de">{label}</p><Heading>Sonuç</Heading>
   <p className="l1a-score">{score} / {questions.length}</p>
@@ -205,5 +253,6 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
   {(()=>{const heard=listen?.(i);return heard?<div className="l1a-actions l1a-test-listen"><Say text={typeof heard==='string'?heard:heard.text} who={typeof heard==='string'?undefined:heard.who} speech={speech} secret wide/></div>:null;})()}
   <div className="l1a-opts column" role="group" aria-label={'Soru '+(i+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={langOf?langOf(option):/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr'} onClick={()=>answer(option)}>{option}</button>)}</div>
   <p className="l1a-mini">Puan: {score}</p>
+  {wait&&<p className="l1a-feedback bad" role="status">Önce bir cevap seç.</p>}
  </>;
 }

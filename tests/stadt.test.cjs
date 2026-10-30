@@ -113,3 +113,13 @@ test('"Bu ünitede" for Lektion 15 is in our own words, and the test listens wit
  const ui=read('app/willkommen-ui.tsx');assert(ui.includes('listen?:(index:number)=>SayItem|undefined')&&ui.includes('langOf?:(text:string)=>'));
  assert(read('app/stadt-a-steps.tsx').includes('listen={i=>testQuestionsA[i][4]}'));
 });
+
+test('İleri at the bottom goes on inside an exercise that shows one item at a time (the learner asked, 30 October 2026)',()=>{
+ const ui=read('app/willkommen-ui.tsx'),steps=read('app/stadt-a-steps.tsx'),page=read('app/stadt-study.tsx');
+ assert(ui.includes('export function useInnerNext(')&&ui.includes('setInnerNext?:(next:(()=>boolean)|null)=>void'));
+ // Kelimeyi kur (next word), Cümleyi kur (next sentence) and the role play (next question) take İleri first.
+ assert.equal((steps.match(/useInnerNext\(props\.setInnerNext,/g)||[]).length,2);assert(ui.includes('useInnerNext(props.setInnerNext,()=>{'));
+ assert(page.includes('setInnerNext={setInnerNext}')&&page.includes('if(innerNext.current?.())')&&page.includes('onClick={()=>forward('));
+ // Lektion 1 passes no setInnerNext: its İleri stays the next step.
+ assert(!read('app/willkommen-study.tsx').includes('setInnerNext'));
+});

@@ -88,6 +88,14 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
  const toPart=useCallback((part:string,next:number)=>{if(isPart(part))open(part,next);},[open]);
  // The step the learner is on (also when opened from its address) stays saved in the browser for later use.
  useEffect(()=>{if(place.index>=0)try{localStorage.setItem(l15PartKeys[place.part].step,parts[place.part].steps[place.index].id);localStorage.setItem(L15_PART_KEY,place.part);}catch{}},[place]);
+ // An exercise that shows one item at a time (a word, a sentence, a question) takes the page's İleri for its next item
+ // first (the learner asked, 30 October 2026); `useInnerNext` in app/willkommen-ui.tsx registers it.
+ const innerNext=useRef<(()=>boolean)|null>(null);
+ const setInnerNext=useCallback((next:(()=>boolean)|null)=>{innerNext.current=next;},[]);
+ const forward=(next:number)=>{
+  if(innerNext.current?.()){requestAnimationFrame(()=>{const heading=document.getElementById('l1a-heading');if(heading&&heading.getBoundingClientRect().top<0)heading.scrollIntoView({block:'start',behavior:'smooth'});});return;}
+  go(next);
+ };
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:saveL15Score(part,id,right,total)}));},[place.part]);
  const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
  const progress=partProgressL15(place.part,scores[place.part]);
@@ -106,10 +114,10 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
       <div className="l1a-top-row"><span className="eyebrow">{config.groups.find(group=>group.ids.includes(step.id))?.label??'Teil '+config.badge}</span><span className="l1a-where">{step.title} · {index+1}/{config.steps.length}</span></div>
       <div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>
      </header>
-     <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language}/>
+     <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext}/>
      <nav className="l1a-pager" aria-label="Adımlar">
       <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{index===0?'İçindekiler':'Geri'}</button>
-      <button type="button" className="btn" onClick={()=>go(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
+      <button type="button" className="btn" onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
      </nav>
     </section>
    </PartBook>}

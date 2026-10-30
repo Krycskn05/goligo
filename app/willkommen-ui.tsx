@@ -39,7 +39,14 @@ export function useLessonSpeech():Speech&{warning?:string}{
 
 export type Sound=ReturnType<typeof useAnswerSound>;
 /** What every step gets: `onGo` opens a step of the same part (a negative number: the contents page), `onPart` a step of another part. */
-export type StepProps={step:Step;speech:Speech;sound:Sound;scores:L1AScoreMap;progress:TopicProgress;onScore:(id:string,right:number,total:number)=>void;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;language:StudyLanguage};
+export type StepProps={step:Step;speech:Speech;sound:Sound;scores:L1AScoreMap;progress:TopicProgress;onScore:(id:string,right:number,total:number)=>void;onGo:(index:number)=>void;onPart:(part:L1PartId,index:number)=>void;language:StudyLanguage;setInnerNext?:(next:(()=>boolean)|null)=>void};
+/** The page's "İleri" goes on inside an exercise that shows one item at a time (Lektion 15A, the learner asked, 30 October
+ * 2026): `next` returns true when it opened the exercise's next item (or ended it), false when the exercise is over and the
+ * page may open the next step. Pages that pass no `setInnerNext` (Lektion 1) keep İleri as the next step. */
+export function useInnerNext(setInnerNext:StepProps['setInnerNext'],next:()=>boolean){
+ const latest=useRef(next);latest.current=next;
+ useEffect(()=>{if(!setInnerNext)return;setInnerNext(()=>latest.current());return()=>setInnerNext(null);},[setInnerNext]);
+}
 
 /* ---------- small pieces ---------- */
 /** A listen button. `secret`: a listening exercise, so the button's name does not give the answer away. */
@@ -131,6 +138,13 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
    if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))]);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
   else{setFeedback({ok:false,text:verbs?'Fiil 2. sırada mı? Sırayı kontrol et.':'Sırayı kontrol et.'});sound.wrong();}};
  const next=()=>{const r=round+1;setRound(r);setChips(shuffle(orderSentences[r].map((word,i)=>({word,i}))));setPicked([]);setState('open');setFeedback(null);};
+ // İleri at the bottom (Lektion 15A): the next sentence (an unsolved one is skipped); after the last one the next step.
+ const ended=useRef(false);if(state==='ok'&&round===orderSentences.length-1)ended.current=true;
+ useInnerNext(props.setInnerNext,()=>{
+  if(ended.current)return false;
+  if(round<orderSentences.length-1){next();return true;}
+  ended.current=true;setFeedback({ok:false,text:`${right} / ${orderSentences.length} cümle doğru`});finish(right,orderSentences.length);return true;
+ });
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">Cümle {round+1} / {orderSentences.length}</p>
   <div className={'l1a-answer'+(state==='ok'?' ok':state==='bad'?' bad':'')} lang="de" dir="ltr" aria-live="polite">{text}</div>

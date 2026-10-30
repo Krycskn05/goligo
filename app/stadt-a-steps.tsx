@@ -13,7 +13,7 @@ import {
 } from '@/lib/stadt-course';
 import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,useInnerNext,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -333,6 +333,13 @@ function BuildExercise(props:StepProps){
  };
  const open=(r:number)=>{setRound(r);setChips(makeChips(r));setPicked([]);setStage('parts');setWrongParts(false);setWrongArticles([]);setFeedback(null);missed.current=false;};
  const restart=()=>{setRight(0);setOver(false);open(0);};
+ // İleri at the bottom opens the next word (the learner asked, 30 October 2026: it went on to the next exercise); an
+ // unfinished word is skipped and does not count; after the last word İleri opens the next step.
+ useInnerNext(props.setInnerNext,()=>{
+  if(over)return false;
+  if(round<buildWords.length-1){open(round+1);return true;}
+  setOver(true);setStage('done');setFeedback({ok:right===buildWords.length,text:`${right} / ${buildWords.length} kelime ilk denemede doğru.`});onScore(step.id,right,buildWords.length);return true;
+ });
  return <>
   <p className="kicker" lang="de">Alıştırma 2 · Bilden Sie Wörter</p><Heading>Kelimeyi kur</Heading>
   <p className="l1a-tr">Parçalara sırayla dokun, sonra artikeli seç. İpucu: artikel son parçadan gelir.</p>
@@ -426,7 +433,13 @@ function RoleExercise(props:StepProps){
  };
  const next=()=>{const r=round+1;setRound(r);setOptions(shuffle(roleQuestions[r].options));setPicked(null);};
  const again=()=>{setRound(0);setOptions(shuffle(roleQuestions[0].options));setPicked(null);setRight(0);setOver(false);};
- const feedback:Feedback=picked===null?null:over?{ok:right===roleQuestions.length,text:right===roleQuestions.length?`Harika, Mei yolunu buldu! ${right} / ${roleQuestions.length}`:`${right} / ${roleQuestions.length} doğru`}:picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
+ // İleri at the bottom opens Mei's next question (an unanswered one is skipped); after the last one the next step.
+ useInnerNext(props.setInnerNext,()=>{
+  if(over)return false;
+  if(round<roleQuestions.length-1){next();return true;}
+  setOver(true);onScore(step.id,right,roleQuestions.length);return true;
+ });
+ const feedback:Feedback=over?{ok:right===roleQuestions.length,text:right===roleQuestions.length?`Harika, Mei yolunu buldu! ${right} / ${roleQuestions.length}`:`${right} / ${roleQuestions.length} doğru`}:picked===null?null:picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
  return <>
   <p className="kicker" lang="de">Alıştırma 11 · Rollenspiel</p><Heading>Sabine sensin!</Heading>
   <p className="l1a-tr">Mei girişte soru soruyor. Panoya bak ve doğru cevabı seç.</p>
@@ -436,7 +449,7 @@ function RoleExercise(props:StepProps){
    <div className="l1a-line a"><Portrait who="mei" name="Mei"/><div className="l1a-bubble"><span className="l15-name">Mei</span><span className="l1a-de" lang="de" dir="ltr">{item.question}</span></div><Say text={item.question} who="mei" speech={speech}/></div>
    {picked!==null&&<div className="l1a-line b"><Portrait who="sabine" name="Sabine"/><div className="l1a-bubble"><span className="l15-name">Sabine</span><span className="l1a-de" lang="de" dir="ltr">{answer}</span></div></div>}
   </div>
-  <div className="l1a-opts column" role="group" aria-label={'Soru '+(round+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null} lang="de" dir="ltr" onClick={()=>choose(option)}>{option}</button>)}</div>
+  <div className="l1a-opts column" role="group" aria-label={'Soru '+(round+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null||over} lang="de" dir="ltr" onClick={()=>choose(option)}>{option}</button>)}</div>
   <FeedbackLine feedback={feedback}/>
   <div className="l1a-actions">
    {picked!==null&&!over&&<button type="button" className="btn small" onClick={next}>Sonraki<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}

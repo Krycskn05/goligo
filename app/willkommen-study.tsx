@@ -234,7 +234,10 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  };
  const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
  const nextSoon=!next?lessonParts[lessonParts.findIndex(row=>row.id===config.id)+1]:undefined;
- return <section className="l1a-part" aria-labelledby="l1a-part-title">
+ // After the cover the left page folds away and one wide page stays (the learner chose it, 30 October 2026, option A);
+ // a short line on the page keeps the way back.
+ const folded=step.kind!=='cover';
+ return <section className={'l1a-part'+(folded?' l1a-folded':'')} aria-labelledby="l1a-part-title">
   <LessonBook variant="wide" className="l1a-book lb-tabbed" left={<div className="lb-sticky">
    <button type="button" className="text-button vault-back-categories" onClick={()=>onGo(-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>Lektion 1</button>
    <span className="eyebrow" lang="de">A1.1 · 1 · Teil {config.badge}</span>
@@ -251,6 +254,7 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
     <span className="l12-step-number" aria-hidden="true">{tabLocked(item.id)?<Lock size={15}/>:done[item.id]?<Check size={16}/>:i+1}</span>
     <span className="l12-step-text"><strong>{item.label}</strong><small>{tabLocked(item.id)?'Önce alıştırmalar':detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
+   <div className="l1a-mini-head" aria-hidden={!folded}><button type="button" className="text-button" tabIndex={folded?undefined:-1} onClick={()=>onGo(-1)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>Lektion 1</button><span aria-hidden="true">·</span><b lang="de">Teil {config.badge}</b><span aria-hidden="true">·</span><span className="l1a-mini-title" lang="de">{config.title}</span></div>
    {children}
   </>}/>
  </section>;

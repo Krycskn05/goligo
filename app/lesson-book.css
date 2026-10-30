@@ -62,7 +62,9 @@
 .lb-goals ul { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
 .lb-goals h2 { margin:0 0 10px; font-family:var(--lb-serif); font-style:italic; font-size:22px; color:#c06a22; }
 .lb-goals li { display:grid; grid-template-columns:22px minmax(0,1fr); gap:10px; align-items:start; font-size:15px; line-height:1.55; }
-.lb-goals li::before { content:""; width:18px; height:18px; margin-top:3px; border:2px solid #9cc8f0; border-radius:5px; background:#fff; }
+/* Star bullets and highlighter on the German phrases (the learner chose it, 30 October 2026, option C): no empty boxes that look clickable. */
+.lb-goals li::before { content:"★"; color:#e2913a; font-size:17px; line-height:1.35; text-align:center; }
+.lb-goals li b { font-weight:800; padding:0 2px; background:linear-gradient(transparent 55%,#ffe58a 55%,#ffe58a 92%,transparent 92%); -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 
 /* Contents (Inhalt): one row per part */
 .lb-toc { list-style:none; margin:10px 0 0; padding:0; display:grid; }

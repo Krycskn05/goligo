@@ -229,6 +229,34 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .lb.l1a-book .l1a-soon-tag { justify-self:start; margin-top:2px; padding:2px 10px; border-radius:999px; background:#fff3a6; color:#8a5a00; }
 .lb.l1a-book .l1a-next-soon { color:var(--ink-3); font-size:14px; font-weight:700; }
 .lb.l1a-book .l1a-card { margin:0; }
+/* After the cover the left page folds back over the rings and one wide page stays (the learner chose it, 30 October 2026,
+   option A). Folding: the page turns away first, then the right page widens; back to the cover it is the other way round. */
+.l1a-part .lb.l1a-book .lb-spread { transition:grid-template-columns .5s ease; }
+.l1a-part .lb.l1a-book .lb-left { transform-origin:right center; transition:transform .6s ease-out .45s,opacity .25s ease .45s; }
+.l1a-part .lb.l1a-book .lb-left:dir(rtl) { transform-origin:left center; }
+.l1a-part .lb.l1a-book .lb-rings { transition:opacity .3s ease .45s; }
+.l1a-mini-head { display:none; }
+.l1a-folded .l1a-mini-head { display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; margin:0 0 12px; font-size:14px; font-weight:700; color:var(--ink-2,#3d5a7a); animation:l1a-mini-in .35s ease .95s both; }
+.l1a-mini-head .text-button { display:inline-flex; align-items:center; gap:4px; font-weight:700; }
+.l1a-mini-head b { color:#c06a22; }
+.l1a-mini-title { font-family:var(--lb-serif,Georgia,serif); font-style:italic; color:var(--ink,#1f3b5c); }
+@keyframes l1a-mini-in { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+@media (min-width:1180px) {
+ .l1a-folded .lb.l1a-book .lb-spread { grid-template-columns:minmax(0,0fr) 0px minmax(0,16fr); transition:grid-template-columns .5s ease .55s; }
+ .l1a-folded .lb.l1a-book .lb-left { transform:perspective(1600px) rotateY(92deg); opacity:0; overflow:hidden; padding:0; max-height:0; visibility:hidden; pointer-events:none; transition:transform .6s ease-in,opacity .2s ease .4s,padding 0s linear .6s,max-height 0s linear .6s,visibility 0s linear .6s; }
+ .l1a-folded .lb.l1a-book .lb-left:dir(rtl) { transform:perspective(1600px) rotateY(-92deg); }
+ .l1a-folded .lb.l1a-book .lb-rings { opacity:0; overflow:hidden; transition:opacity .25s ease .3s; }
+ .l1a-folded .lb.l1a-book .lb-right,.l1a-folded .lb.l1a-book .lb-right:dir(rtl) { border-radius:16px; box-shadow:none; }
+}
+@media (max-width:1179px) {
+ .l1a-folded .lb.l1a-book .lb-left { display:none; }
+ .l1a-folded .lb.l1a-book .lb-right,.l1a-folded .lb.l1a-book .lb-right:dir(rtl) { border-radius:14px; }
+ .l1a-folded .l1a-mini-head { animation-delay:0s; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .l1a-part .lb.l1a-book .lb-spread,.l1a-part .lb.l1a-book .lb-left,.l1a-part .lb.l1a-book .lb-rings { transition:none !important; }
+ .l1a-folded .l1a-mini-head { animation:none; }
+}
 .lb.l1a-book #l1a-tabs { scroll-margin-top:12px; }
 .lb.l1a-book .lb-sticky>.progress-meter { margin-top:4px; }
 @media (max-width:1179px) {
@@ -265,7 +293,7 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
  .l1a-contents .lb-goals h2 { margin:0 0 6px; font-size:19px; }
  .l1a-contents .lb-goals ul { gap:4px; }
  .l1a-contents .lb-goals li { grid-template-columns:18px minmax(0,1fr); gap:8px; font-size:13.5px; line-height:1.4; }
- .l1a-contents .lb-goals li::before { width:15px; height:15px; margin-top:2px; }
+ .l1a-contents .lb-goals li::before { font-size:14px; line-height:1.4; }
  .l1a-contents .lb-heading { margin:0 0 2px; font-size:26px; }
  .l1a-contents .lb-toc { margin:4px 0 0; }
  .l1a-contents .lb-toc-row { padding:8px 2px 9px; }

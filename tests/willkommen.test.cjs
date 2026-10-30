@@ -96,6 +96,9 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  for(const file of ['app/willkommen-ui.tsx','app/stadt-a-steps.tsx'])assert(!read(file).includes('<select'),file);
  // Gap exercises check themselves: no "Kontrol et" / "Cevapları göster" (30 October 2026).
  assert(ui.includes('export function useSelfCheck(')&&ui.includes('const self=useSelfCheck(total,'));
+ // After the cover the left page folds away (30 October 2026, option A); the goals have star bullets (option C).
+ for(const file of ['app/willkommen-study.tsx','app/stadt-study.tsx']){const code=read(file);assert(code.includes("const folded=step.kind!=='cover';")&&code.includes("(folded?' l1a-folded':'')")&&code.includes('className="l1a-mini-head"'),file);}
+ assert(read('app/willkommen.css').includes('.l1a-folded .lb.l1a-book .lb-spread { grid-template-columns:minmax(0,0fr) 0px minmax(0,16fr);')&&read('app/lesson-book.css').includes('.lb-goals li::before { content:"★";'));
  for(const file of ['app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/stadt-a-steps.tsx']){const code=read(file);const gap=file.endsWith('willkommen-ui.tsx')?code.slice(code.indexOf('export function GapExercise('),code.indexOf('/** Matching:')):code;assert(!gap.includes('Cevapları göster'),file);}
  assert(!read('app/willkommen-b-steps.tsx').slice(read('app/willkommen-b-steps.tsx').indexOf('function NamesExercise(')).split('\n}\n')[0].includes('Kontrol et'));
  assert(lesson.unitGoals.length>=4);

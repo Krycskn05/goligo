@@ -1,0 +1,228 @@
+{
+ "started": "2026-10-30 15:04 UTC",
+ "settings": "supertonic3-de-speed0.92-steps10-v1",
+ "texts": 3690,
+ "voices": {
+  "F1": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 5.3,
+   "median_pitch_hz": 180.0,
+   "asr": [
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie Frau Weiß.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und du Nikos?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3690
+  },
+  "F2": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.7,
+   "median_pitch_hz": 196.5,
+   "asr": [
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie Frau Weiß.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und Dunikus.",
+     "score": 0.945
+    }
+   ],
+   "asr_mean": 0.972,
+   "available": 3690
+  },
+  "F3": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.7,
+   "median_pitch_hz": 169.3,
+   "asr": [
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und du Nikus.",
+     "score": 0.964
+    },
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland. Und sie Frau Weiß?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.982,
+   "available": 3690
+  },
+  "F4": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.7,
+   "median_pitch_hz": 205.1,
+   "asr": [
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland. Und sie, Frau Weiß?",
+     "score": 1.0
+    },
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und du Nikos.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3690
+  },
+  "F5": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.7,
+   "median_pitch_hz": 157.5,
+   "asr": [
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und Unicos.",
+     "score": 0.926
+    },
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie Frau Weiß.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.963,
+   "available": 3690
+  },
+  "M1": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.7,
+   "median_pitch_hz": 130.5,
+   "asr": [
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und Unikos.",
+     "score": 0.963
+    },
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland. Und sie, Frau Weiß?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.982,
+   "available": 3690
+  },
+  "M2": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.8,
+   "median_pitch_hz": 89.8,
+   "asr": [
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie, Frau Weiß.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und du Nikos.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3690
+  },
+  "M3": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.8,
+   "median_pitch_hz": 95.9,
+   "asr": [
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und Nikos.",
+     "score": 0.943
+    },
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie, Frau Weiß.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.972,
+   "available": 3690
+  },
+  "M4": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.6,
+   "median_pitch_hz": 121.5,
+   "asr": [
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie Frau Weiß.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und du Nikos?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3690
+  },
+  "M5": {
+   "rate": 44100,
+   "rendered": 2,
+   "seconds": 4.7,
+   "median_pitch_hz": 81.8,
+   "asr": [
+    {
+     "text": "Ich heiße Aisha. Und du, Nikos?",
+     "heard": "Ich heiße Aisha und du Nikos.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich komme aus Deutschland. Und Sie, Frau Weiß?",
+     "heard": "Ich komme aus Deutschland und sie, Frau Weiß.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 3690
+  }
+ },
+ "errors": [],
+ "package": "1.3.1",
+ "init_signature": "(self, model: 'str' = 'supertonic-3', model_dir: 'Optional[Union[Path, str]]' = None, auto_download: 'bool' = True, intra_op_num_threads: 'Optional[int]' = None, inter_op_num_threads: 'Optional[int]' = None)",
+ "init_used": {
+  "model": "supertonic-3",
+  "auto_download": true
+ },
+ "synthesize_signature": "(text: 'str', voice_style: 'Style', total_steps: 'int' = 8, speed: 'float' = 1.05, max_chunk_length: 'Optional[int]' = None, silence_duration: 'float' = 0.3, lang: 'Optional[str]' = None, verbose: 'bool' = False) -> 'tuple[np.ndarray, np.ndarray]'",
+ "ready_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "finished": "2026-10-30 15:05 UTC"
+}

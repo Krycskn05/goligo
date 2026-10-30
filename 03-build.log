@@ -1,0 +1,66 @@
+$ node scripts/sounds/make-sounds.mjs && node scripts/run-framework.mjs build
+Goliqo sesleri hazır: tap 0.24s, tap2 0.24s, tap3 0.24s, whoosh 0.55s, correct 0.95s, complete 1.65s, soft 0.8s, beep 0.7s, retro 0.55s, low 0.95s, cartoon 0.85s, tapWood 0.22s, tapPop 0.22s, tapDrop 0.26s, tapBell 0.4s, tapChip 0.12s, pageFlip 0.177s, pageSlide 0.48s, pageHarp 0.75s, pageBubbles 0.42s, pageChip 0.17s, correctMarimba 0.95s, correctCoin 0.62s, correctDing 1.2s, correctFanfare 0.95s, correctBubbles 0.95s, completeFanfare 1.6s, completeLevel 0.89s, completeChimes 1.65s, completeHarp 1.6s, paulHello 0.85s, paulTip 0.75s, paulHmm 0.95s, paulClap 1.55s, paulDrum 1.05s, completeMarimba 1.6s
+
+  vinext build  (Vite 8.0.13)
+
+[34m[1/5] analyze client references...[39m
+[2Ktransforming...✓ 495 modules transformed.
+rendering chunks...
+[32m✓ built in 2.36s[39m
+[34m[2/5] analyze server references...[39m
+[2Ktransforming...✓ 355 modules transformed.
+rendering chunks...
+[32m✓ built in 1.13s[39m
+[34m[3/5] build rsc environment...[39m
+[2Ktransforming...✓ 492 modules transformed.
+rendering chunks...
+computing gzip size...
+[32m✓ built in 2.04s[39m
+[34m[4/5] build client environment...[39m
+[2Ktransforming...✓ 2125 modules transformed.
+rendering chunks...
+computing gzip size...
+[33m[33m[PLUGIN_TIMINGS] [0mYour build spent significant time in plugins. Here is a breakdown:
+  - vinext:middleware-server-only (20%)
+  - vinext:css-data-url (14%)
+  - rsc:virtual-client-package (13%)
+  - alias (11%)
+  - vinext:jsx-in-js (10%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m
+[32m✓ built in 3.51s[39m
+[34m[5/5] build ssr environment...[39m
+[2Ktransforming...✓ 361 modules transformed.
+rendering chunks...
+computing gzip size...
+[32m✓ built in 1.87s[39m
+[0m
+  Route (app)
+  ┌ ƒ /                      
+  ├ ƒ /a1-1/willkommen       
+  ├ ƒ /a1-2/ausbildung       
+  ├ ƒ /a1-2/ausbildung/hoeren
+  ├ ƒ /a1-2/ev-ve-yasam      
+  ├ ƒ /a1-2/wege-in-der-stadt
+  ├ λ /api/auth              
+  ├ λ /api/ilerleme          
+  ├ λ /api/konus             
+  ├ λ /api/study             
+  ├ ƒ /ev-esyalar            
+  ├ ƒ /fiiller               
+  ├ ƒ /giris                 
+  ├ ƒ /gizlilik              
+  ├ ƒ /hesabim               
+  ├ ƒ /impressum             
+  ├ ƒ /konular               
+  ├ ƒ /kullanim-kosullari    
+  ├ ƒ /oyunlar               
+  ├ ƒ /sifre-yenile          
+  ├ ƒ /uye-ol                
+  ├ ƒ /yanlislarim           
+  └ ƒ /yonetim               
+
+  λ API  ƒ Dynamic
+
+  Build complete. Run `vinext start` to start the production server.
+

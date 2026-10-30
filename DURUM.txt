@@ -1,0 +1,8 @@
+1-pnpm=basarili
+2-kurulum=basarili
+3-derleme=basarili
+4-typescript=basarili
+5-testler=basarili
+5-sesler=basarili
+6-veritabani=basarili
+7-site=basarili

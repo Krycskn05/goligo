@@ -4,7 +4,8 @@ import {useEffect,useRef,useState} from 'react';
 /**
  * Special German letters (the learner asked, 30 October 2026: "ß and the umlauts are hard to type on my tablet").
  * While a German text box has the focus — an input or textarea whose own lang, or a parent's, is German — a small row
- * ä ö ü ß Ä Ö Ü sits at the bottom of the visible screen, right above the on-screen keyboard. A tap writes the letter
+ * ä ö ü ß Ä Ö Ü sits at the bottom of the visible screen, right above the on-screen keyboard — a grey strip with keys like the
+ * keyboard's own (design "Klavye şeridi", the learner chose it from five drafts on 30 October 2026). A tap writes the letter
  * where the cursor is; the box keeps the focus, so the keyboard stays open. The page scrolls a little when the box
  * would be under the row. Boxes that bring their own row (`.umlaut-row`: Lektion 12, Ev ve Yaşam, the study
  * screens) are left alone. Mounted once for the whole site in app/layout.tsx.
@@ -41,7 +42,10 @@ export function writeLetter(el:Field,letter:string){
 export function LetterBar(){
  const [field,setField]=useState<Field|null>(null);
  const [top,setTop]=useState<number|null>(null);
- const bar=useRef<HTMLDivElement>(null);const fieldRef=useRef<Field|null>(null);
+ const bar=useRef<HTMLDivElement|null>(null);const fieldRef=useRef<Field|null>(null);
+ // Places the row again once it is on the screen and its real height is known (the first placing guesses the height).
+ const placeRef=useRef<(()=>void)|null>(null);
+ const setBar=(node:HTMLDivElement|null)=>{const first=!bar.current&&!!node;bar.current=node;if(first)placeRef.current?.();};
  useEffect(()=>{
   let timer=0;
   const pick=(target:EventTarget|null)=>isGermanField(target)&&!hasOwnRow(target)?target:null;
@@ -59,19 +63,19 @@ export function LetterBar(){
    cancelAnimationFrame(frame);
    frame=requestAnimationFrame(()=>{
     if(!field.isConnected||!isGermanField(field)){setField(null);return;}
-    const view=window.visualViewport;const height=bar.current?.offsetHeight??52;
+    const view=window.visualViewport;const height=bar.current?.offsetHeight??64;
     const bottom=view?view.offsetTop+view.height:window.innerHeight;
-    const at=Math.round(bottom-height-8);setTop(at);
-    document.documentElement.style.setProperty('--letter-bar-space',height+16+'px');
+    const at=Math.round(bottom-height);setTop(at);
+    document.documentElement.style.setProperty('--letter-bar-space',height+12+'px');
     // Keep the box itself above the row (once per focus, so the learner can still scroll freely).
     const box=field.getBoundingClientRect();
     if(!scrolled&&box.bottom>at-8&&box.top>0){scrolled=true;window.scrollBy({top:box.bottom-at+16,behavior:'smooth'});}
    });
   };
-  place();
+  placeRef.current=place;place();
   const view=window.visualViewport;
   view?.addEventListener('resize',place);view?.addEventListener('scroll',place);window.addEventListener('resize',place);
-  return ()=>{cancelAnimationFrame(frame);view?.removeEventListener('resize',place);view?.removeEventListener('scroll',place);window.removeEventListener('resize',place);};
+  return ()=>{placeRef.current=null;cancelAnimationFrame(frame);view?.removeEventListener('resize',place);view?.removeEventListener('scroll',place);window.removeEventListener('resize',place);};
  },[field]);
  // A finger on a letter must not take the focus from the box (that would close the keyboard): the letter is written on
  // touchstart and the tap goes no further. Mouse and keyboard use the click.
@@ -88,7 +92,7 @@ export function LetterBar(){
   writeLetter(el,letter);
  }
  if(!field||top===null)return null;
- return <div ref={bar} className="letter-bar" role="toolbar" aria-label="ä ö ü ß" lang="de" dir="ltr" style={{top}}>
+ return <div ref={setBar} className="letter-bar" role="toolbar" aria-label="ä ö ü ß" lang="de" dir="ltr" style={{top}}>
   {GERMAN_LETTERS.map(letter=><button type="button" key={letter} data-letter={letter} tabIndex={-1} aria-label={letter} onMouseDown={event=>event.preventDefault()} onClick={()=>type(letter)}>{letter}</button>)}
  </div>;
 }

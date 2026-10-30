@@ -71,5 +71,5 @@ test('special letters: ä ö ü ß Ä Ö Ü under German boxes that have no row 
  const bar=read('app/letter-bar.tsx');
  assert(bar.includes("export const GERMAN_LETTERS=['ä','ö','ü','ß','Ä','Ö','Ü']"));
  for(const piece of ["startsWith('de')",'node!==document.documentElement','.umlaut-row',"addEventListener('touchstart',touch,{passive:false})",'onMouseDown={event=>event.preventDefault()}',"dispatchEvent(new Event('input',{bubbles:true}))",'visualViewport','el.readOnly||el.disabled'])assert(bar.includes(piece),piece);
- const css=read('app/globals.css');assert(css.includes('.letter-bar{position:fixed;'));assert(css.includes('body::after{content:"";display:block;height:var(--letter-bar-space,0px)}'));
+ const css=read('app/globals.css');assert(css.includes('.letter-bar{position:fixed;left:0;right:0;')&&css.includes('background:#c7cbd2'),'design "Klavye şeridi": a full-width grey strip with white keys');assert(css.includes('body::after{content:"";display:block;height:var(--letter-bar-space,0px)}'));
 });

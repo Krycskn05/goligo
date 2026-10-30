@@ -121,7 +121,8 @@ test('Oyunlar and Yanlışlarım are parts of their own; Yanlışlarım shows th
  const auth=load('member-auth');for(const page of ['/oyunlar','/yanlislarim'])assert.ok(auth.GUEST_PAGES.has(page),page);
  const page=read('app/verb-study.tsx');
  assert.ok(page.includes("if(value==='oyunlar'||value==='yanlislar')window.location.replace(value==='oyunlar'?'/oyunlar':'/yanlislarim');"),'old addresses move');
- assert.ok(page.includes("{part?<span>{t(part==='games'?'gamesTitle':'mistakesTitle')}</span>:section?<>"),'Ana sayfa › Oyunlar, not under Fiil Atölyesi');
+ // The "Ana sayfa › …" breadcrumb is gone (the learner asked, 30 October 2026); Oyunlar and Yanlışlarım stay parts of their own.
+ assert.ok(!page.includes('className="object-breadcrumb"'),'no breadcrumb');
  assert.ok(!page.includes("{t('backWorkshop')}</button>}</div>")||page.split("{!part&&<button type=\"button\" className=\"text-button verb-back\"").length===4,'no "back to the workshop" on the own pages');
  for(const piece of ['data-mistake-part="vault"','data-mistake-part="housing"','href="/ev-esyalar?learn=de&tekrar=1"','href="/a1-2/ev-ve-yasam?tekrar=1"'])assert.ok(page.includes(piece),piece);
  assert.ok(read('app/object-study.tsx').includes("get('tekrar')==='1')chooseCategory('all');")&&read('app/housing-study.tsx').includes("get('tekrar')==='1')choose('all');"));

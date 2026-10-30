@@ -189,6 +189,27 @@ async function languageFlow(browser) {
 
 (async () => {
   const browser = await chromium.launch();
+  // 30 Ekim 2026: Ubuntu 26.04 makinesinde "networkidle" hic gelmedi (sunucuya baska istek gitmedigi halde 90 sn bekledi).
+  // Sayfa "load" ile acilir, sonra en fazla 15 sn ag sessizligi beklenir; gelmezse test devam eder.
+  const newContext = browser.newContext.bind(browser);
+  browser.newContext = async (...args) => {
+    const ctx = await newContext(...args);
+    // Disaridaki adresler (Google yazi tipleri) beklenmez: takilirsa sayfanin "load" olayi da gelmez.
+    await ctx.route((url) => !/^https?:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url.toString()), (route) => route.abort());
+    const newPage = ctx.newPage.bind(ctx);
+    ctx.newPage = async () => {
+      const p = await newPage();
+      const goto = p.goto.bind(p);
+      p.goto = async (url, opts = {}) => {
+        if (opts.waitUntil !== "networkidle") return goto(url, opts);
+        const response = await goto(url, { ...opts, waitUntil: "load" });
+        await p.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+        return response;
+      };
+      return p;
+    };
+    return ctx;
+  };
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "tr-TR" });
   const page = await context.newPage();
   const errors = [];

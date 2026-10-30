@@ -3,7 +3,7 @@ import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {OptionText} from './option-fit';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,ChevronRight,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,Compass,Headphones,Loader2,Lock,Play,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {housingMeaning,type HousingExercise} from '@/lib/housing-course';
 import {housingIllustration} from '@/lib/housing-illustrations';
@@ -325,7 +325,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   <SiteHeader language={language} languages={vaultLanguages} onLanguage={value=>{if(isVaultLanguage(value)){stopFeedback();onLanguage(value);}}} homeHref="/?learn=de" homeLabel={v('home')} stats={snapshot.stats} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={section==='games'?'games':section==='mistakes'?'mistakes':'verbs'}/>
   <main id="object-main" className="object-page">
-   <div className="object-breadcrumb"><a href="/?learn=de">{v('home')}</a><ChevronRight size={14} className="vault-direction-icon"/>{part?<span>{t(part==='games'?'gamesTitle':'mistakesTitle')}</span>:section?<><a href="/fiiller" onClick={event=>{event.preventDefault();closeSection();}}>{t('workshopTitle')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{t(section==='games'?'gamesTitle':'mistakesTitle')}</span></>:<span>{t('workshopTitle')}</span>}</div>
+   {/* The "Ana sayfa › …" breadcrumb was removed at the learner's request (30 October 2026); the menu above leads home. */}
    {guest&&<GuestBanner language={language} back={back}/>}
    {error&&<div className="object-alert" role="alert"><p>{errorText(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{v('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}

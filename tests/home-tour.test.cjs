@@ -26,8 +26,10 @@ test('the home page introduces the site; the units catalogue moved to /konular',
  for(const file of ['app/housing-study.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx']){
   const source=read(file);
   assert.ok(!source.includes('/?learn=de&level=A1.2'),file);
-  assert.ok(source.includes('homeHref="/konular?level=A1.2"')&&source.includes('<a href="/konular?level=A1.2">A1.2</a>'),file);
+  // The header leads back to A1.2; the "A1.2 › …" breadcrumb was removed at the learner's request (30 October 2026).
+  assert.ok(source.includes('homeHref="/konular?level=A1.2"')&&!source.includes('className="object-breadcrumb"'),file);
  }
+ for(const file of ['app/object-study.tsx','app/verb-study.tsx'])assert.ok(!read(file).includes('className="object-breadcrumb"'),file+': no "Ana sayfa ›" breadcrumb');
  assert.ok(read('app/layout.tsx').includes('import "./home-tour.css";'));
  const icons=read('app/nav-icons.tsx');
  for(const name of ['home','housing','ausbildung'])assert.ok(icons.includes(' '+name+':<>')&&read('app/koko-theme.css').includes('.nav-icon-'+name+' {'),name);

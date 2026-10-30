@@ -68,7 +68,7 @@ export function HoerenPage({language,onLanguage,guest=false}:{language:StudyLang
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={housingText(language,'back')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
   <main id="l12-main" className="object-page housing-page l12-page" lang={language} dir={languageDirection(language)}>
-   <div className="object-breadcrumb"><a href="/konular?level=A1.2">A1.2</a><span aria-hidden="true">›</span><a href={AUSBILDUNG_PATH}>Lektion 12 · Ausbildung</a><span aria-hidden="true">›</span>{task?<><a href={AUSBILDUNG_PATH+'/hoeren'} onClick={event=>{event.preventDefault();open(null);}}>{t('Dinleme')}</a><span aria-hidden="true">›</span><span>{task.number}</span></>:<span>{t('Dinleme')}</span>}</div>
+   {/* The breadcrumb was removed at the learner's request (30 October 2026: "remove these everywhere"); the header leads back. */}
    {guest&&<GuestBanner language={language} back={back}/>}
    {language!=='tr'&&!hasL12Pack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
    {player.warning&&<p className="object-alert" role="status">{player.warning}</p>}

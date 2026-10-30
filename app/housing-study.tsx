@@ -129,7 +129,7 @@ export function HousingWorkshop({language,onLanguage,guest=false}:{language:Stud
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref="/konular?level=A1.2" homeLabel={h('back')} stats={snapshot.stats} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
   <main id="housing-main" className="object-page housing-page">
-   <div className="object-breadcrumb"><a href="/konular?level=A1.2">A1.2</a><span aria-hidden="true">›</span><span>{h('title')}</span></div>
+   {/* The breadcrumb was removed at the learner's request (30 October 2026: "remove these everywhere"); the header leads back. */}
    {guest&&<GuestBanner language={language} back={back}/>}
    {error&&<div className="object-alert" role="alert"><p>{signIn?v('signInError'):h(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{if(pendingAnswer.current)void submit(pendingAnswer.current.answer);else if(pendingStart.current)void start(pendingStart.current.reviewOnly,pendingStart.current.onlyIds);else void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}

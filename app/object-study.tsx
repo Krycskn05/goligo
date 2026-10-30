@@ -2,7 +2,7 @@
 import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,ChevronRight,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CheckCircle2,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {objectGroups,objectVocabulary,objectWordMap,type ObjectWord} from '@/lib/object-course';
 import {objectSubgroups,subgroupName,inObjectSubgroup} from '@/lib/object-subgroups';
@@ -181,7 +181,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'vault'} course={course}/>
   <main id="object-main" className="object-page">
    {onCourse&&<CourseSelector course={course} language={isStudyLanguage(language)?language:'en'} disabled={busy} onChange={onCourse}/>}
-   <div className="object-breadcrumb"><a href={'/?learn='+course}>{text('home')}</a><ChevronRight size={14} className="vault-direction-icon"/><span>{text('vaultTitle')}</span></div>
+   {/* The "Ana sayfa › …" breadcrumb was removed at the learner's request (30 October 2026); the menu above leads home. */}
    {guest&&<GuestBanner language={language} back={back}/>}
    {error&&<div className="object-alert" role="alert"><p>{text(error)}</p>{signIn?<a href="/auth/login" className="btn">{text('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{text('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{text('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:text('audioWarning')}</p>}

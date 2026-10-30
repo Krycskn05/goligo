@@ -26,6 +26,7 @@ import {GUEST_L12_PART} from '@/lib/guest-parts';
 import {GuestBanner,GuestLock,GuestMore} from './guest-taste';
 import {ExerciseView,Flashcards,LessonBlocks,Rich,TeachingCard,readKnown,readScores,teachingCards,type Speech} from './ausbildung-ui';
 import {LISTEN_CHANGED,ListenTask,listenResult,useListenPlayer} from './ausbildung-listen';
+import {useSyncVersion} from './lesson-sync';
 
 const unit=courseUnits.find(item=>item.id==='book-12')!;
 const partParam=(value:string|null):L12PartId|null=>value&&lessonPartMap.has(value as L12PartId)?value as L12PartId:null;
@@ -61,8 +62,9 @@ export default function AusbildungStudy({guest=false}:{guest?:boolean}){
  const switchLanguage=useLanguageSwitch(setLanguage,loadL12Pack);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 · Ausbildung · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
+ const synced=useSyncVersion('l12'); // progress from another device: read it again (app/lesson-sync.tsx)
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <L12Provider language={language}><AusbildungLesson language={language} onLanguage={switchLanguage} guest={guest}/></L12Provider>;
+ return <L12Provider language={language}><AusbildungLesson key={synced} language={language} onLanguage={switchLanguage} guest={guest}/></L12Provider>;
 }
 
 type Route={part:L12PartId|null;step:L12Step|null};

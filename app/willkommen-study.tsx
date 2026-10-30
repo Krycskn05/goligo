@@ -29,6 +29,7 @@ import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {StepViewC} from './willkommen-c-steps';
 import {StepViewD} from './willkommen-d-steps';
+import {useSyncVersion} from './lesson-sync';
 
 /**
  * Lektion 1 „Willkommen!“ (the learner's own lesson pages): the contents page is an open notebook like Lektion 11 and
@@ -42,8 +43,9 @@ export default function WillkommenStudy({guest=false}:{guest?:boolean}){
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 1 · Willkommen! · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
+ const synced=useSyncVersion('l1'); // progress from another device: read it again (app/lesson-sync.tsx)
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <WillkommenLesson language={language} onLanguage={switchLanguage} guest={guest}/>;
+ return <WillkommenLesson key={synced} language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 
 /** A part with a lesson: its steps, tabs, scored exercises, picture and step views. */

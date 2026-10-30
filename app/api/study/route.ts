@@ -61,7 +61,7 @@ export async function GET(request:Request){
   if(url.searchParams.get('note')==='tour'){const row=await db.prepare('SELECT value FROM study_notes WHERE user_id=? AND key=?').bind(user,'tour').first<{value:string}>();return json({tour:row?.value??''});}
   const [reviews,notes,sessions,activePicture,activeVerb]=await Promise.all([
    db.prepare('SELECT question_id,wrong_count,streak,seen,last_answer,last_wrong,last_at,due_at FROM study_review WHERE user_id=?').bind(user).all(),
-   db.prepare('SELECT key,value FROM study_notes WHERE user_id=?').bind(user).all<{key:string;value:string}>(),
+   db.prepare("SELECT key,value FROM study_notes WHERE user_id=? AND key NOT LIKE 'sync:%'").bind(user).all<{key:string;value:string}>(), // lesson progress (app/api/ilerleme) is not needed here
    db.prepare("SELECT s.id,s.mode,s.topic,s.created_at,s.finished_at,s.questions,COUNT(a.id) AS answered,COALESCE(SUM(a.correct),0) AS correct FROM study_sessions s LEFT JOIN study_answers a ON a.session_id=s.id AND a.user_id=s.user_id WHERE s.user_id=? AND ((?=1 AND s.topic LIKE 'en-%') OR (?=0 AND s.topic NOT LIKE 'en-%')) GROUP BY s.id ORDER BY s.created_at DESC LIMIT 40").bind(user,english?1:0,english?1:0).all<Record<string,unknown>>(),
    db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode IN ('visual','write','listen') AND topic LIKE ? AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user,english?'en-objects-%':'objects-%').first<{id:string}>(),
    english?Promise.resolve(null):db.prepare("SELECT id FROM study_sessions WHERE user_id=? AND mode='workshop' AND topic LIKE 'verbs-%' AND finished_at IS NULL ORDER BY created_at DESC LIMIT 1").bind(user).first<{id:string}>()

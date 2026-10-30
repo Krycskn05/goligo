@@ -56,6 +56,9 @@ s_site() {
   done
   [ "$ok" -eq 1 ] || { echo "Site 3 dakikada acilmadi"; tail -n 80 "$OUT/07-dev-server.log"; return 1; }
   # Playwright'ın indirilmesi bazen ağ yüzünden takılıyor: 3 kez dener (bir kez "Playwright kurulamadi" yayını durdurmuştu).
+  # 30 Ekim 2026: GitHub'ın ubuntu-latest makinesi Ubuntu 26.04 oldu; Playwright 1.55.1'in ona tarayıcısı yok
+  # ("does not support chromium on ubuntu26.04-x64"). O zaman Ubuntu 24.04 tarayıcısını kullanır.
+  if grep -q 'VERSION_ID="26' /etc/os-release 2>/dev/null; then export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64; echo "Ubuntu 26.04: Playwright 24.04 tarayicisini kullaniyor"; fi
   local pw=0
   # 30 Ekim 2026: üç deneme de olmadı ve neden görünmedi; artık çıktı 08b-playwright.log'a yazılır, sistem paketleri
   # (--with-deps, apt) kurulamazsa tarayıcı onlarsız kurulur (GitHub'ın Ubuntu makinesinde bu paketler zaten var).

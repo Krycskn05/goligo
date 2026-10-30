@@ -890,3 +890,11 @@ html[data-lernkoko-motion="reduced"] .puzzle-empty.filled,html[data-lernkoko-mot
  .vault-feature-grid > .vault-mode-card.featured:only-child .vault-category-art { margin-bottom:0; }
 }
 
+/* Special German letters at the bottom of the screen while a German text box has the focus (app/letter-bar.tsx; the learner asked,
+   30 October 2026). The page gets room below so nothing stays hidden under the row. */
+.letter-bar{position:fixed;left:50%;transform:translateX(-50%);z-index:80;display:flex;gap:4px;padding:5px;border-radius:16px;background:#fff;border:1.5px solid #cdd5e4;box-shadow:0 8px 22px rgba(28,82,130,.18)}
+.letter-bar button{min-width:40px;height:40px;padding:0 6px;border:1px solid #dce2ec;border-radius:11px;background:#f8f9fd;color:#1f3b5c;font:inherit;font-size:19px;font-weight:700;line-height:1;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.letter-bar button:hover{background:#eaf4ff}
+.letter-bar button:active{background:#d6eaff;transform:translateY(1px)}
+body::after{content:"";display:block;height:var(--letter-bar-space,0px)}
+@media (max-width:360px){.letter-bar{gap:3px;padding:4px}.letter-bar button{min-width:34px;height:38px;font-size:17px}}

@@ -26,6 +26,7 @@ import {InstallGuide} from './install-guide';
 import {SiteMenu} from './site-menu';
 import {SiteTour} from './site-tour';
 import {GuestBanner} from './guest-taste';
+import {useSyncVersion} from './lesson-sync';
 
 /** home = the welcome page at "/" (Koko's tour of the site); units = the units catalogue at /konular. */
 export type HomePage='home'|'units';
@@ -59,9 +60,10 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const [willkommen,setWillkommen]=useState<TopicProgress|null>(null);
  // Lektion 15 (Teil A since 30 October 2026) keeps its scores in the browser, too (lib/stadt-progress.ts).
  const [stadt,setStadt]=useState<TopicProgress|null>(null);
- useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home]);
- useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home]);
- useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home]);
+ const synced=useSyncVersion(); // lesson progress from another device (app/lesson-sync.tsx)
+ useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
+ useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
+ useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={languageDirection(language)} lang={language}>

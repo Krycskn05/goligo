@@ -21,6 +21,7 @@ import {RasterArt} from './toon-art';
 import {LessonBook} from './lesson-book';
 import {hoerenPicture} from '@/lib/ausbildung-art';
 import {LISTEN_CHANGED,ListenTask,listenPart,listenResult,tasksByNumber,useListenPlayer} from './ausbildung-listen';
+import {useSyncVersion} from './lesson-sync';
 
 /** Lektion 12 – Hören: the 14 listening sections; one section at a time (?bolum=1 … 14). */
 /** `guest`: a visitor without an account — the sections of Teil A are open, the others ask to sign up. */
@@ -29,8 +30,9 @@ export default function AusbildungHoeren({guest=false}:{guest?:boolean}){
  const switchLanguage=useLanguageSwitch(setLanguage,loadL12Pack);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 – Hören · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
+ const synced=useSyncVersion('l12'); // progress from another device: read it again (app/lesson-sync.tsx)
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <L12Provider language={language}><HoerenPage language={language} onLanguage={switchLanguage} guest={guest}/></L12Provider>;
+ return <L12Provider language={language}><HoerenPage key={synced} language={language} onLanguage={switchLanguage} guest={guest}/></L12Provider>;
 }
 
 /** The section in the address: ?bolum=4, or the older #bolum-4 links. */

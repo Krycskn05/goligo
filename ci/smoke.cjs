@@ -280,6 +280,10 @@ async function languageFlow(browser) {
   await page.waitForTimeout(600);
   await page.screenshot({ path: path.join(OUT, "03f-lektion-15a-konus.png"), fullPage: true });
   record("Lektion 15A: Konus adimi aciliyor (Omar'in ilk cumlesi, yazma kutusu)", (await page.locator("[data-l15-step='konus'] .l1a-talk .l1a-line").count()) === 1 && (await page.locator("[data-l15-step='konus'] .l1a-talk-input").count()) === 1, "");
+  // Ozel harfler (30 Ekim 2026): Almanca kutuya dokununca altta a o u ss satiri cikar, dokunulan harf kutuya yazilir.
+  await page.locator("[data-l15-step='konus'] .l1a-talk-input").click({ timeout: 5000 }).catch(() => {});await page.waitForTimeout(300);
+  await page.locator(".letter-bar button[data-letter='ß']").click({ timeout: 5000 }).catch(() => {});
+  record("Ozel harf satiri: Almanca kutuda cikiyor, harfi yaziyor", (await page.locator(".letter-bar button").count()) === 7 && (await page.locator("[data-l15-step='konus'] .l1a-talk-input").inputValue()) === "ß", "");
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=katlar", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 15A: katlar adimi aciliyor (bina, 7 kat ve cati)", (await page.locator("[data-l15-step='katlar'] .l15-house .l15-floor").count()) === 8, "");
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=wohin", { waitUntil: "networkidle", timeout: 90000 });

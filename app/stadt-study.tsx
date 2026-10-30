@@ -24,6 +24,7 @@ import {LessonBook} from './lesson-book';
 import {TopicArt} from './toon-art';
 import {useLessonSpeech,Rich,StepStrip,type StepProps} from './willkommen-ui';
 import {StepViewL15A} from './stadt-a-steps';
+import {useSyncVersion} from './lesson-sync';
 
 /**
  * Lektion 15 „Wege in der Stadt“ (A1.2): the contents page is an open notebook like Lektion 1, 11 and 12 (Teil A–D;
@@ -38,8 +39,9 @@ export default function StadtStudy({guest=false}:{guest?:boolean}){
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 15 · Wege in der Stadt · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
+ const synced=useSyncVersion('l15'); // progress from another device: read it again (app/lesson-sync.tsx)
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;
- return <StadtLesson language={language} onLanguage={switchLanguage} guest={guest}/>;
+ return <StadtLesson key={synced} language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 
 /** A part with a lesson: its steps, tabs, scored exercises, picture and step view. */

@@ -19,6 +19,8 @@ import "./site-tour.css";
 import "./games.css";
 import LearningEffects from './learning-effects';
 import { OptionFit } from './option-fit';
+import { LetterBar } from './letter-bar';
+import { LessonSync } from './lesson-sync';
 import { STORAGE_MOVE_SCRIPT } from "@/lib/storage-move";
 
 export const metadata: Metadata = {
@@ -55,7 +57,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
         <meta name="theme-color" content="#fdf8ec" />
       </head>
-      <body className="antialiased">{children}<LearningEffects/><OptionFit/></body>
+      <body className="antialiased">{children}<LearningEffects/><OptionFit/><LetterBar/><LessonSync/></body>
     </html>
   );
 }

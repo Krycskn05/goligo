@@ -15,7 +15,7 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,FeedbackLine,WordChoice,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -285,8 +285,9 @@ function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactN
   if(!ok)sound.wrong();else if(lineDone&&line.say){const say=line.say;sound.correct(()=>speech.speak(say));}else sound.correct();
  };
  const restart=()=>{setValues(gaps.map(()=>''));setOrders(mix());first.current=gaps.map(()=>null);scored.current=false;setFeedback(null);};
- const field=(l:number,g:number,gap:ChoiceGap)=>{const i=indexOf(l,g);const value=values[i];const state=!value?'':value===gap.answer?' ok':' bad';
-  return <select key={'gap'+g} className={'l1a-gap l15-select'+state} value={value} aria-label={`Boşluk ${i+1}`} onChange={event=>choose(i,event.target.value)}><option value="">…</option>{orders[i].map(option=><option key={option} value={option}>{option}</option>)}</select>;};
+ // The words open under the gap like in Lektion 1 (the learner chose it, 30 October 2026, option B).
+ const field=(l:number,g:number,gap:ChoiceGap)=>{const i=indexOf(l,g);const value=values[i];
+  return <WordChoice key={'gap'+g} value={value} options={orders[i]} used={values.filter((_,k)=>k!==i)} state={!value?null:value===gap.answer} label={`Boşluk ${i+1}`} onChoose={word=>choose(i,word)}/>;};
  const text=(line:ChoiceLine,l:number)=>{let g=0;return line.parts.map((part,p)=>typeof part==='string'?<span key={p}>{part}</span>:field(l,g++,part));};
  const lineOk=(l:number)=>gaps.every((gap,i)=>gap.line!==l||values[i]===gap.answer);
  return <>

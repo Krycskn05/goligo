@@ -116,6 +116,31 @@ export function LockedStep({openLabel,onOpen}:{openLabel:string;onOpen:()=>void}
   <p>Bu bölüm henüz kilitli. Önce alıştırmaları sırayla bitir.</p>
   <button type="button" className="btn small" onClick={onOpen}>Sıradaki alıştırma: {openLabel}</button></div>;
 }
+/** A gap filled from a box of words (the learner chose it, 30 October 2026, option B): a tap on the gap opens the words
+ * right under it as big buttons, a tap on a word puts it in and closes the box (Escape or a tap elsewhere closes it too).
+ * Words already used in another gap look faded but can still be chosen. Used in every lesson instead of a drop-down list. */
+export function WordChoice({value,options,used=[],state,label,onChoose}:{value:string;options:readonly string[];used?:readonly string[];state:boolean|null;label:string;onChoose:(value:string)=>void}){
+ const [open,setOpen]=useState(false);
+ const box=useRef<HTMLSpanElement>(null);const menu=useRef<HTMLSpanElement>(null);
+ useEffect(()=>{if(!open)return;
+  const element=menu.current;
+  if(element){
+   // Keep the box on the screen: near the right edge it moves left (near the left edge, right).
+   element.style.transform='';const rect=element.getBoundingClientRect();const over=rect.right-(window.innerWidth-8);const under=8-rect.left;
+   if(over>0)element.style.transform=`translateX(${-Math.min(over,Math.max(0,rect.left-8))}px)`;else if(under>0)element.style.transform=`translateX(${under}px)`;
+   element.scrollIntoView({block:'nearest',behavior:'smooth'});
+   element.querySelector<HTMLButtonElement>('button.on')?.focus({preventScroll:true});
+  }
+  const away=(event:PointerEvent)=>{if(!box.current?.contains(event.target as Node))setOpen(false);};
+  const key=(event:KeyboardEvent)=>{if(event.key==='Escape'){setOpen(false);box.current?.querySelector<HTMLButtonElement>('.l1a-choice-slot')?.focus();}};
+  document.addEventListener('pointerdown',away);document.addEventListener('keydown',key);
+  return()=>{document.removeEventListener('pointerdown',away);document.removeEventListener('keydown',key);};
+ },[open]);
+ return <span className={'l1a-choice'+(open?' open':'')} ref={box}>
+  <button type="button" className={'l1a-choice-slot'+(value?' filled':'')+(state===true?' ok':state===false?' bad':'')} lang="de" aria-haspopup="true" aria-expanded={open} aria-label={value?label+': '+value:label} onClick={()=>setOpen(current=>!current)}>{value||' '}</button>
+  {open&&<span className="l1a-choice-menu" ref={menu} role="group" aria-label={label}>{options.map(word=><button type="button" key={word} lang="de" className={'l1a-choice-word'+(word===value?' on':'')+(word!==value&&used.includes(word)?' used':'')} onClick={()=>{onChoose(word);setOpen(false);}}>{word}</button>)}</span>}
+ </span>;
+}
 /** A typed gap as one cell per missing letter inside the word (the learner chose it, 30 October 2026, option A). One real
  * input lies over the cells, so the phone keyboard, deleting and pasting work as usual; the caret always stays at the end. */
 function LetterCells({value,size,state,label,exact,inputRef,onChange}:{value:string;size:number;state:boolean|null;label:string;exact:boolean;inputRef:(element:HTMLInputElement|null)=>void;onChange:(value:string)=>void}){
@@ -161,9 +186,15 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
   const after=nextChecked.findIndex((value,k)=>k>i&&value!==true);const target=after>=0?after:nextChecked.findIndex(value=>value!==true);
   if(target>=0)refs.current[target]?.focus();
  };
+ // A word from the box: right or wrong shows at once; when every gap is right the exercise is checked at once.
+ const chooseWord=(i:number,word:string)=>{
+  const next=values.slice();next[i]=word;setValues(next);
+  const nextChecked=checked.slice();nextChecked[i]=accepts(word,gaps[i].answers);setChecked(nextChecked);
+  if(nextChecked.every(value=>value===true))check(next);
+ };
  const reveal=()=>{setValues(gaps.map(gap=>gap.answers[0]));setChecked(gaps.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
  const field=(l:number,g:number)=>{const i=at(l,g);const state=checked[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
-  const input=choices?<select className={cls} value={values[i]} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);const ok=accepts(event.target.value,gaps[i].answers);const nextChecked=checked.slice();nextChecked[i]=event.target.value?ok:null;setChecked(nextChecked);}}><option value="">…</option>{(box??choices).map(word=><option key={word} value={word}>{word}</option>)}</select>
+  const input=choices?<WordChoice value={values[i]} options={box??choices} used={values.filter((_,k)=>k!==i)} state={state} label={`Boşluk ${i+1}`} onChoose={word=>chooseWord(i,word)}/>
    :cells&&!wide?<LetterCells value={values[i]} size={Array.from(gaps[i].answers[0]).length} state={state} label={`Boşluk ${i+1}`} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
    :<input className={cls} value={values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const nextChecked=checked.slice();nextChecked[i]=null;setChecked(nextChecked);}}}/>;
   return <span className="l1a-gap-wrap" key={g}>{input}{state===false&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};

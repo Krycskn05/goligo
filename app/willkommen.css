@@ -52,6 +52,21 @@
 .l1a-gap.wide { display:block; width:100%; text-align:start; margin:4px 0 2px; padding:10px 12px; border:2px solid var(--toy-line,#dce5da); border-radius:12px; min-height:46px; }
 select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min-width:6.5em; text-align:start; }
 .l1a-gap.ok { border-color:#5d934e; background:#edf6e9; }
+/* Words from a box: a tap on the gap opens the words right under it (the learner chose it, 30 October 2026, option B). */
+.l1a-choice { position:relative; display:inline-block; vertical-align:middle; max-width:100%; margin:2px 1px; line-height:1.35; }
+.l1a-choice.open { z-index:40; }
+.l1a-line:has(.l1a-choice.open),.l1a-row:has(.l1a-choice.open),.l15-choice-row:has(.l1a-choice.open) { position:relative; z-index:40; }
+.l1a-choice-slot { display:inline-block; min-width:4.6em; max-width:100%; min-height:38px; padding:3px 14px; border-radius:999px; border:2px dashed #9cc3ea; background:#fff; color:var(--blue-2,#2f7fd6); font:inherit; font-weight:800; line-height:1.35; text-align:center; white-space:normal; overflow-wrap:anywhere; cursor:pointer; vertical-align:middle; }
+.l1a-choice-slot.filled { border-style:solid; }
+.l1a-choice.open .l1a-choice-slot { border:2px solid var(--blue-2,#2f7fd6); box-shadow:0 0 0 4px rgba(47,127,214,.18); }
+.l1a-choice-slot.ok { border:2px solid #8fd18a; background:#e3f3dc; color:#2f6a24; }
+.l1a-choice-slot.bad { border:2px solid #e3a78d; background:#fff2ed; color:#9a4b2c; }
+.l1a-choice-menu { position:absolute; inset-inline-start:-6px; top:calc(100% + 8px); display:flex; flex-wrap:wrap; gap:6px; width:max-content; max-width:min(300px,calc(100vw - 32px)); padding:10px; border-radius:16px; background:#fff; border:1.5px solid #cfdeee; box-shadow:0 12px 28px rgba(31,59,92,.18); line-height:1.2; text-align:start; }
+.l1a-choice-menu::before { content:""; position:absolute; inset-inline-start:26px; top:-8px; width:14px; height:14px; background:#fff; border-left:1.5px solid #cfdeee; border-top:1.5px solid #cfdeee; transform:rotate(45deg); }
+.l1a-choice-word { position:relative; min-height:40px; padding:6px 14px; border-radius:999px; background:#fff; border:1.5px solid #cfdeee; box-shadow:0 2px 0 #cfdeee; color:var(--ink,#1f3b5c); font:inherit; font-size:16px; font-weight:800; line-height:1.25; cursor:pointer; text-align:start; white-space:normal; }
+.l1a-choice-word:hover,.l1a-choice-word:focus-visible { border-color:var(--blue-2,#2f7fd6); background:#f5faff; }
+.l1a-choice-word.on { background:var(--blue-2,#2f7fd6); border-color:var(--blue-2,#2f7fd6); color:#fff; box-shadow:none; }
+.l1a-choice-word.used { opacity:.4; }
 /* Letter cells: one small box per missing letter inside the word (the learner chose it, 30 October 2026, option A). */
 .l1a-cells { position:relative; display:inline-flex; flex-wrap:wrap; gap:3px; margin:0 1px; vertical-align:-4px; cursor:text; }
 .l1a-cells i { font-style:normal; display:inline-grid; place-items:center; width:1em; height:1.45em; border-radius:6px 6px 2px 2px; background:#fff; border-bottom:2.5px solid var(--blue-2,#2f7fd6); color:var(--blue-2,#2f7fd6); font-weight:800; line-height:1; box-shadow:0 1px 0 rgba(31,59,92,.06); transition:background .15s,box-shadow .15s; }

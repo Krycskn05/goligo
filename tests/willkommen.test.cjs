@@ -91,6 +91,9 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  assert(ui.includes('export function exerciseLock(')&&ui.includes('export function LockedStep(')&&ui.includes('function LetterCells('));
  for(const file of ['app/willkommen-study.tsx','app/stadt-study.tsx']){const code=read(file);for(const piece of ['const lock=exerciseLock(config.groups,config.steps,scores[place.part]);','if(mustFinish&&step){setLockNote(step.id);return;}','{stepLocked?<LockedStep','tabLocked(item.id)'])assert(code.includes(piece),file+': '+piece);}
  assert(read('app/willkommen-study.tsx').includes('title="Eksik harfleri tamamla" cells lines={lettersExercise.lines}'));
+ // Words from a box open under the gap in every lesson; no drop-down list is left (30 October 2026, option B).
+ assert(ui.includes('export function WordChoice(')&&ui.includes('const input=choices?<WordChoice ')&&read('app/stadt-a-steps.tsx').includes('return <WordChoice '));
+ for(const file of ['app/willkommen-ui.tsx','app/stadt-a-steps.tsx'])assert(!read(file).includes('<select'),file);
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
  for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);

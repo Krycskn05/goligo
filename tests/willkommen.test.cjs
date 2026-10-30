@@ -288,7 +288,7 @@ test('exercise fixes (30 October 2026): mixed word boxes, clear Sie/du rows, eve
  for(let i=0;i<300;i++){const order=mixedOrder(box,box);assert.deepEqual([...order].sort(),[...box].sort());assert.notEqual(order.join(),box.join(),'never the order of the gaps');}
  const page=pageCode();
  assert.equal((page.match(/ bank lines=\{/g)||[]).length,3,'Lektion 1 A–C word boxes list the mixed box');
- assert(page.includes('const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);')&&page.includes('{(box??choices).map(word=>'));
+ assert(page.includes('const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);')&&page.includes('options={box??choices}'));
  assert(page.includes('return rows.map(row=>fixed?row.options:shuffle(row.options));'),'rows with their own choices are mixed');
  const stadt=read('app/stadt-a-steps.tsx');assert(!stadt.includes('shuffleOptions'));assert(stadt.includes('bankLead="Kutudaki kelimeleri yerleştir:"')&&stadt.includes('const [orders,setOrders]=useState(mix);'));
  // Sie oder du: no row without a clue any more.

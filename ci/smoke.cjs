@@ -274,7 +274,7 @@ async function languageFlow(browser) {
   record("Lektion 1: defter girisi (Teil A-D acik)", (await page.locator(".l1a-book .lb-toc-row button.lb-toc-open").count()) === 4 && (await page.locator(".l1a-book .l1a-soon").count()) === 0, "");
   await page.locator("[data-l1a-part='a'] button.lb-toc-open").click();
   await page.waitForTimeout(600);
-  record("Lektion 1A: kapak, 23 adim, dort sekme (Konus dahil)", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/23/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 4, (await page.locator(".l1a-where").textContent()) || "");
+  record("Lektion 1A: kapak, 22 adim, dort sekme (Konus dahil)", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/22/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 4, (await page.locator(".l1a-where").textContent()) || "");
   // Teil B (25 October 2026): a step opens from its address; the alphabet has 30 letters.
   await page.goto(BASE + "/a1-1/willkommen?teil=b&adim=alfabe", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 1B: alfabe adimi aciliyor (30 harf)", (await page.locator("[data-l1a-step='alfabe'][data-l1a-teil='b']").count()) === 1 && (await page.locator(".l1a-letter").count()) === 30, (await page.locator(".l1a-where").textContent()) || "");
@@ -301,6 +301,13 @@ async function languageFlow(browser) {
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, "03d-lektion-15a-diyalog.png"), fullPage: true });
   record("Lektion 15A: diyalog adimi aciliyor (pano, 15 satir, dinle dugmeleri)", (await page.locator("[data-l15-step='diyalog-amt'] .l15-board").count()) === 1 && (await page.locator("[data-l15-step='diyalog-amt'] .l1a-line").count()) === 15 && (await page.locator("[data-l15-step='diyalog-amt'] .l1a-line .l12-say").count()) === 15, "");
+  // Alistirmalar sirayla (30 Ekim 2026): alistirmalar bitmeden Konus kilitli; sonra hepsi bitti sayilip sonraki adimlar aciliyor.
+  await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=konus", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(600);
+  record("Lektion 15A: alistirmalar bitmeden Konus kilitli", (await page.locator("[data-l15-step='konus'] .l1a-locked").count()) === 1, "");
+  await page.evaluate(() => { const key = "lernkoko-l15a-scores"; let scores = {}; try { scores = JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch {}
+    for (const id of ["eslestir", "kelime-kur", "wohin", "katlar-yaz", "pano", "rami", "einen-eine", "dinle", "ach-ich", "sirala", "rollenspiel"]) if (!scores[id]) scores[id] = { right: 1, total: 1 };
+    localStorage.setItem(key, JSON.stringify(scores)); });
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=konus", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(600);
   await page.screenshot({ path: path.join(OUT, "03f-lektion-15a-konus.png"), fullPage: true });
@@ -313,9 +320,11 @@ async function languageFlow(browser) {
   record("Lektion 15A: katlar adimi aciliyor (bina, 7 kat ve cati)", (await page.locator("[data-l15-step='katlar'] .l15-house .l15-floor").count()) === 8, "");
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=wohin", { waitUntil: "networkidle", timeout: 90000 });
   {
-    const gaps = page.locator("[data-l15-step='wohin'] select");
-    await gaps.nth(0).selectOption("Sie"); await gaps.nth(1).selectOption("zur");
-    record("Lektion 15A: secimler hemen kontrol ediliyor (yesil / kirmizi)", (await gaps.count()) === 21 && (await page.locator("[data-l15-step='wohin'] select.ok").count()) === 1 && (await page.locator("[data-l15-step='wohin'] select.bad").count()) === 1, "");
+    // Kelime kutusu bosluga dokununca altinda aciliyor (30 Ekim 2026), acilir liste yok.
+    const gaps = page.locator("[data-l15-step='wohin'] .l1a-choice-slot");
+    const pick = async (n, word) => { await gaps.nth(n).click({ timeout: 5000 }); await page.locator("[data-l15-step='wohin'] .l1a-choice-menu button.l1a-choice-word", { hasText: new RegExp("^" + word + "$") }).first().click({ timeout: 5000 }); };
+    await pick(0, "Sie").catch(() => {}); await pick(1, "zur").catch(() => {});
+    record("Lektion 15A: secimler hemen kontrol ediliyor (yesil / kirmizi)", (await gaps.count()) === 21 && (await page.locator("[data-l15-step='wohin'] .l1a-choice-slot.ok").count()) === 1 && (await page.locator("[data-l15-step='wohin'] .l1a-choice-slot.bad").count()) === 1 && (await page.locator("[data-l15-step='wohin'] select").count()) === 0, "");
   }
   {
     const mobile = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });

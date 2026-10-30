@@ -227,7 +227,7 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
   <div className="l1a-dialogue">{lines.map((item,l)=>item.who?<div className={'l1a-line '+item.who} key={l}><div className="l1a-bubble">{line(item,l)}</div></div>:<div className={'l1a-row'+(item.say?' l1a-row-say':'')} key={l}>{item.say&&<Say text={sayText(item.say)} who={typeof item.say==='string'?undefined:item.say.who} speech={speech} label={String(l+1)} wide secret/>}{line(item,l)}</div>)}</div>
-  {/* No "Kontrol et" / "Cevapları göster" (the learner asked, 30 October 2026): every gap checks itself. */}
+  {/* No check or show-answers buttons (the learner asked, 30 October 2026): every gap checks itself. */}
   <FeedbackLine feedback={feedback}/>
  </>;
 }

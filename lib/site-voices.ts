@@ -109,6 +109,26 @@ export function clipPlaybackRate(rate:number){
  return Number.isFinite(value)?Math.max(0.5,Math.min(1.3,value)):1;
 }
 
+/** Clips that are on the page are loaded before the tap (the learner heard late voices, 30 October 2026): a few at a
+ * time, each once, kept in memory; the player then plays the loaded copy instead of downloading first. */
+const loadedClips=new Map<string,string>();const wantedClips=new Set<string>();const clipQueue:string[]=[];let clipsLoading=0;
+export function warmClip(url:string){
+ if(!url||wantedClips.has(url)||typeof fetch!=='function'||typeof URL==='undefined'||typeof URL.createObjectURL!=='function')return;
+ wantedClips.add(url);clipQueue.push(url);pumpClips();
+}
+function pumpClips(){
+ while(clipsLoading<3&&clipQueue.length){
+  const url=clipQueue.shift() as string;clipsLoading++;
+  void fetch(url).then(response=>response.ok?response.blob():null).then(blob=>{
+   if(!blob||!blob.size)return;
+   if(loadedClips.size>=200){const oldest=loadedClips.keys().next().value as string;const copy=loadedClips.get(oldest);loadedClips.delete(oldest);wantedClips.delete(oldest);if(copy)setTimeout(()=>URL.revokeObjectURL(copy),60000);}
+   loadedClips.set(url,URL.createObjectURL(blob));
+  }).catch(()=>{wantedClips.delete(url);}).finally(()=>{clipsLoading--;pumpClips();});
+ }
+}
+/** The loaded copy of a clip, or the clip's own address. */
+export function clipSource(url:string){return loadedClips.get(url)??url;}
+
 type ClipEvents={onStart:()=>void;onEnd:()=>void;onError:()=>void};
 /** `loading` says whether the current clip is still being downloaded (a slow connection), so the chosen voice is kept a little longer. */
 export type ClipPlayer={unlock:()=>void;play:(url:string,rate:number,events:ClipEvents,speed?:number)=>void;stop:()=>void;loading?:()=>boolean};
@@ -130,7 +150,7 @@ export function createClipPlayer(createAudio:()=>HTMLAudioElement=()=>new Audio(
   play(url,rate,events,speed=1){
    const audio=media();const mine=++token;
    detach(audio);try{audio.pause();}catch{}
-   audio.muted=false;audio.src=url;
+   audio.muted=false;audio.src=clipSource(url);
    const pitch=audio as HTMLAudioElement&{webkitPreservesPitch?:boolean;mozPreservesPitch?:boolean};
    try{pitch.preservesPitch=true;pitch.webkitPreservesPitch=true;pitch.mozPreservesPitch=true;}catch{}
    // speed: a listening player's 0.5×–2× on top of the reading rate.

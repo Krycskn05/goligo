@@ -72,5 +72,5 @@ test('Konuş waits and stays on the lesson (30 October 2026): at least eight ans
  assert.equal(prompt.talkDone(turns(8),true),true);assert.equal(prompt.talkDone(turns(9),false),false);
  assert(read('app/api/konus/route.ts').includes('done:talkDone(history,reply.done)'));
  const step=read('app/talk-step.tsx');
- for(const piece of ['r.continuous=true','if(want.current){window.setTimeout(()=>{if(want.current)session(kept);},150);return;}','sendOnStop.current=true;want.current=false;rec.current?.stop();','},30000);',"'Bitir ve gönder'"])assert(step.includes(piece),piece);
+ for(const piece of ['r.continuous=!android','if(rec.current!==r)return;','if(rec.current||want.current)stopMic();','if(want.current){window.setTimeout(()=>{if(want.current)session(kept);},150);return;}','sendOnStop.current=true;want.current=false;rec.current?.stop();','},30000);',"'Bitir ve gönder'"])assert(step.includes(piece),piece);
 });

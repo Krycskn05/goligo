@@ -38,6 +38,7 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
  useEffect(()=>{end.current?.scrollIntoView({block:'nearest',behavior:'smooth'});},[lines.length,busy]);
  const send=async(text:string)=>{
   const said=text.trim();if(!said||busy||done)return;
+  if(rec.current||want.current)stopMic(); // a late result must not refill the box after sending (30 October 2026)
   sound.prepare();speech.prepare();speech.stop();setError(null);setInput('');
   const next:Line[]=[...lines,{role:'learner',text:said}];setLines(next);setBusy(true);
   try{
@@ -56,16 +57,20 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
  // until the learner taps the button again; then what was heard is sent. After 30 s without a word it stops and keeps
  // the text in the box.
  const want=useRef(false);const sendOnStop=useRef(false);const heard=useRef('');const idle=useRef<ReturnType<typeof setTimeout>|null>(null);
- const sendRef=useRef(send);sendRef.current=send;
+ const sendRef=useRef(send);sendRef.current=send;const inputNow=useRef(input);inputNow.current=input;
  useEffect(()=>()=>{want.current=false;if(idle.current)clearTimeout(idle.current);},[]);
  const quiet=()=>{if(idle.current)clearTimeout(idle.current);idle.current=setTimeout(()=>{sendOnStop.current=false;want.current=false;rec.current?.stop();},30000);};
  const session=(base:string)=>{
   const r=recognizer();if(!r){want.current=false;setListening(false);return;}
-  r.lang='de-DE';r.interimResults=true;r.continuous=true;r.maxAlternatives=1;let said='';
-  r.onresult=event=>{let finals='',interim='';for(let i=0;i<event.results.length;i++){const part=event.results[i][0].transcript;if(event.results[i].isFinal)finals+=part+' ';else interim+=part;}
+  // Android repeats words in one long session, so there every pause starts a new short session instead.
+  const android=typeof navigator!=='undefined'&&/Android/i.test(navigator.userAgent);
+  r.lang='de-DE';r.interimResults=true;r.continuous=!android;r.maxAlternatives=1;let said='';
+  r.onresult=event=>{if(rec.current!==r)return; // a stopped session (sent, typed over, Baştan) is ignored
+   let finals='',interim='',last='';for(let i=0;i<event.results.length;i++){const part=event.results[i][0].transcript;if(event.results[i].isFinal){const clean=part.trim().toLowerCase();if(clean&&clean!==last)finals+=part+' ';last=clean;}else interim+=part;}
    said=finals;const text=(base+' '+finals+interim).replace(/\s+/g,' ').trim();heard.current=text;setInput(text);quiet();};
-  r.onerror=event=>{if(event.error==='not-allowed'||event.error==='service-not-allowed'){want.current=false;sendOnStop.current=false;setError({text:'Mikrofon izni gerekiyor. Tarayıcıda mikrofona izin ver ya da yaz.'});}};
+  r.onerror=event=>{if(rec.current!==r)return;if(event.error==='not-allowed'||event.error==='service-not-allowed'){want.current=false;sendOnStop.current=false;setError({text:'Mikrofon izni gerekiyor. Tarayıcıda mikrofona izin ver ya da yaz.'});}};
   r.onend=()=>{
+   if(rec.current!==r)return;
    const kept=(base+' '+said).replace(/\s+/g,' ').trim();
    if(want.current){window.setTimeout(()=>{if(want.current)session(kept);},150);return;}
    if(idle.current)clearTimeout(idle.current);
@@ -79,9 +84,12 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
  const listen=()=>{
   if(listening){sendOnStop.current=true;want.current=false;rec.current?.stop();return;}
   if(!recognizer())return;speech.stop();setError(null);
-  want.current=true;sendOnStop.current=false;heard.current='';setInput('');setListening(true);quiet();session('');
+  // What is already in the box stays and the spoken words are added after it.
+  const base=inputNow.current.trim();want.current=true;sendOnStop.current=false;heard.current=base;setInput(base);setListening(true);quiet();session(base);
  };
- const restart=()=>{want.current=false;sendOnStop.current=false;rec.current?.abort();speech.stop();setLines([opening]);setDone(false);setInput('');setError(null);};
+ /** Stops the microphone at once and forgets the session: nothing it still hears is written or sent. */
+ function stopMic(){want.current=false;sendOnStop.current=false;if(idle.current)clearTimeout(idle.current);const r=rec.current;rec.current=null;try{r?.abort();}catch{}setListening(false);}
+ const restart=()=>{stopMic();speech.stop();setLines([opening]);setDone(false);setInput('');setError(null);};
  const partner=scenario.name;
  return <>
   <p className="kicker" lang="de">Sprechen · {scenario.title}</p><Heading>Konuş: {scenario.title}</Heading>
@@ -105,7 +113,7 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
   {error&&<p className="l1a-feedback bad" role="status">{error.text}{error.signIn&&<> <a href={'/giris?return_to='+encodeURIComponent(typeof window==='undefined'?'/':window.location.pathname+window.location.search)}>Giriş yap</a></>}</p>}
   {done?<p className="l1a-feedback ok" role="status">Konuşma bitti 🎉</p>:<form className="l1a-talk-box" onSubmit={event=>{event.preventDefault();void send(input);}}>
    {canListen&&<button type="button" className={'l1a-talk-mic'+(listening?' on':'')} aria-pressed={listening} aria-label={listening?'Bitir ve gönder':'Bas ve Almanca konuş'} disabled={busy} onClick={listen}>{listening?<Square size={22} aria-hidden="true"/>:<Mic size={24} aria-hidden="true"/>}</button>}
-   <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={listening?'Dinliyorum… bitince ■ dokun':canListen?'Konuş ya da yaz…':'Almanca yaz…'} aria-label="Cevabın" maxLength={300} disabled={busy} onChange={event=>setInput(event.target.value)}/>
+   <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={listening?'Dinliyorum… bitince ■ dokun':canListen?'Konuş ya da yaz…':'Almanca yaz…'} aria-label="Cevabın" maxLength={300} disabled={busy} onChange={event=>{if(rec.current||want.current)stopMic();setInput(event.target.value);}}/>
    <button type="submit" className="btn small l1a-talk-send" disabled={busy||!input.trim()} aria-label="Gönder"><Send size={18} aria-hidden="true"/></button>
   </form>}
   <div className="l1a-actions">

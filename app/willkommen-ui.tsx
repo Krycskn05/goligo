@@ -3,6 +3,7 @@ import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'reac
 import {ArrowRight,Check,Lock,RotateCcw,Trash2,Volume2} from 'lucide-react';
 import type {StudyLanguage} from '@/lib/study-languages';
 import type {TopicProgress} from '@/lib/progress';
+import {siteClipUrls,warmClip} from '@/lib/site-voices';
 import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
 import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
@@ -17,10 +18,13 @@ import {mixedOrder} from '@/lib/mixed-order';
 /** Site speech plus "read these one after the other" (dialogues, spelling, the learner's own sentences). A text with a
  * speaker (`who`, see `speakers` in lib/willkommen-course.ts) is read with that person's own voice — a man by a man, a
  * woman by a woman; everything else with the learner's chosen voice. `slow` reads slowly (letters when spelling). */
-export type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void};
+export type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void;warm?:(items:readonly SayItem[])=>void};
 export function useLessonSpeech():Speech&{warning?:string}{
  const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning,siteVoices}=german;
  const voices=useRef(siteVoices);voices.current=siteVoices;
+ const preferred=useRef(german.voiceName);preferred.current=german.voiceName;
+ // Loads the clips of what is on the page before the tap (30 October 2026); runs again once the site voices are known.
+ const warm=useCallback((items:readonly SayItem[])=>{if(!siteVoices.length)return;for(const item of items){const text=sayText(item);if(!text.trim())continue;const who=typeof item==='string'?undefined:item.who;const url=siteClipUrls(speakerVoice(who,siteVoices)??preferred.current,text)[0];if(url)warmClip(url);}},[siteVoices]);
  const say=useCallback((item:SayItem)=>{const who=typeof item==='string'?undefined:item.who;const slow=typeof item!=='string'&&!!item.slow;speak(sayText(item),slow,speakerVoice(who,voices.current));},[speak]);
  const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
  const busyRef=useRef(busy);
@@ -35,7 +39,7 @@ export function useLessonSpeech():Speech&{warning?:string}{
  const speakOne=useCallback((item:SayItem)=>{queue.current=[];say(item);},[say]);
  const stopAll=useCallback(()=>{queue.current=[];if(waiting.current){clearTimeout(waiting.current);waiting.current=null;}stop();},[stop]);
  useEffect(()=>()=>{if(waiting.current)clearTimeout(waiting.current);},[]);
- return useMemo(()=>({speak:speakOne,speakAll,busy,activeText,stop:stopAll,prepare,warning}),[speakOne,speakAll,busy,activeText,stopAll,prepare,warning]);
+ return useMemo(()=>({speak:speakOne,speakAll,busy,activeText,stop:stopAll,prepare,warning,warm}),[speakOne,speakAll,busy,activeText,stopAll,prepare,warning,warm]);
 }
 
 export type Sound=ReturnType<typeof useAnswerSound>;
@@ -71,6 +75,7 @@ const sameItems=(a:unknown,b:readonly string[])=>Array.isArray(a)&&a.length===b.
 /* ---------- small pieces ---------- */
 /** A listen button. `secret`: a listening exercise, so the button's name does not give the answer away. */
 export function Say({text,who,slow,speech,label='Dinle',wide=false,secret=false}:{text:string;who?:string;slow?:boolean;speech:Speech;label?:string;wide?:boolean;secret?:boolean}){
+ const warm=speech.warm;useEffect(()=>{warm?.([{text,who}]);},[warm,text,who]);
  const playing=speech.busy&&speech.activeText===text;
  return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={secret?(label==='Dinle'?label:'Dinle '+label):label+': '+text} title={label} data-who={who} onClick={()=>speech.speak({text,who,slow})}><Volume2 size={18} aria-hidden="true"/>{wide&&label}</button>;
 }
@@ -89,6 +94,35 @@ export {mixedOrder};
 /* ---------- exercises ---------- */
 export type Feedback={ok:boolean;text:string}|null;
 export function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?.text??''}</p>;}
+/** Gaps that check themselves (the learner asked, 30 October 2026: no "Kontrol et", no "Cevapları göster"): a right
+ * answer turns green at once; a wrong one turns red when it is final (the learner leaves the box or presses Enter, every
+ * letter cell is filled, a word is chosen) and the right answer stays next to it until it is fixed. The score counts the
+ * first try of every gap; `onDone` runs once, when every gap is right. */
+export type SelfCheckResult='right'|'wrong'|'open';
+export function useSelfCheck(count:number,isRight:(i:number,value:string)=>boolean,onDone:(firstRight:number)=>void){
+ const fresh=()=>({values:Array.from({length:count},()=>''),state:Array.from({length:count},():boolean|null=>null),hinted:Array.from({length:count},()=>false)});
+ const [view,setView]=useState(fresh);
+ const latest=useRef(view);latest.current=view;
+ const first=useRef<(boolean|null)[]>(Array.from({length:count},()=>null));const scored=useRef(false);
+ const change=(i:number,value:string,final=false):SelfCheckResult=>{
+  const old=latest.current;const filled=value.trim().length>0;
+  const right=filled&&isRight(i,value);const wrong=!right&&final&&filled;
+  const next={values:old.values.slice(),state:old.state.slice(),hinted:old.hinted.slice()};
+  next.values[i]=value;next.state[i]=right?true:wrong?false:null;if(wrong)next.hinted[i]=true;
+  if((right||wrong)&&first.current[i]===null)first.current[i]=right;
+  latest.current=next;setView(next);
+  if(right&&!scored.current&&next.state.every(value=>value===true)){scored.current=true;onDone(first.current.filter(value=>value===true).length);}
+  return right?'right':wrong?'wrong':'open';
+ };
+ const leave=(i:number):SelfCheckResult=>latest.current.state[i]===true?'right':change(i,latest.current.values[i],true);
+ const reset=()=>{const next=fresh();latest.current=next;setView(next);first.current=Array.from({length:count},()=>null);scored.current=false;};
+ return {values:view.values,state:view.state,hinted:view.hinted,change,leave,reset,
+  stateNow:(i:number)=>latest.current.state[i],anyWrong:()=>latest.current.state.some(value=>value===false),isDone:()=>scored.current};
+}
+/** The line under a self-checking exercise after a wrong answer (cleared once nothing is red). */
+export function selfCheckNote(result:SelfCheckResult,self:{anyWrong:()=>boolean;isDone:()=>boolean},text:string,setFeedback:(feedback:Feedback)=>void){
+ if(result==='wrong')setFeedback({ok:false,text});else if(!self.anyWrong()&&!self.isDone())setFeedback(null);
+}
 /** Finishes an exercise: saves the score, plays the sound and reads the solution after a full score. */
 export function useFinish(props:StepProps){
  const {sound,speech,onScore,step}=props;
@@ -155,54 +189,45 @@ function LetterCells({value,size,state,label,exact,inputRef,onChange}:{value:str
  </span>;
 }
 /** Gaps in a text: letters inside a word, whole sentences (wide) or a word chosen from a box. `speakers` read the
- * solution as a little dialogue (lines alternate a, b), each line by its own person. */
+ * solution as a little dialogue (lines alternate a, b), each line by its own person. Every gap checks itself
+ * (useSelfCheck); when all are right the solution is read. */
 export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];bank?:boolean;say:SayItem[];speakers?:{a:string;b:string};exact?:boolean;cells?:boolean}){
- const {kicker,title,before,lines,wide=false,choices,bank=false,sound,speech,speakers,exact=false,cells=false}=props;
+ const {kicker,title,before,lines,wide=false,choices,bank=false,sound,speech,speakers,exact=false,cells=false,onScore,step}=props;
  const refs=useRef<(HTMLInputElement|null)[]>([]);
  const accepts=exact?acceptsExact:acceptsAnswer;
  const say=useMemo(()=>speakers?withSpeakers(props.say.map(item=>typeof item==='string'?item:item.text),speakers):props.say,[props.say,speakers]);
  const gaps=useMemo(()=>lines.flatMap((line,l)=>line.answers.map((answers,g)=>({line:l,gap:g,answers}))),[lines]);
- const [values,setValues]=useState<string[]>(()=>gaps.map(()=>''));const [checked,setChecked]=useState<(boolean|null)[]>(()=>gaps.map(()=>null));
- const [feedback,setFeedback]=useState<Feedback>(null);const finish=useFinish(props);
+ const [feedback,setFeedback]=useState<Feedback>(null);
+ const warm=speech.warm;useEffect(()=>{warm?.(say);},[warm,say]); // the solution read at the end, loaded early
  // The box in mixed order, the same in the list above and in every gap (`bank` writes the list as the lead).
  const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);
  const lead=bank&&box?'Kelimeler: '+box.join(' · '):props.lead;
  const at=(l:number,g:number)=>gaps.findIndex(item=>item.line===l&&item.gap===g);
- const check=(list:string[]=values)=>{
-  sound.prepare();speech.prepare();
-  const result=gaps.map((gap,i)=>accepts(list[i],gap.answers));setChecked(result);
-  const right=result.filter(Boolean).length;
-  setFeedback(right===gaps.length?{ok:true,text:'Hepsi doğru!'}:{ok:false,text:`${right} / ${gaps.length} doğru. Kırmızıları düzelt; doğrusu yanında yazıyor.`});
-  finish(right,gaps.length,say);
- };
- // Letter cells: a word turns green as soon as it is right and the next empty gap opens; when every gap is right the
- // exercise is checked at once (no extra tap). A wrong word is shown only by "Kontrol et".
- const typeCells=(i:number,text:string)=>{
-  const next=values.slice();next[i]=text;setValues(next);
-  const ok=Array.from(text).length>=Array.from(gaps[i].answers[0]).length&&accepts(text,gaps[i].answers);
-  const nextChecked=checked.slice();nextChecked[i]=ok?true:null;setChecked(nextChecked);
-  if(!ok)return;
-  if(nextChecked.every(value=>value===true)){check(next);return;}
-  const after=nextChecked.findIndex((value,k)=>k>i&&value!==true);const target=after>=0?after:nextChecked.findIndex(value=>value!==true);
-  if(target>=0)refs.current[target]?.focus();
- };
- // A word from the box: right or wrong shows at once; when every gap is right the exercise is checked at once.
- const chooseWord=(i:number,word:string)=>{
-  const next=values.slice();next[i]=word;setValues(next);
-  const nextChecked=checked.slice();nextChecked[i]=accepts(word,gaps[i].answers);setChecked(nextChecked);
-  if(nextChecked.every(value=>value===true))check(next);
- };
- const reveal=()=>{setValues(gaps.map(gap=>gap.answers[0]));setChecked(gaps.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
- const field=(l:number,g:number)=>{const i=at(l,g);const state=checked[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
-  const input=choices?<WordChoice value={values[i]} options={box??choices} used={values.filter((_,k)=>k!==i)} state={state} label={`Boşluk ${i+1}`} onChoose={word=>chooseWord(i,word)}/>
-   :cells&&!wide?<LetterCells value={values[i]} size={Array.from(gaps[i].answers[0]).length} state={state} label={`Boşluk ${i+1}`} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
-   :<input className={cls} value={values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const nextChecked=checked.slice();nextChecked[i]=null;setChecked(nextChecked);}}}/>;
-  return <span className="l1a-gap-wrap" key={g}>{input}{state===false&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
+ const letters=(text:string)=>Array.from(text).length;
+ const total=gaps.length;
+ const self=useSelfCheck(total,(i,value)=>accepts(value,gaps[i].answers)&&(!cells||wide||letters(value)>=letters(gaps[i].answers[0])),firstRight=>{
+  onScore(step.id,firstRight,total);
+  setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':`Hepsi doğru! İlk denemede ${firstRight} / ${total} doğruydu.`});
+  sound.correct(()=>{if(say.length)speech.speakAll(say);});
+ });
+ const note=(result:SelfCheckResult)=>selfCheckNote(result,self,choices?'Kırmızıyı değiştir: başka bir kelime dene.':'Kırmızıyı düzelt; doğrusu yanında yazıyor.',setFeedback);
+ const prepare=()=>{sound.prepare();speech.prepare();};
+ const focusNext=(i:number)=>{const target=gaps.findIndex((_,k)=>k>i&&self.stateNow(k)!==true);if(target>=0)refs.current[target]?.focus();};
+ // Letter cells: final when every cell is filled; a right word opens the next gap.
+ const typeCells=(i:number,text:string)=>{prepare();const result=self.change(i,text,letters(text)>=letters(gaps[i].answers[0]));note(result);if(result==='right')focusNext(i);};
+ const chooseWord=(i:number,word:string)=>{prepare();note(self.change(i,word,true));};
+ const typeText=(i:number,text:string)=>{prepare();note(self.change(i,text));};
+ const field=(l:number,g:number)=>{const i=at(l,g);const state=self.state[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
+  const input=choices?<WordChoice value={self.values[i]} options={box??choices} used={self.values.filter((_,k)=>k!==i)} state={state} label={`Boşluk ${i+1}`} onChoose={word=>chooseWord(i,word)}/>
+   :cells&&!wide?<LetterCells value={self.values[i]} size={letters(gaps[i].answers[0])} state={state} label={`Boşluk ${i+1}`} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
+   :<input ref={element=>{refs.current[i]=element;}} className={cls} value={self.values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} enterKeyHint="next"
+     onChange={event=>typeText(i,event.target.value)} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>;
+  return <span className="l1a-gap-wrap" key={g}>{input}{!choices&&self.hinted[i]&&state!==true&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
  const line=(item:GapLine,l:number)=>{const parts=item.text.split('___');return <span className="l1a-de l1a-gap-text" lang="de" dir="ltr">{parts.map((part,g)=><span key={g}>{part}{g<parts.length-1&&field(l,g)}</span>)}</span>;};
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
   <div className="l1a-dialogue">{lines.map((item,l)=>item.who?<div className={'l1a-line '+item.who} key={l}><div className="l1a-bubble">{line(item,l)}</div></div>:<div className={'l1a-row'+(item.say?' l1a-row-say':'')} key={l}>{item.say&&<Say text={sayText(item.say)} who={typeof item.say==='string'?undefined:item.say.who} speech={speech} label={String(l+1)} wide secret/>}{line(item,l)}</div>)}</div>
-  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>check()}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={reveal}>Cevapları göster</button></div>
+  {/* No "Kontrol et" / "Cevapları göster" (the learner asked, 30 October 2026): every gap checks itself. */}
   <FeedbackLine feedback={feedback}/>
  </>;
 }

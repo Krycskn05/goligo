@@ -1,5 +1,5 @@
 'use client';
-import {useState,type ReactNode} from 'react';
+import {useRef,useState,type ReactNode} from 'react';
 import {Check,Play,Volume2} from 'lucide-react';
 import {normalizeLoose,acceptsAnswer,type SayItem} from '@/lib/willkommen-course';
 import {
@@ -12,7 +12,7 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 1, Teil B – Ich spreche ein bisschen Deutsch. (the learner's lesson page, 25 October 2026): the steps.
@@ -177,22 +177,25 @@ function HearExercise(props:StepProps){
   <FeedbackLine feedback={feedback}/>
  </>;
 }
-/** Exercise 5 · hear the letters, write the name. */
+/** Exercise 5 · hear the letters, write the name. Every name checks itself (useSelfCheck, 30 October 2026). */
 function NamesExercise(props:StepProps){
- const {speech,sound}=props;const finish=useFinish(props);
- const [values,setValues]=useState<string[]>(()=>spellNames.map(()=>''));const [checked,setChecked]=useState<(boolean|null)[]>(()=>spellNames.map(()=>null));
+ const {speech,sound,onScore,step}=props;
  const [feedback,setFeedback]=useState<Feedback>(null);
- const check=()=>{sound.prepare();speech.prepare();const result=spellNames.map((name,i)=>acceptsAnswer(values[i],[name]));setChecked(result);const right=result.filter(Boolean).length;
-  setFeedback(right===spellNames.length?{ok:true,text:'Hepsi doğru!'}:{ok:false,text:`${right} / ${spellNames.length} doğru. Kırmızıları düzelt; doğrusu yanında yazıyor.`});finish(right,spellNames.length);};
- const reveal=()=>{setValues(spellNames.slice());setChecked(spellNames.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
+ const refs=useRef<(HTMLInputElement|null)[]>([]);
+ const total=spellNames.length;
+ const self=useSelfCheck(total,(i,value)=>acceptsAnswer(value,[spellNames[i]]),firstRight=>{
+  onScore(step.id,firstRight,total);setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':`Hepsi doğru! İlk denemede ${firstRight} / ${total} doğruydu.`});sound.correct();
+ });
+ const note=(result:SelfCheckResult)=>selfCheckNote(result,self,'Kırmızıyı düzelt; doğrusu yanında yazıyor.',setFeedback);
+ const focusNext=(i:number)=>{const target=spellNames.findIndex((_,k)=>k>i&&self.stateNow(k)!==true);if(target>=0)refs.current[target]?.focus();};
  return <>
   <p className="kicker" lang="de">Alıştırma 5 · Buchstabieren</p><Heading>Harf harf dinle, adı yaz</Heading>
   <p className="l1a-tr">Harfleri dinle, adı kutuya yaz. (ß yerine ss, ü yerine ue yazabilirsin.)</p>
   {spellNames.map((name,i)=><div className="l1a-arow l1a-name-row" key={name}>
    <SpellButton word={name} speech={speech} label={String(i+1)}/>
-   <span className="l1a-gap-wrap"><input className={'l1a-gap l1a-name-gap'+(checked[i]===true?' ok':checked[i]===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} aria-label={'Ad '+(i+1)} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const state=checked.slice();state[i]=null;setChecked(state);}}}/>{checked[i]===false&&<span className="l1a-hint" lang="de">→ {name}</span>}</span>
+   <span className="l1a-gap-wrap"><input ref={element=>{refs.current[i]=element;}} className={'l1a-gap l1a-name-gap'+(self.state[i]===true?' ok':self.state[i]===false?' bad':'')} value={self.values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} aria-label={'Ad '+(i+1)} enterKeyHint="next"
+    onChange={event=>{sound.prepare();speech.prepare();note(self.change(i,event.target.value));}} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>{self.hinted[i]&&self.state[i]!==true&&<span className="l1a-hint" lang="de">→ {name}</span>}</span>
   </div>)}
-  <div className="l1a-actions"><button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={reveal}>Cevapları göster</button></div>
   <FeedbackLine feedback={feedback}/>
  </>;
 }

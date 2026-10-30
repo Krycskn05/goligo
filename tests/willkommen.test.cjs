@@ -94,6 +94,10 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  // Words from a box open under the gap in every lesson; no drop-down list is left (30 October 2026, option B).
  assert(ui.includes('export function WordChoice(')&&ui.includes('const input=choices?<WordChoice ')&&read('app/stadt-a-steps.tsx').includes('return <WordChoice '));
  for(const file of ['app/willkommen-ui.tsx','app/stadt-a-steps.tsx'])assert(!read(file).includes('<select'),file);
+ // Gap exercises check themselves: no "Kontrol et" / "Cevapları göster" (30 October 2026).
+ assert(ui.includes('export function useSelfCheck(')&&ui.includes('const self=useSelfCheck(total,'));
+ for(const file of ['app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/stadt-a-steps.tsx']){const code=read(file);const gap=file.endsWith('willkommen-ui.tsx')?code.slice(code.indexOf('export function GapExercise('),code.indexOf('/** Matching:')):code;assert(!gap.includes('Cevapları göster'),file);}
+ assert(!read('app/willkommen-b-steps.tsx').slice(read('app/willkommen-b-steps.tsx').indexOf('function NamesExercise(')).split('\n}\n')[0].includes('Kontrol et'));
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
  for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);

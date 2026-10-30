@@ -44,9 +44,29 @@ export function learningReaction(kind:LearningReaction) {
 }
 let audio:AudioContext|null=null;
 const active=new Set<()=>void>();
+/** Ready audio elements per sound (the learner heard late taps, 30 October 2026): a new element for every tap had to
+ * load first; a free ready one starts at once. A busy one is never taken over (a few per sound, then a fresh one). */
+const ready=new Map<SoundId,HTMLAudioElement[]>();
+function readyAudio(id:SoundId):HTMLAudioElement{
+ const list=ready.get(id)??[];ready.set(id,list);
+ const free=list.find(item=>item.paused||item.ended);
+ if(free){try{free.currentTime=0;}catch{}return free;}
+ const media=new window.Audio(soundUrl(id));media.preload='auto';if(list.length<3)list.push(media);return media;
+}
+/** Loads the chosen sounds once, inside the first tap, so the next ones play at once. */
+let primed=false;
+function primeSounds(){
+ if(primed||typeof window==='undefined'||typeof window.Audio!=='function')return;primed=true;
+ const chosen=readEffects();
+ for(const id of [chosen.tap==='tap'?'tap':chosen.tap,chosen.page,chosen.correct,chosen.wrong,chosen.complete,'paulDrum'] as SoundId[]){
+  if(!(id in soundRecipes)||ready.get(id)?.length)continue;
+  try{const media=new window.Audio(soundUrl(id));media.preload='auto';(media as HTMLAudioElement&{load?:()=>void}).load?.();ready.set(id,[media]);}catch{}
+ }
+}
 export function prepareEffects() {
  if(typeof window==='undefined')return null;
  configureAudioSession();
+ primeSounds();
  const Constructor=window.AudioContext??(window as Window&{webkitAudioContext?:typeof AudioContext}).webkitAudioContext;
  if(!Constructor)return null;
  try {
@@ -105,10 +125,11 @@ export function playLearningSound(id:SoundId,after?:()=>void,preview=false):()=>
  // of a Web Audio context suspended by the app, silent mode or tab switching.
  if(typeof window.Audio==='function'){
   try{
-   media=new window.Audio(soundUrl(id));media.preload='auto';media.volume=preferences.volume;
-   const playing=()=>{if(finished||toneStarted)return;if(timer!==undefined)clearTimeout(timer);timer=setTimeout(()=>finish(true),soundDuration(id)*1000+1200);};
+   media=readyAudio(id);media.volume=preferences.volume;const clip=media;
+   // Ends on the clip's real length when it is known (the next voice is not kept waiting); otherwise on the recipe's.
+   const playing=()=>{if(finished||toneStarted)return;if(timer!==undefined)clearTimeout(timer);const length=Number.isFinite(clip.duration)&&clip.duration>0?clip.duration*1000+250:soundDuration(id)*1000+1200;timer=setTimeout(()=>finish(true),length);};
    media.onplaying=playing;media.onended=()=>finish(true);media.onerror=fallback;
-   timer=setTimeout(fallback,1800);
+   timer=setTimeout(fallback,1000);
    const started=media.play();if(started)void started.then(playing,fallback);
   }catch{fallback();}
  }else fallback();

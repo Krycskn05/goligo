@@ -15,7 +15,7 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Heading,Portrait,FeedbackLine,WordChoice,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,FeedbackLine,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -367,37 +367,35 @@ function BuildExercise(props:StepProps){
   </div>
  </>;
 }
-/** Alıştırma 4 · write the floor: a right answer turns green at once and is read; "Kontrol et" shows the rest. */
+/** Alıştırma 4 · write the floor: a right answer turns green at once and is read; a wrong one turns red when the learner
+ * leaves the box, with the right answer next to it (no "Kontrol et", 30 October 2026). The score counts the first tries. */
 function FloorWriting(props:StepProps){
  const {speech,sound,onScore,step}=props;
- const [values,setValues]=useState<string[]>(()=>floorLines.map(()=>''));const [shown,setShown]=useState(false);
  const [feedback,setFeedback]=useState<Feedback>(null);
- const spoken=useRef<boolean[]>(floorLines.map(()=>false));const scored=useRef(false);
- const ok=(i:number,list=values)=>acceptsAnswer(list[i],floorLines[i][1]);
+ const refs=useRef<(HTMLInputElement|null)[]>([]);const spoken=useRef<boolean[]>(floorLines.map(()=>false));
+ const total=floorLines.length;
+ const self=useSelfCheck(total,(i,value)=>acceptsAnswer(value,floorLines[i][1]),firstRight=>{
+  onScore(step.id,firstRight,total);setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':`Hepsi doğru! İlk denemede ${firstRight} / ${total} doğruydu.`});
+ });
+ const note=(result:SelfCheckResult)=>selfCheckNote(result,self,'Kırmızıyı düzelt; doğrusu yanında yazıyor.',setFeedback);
  const change=(i:number,value:string)=>{
-  const next=values.slice();next[i]=value;setValues(next);
-  if(!acceptsAnswer(value,floorLines[i][1])||spoken.current[i])return;
-  spoken.current[i]=true;sound.prepare();speech.prepare();
-  const said=floorLines[i][1].find(answer=>acceptsAnswer(value,[answer]))??floorLines[i][1][0];
+  sound.prepare();speech.prepare();const result=self.change(i,value);note(result);
+  if(result!=='right'||spoken.current[i])return;
+  spoken.current[i]=true;const said=floorLines[i][1].find(answer=>acceptsAnswer(value,[answer]))??floorLines[i][1][0];
   sound.correct(()=>speech.speak(said));
-  if(floorLines.every((_,j)=>ok(j,next))){setFeedback({ok:true,text:'Hepsi doğru!'});if(!scored.current){scored.current=true;onScore(step.id,floorLines.length,floorLines.length);}}
  };
- const check=()=>{
-  sound.prepare();speech.prepare();setShown(true);const right=floorLines.filter((_,i)=>ok(i)).length;
-  setFeedback(right===floorLines.length?{ok:true,text:'Hepsi doğru!'}:{ok:false,text:`${right} / ${floorLines.length} doğru. Kırmızıları düzelt; doğrusu yanında yazıyor.`});
-  if(!scored.current){scored.current=true;onScore(step.id,right,floorLines.length);}
-  if(right===floorLines.length)sound.complete();else sound.wrong();
- };
- const restart=()=>{setValues(floorLines.map(()=>''));setShown(false);setFeedback(null);spoken.current=floorLines.map(()=>false);scored.current=false;};
+ const focusNext=(i:number)=>{const target=floorLines.findIndex((_,k)=>k>i&&self.stateNow(k)!==true);if(target>=0)refs.current[target]?.focus();};
+ const restart=()=>{self.reset();setFeedback(null);spoken.current=floorLines.map(()=>false);};
  return <>
   <p className="kicker" lang="de">Alıştırma 4 · Wo? Ergänzen Sie.</p><Heading>Katları yaz</Heading>
   <p className="l1a-tr">Doğru yazınca kutu hemen yeşil olur ve okunur. (ü yerine ue de yazabilirsin.)</p>
-  {floorLines.map(([floor,answers],i)=>{const right=ok(i);const state=right?' ok':shown?' bad':'';return <div className="l1a-arow l15-floor-row" key={floor}>
+  {floorLines.map(([floor,answers],i)=>{const state=self.state[i]===true?' ok':self.state[i]===false?' bad':'';return <div className="l1a-arow l15-floor-row" key={floor}>
    <b className="l15-floor-tag">{floor}</b>
-   <span className="l1a-gap-wrap l15-floor-field"><input className={'l1a-gap wide'+state} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={i===0?'im …':''} aria-label={floor} onChange={event=>change(i,event.target.value)}/>{shown&&!right&&<span className="l1a-hint" lang="de">→ {answers[0]}</span>}</span>
+   <span className="l1a-gap-wrap l15-floor-field"><input ref={element=>{refs.current[i]=element;}} className={'l1a-gap wide'+state} value={self.values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={i===0?'im …':''} aria-label={floor} enterKeyHint="next"
+    onChange={event=>change(i,event.target.value)} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>{self.hinted[i]&&self.state[i]!==true&&<span className="l1a-hint" lang="de">→ {answers[0]}</span>}</span>
   </div>;})}
   <FeedbackLine feedback={feedback}/>
-  <div className="l1a-actions"><button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button><button type="button" className="btn secondary small" onClick={restart}><RotateCcw size={16} aria-hidden="true"/>Baştan</button></div>
+  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={restart}><RotateCcw size={16} aria-hidden="true"/>Baştan</button></div>
  </>;
 }
 /** Alıştırma 6 · Rami at the Bürgeramt: the words of the box into the dialogue, then listen to it. */

@@ -104,6 +104,10 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
  // These marks do not change the percentage, which counts only the scored exercises.
  useEffect(()=>{if(place.index<0)return;const step=parts[place.part].steps[place.index];if(step.kind!=='teach')return;const part=place.part;if(!readL15Scores(part)[step.id])setScores(previous=>({...previous,[part]:saveL15Score(part,step.id,1,1)}));},[place]);
  const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
+ // The open index tab's steps sit inside the blue progress bar (the learner chose it, 30 October 2026, option C);
+ // the cover and one-step tabs keep the plain bar.
+ const stepGroup=step?config.groups.find(item=>item.ids.includes(step.id)):undefined;
+ const trackGroup=stepGroup&&stepGroup.ids.length>1?stepGroup:undefined;
  const progress=partProgressL15(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app l15-app" lang={language} dir={dir}>
@@ -117,8 +121,9 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} progress={progress} scores={scores[place.part]} language={language} onGo={go} onPart={open}>
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l15-step={step.id} data-l15-teil={config.id}>
      <header className="l1a-top">
-      <div className="l1a-top-row"><span className="eyebrow">{config.groups.find(group=>group.ids.includes(step.id))?.label??'Teil '+config.badge}</span><span className="l1a-where">{step.title} · {index+1}/{config.steps.length}</span></div>
-      <div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>
+      <div className="l1a-top-row"><span className="eyebrow">{stepGroup?.label??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{step.title} · {index+1}/{config.steps.length}</>}</span></div>
+      {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:stepShortA[id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>
+      :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
      </header>
      <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l15'+place.part+'-run'}/>
      <nav className="l1a-pager" aria-label="Adımlar">
@@ -219,7 +224,6 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
     <span className="l12-step-number" aria-hidden="true">{done[item.id]?<Check size={16}/>:i+1}</span>
     <span className="l12-step-text"><strong>{item.label}</strong><small>{detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
-   {group&&group.ids.length>1&&<StepStrip label={group.label} current={step.id} scores={scores} onOpen={onGo} items={group.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:stepShortA[id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>}
    {children}
   </>}/>
  </section>;

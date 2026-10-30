@@ -60,20 +60,14 @@ function PhraseRow({de,tr,badge,emoji,speech}:{de:string;tr:ReactNode;badge?:str
 }
 
 /* ---------- teaching steps ---------- */
-function CoverC({progress,onGo,scores}:StepProps){
+function CoverC({progress,scores}:StepProps){
  const started=Object.keys(scores).length>0;
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">C — Guten Tag!</span></Heading>
   <p>Bu derste öğreneceklerin:</p>
   <ul className="l1a-list"><li>Günün saatine göre selam: <b lang="de">Guten Morgen / Tag / Abend</b></li><li>Vedalaşma: <b lang="de">Auf Wiedersehen, Tschüs, Bis bald</b></li><li>Hâl hatır: <b lang="de">Wie geht es dir? / Wie geht es Ihnen?</b></li><li>Fiil her zaman 2. pozisyonda</li><li>Doğru yazma: nokta, soru işareti, büyük harf</li></ul>
-  <p className="l1a-tr">Önce konuyu öğren (11 kısa adım), sonra alıştırmaları yap (12 alıştırma + test). Alttaki “İleri” ile ilerle.</p>
   {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1C"/>}
-  <div className="l1a-jump">
-   <button type="button" className="btn small" onClick={()=>onGo(1)}><Play size={16} aria-hidden="true"/>Konuyu öğren</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexC('tageszeit-uebung'))}>Alıştırmalara geç</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexC('test'))}>Teste geç</button>
-  </div>
  </>;
 }
 function TimeOfDay({speech}:{speech:Speech}){

@@ -114,7 +114,7 @@ function Rule({rows}:{rows:readonly (readonly [ReactNode,ReactNode])[]}){
 }
 
 /* ---------- teaching steps ---------- */
-function CoverA({progress,onGo,scores}:StepProps){
+function CoverA({progress,scores}:StepProps){
  const started=Object.keys(scores).length>0;
  return <>
   <p className="kicker" lang="de">Lektion 15 · Wege in der Stadt</p>
@@ -133,13 +133,7 @@ function CoverA({progress,onGo,scores}:StepProps){
   <h2 className="l1a-h2">Bu dersteki kişiler</h2>
   <ul className="l15-cast">{castA.map(key=><li key={key}><Portrait who={key} name={personName(key)}/><span>{personName(key)}</span></li>)}</ul>
   <p className="l1a-mini">Her kişinin kendi sesi var: kadınları kadın sesi, erkekleri erkek sesi okur.</p>
-  <p className="l1a-tr">Önce konuyu öğren (10 kısa adım), sonra alıştırmaları yap (11 alıştırma + test). Alttaki “İleri” ile ilerle.</p>
   {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 15A"/>}
-  <div className="l1a-jump">
-   <button type="button" className="btn small" onClick={()=>onGo(1)}><Play size={16} aria-hidden="true"/>Konuyu öğren</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexA('eslestir'))}>Alıştırmalara geç</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexA('test'))}>Teste geç</button>
-  </div>
  </>;
 }
 function BuildingWords({speech}:{speech:Speech}){

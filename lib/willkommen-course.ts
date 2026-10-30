@@ -81,7 +81,7 @@ export const articleCountries:Country[]=[
  ['🇮🇶','der Irak','Irak','aus dem Irak'],['🇮🇷','der Iran','İran','aus dem Iran'],['🇱🇧','der Libanon','Lübnan','aus dem Libanon'],
  ['🇾🇪','der Jemen','Yemen','aus dem Jemen'],['🇸🇩','der Sudan','Sudan','aus dem Sudan'],['🇺🇸','die USA','ABD','aus den USA'],['🇳🇱','die Niederlande','Hollanda','aus den Niederlanden'],
 ];
-/** Step 5 · aus + article, read aloud as groups. */
+/** aus + article, read aloud as groups (its topic page was removed at the learner's request, 30 October 2026). */
 export const articleGroups:{rule:string;examples:string;say:string}[]=[
  {rule:'die → der',examples:'die Türkei → **aus der Türkei** · die Schweiz → **aus der Schweiz** · die Ukraine → **aus der Ukraine**',say:'aus der Türkei, aus der Schweiz, aus der Ukraine'},
  {rule:'der → dem',examples:'der Irak → **aus dem Irak** · der Sudan → **aus dem Sudan** · der Jemen → **aus dem Jemen** · der Iran → **aus dem Iran** · der Libanon → **aus dem Libanon**',say:'aus dem Irak, aus dem Sudan, aus dem Jemen, aus dem Iran, aus dem Libanon'},
@@ -115,11 +115,18 @@ export const people:Person[]=[
  {key:'tomasz',name:'Tomasz Nowak',land:'Polen',city:'Krakau',flag:'🇵🇱'},
 ];
 export const personSpeech=(p:Person)=>`Ich heiße ${p.name}. Ich komme aus ${p.land}, aus ${p.city}.`;
-/** Step 9 · "Guten Tag" in other languages. */
+/** Step 8 · "Guten Tag" in other languages. */
 export const greetingsAround:readonly [language:string,greeting:string][]=[
  ['Türkçe','Merhaba! / İyi günler!'],['İngilizce','Hello! / Good day!'],['Fransızca','Bonjour!'],['Arapça','As-salamu alaikum! / Marhaba!'],
  ['İspanyolca','Hola! / Buenos días!'],['Lehçe','Dzień dobry!'],['Yunanca','Kaliméra!'],['Bulgarca','Dobar den!'],['Tayca','Sawatdi!'],
 ];
+/** Each greeting is read in its own language and script by the device's voice for that language (the learner asked,
+ * 30 October 2026); the site's natural voices speak only German. */
+export const greetingVoices:Record<string,{lang:string;say:string}>={
+ 'Türkçe':{lang:'tr-TR',say:'Merhaba! İyi günler!'},'İngilizce':{lang:'en-GB',say:'Hello! Good day!'},'Fransızca':{lang:'fr-FR',say:'Bonjour !'},
+ 'Arapça':{lang:'ar-SA',say:'السلام عليكم! مرحبا!'},'İspanyolca':{lang:'es-ES',say:'¡Hola! ¡Buenos días!'},'Lehçe':{lang:'pl-PL',say:'Dzień dobry!'},
+ 'Yunanca':{lang:'el-GR',say:'Καλημέρα!'},'Bulgarca':{lang:'bg-BG',say:'Добър ден!'},'Tayca':{lang:'th-TH',say:'สวัสดี'},
+};
 /** Step 10 · word list. */
 export const words:Phrase[]=[
  ['Guten Tag!','İyi günler! / Merhaba!'],['Herzlich willkommen!','Hoş geldiniz!'],['Danke!','Teşekkürler!'],
@@ -225,7 +232,6 @@ export const steps:Step[]=[
  {id:'ad',title:'Adınız ne?',kind:'teach'},
  {id:'nereden',title:'Nereden geliyorsunuz?',kind:'teach'},
  {id:'ulkeler',title:'Ülkeler',kind:'teach'},
- {id:'artikel',title:'Dikkat: aus + artikel',kind:'teach'},
  {id:'fiiller',title:'Üç fiil',kind:'teach'},
  {id:'diyalog',title:'Diyalog',kind:'teach'},
  {id:'kisiler',title:'Kişiler nereden?',kind:'teach'},

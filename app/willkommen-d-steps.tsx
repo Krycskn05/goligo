@@ -43,20 +43,14 @@ export function StepViewD(props:StepProps){
 }
 
 /* ---------- teaching steps ---------- */
-function CoverD({progress,onGo,scores}:StepProps){
+function CoverD({progress,scores}:StepProps){
  const started=Object.keys(scores).length>0;
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">D — Ich bin neu hier.</span></Heading>
   <p>Bu bölümde:</p>
   <ul className="l1a-list"><li>Çizgi roman: yeni komşuyla tanışma</li><li>Lektion 1’in en önemli cümleleri ve ezber stratejisi</li><li>Lektion 1 özeti</li><li><b lang="de">Alles klar?</b> — puanlı bölüm sınavı</li></ul>
-  <p className="l1a-tr">Önce konuyu öğren (5 kısa adım), sonra 3 alıştırma ve <span lang="de">Alles klar?</span> (4 bölüm + test).</p>
   {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1D"/>}
-  <div className="l1a-jump">
-   <button type="button" className="btn small" onClick={()=>onGo(1)}><Play size={16} aria-hidden="true"/>Konuyu öğren</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexD('tamamla'))}>Alıştırmalara geç</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexD('wortschatz'))}>Alles klar?</button>
-  </div>
  </>;
 }
 function Comic({speech}:{speech:Speech}){

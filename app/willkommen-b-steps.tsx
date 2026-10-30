@@ -76,20 +76,14 @@ export function ProfileCard({card}:{card:Profile}){
 }
 
 /* ---------- teaching steps ---------- */
-function CoverB({progress,onGo,scores}:StepProps){
+function CoverB({progress,scores}:StepProps){
  const started=Object.keys(scores).length>0;
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">B — Ich spreche ein bisschen Deutsch.</span></Heading>
   <p>Bu derste öğreneceklerin:</p>
   <ul className="l1a-list"><li>Hangi dilleri konuştuğunu söylemek: <b lang="de">Ich spreche …</b></li><li><b lang="de">Sie</b> mi, <b lang="de">du</b> mu? Resmî ve samimi konuşma</li><li>Fiil çekimi: <span lang="de">ich / du / Sie</span></li><li>Alfabe ve adını harf harf söylemek</li><li>Anlamadığında sormak: <b lang="de">Wie bitte?</b></li></ul>
-  <p className="l1a-tr">Önce konuyu öğren (10 kısa adım), sonra alıştırmaları yap (11 alıştırma + test). Alttaki “İleri” ile ilerle.</p>
   {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1B"/>}
-  <div className="l1a-jump">
-   <button type="button" className="btn small" onClick={()=>onGo(1)}><Play size={16} aria-hidden="true"/>Konuyu öğren</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexB('land-sprache'))}>Alıştırmalara geç</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexB('test'))}>Teste geç</button>
-  </div>
  </>;
 }
 function Languages({speech}:{speech:Speech}){

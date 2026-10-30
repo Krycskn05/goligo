@@ -8,7 +8,7 @@ import {courseUnits} from '@/lib/textbook-curriculum';
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
-import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,articleGroups,noArticleSay,verbForms,dialogue,people,personSpeech,greetingsAround,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
+import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,verbForms,dialogue,people,personSpeech,greetingsAround,greetingVoices,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
 import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
 import {stepsC,stepGroupsC,scoredExercisesC,testQuestionsC,wordsC,willkommenCPictures} from '@/lib/willkommen-c-course';
 import {stepsD,stepGroupsD,scoredExercisesD,testQuestionsD,wordsD,willkommenDPictures,checkPoints} from '@/lib/willkommen-d-course';
@@ -117,6 +117,10 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
   go(next);
  };
  const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
+ // The open index tab's steps sit inside the blue progress bar (the learner chose it, 30 October 2026, option C);
+ // the cover and one-step tabs keep the plain bar.
+ const stepGroup=step?config.groups.find(item=>item.ids.includes(step.id)):undefined;
+ const trackGroup=stepGroup&&stepGroup.ids.length>1?stepGroup:undefined;
  const progress=partProgressL1(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app" lang={language} dir={dir}>
@@ -131,8 +135,9 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} scores={scores[place.part]} progress={progress} language={language} onGo={go} onPart={open}>
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id}>
      <header className="l1a-top">
-      <div className="l1a-top-row"><span className="eyebrow">{config.groups.find(group=>group.ids.includes(step.id))?.label??'Teil '+config.badge}</span><span className="l1a-where">{step.title} · {index+1}/{config.steps.length}</span></div>
-      <div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>
+      <div className="l1a-top-row"><span className="eyebrow">{stepGroup?.label??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{step.title} · {index+1}/{config.steps.length}</>}</span></div>
+      {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:shortNames[config.id][id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>
+      :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
      </header>
      <View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={open} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l1'+place.part+'-run'}/>
      <nav className="l1a-pager" aria-label="Adımlar">
@@ -236,7 +241,6 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
     <span className="l12-step-number" aria-hidden="true">{done[item.id]?<Check size={16}/>:i+1}</span>
     <span className="l12-step-text"><strong>{item.label}</strong><small>{detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
-   {group&&group.ids.length>1&&<StepStrip label={group.label} current={step.id} scores={scores} onOpen={onGo} items={group.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:shortNames[config.id][id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>}
    {children}
   </>}/>
  </section>;
@@ -251,11 +255,10 @@ function StepViewA(props:StepProps){
   case 'ad':return <Names speech={props.speech}/>;
   case 'nereden':return <Origin speech={props.speech}/>;
   case 'ulkeler':return <Countries speech={props.speech}/>;
-  case 'artikel':return <ArticleRule speech={props.speech}/>;
   case 'fiiller':return <Verbs speech={props.speech}/>;
   case 'diyalog':return <Dialogue speech={props.speech}/>;
   case 'kisiler':return <People speech={props.speech}/>;
-  case 'diller':return <Languages/>;
+  case 'diller':return <Languages speech={props.speech}/>;
   case 'kelimeler':return <WordList speech={props.speech}/>;
   case 'harfler':return <GapExercise kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" lines={lettersExercise.lines} say={lettersExercise.say} speakers={exerciseSpeakers.harfler} {...props}/>;
   case 'eslestir':return <MatchExercise kicker="Alıştırma 2 · Verbinden Sie" title="Soruyu cevapla eşleştir" pairs={matchPairs} sayFor={i=>matchSay(matchPairs[i])} {...props}/>;
@@ -273,7 +276,7 @@ function StepViewA(props:StepProps){
  return null;
 }
 
-function Cover({progress,onGo,scores}:StepProps){
+function Cover({progress,scores}:StepProps){
  const started=Object.keys(scores).length>0;
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
@@ -281,13 +284,7 @@ function Cover({progress,onGo,scores}:StepProps){
   {/* The cover picture is on the notebook's left page now. */}
   <p>Bu derste öğreneceklerin:</p>
   <ul className="l1a-list"><li>Selamlaşma: <b lang="de">Guten Tag!</b></li><li>Adını söylemek ve sormak</li><li>Nereden geldiğini söylemek</li><li>Ülke adları ve <b lang="de">aus</b></li></ul>
-  <p className="l1a-tr">Önce konuyu öğren (10 kısa adım), sonra alıştırmaları yap (9 alıştırma + test). Alttaki “İleri” ile ilerle.</p>
   {started&&<ProgressMeter progress={progress} language={'tr'} label="Lektion 1A"/>}
-  <div className="l1a-jump">
-   <button type="button" className="btn small" onClick={()=>onGo(1)}><Play size={16} aria-hidden="true"/>Konuyu öğren</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndex('harfler'))}>Alıştırmalara geç</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(stepIndex('test'))}>Teste geç</button>
-  </div>
  </>;
 }
 function Teach({title,phrases,note,speech}:{title:string;phrases:readonly (readonly [string,string])[];note?:ReactNode;speech:Speech}){
@@ -309,18 +306,12 @@ function Origin({speech}:{speech:Speech}){
   <table className="l1a-table"><tbody><tr><td><b lang="de">woher</b></td><td>nereden</td></tr><tr><td><b lang="de">kommen</b></td><td>gelmek</td></tr><tr><td><b lang="de">aus</b></td><td>-den / -dan</td></tr></tbody></table></>;
 }
 function Countries({speech}:{speech:Speech}){
- const flag=(c:readonly [string,string,string,string],art:boolean)=><button type="button" key={c[1]} className={'l1a-flag'+(art?' art':'')+(speech.busy&&speech.activeText===c[3]?' playing':'')} onClick={()=>speech.speak(c[3])} aria-label={'Dinle: '+c[3]}><span className="l1a-flag-emoji" aria-hidden="true">{c[0]}</span><b lang="de">{c[1]}</b><small>{c[2]}</small></button>;
- return <><Heading>Ülkeler</Heading><p className="l1a-tr">Dokun, dinle: “aus …” biçimiyle okunur.</p>
-  <h2 className="l1a-h2">Artikel yok: <span lang="de">aus</span> + ülke</h2><div className="l1a-flags">{countries.map(c=>flag(c,false))}</div>
-  <h2 className="l1a-h2">Artikel var: <span lang="de">aus der / dem / den …</span></h2><p className="l1a-mini">Mavi yazılı ülkeler artikel alır. Kuralı bir sonraki adımda göreceksin.</p><div className="l1a-flags">{articleCountries.map(c=>flag(c,true))}</div></>;
-}
-function ArticleRule({speech}:{speech:Speech}){
- return <><Heading>Dikkat: <span lang="de">aus</span> + artikel</Heading>
-  <p>Çoğu ülke artikel almaz:</p>
-  <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de">aus Deutschland · aus Polen · aus Syrien</span></div><Say text={noArticleSay} speech={speech}/></div>
-  <p>Bazı ülkeler artikel alır. <b lang="de">aus</b>’tan sonra artikel değişir:</p>
-  {articleGroups.map(group=><div className="l1a-phrase" key={group.rule}><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{group.rule}</span><span className="l1a-tr" lang="de"><Rich text={group.examples}/></span></div><Say text={group.say} speech={speech}/></div>)}
-  <Note>Neden değişiyor? <b lang="de">aus</b> kelimesinden sonra Dativ gelir. A1’de bunu sadece ezberle: <b lang="de">der Türkei, dem Irak, den USA</b>.</Note></>;
+ const flag=(c:readonly [string,string,string,string],art:boolean)=><button type="button" key={c[1]} className={'l1a-flag'+(art?' art':'')+(speech.busy&&speech.activeText===c[3]?' playing':'')} onClick={()=>speech.speak(c[3])} aria-label={'Dinle: '+c[3]}><span className="l1a-flag-emoji" aria-hidden="true">{c[0]}</span><b lang="de">{art?c[3]:c[1]}</b><small>{c[2]}</small></button>;
+ // No rule here (the learner asked, 30 October 2026): the countries with der / dem / den are only learnt by heart, the
+ // why comes in a later lesson. Their cards show the whole "aus der Türkei" to memorise.
+ return <><Heading>Ülkeler</Heading><p className="l1a-tr">Dokun, dinle ve ezberle: “aus …” biçimiyle okunur.</p>
+  <h2 className="l1a-h2"><span lang="de">aus</span> + ülke</h2><div className="l1a-flags">{countries.map(c=>flag(c,false))}</div>
+  <h2 className="l1a-h2"><span lang="de">aus der / dem / den</span> + ülke</h2><p className="l1a-mini">Bu ülkeleri <b lang="de">der / dem / den</b> ile birlikte ezberle.</p><div className="l1a-flags">{articleCountries.map(c=>flag(c,true))}</div></>;
 }
 function Verbs({speech}:{speech:Speech}){
  const cell=(text:string)=><td><span lang="de">{text}</span> <Say text={text} speech={speech}/></td>;
@@ -338,10 +329,32 @@ function People({speech}:{speech:Speech}){
  return <><Heading>Kişiler nereden geliyor?</Heading><p className="l1a-tr">Önce ülke, sonra şehir: <b lang="de">aus Kenia, aus Nairobi</b>.</p>
   {people.map(p=><div className="l1a-person" key={p.key}><Portrait who={p.key} name={p.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de"><span aria-hidden="true">{p.flag} </span><span lang="de">{p.name}</span></span><span className="l1a-tr" lang="de" dir="ltr">Ich komme aus {p.land}, aus {p.city}.</span></div><Say text={personSpeech(p)} who={p.key} speech={speech}/></div>)}</>;
 }
-function Languages(){
+/** Reads a greeting in its own language with the device's voice for that language (the site's natural voices speak only German). */
+function useWorldVoice(stopLesson:()=>void){
+ const [playing,setPlaying]=useState('');
+ useEffect(()=>()=>{try{window.speechSynthesis?.cancel();}catch{}},[]);
+ const speak=useCallback((lang:string,text:string)=>{
+  try{
+   const synth=window.speechSynthesis;if(!synth)return;
+   stopLesson();synth.cancel();
+   const utterance=new SpeechSynthesisUtterance(text);utterance.lang=lang;utterance.rate=0.9;
+   const all=synth.getVoices(),code=lang.toLowerCase(),base=code.slice(0,2);
+   const voice=all.find(item=>item.lang.toLowerCase().replace('_','-')===code)??all.find(item=>item.lang.toLowerCase().startsWith(base));
+   if(voice)utterance.voice=voice;
+   const done=()=>setPlaying(current=>current===text?'':current);
+   utterance.onend=done;utterance.onerror=done;
+   setPlaying(text);synth.speak(utterance);
+  }catch{setPlaying('');}
+ },[stopLesson]);
+ return {speak,playing};
+}
+function Languages({speech}:{speech:Speech}){
+ const world=useWorldVoice(speech.stop);
  return <><Heading>Farklı dillerde “Guten Tag”</Heading>
   <img className="l1a-cover" src={willkommenPictures.map.src} alt="Paul Hoca dünya haritasını gösteriyor" width={willkommenPictures.map.width} height={willkommenPictures.map.height} loading="lazy" decoding="async"/>
-  <table className="l1a-table"><tbody>{greetingsAround.map(([lang,greeting])=><tr key={lang}><td><b>{lang}</b></td><td>{greeting}</td></tr>)}</tbody></table>
+  <p className="l1a-tr">Dokun, dinle: her selam kendi dilinde okunur.</p>
+  <table className="l1a-table"><tbody>{greetingsAround.map(([lang,greeting])=>{const voice=greetingVoices[lang];return <tr key={lang}><td><b>{lang}</b></td><td>{greeting}</td>
+   <td className="l1a-say-cell">{voice&&<button type="button" className={'l12-say'+(world.playing===voice.say?' playing':'')} aria-label={'Dinle: '+greeting} title="Dinle" onClick={()=>world.speak(voice.lang,voice.say)}><Volume2 size={18} aria-hidden="true"/></button>}</td></tr>;})}</tbody></table>
   {/* The classroom note ("everyone writes Guten Tag in their language …") was removed at the learner's request (24 October 2026). */}</>;
 }
 function WordList({speech}:{speech:Speech}){

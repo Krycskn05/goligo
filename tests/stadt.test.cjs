@@ -138,11 +138,12 @@ test('a test or a one-at-a-time exercise left in the middle goes on where it was
  assert(ui.includes('pending.current?.()')&&ui.includes('pending.current=()=>onScore(step.id,total,questions.length)'));
 });
 
-test('the steps of the open tab are a strip to scroll under the tabs, in every lesson (the learner chose it, 30 October 2026)',()=>{
+test('the steps of the open tab sit inside the blue progress bar, in every lesson (the learner chose it, 30 October 2026, option C)',()=>{
  const ui=read('app/willkommen-ui.tsx'),l1=read('app/willkommen-study.tsx'),l15=read('app/stadt-study.tsx'),css=read('app/willkommen.css');
  assert(ui.includes('export function StepStrip(')&&ui.includes("element.addEventListener('wheel',wheel,{passive:false})"),'a finger or the mouse wheel scrolls it');
- for(const page of [l1,l15])assert(page.includes('{group&&group.ids.length>1&&<StepStrip label={group.label}'));
- for(const cls of ['.l1a-strip {','.l1a-strip-pill.on','.l1a-strip-pill.done b'])assert(css.includes(cls),cls);
+ for(const page of [l1,l15]){assert(page.includes('{trackGroup?<StepStrip track label={trackGroup.label}'));assert(!page.includes('{group&&group.ids.length>1&&<StepStrip'),'no separate strip under the tabs');}
+ assert(ui.includes("className={'l1a-strip'+(track?' l1a-track':'')}")&&ui.includes("toggleAttribute('data-fade-left'"));
+ for(const cls of ['.l1a-strip {','.l1a-strip-pill.on','.l1a-strip-pill.done b','.l1a-strip.l1a-track {','.l1a-track .l1a-strip-pill.on','.l1a-track .l1a-strip-pill.done {'])assert(css.includes(cls),cls);
  // Every exercise of Lektion 15A and of Lektion 1 has a short name for its pill.
  for(const id of lesson.stepGroupsA[1].ids)assert(lesson.stepShortA[id],id);
  const l1course=load('willkommen-course'),b=load('willkommen-b-course'),c=load('willkommen-c-course'),d=load('willkommen-d-course');

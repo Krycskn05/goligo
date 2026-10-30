@@ -7,11 +7,12 @@ const read=file=>fs.readFileSync(file,'utf8');
 /** The lesson's code: the page, the shared pieces and Teil B's steps. */
 const pageCode=()=>['app/willkommen-study.tsx','app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx','app/willkommen-d-steps.tsx'].map(read).join('\n');
 
-test('22 steps in the order of the learner\'s page: cover, 10 teaching steps, 9 exercises, test, end',()=>{
- assert.equal(lesson.steps.length,23);
- assert.deepEqual(lesson.steps.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(9).fill('exercise'),'test','speak','end']);
- assert.equal(new Set(lesson.steps.map(step=>step.id)).size,23,'ids are unique');
- assert.equal(lesson.stepIndex('test'),20);assert.equal(lesson.stepIndex('yok'),-1);
+test('22 steps in the order of the learner\'s page: cover, 9 teaching steps, 9 exercises, test, talk, end ("Dikkat: aus + artikel" removed, 30 October 2026)',()=>{
+ assert.equal(lesson.steps.length,22);
+ assert.deepEqual(lesson.steps.map(step=>step.kind),['cover',...Array(9).fill('teach'),...Array(9).fill('exercise'),'test','speak','end']);
+ assert.equal(new Set(lesson.steps.map(step=>step.id)).size,22,'ids are unique');
+ assert.equal(lesson.stepIndex('artikel'),-1,'no aus + artikel rule page');
+ assert.equal(lesson.stepIndex('test'),19);assert.equal(lesson.stepIndex('yok'),-1);
  assert.equal(lesson.countries.length,28);assert.equal(lesson.articleCountries.length,10);assert.equal(lesson.dialogue.length,6);assert.equal(lesson.people.length,6);assert.equal(lesson.words.length,15);
  assert.equal(lesson.testQuestions.length,10);assert.equal(lesson.articleRows.length,10);assert.equal(lesson.listenItems.length,3);
  for(const [question,options,answer] of lesson.testQuestions)assert(options.includes(answer),question);
@@ -81,9 +82,10 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  assert.deepEqual(lesson.lessonParts.map(part=>part.badge),['A','B','C','D']);
  assert(lesson.lessonParts.every(part=>part.title&&part.lead),'Teil A–D are all ready');
  assert.deepEqual(lesson.stepGroups.map(group=>group.id),['konu','alistirmalar','test','konus']);
- assert.equal(lesson.stepGroups[0].ids.length,10);assert.equal(lesson.stepGroups[1].ids.length,9);
+ assert.equal(lesson.stepGroups[0].ids.length,9);assert.equal(lesson.stepGroups[1].ids.length,9);
  assert.equal(lesson.groupOf('diyalog').id,'konu');assert.equal(lesson.groupOf('kutu').id,'alistirmalar');assert.equal(lesson.groupOf('kapak'),undefined);
- assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,21,'every teaching step, exercise, the test and the talk is in exactly one tab');
+ assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,20,'every teaching step, exercise, the test and the talk is in exactly one tab');
+ for(const [lang] of lesson.greetingsAround)assert(lesson.greetingVoices[lang]?.lang&&lesson.greetingVoices[lang].say,'greeting read in its own language: '+lang);
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
  for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);

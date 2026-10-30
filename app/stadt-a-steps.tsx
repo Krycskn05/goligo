@@ -7,7 +7,7 @@ import {
  stadtPictures,castA,personName,buildingWords,officeWords,officeVerbs,directionWords,directionSay,articleOf,
  houseFloors,roofSay,floorRule,floorSynonyms,needDialogue,mustForms,tasks,instructions,upDown,checkDialogue,
  esGibtRule,esGibtDialogue,askWhere,achWords,ichWords,longWords,longWordSay,officeBoard,schoolBoard,officeDialogue,schoolDialogue,
- matchPictures,buildWords,joinParts,buildSay,wohinLines,floorLines,boardLines,ramiBox,ramiLines,ramiSay,esGibtRows,esGibtSay,
+ matchPictures,buildWords,joinParts,buildSay,wohinLines,floorLines,boardLines,ramiLines,ramiSay,esGibtRows,esGibtSay,
  hearItems,achIchRows,orderSentences,orderSay,roleQuestions,testQuestionsA,isTurkishText,summaryLines,stepIndexA,lineGaps,
  type Word,type BoardRow,type ChoiceLine,type ChoiceGap,
 } from '@/lib/stadt-course';
@@ -15,7 +15,7 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -261,13 +261,16 @@ function DialogueStep({speech,kicker,title,picture,alt,lead,board,lines}:{speech
 /**
  * Choices inside sentences (Alıştırma 3, 5 and 6): every gap is checked as soon as it is chosen (green or red, with the
  * site's sound); a finished line is read by its person (`say`). The score is the gaps right at the first choice, saved
- * once every gap is right. `dialogue` shows the lines as a conversation with portraits; `shuffleOptions` mixes a
- * shared word box for every gap.
+ * once every gap is right. `dialogue` shows the lines as a conversation with portraits. The choices are always mixed (the
+ * learner asked, 30 October 2026: in the written order they gave the answers away); a word box shared by every gap is mixed
+ * once, the same in every gap and in the list above (`bankLead`).
  */
-function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactNode;before?:ReactNode;lines:readonly ChoiceLine[];dialogue?:boolean;shuffleOptions?:boolean;after?:(done:boolean)=>ReactNode}){
- const {kicker,title,lead,before,lines,dialogue=false,shuffleOptions=false,after,speech,sound,onScore,step}=props;
+function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactNode;bankLead?:string;before?:ReactNode;lines:readonly ChoiceLine[];dialogue?:boolean;after?:(done:boolean)=>ReactNode}){
+ const {kicker,title,bankLead,before,lines,dialogue=false,after,speech,sound,onScore,step}=props;
  const gaps=useMemo(()=>lines.flatMap((line,l)=>lineGaps(line).map((gap,g)=>({line:l,gap:g,options:gap.options,answer:gap.answer}))),[lines]);
- const [orders,setOrders]=useState(()=>gaps.map(gap=>shuffleOptions?shuffle(gap.options):[...gap.options]));
+ const mix=()=>{const shared=gaps.length>1&&gaps.every(gap=>gap.options===gaps[0].options);const bank=shared?mixedOrder(gaps[0].options,gaps.map(gap=>gap.answer)):null;return gaps.map(gap=>bank??shuffle(gap.options));};
+ const [orders,setOrders]=useState(mix);
+ const lead=bankLead&&orders.length?<>{bankLead} <i lang="de">{orders[0].join(' · ')}</i></>:props.lead;
  const [values,setValues]=useState<string[]>(()=>gaps.map(()=>''));
  const first=useRef<(boolean|null)[]>(gaps.map(()=>null));const scored=useRef(false);
  const [feedback,setFeedback]=useState<Feedback>(null);
@@ -287,7 +290,7 @@ function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactN
   else setFeedback(null);
   if(!ok)sound.wrong();else if(lineDone&&line.say){const say=line.say;sound.correct(()=>speech.speak(say));}else sound.correct();
  };
- const restart=()=>{setValues(gaps.map(()=>''));setOrders(gaps.map(gap=>shuffleOptions?shuffle(gap.options):[...gap.options]));first.current=gaps.map(()=>null);scored.current=false;setFeedback(null);};
+ const restart=()=>{setValues(gaps.map(()=>''));setOrders(mix());first.current=gaps.map(()=>null);scored.current=false;setFeedback(null);};
  const field=(l:number,g:number,gap:ChoiceGap)=>{const i=indexOf(l,g);const value=values[i];const state=!value?'':value===gap.answer?' ok':' bad';
   return <select key={'gap'+g} className={'l1a-gap l15-select'+state} value={value} aria-label={`Boşluk ${i+1}`} onChange={event=>choose(i,event.target.value)}><option value="">…</option>{orders[i].map(option=><option key={option} value={option}>{option}</option>)}</select>;};
  const text=(line:ChoiceLine,l:number)=>{let g=0;return line.parts.map((part,p)=>typeof part==='string'?<span key={p}>{part}</span>:field(l,g++,part));};
@@ -405,9 +408,9 @@ function FloorWriting(props:StepProps){
 /** Alıştırma 6 · Rami at the Bürgeramt: the words of the box into the dialogue, then listen to it. */
 function RamiExercise(props:StepProps){
  const {speech}=props;
- return <ChoiceExercise kicker="Alıştırma 6 · Was passt?" title="Rami Bürgeramt’ta" lead={<>Kutudaki kelimeleri yerleştir: <i lang="de">{ramiBox.join(' · ')}</i></>}
+ return <ChoiceExercise kicker="Alıştırma 6 · Was passt?" title="Rami Bürgeramt’ta" bankLead="Kutudaki kelimeleri yerleştir:"
   before={<Picture {...stadtPictures.rami} alt="Rami danışmada, elinde vize evrakı; Omar soldaki asansörü gösteriyor"/>}
-  lines={ramiLines} dialogue shuffleOptions
+  lines={ramiLines} dialogue
   after={done=><div className="l1a-actions"><button type="button" className="btn secondary small" disabled={!done||speech.busy} onClick={()=>speech.speakAll(ramiSay)}><Play size={16} aria-hidden="true"/>Tamamlanan diyaloğu dinle</button></div>}
   {...props}/>;
 }

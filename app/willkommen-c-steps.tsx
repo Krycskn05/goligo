@@ -41,7 +41,7 @@ export function StepViewC(props:StepProps){
   case 'gesichter':return <MatchExercise kicker="Alıştırma 4 · Wie geht es?" title="Yüzü kelimeyle eşleştir" pairs={moods.map(([emoji,de])=>[emoji,de] as const)} sayFor={i=>[moods[i][1]]} {...props}/>;
   case 'memory':return <MemoryGame {...props}/>;
   case 'hoeren':return <ChoiceRows kicker="Alıştırma 6 · Hören Sie" title="Dinle: nasıllar?" lead="Dinle, kişinin nasıl olduğunu seç." wide rows={moodHearing.map((item,i)=>({key:item.key,label:item.name,before:<div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span></div><Say text={item.text} who={item.key} speech={speech} wide secret/></div>,options:item.options.map((option,j)=>({value:String(j),label:option})),answer:String(item.answer),reveal:<span className="l1a-mini">Metin: <span lang="de" dir="ltr">{item.text}</span></span>}))} {...props}/>;
-  case 'kutu':return <GapExercise kicker="Alıştırma 7 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+boxWordsC.join(' · ')} lines={boxLinesC} choices={boxWordsC} say={boxSayC} speakers={{a:'nikos',b:'nora'}} {...props}/>;
+  case 'kutu':return <GapExercise kicker="Alıştırma 7 · Was passt?" title="Kutudan doğru kelimeyi seç" bank lines={boxLinesC} choices={boxWordsC} say={boxSayC} speakers={{a:'nikos',b:'nora'}} {...props}/>;
   case 'sirala':return <OrderExercise kicker="Alıştırma 8 · Verben im Satz" title="Cümleyi kur — fiil 2. pozisyonda" sentences={orderVerbSentences.map(item=>item.words)} verbs={orderVerbSentences.map(item=>item.verb)} sayFor={sentence=>sentence} {...props}/>;
   case 'punkt':return <ChoiceRows kicker="Alıştırma 9 · Punkt oder Fragezeichen?" title="Nokta mı, soru işareti mi?" rows={punctuationQuestions.map((item,i)=>({key:String(i),label:item.sentence,before:<span className="l1a-land" lang="de">{item.sentence} …</span>,options:[{value:'.',label:'.'},{value:'?',label:'?'}],answer:item.answer,say:item.sentence+item.answer}))} {...props}/>;
   case 'gross-klein':return <GapExercise kicker="Alıştırma 10 · Groß oder klein?" title="Büyük harfleri düzelt" lead="Metin tamamen küçük yazılmış. Her cümleyi doğru büyük harflerle yaz (büyük-küçük harf sayılır)." before={<div className="l1a-glued l1a-lower" lang="de" dir="ltr">{lowercaseText}</div>} lines={capitalLines} wide exact say={[{text:capitalSay,who:'nora'}]} {...props}/>;
@@ -160,7 +160,7 @@ function MemoryGame(props:StepProps){
   const next=[...open,card.key];setOpen(next);if(next.length<2)return;
   setMoves(m=>m+1);const [a,b]=next.map(key=>cards.find(item=>item.key===key)!);
   if(a.mood===b.mood){const done=[...found,a.mood];setFound(done);setOpen([]);
-   if(done.length===moods.length){setFeedback({ok:true,text:`6 çift bulundu — ${moves+1} hamle!`});sound.correct(()=>speech.speak(moods[a.mood][1]));}else speech.speak(moods[a.mood][1]);}
+   if(done.length===moods.length){props.onScore(props.step.id,1,1);setFeedback({ok:true,text:`6 çift bulundu — ${moves+1} hamle!`});sound.correct(()=>speech.speak(moods[a.mood][1]));}else speech.speak(moods[a.mood][1]);}
   else{lock.current=true;timer.current=setTimeout(()=>{setOpen([]);lock.current=false;},900);}
  };
  const again=()=>{setCards(deal());setOpen([]);setFound([]);setMoves(0);setFeedback(null);lock.current=false;};
@@ -173,9 +173,9 @@ function MemoryGame(props:StepProps){
  </>;
 }
 /** Exercise 12 · Das bin ich! Four sentences about yourself (not scored), then hear them. */
-function OwnC({speech}:StepProps){
+function OwnC({speech,onScore,step}:StepProps){
  const [values,setValues]=useState(()=>ownPromptsC.map(()=>''));const [state,setState]=useState<(boolean|null)[]>(()=>ownPromptsC.map(()=>null));
- const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPromptsC[i].pattern.test(normalizeLoose(value)):null;setState(s);};
+ const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPromptsC[i].pattern.test(normalizeLoose(value)):null;setState(s);if(s.every(value=>value===true))onScore(step.id,s.length,s.length);}; // all sentences fit: the step shows done
  return <>
   <p className="kicker" lang="de">Alıştırma 12 · Das bin ich!</p><Heading>Şimdi sen: kendini tanıt</Heading><p className="l1a-tr">4 cümle yaz, sonra tanıtımını dinle.</p>
   {ownPromptsC.map((prompt,i)=><div className="l1a-row" key={prompt.placeholder}><input className={'l1a-gap wide'+(state[i]===true?' ok':state[i]===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="sentences" autoComplete="off" placeholder={prompt.placeholder} aria-label={prompt.placeholder} onChange={event=>change(i,event.target.value)}/>{state[i]===false&&<span className="l1a-mini">Kalıp: <span lang="de">{prompt.placeholder}</span></span>}</div>)}

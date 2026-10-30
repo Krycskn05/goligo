@@ -34,14 +34,14 @@ export function StepViewB(props:StepProps){
   case 'steckbrief':return <ProfileStep speech={speech}/>;
   case 'kelimeler':return <WordListB speech={speech}/>;
   case 'land-sprache':return <MatchExercise kicker="Alıştırma 1 · Land → Sprache" title="Ülkeyi diliyle eşleştir" pairs={landLanguage.map(([land,language])=>[land,language] as const)} sayFor={i=>[landLanguage[i][2]]} {...props}/>;
-  case 'sie-oder-du':return <ChoiceRows kicker="Alıştırma 2 · Sie oder du?" title="Sie mi, du mu?" lead="Fiile bak: -st → du, -en → Sie." rows={sieOrDu.map((item,i)=>({key:String(i),label:item.before+' … '+item.after,before:<span className="l1a-land" lang="de">{item.before}</span>,after:<span className="l1a-land" lang="de">{item.after}</span>,options:[{value:'du',label:'du'},{value:'Sie',label:'Sie'}],answer:item.answer,say:sieOrDuSay(item)}))} {...props}/>;
+  case 'sie-oder-du':return <ChoiceRows kicker="Alıştırma 2 · Sie oder du?" title="Sie mi, du mu?" lead="Fiile bak: -st → du, -en → Sie. Fiil yoksa isme bak: ön ad → du, Frau / Herr → Sie." rows={sieOrDu.map((item,i)=>({key:String(i),label:item.before+' … '+item.after,before:<span className="l1a-land" lang="de">{item.before}</span>,after:<span className="l1a-land" lang="de">{item.after}</span>,options:[{value:'du',label:'du'},{value:'Sie',label:'Sie'}],answer:item.answer,say:sieOrDuSay(item)}))} {...props}/>;
   case 'endungen':return <GapExercise kicker="Alıştırma 3 · Verben" title="Fiil ekini yaz" lead="Kutuya sadece eki yaz (e, st, t, en) ya da sein’ı (bin, bist, sind)." lines={endingLines} say={endingSay} {...props}/>;
   case 'hoeren':return <HearExercise {...props}/>;
   case 'namen':return <NamesExercise {...props}/>;
   case 'buchstabe':return <LetterExercise {...props}/>;
-  case 'kutu':return <GapExercise kicker="Alıştırma 7 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+boxWordsB.join(' · ')} lines={boxLinesB} choices={boxWordsB} say={boxSayB} speakers={{a:'aisha',b:'tomasz'}} {...props}/>;
+  case 'kutu':return <GapExercise kicker="Alıştırma 7 · Was passt?" title="Kutudan doğru kelimeyi seç" bank lines={boxLinesB} choices={boxWordsB} say={boxSayB} speakers={{a:'aisha',b:'tomasz'}} {...props}/>;
   case 'umformen':return <GapExercise kicker="Alıştırma 8 · Sie ↔ du" title="Soruyu çevir" lead="Resmî soruyu samimiye (ya da tersine) çevir." lines={turnLines} wide say={turnSay} speakers={{a:'paul',b:'paul'}} {...props}/>;
-  case 'karte':return <GapExercise kicker="Alıştırma 9 · Steckbrief" title="Karttan cümle kur" lead="Rami kendini tanıtıyor. 3 cümle yaz (ipucu: Libanon artikel alır)." before={<ProfileCard card={ramiCard}/>} lines={cardLines} wide say={cardSay} speakers={{a:'rami',b:'rami'}} {...props}/>;
+  case 'karte':return <GapExercise kicker="Alıştırma 9 · Steckbrief" title="Karttan cümle kur" lead="Rami kendini tanıtıyor. 3 cümle yaz: ich ile ya da onun hakkında (er, Sie). İpucu: Libanon artikel alır." before={<ProfileCard card={ramiCard}/>} lines={cardLines} wide say={cardSay} speakers={{a:'rami',b:'rami'}} {...props}/>;
   case 'richtig':return <ChoiceRows kicker="Alıştırma 10 · Alles richtig?" title="Doğru mu? Nikos cevap veriyor." lead="Yasemin karttan cümle kuruyor. Doğruysa “Ja, richtig!”, yanlışsa “Nein.” seç." before={<ProfileCard card={nikosCard}/>} wide rows={checkItems.map((item,i)=>({key:String(i),label:item.statement,before:<span className="l1a-land l1a-statement" lang="de"><Say text={item.statement} who="yasemin" speech={speech}/>{item.statement}</span>,options:[{value:'ja',label:'Ja, richtig!'},{value:'nein',label:'Nein.'}],answer:item.answer,say:{text:item.reply,who:'nikos'},reveal:<span className="l1a-mini l1a-reply" lang="de">Nikos: {item.reply}</span>}))} {...props}/>;
   case 'sen':return <OwnB {...props}/>;
   case 'test':return <TestStep label="Lektion 1B · Test" questions={testQuestionsB} sayFor={i=>testQuestionsB[i][3]} {...props}/>;
@@ -211,9 +211,9 @@ function LetterExercise(props:StepProps){
  return <ChoiceRows kicker="Alıştırma 6 · Welcher Buchstabe?" title="Dinle: hangi harf?" lead="Dinle, duyduğun harfi seç." rows={rows} {...props}/>;
 }
 /** Exercise 11 · now you: write your languages and spell your name (not scored). */
-function OwnB({speech}:StepProps){
+function OwnB({speech,onScore,step}:StepProps){
  const [values,setValues]=useState(['','']);const [state,setState]=useState<(boolean|null)[]>([null,null]);
- const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPromptsB[i].pattern.test(normalizeLoose(value)):null;setState(s);};
+ const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPromptsB[i].pattern.test(normalizeLoose(value)):null;setState(s);if(s.every(value=>value===true))onScore(step.id,s.length,s.length);}; // all sentences fit: the step shows done
  const letters=values[1].replace(/^\s*ich\s+buchstabiere\s*:?/i,'').trim();
  return <>
   <p className="kicker" lang="de">Alıştırma 11 · Jetzt du</p><Heading>Şimdi sen</Heading><p className="l1a-tr">Kendi dillerinle ve adınla yaz, sonra dinle.</p>

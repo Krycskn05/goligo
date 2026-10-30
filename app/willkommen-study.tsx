@@ -104,6 +104,10 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
  // The step the learner is on (also when opened from its address) stays saved in the browser for later use.
  useEffect(()=>{if(place.index>=0)try{localStorage.setItem(partKeys[place.part].step,parts[place.part].steps[place.index].id);localStorage.setItem(L1_PART_KEY,place.part);}catch{}},[place]);
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:savePartScore(part,id,right,total)}));},[place.part]);
+ // Steps without a score are marked done as well (the learner asked, 30 October 2026: "I did it, but it does not show done"):
+ // a topic page once it is opened, here; "Şimdi sen", the memory game and Konuş when they are finished (their components).
+ // These marks do not change the percentage, which counts only the scored exercises.
+ useEffect(()=>{if(place.index<0)return;const step=parts[place.part].steps[place.index];if(step.kind!=='teach'&&step.id!=='puanlar')return;const part=place.part;if(!readPartScores(part)[step.id])setScores(previous=>({...previous,[part]:savePartScore(part,step.id,1,1)}));},[place]);
  // An exercise that shows one item at a time (a sentence, a test question) takes the page's İleri for its next item first
  // (the learner asked, 30 October 2026, like Lektion 15); `useInnerNext` in app/willkommen-ui.tsx registers it.
  const innerNext=useRef<(()=>boolean)|null>(null);
@@ -206,7 +210,7 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const exerciseIds=config.scored.filter(exercise=>config.groups[1].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const testIds=config.scored.filter(exercise=>config.groups[2].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
- const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:false};
+ const done:Record<StepGroup['id'],boolean>={konu:config.groups[0].ids.every(id=>scores[id]),alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:!!scores.konus};
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
@@ -260,7 +264,7 @@ function StepViewA(props:StepProps){
   case 'aus':return <ArticleExercise {...props}/>;
   case 'dinle':return <ListenExercise {...props}/>;
   case 'soru':return <GapExercise kicker="Alıştırma 7 · Schreiben Sie Fragen" title="Cevap var, soruyu yaz" lead="Cevaba bakıp soruyu yaz. (İpucu: Herr / Frau + soyadı ekleyebilirsin.)" lines={questionLines.flatMap(line=>[{who:'a' as const,text:'___',answers:[line.answers]},{who:'b' as const,text:line.reply,answers:[]}])} wide say={questionSay} speakers={exerciseSpeakers.soru} {...props}/>;
-  case 'kutu':return <GapExercise kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+wordBox.join(' · ')} lines={boxLines} choices={wordBox} say={boxSay} speakers={exerciseSpeakers.kutu} {...props}/>;
+  case 'kutu':return <GapExercise kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" bank lines={boxLines} choices={wordBox} say={boxSay} speakers={exerciseSpeakers.kutu} {...props}/>;
   case 'sen':return <OwnExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 1A · Test" questions={testQuestions} sayFor={i=>testSpeech(testQuestions[i])} {...props}/>;
   case 'konus':return <TalkStep scenario={talkScenarios.l1a} {...props}/>;
@@ -377,9 +381,9 @@ function ListenExercise(props:StepProps){
   <FeedbackLine feedback={feedback}/>
  </>;
 }
-function OwnExercise({speech}:StepProps){
+function OwnExercise({speech,onScore,step}:StepProps){
  const [values,setValues]=useState(['','']);const [state,setState]=useState<(boolean|null)[]>([null,null]);
- const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPrompts[i].pattern.test(normalizeLoose(value)):null;setState(s);};
+ const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPrompts[i].pattern.test(normalizeLoose(value)):null;setState(s);if(s.every(value=>value===true))onScore(step.id,s.length,s.length);}; // all sentences fit: the step shows done
  return <>
   <p className="kicker" lang="de">Alıştırma 9 · Sprechen Sie</p><Heading>Şimdi sen cevap ver</Heading><p className="l1a-tr">Kendi adınla ve ülkenle yaz, sonra dinle.</p>
   <div className="l1a-dialogue">{ownPrompts.map((prompt,i)=><div key={prompt.question}>

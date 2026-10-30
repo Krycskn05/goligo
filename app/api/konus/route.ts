@@ -3,7 +3,7 @@ import {getRawDb} from '@/db';
 import {getChatGPTUser} from '@/app/chatgpt-auth';
 import {countAttempt,isLimited} from '@/lib/member-store';
 import {talkScenarios} from '@/lib/talk-scenarios';
-import {TALK_DAILY_LIMIT,TALK_MODEL,TALK_TEXT_MAX,parseTalkReply,talkMessages,talkReplySchema,type TalkTurn} from '@/lib/talk-prompt';
+import {TALK_DAILY_LIMIT,TALK_MODEL,TALK_TEXT_MAX,parseTalkReply,talkDone,talkMessages,talkReplySchema,type TalkTurn} from '@/lib/talk-prompt';
 
 /**
  * "Konuş": one turn of a lesson's spoken role play (the learner asked, 30 October 2026). Members only; the browser sends
@@ -39,7 +39,7 @@ export async function POST(request:Request){
   const reply=parseTalkReply(raw);
   if(!reply)throw new Error('Empty talk reply');
   await countAttempt(db,key,DAY);
-  return json({reply});
+  return json({reply:{...reply,done:talkDone(history,reply.done)}});
  }catch(error){
   console.error('Talk failed',error);
   return json({error:'Şu anda cevap gelmedi. Biraz sonra yeniden dene.'},503);

@@ -7,6 +7,7 @@ import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,withSpeakers
 import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {PaulHoca} from './paul-hoca';
+import {mixedOrder} from '@/lib/mixed-order';
 
 /*
  * Pieces shared by Lektion 1's lesson pages (Teil A in app/willkommen-study.tsx, Teil B in app/willkommen-b-steps.tsx):
@@ -83,6 +84,7 @@ export function Rich({text}:{text:string}){const parts=text.split(/(\*\*[^*]+\*\
 export function Heading({children}:{children:ReactNode}){return <h2 id="l1a-heading" tabIndex={-1} className="l1a-heading">{children}</h2>;}
 export function Portrait({who,name}:{who:string;name:string}){return <img className="l1a-portrait" src={portraitSrc(who)} alt={name} width={64} height={64} loading="lazy" decoding="async"/>;}
 export function shuffle<T>(list:readonly T[]):T[]{const out=list.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;}
+export {mixedOrder};
 
 /* ---------- exercises ---------- */
 export type Feedback={ok:boolean;text:string}|null;
@@ -97,13 +99,16 @@ export function useFinish(props:StepProps){
 }
 /** Gaps in a text: letters inside a word, whole sentences (wide) or a word chosen from a box. `speakers` read the
  * solution as a little dialogue (lines alternate a, b), each line by its own person. */
-export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];say:SayItem[];speakers?:{a:string;b:string};exact?:boolean}){
- const {kicker,title,lead,before,lines,wide=false,choices,sound,speech,speakers,exact=false}=props;
+export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;lines:GapLine[];wide?:boolean;choices?:string[];bank?:boolean;say:SayItem[];speakers?:{a:string;b:string};exact?:boolean}){
+ const {kicker,title,before,lines,wide=false,choices,bank=false,sound,speech,speakers,exact=false}=props;
  const accepts=exact?acceptsExact:acceptsAnswer;
  const say=useMemo(()=>speakers?withSpeakers(props.say.map(item=>typeof item==='string'?item:item.text),speakers):props.say,[props.say,speakers]);
  const gaps=useMemo(()=>lines.flatMap((line,l)=>line.answers.map((answers,g)=>({line:l,gap:g,answers}))),[lines]);
  const [values,setValues]=useState<string[]>(()=>gaps.map(()=>''));const [checked,setChecked]=useState<(boolean|null)[]>(()=>gaps.map(()=>null));
  const [feedback,setFeedback]=useState<Feedback>(null);const finish=useFinish(props);
+ // The box in mixed order, the same in the list above and in every gap (`bank` writes the list as the lead).
+ const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);
+ const lead=bank&&box?'Kelimeler: '+box.join(' · '):props.lead;
  const at=(l:number,g:number)=>gaps.findIndex(item=>item.line===l&&item.gap===g);
  const check=()=>{
   sound.prepare();speech.prepare();
@@ -114,7 +119,7 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
  };
  const reveal=()=>{setValues(gaps.map(gap=>gap.answers[0]));setChecked(gaps.map(()=>true));setFeedback({ok:true,text:'Cevaplar gösterildi.'});};
  const field=(l:number,g:number)=>{const i=at(l,g);const state=checked[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
-  const input=choices?<select className={cls} value={values[i]} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);const ok=accepts(event.target.value,gaps[i].answers);const nextChecked=checked.slice();nextChecked[i]=event.target.value?ok:null;setChecked(nextChecked);}}><option value="">…</option>{choices.map(word=><option key={word} value={word}>{word}</option>)}</select>
+  const input=choices?<select className={cls} value={values[i]} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);const ok=accepts(event.target.value,gaps[i].answers);const nextChecked=checked.slice();nextChecked[i]=event.target.value?ok:null;setChecked(nextChecked);}}><option value="">…</option>{(box??choices).map(word=><option key={word} value={word}>{word}</option>)}</select>
    :<input className={cls} value={values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);if(checked[i]!==null){const nextChecked=checked.slice();nextChecked[i]=null;setChecked(nextChecked);}}}/>;
   return <span className="l1a-gap-wrap" key={g}>{input}{state===false&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
  const line=(item:GapLine,l:number)=>{const parts=item.text.split('___');return <span className="l1a-de l1a-gap-text" lang="de" dir="ltr">{parts.map((part,g)=><span key={g}>{part}{g<parts.length-1&&field(l,g)}</span>)}</span>;};
@@ -192,6 +197,9 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
 export type ChoiceRow={key:string;before?:ReactNode;after?:ReactNode;options:{value:string;label:string}[];answer:string;say?:SayItem;reveal?:ReactNode;label:string;optionLang?:string};
 export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:string;before?:ReactNode;rows:ChoiceRow[];wide?:boolean}){
  const {speech,sound,rows,kicker,title,lead,before,wide=false}=props;const finish=useFinish(props);
+ // Rows with their own choices are mixed (the learner asked, 30 October 2026); one fixed pair for every row (du / Sie,
+ // Ach / Ich, Ja / Nein) keeps its order.
+ const [orders]=useState(()=>{const key=(row:ChoiceRow)=>row.options.map(option=>option.value).join('\u0001');const fixed=rows.every(row=>key(row)===key(rows[0]));return rows.map(row=>fixed?row.options:shuffle(row.options));});
  const [answers,setAnswers]=useState<Record<number,string>>({});const [feedback,setFeedback]=useState<Feedback>(null);
  const answer=(i:number,value:string)=>{if(answers[i]!==undefined)return;sound.prepare();speech.prepare();
   const next={...answers,[i]:value};setAnswers(next);const row=rows[i];const ok=value===row.answer;
@@ -203,7 +211,7 @@ export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:str
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
   {rows.map((row,i)=><div className={'l1a-arow'+(wide?' wide':'')} key={row.key} data-done={answers[i]!==undefined?'':undefined}>
    {row.before}
-   <div className="l1a-opts" role="group" aria-label={row.label}>{row.options.map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang={row.optionLang??'de'} onClick={()=>answer(i,option.value)}>{option.label}</button>)}</div>
+   <div className="l1a-opts" role="group" aria-label={row.label}>{(orders[i]??row.options).map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang={row.optionLang??'de'} onClick={()=>answer(i,option.value)}>{option.label}</button>)}</div>
    {row.after}
    {answers[i]!==undefined&&row.reveal}
   </div>)}

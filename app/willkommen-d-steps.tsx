@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {Check,Eye,EyeOff,Play,Volume2} from 'lucide-react';
 import {normalizeLoose} from '@/lib/willkommen-course';
 import {
@@ -128,9 +128,13 @@ function IchSentences(props:StepProps){
  </>;
 }
 /** Exercise 3 · Und Sie? Write three sentences, listen, hide them and say them by heart, then rate yourself (not scored). */
-function OwnD({speech}:StepProps){
+function OwnD({speech,onScore,step}:StepProps){
  const [values,setValues]=useState(()=>ownPromptsD.map(()=>''));const [hidden,setHidden]=useState(false);const [rating,setRating]=useState<number|null>(null);
  const state=(i:number)=>values[i].trim()?ownPromptsD[i].pattern.test(normalizeLoose(values[i])):null;
+ const allRight=values.every((_,i)=>state(i)===true);
+ // All three sentences fit: the step shows done.
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ useEffect(()=>{if(allRight)onScore(step.id,values.length,values.length);},[allRight]);
  return <>
   <p className="kicker" lang="de">Alıştırma 3 · Und Sie?</p><Heading>Şimdi sen: üç cümlen</Heading>
   <p className="l1a-tr">Yaz → dinle → gizle → ezberden söyle → kendini değerlendir.</p>

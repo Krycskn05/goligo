@@ -99,6 +99,10 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
   go(next);
  };
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:saveL15Score(part,id,right,total)}));},[place.part]);
+ // Steps without a score are marked done as well (the learner asked, 30 October 2026: "I did it, but it does not show done"):
+ // a topic page once it is opened, here; Konuş when they are finished (their components).
+ // These marks do not change the percentage, which counts only the scored exercises.
+ useEffect(()=>{if(place.index<0)return;const step=parts[place.part].steps[place.index];if(step.kind!=='teach')return;const part=place.part;if(!readL15Scores(part)[step.id])setScores(previous=>({...previous,[part]:saveL15Score(part,step.id,1,1)}));},[place]);
  const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
  const progress=partProgressL15(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
@@ -189,7 +193,7 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const exerciseIds=config.scored.filter(exercise=>config.groups[1].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const testIds=config.scored.filter(exercise=>config.groups[2].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
- const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:false};
+ const done:Record<StepGroup['id'],boolean>={konu:config.groups[0].ids.every(id=>scores[id]),alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:!!scores.konus};
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,

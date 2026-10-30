@@ -19,10 +19,12 @@ export const willkommenBPictures={
 /** The alphabet: the letter, how it sounds for a Turkish speaker, and what the site voice reads — the German letter
  * name written so a voice reads the name, not a word (Jot, Vau, Zett, a long vowel as Ah, Eh …). */
 export type Letter=readonly [letter:string,hint:string,say:string];
+// Ä is read with the text "Eh" (30 October 2026): the site voices read "Äh" like the filler "äh", close to "a" (measured: the
+// vowel of their "Äh" lies next to their "Ah"); the learner expects a long "e". So the listening question for Ä offers A and O, not E.
 export const alphabet:Letter[]=[
  ['A','a','Ah'],['B','be','Beh'],['C','tse','Zeh'],['D','de','Deh'],['E','e','Eh'],['F','ef','Eff'],['G','ge','Geh'],['H','ha','Hah'],['I','i','Ih'],['J','yot','Jot'],
  ['K','ka','Kah'],['L','el','Ell'],['M','em','Emm'],['N','en','Enn'],['O','o','Oh'],['P','pe','Peh'],['Q','ku','Kuh'],['R','er','Err'],['S','es','Ess'],['T','te','Teh'],
- ['U','u','Uh'],['V','fau','Vau'],['W','ve','Weh'],['X','iks','Ix'],['Y','üpsilon','Ypsilon'],['Z','tset','Zett'],['Ä','a-umlaut (e)','Äh'],['Ö','o-umlaut','Öh'],['Ü','u-umlaut','Üh'],['ß','estset','Eszett'],
+ ['U','u','Uh'],['V','fau','Vau'],['W','ve','Weh'],['X','iks','Ix'],['Y','üpsilon','Ypsilon'],['Z','tset','Zett'],['Ä','a-umlaut (e)','Eh'],['Ö','o-umlaut','Öh'],['Ü','u-umlaut','Üh'],['ß','estset','Eszett'],
 ];
 /** Letters that sound different from Turkish (a blue frame on the alphabet). */
 export const hardLetters=['C','E','I','J','V','W','Y','Z','ß'];
@@ -136,7 +138,9 @@ export const landLanguage:readonly [land:string,language:string,say:string][]=[
 export const sieOrDu:{before:string;after:string;answer:'du'|'Sie'}[]=[
  {before:'Wie heißt',after:'?',answer:'du'},{before:'Woher kommen',after:'?',answer:'Sie'},{before:'Welche Sprachen sprichst',after:'?',answer:'du'},
  {before:'Wie heißen',after:', Frau Krüger?',answer:'Sie'},{before:'Woher kommst',after:', Tomasz?',answer:'du'},{before:'Welche Sprachen sprechen',after:', Herr Nasser?',answer:'Sie'},
- {before:'Und',after:'? Ich bin Aisha.',answer:'du'},{before:'Und',after:'? Ich komme aus Deutschland, Frau Weiß.',answer:'Sie'},
+ // No verb in the last two rows: the name decides (first name → du, Frau/Herr → Sie). Until 30 October 2026 the first one was
+ // "Und ___? Ich bin Aisha.", where Sie fitted as well (the learner chose Sie and it counted as wrong).
+ {before:'Ich heiße Aisha. Und',after:', Nikos?',answer:'du'},{before:'Ich komme aus Deutschland. Und',after:', Frau Weiß?',answer:'Sie'},
 ];
 export const sieOrDuSay=(item:{before:string;after:string;answer:string})=>item.before+' '+item.answer+item.after;
 /** Exercise 3 · verb endings (the gap is part of a word). */
@@ -159,7 +163,7 @@ export const spellNames=['Fuchs','Jonas','Weiß','Yasemin','Vogt'];
 /** Exercise 6 · which letter? */
 export const letterQuestions:{answer:string;options:string[]}[]=[
  {answer:'J',options:['J','Y','I']},{answer:'V',options:['V','W','F']},{answer:'Z',options:['Z','C','S']},{answer:'E',options:['E','I','A']},
- {answer:'Y',options:['Y','J','Ü']},{answer:'G',options:['G','K','C']},{answer:'W',options:['W','V','U']},{answer:'Ä',options:['Ä','A','E']},
+ {answer:'Y',options:['Y','J','Ü']},{answer:'G',options:['G','K','C']},{answer:'W',options:['W','V','U']},{answer:'Ä',options:['Ä','A','O']},
 ];
 /** Exercise 7 · the word box (a = Aisha, b = Tomasz). */
 export const boxWordsB=['neu','Name','bitte','schreibt','buchstabiere','Danke'];
@@ -181,10 +185,13 @@ export const turnLines:GapLine[]=[
 ];
 export const turnSay=turnLines.map(line=>line.answers[0][0]);
 /** Exercise 9 · from the card to sentences (Rami). */
+// Rami speaks about himself (ich), but every right sentence about him counts too (the learner asked, 30 October 2026, after
+// writing "Sie heißen Rami Khalil."): er (about him), Sie (to him, formal) and du (to him, informal).
+const cardLanguages=['Arabisch, Französisch und ein bisschen Deutsch','Arabisch, Französisch, ein bisschen Deutsch'];
 export const cardLines:GapLine[]=[
- {text:'1. ___',answers:[['Ich heiße Rami Khalil.','Ich bin Rami Khalil.','Mein Name ist Rami Khalil.']]},
- {text:'2. ___',answers:[['Ich komme aus dem Libanon.']]},
- {text:'3. ___',answers:[['Ich spreche Arabisch, Französisch und ein bisschen Deutsch.','Ich spreche Arabisch, Französisch und ein bisschen Deutsch']]},
+ {text:'1. ___',answers:[['Ich heiße Rami Khalil.','Ich bin Rami Khalil.','Mein Name ist Rami Khalil.','Er heißt Rami Khalil.','Er ist Rami Khalil.','Sein Name ist Rami Khalil.','Sie heißen Rami Khalil.','Sie sind Rami Khalil.','Du heißt Rami Khalil.','Du bist Rami Khalil.']]},
+ {text:'2. ___',answers:[['Ich komme aus dem Libanon.','Er kommt aus dem Libanon.','Sie kommen aus dem Libanon.','Du kommst aus dem Libanon.']]},
+ {text:'3. ___',answers:[['Ich spreche','Er spricht','Sie sprechen','Du sprichst'].flatMap(start=>cardLanguages.map(list=>start+' '+list+'.'))]},
 ];
 export const cardSay=['Ich heiße Rami Khalil.','Ich komme aus dem Libanon.','Ich spreche Arabisch, Französisch und ein bisschen Deutsch.'];
 /** Exercise 10 · right or not? Yasemin says it, Nikos answers. */

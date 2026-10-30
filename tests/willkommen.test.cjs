@@ -264,3 +264,31 @@ test('phone check (30 October 2026): words wrap between words, dialogue bubbles 
  assert.equal(load('housing-copy').housingCopy.openA.length,6);
  assert(read('app/category-study.tsx').includes("housingText(language,unit.id==='book-15'?'openA':'open')"));
 });
+
+test('exercise fixes (30 October 2026): mixed word boxes, clear Sie/du rows, every right card sentence, Ä read as a long e, every finished step shows done',()=>{
+ const {mixedOrder}=load('mixed-order');
+ const box=['Tag','heiße','Woher','aus','willkommen','Danke'];
+ for(let i=0;i<300;i++){const order=mixedOrder(box,box);assert.deepEqual([...order].sort(),[...box].sort());assert.notEqual(order.join(),box.join(),'never the order of the gaps');}
+ const page=pageCode();
+ assert.equal((page.match(/ bank lines=\{/g)||[]).length,3,'Lektion 1 A–C word boxes list the mixed box');
+ assert(page.includes('const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);')&&page.includes('{(box??choices).map(word=>'));
+ assert(page.includes('return rows.map(row=>fixed?row.options:shuffle(row.options));'),'rows with their own choices are mixed');
+ const stadt=read('app/stadt-a-steps.tsx');assert(!stadt.includes('shuffleOptions'));assert(stadt.includes('bankLead="Kutudaki kelimeleri yerleştir:"')&&stadt.includes('const [orders,setOrders]=useState(mix);'));
+ // Sie oder du: no row without a clue any more.
+ const rows=lessonB.sieOrDu.slice(-2);assert.deepEqual(rows.map(row=>[row.after,row.answer]),[[', Nikos?','du'],[', Frau Weiß?','Sie']]);
+ // The card: ich, er, Sie and du all count.
+ const card=lessonB.cardLines;
+ for(const [i,text] of [[0,'Sie heißen Rami Khalil.'],[0,'Er heißt Rami Khalil'],[0,'Ich heiße Rami Khalil.'],[1,'Sie kommen aus dem Libanon.'],[1,'Er kommt aus dem Libanon'],[2,'Sie sprechen Arabisch, Französisch und ein bisschen Deutsch.'],[2,'Er spricht Arabisch, Französisch, ein bisschen Deutsch']])assert(lesson.acceptsAnswer(text,card[i].answers[0]),text);
+ for(const [i,text] of [[0,'Sie heißt Rami Khalil.'],[1,'Sie kommen aus Libanon.'],[2,'Sie Sprache sprechen Arabisch, Französisch und ein bisschen Deutsch']])assert(!lesson.acceptsAnswer(text,card[i].answers[0]),text);
+ // Ä: the site voices read "Äh" like "a"; it is read as "Eh", and its listening question offers no E.
+ assert.deepEqual(lessonB.alphabet.find(letter=>letter[0]==='Ä'),['Ä','a-umlaut (e)','Eh']);
+ assert.deepEqual(lessonB.letterQuestions.find(item=>item.answer==='Ä').options,['Ä','A','O']);
+ // Done marks for steps without a score: topic pages when opened, Şimdi sen / memory / Konuş when finished; tabs too.
+ for(const file of ['app/willkommen-study.tsx','app/stadt-study.tsx']){const code=read(file);assert(code.includes("if(step.kind!=='teach'"),file);assert(code.includes("konu:config.groups[0].ids.every(id=>scores[id])")&&code.includes('konus:!!scores.konus'),file);}
+ for(const file of ['app/willkommen-study.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx'])assert(read(file).includes('if(s.every(value=>value===true))onScore(step.id,s.length,s.length);'),file);
+ assert(read('app/willkommen-d-steps.tsx').includes('useEffect(()=>{if(allRight)onScore(step.id,values.length,values.length);},[allRight]);'));
+ assert(read('app/willkommen-c-steps.tsx').includes('if(done.length===moods.length){props.onScore(props.step.id,1,1);'));
+ assert(read('app/talk-step.tsx').includes('if(reply.done){setDone(true);props.onScore(step.id,1,1);}'));
+ // Scores of unscored steps never change the percentage.
+ assert.equal(load('willkommen-progress').partProgressL1('b',{sen:{right:2,total:2},sprachen:{right:1,total:1}}).learned,0);
+});

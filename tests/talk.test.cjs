@@ -60,3 +60,17 @@ test('the page: a Konuş tab and step after the test in every lesson part, the m
  const css=read('app/willkommen.css');assert(css.includes('.l1a-talk-mic')&&css.includes('.lb.l1a-book .l12-steps ol:has(> li:nth-child(4))'));
  const smoke=read('ci/smoke.cjs');assert(smoke.includes('?adim=konus')&&smoke.includes('dort sekme'));
 });
+
+test('Konuş waits and stays on the lesson (30 October 2026): at least eight answers, the lesson topic only, the microphone listens until tapped',()=>{
+ const scenario=talk.talkScenarios.l1b;
+ const system=prompt.talkSystemPrompt(scenario,2);
+ for(const piece of ['Talk ONLY about the topic of this lesson','Never start another topic','Use only the German of this lesson',"This is the learner's turn 3 of 8",'Do NOT say goodbye yet','"tr" is the Turkish translation of your WHOLE German reply'])assert(system.includes(piece),piece);
+ assert(prompt.talkSystemPrompt(scenario,7).includes('Now thank the learner, say goodbye'));
+ const turns=n=>Array.from({length:n},(_,i)=>[{role:'partner',text:'Frage '+i},{role:'learner',text:'Antwort '+i}]).flat();
+ assert(prompt.talkMessages(scenario,turns(3))[0].content.includes("turn 3 of 8"));
+ assert.equal(prompt.talkDone(turns(3),true),false,'the model cannot end after three answers');
+ assert.equal(prompt.talkDone(turns(8),true),true);assert.equal(prompt.talkDone(turns(9),false),false);
+ assert(read('app/api/konus/route.ts').includes('done:talkDone(history,reply.done)'));
+ const step=read('app/talk-step.tsx');
+ for(const piece of ['r.continuous=true','if(want.current){window.setTimeout(()=>{if(want.current)session(kept);},150);return;}','sendOnStop.current=true;want.current=false;rec.current?.stop();','},30000);',"'Bitir ve gönder'"])assert(step.includes(piece),piece);
+});

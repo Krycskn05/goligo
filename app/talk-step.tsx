@@ -34,7 +34,7 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
  useEffect(()=>{setCanListen(!!recognizer());},[]);
  useRunSave(runKey,step.id,lines.length>1?{lines,done}:null);
  const rec=useRef<Recognizer|null>(null);const end=useRef<HTMLDivElement>(null);
- useEffect(()=>()=>{rec.current?.abort();},[]);
+ useEffect(()=>()=>{want.current=false;rec.current?.abort();},[]);
  useEffect(()=>{end.current?.scrollIntoView({block:'nearest',behavior:'smooth'});},[lines.length,busy]);
  const send=async(text:string)=>{
   const said=text.trim();if(!said||busy||done)return;
@@ -46,22 +46,42 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
    if(!response.ok||!data.reply){setError({text:data.error??'Şu anda cevap gelmedi. Biraz sonra yeniden dene.',signIn:data.signIn});setLines(lines);setInput(said);return;}
    const reply=data.reply;
    setLines([...next.slice(0,-1),{role:'learner',text:said,better:reply.better,correction:reply.correction},{role:'partner',text:reply.de,tr:reply.tr}]);
-   if(reply.done)setDone(true);
+   if(reply.done){setDone(true);props.onScore(step.id,1,1);} // the Konuş tab and pill show done
    speech.speak({text:reply.de,who:scenario.who});
   }catch{setError({text:'İnternet bağlantısını kontrol et ve yeniden dene.'});setLines(lines);setInput(said);}
   finally{setBusy(false);}
  };
- const listen=()=>{
-  if(listening){rec.current?.stop();return;}
-  const r=recognizer();if(!r)return;speech.stop();setError(null);
-  r.lang='de-DE';r.interimResults=true;r.continuous=false;r.maxAlternatives=1;let heard='';let final=false;
-  r.onresult=event=>{let text='';for(let i=0;i<event.results.length;i++){text+=event.results[i][0].transcript;if(event.results[i].isFinal)final=true;}heard=text;setInput(text);};
-  r.onerror=event=>{setListening(false);if(event.error==='not-allowed'||event.error==='service-not-allowed')setError({text:'Mikrofon izni gerekiyor. Tarayıcıda mikrofona izin ver ya da yaz.'});else if(event.error==='no-speech')setError({text:'Ses duyulmadı. Yeniden dene.'});};
-  r.onend=()=>{setListening(false);rec.current=null;if(final&&heard.trim())void send(heard);};
-  rec.current=r;setListening(true);
-  try{r.start();}catch{setListening(false);}
+ // The microphone waits for the learner (the learner asked, 30 October 2026: it stopped at the first pause): it keeps
+ // listening through pauses — the browser's recognition ends a session after a silence, so a new one starts at once —
+ // until the learner taps the button again; then what was heard is sent. After 30 s without a word it stops and keeps
+ // the text in the box.
+ const want=useRef(false);const sendOnStop=useRef(false);const heard=useRef('');const idle=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const sendRef=useRef(send);sendRef.current=send;
+ useEffect(()=>()=>{want.current=false;if(idle.current)clearTimeout(idle.current);},[]);
+ const quiet=()=>{if(idle.current)clearTimeout(idle.current);idle.current=setTimeout(()=>{sendOnStop.current=false;want.current=false;rec.current?.stop();},30000);};
+ const session=(base:string)=>{
+  const r=recognizer();if(!r){want.current=false;setListening(false);return;}
+  r.lang='de-DE';r.interimResults=true;r.continuous=true;r.maxAlternatives=1;let said='';
+  r.onresult=event=>{let finals='',interim='';for(let i=0;i<event.results.length;i++){const part=event.results[i][0].transcript;if(event.results[i].isFinal)finals+=part+' ';else interim+=part;}
+   said=finals;const text=(base+' '+finals+interim).replace(/\s+/g,' ').trim();heard.current=text;setInput(text);quiet();};
+  r.onerror=event=>{if(event.error==='not-allowed'||event.error==='service-not-allowed'){want.current=false;sendOnStop.current=false;setError({text:'Mikrofon izni gerekiyor. Tarayıcıda mikrofona izin ver ya da yaz.'});}};
+  r.onend=()=>{
+   const kept=(base+' '+said).replace(/\s+/g,' ').trim();
+   if(want.current){window.setTimeout(()=>{if(want.current)session(kept);},150);return;}
+   if(idle.current)clearTimeout(idle.current);
+   rec.current=null;setListening(false);
+   const text=heard.current.trim();
+   if(sendOnStop.current&&text)void sendRef.current(text);
+  };
+  rec.current=r;
+  try{r.start();}catch{want.current=false;setListening(false);}
  };
- const restart=()=>{rec.current?.abort();speech.stop();setLines([opening]);setDone(false);setInput('');setError(null);};
+ const listen=()=>{
+  if(listening){sendOnStop.current=true;want.current=false;rec.current?.stop();return;}
+  if(!recognizer())return;speech.stop();setError(null);
+  want.current=true;sendOnStop.current=false;heard.current='';setInput('');setListening(true);quiet();session('');
+ };
+ const restart=()=>{want.current=false;sendOnStop.current=false;rec.current?.abort();speech.stop();setLines([opening]);setDone(false);setInput('');setError(null);};
  const partner=scenario.name;
  return <>
   <p className="kicker" lang="de">Sprechen · {scenario.title}</p><Heading>Konuş: {scenario.title}</Heading>
@@ -84,8 +104,8 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
   </div>
   {error&&<p className="l1a-feedback bad" role="status">{error.text}{error.signIn&&<> <a href={'/giris?return_to='+encodeURIComponent(typeof window==='undefined'?'/':window.location.pathname+window.location.search)}>Giriş yap</a></>}</p>}
   {done?<p className="l1a-feedback ok" role="status">Konuşma bitti 🎉</p>:<form className="l1a-talk-box" onSubmit={event=>{event.preventDefault();void send(input);}}>
-   {canListen&&<button type="button" className={'l1a-talk-mic'+(listening?' on':'')} aria-pressed={listening} aria-label={listening?'Dinlemeyi durdur':'Bas ve Almanca konuş'} disabled={busy} onClick={listen}>{listening?<Square size={22} aria-hidden="true"/>:<Mic size={24} aria-hidden="true"/>}</button>}
-   <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={listening?'Dinliyorum…':canListen?'Konuş ya da yaz…':'Almanca yaz…'} aria-label="Cevabın" maxLength={300} disabled={busy} onChange={event=>setInput(event.target.value)}/>
+   {canListen&&<button type="button" className={'l1a-talk-mic'+(listening?' on':'')} aria-pressed={listening} aria-label={listening?'Bitir ve gönder':'Bas ve Almanca konuş'} disabled={busy} onClick={listen}>{listening?<Square size={22} aria-hidden="true"/>:<Mic size={24} aria-hidden="true"/>}</button>}
+   <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={listening?'Dinliyorum… bitince ■ dokun':canListen?'Konuş ya da yaz…':'Almanca yaz…'} aria-label="Cevabın" maxLength={300} disabled={busy} onChange={event=>setInput(event.target.value)}/>
    <button type="submit" className="btn small l1a-talk-send" disabled={busy||!input.trim()} aria-label="Gönder"><Send size={18} aria-hidden="true"/></button>
   </form>}
   <div className="l1a-actions">

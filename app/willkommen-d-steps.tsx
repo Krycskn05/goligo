@@ -8,6 +8,8 @@ import {
  vocabSay,grammarLines,grammarSay,talkLines,talkSay,profileLines,testQuestionsD,checkSections,checkPoints,stepIndexD,lineSayD,
 } from '@/lib/willkommen-d-course';
 import {ProgressMeter} from './progress-ui';
+import {TalkStep} from './talk-step';
+import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Note,Rich,Heading,FeedbackLine,useFinish,GapExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {DialogueLines,Picture} from './willkommen-b-steps';
@@ -34,6 +36,7 @@ export function StepViewD(props:StepProps){
   case 'steckbrief':return <GapExercise kicker="Alles klar? · 4 Steckbrief · 4 Punkte" title="Kimlik kartlarını doldur" lead="Bir önceki diyaloğa göre: ülke ve diller." lines={profileLines} wide say={[]} {...props}/>;
   case 'test':return <TestStep label="Alles klar? · 5 Lektion 1 Test · 15 Punkte" questions={testQuestionsD} sayFor={i=>testQuestionsD[i][3]} {...props}/>;
   case 'puanlar':return <Points {...props}/>;
+  case 'konus':return <TalkStep scenario={talkScenarios.l1d} {...props}/>;
   case 'bitti':return <EndD {...props}/>;
  }
  return null;

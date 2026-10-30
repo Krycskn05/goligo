@@ -10,6 +10,8 @@ import {
 } from '@/lib/willkommen-c-course';
 import {lineSay} from '@/lib/willkommen-b-course';
 import {ProgressMeter} from './progress-ui';
+import {TalkStep} from './talk-step';
+import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Note,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {DialogueLines,ListenAll,Picture} from './willkommen-b-steps';
@@ -46,6 +48,7 @@ export function StepViewC(props:StepProps){
   case 'diktat':return <GapExercise kicker="Alıştırma 11 · Diktat" title="Dinle ve yaz" lead="İstediğin kadar dinle, cümleyi kutuya yaz." lines={dictationLines} wide say={[]} {...props}/>;
   case 'sen':return <OwnC {...props}/>;
   case 'test':return <TestStep label="Lektion 1C · Test" questions={testQuestionsC} sayFor={i=>testQuestionsC[i][3]} {...props}/>;
+  case 'konus':return <TalkStep scenario={talkScenarios.l1c} {...props}/>;
   case 'bitti':return <EndC {...props}/>;
  }
  return null;

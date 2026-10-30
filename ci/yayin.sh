@@ -79,7 +79,7 @@ s_build() {
     const c=require("./dist/server/wrangler.json");
     console.log(JSON.stringify({name:c.name,main:c.main,compatibility_date:c.compatibility_date,
       compatibility_flags:c.compatibility_flags,d1_databases:c.d1_databases,vars:c.vars,
-      assets:c.assets,workers_dev:c.workers_dev,routes:c.routes},null,1));'
+      assets:c.assets,workers_dev:c.workers_dev,routes:c.routes,ai:c.ai},null,1));'
 }
 s_sesler() { # Doğal site seslerini ("sesler" dalı) siteye ekler; yoksa cihaz sesi kullanılır.
   rm -rf public/voices && mkdir -p public/voices

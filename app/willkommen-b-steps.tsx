@@ -9,6 +9,8 @@ import {
  cardLines,cardSay,checkItems,ownPromptsB,testQuestionsB,stepIndexB,type Line,type Profile,
 } from '@/lib/willkommen-b-course';
 import {ProgressMeter} from './progress-ui';
+import {TalkStep} from './talk-step';
+import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
@@ -43,6 +45,7 @@ export function StepViewB(props:StepProps){
   case 'richtig':return <ChoiceRows kicker="Alıştırma 10 · Alles richtig?" title="Doğru mu? Nikos cevap veriyor." lead="Yasemin karttan cümle kuruyor. Doğruysa “Ja, richtig!”, yanlışsa “Nein.” seç." before={<ProfileCard card={nikosCard}/>} wide rows={checkItems.map((item,i)=>({key:String(i),label:item.statement,before:<span className="l1a-land l1a-statement" lang="de"><Say text={item.statement} who="yasemin" speech={speech}/>{item.statement}</span>,options:[{value:'ja',label:'Ja, richtig!'},{value:'nein',label:'Nein.'}],answer:item.answer,say:{text:item.reply,who:'nikos'},reveal:<span className="l1a-mini l1a-reply" lang="de">Nikos: {item.reply}</span>}))} {...props}/>;
   case 'sen':return <OwnB {...props}/>;
   case 'test':return <TestStep label="Lektion 1B · Test" questions={testQuestionsB} sayFor={i=>testQuestionsB[i][3]} {...props}/>;
+  case 'konus':return <TalkStep scenario={talkScenarios.l1b} {...props}/>;
   case 'bitti':return <EndB {...props}/>;
  }
  return null;

@@ -42,6 +42,8 @@ const localBindingConfig = {
   // "Şifremi unuttum" emails (Cloudflare Email Service, goliqo.com onboarded in the dashboard): only in the deployed
   // build; local runs and checks have no email binding (app/api/auth answers errService if it would need one).
   ...(productionDatabaseId ? { send_email: [{ name: "EMAIL" }] } : {}),
+  // "Konuş" (app/api/konus): Workers AI, only in the deployed build; local runs and checks answer "not available".
+  ...(productionDatabaseId ? { ai: { binding: "AI" } } : {}),
   r2_buckets: r2
     ? [
         {

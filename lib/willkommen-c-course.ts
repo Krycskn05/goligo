@@ -199,6 +199,7 @@ export const stepsC:Step[]=[
  {id:'diktat',title:'Alıştırma 11',kind:'exercise'},
  {id:'sen',title:'Alıştırma 12',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
+ {id:'konus',title:'Konuşma',kind:'speak'},
  {id:'bitti',title:'Bitti',kind:'end'},
 ];
 export const stepIndexC=(id:string)=>stepsC.findIndex(step=>step.id===id);
@@ -220,6 +221,7 @@ export const stepGroupsC:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:stepsC.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:stepsC.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
+ {id:'konus',label:'Konuş',ids:['konus']},
 ];
 
 /** Every German text Teil C speaks (rendered as site voices by scripts/voices). */

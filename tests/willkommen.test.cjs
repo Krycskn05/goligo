@@ -8,9 +8,9 @@ const read=file=>fs.readFileSync(file,'utf8');
 const pageCode=()=>['app/willkommen-study.tsx','app/willkommen-ui.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx','app/willkommen-d-steps.tsx'].map(read).join('\n');
 
 test('22 steps in the order of the learner\'s page: cover, 10 teaching steps, 9 exercises, test, end',()=>{
- assert.equal(lesson.steps.length,22);
- assert.deepEqual(lesson.steps.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(9).fill('exercise'),'test','end']);
- assert.equal(new Set(lesson.steps.map(step=>step.id)).size,22,'ids are unique');
+ assert.equal(lesson.steps.length,23);
+ assert.deepEqual(lesson.steps.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(9).fill('exercise'),'test','speak','end']);
+ assert.equal(new Set(lesson.steps.map(step=>step.id)).size,23,'ids are unique');
  assert.equal(lesson.stepIndex('test'),20);assert.equal(lesson.stepIndex('yok'),-1);
  assert.equal(lesson.countries.length,28);assert.equal(lesson.articleCountries.length,10);assert.equal(lesson.dialogue.length,6);assert.equal(lesson.people.length,6);assert.equal(lesson.words.length,15);
  assert.equal(lesson.testQuestions.length,10);assert.equal(lesson.articleRows.length,10);assert.equal(lesson.listenItems.length,3);
@@ -80,10 +80,10 @@ test('a man is read by a man, a woman by a woman, and two people in one step nev
 test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, Teil A on a wide spread with three tabs (25 October 2026)',()=>{
  assert.deepEqual(lesson.lessonParts.map(part=>part.badge),['A','B','C','D']);
  assert(lesson.lessonParts.every(part=>part.title&&part.lead),'Teil A–D are all ready');
- assert.deepEqual(lesson.stepGroups.map(group=>group.id),['konu','alistirmalar','test']);
+ assert.deepEqual(lesson.stepGroups.map(group=>group.id),['konu','alistirmalar','test','konus']);
  assert.equal(lesson.stepGroups[0].ids.length,10);assert.equal(lesson.stepGroups[1].ids.length,9);
  assert.equal(lesson.groupOf('diyalog').id,'konu');assert.equal(lesson.groupOf('kutu').id,'alistirmalar');assert.equal(lesson.groupOf('kapak'),undefined);
- assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,20,'every teaching step, exercise and the test is in exactly one tab');
+ assert.equal(new Set(lesson.stepGroups.flatMap(group=>group.ids)).size,21,'every teaching step, exercise, the test and the talk is in exactly one tab');
  assert(lesson.unitGoals.length>=4);
  const page=pageCode();
  for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);
@@ -110,10 +110,10 @@ test('the page, its pictures, the units link, guest access and the menu',()=>{
 });
 
 test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps, letters read by their German names, a voice per person',()=>{
- assert.equal(lessonB.stepsB.length,24);
- assert.deepEqual(lessonB.stepsB.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(11).fill('exercise'),'test','end']);
- assert.equal(new Set(lessonB.stepsB.map(step=>step.id)).size,24,'ids are unique');
- assert.deepEqual(lessonB.stepGroupsB.map(group=>group.ids.length),[10,11,1]);
+ assert.equal(lessonB.stepsB.length,25);
+ assert.deepEqual(lessonB.stepsB.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(11).fill('exercise'),'test','speak','end']);
+ assert.equal(new Set(lessonB.stepsB.map(step=>step.id)).size,25,'ids are unique');
+ assert.deepEqual(lessonB.stepGroupsB.map(group=>group.ids.length),[10,11,1,1]);
  assert.equal(lessonB.languages.length,31);assert.equal(lessonB.alphabet.length,30);assert.equal(lessonB.wordsB.length,23);assert.equal(lessonB.testQuestionsB.length,12);
  for(const [question,options,answer] of lessonB.testQuestionsB)assert(options.includes(answer),question);
  // After a test answer only the right answer is read — in German, never a Turkish answer.
@@ -164,10 +164,10 @@ test('"Bu ünitede": what units 1–3 teach, in our own words (no sentences, nam
 });
 
 test('Teil C „Guten Tag!“ (25 October 2026): 26 steps, greetings by the time of day, Wie geht’s?, the verb in position 2, writing right',()=>{
- assert.equal(lessonC.stepsC.length,26);
- assert.deepEqual(lessonC.stepsC.map(step=>step.kind),['cover',...Array(11).fill('teach'),...Array(12).fill('exercise'),'test','end']);
- assert.equal(new Set(lessonC.stepsC.map(step=>step.id)).size,26,'ids are unique');
- assert.deepEqual(lessonC.stepGroupsC.map(group=>group.ids.length),[11,12,1]);
+ assert.equal(lessonC.stepsC.length,27);
+ assert.deepEqual(lessonC.stepsC.map(step=>step.kind),['cover',...Array(11).fill('teach'),...Array(12).fill('exercise'),'test','speak','end']);
+ assert.equal(new Set(lessonC.stepsC.map(step=>step.id)).size,27,'ids are unique');
+ assert.deepEqual(lessonC.stepGroupsC.map(group=>group.ids.length),[11,12,1,1]);
  assert.equal(lessonC.stepIndexC('befinden'),4);assert.equal(lessonC.moods.length,6);assert.equal(lessonC.testQuestionsC.length,12);
  // The memory game and the learner's own sentences have no score; every other exercise and the test do.
  const scored=lessonC.scoredExercisesC.map(e=>e.id);
@@ -217,8 +217,8 @@ test('Teil C „Guten Tag!“ (25 October 2026): 26 steps, greetings by the time
 });
 
 test('Teil D „Ich bin neu hier.“ (25 October 2026): the comic, the summary, Alles klar? with points, and the end of Lektion 1',()=>{
- assert.equal(lessonD.stepsD.length,16);assert.equal(new Set(lessonD.stepsD.map(step=>step.id)).size,16,'ids are unique');
- assert.deepEqual(lessonD.stepGroupsD.map(group=>group.ids.length),[5,3,6]);
+ assert.equal(lessonD.stepsD.length,17);assert.equal(new Set(lessonD.stepsD.map(step=>step.id)).size,17,'ids are unique');
+ assert.deepEqual(lessonD.stepGroupsD.map(group=>group.ids.length),[5,3,6,1]);
  for(const group of lessonD.stepGroupsD)for(const id of group.ids)assert(lessonD.stepIndexD(id)>0,id);
  assert.deepEqual(lessonD.scoredExercisesD.map(e=>[e.id,e.total]),[['tamamla',8],['ich',10],['wortschatz',5],['grammatik',8],['kommunikation',6],['steckbrief',4],['test',15]]);
  // Alles klar?: the points of each section are the number of its answers (38 in all, like the book's page).

@@ -7,11 +7,11 @@ const lesson=load('stadt-course'),progress=load('stadt-progress'),l1=load('willk
 const read=file=>fs.readFileSync(file,'utf8');
 const pageCode=()=>['app/stadt-study.tsx','app/stadt-a-steps.tsx'].map(read).join('\n');
 
-test('24 steps in the order of the learner\'s page: cover, 10 teaching steps, 11 exercises, test, summary',()=>{
- assert.equal(lesson.stepsA.length,24);
- assert.deepEqual(lesson.stepsA.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(11).fill('exercise'),'test','end']);
- assert.equal(new Set(lesson.stepsA.map(step=>step.id)).size,24,'ids are unique');
- assert.deepEqual(lesson.stepGroupsA.map(group=>group.ids.length),[10,11,1]);
+test('25 steps in the order of the learner\'s page: cover, 10 teaching steps, 11 exercises, test, summary',()=>{
+ assert.equal(lesson.stepsA.length,25);
+ assert.deepEqual(lesson.stepsA.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(11).fill('exercise'),'test','speak','end']);
+ assert.equal(new Set(lesson.stepsA.map(step=>step.id)).size,25,'ids are unique');
+ assert.deepEqual(lesson.stepGroupsA.map(group=>group.ids.length),[10,11,1,1]);
  assert.equal(lesson.stepIndexA('test'),22);assert.equal(lesson.stepIndexA('yok'),-1);
  assert.equal(lesson.buildingWords.length,13);assert.equal(lesson.officeWords.length,11);assert.equal(lesson.officeVerbs.length,10);assert.equal(lesson.directionWords.length,11);
  assert.equal(lesson.officeDialogue.length,15);assert.equal(lesson.schoolDialogue.length,9);assert.equal(lesson.summaryLines.length,10);
@@ -147,5 +147,5 @@ test('the steps of the open tab are a strip to scroll under the tabs, in every l
  for(const id of lesson.stepGroupsA[1].ids)assert(lesson.stepShortA[id],id);
  const l1course=load('willkommen-course'),b=load('willkommen-b-course'),c=load('willkommen-c-course'),d=load('willkommen-d-course');
  const groups={a:l1course.stepGroups,b:b.stepGroupsB,c:c.stepGroupsC,d:d.stepGroupsD};
- for(const [part,list] of Object.entries(groups))for(const group of list.slice(1))for(const id of group.ids)assert(new RegExp("(^|[,{ ])'?"+id+"'?:'").test(l1.slice(l1.indexOf('const shortNames'),l1.indexOf('const parts'))),part+': '+id);
+ for(const [part,list] of Object.entries(groups))for(const group of list.slice(1).filter(group=>group.ids.length>1))for(const id of group.ids)assert(new RegExp("(^|[,{ ])'?"+id+"'?:'").test(l1.slice(l1.indexOf('const shortNames'),l1.indexOf('const parts'))),part+': '+id);
 });

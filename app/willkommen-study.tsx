@@ -25,6 +25,8 @@ import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
 import {StepStrip,useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {StepViewB} from './willkommen-b-steps';
+import {TalkStep} from './talk-step';
+import {talkScenarios} from '@/lib/talk-scenarios';
 import {StepViewC} from './willkommen-c-steps';
 import {StepViewD} from './willkommen-d-steps';
 
@@ -202,11 +204,12 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const exerciseIds=config.scored.filter(exercise=>config.groups[1].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const testIds=config.scored.filter(exercise=>config.groups[2].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
- const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id])};
+ const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:false};
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
   test:config.testDetail?config.testDetail(scores):scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${config.testCount} soru`,
+  konus:'Yapay zekâyla',
  };
  const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
  const nextSoon=!next?lessonParts[lessonParts.findIndex(row=>row.id===config.id)+1]:undefined;
@@ -258,6 +261,7 @@ function StepViewA(props:StepProps){
   case 'kutu':return <GapExercise kicker="Alıştırma 8 · Was passt?" title="Kutudan doğru kelimeyi seç" lead={'Kelimeler: '+wordBox.join(' · ')} lines={boxLines} choices={wordBox} say={boxSay} speakers={exerciseSpeakers.kutu} {...props}/>;
   case 'sen':return <OwnExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 1A · Test" questions={testQuestions} sayFor={i=>testSpeech(testQuestions[i])} {...props}/>;
+  case 'konus':return <TalkStep scenario={talkScenarios.l1a} {...props}/>;
   case 'bitti':return <End {...props}/>;
  }
  return null;

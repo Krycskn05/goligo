@@ -198,6 +198,7 @@ export const stepsD:Step[]=[
  {id:'steckbrief',title:'Alles klar? 4',kind:'exercise'},
  {id:'test',title:'Alles klar? 5',kind:'test'},
  {id:'puanlar',title:'Puanların',kind:'end'},
+ {id:'konus',title:'Konuşma',kind:'speak'},
  {id:'bitti',title:'Bitti',kind:'end'},
 ];
 export const stepIndexD=(id:string)=>stepsD.findIndex(step=>step.id===id);
@@ -215,6 +216,7 @@ export const stepGroupsD:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:['cizgi-roman','onemli','strateji','ozet','kelimeler']},
  {id:'alistirmalar',label:'Alıştırmalar',ids:['tamamla','ich','sen']},
  {id:'test',label:'Alles klar?',ids:['wortschatz','grammatik','kommunikation','steckbrief','test','puanlar']},
+ {id:'konus',label:'Konuş',ids:['konus']},
 ];
 
 /** Every German text Teil D speaks (rendered as site voices by scripts/voices). */

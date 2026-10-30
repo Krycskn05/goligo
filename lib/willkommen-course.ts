@@ -216,7 +216,8 @@ export function testSpeech([question,,answer]:TestQuestion):string{
 }
 
 /** The steps in order (ids are stable; the title is shown in the top bar). */
-export type StepKind='cover'|'teach'|'exercise'|'test'|'end';
+/** `speak`: the AI role play after the test ("Konuş", 30 October 2026, lib/talk-scenarios.ts). */
+export type StepKind='cover'|'teach'|'exercise'|'test'|'speak'|'end';
 export type Step={id:string;title:string;kind:StepKind};
 export const steps:Step[]=[
  {id:'kapak',title:'Kapak',kind:'cover'},
@@ -240,6 +241,7 @@ export const steps:Step[]=[
  {id:'kutu',title:'Alıştırma 8',kind:'exercise'},
  {id:'sen',title:'Alıştırma 9',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
+ {id:'konus',title:'Konuşma',kind:'speak'},
  {id:'bitti',title:'Bitti',kind:'end'},
 ];
 export const stepIndex=(id:string)=>steps.findIndex(step=>step.id===id);
@@ -294,10 +296,11 @@ export const lessonParts:LessonPart[]=[
 /** What Lektion 1 teaches ("Bu ünitede" on the left page of the contents): lib/unit-goals.ts, in our own words. */
 export const unitGoals=unitGoalsFor(WILLKOMMEN_UNIT);
 /** Teil A's steps as three index tabs on the right page (the cover and the end belong to none). */
-export type StepGroup={id:'konu'|'alistirmalar'|'test';label:string;ids:string[]};
+export type StepGroup={id:'konu'|'alistirmalar'|'test'|'konus';label:string;ids:string[]};
 export const stepGroups:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:steps.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:steps.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
+ {id:'konus',label:'Konuş',ids:['konus']},
 ];
 export const groupOf=(id:string)=>stepGroups.find(group=>group.ids.includes(id));

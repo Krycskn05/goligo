@@ -366,6 +366,7 @@ export const stepsA:Step[]=[
  {id:'sirala',title:'Alıştırma 10',kind:'exercise'},
  {id:'rollenspiel',title:'Alıştırma 11',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
+ {id:'konus',title:'Konuşma',kind:'speak'},
  {id:'ozet',title:'Özet',kind:'end'},
 ];
 export const stepIndexA=(id:string)=>stepsA.findIndex(step=>step.id===id);
@@ -391,6 +392,7 @@ export const stepGroupsA:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:stepsA.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:stepsA.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
+ {id:'konus',label:'Konuş',ids:['konus']},
 ];
 /** Every word Teil A teaches, for the count on the contents page. */
 export const wordCountA=buildingWords.length+officeWords.length+officeVerbs.length+directionWords.length;

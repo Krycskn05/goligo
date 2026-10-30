@@ -187,11 +187,12 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const exerciseIds=config.scored.filter(exercise=>config.groups[1].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const testIds=config.scored.filter(exercise=>config.groups[2].ids.includes(exercise.id)).map(exercise=>exercise.id);
  const exercisesDone=exerciseIds.filter(id=>scores[id]).length;
- const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id])};
+ const done:Record<StepGroup['id'],boolean>={konu:false,alistirmalar:exercisesDone>=exerciseIds.length,test:testIds.length>0&&testIds.every(id=>scores[id]),konus:false};
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
   test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${config.testCount} soru`,
+  konus:'Yapay zekâyla',
  };
  const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
  const nextSoon=!next?stadtParts[stadtParts.findIndex(row=>row.id===config.id)+1]:undefined;

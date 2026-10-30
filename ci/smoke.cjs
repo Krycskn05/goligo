@@ -249,7 +249,7 @@ async function languageFlow(browser) {
   record("Lektion 1: defter girisi (Teil A-D acik)", (await page.locator(".l1a-book .lb-toc-row button.lb-toc-open").count()) === 4 && (await page.locator(".l1a-book .l1a-soon").count()) === 0, "");
   await page.locator("[data-l1a-part='a'] button.lb-toc-open").click();
   await page.waitForTimeout(600);
-  record("Lektion 1A: kapak, 22 adim, uc sekme", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/22/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
+  record("Lektion 1A: kapak, 23 adim, dort sekme (Konus dahil)", (await page.locator("[data-l1a-step='kapak']").count()) === 1 && /1\/23/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 4, (await page.locator(".l1a-where").textContent()) || "");
   // Teil B (25 October 2026): a step opens from its address; the alphabet has 30 letters.
   await page.goto(BASE + "/a1-1/willkommen?teil=b&adim=alfabe", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 1B: alfabe adimi aciliyor (30 harf)", (await page.locator("[data-l1a-step='alfabe'][data-l1a-teil='b']").count()) === 1 && (await page.locator(".l1a-letter").count()) === 30, (await page.locator(".l1a-where").textContent()) || "");
@@ -271,11 +271,15 @@ async function languageFlow(browser) {
   record("Lektion 15: defter girisi (Teil A acik, B-D yakinda)", (await page.locator(".l15-book .lb-toc-row button.lb-toc-open").count()) === 1 && (await page.locator(".l15-book .l1a-soon").count()) === 3, "");
   await page.locator("[data-l15-part='a'] button.lb-toc-open").click();
   await page.waitForTimeout(600);
-  record("Lektion 15A: kapak, 24 adim, uc sekme", (await page.locator("[data-l15-step='kapak']").count()) === 1 && /1\/24/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
+  record("Lektion 15A: kapak, 25 adim, dort sekme (Konus dahil)", (await page.locator("[data-l15-step='kapak']").count()) === 1 && /1\/25/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 4, (await page.locator(".l1a-where").textContent()) || "");
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=diyalog-amt", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, "03d-lektion-15a-diyalog.png"), fullPage: true });
   record("Lektion 15A: diyalog adimi aciliyor (pano, 15 satir, dinle dugmeleri)", (await page.locator("[data-l15-step='diyalog-amt'] .l15-board").count()) === 1 && (await page.locator("[data-l15-step='diyalog-amt'] .l1a-line").count()) === 15 && (await page.locator("[data-l15-step='diyalog-amt'] .l1a-line .l12-say").count()) === 15, "");
+  await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=konus", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: path.join(OUT, "03f-lektion-15a-konus.png"), fullPage: true });
+  record("Lektion 15A: Konus adimi aciliyor (Omar'in ilk cumlesi, yazma kutusu)", (await page.locator("[data-l15-step='konus'] .l1a-talk .l1a-line").count()) === 1 && (await page.locator("[data-l15-step='konus'] .l1a-talk-input").count()) === 1, "");
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=katlar", { waitUntil: "networkidle", timeout: 90000 });
   record("Lektion 15A: katlar adimi aciliyor (bina, 7 kat ve cati)", (await page.locator("[data-l15-step='katlar'] .l15-house .l15-floor").count()) === 8, "");
   await page.goto(BASE + "/a1-2/wege-in-der-stadt?adim=wohin", { waitUntil: "networkidle", timeout: 90000 });

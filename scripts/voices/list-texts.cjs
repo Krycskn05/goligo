@@ -41,4 +41,6 @@ for(const text of load('willkommen-c-course').willkommenCSpeechTexts())add(text)
 for(const text of load('willkommen-d-course').willkommenDSpeechTexts())add(text);
 // Lektion 15A „Gehen Sie die Treppe hoch.“: words, floors, directions, es gibt, Ach/Ich, the dialogues, exercises and the test.
 for(const text of load('stadt-course').stadtSpeechTexts())add(text);
+// "Konuş" (the AI role plays): the partners' opening lines and the phrases to try.
+for(const text of load('talk-scenarios').talkSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

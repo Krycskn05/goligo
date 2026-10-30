@@ -12,6 +12,8 @@ import {
  type Word,type BoardRow,type ChoiceLine,type ChoiceGap,
 } from '@/lib/stadt-course';
 import {ProgressMeter} from './progress-ui';
+import {TalkStep} from './talk-step';
+import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Note,Heading,Portrait,FeedbackLine,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
@@ -47,6 +49,7 @@ export function StepViewL15A(props:StepProps){
   case 'sirala':return <OrderExercise kicker="Alıştırma 10 · Sätze bauen" title="Cümleyi kur" sentences={orderSentences} sayFor={orderSay} {...props}/>;
   case 'rollenspiel':return <RoleExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 15A · Test" questions={testQuestionsA} sayFor={i=>testQuestionsA[i][3]} listen={i=>testQuestionsA[i][4]} langOf={text=>isTurkishText(text)?'tr':'de'} {...props}/>;
+  case 'konus':return <TalkStep scenario={talkScenarios.l15a} {...props}/>;
   case 'ozet':return <EndA {...props}/>;
  }
  return null;

@@ -11,8 +11,8 @@ import {verbText} from '@/lib/verb-copy';
 import {t,translate,studyLanguages,isStudyLanguage,type StudyLanguage} from '@/lib/study-languages';
 import {languageDirection} from '@/lib/site-languages';
 import {useLanguageSwitch} from './language-switch';
-import {ENGLISH_COURSE_ENABLED,activeLearningLanguage,learningText,saveLearningLanguage,type LearningLanguage} from '@/lib/learning-language';
-import {TopicArt,HeroArt} from './toon-art';
+import {ENGLISH_COURSE_ENABLED,activeLearningLanguage,saveLearningLanguage,type LearningLanguage} from '@/lib/learning-language';
+import {TopicArt} from './toon-art';
 import {CourseSelector} from './course-selector';
 import {SiteFooter} from './site-footer';
 import {SiteHeader} from './site-header';
@@ -72,7 +72,9 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
     {guest&&<GuestBanner language={language} back="/konular"/>}
     {onCourse&&<CourseSelector course={course} language={language} onChange={onCourse}/>}
     {home?<><HomeTour language={language}/><SiteTour language={language}/></>:<>
-    <section className="toon-hero"><div><span className="eyebrow">{learningText(language,course)}</span><h1 id="work-heading" tabIndex={-1}>{c(language,'catalogTitle')}</h1></div><div className="toon-hero-art"><HeroArt/></div></section>
+    {/* The "Almanca Eğitimi · Üniteler ve konular" banner with its picture was removed at the learner's request
+        (30 October 2026): the notebook starts at the top; the heading stays for screen readers. */}
+    <h1 id="work-heading" className="sr-only" tabIndex={-1}>{c(language,'catalogTitle')}</h1>
     {/* The catalogue as a spiral notebook: level tabs, ruled paper, unit photos taped onto the page. */}
     <section id="curriculum" className="nb" aria-labelledby="curriculum-heading">
      <div className="nb-tabs" role="group" aria-label={c(language,'levelLabel')}>{(['A1.1','A1.2'] as const).map(value=><button type="button" key={value} className={level===value?'active':''} aria-pressed={level===value} onClick={()=>setLevel(value)}><strong>{value}</strong><span>{c(language,'categories')}</span></button>)}</div>

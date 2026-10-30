@@ -23,7 +23,7 @@ import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
-import {useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {StepStrip,useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {StepViewB} from './willkommen-b-steps';
 import {StepViewC} from './willkommen-c-steps';
 import {StepViewD} from './willkommen-d-steps';
@@ -46,6 +46,13 @@ export default function WillkommenStudy({guest=false}:{guest?:boolean}){
 
 /** A part with a lesson: its steps, tabs, scored exercises, picture and step views. */
 type PartConfig={id:L1PartId;badge:string;title:string;lead:string;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode;testDetail?:(scores:L1AScoreMap)=>string};
+/** Short names of the exercises for the strip under the tabs (a teaching step shows its own title). */
+const shortNames:Record<L1PartId,Record<string,string>>={
+ a:{harfler:'Eksik harfler',eslestir:'Eşleştir',sirala:'Sıraya koy',ayir:'Kelimeleri ayır',aus:'aus + artikel',dinle:'Dinle',soru:'Soruyu yaz',kutu:'Kutudan seç',sen:'Şimdi sen'},
+ b:{'land-sprache':'Ülke – dil','sie-oder-du':'Sie mi, du mu?',endungen:'Fiil ekleri',hoeren:'Dinle',namen:'Adı yaz',buchstabe:'Hangi harf?',kutu:'Kutudan seç',umformen:'Soruyu çevir',karte:'Karttan cümle',richtig:'Doğru mu?',sen:'Şimdi sen'},
+ c:{'tageszeit-uebung':'Saate göre selam','sie-du-beide':'Kime söylenir?',ayir:'Selamları ayır',gesichter:'Yüz – kelime',memory:'Hafıza oyunu',hoeren:'Dinle',kutu:'Kutudan seç',sirala:'Cümle kur',punkt:'Nokta mı, soru mu?','gross-klein':'Büyük harf',diktat:'Dinle ve yaz',sen:'Şimdi sen'},
+ d:{tamamla:'Çizgi roman',ich:'„ich“ cümleleri',sen:'Üç cümlen',wortschatz:'Kelime',grammatik:'Dilbilgisi',kommunikation:'İletişim',steckbrief:'Kimlik kartı',test:'Test',puanlar:'Puanların'},
+};
 const parts:Record<L1PartId,PartConfig>={
  a:{id:'a',badge:'A',title:lessonParts[0].title??'',lead:lessonParts[0].lead??'',steps,groups:stepGroups,scored:scoredExercises,testCount:testQuestions.length,wordCount:words.length,cover:willkommenPictures.cover,coverAlt:'Süpermarket önünde tokalaşan iki kişi: Sabine ve Omar',View:StepViewA},
  b:{id:'b',badge:'B',title:lessonParts[1].title??'',lead:lessonParts[1].lead??'',steps:stepsB,groups:stepGroupsB,scored:scoredExercisesB,testCount:testQuestionsB.length,wordCount:wordsB.length,cover:willkommenBPictures.cover,coverAlt:'Dil kursu sınıfı: Paul Hoca tahtada, öğrenciler masalarında',View:StepViewB},
@@ -220,6 +227,7 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
     <span className="l12-step-number" aria-hidden="true">{done[item.id]?<Check size={16}/>:i+1}</span>
     <span className="l12-step-text"><strong>{item.label}</strong><small>{detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
+   {group&&group.ids.length>1&&<StepStrip label={group.label} current={step.id} scores={scores} onOpen={onGo} items={group.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:shortNames[config.id][id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>}
    {children}
   </>}/>
  </section>;

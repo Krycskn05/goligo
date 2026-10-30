@@ -137,3 +137,15 @@ test('a test or a one-at-a-time exercise left in the middle goes on where it was
  // Leaving right after the last test answer still saves the result.
  assert(ui.includes('pending.current?.()')&&ui.includes('pending.current=()=>onScore(step.id,total,questions.length)'));
 });
+
+test('the steps of the open tab are a strip to scroll under the tabs, in every lesson (the learner chose it, 30 October 2026)',()=>{
+ const ui=read('app/willkommen-ui.tsx'),l1=read('app/willkommen-study.tsx'),l15=read('app/stadt-study.tsx'),css=read('app/willkommen.css');
+ assert(ui.includes('export function StepStrip(')&&ui.includes("element.addEventListener('wheel',wheel,{passive:false})"),'a finger or the mouse wheel scrolls it');
+ for(const page of [l1,l15])assert(page.includes('{group&&group.ids.length>1&&<StepStrip label={group.label}'));
+ for(const cls of ['.l1a-strip {','.l1a-strip-pill.on','.l1a-strip-pill.done b'])assert(css.includes(cls),cls);
+ // Every exercise of Lektion 15A and of Lektion 1 has a short name for its pill.
+ for(const id of lesson.stepGroupsA[1].ids)assert(lesson.stepShortA[id],id);
+ const l1course=load('willkommen-course'),b=load('willkommen-b-course'),c=load('willkommen-c-course'),d=load('willkommen-d-course');
+ const groups={a:l1course.stepGroups,b:b.stepGroupsB,c:c.stepGroupsC,d:d.stepGroupsD};
+ for(const [part,list] of Object.entries(groups))for(const group of list.slice(1))for(const id of group.ids)assert(new RegExp("(^|[,{ ])'?"+id+"'?:'").test(l1.slice(l1.indexOf('const shortNames'),l1.indexOf('const parts'))),part+': '+id);
+});

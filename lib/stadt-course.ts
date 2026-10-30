@@ -369,6 +369,8 @@ export const stepsA:Step[]=[
  {id:'ozet',title:'Özet',kind:'end'},
 ];
 export const stepIndexA=(id:string)=>stepsA.findIndex(step=>step.id===id);
+/** Short names of the exercises for the strip under the tabs (a teaching step shows its own title). */
+export const stepShortA:Record<string,string>={'eslestir':'Resim – kelime','kelime-kur':'Kelime kur','wohin':'Kim nereye?','katlar-yaz':'Katları yaz','pano':'Panoyu oku','rami':'Rami’nin diyaloğu','einen-eine':'einen / eine','dinle':'Dinle','ach-ich':'Ach / Ich','sirala':'Cümle kur','rollenspiel':'Rol oyunu'};
 const gapCount=(lines:readonly ChoiceLine[])=>lines.reduce((n,line)=>n+lineGaps(line).length,0);
 /** Every exercise is scored (the gaps of the sentence exercises one by one, right at the first choice). */
 export const scoredExercisesA:{id:string;total:number}[]=[

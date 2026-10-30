@@ -267,4 +267,12 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
  .l1a-contents .lb-sub { display:none; }
  .l1a-contents .lb-toc-text small { -webkit-line-clamp:1; }
 }
+/* The steps of the open tab as a strip to scroll (30 October 2026, the learner chose it from drafts; app/willkommen-ui.tsx StepStrip). */
+.l1a-strip { display:flex; gap:6px; overflow-x:auto; scroll-snap-type:x proximity; margin:-2px 0 12px; padding:2px 2px 6px; scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%); mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%); }
+.l1a-strip::-webkit-scrollbar { display:none; }
+.l1a-strip-pill { flex:none; display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:0 12px 0 6px; border-radius:999px; border:1.5px solid #d6e2ee; background:#fff; color:var(--ink-2,#3d5a7a); font:inherit; font-size:13.5px; font-weight:700; white-space:nowrap; cursor:pointer; scroll-snap-align:center; }
+.l1a-strip-pill b { display:grid; place-items:center; width:26px; height:26px; border-radius:50%; background:#eef3f8; font-size:12px; }
+.l1a-strip-pill.done b { background:#edf6e9; color:#2f7a31; }
+.l1a-strip-pill.on { background:var(--blue-2,#2f7fd6); border-color:var(--blue-2,#2f7fd6); color:#fff; }
+.l1a-strip-pill.on b { background:rgba(255,255,255,.25); color:#fff; }
 @media (prefers-reduced-motion:reduce) { .l1a-bar i { transition:none; } }

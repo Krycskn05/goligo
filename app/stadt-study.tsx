@@ -10,7 +10,7 @@ import {c} from '@/lib/category-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
 import type {L1AScoreMap} from '@/lib/willkommen-progress';
 import type {Step,StepGroup} from '@/lib/willkommen-course';
-import {STADT_PATH,STADT_UNIT,stadtParts,stadtGoals,stadtPictures,stepsA,stepGroupsA,scoredExercisesA,testQuestionsA,wordCountA} from '@/lib/stadt-course';
+import {STADT_PATH,STADT_UNIT,stadtParts,stadtGoals,stadtPictures,stepShortA,stepsA,stepGroupsA,scoredExercisesA,testQuestionsA,wordCountA} from '@/lib/stadt-course';
 import {L15_PART_KEY,l15PartKeys,readL15Scores,saveL15Score,partProgressL15,type L15PartId} from '@/lib/stadt-progress';
 import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
@@ -22,7 +22,7 @@ import {ProgressMeter} from './progress-ui';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
 import {TopicArt} from './toon-art';
-import {useLessonSpeech,Rich,type StepProps} from './willkommen-ui';
+import {useLessonSpeech,Rich,StepStrip,type StepProps} from './willkommen-ui';
 import {StepViewL15A} from './stadt-a-steps';
 
 /**
@@ -212,6 +212,7 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
     <span className="l12-step-number" aria-hidden="true">{done[item.id]?<Check size={16}/>:i+1}</span>
     <span className="l12-step-text"><strong>{item.label}</strong><small>{detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
+   {group&&group.ids.length>1&&<StepStrip label={group.label} current={step.id} scores={scores} onOpen={onGo} items={group.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:stepShortA[id]??config.steps.find(entry=>entry.id===id)?.title??id}))}/>}
    {children}
   </>}/>
  </section>;

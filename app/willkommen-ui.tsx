@@ -256,3 +256,13 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
   {wait&&<p className="l1a-feedback bad" role="status">Önce bir cevap seç.</p>}
  </>;
 }
+
+/** The steps of the open index tab as a strip of small pills under the tabs (the learner chose it, 30 October 2026):
+ * scroll it with a finger, or with the mouse wheel on a computer; a tap opens a step. A done exercise shows a tick. */
+export type StripItem={id:string;index:number;number:number;label:string};
+export function StepStrip({items,current,scores,onOpen,label}:{items:StripItem[];current:string;scores:L1AScoreMap;onOpen:(index:number)=>void;label:string}){
+ const row=useRef<HTMLDivElement>(null);
+ useEffect(()=>{const element=row.current;if(!element)return;const on=element.querySelector<HTMLElement>('.l1a-strip-pill.on');if(on)element.scrollLeft=on.offsetLeft-(element.clientWidth-on.offsetWidth)/2;},[current]);
+ useEffect(()=>{const element=row.current;if(!element)return;const wheel=(event:WheelEvent)=>{if(Math.abs(event.deltaY)>Math.abs(event.deltaX)&&element.scrollWidth>element.clientWidth){element.scrollLeft+=event.deltaY;event.preventDefault();}};element.addEventListener('wheel',wheel,{passive:false});return()=>element.removeEventListener('wheel',wheel);},[]);
+ return <nav className="l1a-strip" ref={row} aria-label={label}>{items.map(item=>{const done=!!scores[item.id]&&item.id!==current;return <button type="button" key={item.id} className={'l1a-strip-pill'+(item.id===current?' on':'')+(done?' done':'')} aria-current={item.id===current?'step':undefined} onClick={()=>onOpen(item.index)}><b aria-hidden="true">{done?<Check size={13}/>:item.number}</b>{item.label}</button>;})}</nav>;
+}

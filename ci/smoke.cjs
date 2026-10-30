@@ -199,6 +199,10 @@ async function languageFlow(browser) {
     const newPage = ctx.newPage.bind(ctx);
     ctx.newPage = async () => {
       const p = await newPage();
+      const settle = p.waitForLoadState.bind(p);
+      p.waitForLoadState = (state, opts = {}) => state === "networkidle"
+        ? settle("load", opts).then(() => settle("networkidle", { timeout: 15000 })).catch(() => {})
+        : settle(state, opts);
       const goto = p.goto.bind(p);
       p.goto = async (url, opts = {}) => {
         if (opts.waitUntil !== "networkidle") return goto(url, opts);

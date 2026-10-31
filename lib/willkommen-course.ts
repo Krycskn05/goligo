@@ -48,11 +48,25 @@ export function speakerVoice(who:string|undefined,available:readonly {id:string;
  const sameKind=speakers.filter(item=>item.gender===speaker.gender);
  return pool[sameKind.indexOf(speaker)%pool.length].id;
 }
-/** The speaker of a sentence that names its speaker ("Ich bin Lena Vogt. Und Sie?"). */
+/** The speaker of a sentence that names its speaker: "Ich bin Lena Vogt. Und Sie?", "Und ich bin Sabine.", "Hallo! Ich bin neu
+ * hier. Ich heiße Tomasz.", "Mein Name ist Aisha Kamau.", "Ich bin Frau Krüger." — the full name, the first name or Frau/Herr with
+ * the surname right after ich bin / ich heiße / mein Name ist / hier ist / hier spricht (anywhere in the text). */
+const namesOf=(speaker:Speaker)=>{const parts=speaker.name.split(' ');const surname=parts.length>1?parts[parts.length-1]:'';
+ return [speaker.name,...(surname?[(speaker.gender==='female'?'Frau ':'Herr ')+surname]:[]),parts[0]];};
+const startsWithName=(rest:string,name:string)=>rest.toLowerCase().startsWith(name.toLowerCase())&&!/[\p{L}\p{N}]/u.test(rest.charAt(name.length));
 export function speakerOf(text:string):string|undefined{
- const match=/\b(?:ich bin|ich heiße)\s+([^.,!?]+)/i.exec(text);if(!match)return undefined;
- const name=match[1].trim();return speakers.find(speaker=>speaker.name===name)?.key;
+ for(const match of text.matchAll(/(?<![\p{L}])(?:ich bin|ich heiße|ich heisse|mein name ist|hier ist|hier spricht)\s+/giu)){
+  const rest=text.slice((match.index??0)+match[0].length);
+  const found=speakers.find(speaker=>namesOf(speaker).some(name=>startsWithName(rest,name)));
+  if(found)return found.key;
+ }
+ return undefined;
 }
+/** Whose voice reads a text (the learner asked, 31 October 2026: "the lessons go by the name — the voices of the Sesler list
+ * are the voices in the texts"): the person who names themselves in it, in every lesson and every exercise, else the speaker
+ * given with it (`who`); nobody → the learner's chosen voice. So "Ich heiße Sabine Krüger." is always Sabine's voice, also in a
+ * phrase list, a word box or a test answer. */
+export const voiceOwner=(item:SayItem):string|undefined=>speakerOf(sayText(item))??(typeof item==='string'?undefined:item.who);
 
 export type Phrase=readonly [de:string,tr:string];
 /** Step 1 · Selamlaşma */

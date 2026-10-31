@@ -19,6 +19,11 @@ export type HoerenTask={id:string;number:number;part?:string;title:string;hint:s
 /** Who speaks with which kind of voice (female, male, neutral narrator). */
 const speakers:Record<string,HoerenVoice>={Marisol:'f',Arun:'m',Amira:'f','Herr Berger':'m',Lehrerin:'f',Tom:'m',Mina:'f',Jonas:'m',Selin:'f',Samuel:'m',Beraterin:'f',Amina:'f',Reporterin:'f',Marco:'m',Sprecher:'n'};
 export const speakerVoice=(who:string):HoerenVoice=>speakers[who]??'n';
+/** Every person of the listening texts keeps one site voice in every task (the learner asked, 31 October 2026: a name is always
+ * read by the same voice). Nobody here is one of the ten names of the Sesler list, so each borrows a voice of their own kind — never
+ * Sabine's (F1) or Paul's (M3), the lesson's teacher; Jonas keeps the voice he has in Lektion 1 (M1); two people of one task never
+ * share a voice. */
+export const hoerenVoiceStyles:Record<string,string>={Marisol:'F2',Amira:'F3',Arun:'M4','Herr Berger':'M2',Lehrerin:'F4',Mina:'F5',Tom:'M5',Jonas:'M1',Selin:'F2',Samuel:'M2',Beraterin:'F4',Amina:'F3',Reporterin:'F5',Marco:'M4'};
 
 const PLANS=['einen Online-Kurs machen','ein Praktikum machen','eine Ausbildung machen','einen Computerkurs machen'];
 const TIMES=['vor – früher (geçmiş)','seit – jetzt (hâlâ devam ediyor)','in – später (gelecek)'];

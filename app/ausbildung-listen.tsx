@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {Check,CheckCircle2,Eye,EyeOff,Headphones,Pause,Play,RotateCcw,SkipBack,SkipForward,Square,X} from 'lucide-react';
 import {lessonParts,normalizeAnswer} from '@/lib/ausbildung-course';
-import {hoerenTasks,questionSpeech,speakerVoice,type HoerenQuestion,type HoerenTask} from '@/lib/ausbildung-hoeren';
+import {hoerenTasks,hoerenVoiceStyles,questionSpeech,speakerVoice,type HoerenQuestion,type HoerenTask} from '@/lib/ausbildung-hoeren';
 import {speakerPicture} from '@/lib/ausbildung-art';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {PaulHoca} from './paul-hoca';
@@ -43,6 +43,7 @@ export function useListenPlayer(){
  const voiceFor=useCallback((who:string,speakers:string[])=>{
   const kind=speakerVoice(who);if(kind==='n')return undefined;
   const pool=latest.current.speech.siteVoices.filter(voice=>voice.gender===(kind==='f'?'female':'male'));if(!pool.length)return undefined;
+  const own=pool.find(voice=>voice.style===hoerenVoiceStyles[who]);if(own)return own.id; // the person's fixed voice
   const same=speakers.filter(name=>speakerVoice(name)===kind);return pool[Math.max(0,same.indexOf(who))%pool.length].id;
  },[]);
  const play=useCallback((key:string,lines:Line[],from=0)=>{

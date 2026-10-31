@@ -4,7 +4,7 @@ import {ArrowRight,Check,Lock,RotateCcw,Trash2,Volume2} from 'lucide-react';
 import type {StudyLanguage} from '@/lib/study-languages';
 import type {TopicProgress} from '@/lib/progress';
 import {siteClipUrls,warmClip} from '@/lib/site-voices';
-import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
+import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,voiceOwner,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
 import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {PaulHoca} from './paul-hoca';
@@ -17,15 +17,16 @@ import {mixedOrder} from '@/lib/mixed-order';
 
 /** Site speech plus "read these one after the other" (dialogues, spelling, the learner's own sentences). A text with a
  * speaker (`who`, see `speakers` in lib/willkommen-course.ts) is read with that person's own voice — a man by a man, a
- * woman by a woman; everything else with the learner's chosen voice. `slow` reads slowly (letters when spelling). */
+ * woman by a woman; a text in which a person names themselves ("Ich heiße Sabine Krüger.") is always read by that person
+ * (`voiceOwner`, 31 October 2026); everything else with the learner's chosen voice. `slow` reads slowly (letters when spelling). */
 export type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void;warm?:(items:readonly SayItem[])=>void};
 export function useLessonSpeech():Speech&{warning?:string}{
  const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning,siteVoices}=german;
  const voices=useRef(siteVoices);voices.current=siteVoices;
  const preferred=useRef(german.voiceName);preferred.current=german.voiceName;
  // Loads the clips of what is on the page before the tap (30 October 2026); runs again once the site voices are known.
- const warm=useCallback((items:readonly SayItem[])=>{if(!siteVoices.length)return;for(const item of items){const text=sayText(item);if(!text.trim())continue;const who=typeof item==='string'?undefined:item.who;const url=siteClipUrls(speakerVoice(who,siteVoices)??preferred.current,text)[0];if(url)warmClip(url);}},[siteVoices]);
- const say=useCallback((item:SayItem)=>{const who=typeof item==='string'?undefined:item.who;const slow=typeof item!=='string'&&!!item.slow;speak(sayText(item),slow,speakerVoice(who,voices.current));},[speak]);
+ const warm=useCallback((items:readonly SayItem[])=>{if(!siteVoices.length)return;for(const item of items){const text=sayText(item);if(!text.trim())continue;const who=voiceOwner(item);const url=siteClipUrls(speakerVoice(who,siteVoices)??preferred.current,text)[0];if(url)warmClip(url);}},[siteVoices]);
+ const say=useCallback((item:SayItem)=>{const who=voiceOwner(item);const slow=typeof item!=='string'&&!!item.slow;speak(sayText(item),slow,speakerVoice(who,voices.current));},[speak]);
  const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
  const busyRef=useRef(busy);
  const next=useCallback(()=>{

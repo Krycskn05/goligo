@@ -150,7 +150,8 @@ export const endingLines:GapLine[]=[
  {text:'Ich sprech___ Türkisch.',answers:[['e']]},{text:'Sie heiß___ Frau Krüger.',answers:[['en']]},{text:'Woher komm___ du, Nikos?',answers:[['st']]},
  {text:'Wie heiß___ Sie?',answers:[['en']]},
 ];
-export const endingSay=endingLines.map(line=>line.text.replace('___',line.answers[0][0][0]));
+/** The whole solved sentence (31 October 2026: only the first letter of the ending was put in — "Ich b neu hier."). */
+export const endingSay=endingLines.map(line=>line.text.replace('___',line.answers[0][0]));
 /** Exercise 4 · listen: which languages? (every right box must be ticked). */
 export type HearItem={key:string;name:string;text:string;options:string[];answers:number[]};
 export const hearItems:HearItem[]=[

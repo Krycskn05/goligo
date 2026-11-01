@@ -1,0 +1,181 @@
+GOLIQO RESİM LİSTESİ — ChatGPT için
+
+Nasıl: Önce 0) numaralı mesajı bir kez gönder. Sonra her paftayı ayrı mesaj olarak gönder.
+Gelen resmi başlıktaki adla kaydet (örneğin meslek-1.png) ve LernKoko/yeni-resimler klasörüne koy.
+
+==== 0) İlk mesaj (bir kez gönder) ====
+For this chat: every image I ask for is a sheet for a German learning website. Each image is a tall portrait image (2:3 ratio) with 6 separate square illustrations in a grid of 2 columns and 3 rows. All six sit on the same plain pale ivory background (#fff9ec) with wide empty gaps between them: no frames, no borders, no dividing lines, and no picture touches another picture or the edge of the image.
+Style: polished original Pixar-style 3D animated film illustration, rounded forms, expressive friendly faces, tactile clay-like materials, soft warm studio light. Colours: teal, amber, terracotta and warm ivory. Original adult characters from diverse backgrounds.
+No visible text, no letters, no numbers, no logos, no watermark. Simple symbols (question mark, tick, cross, plus, heart, exclamation mark) are allowed only where described.
+Keep this style and layout for every sheet in this chat. Reply "OK" now; I will send the first sheet next.
+
+==== meslek-1.png · Meslekler 1 · Sağlık (die Ärztin, der Arzt, die Zahnärztin, der Zahnarzt, die Tierärztin, der Tierarzt) ====
+Sheet meslek-1: same style, background and 2×3 layout as described.
+Row 1, left: a friendly female doctor in a white coat with a stethoscope around her neck, holding a clipboard.
+Row 1, right: a friendly male doctor in a white coat with a stethoscope, holding a small medicine box.
+Row 2, left: a female dentist in light blue scrubs holding a small dental mirror, a dental chair behind her.
+Row 2, right: a male dentist in light blue scrubs holding a big model of a tooth.
+Row 3, left: a female vet in green scrubs gently holding a small dog.
+Row 3, right: a male vet in green scrubs examining a cat on a table with a stethoscope.
+
+==== meslek-2.png · Meslekler 2 · Bakım ve eczane (die Krankenpflegerin, der Krankenpfleger, die Altenpflegerin, der Altenpfleger, die Apothekerin, der Apotheker) ====
+Sheet meslek-2: same style, background and 2×3 layout as described.
+Row 1, left: a female hospital nurse in scrubs pushing a small medicine trolley.
+Row 1, right: a male hospital nurse in scrubs holding a thermometer and a clipboard.
+Row 2, left: a female elderly-care worker helping an old man walk with a walking frame.
+Row 2, right: a male elderly-care worker bringing a cup of tea to a smiling old woman in an armchair.
+Row 3, left: a female pharmacist in a white coat behind a pharmacy counter, holding out a medicine box.
+Row 3, right: a male pharmacist in a white coat taking a box from shelves full of medicine boxes.
+
+==== meslek-3.png · Meslekler 3 · Eğitim ve bilgisayar (die Lehrerin, der Lehrer, die Erzieherin, der Erzieher, die Programmiererin, der Programmierer) ====
+Sheet meslek-3: same style, background and 2×3 layout as described.
+Row 1, left: a female teacher pointing at a blank green chalkboard.
+Row 1, right: a male teacher holding a stack of books in front of a blank whiteboard.
+Row 2, left: a female kindergarten teacher sitting on the floor building colourful wooden blocks with two small children.
+Row 2, right: a male kindergarten teacher reading a picture book to two small children.
+Row 3, left: a female software developer at a desk with two monitors showing colourful abstract blocks, no readable text.
+Row 3, right: a male software developer with headphones typing on a laptop.
+
+==== meslek-4.png · Meslekler 4 · Mağaza ve fırın (die Verkäuferin, der Verkäufer, die Kassiererin, der Kassierer, die Bäckerin, der Bäcker) ====
+Sheet meslek-4: same style, background and 2×3 layout as described.
+Row 1, left: a female shop assistant in a clothing shop folding a sweater on the counter.
+Row 1, right: a male shop assistant in an electronics shop showing a smartphone to the viewer.
+Row 2, left: a female cashier at a supermarket checkout scanning groceries.
+Row 2, right: a male cashier at a supermarket till handing over a receipt.
+Row 3, left: a female baker in a white apron holding a tray of fresh bread rolls.
+Row 3, right: a male baker in a white cap taking a loaf of bread out of an oven with a wooden peel.
+
+==== meslek-5.png · Meslekler 5 · Restoran ve kuaför (die Kellnerin, der Kellner, die Köchin, der Koch, die Friseurin, der Friseur) ====
+Sheet meslek-5: same style, background and 2×3 layout as described.
+Row 1, left: a female waiter carrying a tray with two drinks in a restaurant.
+Row 1, right: a male waiter with a small notepad taking an order.
+Row 2, left: a female chef in a tall white chef hat stirring a big pot.
+Row 2, right: a male chef in a tall white chef hat chopping vegetables on a wooden board.
+Row 3, left: a female hairdresser cutting a seated customer’s hair with scissors and a comb.
+Row 3, right: a male hairdresser drying a seated customer’s hair with a hair dryer.
+
+==== meslek-6.png · Meslekler 6 · Yol ve güvenlik (die Busfahrerin, der Busfahrer, die Taxifahrerin, der Taxifahrer, die Polizistin, der Polizist) ====
+Sheet meslek-6: same style, background and 2×3 layout as described.
+Row 1, left: a female bus driver behind the wheel of a yellow city bus, waving through the window.
+Row 1, right: a male bus driver standing next to the open door of a yellow city bus.
+Row 2, left: a female taxi driver leaning out of the window of a cream-coloured taxi.
+Row 2, right: a male taxi driver putting a suitcase into the boot of a cream-coloured taxi.
+Row 3, left: a female police officer in a navy blue uniform and cap giving directions with her arm, no writing on the uniform.
+Row 3, right: a male police officer in a navy blue uniform and cap standing next to a police car, no writing on the car or the uniform.
+
+==== meslek-7.png · Meslekler 7 · Usta işleri (die Mechanikerin, der Mechaniker, die Elektrikerin, der Elektriker, die Malerin, der Maler) ====
+Sheet meslek-7: same style, background and 2×3 layout as described.
+Row 1, left: a female car mechanic in overalls holding a wrench next to a car with the bonnet open.
+Row 1, right: a male car mechanic in overalls checking a car tyre.
+Row 2, left: a female electrician in work clothes and a helmet fixing a wall socket with a screwdriver.
+Row 2, right: a male electrician on a ladder changing a ceiling light, a coil of cable on his shoulder.
+Row 3, left: a female painter and decorator in white overalls painting a wall with a roller.
+Row 3, right: a male painter and decorator in white overalls on a stepladder holding a paint bucket and a brush.
+
+==== meslek-8.png · Meslekler 8 · Bina, bahçe ve şantiye (die Hausmeisterin, der Hausmeister, die Gärtnerin, der Gärtner, die Ingenieurin, der Ingenieur) ====
+Sheet meslek-8: same style, background and 2×3 layout as described.
+Row 1, left: a female building caretaker in a grey work jacket holding a big ring of keys in the entrance hall of an apartment building.
+Row 1, right: a male building caretaker repairing a door with an open toolbox in a stairwell.
+Row 2, left: a female gardener kneeling and planting flowers.
+Row 2, right: a male gardener trimming a hedge with garden shears.
+Row 3, left: a female engineer in a white helmet and safety vest holding rolled-up plans at a building site.
+Row 3, right: a male engineer in a white helmet looking at a tablet in front of a small bridge model.
+
+==== lektion1-1.png · Lektion 1 1 · 1A · Tanışma (Guten Tag!, Herzlich willkommen!, Danke!, wie, heißen, Sie) ====
+Sheet lektion1-1: same style, background and 2×3 layout as described.
+Row 1, left: two adults shaking hands and smiling on a sunny street at midday, a bright sun in the sky.
+Row 1, right: a smiling host opening a front door wide with open arms to welcome a guest who holds flowers.
+Row 2, left: a person receiving a small wrapped gift with one hand on the heart, smiling gratefully.
+Row 2, right: a puzzled person scratching their head in front of an unbuilt flat-pack furniture kit and a screwdriver, a big question mark floating above.
+Row 3, left: a smiling person pointing to a blank name badge on their shirt while introducing themselves.
+Row 3, right: a young man politely greeting an older woman in an elegant suit with a respectful slight bow, in an office lobby.
+
+==== lektion1-2.png · Lektion 1 2 · 1A · Ben, siz, ve (ich, ich bin, Herr, Frau, und, Und Sie?) ====
+Sheet lektion1-2: same style, background and 2×3 layout as described.
+Row 1, left: a cheerful person pointing at their own chest with both thumbs.
+Row 1, right: a confident person with one hand on the chest, next to a big speech bubble that shows a small portrait of the same person.
+Row 2, left: a polite middle-aged man in a suit lifting his hat in greeting.
+Row 2, right: a polite middle-aged woman in a blazer smiling and nodding in greeting.
+Row 3, left: a red apple and a yellow pear side by side with a big plus symbol between them.
+Row 3, right: two business people at a table; one has just spoken and politely gestures with an open palm toward the other, inviting an answer.
+
+==== lektion1-3.png · Lektion 1 3 · 1A–1B · Nereden, diller (woher, kommen, aus, die Sprache, sprechen, Welche Sprachen …?) ====
+Sheet lektion1-3: same style, background and 2×3 layout as described.
+Row 1, left: a curious person beside a big globe, a dotted travel path arching from a far-away country toward them, a question mark above.
+Row 1, right: a smiling traveller with a suitcase walking toward the viewer through an airport arrival gate.
+Row 2, left: a person stepping out through a little door cut into a big colourful globe, waving hello.
+Row 2, right: three people from different backgrounds talking, colourful empty speech bubbles with different patterns above them.
+Row 3, left: two friends talking face to face at a café table, one speaking with an empty speech bubble.
+Row 3, right: a person surrounded by several colourful empty speech bubbles with different patterns, looking at them with a curious, questioning face.
+
+==== lektion1-4.png · Lektion 1 4 · 1B · Sen, ad (ein bisschen, Deutsch, du, Hallo!, der Name, Mein Name ist …) ====
+Sheet lektion1-4: same style, background and 2×3 layout as described.
+Row 1, left: a hand showing “a little” with thumb and index finger almost touching, next to a teaspoon with a tiny pinch of sugar.
+Row 1, right: a small German flag on a desk next to a blank textbook and a cup of coffee.
+Row 2, left: two young friends in casual clothes; one points at the other with a big friendly smile.
+Row 2, right: a person waving hello cheerfully with one raised hand.
+Row 3, left: close-up of a blank white name badge sticker on a colourful shirt, a pen beside it.
+Row 3, right: a person at a meeting holding up a blank name card in front of them and smiling.
+
+==== lektion1-5.png · Lektion 1 5 · 1B · Yeni, burada, yazmak (neu, hier, Ich bin neu hier., das Land, schreiben, buchstabieren) ====
+Sheet lektion1-5: same style, background and 2×3 layout as described. Exception: in the “spelling” picture the wooden alphabet blocks may show the letters A, B and C.
+Row 1, left: a shiny new pair of sneakers in an open shoe box, little sparkles around them.
+Row 1, right: a person pointing down at the ground where a big red map pin stands at their feet.
+Row 2, left: a slightly shy person holding a moving box in front of a new apartment building, smiling.
+Row 2, right: a small landscape island showing one country: green fields, a river, mountains, a village and a little flag on a pole.
+Row 3, left: a hand writing with a blue pen in an open notebook, only scribbled lines, no readable writing.
+Row 3, right: spelling: a person on the phone spelling a word, colourful wooden alphabet blocks floating in a row beside them.
+
+==== lektion1-6.png · Lektion 1 6 · 1B · Efendim? Evet, hayır (Wie bitte?, Wie schreibt man das?, bitte, ja, nein, richtig) ====
+Sheet lektion1-6: same style, background and 2×3 layout as described.
+Row 1, left: a person cupping one hand behind the ear and leaning forward with a puzzled face, as if they did not hear.
+Row 1, right: a person at a desk looking puzzled at a notebook, pen in hand, a question mark above, a friend leaning in to help.
+Row 2, left: a friendly waiter politely handing a cup of coffee to a smiling guest.
+Row 2, right: a person nodding and giving a thumbs up, a big green tick symbol beside them.
+Row 3, left: a person shaking their head and raising one hand to say no, a big red cross symbol beside them.
+Row 3, right: a happy student holding up a worksheet with a big green tick symbol on it.
+
+==== lektion1-7.png · Lektion 1 7 · 1B–1C · Günün selamları (interessant, Guten Morgen!, Guten Abend!, Gute Nacht!, Auf Wiedersehen!, Tschüs!) ====
+Sheet lektion1-7: same style, background and 2×3 layout as described.
+Row 1, left: a fascinated museum visitor looking closely at a dinosaur skeleton through a magnifying glass.
+Row 1, right: a person in pyjamas stretching at an open window at sunrise, a steaming coffee cup on the sill.
+Row 2, left: two neighbours greeting each other under a glowing street lamp, orange and purple evening sky.
+Row 2, right: a person in pyjamas waving good night at a bedroom door, moon and stars outside the window.
+Row 3, left: a shop owner at the shop door politely waving goodbye to a customer who leaves with a shopping bag.
+Row 3, right: two friends waving a casual goodbye as they walk off in opposite directions.
+
+==== lektion1-8.png · Lektion 1 8 · 1C · Nasılsın? (Bis bald!, Wie geht es Ihnen?, Wie geht es dir?, Wie geht’s?, Danke, gut., Und Ihnen? / Und dir?) ====
+Sheet lektion1-8: same style, background and 2×3 layout as described.
+Row 1, left: two friends hugging goodbye at a front door, a small calendar with a heart symbol on the wall.
+Row 1, right: a younger person politely asking an elderly neighbour with a walking stick how they are, both smiling, in a stairwell.
+Row 2, left: two close friends meeting in a café, one leaning forward with a caring, questioning look.
+Row 2, right: two friends giving each other a quick high five in the street.
+Row 3, left: a relaxed smiling person in an armchair holding a cup of tea and making an OK sign with the other hand.
+Row 3, right: two people chatting on a park bench; one answers happily and turns an open palm back toward the other.
+
+==== lektion1-9.png · Lektion 1 9 · 1C · Çok, değil, idare eder (sehr, nicht, schlecht, es geht, Sagen wir du?, Ja, gern!) ====
+Sheet lektion1-9: same style, background and 2×3 layout as described.
+Row 1, left: a gigantic ice cream cone next to a small normal one, a person staring at the giant one in amazement.
+Row 1, right: a quiet library with a mobile phone crossed out by a big red prohibition circle symbol, a person putting their phone away.
+Row 2, left: a sad person with a small rain cloud above their head, giving a thumbs down.
+Row 2, right: a person with a neutral face making a so-so gesture, one flat hand tilting from side to side.
+Row 3, left: two colleagues with coffee mugs in an office kitchen; one warmly offers a handshake with a friendly smile.
+Row 3, right: a person happily accepting a cup of tea that a friend offers.
+
+==== lektion1-10.png · Lektion 1 10 · 1C–1D · Yolculuk, komşular (Gute Reise!, die Nachbarin, der Nachbar, die Wohnung, wichtig, der Satz) ====
+Sheet lektion1-10: same style, background and 2×3 layout as described.
+Row 1, left: friends waving goodbye on a train platform to a traveller with a suitcase stepping onto the train.
+Row 1, right: a friendly woman neighbour waving from her apartment door in the stairwell.
+Row 2, left: a friendly man neighbour carrying grocery bags up the stairs of an apartment building, nodding hello.
+Row 2, right: a cosy small apartment shown as a cutaway: living room with a sofa, a small kitchen and a window with plants.
+Row 3, left: a serious person holding a red folder with a big exclamation mark symbol on it.
+Row 3, right: a row of colourful blank word blocks lined up like a little train on a desk, ending with a big round dot.
+
+==== lektion1-11.png · Lektion 1 11 · 1D · Ezberle, kaydet, alıştır (auswendig lernen, aufnehmen, üben, leicht, schwer, Alles klar?) ====
+Sheet lektion1-11: same style, background and 2×3 layout as described.
+Row 1, left: a learner with eyes closed reciting, holding a closed notebook, a thought bubble with blank lines.
+Row 1, right: a person recording their own voice with a smartphone, sound waves going from their mouth into the phone.
+Row 2, left: a person practising with a stack of blank flash cards at a kitchen table, turning one over.
+Row 2, right: a person lifting a big box easily with one finger, a feather floating beside it.
+Row 3, left: a person straining to lift a very heavy box, drops of sweat flying.
+Row 3, right: a teacher with a questioning look giving a thumbs up to a learner, who answers with an OK sign and a smile.

@@ -431,3 +431,12 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
  .l1a-lang b { font-size:13px; }
  .l1a-profile { flex-direction:column; }
 }
+
+/* Tap a word row to hear it (app/tap-to-say.tsx, 2 November 2026): the row shows it can be tapped; the speaker stays as a sign. */
+.tap-say { cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background-color .15s ease, border-color .15s ease; }
+@media (hover:hover) {
+ .tap-say:hover, tr.tap-say:hover > td { background-color:#f3f9ff; }
+ .tap-say:hover { border-color:#bcd8f3; }
+}
+.tap-say:active, tr.tap-say:active > td { background-color:#e8f3ff; }
+@media (prefers-reduced-motion:reduce) { .tap-say { transition:none; } }

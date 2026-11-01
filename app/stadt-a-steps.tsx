@@ -59,7 +59,6 @@ export function StepViewL15A(props:StepProps){
 const lineSay=(line:Line):SayItem=>({text:line.say??line.de,who:line.who});
 /** der, die and das in their colours (blue, red, green), the rest of the word as it is. */
 function Art({de}:{de:string}){const article=articleOf(de);return article?<><span className={'l15-'+article}>{article}</span>{de.slice(article.length)}</>:<>{de}</>;}
-function Legend(){return <p className="l15-legend"><span className="l15-der">der = eril</span><span className="l15-die">die = dişil</span><span className="l15-das">das = nötr</span></p>;}
 function Picture({src,width,height,alt}:{src:string;width:number;height:number;alt:string}){
  return <img className="l1a-cover l1a-scene l15-scene" src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async"/>;
 }
@@ -136,13 +135,11 @@ function CoverA(_props:StepProps){ // the part's progress is on the left page (n
 function BuildingWords({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Binada</p><Heading><span lang="de">Im Gebäude</span></Heading>
   <Picture {...stadtPictures.building} alt="Bina içi: asansör, bekleme koltukları, merdiven ve danışma masası"/>
-  <Legend/>
   <WordRows words={buildingWords} speech={speech}/></>;
 }
 function OfficeWords({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Resmî işler</p><Heading><span lang="de">Im Amt</span></Heading>
   <p className="l1a-tr">Berlin’de bu işler için <b lang="de">Bürgeramt</b>’a, <b lang="de">Ausländerbehörde</b>’ye veya <b lang="de">Führerscheinstelle</b>’ye gidilir.</p>
-  <Legend/>
   <WordRows words={officeWords} speech={speech}/>
   <h2 className="l1a-h2">Fiiller</h2>
   {officeVerbs.map(([de,tr,example])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{tr}</span><span className="l15-example" lang="de">{example}</span></div><Say text={example} speech={speech}/></div>)}

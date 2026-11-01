@@ -8,7 +8,7 @@ export {ADMIN_EMAILS,isAdminEmail} from './admin-access';
 
 export const DAY=86400000;
 export type AreaId='housing'|'vault'|'vaultEn'|'verbs'|'other';
-export const AREA_NAMES:Record<AreaId,string>={housing:'Ev ve Yaşam',vault:'Nesne Kasası',vaultEn:'Nesne Kasası (İngilizce)',verbs:'Fiil Atölyesi',other:'Diğer konular'};
+export const AREA_NAMES:Record<AreaId,string>={housing:'Ev ve Yaşam',vault:'Kelime Kasası',vaultEn:'Kelime Kasası (İngilizce)',verbs:'Fiil Atölyesi',other:'Diğer konular'};
 export function areaOf(questionId:string):AreaId{
  if(questionId.startsWith('housing-'))return 'housing';
  if(questionId.startsWith('en-obj-'))return 'vaultEn';
@@ -37,7 +37,7 @@ const topicTitles=new Map(learningTopics.map(topic=>[topic.id,topic.title]));
 export function topicName(topic:string){
  if(topic==='all')return 'Bütün konular';
  if(topic==='en-all')return 'Bütün konular (İngilizce)';
- return topicTitles.get(topic)??(topic.startsWith('verb')?'Fiil Atölyesi':topic.startsWith('objects')||topic.startsWith('en-objects')?'Nesne Kasası':topic);
+ return topicTitles.get(topic)??(topic.startsWith('verb')?'Fiil Atölyesi':topic.startsWith('objects')||topic.startsWith('en-objects')?'Kelime Kasası':topic);
 }
 export const modeName=(mode:string)=>modeLabels[mode]??mode;
 

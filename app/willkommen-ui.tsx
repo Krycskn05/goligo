@@ -153,8 +153,9 @@ export function LockedStep({openLabel,onOpen}:{openLabel:string;onOpen:()=>void}
 }
 /** A gap filled from a box of words (the learner chose it, 30 October 2026, option B): a tap on the gap opens the words
  * right under it as big buttons, a tap on a word puts it in and closes the box (Escape or a tap elsewhere closes it too).
- * Words already used in another gap look faded but can still be chosen. Used in every lesson instead of a drop-down list. */
-export function WordChoice({value,options,used=[],state,label,onChoose}:{value:string;options:readonly string[];used?:readonly string[];state:boolean|null;label:string;onChoose:(value:string)=>void}){
+ * Every word always looks the same, even when it is already in another gap (the learner asked, 2 November 2026: a faded
+ * word gave the answer away). Used in every lesson instead of a drop-down list. */
+export function WordChoice({value,options,state,label,onChoose}:{value:string;options:readonly string[];state:boolean|null;label:string;onChoose:(value:string)=>void}){
  const [open,setOpen]=useState(false);
  const box=useRef<HTMLSpanElement>(null);const menu=useRef<HTMLSpanElement>(null);
  useEffect(()=>{if(!open)return;
@@ -173,7 +174,7 @@ export function WordChoice({value,options,used=[],state,label,onChoose}:{value:s
  },[open]);
  return <span className={'l1a-choice'+(open?' open':'')} ref={box}>
   <button type="button" className={'l1a-choice-slot'+(value?' filled':'')+(state===true?' ok':state===false?' bad':'')} lang="de" aria-haspopup="true" aria-expanded={open} aria-label={value?label+': '+value:label} onClick={()=>setOpen(current=>!current)}>{value||' '}</button>
-  {open&&<span className="l1a-choice-menu" ref={menu} role="group" aria-label={label}>{options.map(word=><button type="button" key={word} lang="de" className={'l1a-choice-word'+(word===value?' on':'')+(word!==value&&used.includes(word)?' used':'')} onClick={()=>{onChoose(word);setOpen(false);}}>{word}</button>)}</span>}
+  {open&&<span className="l1a-choice-menu" ref={menu} role="group" aria-label={label}>{options.map(word=><button type="button" key={word} lang="de" className={'l1a-choice-word'+(word===value?' on':'')} onClick={()=>{onChoose(word);setOpen(false);}}>{word}</button>)}</span>}
  </span>;
 }
 /** A typed gap as one cell per missing letter inside the word (the learner chose it, 30 October 2026, option A). One real
@@ -219,7 +220,7 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
  const chooseWord=(i:number,word:string)=>{prepare();note(self.change(i,word,true));};
  const typeText=(i:number,text:string)=>{prepare();note(self.change(i,text));};
  const field=(l:number,g:number)=>{const i=at(l,g);const state=self.state[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
-  const input=choices?<WordChoice value={self.values[i]} options={box??choices} used={self.values.filter((_,k)=>k!==i)} state={state} label={`Boşluk ${i+1}`} onChoose={word=>chooseWord(i,word)}/>
+  const input=choices?<WordChoice value={self.values[i]} options={box??choices} state={state} label={`Boşluk ${i+1}`} onChoose={word=>chooseWord(i,word)}/>
    :cells&&!wide?<LetterCells value={self.values[i]} size={letters(gaps[i].answers[0])} state={state} label={`Boşluk ${i+1}`} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
    :<input ref={element=>{refs.current[i]=element;}} className={cls} value={self.values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} enterKeyHint="next"
      onChange={event=>typeText(i,event.target.value)} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>;

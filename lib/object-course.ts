@@ -94,7 +94,7 @@ export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:
  {key:'moving',title:'Taşınma sahnesi',de:'Beim Umzug',src:'/objects/source/moving.jpg',width:2048,height:1432,marks:sceneData.moving as SceneMark[]},
 ];
 export const objectWords:Word[]=objectVocabulary.map(w=>({de:w.de,tr:w.tr,topic:w.topic}));
-export const objectTopics:Topic[]=[...objectGroups,{id:'objects-all',title:'Nesne Kasası',de:'Gegenstände üben',subtitle:''}].map((g,i)=>({id:g.id,title:g.title,de:g.de,unit:0,section:String(i+1),pages:'Nesne Kasası görselleri',minutes:8,lead:'Nesneleri resimli testlerle çalış; cevabından sonra anlamını çalışma dilinde gör.',blocks:[{heading:'Kelimeyi artikeliyle öğren',text:'Resme bak; doğru Almanca kelimeyi dört seçenekten seç. Cevabından sonra anlamını çalışma dilinde görebilirsin.'}]}));
+export const objectTopics:Topic[]=[...objectGroups,{id:'objects-all',title:'Kelime Kasası',de:'Wörter üben',subtitle:''}].map((g,i)=>({id:g.id,title:g.title,de:g.de,unit:0,section:String(i+1),pages:'Nesne Kasası görselleri',minutes:8,lead:'Nesneleri resimli testlerle çalış; cevabından sonra anlamını çalışma dilinde gör.',blocks:[{heading:'Kelimeyi artikeliyle öğren',text:'Resme bak; doğru Almanca kelimeyi dört seçenekten seç. Cevabından sonra anlamını çalışma dilinde görebilirsin.'}]}));
 const imageOf=(w:ObjectWord)=>({src:w.image,alt:w.tr,caption:w.crop?'Yüklediğin resimden nesne ayrıntısı':'Bu çalışma için çizilmiş nesne',...(w.crop?{crop:w.crop}:{})});
 // Pictures that also show another object of the list are never offered together (a thumb is also a finger,
 // a whole head also shows the eyes and the nose).

@@ -78,7 +78,7 @@ test('the overview counts members, learners, logins and answers per Berlin day',
  // Berlin is UTC+2 in October: 23:30 UTC already belongs to the next day there.
  assert.equal(stats.dayNumber(Date.UTC(2026,9,20,23,30),stats.zoneOffsetMs(NOW)),stats.dayNumber(Date.UTC(2026,9,21,8),stats.zoneOffsetMs(NOW)));
  const areas=await stats.loadAreas(db);
- assert.deepEqual(areas.map(a=>[a.name,a.answers,a.correct,a.learners]),[['Ev ve Yaşam',1,1,1],['Nesne Kasası',2,1,2],['Fiil Atölyesi',4,2,2]]);
+ assert.deepEqual(areas.map(a=>[a.name,a.answers,a.correct,a.learners]),[['Ev ve Yaşam',1,1,1],['Kelime Kasası',2,1,2],['Fiil Atölyesi',4,2,2]]);
 });
 
 test('the member list has every member and older accounts, newest activity first',async()=>{

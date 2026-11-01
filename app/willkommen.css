@@ -439,3 +439,8 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 }
 .tap-say:active, tr.tap-say:active > td { background-color:#e8f3ff; }
 @media (prefers-reduced-motion:reduce) { .tap-say { transition:none; } }
+
+/* Read-along (app/willkommen-ui.tsx `showReading`, 2 November 2026): the dialogue line being read is ringed in blue. */
+.l1a-line .l1a-bubble { transition:box-shadow .2s ease; }
+.l1a-line.l1a-reading .l1a-bubble { box-shadow:0 0 0 3px var(--blue-2,#2f7fd6), 0 6px 18px rgba(47,127,214,.18); }
+@media (prefers-reduced-motion:reduce) { .l1a-line .l1a-bubble { transition:none; } }

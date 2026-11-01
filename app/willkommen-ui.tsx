@@ -19,6 +19,45 @@ import {mixedOrder} from '@/lib/mixed-order';
  * speaker (`who`, see `speakers` in lib/willkommen-course.ts) is read with that person's own voice — a man by a man, a
  * woman by a woman; a text in which a person names themselves ("Ich heiße Sabine Krüger.") is always read by that person
  * (`voiceOwner`, 31 October 2026); everything else with the learner's chosen voice. `slow` reads slowly (letters when spelling). */
+/** Read-along (the learner asked, 2 November 2026): while a dialogue is read one line after the other, the line being
+ * read is marked (`.l1a-reading`) and the page scrolls with it, so the learner sees each sentence as it is spoken. The
+ * line is found by its German text (`.l1a-de` inside `.l1a-line`, gaps count with the word that fills them); a spoken
+ * text with no such line on the page changes nothing. Scrolling waits while the learner scrolls by hand. */
+const READING='l1a-reading';
+const plain=(text:string)=>text.replace(/\u00a0/g,' ').replace(/\s+/g,' ').replace(/\s+([.,!?;:])/g,'$1').trim().toLowerCase();
+/** The words of a line as they would be read: typed gaps count with what is written in them; hints and open word boxes do not. */
+function spokenText(node:Node):string{
+ if(node.nodeType===Node.TEXT_NODE)return node.nodeValue??'';
+ if(!(node instanceof HTMLElement))return '';
+ if(node instanceof HTMLInputElement||node instanceof HTMLTextAreaElement)return node.value;
+ if(node.getAttribute('aria-hidden')==='true'||node.classList.contains('l1a-hint')||node.classList.contains('l1a-choice-menu'))return '';
+ return [...node.childNodes].map(spokenText).join('');
+}
+export function findReadLine(text:string,after?:Element|null):HTMLElement|null{
+ const want=plain(text);if(!want)return null;
+ const lines=[...document.querySelectorAll<HTMLElement>('.l1a-line')];
+ const textOf=(line:HTMLElement)=>{const de=line.querySelector('.l1a-de');return de?plain(spokenText(de)):'';};
+ const exact=lines.filter(line=>textOf(line)===want);
+ // A line read a little shorter than it is written (a Turkish word left out): most of its words are on the line.
+ const words=(value:string)=>value.replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean);
+ const wanted=words(want);
+ const share=(line:HTMLElement)=>{const have=new Set(words(textOf(line)));return wanted.filter(word=>have.has(word)).length/wanted.length;};
+ let loose=exact;
+ if(!loose.length&&wanted.length>=4){const scored=lines.map(line=>({line,score:share(line)})).filter(item=>item.score>=0.75);const best=Math.max(0,...scored.map(item=>item.score));loose=scored.filter(item=>item.score===best).map(item=>item.line);}
+ if(!loose.length)return null;
+ // The same sentence twice on a page: take the first one after the line read before.
+ const later=after?loose.find(line=>after.compareDocumentPosition(line)&Node.DOCUMENT_POSITION_FOLLOWING):undefined;
+ return later??loose[0];
+}
+function clearReading(){document.querySelectorAll('.'+READING).forEach(line=>line.classList.remove(READING));}
+function showReading(line:HTMLElement,scroll:boolean){
+ clearReading();line.classList.add(READING);
+ if(!scroll)return;
+ const rect=line.getBoundingClientRect();const height=window.innerHeight||document.documentElement.clientHeight;
+ if(rect.top>=height*0.18&&rect.bottom<=height*0.82)return; // already in the middle of the screen
+ const still=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+ line.scrollIntoView({block:'center',behavior:still?'auto':'smooth'});
+}
 export type Speech={speak:(item:SayItem)=>void;speakAll:(items:SayItem[])=>void;busy:boolean;activeText?:string;stop:()=>void;prepare:()=>void;warm?:(items:readonly SayItem[])=>void};
 export function useLessonSpeech():Speech&{warning?:string}{
  const german=useGermanSpeech('de');const {speak,busy,activeText,stop,prepare,warning,siteVoices}=german;
@@ -28,6 +67,7 @@ export function useLessonSpeech():Speech&{warning?:string}{
  const warm=useCallback((items:readonly SayItem[])=>{if(!siteVoices.length)return;for(const item of items){const text=sayText(item);if(!text.trim())continue;const who=voiceOwner(item);const url=siteClipUrls(speakerVoice(who,siteVoices)??preferred.current,text)[0];if(url)warmClip(url);}},[siteVoices]);
  const say=useCallback((item:SayItem)=>{const who=voiceOwner(item);const slow=typeof item!=='string'&&!!item.slow;speak(sayText(item),slow,speakerVoice(who,voices.current));},[speak]);
  const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const following=useRef(false);const lastLine=useRef<HTMLElement|null>(null);const handScroll=useRef(false);
  const busyRef=useRef(busy);
  const next=useCallback(()=>{
   const item=queue.current.shift();if(!item)return;
@@ -36,9 +76,20 @@ export function useLessonSpeech():Speech&{warning?:string}{
   waiting.current=setTimeout(()=>{waiting.current=null;if(!busyRef.current)next();},1500);
  },[say]);
  useEffect(()=>{const was=busyRef.current;busyRef.current=busy;if(busy&&waiting.current){clearTimeout(waiting.current);waiting.current=null;}if(was&&!busy)next();},[busy,next]);
- const speakAll=useCallback((items:SayItem[])=>{stop();queue.current=items.filter(item=>sayText(item).trim());next();},[stop,next]);
- const speakOne=useCallback((item:SayItem)=>{queue.current=[];say(item);},[say]);
- const stopAll=useCallback(()=>{queue.current=[];if(waiting.current){clearTimeout(waiting.current);waiting.current=null;}stop();},[stop]);
+ const speakAll=useCallback((items:SayItem[])=>{stop();queue.current=items.filter(item=>sayText(item).trim());following.current=true;lastLine.current=null;handScroll.current=false;next();},[stop,next]);
+ const speakOne=useCallback((item:SayItem)=>{queue.current=[];following.current=false;clearReading();say(item);},[say]);
+ const stopAll=useCallback(()=>{queue.current=[];following.current=false;clearReading();if(waiting.current){clearTimeout(waiting.current);waiting.current=null;}stop();},[stop]);
+ // Read-along: mark the line being read and keep it on the screen; the mark goes when the reading ends.
+ useEffect(()=>{
+  if(!following.current)return;
+  if(busy&&activeText){const line=findReadLine(activeText,lastLine.current);if(line){lastLine.current=line;showReading(line,!handScroll.current);}return;}
+  if(!busy&&!queue.current.length&&!waiting.current){following.current=false;clearReading();}
+ },[busy,activeText]);
+ useEffect(()=>{
+  const hand=()=>{if(following.current)handScroll.current=true;};
+  window.addEventListener('wheel',hand,{passive:true});window.addEventListener('touchmove',hand,{passive:true});
+  return()=>{window.removeEventListener('wheel',hand);window.removeEventListener('touchmove',hand);clearReading();};
+ },[]);
  useEffect(()=>()=>{if(waiting.current)clearTimeout(waiting.current);},[]);
  return useMemo(()=>({speak:speakOne,speakAll,busy,activeText,stop:stopAll,prepare,warning,warm}),[speakOne,speakAll,busy,activeText,stopAll,prepare,warning,warm]);
 }

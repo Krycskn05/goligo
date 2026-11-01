@@ -131,7 +131,6 @@ function CoverA(_props:StepProps){ // the part's progress is on the left page (n
   </ul>
   <h2 className="l1a-h2">Bu dersteki kişiler</h2>
   <ul className="l15-cast">{castA.map(key=><li key={key}><Portrait who={key} name={personName(key)}/><span>{personName(key)}</span></li>)}</ul>
-  <p className="l1a-mini">Her kişinin kendi sesi var: kadınları kadın sesi, erkekleri erkek sesi okur.</p>
  </>;
 }
 function BuildingWords({speech}:{speech:Speech}){

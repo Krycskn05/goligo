@@ -4,8 +4,6 @@
 .l15-der { color:#1f5fae; font-weight:800; }
 .l15-die { color:#c0392b; font-weight:800; }
 .l15-das { color:#2e7d32; font-weight:800; }
-.l15-legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin:8px 0 6px; font-size:13px; }
-.l15-legend span { padding:2px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--toy-line,#dce5da); }
 .l15-scene { max-height:320px; background:transparent; box-shadow:none; }
 .l15-emoji { flex:none; width:36px; font-size:26px; line-height:1; text-align:center; }
 /* word rows: emoji, the word with its article colour, plural, meaning, example, listen */

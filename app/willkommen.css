@@ -435,10 +435,12 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 /* Tap a word row to hear it (app/tap-to-say.tsx, 2 November 2026): the row shows it can be tapped; the speaker stays as a sign. */
 .tap-say { cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background-color .15s ease, border-color .15s ease; }
 @media (hover:hover) {
- .tap-say:hover, tr.tap-say:hover > td { background-color:#f3f9ff; }
- .tap-say:hover { border-color:#bcd8f3; }
+ .tap-say:not(.l1a-line):hover, tr.tap-say:hover > td { background-color:#f3f9ff; }
+ .tap-say:not(.l1a-line):hover { border-color:#bcd8f3; }
+ .l1a-line.tap-say:hover .l1a-bubble { filter:brightness(.97); }
 }
-.tap-say:active, tr.tap-say:active > td { background-color:#e8f3ff; }
+.tap-say:not(.l1a-line):active, tr.tap-say:active > td { background-color:#e8f3ff; }
+.l1a-line.tap-say:active .l1a-bubble { filter:brightness(.93); }
 @media (prefers-reduced-motion:reduce) { .tap-say { transition:none; } }
 
 /* Read-along (app/willkommen-ui.tsx `showReading`, 2 November 2026): the dialogue line being read is ringed in blue. */

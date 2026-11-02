@@ -142,12 +142,12 @@ function OfficeWords({speech}:{speech:Speech}){
   <p className="l1a-tr">Berlin’de bu işler için <b lang="de">Bürgeramt</b>’a, <b lang="de">Ausländerbehörde</b>’ye veya <b lang="de">Führerscheinstelle</b>’ye gidilir.</p>
   <WordRows words={officeWords} speech={speech}/>
   <h2 className="l1a-h2">Fiiller</h2>
-  {officeVerbs.map(([de,tr,example])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{tr}</span><span className="l15-example" lang="de">{example}</span></div><Say text={example} speech={speech}/></div>)}
+  <div className="l15-word-grid">{officeVerbs.map(([de,tr,example])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{tr}</span><span className="l15-example" lang="de">{example}</span></div><Say text={example} speech={speech}/></div>)}</div>
   <Note><b lang="de">ab|holen, an|melden, ab|melden, hoch|gehen</b> ayrılabilen fiillerdir: <i lang="de">Ich <b>hole</b> meinen Ausweis <b>ab</b>.</i> — <i lang="de">Gehen Sie die Treppe <b>hoch</b>.</i></Note></>;
 }
 function Directions({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Yön</p><Heading><span lang="de">Wo? Wohin?</span></Heading>
-  {directionWords.map(row=>{const [emoji,de,tr,example]=row;return <div className="l1a-phrase" key={de}><span className="l15-emoji" aria-hidden="true">{emoji}</span><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{tr}</span>{example&&<span className="l15-example" lang="de">{example}</span>}</div><Say text={directionSay(row)} speech={speech}/></div>;})}
+  <div className="l15-word-grid">{directionWords.map(row=>{const [emoji,de,tr,example]=row;return <div className="l1a-phrase" key={de}><span className="l15-emoji" aria-hidden="true">{emoji}</span><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{tr}</span>{example&&<span className="l15-example" lang="de">{example}</span>}</div><Say text={directionSay(row)} speech={speech}/></div>;})}</div>
   <Note><b lang="de">links</b> = solda (<span lang="de">Wo?</span> Nerede?) · <b lang="de">nach links</b> = sola (<span lang="de">Wohin?</span> Nereye?)<br/><i lang="de">Der Aufzug ist links.</i> — <i lang="de">Gehen Sie nach links.</i></Note></>;
 }
 /** The floors of a house: tap a floor (or the roof) to hear it. */

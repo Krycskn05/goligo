@@ -11,8 +11,8 @@ test('the layout mounts the tap-to-hear helper once',()=>{
 
 test('word rows of every lesson are covered, the speaker icon stays and exercise rows are left alone',()=>{
  const code=read('app/tap-to-say.tsx');
- for(const row of ['.l1a-phrase','.l15-word','.l12-word-tile','.l1a-table tbody tr','.l1a-say-list li','.l1a-pos-row'])assert(code.includes(row),row);
- assert(code.includes("classList.contains('l12-say')"),'only the round listen button is pressed');
+ for(const row of ['.l1a-phrase','.l15-word','.l12-word-tile','.l1a-table tbody tr','.l1a-say-list li','.l1a-pos-row','.l1a-line','.housing-lesson-example'])assert(code.includes(row),row);
+ assert(code.includes("const SAY_BUTTON='.l12-say,.housing-lesson-example > .icon-btn';")&&code.includes('button.matches(SAY_BUTTON)'),'only a listen button is pressed');
  assert(code.includes('buttons.length!==1'),'rows with two listen buttons or choice buttons are skipped');
  assert(code.includes("querySelector('input,select,textarea')"),'rows with answer fields are skipped');
  assert(read('app/willkommen.css').includes('.tap-say {'),'tappable rows show a pointer');

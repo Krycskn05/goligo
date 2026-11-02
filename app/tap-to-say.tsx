@@ -7,7 +7,10 @@ import {useEffect} from 'react';
  * when it is tapped anywhere; the speaker icon stays as a sign that the row can be heard. Rows with answer fields,
  * choice buttons or two listen buttons (Sie / du tables) are left alone, and so are taps on links and buttons.
  */
-export const TAP_ROWS='.l1a-phrase,.l15-word,.l12-word-tile,.l1a-table tbody tr,.l1a-say-list li,.l1a-pos-row,.l15-say-bubble';
+// Dialogue lines and the Ev ve Yaşam example sentences joined on 2 November 2026 (the learner: "do what you fixed in Lektion 15
+// everywhere on the site"): a tap on a speech bubble reads it.
+export const TAP_ROWS='.l1a-phrase,.l15-word,.l12-word-tile,.l1a-table tbody tr,.l1a-say-list li,.l1a-pos-row,.l15-say-bubble,.l1a-line,.housing-lesson-example';
+const SAY_BUTTON='.l12-say,.housing-lesson-example > .icon-btn';
 const SKIP='button,a,input,select,textarea,label,summary,[role="button"],[contenteditable="true"]';
 
 /** The row's only listen button, or null when the row is not a plain word row. */
@@ -16,7 +19,7 @@ export function rowSayButton(row:Element):HTMLButtonElement|null{
  const buttons=row.querySelectorAll('button');
  if(buttons.length!==1)return null;
  const button=buttons[0];
- return button.classList.contains('l12-say')?button:null;
+ return button.matches(SAY_BUTTON)?button:null;
 }
 
 function rowAt(target:EventTarget|null):HTMLElement|null{

@@ -412,7 +412,7 @@ function OwnExercise({speech,onScore,step}:StepProps){
  return <>
   <p className="kicker" lang="de">Alıştırma 9 · Sprechen Sie</p><Heading>Şimdi sen cevap ver</Heading><p className="l1a-tr">Kendi adınla ve ülkenle yaz, sonra dinle.</p>
   <div className="l1a-dialogue">{ownPrompts.map((prompt,i)=><div key={prompt.question}>
-   <div className="l1a-line a"><div className="l1a-bubble"><span className="l1a-de" lang="de">{prompt.question}</span></div><Say text={prompt.question} speech={speech}/></div>
+   <div className="l1a-line a"><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l1a-de" lang="de">{prompt.question}</span></div><Say text={prompt.question} speech={speech}/></div></div>
    <div className="l1a-line b"><div className="l1a-bubble"><input className={'l1a-gap wide'+(state[i]===true?' ok':state[i]===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" placeholder={prompt.placeholder} aria-label={prompt.question} onChange={event=>change(i,event.target.value)}/>{state[i]===false&&<span className="l1a-mini">Kalıp: <span lang="de">{prompt.placeholder}</span></span>}</div></div>
   </div>)}</div>
   <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy||!values.some(v=>v.trim())} onClick={()=>speech.speakAll(values.map(v=>v.trim()).filter(Boolean))}><Volume2 size={16} aria-hidden="true"/>Cümlelerimi dinle</button></div>

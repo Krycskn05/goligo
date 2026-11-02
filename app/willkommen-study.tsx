@@ -7,6 +7,7 @@ import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib
 import {courseUnits} from '@/lib/textbook-curriculum';
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
+import {vaultText} from '@/lib/object-vault-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
 import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,verbForms,dialogue,people,personSpeech,greetingsAround,greetingVoices,words,lettersExercise,matchPairs,orderSentences,orderMeanings,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
 import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
@@ -131,7 +132,7 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
  const progress=partProgressL1(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app" lang={language} dir={dir}>
-  <a className="skip-link" href="#l1a-main">{c(language,'catalogTitle')}</a>
+  <a className="skip-link" href="#l1a-main">{vaultText(language,'skipContent')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){speech.stop();onLanguage(value);}}} homeHref="/konular?level=A1.1" homeLabel={c(language,'catalogTitle')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current="units"/>
   <main id="l1a-main" className="object-page housing-page l1a-page" lang={language} dir={dir}>

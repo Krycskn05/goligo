@@ -125,7 +125,7 @@ export function HousingWorkshop({language,onLanguage,guest=false}:{language:Stud
  const actionDisabled=busy||cueBusy||speech.busy;
  const modeLabels={test:v('testPractice'),write:v('writePractice'),testDetail:v('testDetail'),writeDetail:v('puzzleHint')};
  return <div className="category-app toon-app housing-app" lang={language} dir={languageDirection(language)}>
-  <a className="skip-link" href="#housing-main">{v('home')}</a>
+  <a className="skip-link" href="#housing-main">{v('skipContent')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value))onLanguage(value);}} homeHref="/konular?level=A1.2" homeLabel={h('back')} stats={snapshot.stats} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
   <main id="housing-main" className="object-page housing-page">

@@ -32,7 +32,8 @@ export function SiteHeader({language,languages,onLanguage,homeHref,homeLabel,sho
   <div className="site-header-tools">
    <label className="site-language"><TopIcon name="language" size={26}/><span className="site-language-label">{label}</span><span className="site-language-code" aria-hidden="true">{language.toUpperCase()}</span><select value={language} aria-label={label} onChange={event=>onLanguage(event.target.value)}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label>
    <div className="site-header-buttons">
-    {showHome&&<a className="object-back site-home" href={homeHref}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
+    {/* The text is hidden on the round button (koko-theme.css), so the link carries its name itself (2 November 2026). */}
+    {showHome&&<a className="object-back site-home" href={homeHref} aria-label={homeLabel} title={homeLabel}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
     <EffectsSettingsButton language={language}/>
     <AccountMenu language={language} guest={guest}/>
    </div>

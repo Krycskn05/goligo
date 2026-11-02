@@ -6,13 +6,15 @@ const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_C
 const load=name=>require(path.join(compiled,name+'.js'));
 const read=file=>fs.readFileSync(file,'utf8');
 const site=load('site-languages');
-const marks=text=>(text.match(/\{\w+\}/g)??[]).sort().join();
+// A text may hold "one||other" (lib/copy-fill.ts pluralPick): its marks are those of one form, and the packs know it by its plural.
+const plural=text=>text.includes('||')?text.slice(text.lastIndexOf('||')+2):text;
+const marks=text=>(plural(text).match(/\{\w+\}/g)??[]).sort().join();
 
 // A text of a copy object in every site language: from the tuple, or the English line from the language pack.
 function everyLanguage(tuple,label){
  for(const {id} of site.siteLanguages){
   const index=site.siteLanguageIndex(id);
-  const text=index<tuple.length?tuple[index]:JSON.parse(read('lib/language-packs/'+id+'.json'))[tuple[2]];
+  const text=index<tuple.length?tuple[index]:JSON.parse(read('lib/language-packs/'+id+'.json'))[plural(tuple[2])];
   assert.ok(text?.trim(),label+' '+id);assert.equal(marks(text),marks(tuple[2]),label+' '+id);
  }
 }

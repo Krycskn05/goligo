@@ -101,9 +101,11 @@ export function loadLanguagePack(language:SiteLanguage):Promise<void>{
 }
 /** A text from the language pack, by its English original (the English text itself when missing). */
 export function packText(language:SiteLanguage,english:string):string{
- listener?.(language,english);
- if(!english)return english;
- return packs.get(language)?.[english]||english;
+ // An English "one||other" text (lib/copy-fill.ts pluralPick) is found in the packs by its plural, the text they were made from.
+ const key=english.includes('||')?english.slice(english.lastIndexOf('||')+2):english;
+ listener?.(language,key);
+ if(!key)return key;
+ return packs.get(language)?.[key]||english;
 }
 /** Picks the language's text from a tuple ordered like siteLanguages; later languages use the pack. */
 export function pickText(tuple:readonly string[],language:SiteLanguage):string{

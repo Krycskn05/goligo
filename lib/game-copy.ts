@@ -1,3 +1,4 @@
+import {pluralPick} from './copy-fill';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {pickText} from './site-languages';
 
@@ -52,4 +53,4 @@ const copy={
 } as const satisfies Record<string,VaultTranslations>;
 export type GameCopyKey=keyof typeof copy;
 export const gameCopy=copy;
-export function gameText(language:VaultLanguage,key:GameCopyKey,params:Record<string,string|number>={}){return pickText(copy[key],language).replace(/\{(\w+)\}/g,(hole,name:string)=>Object.prototype.hasOwnProperty.call(params,name)?String(params[name]):hole);}
+export function gameText(language:VaultLanguage,key:GameCopyKey,params:Record<string,string|number>={}){return pluralPick(pickText(copy[key],language),params).replace(/\{(\w+)\}/g,(hole,name:string)=>Object.prototype.hasOwnProperty.call(params,name)?String(params[name]):hole);}

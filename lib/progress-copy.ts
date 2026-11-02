@@ -1,3 +1,4 @@
+import {pluralPick} from './copy-fill';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {languageLocale,pickText} from './site-languages';
 import type {ProgressStage} from './progress';
@@ -32,7 +33,7 @@ export type ProgressCopyKey=keyof typeof progressCopy;
 const stageKeys:Record<ProgressStage,ProgressCopyKey>={new:'stageNew',started:'stageStarted',warming:'stageWarming',half:'stageHalf',almost:'stageAlmost',master:'stageMaster'};
 
 export function progressText(language:VaultLanguage,key:ProgressCopyKey,params:Record<string,string|number>={}){
- return pickText(progressCopy[key],language).replace(/\{(\w+)\}/g,(_,name:string)=>String(params[name]??''));
+ return pluralPick(pickText(progressCopy[key],language),params).replace(/\{(\w+)\}/g,(_,name:string)=>String(params[name]??''));
 }
 export function stageText(language:VaultLanguage,stage:ProgressStage){return progressText(language,stageKeys[stage]);}
 export function formatPercent(value:number,language:VaultLanguage){

@@ -6,6 +6,7 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {studyLanguages,isStudyLanguage,type StudyLanguage} from '@/lib/study-languages';
 import {languageDirection} from '@/lib/site-languages';
 import {housingText} from '@/lib/housing-copy';
+import {vaultText} from '@/lib/object-vault-copy';
 import {AUSBILDUNG_PATH,lessonPartMap,turkishNote} from '@/lib/ausbildung-course';
 import {GUEST_L12_PART} from '@/lib/guest-parts';
 import {GuestBanner,GuestMore} from './guest-taste';
@@ -64,7 +65,7 @@ export function HoerenPage({language,onLanguage,guest=false}:{language:StudyLang
  const task=number?taskMap.get(number):undefined;
  const done=hoerenTasks.filter(item=>results[item.id]).length;
  return <div className="category-app toon-app housing-app l12-app" lang={language} dir={languageDirection(language)}>
-  <a className="skip-link" href="#l12-main">{housingText(language,'back')}</a>
+  <a className="skip-link" href="#l12-main">{vaultText(language,'skipContent')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={housingText(language,'back')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
   <main id="l12-main" className="object-page housing-page l12-page" lang={language} dir={languageDirection(language)}>

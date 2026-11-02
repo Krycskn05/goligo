@@ -10,7 +10,7 @@ import {housingIllustration} from '@/lib/housing-illustrations';
 import {objectMeaning} from '@/lib/object-translations';
 import {ObjectArt,RasterArt} from './toon-art';
 import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
-import {verbFamilies,verbFamilyOf,familyTitle,type VerbFamily} from '@/lib/verb-families';
+import {verbFamilies,verbFamilyOf,verbFamilyMap,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {sentenceChunks,verbRules,verbPrefix,praesensStem,praesensForm,separablePrefixes,verbPicture,type VerbTense} from '@/lib/verb-logic';
@@ -64,6 +64,22 @@ export default function VerbStudy({guest=false,part}:{guest?:boolean;part?:VerbS
  useEffect(()=>{if(!ready)return;try{saveVaultLanguage(localStorage,language);}catch{}},[language,ready]);
  return ready?<VerbWorkshop language={language} onLanguage={switchLanguage} guest={guest} part={part}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
 }
+/** The part and the verb card open in the workshop, read from the address (null: the map). This component only mounts in the browser. */
+export function readWorkshopView():{family:VerbFamily;verbId?:string}|null{
+ if(typeof window==='undefined')return null;
+ const params=new URLSearchParams(window.location.search);const family=verbFamilyMap.get(params.get('parca')??'');
+ if(!family)return null;const verbId=params.get('fiil')??'';
+ return family.verbs.includes(verbId)?{family,verbId}:{family};
+}
+/** Keeps the open part and verb card in the address without a new history entry (Back still leaves the page as before). */
+function writeWorkshopView(view:{family:VerbFamily;verbId?:string}|null){
+ try{
+  const url=new URL(window.location.href);
+  if(view){url.searchParams.set('parca',view.family.id);if(view.verbId)url.searchParams.set('fiil',view.verbId);else url.searchParams.delete('fiil');}
+  else{url.searchParams.delete('parca');url.searchParams.delete('fiil');}
+  if(url.href!==window.location.href)window.history.replaceState(window.history.state,'',url);
+ }catch{}
+}
 export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:VaultLanguage;onLanguage:(value:VaultLanguage)=>void;guest?:boolean;part?:VerbSection}){
  const v=(key:VaultCopyKey,params?:Record<string,string|number>)=>vaultText(language,key,params,'de');
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
@@ -78,8 +94,10 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const [prefix,setPrefix]=useState('');const [prefixWarning,setPrefixWarning]=useState(false);
  const [dismissed,setDismissed]=useState<Set<string>>(new Set());
  const [game,setGame]=useState<GameId|null>(null);const [gameTopic,setGameTopic]=useState('verbs-all');
- // A part opened from the map (its verb list), and optionally one verb's card inside it.
- const [view,setView]=useState<{family:VerbFamily;verbId?:string}|null>(null);
+ // A part opened from the map (its verb list), and optionally one verb's card inside it. Both stay in the address
+ // (?parca=verbs-w1&fiil=…), so a reload keeps the open card instead of going back to the map (2 November 2026).
+ const [view,setView]=useState<{family:VerbFamily;verbId?:string}|null>(()=>part?null:readWorkshopView());
+ useEffect(()=>{if(part)return;writeWorkshopView(view);},[view,part]);
  // Oyunlar (/oyunlar) and Yanlışlarım (/yanlislarim) are parts of the site of their own (the learner asked, 22 October
  // 2026): this component draws them with `part`; the old addresses /fiiller?bolum=oyunlar|yanlislar move there.
  const [section,setSection]=useState<VerbSection|null>(part??null);

@@ -11,7 +11,8 @@ export function HousingLessonNotes({section,language,onBack,onContinue,onSpeak,s
  const l=(key:LessonLabel)=>translate(lessonCopy[key],language);
  const sentenceMeaning=(de:string)=>{const q=housingQuestions.find(item=>item.resultDe===de);return q?housingMeaning(q,language):'';};
  const go=(id:string)=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
- const contents=[...lesson.steps.map((item,i)=>({id:'lesson-step-'+(i+1),title:translate(item.title,language)})),{id:'lesson-build',title:l('build')},{id:'lesson-examples',title:l('examples')},{id:'lesson-mistakes',title:l('mistakes')}];
+ // The step titles start with their number ("1. …"); the list shows the number once, in its own column (2 November 2026).
+ const contents=[...lesson.steps.map((item,i)=>({id:'lesson-step-'+(i+1),title:translate(item.title,language).replace(/^\s*\d+[.)]\s*/,'')})),{id:'lesson-build',title:l('build')},{id:'lesson-examples',title:l('examples')},{id:'lesson-mistakes',title:l('mistakes')}];
  // An open notebook (the same markup as LessonBook in app/lesson-book.tsx, written out so this file
  // loads on its own in the render test): the left page names the lesson and lists its cards.
  return <section className="housing-lesson" aria-labelledby="housing-heading"><div className="lb lb-wide"><div className="lb-spread">

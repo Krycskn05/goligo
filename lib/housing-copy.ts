@@ -1,3 +1,4 @@
+import {pluralPick} from './copy-fill';
 import {translate,type StudyLanguage,type Translations} from './study-languages';
 export const housingCopy={
  title:['Ev ve Yaşam','Wohnen','Home and Living','البيت والحياة','Дім і життя','Habitat et vie quotidienne'],
@@ -10,7 +11,7 @@ export const housingCopy={
  steps:['Kitaptaki alt başlık','Unterthema im Buch','Book subtopic','العنوان الفرعي في الكتاب','Підтема з підручника','Sous-partie du livre'],
  notes:['Kısa konu anlatımı ve örnekler','Kurze Erklärung und Beispiele','Short lesson and examples','شرح مختصر وأمثلة','Коротке пояснення й приклади','Explications courtes et exemples'],
  length:['Çalışma uzunluğu','Umfang der Übung','Practice length','طول التدريب','Обсяг вправ','Longueur de l’exercice'],
- exercises:['{n} alıştırma','{n} Übungen','{n} exercises','{n} تمرينًا','{n} вправ','{n} exercices'],
+ exercises:['{n} alıştırma','{n} Übung||{n} Übungen','{n} exercise||{n} exercises','{n} تمرينًا','{n} вправ','{n} exercices'],
  whole:['Tamamı · {n} alıştırma','Alle · {n} Übungen','All · {n} exercises','الكل · {n} تمرينًا','Усі · {n} вправ','Tout · {n} exercices'],
  start:['Çalışmaya başla','Übung starten','Start practising','ابدأ التدريب','Почати тренування','Commencer'],
  word:['Kelimeyi veya fiil biçimini tamamla.','Ergänze das Wort oder die Verbform.','Complete the word or verb form.','أكمل الكلمة أو صيغة الفعل.','Доповни слово або форму дієслова.','Complète le mot ou la forme du verbe.'],
@@ -31,7 +32,7 @@ export const housingCopy={
  star:['Yıldız koy','Mit Stern markieren','Star this question','ضع نجمة','Позначити зірочкою','Marquer d’une étoile'],
  unstar:['Yıldızı kaldır','Stern entfernen','Remove the star','أزل النجمة','Зняти зірочку','Retirer l’étoile'],
  reviewMarked:['Yanlışları ve yıldızlıları tekrar et','Fehler und Markierte wiederholen','Review mistakes and starred','راجع الأخطاء والمميز بنجمة','Повторити помилки й позначені','Revoir erreurs et étoiles'],
- remaining:['{n} çözülmemiş soru kaldı','Noch {n} ungelöste Fragen','{n} unsolved questions left','بقي {n} من الأسئلة غير المحلولة','Залишилось нерозв’язаних запитань: {n}','Encore {n} questions non résolues'],
+ remaining:['{n} çözülmemiş soru kaldı','Noch {n} ungelöste Frage||Noch {n} ungelöste Fragen','{n} unsolved question left||{n} unsolved questions left','بقي {n} من الأسئلة غير المحلولة','Залишилось нерозв’язаних запитань: {n}','Encore {n} questions non résolues'],
  allSolved:['Bu bölümdeki tüm soruları çözdün. Yeni turlar hepsini karışık tekrar eder.','Du hast hier alle Fragen gelöst. Neue Runden wiederholen alles gemischt.','You have solved every question here. New rounds review them all, shuffled.','حللت كل الأسئلة هنا. الجولات الجديدة تراجعها كلها بترتيب مخلوط.','Ти розв’язав тут усі запитання. Нові раунди повторюють усе вперемішку.','Tu as résolu toutes les questions ici. Les nouvelles séries les révisent toutes, mélangées.'],
  wordBank:['Cümle için kelimeler','Wörter für den Satz','Words for the sentence','كلمات الجملة','Слова для речення','Mots pour la phrase'],
  pages:['Kitap sayfaları {pages}','Buchseiten {pages}','Book pages {pages}','صفحات الكتاب {pages}','Сторінки підручника {pages}','Pages du livre {pages}'],
@@ -40,4 +41,4 @@ export const housingCopy={
  contents:['İçindekiler','Inhalt','Contents','المحتويات','Зміст','Sommaire'],
 } satisfies Record<string,Translations>;
 export type HousingCopyKey=keyof typeof housingCopy;
-export function housingText(language:StudyLanguage,key:HousingCopyKey,params:Record<string,string|number>={}){return translate(housingCopy[key],language).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??''));}
+export function housingText(language:StudyLanguage,key:HousingCopyKey,params:Record<string,string|number>={}){return pluralPick(translate(housingCopy[key],language),params).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??''));}

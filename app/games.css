@@ -159,3 +159,14 @@
  .rescue-word { font-size:23px; }
  .rescue-letter { min-width:20px; height:34px; }
 }
+
+/* Symmetry (2 November 2026, the learner's check: the menu sat on the left with 32 px on one side and about 328 px on the
+   other, and the length labels were at different heights): the Oyunlar and Yanlışlarım sections stand in the middle of
+   the page, the game cards wrap in centred rows (the last card is not left alone on the left), and every card keeps its
+   level · length label and its play button on the same line at the bottom, whatever the length of its text. */
+.verb-section { margin-inline:auto; width:100%; }
+.game-cards.verb-section-games { display:flex; flex-wrap:wrap; justify-content:center; }
+.verb-section-games .game-card { flex:0 1 calc((100% - 32px) / 3); min-width:200px; }
+.game-card-meta { margin-top:auto; }
+.game-card-meta + .game-card-play { margin-top:0; }
+@media (max-width:560px) { .verb-section-games .game-card { flex-basis:calc((100% - 12px) / 2); min-width:0; } }

@@ -7,6 +7,7 @@ import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib
 import {courseUnits} from '@/lib/textbook-curriculum';
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
+import {vaultText} from '@/lib/object-vault-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
 import type {L1AScoreMap} from '@/lib/willkommen-progress';
 import type {Step,StepGroup} from '@/lib/willkommen-course';
@@ -118,7 +119,7 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
  const progress=partProgressL15(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app l15-app" lang={language} dir={dir}>
-  <a className="skip-link" href="#l15-main">{c(language,'catalogTitle')}</a>
+  <a className="skip-link" href="#l15-main">{vaultText(language,'skipContent')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){speech.stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={c(language,'catalogTitle')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current="units"/>
   <main id="l15-main" className="object-page housing-page l1a-page l15-page" lang={language} dir={dir}>

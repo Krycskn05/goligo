@@ -563,7 +563,7 @@ const richtigSchreiben:L12Part={
 };
 
 const allesKlar:L12Part={
- id:'test',badge:'✓',title:'Alles klar? – Lektion 12 Testi',de:'Alles klar?',
+ id:'test',badge:'✓',title:'Alles klar? – Test zu Lektion 12',de:'Alles klar?',
  lead:'Kitaptaki format: Wortschatz, Grammatik, Kommunikation + Teil A için ek bölüm. Toplam 25 puan. Sözlüğe bakmadan, tek seferde yap.',card:'25 puanlık ünite testi: Wortschatz, Grammatik, Kommunikation, Zusatz.',
  sections:[],
  exercises:[

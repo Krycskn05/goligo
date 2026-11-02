@@ -7,6 +7,7 @@ import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib
 import {languageDirection} from '@/lib/site-languages';
 import {courseUnits} from '@/lib/textbook-curriculum';
 import {housingText} from '@/lib/housing-copy';
+import {vaultText} from '@/lib/object-vault-copy';
 import {AUSBILDUNG_PATH,lessonPartMap,turkishNote,type L12Part,type L12PartId,type L12Word} from '@/lib/ausbildung-course';
 import type {HoerenTask} from '@/lib/ausbildung-hoeren';
 import {exerciseAnswerCount,isCheckable,isStep,isWordSection,lessonProgress,partProgress,partSteps,testPoints,type L12ScoreMap,type L12Step} from '@/lib/ausbildung-progress';
@@ -95,7 +96,7 @@ export function AusbildungLesson({language,onLanguage,guest=false}:{language:Stu
  const step=current?(route.step&&partSteps(current).includes(route.step)?route.step:partSteps(current)[0]):null;
  const unitName=translate(unit.names,language);
  return <div className="category-app toon-app housing-app l12-app" lang={language} dir={languageDirection(language)}>
-  <a className="skip-link" href="#l12-main">{housingText(language,'back')}</a>
+  <a className="skip-link" href="#l12-main">{vaultText(language,'skipContent')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){german.stop();onLanguage(value);}}} homeHref="/konular?level=A1.2" homeLabel={housingText(language,'back')} guest={guest}/>
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'units'}/>
   <main id="l12-main" className="object-page housing-page l12-page" lang={language} dir={languageDirection(language)}>

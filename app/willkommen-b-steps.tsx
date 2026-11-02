@@ -12,7 +12,7 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 1, Teil B – Ich spreche ein bisschen Deutsch. (the learner's lesson page, 25 October 2026): the steps.
@@ -161,7 +161,7 @@ function HearExercise(props:StepProps){
  const check=(i:number)=>{if(checked[i]!==null)return;sound.prepare();speech.prepare();const item=hearItems[i];const chosen=ticked[i];
   const ok=chosen.length===item.answers.length&&chosen.every(j=>item.answers.includes(j));const next=checked.slice();next[i]=ok;setChecked(next);
   const done=next.filter(value=>value!==null).length;const right=next.filter(Boolean).length;
-  if(done===hearItems.length){setFeedback({ok:right===hearItems.length,text:`${right} / ${hearItems.length} doğru`});finish(right,hearItems.length);}
+  if(done===hearItems.length){setFeedback(scoreFeedback(right,hearItems.length));finish(right,hearItems.length,undefined,ok);}
   else if(ok)sound.correct();else sound.wrong();};
  return <>
   <p className="kicker" lang="de">Alıştırma 4 · Hören Sie</p><Heading>Dinle: hangi dilleri konuşuyorlar?</Heading>

@@ -8,7 +8,7 @@ import {courseUnits} from '@/lib/textbook-curriculum';
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {turkishNote} from '@/lib/ausbildung-course';
-import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,verbForms,dialogue,people,personSpeech,greetingsAround,greetingVoices,words,lettersExercise,matchPairs,orderSentences,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
+import {WILLKOMMEN_PATH,WILLKOMMEN_UNIT,lessonParts,unitGoals,stepGroups,groupOf,scoredExercises,steps,stepIndex,greetings,namePhrases,originPhrases,countries,articleCountries,verbForms,dialogue,people,personSpeech,greetingsAround,greetingVoices,words,lettersExercise,matchPairs,orderSentences,orderMeanings,gluedText,gluedSentences,gluedSay,articleOptions,articleRows,articleRowSpeech,listenItems,questionLines,questionSay,wordBox,boxLines,boxSay,ownPrompts,testQuestions,testSpeech,normalizeLoose,willkommenPictures,dialogueSpeaker,exerciseSpeakers,matchSay,orderSay,type Step,type StepGroup} from '@/lib/willkommen-course';
 import {stepsB,stepGroupsB,scoredExercisesB,testQuestionsB,wordsB,willkommenBPictures} from '@/lib/willkommen-b-course';
 import {stepsC,stepGroupsC,scoredExercisesC,testQuestionsC,wordsC,willkommenCPictures} from '@/lib/willkommen-c-course';
 import {stepsD,stepGroupsD,scoredExercisesD,testQuestionsD,wordsD,willkommenDPictures,checkPoints} from '@/lib/willkommen-d-course';
@@ -23,7 +23,7 @@ import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
-import {StepStrip,exerciseLock,LockedStep,useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {StepStrip,exerciseLock,LockedStep,useLessonSpeech,Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {StepViewB} from './willkommen-b-steps';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
@@ -276,7 +276,7 @@ function StepViewA(props:StepProps){
   case 'kelimeler':return <WordList speech={props.speech}/>;
   case 'harfler':return <GapExercise kicker="Alıştırma 1 · Ergänzen Sie" title="Eksik harfleri tamamla" cells lines={lettersExercise.lines} say={lettersExercise.say} speakers={exerciseSpeakers.harfler} {...props}/>;
   case 'eslestir':return <MatchExercise kicker="Alıştırma 2 · Verbinden Sie" title="Soruyu cevapla eşleştir" pairs={matchPairs} sayFor={i=>matchSay(matchPairs[i])} {...props}/>;
-  case 'sirala':return <OrderExercise kicker="Alıştırma 3 · Ordnen Sie" title="Kelimeleri sıraya koy" sentences={orderSentences} sayFor={orderSay} {...props}/>;
+  case 'sirala':return <OrderExercise kicker="Alıştırma 3 · Ordnen Sie" title="Kelimeleri sıraya koy" sentences={orderSentences} meanings={orderMeanings} sayFor={orderSay} {...props}/>;
   case 'ayir':return <GapExercise kicker="Alıştırma 4 · Markieren Sie" title="Kelimeleri ayır, cümleleri yaz" lead="Bu metinde boşluk yok. 5 cümleyi ayırıp aşağıya yaz." before={<div className="l1a-glued" lang="de" dir="ltr">{gluedText}</div>} lines={gluedSentences.map(line=>({who:line.who,text:'___',answers:[line.answers]}))} wide say={gluedSay} speakers={exerciseSpeakers.ayir} {...props}/>;
   case 'aus':return <ArticleExercise {...props}/>;
   case 'dinle':return <ListenExercise {...props}/>;
@@ -382,7 +382,7 @@ function ArticleExercise(props:StepProps){
  const answer=(i:number,value:string)=>{if(answers[i]!==undefined)return;sound.prepare();speech.prepare();
   const next={...answers,[i]:value};setAnswers(next);const ok=value===articleRows[i][1];
   const done=Object.keys(next).length;const right=articleRows.filter((row,j)=>next[j]===row[1]).length;
-  if(done===articleRows.length){setFeedback({ok:right===articleRows.length,text:`${right} / ${articleRows.length} doğru`});finish(right,articleRows.length);}
+  if(done===articleRows.length){setFeedback(scoreFeedback(right,articleRows.length));finish(right,articleRows.length,[articleRowSpeech(articleRows[i])],ok);}
   else if(ok)sound.correct(()=>speech.speak(articleRowSpeech(articleRows[i])));else sound.wrong(()=>speech.speak(articleRowSpeech(articleRows[i])));};
  return <>
   <p className="kicker" lang="de">Alıştırma 5 · Artikel</p><Heading><span lang="de">aus</span> + ?</Heading><p className="l1a-tr">Doğru olanı seç. “–” = artikel yok.</p>
@@ -395,7 +395,7 @@ function ListenExercise(props:StepProps){
  const [answers,setAnswers]=useState<Record<number,number>>({});const [feedback,setFeedback]=useState<Feedback>(null);
  const answer=(i:number,j:number)=>{if(answers[i]!==undefined)return;sound.prepare();const next={...answers,[i]:j};setAnswers(next);
   const ok=j===listenItems[i].answer;const done=Object.keys(next).length;const right=listenItems.filter((item,k)=>next[k]===item.answer).length;
-  if(done===listenItems.length){setFeedback({ok:right===listenItems.length,text:`${right} / ${listenItems.length} doğru`});finish(right,listenItems.length);}else if(ok)sound.correct();else sound.wrong();};
+  if(done===listenItems.length){setFeedback(scoreFeedback(right,listenItems.length));finish(right,listenItems.length,undefined,ok);}else if(ok)sound.correct();else sound.wrong();};
  return <>
   <p className="kicker" lang="de">Alıştırma 6 · Hören Sie</p><Heading>Dinle ve işaretle</Heading><p className="l1a-tr">Kişiler nereden geliyor? Önce dinle, sonra seç.</p>
   {listenItems.map((item,i)=><div className="l1a-listen" key={item.key}>

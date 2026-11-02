@@ -7,7 +7,7 @@ import {
  stadtPictures,castA,personName,buildingWords,officeWords,officeVerbs,directionWords,directionSay,articleOf,
  houseFloors,roofSay,floorRule,floorSynonyms,needDialogue,mustForms,tasks,instructions,upDown,checkDialogue,
  esGibtRule,esGibtDialogue,askWhere,achWords,ichWords,longWords,longWordSay,officeBoard,schoolBoard,officeDialogue,schoolDialogue,
- matchPictures,buildWords,joinParts,buildSay,wohinLines,floorLines,boardLines,ramiLines,ramiSay,esGibtRows,esGibtSay,
+ matchPictures,buildWords,joinParts,buildSay,wohinLines,floorLines,boardLines,ramiLines,ramiSay,orderMeanings,esGibtRows,esGibtSay,
  hearItems,achIchRows,orderSentences,orderSay,roleQuestions,testQuestionsA,isTurkishText,summaryLines,stepIndexA,lineGaps,
  type Word,type BoardRow,type ChoiceLine,type ChoiceGap,
 } from '@/lib/stadt-course';
@@ -15,7 +15,7 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Heading,Portrait,FeedbackLine,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,FeedbackLine,scoreFeedback,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -46,7 +46,7 @@ export function StepViewL15A(props:StepProps){
   case 'einen-eine':return <EsGibtExercise {...props}/>;
   case 'dinle':return <HearExercise {...props}/>;
   case 'ach-ich':return <AchIchExercise {...props}/>;
-  case 'sirala':return <OrderExercise kicker="Alıştırma 10 · Sätze bauen" title="Cümleyi kur" sentences={orderSentences} sayFor={orderSay} {...props}/>;
+  case 'sirala':return <OrderExercise kicker="Alıştırma 10 · Sätze bauen" title="Cümleyi kur" sentences={orderSentences} meanings={orderMeanings} sayFor={orderSay} {...props}/>;
   case 'rollenspiel':return <RoleExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 15A · Test" questions={testQuestionsA} sayFor={i=>testQuestionsA[i][3]} listen={i=>testQuestionsA[i][4]} langOf={text=>isTurkishText(text)?'tr':'de'} {...props}/>;
   case 'konus':return <TalkStep scenario={talkScenarios.l15a} {...props}/>;
@@ -416,10 +416,11 @@ function HearExercise(props:StepProps){
   reveal:<p className="l1a-mini">Metin: <span lang="de" dir="ltr">„{item.text}“</span></p>}));
  return <ChoiceRows kicker="Alıştırma 8 · Hören" title="Dinle: Nereye?" lead="Dinle ve doğru yeri seç. Cevaptan sonra cümle görünür." rows={rows} wide {...props}/>;
 }
-/** Alıştırma 9 · Ach-Laut or Ich-Laut? (the word is read after the answer). */
+/** Alıştırma 9 · Ach-Laut or Ich-Laut? The word is heard with its speaker button only; it is not read again after the
+ * answer (the learner asked, 2 November 2026: only in this exercise). */
 function AchIchExercise(props:StepProps){
  const {speech}=props;
- const rows=achIchRows.map(([word,answer])=>({key:word,label:word,before:<span className="l15-row-text"><span className="l1a-land" lang="de">{word}</span> <Say text={word} speech={speech}/></span>,options:[{value:'Ach',label:'Ach'},{value:'Ich',label:'Ich'}],answer,say:word as SayItem}));
+ const rows=achIchRows.map(([word,answer])=>({key:word,label:word,before:<span className="l15-row-text"><span className="l1a-land" lang="de">{word}</span> <Say text={word} speech={speech}/></span>,options:[{value:'Ach',label:'Ach'},{value:'Ich',label:'Ich'}],answer}));
  return <ChoiceRows kicker="Alıştırma 9 · Phonetik" title="Ach-Laut mı, Ich-Laut mı?" lead="Kelimeyi dinle, ch’den önceki harfe bak ve seç. (a, o, u, au + ch = Ach)" rows={rows} {...props}/>;
 }
 /** Alıştırma 11 · role play: the learner is Sabine; Mei asks, the school's board has the answer. */
@@ -451,7 +452,7 @@ function RoleExercise(props:StepProps){
   if(picked!==null){next();return true;}
   setWait(true);return true;
  });
- const feedback:Feedback=over?{ok:right===roleQuestions.length,text:right===roleQuestions.length?`Harika, Mei yolunu buldu! ${right} / ${roleQuestions.length}`:`${right} / ${roleQuestions.length} doğru`}:picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
+ const feedback:Feedback=over?(right===roleQuestions.length?{ok:true,text:`Harika, Mei yolunu buldu! ${right} / ${roleQuestions.length}`}:scoreFeedback(right,roleQuestions.length)):picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
  return <>
   <p className="kicker" lang="de">Alıştırma 11 · Rollenspiel</p><Heading>Sabine sensin!</Heading>
   <p className="l1a-tr">Mei girişte soru soruyor. Panoya bak ve doğru cevabı seç.</p>

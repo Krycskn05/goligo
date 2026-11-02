@@ -90,6 +90,7 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .l1a-feedback { min-height:1.5em; margin:10px 0 0; font-weight:800; }
 .l1a-feedback.ok { color:#2f7a31; }
 .l1a-feedback.bad { color:#a63d2a; }
+.l1a-feedback.info { color:var(--ink,#1f3b5c); }
 .l1a-match { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
 .l1a-mbtn { display:block; width:100%; margin:0 0 8px; padding:10px 10px; border:2px solid var(--toy-line,#dce5da); border-radius:14px; background:#fff; color:var(--ink); font:inherit; font-weight:700; font-size:15px; text-align:start; cursor:pointer; min-height:48px; overflow-wrap:anywhere; }
 .l1a-mbtn.sel { border-color:var(--blue-2,#2f7fd6); background:#eaf4ff; }
@@ -444,3 +445,7 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .l1a-line .l1a-bubble { transition:box-shadow .2s ease; }
 .l1a-line.l1a-reading .l1a-bubble { box-shadow:0 0 0 3px var(--blue-2,#2f7fd6), 0 6px 18px rgba(47,127,214,.18); }
 @media (prefers-reduced-motion:reduce) { .l1a-line .l1a-bubble { transition:none; } }
+
+/* Sentence building: what the sentence means, so the learner knows what to build (2 November 2026). */
+.l1a-order-goal { margin:4px 0 12px; padding:10px 14px; border-radius:14px; background:#f3f9ff; border:1.5px solid #d6e4f2; font-size:17px; color:var(--ink,#1f3b5c); }
+.l1a-order-goal b { font-weight:800; }

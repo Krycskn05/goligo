@@ -126,9 +126,9 @@ export const boxLinesC:GapLine[]=[
 ];
 export const boxSayC=['Guten Morgen, Frau Weiß! Wie geht es Ihnen?','Danke, sehr gut! Und Ihnen?','Auch gut. Sagen wir du?','Ja, gern! Ich bin Nora.','Und ich bin Nikos. Wie geht es dir heute, Nora?','Super!'];
 /** Exercise 8 · build the sentence: the verb in position 2 (a chip may hold two words). */
-export const orderVerbSentences:{words:string[];verb:string}[]=[
- {words:['Woher','kommen','Sie?'],verb:'kommen'},{words:['Ich','komme','aus','Spanien.'],verb:'komme'},{words:['Welche Sprachen','sprechen','Sie?'],verb:'sprechen'},
- {words:['Wie','geht','es','dir?'],verb:'geht'},{words:['Ich','bin','neu','hier.'],verb:'bin'},{words:['Ich','spreche','Polnisch','und','Deutsch.'],verb:'spreche'},
+export const orderVerbSentences:{words:string[];verb:string;tr:string}[]=[
+ {words:['Woher','kommen','Sie?'],verb:'kommen',tr:'Nerelisiniz?'},{words:['Ich','komme','aus','Spanien.'],verb:'komme',tr:'İspanya’danım.'},{words:['Welche Sprachen','sprechen','Sie?'],verb:'sprechen',tr:'Hangi dilleri konuşuyorsunuz?'},
+ {words:['Wie','geht','es','dir?'],verb:'geht',tr:'Nasılsın?'},{words:['Ich','bin','neu','hier.'],verb:'bin',tr:'Burada yeniyim.'},{words:['Ich','spreche','Polnisch','und','Deutsch.'],verb:'spreche',tr:'Lehçe ve Almanca konuşuyorum.'},
 ];
 /** Exercise 9 · full stop or question mark? */
 export const punctuationQuestions:{sentence:string;answer:'.'|'?'}[]=[

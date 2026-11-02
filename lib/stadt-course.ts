@@ -297,6 +297,8 @@ export const orderSentences:string[][]=[
  ['Dann','müssen','Sie','zur','Ausländerbehörde','gehen.'],
 ];
 export const orderSay=(sentence:string):SayItem=>({text:sentence,who:'omar'});
+/** What each sentence means, shown above the words so the learner knows what to build (the learner asked, 2 November 2026). */
+export const orderMeanings:string[]=['Merdivenden yukarı çıkın.','Asansörü kullanın.','Üçüncü katta sağa gidin.','Burada asansör var mı?','Kimliğimi almak istiyorum.','O zaman Yabancılar Dairesi’ne gitmeniz gerekiyor.'];
 /** Exercise 11 · role play: the learner is Sabine; Mei asks, the board of the school has the answer (the first option). */
 export const roleQuestions:readonly {question:string;options:string[]}[]=[
  {question:'Entschuldigung, wo ist Kursraum 204?',options:['Kursraum 204 ist im zweiten Stock. Gehen Sie die Treppe hoch und dann nach rechts.','Kursraum 204 ist im zweiten Stock. Gehen Sie dann nach links.','Kursraum 204 ist im dritten Stock rechts.']},

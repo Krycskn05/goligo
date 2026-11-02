@@ -166,6 +166,8 @@ export const lettersExercise:{lines:GapLine[];say:string[]}={
 export const matchPairs:Phrase[]=[['Wie heißen Sie?','Ich heiße Jonas Berg.'],['Woher kommen Sie?','Ich komme aus Polen.'],['Herzlich willkommen!','Danke!'],['Ich bin Mira Fuchs. Und Sie?','Ich bin Tarek Salim.']];
 /** Exercise 3 · put the words in order. */
 export const orderSentences:string[][]=[['Woher','kommen','Sie,','Herr','Salim?'],['Ich','komme','aus','der','Türkei.'],['Guten','Tag.','Wie','heißen','Sie?'],['Ich','bin','Lena','Vogt.','Und','Sie?']];
+/** What each sentence means, shown above the words (the learner asked, 2 November 2026). */
+export const orderMeanings:string[]=['Nerelisiniz, Bay Salim?','Türkiye’denim.','İyi günler. Adınız ne?','Ben Lena Vogt. Ya siz?'];
 /** Exercise 4 · separate the words of a glued text. */
 export const gluedText='GutenTagWieheißenSieIchbinLenaVogtWoherkommenSieFrauVogtIchkommeausKenia';
 export const gluedSentences:{who:'a'|'b';answers:string[]}[]=[

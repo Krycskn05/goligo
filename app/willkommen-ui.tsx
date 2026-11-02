@@ -144,8 +144,11 @@ export function shuffle<T>(list:readonly T[]):T[]{const out=list.slice();for(let
 export {mixedOrder};
 
 /* ---------- exercises ---------- */
-export type Feedback={ok:boolean;text:string}|null;
-export function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?.text??''}</p>;}
+export type Feedback={ok:boolean;text:string;info?:boolean}|null;
+/** The line under an exercise once every row is answered (the learner asked, 2 November 2026): never red, because the last
+ * answer may well have been right; a full score is green. */
+export function scoreFeedback(right:number,total:number):Feedback{return right===total?{ok:true,text:`Hepsi doğru! ${right} / ${total}`}:{ok:true,info:true,text:`Bitti: ${right} / ${total} doğru. Yanlışların doğrusu yeşil.`};}
+export function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.info?' info':feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?.text??''}</p>;}
 /** Gaps that check themselves (the learner asked, 30 October 2026: no "Kontrol et", no "Cevapları göster"): a right
  * answer turns green at once; a wrong one turns red when it is final (the learner leaves the box or presses Enter, every
  * letter cell is filled, a word is chosen) and the right answer stays next to it until it is fixed. The score counts the
@@ -176,11 +179,16 @@ export function selfCheckNote(result:SelfCheckResult,self:{anyWrong:()=>boolean;
  if(result==='wrong')setFeedback({ok:false,text});else if(!self.anyWrong()&&!self.isDone())setFeedback(null);
 }
 /** Finishes an exercise: saves the score, plays the sound and reads the solution after a full score. */
+/** The end of an exercise: saves the score and plays the sound. `lastOk` is the last answer (rows answered one by one):
+ * the sound goes by that answer, never by the whole score (the learner asked, 2 November 2026: six right answers ended
+ * with the wrong sound because of an earlier mistake). Without `lastOk` (one check for everything) it goes by the score.
+ * `say` is read after the sound: the whole solution, or the last row's sentence. */
 export function useFinish(props:StepProps){
  const {sound,speech,onScore,step}=props;
- return useCallback((right:number,total:number,say?:SayItem[])=>{
+ return useCallback((right:number,total:number,say?:SayItem[],lastOk?:boolean)=>{
   onScore(step.id,right,total);
-  if(right===total){sound.correct(()=>{if(say?.length)speech.speakAll(say);});}else sound.wrong();
+  const read=()=>{if(say?.length)speech.speakAll(say);};
+  if(lastOk??right===total)sound.correct(read);else sound.wrong(lastOk===undefined?undefined:read);
  },[sound,speech,onScore,step.id]);
 }
 /** Exercises go in order (the learner asked, 30 October 2026): an exercise opens once the ones before it are done, and
@@ -293,7 +301,7 @@ export function MatchExercise(props:StepProps&{kicker:string;title:string;lead?:
  const pickRight=(i:number)=>{
   if(selected===null||done.includes(i))return;sound.prepare();speech.prepare();
   if(i===selected){const next=[...done,i];setDone(next);setSelected(null);speech.speakAll(sayFor(i));
-   if(next.length===pairs.length){const right=Math.max(0,pairs.length-misses);setFeedback({ok:true,text:'Hepsi eşleşti!'});finish(right,pairs.length);}}
+   if(next.length===pairs.length){const right=Math.max(0,pairs.length-misses);setFeedback({ok:true,text:'Hepsi eşleşti!'});finish(right,pairs.length,undefined,true);}}
   else{setWrongAt(i);setMisses(m=>m+1);setFeedback({ok:false,text:'Bu ikisi uymuyor.'});sound.wrong();setTimeout(()=>setWrongAt(null),600);}
  };
  return <>
@@ -306,8 +314,8 @@ export function MatchExercise(props:StepProps&{kicker:string;title:string;lead?:
  </>;
 }
 /** Word order: tap the chips in order; a right sentence is read (`sayFor`); `verbs` names the verb in position 2 in the feedback. */
-export function OrderExercise(props:StepProps&{kicker:string;title:string;sentences:string[][];sayFor:(sentence:string)=>SayItem;verbs?:string[]}){
- const {speech,sound,sentences:orderSentences,sayFor:orderSay,kicker,title,verbs,runKey,step}=props;const finish=useFinish(props);
+export function OrderExercise(props:StepProps&{kicker:string;title:string;sentences:string[][];sayFor:(sentence:string)=>SayItem;verbs?:string[];meanings?:string[]}){
+ const {speech,sound,sentences:orderSentences,sayFor:orderSay,kicker,title,verbs,meanings,runKey,step}=props;const finish=useFinish(props);
  const deal=(r:number)=>shuffle(orderSentences[r].map((word,i)=>({word,i})));
  // A sentence game left in the middle goes on at its sentence; a solved sentence goes on at the next one.
  type Run={round:number;right:number;picked:number[];chips:{word:string;i:number}[];state:'open'|'ok'|'bad'};
@@ -336,6 +344,7 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
  });
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">Cümle {round+1} / {orderSentences.length}</p>
+  {meanings?.[round]&&<p className="l1a-order-goal">Bu cümleyi kur: <b>{meanings[round]}</b></p>}
   <div className={'l1a-answer'+(state==='ok'?' ok':state==='bad'?' bad':'')} lang="de" dir="ltr" aria-live="polite">{text}</div>
   <div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)||state==='ok'} onClick={()=>{setPicked([...picked,chip.i]);setState('open');}}>{chip.word}</button>)}</div>
   <div className="l1a-actions">
@@ -359,7 +368,7 @@ export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:str
   const next={...answers,[i]:value};setAnswers(next);const row=rows[i];const ok=value===row.answer;
   const done=Object.keys(next).length;const right=rows.filter((item,j)=>next[j]===item.answer).length;
   const say=()=>{if(row.say)speech.speak(row.say);};
-  if(done===rows.length){setFeedback({ok:right===rows.length,text:`${right} / ${rows.length} doğru`});finish(right,rows.length,row.say?[row.say]:undefined);}
+  if(done===rows.length){setFeedback(scoreFeedback(right,rows.length));finish(right,rows.length,row.say?[row.say]:undefined,ok);}
   else if(ok)sound.correct(say);else sound.wrong(say);};
  return <>
   <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}

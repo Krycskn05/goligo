@@ -1,4 +1,4 @@
-/* Lektion 2 „Berufe“ (app/berufe-study.tsx, app/berufe-a-steps.tsx): the lesson uses the look of Lektion 1 and 15
+/* Lektion 2 „Berufe“ (app/berufe-study.tsx, app/berufe-a-steps.tsx … berufe-d-steps.tsx): the lesson uses the look of Lektion 1 and 15
    (the l1a-* styles of app/willkommen.css, the l15-* pieces of app/stadt.css); these are only its own pieces — the job
    cards with their pictures, the quick checks, the picture quiz and the form rows. Phone first. */
 /* the jobs: picture (a tap reads both forms), der / die rows that read themselves, the meaning */
@@ -69,3 +69,39 @@
  .l1a-line:has(> .l2-faces) > .l1a-bubble { grid-column:2; grid-row:1 / span 2; }
  .l1a-line:has(> .l2-faces) > .l12-say { grid-column:1; grid-row:2; justify-self:center; margin-top:0; width:38px; height:38px; }
 }
+/* Teil C and D (2 November 2026): pictures without the scene frame (hands, the form, the trophy) */
+.l2-plain { display:block; max-width:100%; height:auto; margin:8px auto; background:transparent; }
+.l2-hands,.l2-figure { margin:10px 0; text-align:center; }
+.l2-hands .l2-plain { max-width:min(100%,620px); }
+.l2-hands figcaption { margin-top:2px; font-weight:800; letter-spacing:.08em; color:var(--ink-2,#3d5a7a); }
+.l2-figure .l2-plain { max-height:320px; width:auto; }
+.l2-trophy { max-height:260px; width:auto; }
+/* the numbers 0–20: a tap reads one */
+.l2-numgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(76px,1fr)); gap:8px; margin:10px 0; }
+.l2-num { display:grid; justify-items:center; gap:2px; padding:8px 4px; border:2px solid var(--toy-line,#dce5da); border-radius:14px; background:#fff; color:var(--ink,#1f3b5c); font:inherit; cursor:pointer; }
+.l2-num:hover,.l2-num.playing { border-color:var(--blue-2,#2f7fd6); background:#eef6fc; }
+.l2-num:focus-visible { outline:3px solid var(--blue-2,#2f7fd6); outline-offset:2px; }
+.l2-num-d { font-size:24px; font-weight:800; line-height:1.1; }
+.l2-num-w { font-size:14px; line-height:1.2; overflow-wrap:anywhere; }
+.l2-num-opts .l1a-opt { min-width:4.5em; font-size:20px; font-weight:800; }
+.l2-dice { font-size:26px; line-height:1; white-space:nowrap; }
+/* phone numbers, typed gaps of a conversation */
+.l2-phone { padding:2px 0 8px; border-bottom:1px dashed var(--toy-line,#dce5da); }
+.l2-phone:last-of-type { border-bottom:0; }
+.l2-phone .l1a-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.l2-phone-gap { width:11em; max-width:100%; letter-spacing:.04em; }
+.l2-person-gap { width:7.5em; max-width:100%; }
+/* a form card: label and field per row (Rami's form, the learner's own form) */
+.l2-formcard { margin:10px 0; padding:12px 14px; border:2px solid var(--toy-line,#dce5da); border-radius:16px; background:#fff; display:grid; gap:8px; }
+.l2-formcard-head { margin:0; font-size:13px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2,#3d5a7a); }
+.l2-formrow { display:grid; grid-template-columns:minmax(0,12em) minmax(0,1fr); align-items:center; gap:4px 10px; }
+.l2-formlabel { font-weight:700; color:var(--ink,#1f3b5c); }
+.l2-formrow .l1a-gap.wide { width:100%; }
+@media (max-width:520px) { .l2-formrow { grid-template-columns:minmax(0,1fr); } }
+/* long words in syllables; the alphabet; the mime pictures */
+.l2-syl { display:inline-block; margin:2px 3px 2px 0; padding:1px 7px; border-radius:8px; background:#eef6fc; font-weight:700; }
+.l2-letters { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+.l2-letter { min-width:2.4em; padding:6px 0; border:2px solid var(--toy-line,#dce5da); border-radius:10px; background:#fff; font:inherit; font-weight:800; color:var(--ink,#1f3b5c); cursor:pointer; }
+.l2-letter:hover { border-color:var(--blue-2,#2f7fd6); }
+.l2-mime { font-size:34px; line-height:1.2; }
+.l2-stress b { color:#c0392b; }

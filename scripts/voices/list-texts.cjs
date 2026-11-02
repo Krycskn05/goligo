@@ -45,6 +45,10 @@ for(const text of load('stadt-course').stadtSpeechTexts())add(text);
 for(const text of load('berufe-course').berufeSpeechTexts())add(text);
 // Lektion 2B „Wer ist das?“: who does what, er / sie / sie, the verbs, introducing someone, questions, Rami, exercises, test and practice.
 for(const text of load('berufe-b-course').berufeBSpeechTexts())add(text);
+// Lektion 2C „Wir brauchen Hilfe.“: the numbers 0–20, phone numbers digit by digit, adding, asking for help, the form, mein / dein, wir / ihr.
+for(const text of load('berufe-c-course').berufeCSpeechTexts())add(text);
+// Lektion 2D „Ich verstehe das nicht.“: the whole verb table, the Personalformular, long words, Wie bitte?, Alles klar? and Sprechen Teil 1.
+for(const text of load('berufe-d-course').berufeDSpeechTexts())add(text);
 // "Konuş" (the AI role plays): the partners' opening lines and the phrases to try.
 for(const text of load('talk-scenarios').talkSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

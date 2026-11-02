@@ -2,7 +2,8 @@
  * Lektion 2 „Berufe“ (A1.1), Teil A – Ich bin Koch. (the learner's lesson page, an artifact of 2 November 2026), ported
  * to the site like Lektion 15 (lib/stadt-course.ts): the cover, nine short teaching steps (the jobs with their pictures,
  * other words, a quick word check, asking and saying a job, women's job names, Ich arbeite als / bei, the verbs and the
- * phrases), seven exercises, a 12-question test and the summary with a speaking practice. Texts for the learner are
+ * phrases), seven exercises, a 12-question test, Konuş (a speaking practice with the learner's own sentences, no AI)
+ * and Bitti. Texts for the learner are
  * Turkish; the German is read with the site voices, each person with their own voice (`speakers` in
  * lib/willkommen-course.ts). Step ids never change: saved scores are keyed by them.
  */
@@ -127,7 +128,8 @@ export const sayBeruf:readonly [de:string,tr:string][]=[['Ich bin Koch.','Ben a�
 export const sieDialogue:Line[]=[
  {who:'nora',de:'Was sind Sie von Beruf, Frau Arslan?',tr:'Mesleğiniz ne, Bayan Arslan?'},
  {who:'yasemin',de:'Ich bin Tierärztin von Beruf. Und Sie?',tr:'Ben veterinerim. Ya siz?'},
- {who:'nora',de:'Ich bin Lehrerin.',tr:'Ben öğretmenim.'},
+ // Nora is a nurse in all of Lektion 2 (the learner's pages, 2 November 2026; in Teil D she works at the care service with Rami).
+ {who:'nora',de:'Ich bin Krankenpflegerin.',tr:'Ben hemşireyim. (die Krankenpflegerin = hemşire; Nora yaşlı bakım servisinde çalışıyor)'},
 ];
 export const duDialogue:Line[]=[
  {who:'omar',de:'Was machst du beruflich, Nikos?',tr:'İş olarak ne yapıyorsun, Nikos?'},
@@ -243,7 +245,8 @@ export const ownPrompts:{question:string;pattern:RegExp;placeholder:string;optio
  {question:'Arbeitest du jetzt?',pattern:/^((ja|nein) )?ich arbeite (jetzt )?(als [a-z]+( bei [a-z0-9 ]+)?|bei [a-z0-9 ]+|nicht)( jetzt)?$/,placeholder:'Ich arbeite als … / Ich arbeite bei … / Ich arbeite jetzt nicht.'},
  {question:'Was machst du noch?',pattern:/^ich (lerne|studiere|bin|repariere|mache|arbeite)( .+)?$/,placeholder:'Ich lerne Deutsch. / Ich studiere.',optional:true},
 ];
-/** The learner's own sentences stay in the browser (and travel with the lesson's progress, lib/lesson-sync.ts). */
+/** The learner's own sentences stay on this device only (the learner asked, 2 November 2026): lib/lesson-sync.ts never
+ * sends a `-own` or `-form` key of Lektion 2 to the account. */
 export const L2A_OWN_KEY='lernkoko-l2a-own';
 /** The test: question, options, the right answer and what is read after the answer ('' for a Turkish answer). */
 export type BerufeTestQuestion=readonly [question:string,options:string[],answer:string,say:string];
@@ -263,10 +266,10 @@ export const berufeTest:BerufeTestQuestion[]=[
  q('„Stimmt! Richtig!“ ne demek?',['Doğru! Evet, öyle!','Maalesef yanlış!','Bilmiyorum.'],''),
 ];
 /** Turkish questions and options of the test and the quick checks (for their language on the page). */
-export const isTurkishText=(text:string)=>/[çğışİÇĞŞ]|\b(ne demek|erkek|etmek|onlar|ben)\b|Bilmiyorum|Selanik/.test(text);
-/** The summary: speaking practice. A person asks, the learner answers (their own sentence from Exercise 7 when there is
- * one, else the example). */
-export type PracticeItem={who:string;question:string;answer:string;own?:number[]};
+export const isTurkishText=(text:string)=>/[çğışİÇĞŞ]|\b(ne demek|erkek|etmek|onlar|ben|cevap)\b|Bilmiyorum|Selanik/.test(text);
+/** Konuş (every part of Lektion 2, no AI): a person asks, the learner answers (their own sentence from Exercise 7 when
+ * there is one, else the example). `answerSay` is what the voice reads when the shown answer has digits. */
+export type PracticeItem={who:string;question:string;answer:string;own?:number[];answerSay?:string};
 export const practiceItems:PracticeItem[]=[
  {who:'paul',question:'Was bist du von Beruf?',answer:'Ich bin Tierärztin von Beruf.',own:[0]},
  {who:'paul',question:'Arbeitest du jetzt?',answer:'Ich arbeite jetzt nicht. Ich lerne Deutsch.',own:[1]},
@@ -295,7 +298,8 @@ export const berufeSteps:Step[]=[
  {id:'sinav',title:'Alıştırma 6',kind:'exercise'},
  {id:'und-du',title:'Alıştırma 7',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
- {id:'ozet',title:'Özet',kind:'end'},
+ {id:'konus',title:'Konuş',kind:'speak'},
+ {id:'ozet',title:'Bitti',kind:'end'},
 ];
 export const berufeStepIndex=(id:string)=>berufeSteps.findIndex(step=>step.id===id);
 /** Short names of the exercises for the strip under the tabs (a teaching step shows its own title). */
@@ -316,17 +320,19 @@ export const berufeGroups:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:berufeSteps.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:berufeSteps.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
+ {id:'konus',label:'Konuş',ids:['konus']},
 ];
 /** Every word Teil A teaches (the jobs and the other words), for the count on the contents page. */
 export const berufeWordCount=jobs.length+otherWords.length;
 
 /* ---------- the notebook ---------- */
-/** Lektion 2's parts on the contents page: Teil A and B; C–D come later (a part without a title shows as coming soon). */
+/** Lektion 2's parts on the contents page: Teil A–D (all four since 2 November 2026; a part without a title would show as coming soon). */
 export type BerufePart={id:'a'|'b'|'c'|'d';badge:string;title?:string;lead?:string};
 export const berufeParts:BerufePart[]=[
  {id:'a',badge:'A',title:'Ich bin Koch.',lead:'Meslek sorma ve söyleme: **Was bist du von Beruf?**, kadın meslek adları **-in**, **Ich arbeite als … / bei …** ve **nicht**.'},
  {id:'b',badge:'B',title:'Wer ist das?',lead:'Birini tanıtmak: **Das ist … Er / Sie kommt aus …**, **er · sie · sie** ile fiiller, **Woher? Wo? Wer?** ve büyük harf.'},
- {id:'c',badge:'C'},{id:'d',badge:'D'},
+ {id:'c',badge:'C',title:'Wir brauchen Hilfe.',lead:'Sayılar **0–20** ve telefon numarası, toplama, yardım isteme: **Ich verstehe das nicht.**, form alanları, **mein / dein** ve **wir · ihr**.'},
+ {id:'d',badge:'D',title:'Ich verstehe das nicht.',lead:'Bütün fiil tablosu, **Personalformular**, uzun kelimeler, **Wie bitte? Wie schreibt man das?** ve puanlı **Alles klar?** sınavı.'},
 ];
 /** What Lektion 2 teaches ("Bu ünitede" on the left page of the contents): lib/unit-goals.ts. */
 export const berufeGoals=unitGoalsFor(BERUFE_UNIT);

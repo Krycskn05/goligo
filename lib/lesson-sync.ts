@@ -26,10 +26,13 @@ export const SYNC_LESSON_MAX=150000;
 export const SYNC_REQUEST_MAX=480000;
 /** Settings of one device, not progress. */
 const DEVICE_ONLY=new Set(['lernkoko-l12-speed']);
+/** The learner's own data — their sentences and their form in Lektion 2 (`lernkoko-l2a-own`, `lernkoko-l2d-form` …) —
+ * stays on this device only (the learner asked, 2 November 2026); it is never sent to the account. */
+const OWN_DATA=/^lernkoko-l2[a-d]-(own|form)$/;
 
 /** The lesson a browser key belongs to, or null for keys that are not synced. */
 export function syncLessonOf(key:string):SyncLesson|null{
- if(DEVICE_ONLY.has(key))return null;
+ if(DEVICE_ONLY.has(key)||OWN_DATA.test(key))return null;
  const match=/^lernkoko-l(1[a-d]?|12|15[a-d]?|2[a-d]?)[-:]/.exec(key);
  if(!match)return null;
  return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':match[1].startsWith('2')?'l2':'l1';

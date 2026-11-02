@@ -3,7 +3,7 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
-const l1=load('willkommen-course'),l1b=load('willkommen-b-course'),l1c=load('willkommen-c-course'),l1d=load('willkommen-d-course'),stadt=load('stadt-course'),berufe=load('berufe-course'),berufeB=load('berufe-b-course');
+const l1=load('willkommen-course'),l1b=load('willkommen-b-course'),l1c=load('willkommen-c-course'),l1d=load('willkommen-d-course'),stadt=load('stadt-course'),berufe=load('berufe-course'),berufeB=load('berufe-b-course'),berufeC=load('berufe-c-course'),berufeD=load('berufe-d-course');
 const hoeren=load('ausbildung-hoeren'),{siteVoices}=load('site-voices');
 const read=file=>fs.readFileSync(file,'utf8');
 const styleOf=key=>l1.speakers.find(s=>s.key===key)?.style;
@@ -31,7 +31,7 @@ test('the voice of a text: the person it names wins over the given speaker; othe
 });
 
 test('the lessons read every self-introduction with the person\'s own voice, and nobody borrows a voice next to its owner',()=>{
- const texts=[...l1.willkommenSpeechTexts(),...l1b.willkommenBSpeechTexts(),...l1c.willkommenCSpeechTexts(),...l1d.willkommenDSpeechTexts(),...stadt.stadtSpeechTexts(),...berufe.berufeSpeechTexts(),...berufeB.berufeBSpeechTexts()];
+ const texts=[...l1.willkommenSpeechTexts(),...l1b.willkommenBSpeechTexts(),...l1c.willkommenCSpeechTexts(),...l1d.willkommenDSpeechTexts(),...stadt.stadtSpeechTexts(),...berufe.berufeSpeechTexts(),...berufeB.berufeBSpeechTexts(),...berufeC.berufeCSpeechTexts(),...berufeD.berufeDSpeechTexts()];
  let named=0;
  for(const text of texts){const key=l1.speakerOf(text);if(!key)continue;named++;
   const speaker=l1.speakers.find(s=>s.key===key);assert(text.toLowerCase().includes(speaker.name.split(' ')[0].toLowerCase()),text);}
@@ -50,6 +50,10 @@ test('the lessons read every self-introduction with the person\'s own voice, and
   'D talk':l1.withSpeakers(l1d.talkSay,{a:'nora',b:'rami'}),'15 Amt':stadt.officeDialogue.map(asSay),'15 Schule':stadt.schoolDialogue.map(asSay),
   '2A sohbet':berufe.chatLines.map(asSay),'2A dört kişi':berufe.fourPeople.map(asSay),'2A diyalog':berufe.dialogueSay,'2A pratik':berufe.practiceItems.map(item=>({text:item.question,who:item.who})),
   '2B Rami':berufeB.ramiTalk.map(text=>({text,who:'rami'})),'2B pratik':berufeB.practiceItemsB.map(item=>({text:item.question,who:item.who})),
+  '2C yardım':berufeC.helpDialogue.map(asSay),'2C ev':berufeC.flatDialogue.map(asSay),'2C telefon':berufeC.phones.map(p=>({text:berufeC.phoneSay(p.number),who:p.who})),
+  '2C diyalog':berufeC.helpSay,'2C mein-dein':berufeC.possessiveLines.map(line=>line.say),'2C wir-ihr':berufeC.wirIhrLines.map(asSay),'2C pratik':berufeC.practiceItemsC.map(item=>({text:item.question,who:item.who})),
+  '2D ilk gün':berufeD.firstDay.map(asSay),'2D Nora':berufeD.noraRami.map(asSay),'2D form':berufeD.formTalk,'2D Wortschatz':berufeD.vocabLinesD.map(line=>line.say),
+  '2D Grammatik':l1.withSpeakers(berufeD.grammarSayD,berufeD.grammarSpeakersD),'2D Sprechen':berufeD.examTalk.flatMap(item=>[{text:item.question,who:'paul'},{text:item.rami,who:'rami'}]),
  };
  for(const [id,items] of Object.entries(steps)){const keys=owners(items);assert(keys.length,id);
   assert.equal(new Set(keys.map(styleOf)).size,keys.length,id+': '+keys.join(','));}

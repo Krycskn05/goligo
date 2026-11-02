@@ -60,7 +60,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const [willkommen,setWillkommen]=useState<TopicProgress|null>(null);
  // Lektion 15 (Teil A since 30 October 2026) keeps its scores in the browser, too (lib/stadt-progress.ts).
  const [stadt,setStadt]=useState<TopicProgress|null>(null);
- // Lektion 2 (Teil A since 2 November 2026) keeps its scores in the browser, too (lib/berufe-progress.ts).
+ // Lektion 2 (Teil A–D since 2 November 2026) keeps its scores in the browser, too (lib/berufe-progress.ts).
  const [berufe,setBerufe]=useState<TopicProgress|null>(null);
  const synced=useSyncVersion(); // lesson progress from another device (app/lesson-sync.tsx)
  useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
@@ -94,7 +94,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
          <span className="nb-num" lang={course} dir="ltr">{course==='de'?'Lektion':'Unit'} {unit.number}</span>
          <h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}
          {progress&&<ProgressMeter progress={progress} language={language} label={title} compact/>}
-         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'||unit.id==='book-02'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
+         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
         </li>;})}</ul>
       </div>
      </div>

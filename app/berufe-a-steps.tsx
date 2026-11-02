@@ -42,6 +42,7 @@ export function StepViewL2A(props:StepProps){
    after={()=><Note>Hatırlatma: <b lang="de">aus</b> = -den (nereden geldiğin), <b lang="de">in</b> = -de (nerede yaşadığın). <i lang="de">aus der Türkei</i>, <i lang="de">in der Schweiz</i> kalıplarını olduğu gibi ezberle.</Note>} {...props}/>;
   case 'und-du':return <OwnExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 2A · Test" questions={berufeTest} sayFor={i=>berufeTest[i][3]} langOf={text=>isTurkishText(text)?'tr':'de'} {...props}/>;
+  case 'konus':return <KonusL2A {...props}/>;
   case 'ozet':return <EndL2A {...props}/>;
  }
  return null;
@@ -316,6 +317,8 @@ function readOwn():string[]{
  try{const saved=JSON.parse(localStorage.getItem(L2A_OWN_KEY)??'[]') as unknown;return ownPrompts.map((_,i)=>Array.isArray(saved)&&typeof saved[i]==='string'?saved[i] as string:'');}catch{return ownPrompts.map(()=>'');}
 }
 const fitsOwn=(i:number,value:string)=>!!value.trim()&&ownPrompts[i].pattern.test(normalizeLoose(value));
+/** The learner's own job sentence of Alıştırma 7 when it fits ("Ich bin Tierärztin von Beruf."), else '' (Teil D's Konuş). */
+export function ownJobSentence():string{const value=readOwn()[0]?.trim()??'';return fitsOwn(0,value)?value:'';}
 /** Alıştırma 7 · Und du? The learner writes their own job and work; a sentence that fits the pattern turns green. Once the
  * first two fit, the exercise is done; then listen, hide them and say them by heart. */
 function OwnExercise({speech,onScore,step}:StepProps){
@@ -339,7 +342,7 @@ function OwnExercise({speech,onScore,step}:StepProps){
    <div className="l1a-line a"><Portrait who="paul" name="Paul Hoca"/><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Paul Hoca</span><span className="l1a-de" lang="de">{prompt.question}</span>{prompt.optional&&<span className="l1a-mini">(isteğe bağlı)</span>}</div><Say text={prompt.question} who="paul" speech={speech}/></div></div>
    <div className="l1a-line b"><div className="l1a-bubble"><input className={'l1a-gap wide'+(state===true?' ok':state===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={prompt.placeholder} aria-label={prompt.question} onChange={event=>change(i,event.target.value)}/>{state===false&&<span className="l1a-mini">Kalıp: <span lang="de">{prompt.placeholder}</span></span>}</div></div>
   </div>;})}</div>}
-  <FeedbackLine feedback={done?{ok:true,text:'Süper! Bunlar artık senin cümlelerin. Özet adımındaki konuşma pratiğinde yine karşına çıkacak.'}:null}/>
+  <FeedbackLine feedback={done?{ok:true,text:'Süper! Bunlar artık senin cümlelerin. Konuş adımında yine karşına çıkacak.'}:null}/>
   <div className="l1a-actions">
    <button type="button" className="btn secondary small" disabled={speech.busy||!mine.length} onClick={()=>speech.speakAll(mine)}><Volume2 size={16} aria-hidden="true"/>Cümlelerimi dinle</button>
    <button type="button" className="btn secondary small" aria-pressed={hidden} onClick={()=>setHidden(!hidden)}>{hidden?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{hidden?'Göster':'Gizle'}</button>
@@ -352,11 +355,43 @@ function practiceAnswer(item:PracticeItem,own:readonly string[]){
  for(const i of item.own??[]){const value=own[i]?.trim();if(value&&fitsOwn(i,value))return value;}
  return item.answer;
 }
-/** The end: what the learner can say now, a speaking practice with their own sentences and what comes next. */
-function EndL2A({progress,onGo,onPart,speech}:StepProps){
- const [own]=useState(readOwn);
+/* ---------- Konuş (every part of Lektion 2, no AI) ---------- */
+/** A row of Konuş: the person's question, maybe a model answer by someone else (Rami in Teil D), and the learner's answer,
+ * shown and read (`say` when the shown text has digits); an empty answer shows "Şimdi sen söyle.". */
+export type SpeakRow={key:string;who:string;question:string;model?:{who:string;text:string};answer:string;say?:string};
+/** How it went (the learner's own rating, read in German like Lektion 1D); the step shows done once rated. */
+export const speakRatings:readonly [mark:string,de:string][]=[['👍','sehr gut'],['👊','gut'],['👎','nicht so gut']];
+/** Konuş: listen to the question (and the model), then say the answer aloud, then rate yourself. Not scored; a rating marks
+ * the step done (the tab's tick). `replies` answer the three ratings. */
+export function SpeakStep({kicker='Konuş · Sprechen',title='Konuşma pratiği',lead,rows,replies,before,after,speech,onScore,step}:StepProps&{kicker?:string;title?:string;lead:ReactNode;rows:readonly SpeakRow[];replies:readonly [string,string,string];before?:ReactNode;after?:ReactNode}){
+ const [rating,setRating]=useState<number|null>(null);
+ const bubble=(who:string,text:string)=><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">{personName(who)}</span><span className="l1a-de" lang="de" dir="ltr">{text}</span></div><Say text={text} who={who} speech={speech}/></div>;
  return <>
-  <p className="kicker" lang="de">Zusammenfassung · Sprechen</p>
+  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>
+  <p className="l1a-tr">{lead}</p>{before}
+  <div className="l1a-dialogue">{rows.map(row=><div className="l2-practice" key={row.key}>
+   <div className="l1a-line a"><Portrait who={row.who} name={personName(row.who)}/>{bubble(row.who,row.question)}</div>
+   {row.model&&<div className="l1a-line b"><Portrait who={row.model.who} name={personName(row.model.who)}/>{bubble(row.model.who,row.model.text)}</div>}
+   <div className="l1a-line b">{row.answer?<div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Sen</span><span className="l1a-de" lang="de" dir="ltr">{row.answer}</span></div><Say text={row.say??row.answer} speech={speech}/></div>
+    :<div className="l1a-bubble"><span className="l15-name">Sen</span><span className="l1a-tr">Şimdi sen söyle.</span></div>}</div>
+  </div>)}</div>
+  {after}
+  <h2 className="l1a-h2">Nasıl gitti?</h2>
+  <div className="l1a-opts" role="group" aria-label="Kendini değerlendir">{speakRatings.map(([mark,de],i)=><button type="button" key={de} className={'l1a-opt'+(rating===i?' ok':'')} aria-pressed={rating===i} lang="de" onClick={()=>{setRating(i);speech.speak(de);onScore(step.id,1,1);}}><span aria-hidden="true">{mark}</span> {de}</button>)}</div>
+  {rating!==null&&<p className="l1a-feedback ok" role="status">{replies[rating]}</p>}
+ </>;
+}
+/** Konuş of Teil A: the questions of the unit; the first three answers are the learner's own sentences (Alıştırma 7). */
+function KonusL2A(props:StepProps){
+ const [own]=useState(readOwn);
+ const rows=practiceItems.map(item=>({key:item.question,who:item.who,question:item.question,answer:practiceAnswer(item,own)}));
+ return <SpeakStep lead="Soruyu dinle, cevabı dinle, sonra sen yüksek sesle söyle. İlk üç cevapta senin cümlelerin var (Alıştırma 7)." rows={rows}
+  replies={['🎉 Süper! Bu kalıplar artık senin.','👍 İyi. Bir kez daha dinle ve söyle.','Sorun değil. Kalıplar adımına dön, yarın tekrar dene.']} {...props}/>;
+}
+/** The end: what the learner can say now and what comes next. */
+function EndL2A({progress,onGo,onPart}:StepProps){
+ return <>
+  <p className="kicker" lang="de">Bitti</p>
   <Heading>Lektion 2A tamam! 🎉</Heading>
   <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
   <p>Artık şunları yapabilirsin:</p>
@@ -366,12 +401,6 @@ function EndL2A({progress,onGo,onPart,speech}:StepProps){
    <li>Kadın ve erkek biçimleri: <b lang="de">-in</b>, <b lang="de">Köchin</b>, <b lang="de">Ärztin</b>, <b lang="de">Hausfrau</b></li>
    <li>Şu anki işini anlatmak: <b lang="de">Ich arbeite als … bei …</b> · <b lang="de">Ich arbeite jetzt nicht.</b></li>
   </ul>
-  <h2 className="l1a-h2">Konuşma pratiği</h2>
-  <p className="l1a-tr">Soruyu dinle, cevabı dinle, sonra sen yüksek sesle söyle. İlk üç cevapta senin cümlelerin var (Alıştırma 7).</p>
-  <div className="l1a-dialogue">{practiceItems.map(item=>{const answer=practiceAnswer(item,own);return <div className="l2-practice" key={item.question}>
-   <div className="l1a-line a"><Portrait who={item.who} name={personName(item.who)}/><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">{personName(item.who)}</span><span className="l1a-de" lang="de" dir="ltr">{item.question}</span></div><Say text={item.question} who={item.who} speech={speech}/></div></div>
-   <div className="l1a-line b"><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Sen</span><span className="l1a-de" lang="de" dir="ltr">{answer}</span></div><Say text={answer} speech={speech}/></div></div>
-  </div>;})}</div>
   <Note><b>Kısa özet:</b> <span lang="de">Ich bin Koch.</span> (artikel yok) · <span lang="de">Lehrer → Lehrerin</span>, <span lang="de">Koch → Köchin</span>, <span lang="de">Hausmann → Hausfrau</span> · <span lang="de">Ich arbeite als … bei …</span> · <span lang="de">aber</span> · <span lang="de">nicht</span> fiilden sonra · <span lang="de">du arbeitest</span></Note>
   <ProgressMeter progress={progress} language={'tr'} label="Lektion 2A"/>
   <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil B – Wer ist das?</b></p>

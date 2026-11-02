@@ -9,11 +9,13 @@ const pageCode=()=>['app/berufe-study.tsx','app/berufe-a-steps.tsx'].map(read).j
 const gaps=line=>line.parts.filter(part=>typeof part!=='string');
 const lineText=line=>line.parts.map(part=>typeof part==='string'?part:part.answer).join('');
 
-test('18 steps in the order of the learner\'s page: cover, 8 teaching steps, 7 exercises, test, summary',()=>{
- assert.equal(lesson.berufeSteps.length,18);
- assert.deepEqual(lesson.berufeSteps.map(step=>step.kind),['cover',...Array(8).fill('teach'),...Array(7).fill('exercise'),'test','end']);
- assert.equal(new Set(lesson.berufeSteps.map(step=>step.id)).size,18,'ids are unique');
- assert.deepEqual(lesson.berufeGroups.map(group=>group.ids.length),[8,7,1]);
+test('19 steps in the order of the learner\'s page: cover, 8 teaching steps, 7 exercises, test, Konuş, Bitti',()=>{
+ assert.equal(lesson.berufeSteps.length,19);
+ assert.deepEqual(lesson.berufeSteps.map(step=>step.kind),['cover',...Array(8).fill('teach'),...Array(7).fill('exercise'),'test','speak','end']);
+ assert.equal(new Set(lesson.berufeSteps.map(step=>step.id)).size,19,'ids are unique');
+ assert.deepEqual(lesson.berufeGroups.map(group=>group.ids.length),[8,7,1,1]);
+ assert.deepEqual(lesson.berufeGroups.map(group=>group.id),['konu','alistirmalar','test','konus'],'Konuş is a tab of its own (no AI)');
+ assert.deepEqual(lesson.berufeSteps.slice(-2).map(step=>step.id+':'+step.title),['konus:Konuş','ozet:Bitti']);
  assert.equal(lesson.berufeStepIndex('test'),16);assert.equal(lesson.berufeStepIndex('yok'),-1);
  assert.equal(lesson.jobs.length,15);assert.equal(lesson.otherWords.length,20);assert.equal(lesson.phrases.length,11);assert.equal(lesson.berufeTest.length,12);
  assert.equal(lesson.berufeWordCount,35);
@@ -65,8 +67,8 @@ test('the learner\'s own sentences: the patterns of the textbook (no article), t
  for(const text of ['Ich arbeite jetzt nicht.','Nein, ich arbeite nicht.','Ich arbeite als Verkäufer bei Edeka.','Ich arbeite bei Siemens.','Ja, ich arbeite jetzt als Tierarzt.'])assert(fits(1,text),text);
  assert(!fits(1,'Ich bin Tierarzt.'));assert(fits(2,'Ich lerne Deutsch.')&&fits(2,'Ich studiere.'));
  assert.deepEqual(lesson.ownPrompts.map(prompt=>!!prompt.optional),[false,false,true]);
- assert.equal(sync.syncLessonOf(lesson.L2A_OWN_KEY),'l2','the sentences travel with the account');
- // The speaking practice uses them (Alıştırma 7) and has an example for every answer.
+ assert.equal(sync.syncLessonOf(lesson.L2A_OWN_KEY),null,'the sentences stay on this device (the learner asked, 2 November 2026)');
+ // Konuş uses them (Alıştırma 7) and has an example for every answer.
  for(const item of lesson.practiceItems){assert(item.answer&&item.question,item.question);for(const i of item.own??[])assert(lesson.ownPrompts[i],item.question);}
 });
 
@@ -101,7 +103,8 @@ test('the page: route, guest access, unit card, progress and sync like Lektion 1
  const units=read('app/category-study.tsx');
  assert(units.includes("unit.id==='book-02'?'/a1-1/berufe'")&&units.includes('readLessonTwoProgress')&&units.includes("unit.id==='book-02'?berufe:"));
  assert(goals.unitGoalsFor('book-02').length>=8);assert.deepEqual(lesson.berufeGoals,goals.unitGoalsFor('book-02'));
- assert.equal(lesson.berufeParts.length,4);assert.equal(lesson.berufeParts.filter(part=>part.title).length,2,'Teil A and B now, C–D later');
+ assert.equal(lesson.berufeParts.length,4);assert.equal(lesson.berufeParts.filter(part=>part.title&&part.lead).length,4,'Teil A–D');
+ assert.deepEqual(lesson.berufeParts.map(part=>part.title),['Ich bin Koch.','Wer ist das?','Wir brauchen Hilfe.','Ich verstehe das nicht.']);
  assert(sync.SYNC_LESSONS.includes('l2'));for(const key of [progress.L2A_SCORES_KEY,progress.L2A_STEP_KEY,progress.L2_PART_KEY,'lernkoko-l2a-run'])assert.equal(sync.syncLessonOf(key),'l2',key);
  assert(read('app/api/ilerleme/route.ts').includes("SYNC_LESSONS.map(()=>'?').join(',')"),'the server reads every lesson of the list');
  const code=pageCode();
@@ -113,6 +116,15 @@ test('the page: route, guest access, unit card, progress and sync like Lektion 1
  const full={};for(const {id,total} of lesson.berufeScored)full[id]={right:total,total};
  assert.equal(progress.partProgressL2('a',full).percent,100);assert.equal(progress.partProgressL2('a',{}).percent,0);
  assert(progress.lessonTwoProgress({a:full}).percent>0,'Teil A counts for the unit card (Teil B too, tests/berufe-b.test.cjs)');
+});
+
+test('Nora is a nurse in all of Lektion 2; Konuş is a speaking practice of its own before Bitti (no AI)',()=>{
+ assert.equal(lesson.sieDialogue[2].de,'Ich bin Krankenpflegerin.');
+ const steps=read('app/berufe-a-steps.tsx');
+ for(const piece of ["case 'konus':return <KonusL2A {...props}/>;",'export function SpeakStep(',"onClick={()=>{setRating(i);speech.speak(de);onScore(step.id,1,1);}}"])assert(steps.includes(piece),piece);
+ const end=steps.slice(steps.indexOf('function EndL2A('));assert(!end.includes('practiceItems'),'the practice moved to Konuş');
+ assert(!steps.includes('TalkStep'),'no AI talk');
+ const shell=read('app/berufe-study.tsx');assert(shell.includes("konus:'Sesli pratik'")&&!shell.includes('Yapay zekâyla'));
 });
 
 test('the job rows read themselves on a tap (the speaker icon stays), the picture reads both forms',()=>{

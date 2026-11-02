@@ -13,6 +13,8 @@ import type {L1AScoreMap} from '@/lib/willkommen-progress';
 import type {Step,StepGroup} from '@/lib/willkommen-course';
 import {BERUFE_PATH,BERUFE_UNIT,berufeParts,berufeGoals,berufePictures,berufeStepShort,berufeSteps,berufeGroups,berufeScored,berufeTest,berufeWordCount} from '@/lib/berufe-course';
 import {berufeBPictures,berufeStepShortB,berufeStepsB,berufeGroupsB,berufeScoredB,berufeTestB,berufeWordCountB} from '@/lib/berufe-b-course';
+import {berufeCPictures,berufeStepShortC,berufeStepsC,berufeGroupsC,berufeScoredC,berufeTestC,berufeWordCountC} from '@/lib/berufe-c-course';
+import {berufeDPictures,berufeStepShortD,berufeStepsD,berufeGroupsD,berufeScoredD,berufeTestD,berufeWordCountD,checkPointsD} from '@/lib/berufe-d-course';
 import {L2_PART_KEY,l2PartKeys,readL2Scores,saveL2Score,partProgressL2,type L2PartId} from '@/lib/berufe-progress';
 import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
@@ -27,15 +29,18 @@ import {TopicArt} from './toon-art';
 import {useLessonSpeech,Rich,StepStrip,exerciseLock,LockedStep,type StepProps} from './willkommen-ui';
 import {StepViewL2A} from './berufe-a-steps';
 import {StepViewL2B} from './berufe-b-steps';
+import {StepViewL2C} from './berufe-c-steps';
+import {StepViewL2D} from './berufe-d-steps';
 import {useSyncVersion} from './lesson-sync';
 
 /**
- * Lektion 2 „Berufe“ (A1.1): the contents page is an open notebook like Lektion 1 and 15 (Teil A–D; Teil A – Ich bin
- * Koch. and Teil B – Wer ist das?, the learner's lesson pages of 2 November 2026, 18 steps each; C–D come later). A part opens on a wide spread, one
+ * Lektion 2 „Berufe“ (A1.1): the contents page is an open notebook like Lektion 1 and 15 (Teil A – Ich bin Koch., B – Wer
+ * ist das?, C – Wir brauchen Hilfe., D – Ich verstehe das nicht.: the learner's lesson pages of 2 November 2026; each ends
+ * with Test, Konuş (a speaking practice, no AI) and Bitti; D has „Alles klar?“ with points). A part opens on a wide spread, one
  * step at a time, with the pieces of Lektion 1 (app/willkommen-ui.tsx) and the same look (the l1a-* and l15-* styles;
  * Lektion 2's own pieces in app/berufe.css). German is read with the site voices, each person with their own voice;
  * answers get the site's sounds and Paul; scores stay in the browser (lib/berufe-progress.ts) and travel with the account
- * (lesson `l2`). Teil A's steps: app/berufe-a-steps.tsx.
+ * (lesson `l2`; the learner's own sentences and form stay on the device). The steps: app/berufe-a-steps.tsx … berufe-d-steps.tsx.
  */
 export default function BerufeStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
@@ -48,12 +53,14 @@ export default function BerufeStudy({guest=false}:{guest?:boolean}){
 }
 
 /** A part with a lesson: its steps, tabs, scored exercises, picture and step view. */
-type PartConfig={id:L2PartId;badge:string;title:string;lead:string;short:Record<string,string>;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode};
+type PartConfig={id:L2PartId;badge:string;title:string;lead:string;short:Record<string,string>;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;testNote?:string;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode};
 const parts:Record<L2PartId,PartConfig>={
  a:{id:'a',badge:'A',title:berufeParts[0].title??'',lead:berufeParts[0].lead??'',short:berufeStepShort,steps:berufeSteps,groups:berufeGroups,scored:berufeScored,testCount:berufeTest.length,wordCount:berufeWordCount,cover:berufePictures.cover,coverAlt:'Omar süpermarkette tezgâhın arkasında, mavi önlük ve isimlikle ekmek uzatıyor; yanında kasada Sabine',View:StepViewL2A},
  b:{id:'b',badge:'B',title:berufeParts[1].title??'',lead:berufeParts[1].lead??'',short:berufeStepShortB,steps:berufeStepsB,groups:berufeGroupsB,scored:berufeScoredB,testCount:berufeTestB.length,wordCount:berufeWordCountB,cover:berufeBPictures.cover,coverAlt:'Paul Hoca sınıfta Nikos’un fotoğrafını gösteriyor; Yasemin ve Omar bakıyor',View:StepViewL2B},
+ c:{id:'c',badge:'C',title:berufeParts[2].title??'',lead:berufeParts[2].lead??'',short:berufeStepShortC,steps:berufeStepsC,groups:berufeGroupsC,scored:berufeScoredC,testCount:berufeTestC.length,wordCount:berufeWordCountC,cover:berufeCPictures.cover,coverAlt:'Yasemin, Omar ve Nikos masada bir formun başında; Yasemin şaşkın, Nikos gülümseyerek formu gösteriyor',View:StepViewL2C},
+ d:{id:'d',badge:'D',title:berufeParts[3].title??'',lead:berufeParts[3].lead??'',short:berufeStepShortD,steps:berufeStepsD,groups:berufeGroupsD,scored:berufeScoredD,testCount:berufeTestD.length,testNote:`Alles klar? · ${checkPointsD} puan`,wordCount:berufeWordCountD,cover:berufeDPictures.cover,coverAlt:'Yaşlı bakım servisinin girişinde Nora, mavi hemşire üniformasıyla Rami’ye bir form uzatıyor; Rami biraz şaşkın gülümsüyor',View:StepViewL2D},
 };
-const partOrder:L2PartId[]=['a','b'];
+const partOrder:L2PartId[]=['a','b','c','d'];
 const isPart=(id:string):id is L2PartId=>id in parts;
 
 /** Where the learner is: a part and a step (`?adim=<id>`; a later part with `teil`), or the contents page (index -1). */
@@ -66,12 +73,12 @@ function readPlace():Place{
 function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
  const [place,setPlace]=useState<Place>(()=>typeof window==='undefined'?{part:'a',index:-1}:readPlace());
- const [scores,setScores]=useState<Record<L2PartId,L1AScoreMap>>({a:{},b:{}});
+ const [scores,setScores]=useState<Record<L2PartId,L1AScoreMap>>({a:{},b:{},c:{},d:{}});
  const speech=useLessonSpeech();const sound=useAnswerSound();
  // useAnswerSound gives a new object on every render: keep the latest speech and sound in a ref, so the effects and
  // callbacks below do not run again on every render (that would be an endless update loop, see Lektion 1).
  const latest=useRef({speech,sound});latest.current={speech,sound};
- useEffect(()=>{setScores({a:readL2Scores('a'),b:readL2Scores('b')});},[]);
+ useEffect(()=>{setScores({a:readL2Scores('a'),b:readL2Scores('b'),c:readL2Scores('c'),d:readL2Scores('d')});},[]);
  useEffect(()=>{const pop=()=>{latest.current.speech.stop();latest.current.sound.stop();setPlace(readPlace());};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
  /** Opens a step of a part; a negative number opens the contents page. */
  const open=useCallback((part:L2PartId,next:number)=>{
@@ -150,7 +157,7 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
 }
 
 /* ---------- the notebook: contents page and a part's spread (like Lektion 1, 11 and 12) ---------- */
-/** Left page: the unit, its picture and what Lektion 2 teaches. Right page: Teil A–D (B–D: coming soon). */
+/** Left page: the unit, its picture and what Lektion 2 teaches. Right page: Teil A–D. */
 function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record<L2PartId,L1AScoreMap>;onOpen:(part:L2PartId,index:number)=>void}){
  const unit=courseUnits.find(item=>item.id===BERUFE_UNIT);const unitName=unit?translate(unit.names,language):'Berufe';
  // On a computer the notebook fits the screen below the header — no scrolling, neither the page nor inside the notebook
@@ -179,7 +186,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <span className="eyebrow" lang="de">A1.1 · Lektion 2 · Berufe</span>
      <h1 id="l1a-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
      <p className="lb-sub" lang="de">Was sind Sie von Beruf?</p>
-     <p className="lb-lead">Meslek sormak ve söylemek, kadın ve erkek meslek adları, <b lang="de">Ich arbeite als … / bei …</b> ve fiiller: <i lang="de">ich arbeite, du arbeitest, Sie arbeiten</i>.</p>
+     <p className="lb-lead">Meslek sormak ve söylemek, birini tanıtmak, sayılar 0–20, yardım istemek ve form doldurmak; fiiller altı kişiyle: <i lang="de">ich arbeite, du arbeitest, er arbeitet, wir arbeiten, ihr arbeitet, sie arbeiten</i>.</p>
     </div>
     <figure className="lb-photo"><TopicArt id={BERUFE_UNIT} title={unitName}/></figure>
    </div>
@@ -216,8 +223,8 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const detail:Record<StepGroup['id'],string>={
   konu:`${config.groups[0].ids.length} kısa adım`,
   alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
-  test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:`${config.testCount} soru`,
-  konus:'Yapay zekâyla',
+  test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:config.testNote??`${config.testCount} soru`,
+  konus:'Sesli pratik',
  };
  const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
  const nextSoon=!next?berufeParts[berufeParts.findIndex(row=>row.id===config.id)+1]:undefined;

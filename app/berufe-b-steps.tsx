@@ -1,6 +1,6 @@
 'use client';
 import {useRef,useState,type ReactNode} from 'react';
-import {BookOpen,Eye,Play,RotateCcw} from 'lucide-react';
+import {ArrowRight,BookOpen,Eye,Play,RotateCcw} from 'lucide-react';
 import {acceptsAnswer,normalizeLoose} from '@/lib/willkommen-course';
 import {jobPicture,isTurkishText} from '@/lib/berufe-course';
 import {
@@ -15,7 +15,7 @@ import {personName} from '@/lib/berufe-course';
 import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
-import {Art,PhraseRow,QuickChecks} from './berufe-a-steps';
+import {Art,PhraseRow,QuickChecks,SpeakStep} from './berufe-a-steps';
 import {Say,Note,Heading,Portrait,FeedbackLine,useSelfCheck,selfCheckNote,type SelfCheckResult,ChoiceRows,OrderExercise,TestStep,mixedOrder,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
 
 /**
@@ -47,14 +47,15 @@ export function StepViewL2B(props:StepProps){
   case 'harf-yaz':return <CapsExercise {...props}/>;
   case 'omar':return <OmarExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 2B · Test" questions={berufeTestB} sayFor={i=>berufeTestB[i][3]} langOf={text=>isTurkishText(text)?'tr':'de'} {...props}/>;
+  case 'konus':return <KonusL2B {...props}/>;
   case 'ozet':return <EndL2B {...props}/>;
  }
  return null;
 }
 
 /* ---------- small pieces ---------- */
-/** A form with its marked part in bold ("komm|t" → komm**t**). */
-function Marked({text}:{text:string}){return <>{text.split('|').map((part,i)=>i%2?<b key={i}>{part}</b>:part)}</>;}
+/** A form with its marked part in bold ("komm|t" → komm**t**; also used by Teil C and D). */
+export function Marked({text}:{text:string}){return <>{text.split('|').map((part,i)=>i%2?<b key={i}>{part}</b>:part)}</>;}
 /** er (blue), sie (red) and sie for more people (green), like the article colours. */
 function Pron({kind,children}:{kind:Pronoun;children?:ReactNode}){return <span className={'l2-pron '+kind} lang="de">{children??(kind==='er'?'er':'sie')}</span>;}
 /** A text about someone: their portraits, the name, German and Turkish; Paul Hoca reads it (a tap on the bubble too). */
@@ -324,11 +325,17 @@ function OmarExercise({speech,sound,onScore,step}:StepProps){
   <Note>İpucu: Sudan artikelli bir ülke: <b lang="de">aus dem Sudan</b> (Lektion 1’deki <i lang="de">aus der Türkei</i> gibi).</Note>
  </>;
 }
-/** The end: what the learner can do now, a speaking practice (Omar from Alıştırma 7) and what comes next. */
-function EndL2B({progress,onGo,onPart,speech}:StepProps){
+/** Konuş of Teil B: introducing people; the last answer is Omar from Alıştırma 7 once all four sentences fit. */
+function KonusL2B(props:StepProps){
  const [omarDone]=useState(()=>readOmar().every((value,i)=>fitsOmar(i,value)));
+ const rows=practiceItemsB.map(item=>({key:item.question,who:item.who,question:item.question,answer:item.omar&&omarDone?omarAll:item.answer}));
+ return <SpeakStep lead="Soruyu dinle, cevabı dinle, sonra sen yüksek sesle söyle. Son cevapta Alıştırma 7’deki Omar cümlelerin var." rows={rows}
+  replies={['🎉 Süper! Artık başkasını tanıtabiliyorsun.','👍 İyi. Bir kez daha dinle ve söyle.','Sorun değil. Konu 3’e dön, yarın tekrar dene.']} {...props}/>;
+}
+/** The end: what the learner can do now and what comes next. */
+function EndL2B({progress,onGo,onPart}:StepProps){
  return <>
-  <p className="kicker" lang="de">Zusammenfassung · Sprechen</p>
+  <p className="kicker" lang="de">Bitti</p>
   <Heading>Lektion 2B tamam! 🎉</Heading>
   <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
   <p>Artık şunları yapabilirsin:</p>
@@ -338,16 +345,11 @@ function EndL2B({progress,onGo,onPart,speech}:StepProps){
    <li>Başkası hakkında soru sormak: <b lang="de">Woher kommt er? Wo wohnt sie? Wer ist das?</b></li>
    <li>Doğru yazmak: cümle başı, isimler, ülkeler, diller ve bütün Nomen büyük</li>
   </ul>
-  <h2 className="l1a-h2">Konuşma pratiği</h2>
-  <p className="l1a-tr">Soruyu dinle, cevabı dinle, sonra sen yüksek sesle söyle. Son cevapta Alıştırma 7’deki Omar cümlelerin var.</p>
-  <div className="l1a-dialogue">{practiceItemsB.map(item=>{const answer=item.omar&&omarDone?omarAll:item.answer;return <div className="l2-practice" key={item.question}>
-   <div className="l1a-line a"><Portrait who={item.who} name={personName(item.who)}/><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">{personName(item.who)}</span><span className="l1a-de" lang="de" dir="ltr">{item.question}</span></div><Say text={item.question} who={item.who} speech={speech}/></div></div>
-   <div className="l1a-line b"><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Sen</span><span className="l1a-de" lang="de" dir="ltr">{answer}</span></div><Say text={answer} speech={speech}/></div></div>
-  </div>;})}</div>
   <Note><b>Kısa özet:</b> <span lang="de">er / sie + -t</span> · <span lang="de">sie (Pl.) + -en</span> · <span lang="de">er spricht, er arbeitet, er ist / sie sind</span> · <span lang="de">Woher? → aus</span> · <span lang="de">Wo? → in</span> · her Nomen büyük</Note>
   <ProgressMeter progress={progress} language={'tr'} label="Lektion 2B"/>
-  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil C – Wir brauchen Hilfe.</b> · yakında.</p>
+  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil C – Wir brauchen Hilfe.</b></p>
   <div className="l1a-actions">
+   <button type="button" className="btn small" onClick={()=>onPart('c',0)}>Teil C’ye geç<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
    <button type="button" className="btn secondary small" onClick={()=>onGo(berufeStepIndexB('wer'))}>Alıştırmaları tekrar yap</button>
    <button type="button" className="btn secondary small" onClick={()=>onPart('a',0)}>Teil A</button>
    <button type="button" className="btn secondary small" onClick={()=>onGo(-1)}><BookOpen size={16} aria-hidden="true"/>Lektion 2 içindekiler</button>

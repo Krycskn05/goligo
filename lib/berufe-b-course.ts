@@ -2,7 +2,7 @@
  * Lektion 2 „Berufe“, Teil B – Wer ist das? (the learner's lesson page, an artifact of 2 November 2026), ported like
  * Teil A (lib/berufe-course.ts): the cover, eight short teaching steps (who does what, the words, a quick check,
  * er / sie / sie, the verbs, introducing someone, questions about someone, capital letters), seven exercises, a
- * 12-question test and the summary with a speaking practice. Texts for the learner are Turkish; the German is read with
+ * 12-question test, Konuş (a speaking practice, no AI) and Bitti. Texts for the learner are Turkish; the German is read with
  * the site voices, each person with their own voice. A `|` in a shown form marks the part in bold ("komm|t" → komm**t**);
  * it is never read. Step ids never change: saved scores are keyed by them.
  */
@@ -266,7 +266,8 @@ export const berufeStepsB:Step[]=[
  {id:'harf-yaz',title:'Alıştırma 6',kind:'exercise'},
  {id:'omar',title:'Alıştırma 7',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
- {id:'ozet',title:'Özet',kind:'end'},
+ {id:'konus',title:'Konuş',kind:'speak'},
+ {id:'ozet',title:'Bitti',kind:'end'},
 ];
 export const berufeStepIndexB=(id:string)=>berufeStepsB.findIndex(step=>step.id===id);
 export const berufeStepShortB:Record<string,string>={'wer':'Wer ist das?','fiil-tablo':'Fiil tablosu','wer-macht':'Kim ne yapıyor?','hoeren':'Dinle','soru-kur':'Soruyu kur','harf-yaz':'Büyük harf','omar':'Omar’ı tanıt'};
@@ -285,6 +286,7 @@ export const berufeGroupsB:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:berufeStepsB.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:berufeStepsB.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
+ {id:'konus',label:'Konuş',ids:['konus']},
 ];
 export const berufeWordCountB=wordsB.length;
 

@@ -313,44 +313,50 @@ export function MatchExercise(props:StepProps&{kicker:string;title:string;lead?:
   <FeedbackLine feedback={feedback}/>
  </>;
 }
-/** Word order: tap the chips in order; a right sentence is read (`sayFor`); `verbs` names the verb in position 2 in the feedback. */
-export function OrderExercise(props:StepProps&{kicker:string;title:string;sentences:string[][];sayFor:(sentence:string)=>SayItem;verbs?:string[];meanings?:string[]}){
- const {speech,sound,sentences:orderSentences,sayFor:orderSay,kicker,title,verbs,meanings,runKey,step}=props;const finish=useFinish(props);
+/** Word order: tap the chips in order; a right sentence is read (`sayFor`); `verbs` names the verb in position 2 in the feedback.
+ * `word`: the chips are the syllables of one long word (Lektion 2D), shown joined; `goalLabel` replaces "Bu cümleyi kur:"
+ * above the goal; `strict` (a points test, Lektion 2D Alles klar?): a sentence counts only when it was built without a
+ * wrong check and without İpucu. */
+export function OrderExercise(props:StepProps&{kicker:string;title:string;sentences:string[][];sayFor:(sentence:string)=>SayItem;verbs?:string[];meanings?:string[];goalLabel?:string;word?:boolean;strict?:boolean}){
+ const {speech,sound,sentences:orderSentences,sayFor:orderSay,kicker,title,verbs,meanings,goalLabel,word=false,strict=false,runKey,step}=props;const finish=useFinish(props);
  const deal=(r:number)=>shuffle(orderSentences[r].map((word,i)=>({word,i})));
  // A sentence game left in the middle goes on at its sentence; a solved sentence goes on at the next one.
- type Run={round:number;right:number;picked:number[];chips:{word:string;i:number}[];state:'open'|'ok'|'bad'};
+ type Run={round:number;right:number;picked:number[];chips:{word:string;i:number}[];state:'open'|'ok'|'bad';miss?:boolean};
  const [saved]=useState(()=>readRun<Run>(runKey,step.id,value=>{
   const round=Number(value.round),right=Number(value.right);if(!(round>=0&&round<orderSentences.length)||!(right>=0&&right<=round+1))return null;
   const chips=Array.isArray(value.chips)?value.chips as Run['chips']:[];if(chips.map(chip=>chip.word).sort().join(' ')!==orderSentences[round].slice().sort().join(' '))return null;
   if(value.state==='ok')return round+1<orderSentences.length?{round:round+1,right,picked:[],chips:deal(round+1),state:'open'}:null;
   const picked=Array.isArray(value.picked)?(value.picked as number[]).filter(i=>chips.some(chip=>chip.i===i)):[];
-  return {round,right,picked,chips,state:value.state==='bad'?'bad':'open'};
+  return {round,right,picked,chips,state:value.state==='bad'?'bad':'open',miss:!!value.miss};
  }));
  const [round,setRound]=useState(saved?.round??0);const [chips,setChips]=useState<{word:string;i:number}[]>(()=>saved?.chips??deal(0));
  const [picked,setPicked]=useState<number[]>(saved?.picked??[]);const [state,setState]=useState<'open'|'ok'|'bad'>(saved?.state??'open');const [right,setRight]=useState(saved?.right??0);const [feedback,setFeedback]=useState<Feedback>(null);
- const sentence=orderSentences[round];const text=picked.map(i=>sentence[i]).join(' ');
+ const [miss,setMiss]=useState(saved?.miss??false);
+ const sentence=orderSentences[round];const text=picked.map(i=>sentence[i]).join(word?'':' ');
  const ended=state==='ok'&&round===orderSentences.length-1;
- useRunSave(runKey,step.id,!ended&&(round>0||picked.length>0||state!=='open')?{round,right,picked,chips,state}:null);
- const check=()=>{sound.prepare();speech.prepare();const ok=text===sentence.join(' ');setState(ok?'ok':'bad');
-  if(ok){const total=right+1;setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?'Tüm cümleler doğru!':verbs?.[round]?`Doğru! Fiil „${verbs[round]}“ 2. pozisyonda.`:'Doğru!'});
-   if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))]);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
-  else{setFeedback({ok:false,text:verbs?'Fiil 2. sırada mı? Sırayı kontrol et.':'Sırayı kontrol et.'});sound.wrong();}};
- const next=()=>{const r=round+1;setRound(r);setChips(deal(r));setPicked([]);setState('open');setFeedback(null);};
+ useRunSave(runKey,step.id,!ended&&(round>0||picked.length>0||state!=='open')?{round,right,picked,chips,state,...(strict?{miss}:{})}:null);
+ const check=()=>{sound.prepare();speech.prepare();const ok=picked.length===sentence.length&&picked.every((p,k)=>sentence[p]===sentence[k]);setState(ok?'ok':'bad');
+  if(ok){const total=right+(strict&&miss?0:1);setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?(word?'Tüm kelimeler doğru!':'Tüm cümleler doğru!'):verbs?.[round]?`Doğru! Fiil „${verbs[round]}“ 2. pozisyonda.`:'Doğru!'});
+   // The sound goes by this last answer (a points test may still have lost a point on an earlier try).
+   if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))],true);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
+  else{if(strict)setMiss(true);setFeedback({ok:false,text:verbs?'Fiil 2. sırada mı? Sırayı kontrol et.':'Sırayı kontrol et.'});sound.wrong();}};
+ const next=()=>{const r=round+1;setRound(r);setChips(deal(r));setPicked([]);setState('open');setMiss(false);setFeedback(null);};
  // İpucu (the learner asked, 2 November 2026): a wrong word at the end is taken back and the next right word is put in.
  const hint=()=>{if(state==='ok')return;sound.prepare();
   let keep=0;while(keep<picked.length&&sentence[picked[keep]]===sentence[keep])keep++;
   const kept=picked.slice(0,keep);if(keep>=sentence.length){setPicked(kept);return;}
+  if(strict)setMiss(true);
   const chip=chips.find(item=>item.word===sentence[keep]&&!kept.includes(item.i));if(!chip)return;
   setPicked([...kept,chip.i]);setState('open');setFeedback({ok:true,info:true,text:'İpucu: sıradaki kelime „'+sentence[keep]+'“.'});};
  // İleri at the bottom: the next sentence once this one is right (a tap by mistake loses nothing); after the last one the next step.
  useInnerNext(props.setInnerNext,()=>{
   if(ended)return false;
   if(state==='ok'){next();return true;}
-  setFeedback({ok:false,text:'Önce cümleyi kur.'});return true;
+  setFeedback({ok:false,text:word?'Önce kelimeyi kur.':'Önce cümleyi kur.'});return true;
  });
  return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">Cümle {round+1} / {orderSentences.length}</p>
-  {meanings?.[round]&&<p className="l1a-order-goal">Bu cümleyi kur: <b>{meanings[round]}</b></p>}
+  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">{word?'Kelime':'Cümle'} {round+1} / {orderSentences.length}</p>
+  {meanings?.[round]&&<p className="l1a-order-goal">{goalLabel?<>{goalLabel} <b lang="de">{meanings[round]}</b></>:word?<>Bu kelimeyi kur: <b>{meanings[round]}</b></>:<>Bu cümleyi kur: <b>{meanings[round]}</b></>}</p>}
   <div className={'l1a-answer'+(state==='ok'?' ok':state==='bad'?' bad':'')} lang="de" dir="ltr" aria-live="polite">{text}</div>
   <div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)||state==='ok'} onClick={()=>{setPicked([...picked,chip.i]);setState('open');}}>{chip.word}</button>)}</div>
   <div className="l1a-actions">

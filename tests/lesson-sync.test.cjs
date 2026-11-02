@@ -5,9 +5,12 @@ const sync=require(path.join(compiled,'lesson-sync.js'));
 const read=file=>fs.readFileSync(file,'utf8');
 
 test('which browser keys travel with the account',()=>{
- const cases={'lernkoko-l1-part':'l1','lernkoko-l1a-scores':'l1','lernkoko-l1d-step':'l1','lernkoko-l1c-run':'l1','lernkoko-l12-scores':'l12','lernkoko-l12:a3':'l12','lernkoko-l12-ex:b':'l12','lernkoko-l12-hoeren:t4':'l12','lernkoko-l12-known:a':'l12','lernkoko-l15a-scores':'l15','lernkoko-l15-part':'l15','lernkoko-l15a-run':'l15','lernkoko-l2a-scores':'l2','lernkoko-l2-part':'l2','lernkoko-l2a-run':'l2','lernkoko-l2a-own':'l2'};
+ const cases={'lernkoko-l1-part':'l1','lernkoko-l1a-scores':'l1','lernkoko-l1d-step':'l1','lernkoko-l1c-run':'l1','lernkoko-l12-scores':'l12','lernkoko-l12:a3':'l12','lernkoko-l12-ex:b':'l12','lernkoko-l12-hoeren:t4':'l12','lernkoko-l12-known:a':'l12','lernkoko-l15a-scores':'l15','lernkoko-l15-part':'l15','lernkoko-l15a-run':'l15','lernkoko-l2a-scores':'l2','lernkoko-l2-part':'l2','lernkoko-l2a-run':'l2','lernkoko-l2c-scores':'l2','lernkoko-l2d-run':'l2'};
  for(const [key,lesson] of Object.entries(cases))assert.equal(sync.syncLessonOf(key),lesson,key);
  for(const key of ['lernkoko-l12-speed','lernkoko-effects-v1','lernkoko-tour-v1','lernkoko-sync-meta','lernkoko-l13-x','lernkoko-l1x-step','lernkoko-l2x-step','lernkoko-l22-x','goligo-dil'])assert.equal(sync.syncLessonOf(key),null,key);
+ // The learner's own sentences and form stay on this device (2 November 2026): never sent, never written back from the account.
+ for(const key of ['lernkoko-l2a-own','lernkoko-l2b-own','lernkoko-l2d-form','lernkoko-l2c-form'])assert.equal(sync.syncLessonOf(key),null,key);
+ assert.deepEqual(sync.cleanItems('l2',{'lernkoko-l2a-own':{v:'["Ich bin Koch."]',t:5},'lernkoko-l2a-scores':{v:'{}',t:5}}),{'lernkoko-l2a-scores':{v:'{}',t:5}},'an own key kept by the account is dropped');
 });
 
 test('changes in the browser get a time; keys from before syncing get age 0; removals are kept',()=>{

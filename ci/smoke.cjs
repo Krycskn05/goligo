@@ -334,26 +334,36 @@ async function languageFlow(browser) {
     record("Lektion 15A telefonda yana tasmiyor", wide <= 1, wide + " px");
     await mobile.close();
   }
-  // Lektion 2 „Berufe“ (2 Kasim 2026): Lektion 15 gibi bir defter (Teil A acik, B-D yakinda); Teil A 18 adim.
+  // Lektion 2 „Berufe“ (2 Kasim 2026): Lektion 15 gibi bir defter, Teil A-D acik; her bolum Test, Konus (yapay zekasiz) ve Bitti ile biter.
   await visit(page, "/a1-1/berufe", "03e-lektion-2.png", errors);
-  record("Lektion 2: defter girisi (Teil A ve B acik, C-D yakinda)", (await page.locator(".l2-book .lb-toc-row button.lb-toc-open").count()) === 2 && (await page.locator(".l2-book .l1a-soon").count()) === 2, "");
+  record("Lektion 2: defter girisi (Teil A-D acik)", (await page.locator(".l2-book .lb-toc-row button.lb-toc-open").count()) === 4 && (await page.locator(".l2-book .l1a-soon").count()) === 0, "");
   await page.locator("[data-l2-part='a'] button.lb-toc-open").click();
   await page.waitForTimeout(600);
-  record("Lektion 2A: kapak, 18 adim, uc sekme", (await page.locator("[data-l2-step='kapak']").count()) === 1 && /1\/18/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
+  record("Lektion 2A: kapak, 19 adim, dort sekme (Konus dahil)", (await page.locator("[data-l2-step='kapak']").count()) === 1 && /1\/19/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 4, (await page.locator(".l1a-where").textContent()) || "");
   await page.goto(BASE + "/a1-1/berufe?adim=meslekler", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, "03f-lektion-2a-meslekler.png"), fullPage: true });
   record("Lektion 2A: meslek kartlari (15 resim, her biri iki satir)", (await page.locator("[data-l2-step='meslekler'] .l2-job").count()) === 15 && (await page.locator("[data-l2-step='meslekler'] .l2-forms li").count()) === 30, "");
-  // Lektion 2B „Wer ist das?“ (2 Kasim 2026): Teil B ayni defterde, 18 adim; resimli "kim ne yapiyor" kartlari.
+  // Lektion 2B „Wer ist das?“ (2 Kasim 2026): Teil B ayni defterde, 19 adim; resimli "kim ne yapiyor" kartlari.
   await page.goto(BASE + "/a1-1/berufe?teil=b&adim=ne-yapiyor", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, "03g-lektion-2b.png"), fullPage: true });
   record("Lektion 2B: Teil B aciliyor (6 resimli kart)", (await page.locator("[data-l2-teil='b'][data-l2-step='ne-yapiyor'] .l2-job").count()) === 6, "");
+  // Lektion 2C „Wir brauchen Hilfe.“: 0-20 sayilari (dokununca okunur) ve parmakla sayma resimleri.
+  await page.goto(BASE + "/a1-1/berufe?teil=c&adim=sayilar", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: path.join(OUT, "03h-lektion-2c.png"), fullPage: true });
+  record("Lektion 2C: 21 sayi ve iki el resmi", (await page.locator("[data-l2-teil='c'][data-l2-step='sayilar'] .l2-num").count()) === 21 && (await page.locator("[data-l2-step='sayilar'] .l2-hands img").count()) === 2, "");
+  // Lektion 2D „Ich verstehe das nicht.“: Rami'nin Personalformular karti; Alles klar? sekmesi.
+  await page.goto(BASE + "/a1-1/berufe?teil=d&adim=personalformular", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: path.join(OUT, "03i-lektion-2d.png"), fullPage: true });
+  record("Lektion 2D: Rami'nin formu (7 satir) ve dort sekme", (await page.locator("[data-l2-teil='d'] .l2-card dl > div").count()) === 7 && (await page.locator("#l1a-tabs .l12-step").count()) === 4, "");
   await page.goto(BASE + "/konular?level=A1.2", { waitUntil: "networkidle", timeout: 90000 });
   record("Uniteler: Lektion 15 karti Lektion 15A'ya aciliyor", (await page.locator("[data-unit='book-15'] a.housing-open[href='/a1-2/wege-in-der-stadt']").count()) === 1, "");
   await page.goto(BASE + "/konular?level=A1.1", { waitUntil: "networkidle", timeout: 90000 });
   record("Uniteler: Lektion 1 karti Lektion 1A'ya acliyor", (await page.locator("[data-unit='book-01'] a.housing-open[href='/a1-1/willkommen']").count()) === 1, "");
-  record("Uniteler: Lektion 2 karti Lektion 2A'ya aciliyor", (await page.locator("[data-unit='book-02'] a.housing-open[href='/a1-1/berufe']").count()) === 1, "");
+  record("Uniteler: Lektion 2 karti Lektion 2'ye aciliyor", (await page.locator("[data-unit='book-02'] a.housing-open[href='/a1-1/berufe']").count()) === 1, "");
   await visit(page, "/", "01-ana-sayfa.png", errors);
   record("Giris yapinca ana sayfada dersler var (tanitim yok)", (await page.locator("[data-landing]").count()) === 0, "");
 

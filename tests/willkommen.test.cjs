@@ -279,7 +279,8 @@ test('phone check (30 October 2026): words wrap between words, dialogue bubbles 
  const origin=read('app/willkommen-study.tsx').match(/function Origin[\s\S]*?<\/table>/)[0];
  assert.equal((origin.match(/<tr>/g)||[]).length,3,'woher / kommen / aus: one pair per row');
  assert.equal(load('housing-copy').housingCopy.openA.length,6);
- assert(read('app/category-study.tsx').includes("housingText(language,unit.id==='book-15'||unit.id==='book-02'?'openA':'open')"));
+ // Lektion 2 has all four parts since 2 November 2026: its card says "study", like Lektion 1; Lektion 15 opens Teil A.
+ assert(read('app/category-study.tsx').includes("housingText(language,unit.id==='book-15'?'openA':'open')"));
 });
 
 test('exercise fixes (30 October 2026): mixed word boxes, clear Sie/du rows, every right card sentence, Ä read as a long e, every finished step shows done',()=>{

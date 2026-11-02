@@ -126,7 +126,7 @@ test('Nora is a nurse in all of Lektion 2; Konuş is a speaking practice of its 
  for(const piece of ["case 'konus':return <KonusL2A {...props}/>;",'export function SpeakStep(',"onClick={()=>{setRating(i);speech.speak(de);onScore(step.id,1,1);}}"])assert(steps.includes(piece),piece);
  const end=steps.slice(steps.indexOf('function EndL2A('));assert(!end.includes('practiceItems'),'the practice moved to Konuş');
  assert(!steps.includes('TalkStep'),'no AI talk');
- const shell=read('app/berufe-study.tsx');assert(shell.includes("konus:'Sesli pratik'")&&!shell.includes('Yapay zekâyla'));
+ const shell=read('app/berufe-study.tsx');assert(shell.includes("konus:ut('Sesli pratik')")&&!shell.includes('Yapay zekâyla'));
 });
 
 test('the job rows read themselves on a tap (the speaker icon stays), the picture reads both forms',()=>{

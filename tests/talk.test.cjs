@@ -42,7 +42,7 @@ test('the prompt: easy German, corrections in Turkish, the last turns only, and 
 
 test('the server: members only, same origin, a daily limit, the prompt from the scenario id, Workers AI only when published',()=>{
  const route=read('app/api/konus/route.ts');
- for(const piece of ["if(!user)return json({error:'Konuşmak için giriş yap.',signIn:true},401);","origin!==new URL(request.url).origin","talkScenarios[body.scenario]","isLimited(db,key,TALK_DAILY_LIMIT,DAY)","countAttempt(db,key,DAY)","talkMessages(scenario,history)","response_format:{type:'json_schema',json_schema:talkReplySchema}","(env as unknown as {AI?:Ai}).AI","503"])assert(route.includes(piece),piece);
+ for(const piece of ["if(!user)return json({error:'Konuşmak için giriş yap.',signIn:true},401);","origin!==new URL(request.url).origin","talkScenarios[body.scenario]","isLimited(db,key,TALK_DAILY_LIMIT,DAY)","countAttempt(db,key,DAY)","talkMessages(scenario,history,talkHelpLanguage(body.language))","response_format:{type:'json_schema',json_schema:talkReplySchema}","(env as unknown as {AI?:Ai}).AI","503"])assert(route.includes(piece),piece);
  assert(!/body\.(prompt|system|messages)/.test(route),'the browser never writes the prompt');
  const vite=read('vite.config.ts');assert(vite.includes('...(productionDatabaseId ? { ai: { binding: "AI" } } : {}),'));
 });

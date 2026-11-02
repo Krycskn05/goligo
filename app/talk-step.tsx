@@ -4,12 +4,14 @@ import {Eye,EyeOff,Mic,RotateCcw,Send,Square} from 'lucide-react';
 import type {TalkScenario} from '@/lib/talk-scenarios';
 import type {TalkReply,TalkTurn} from '@/lib/talk-prompt';
 import {Heading,Portrait,Say,readRun,useRunSave,type StepProps} from './willkommen-ui';
+import {ut,utLang} from '@/lib/unit-i18n';
 
 /**
  * "Konuş" (the learner asked, 30 October 2026: "I do the lessons but I can't speak"): a short role play with an AI
  * partner after each lesson part. The learner taps the microphone and speaks German (the browser's speech recognition;
  * typing works everywhere), the partner answers in easy German with their own site voice (lib/talk-scenarios.ts,
- * app/api/konus). A mistake gets the better sentence and a short Turkish note. The conversation stays in the browser.
+ * app/api/konus). A mistake gets the better sentence and a short note, in the lesson's language (Turkish, English, Arabic or
+ * Ukrainian: the opening line comes from lib/unit-i18n.ts, the replies from the model). The conversation stays in the browser.
  */
 type Line=TalkTurn&{tr?:string;better?:string|null;correction?:string|null};
 type Recognizer={lang:string;interimResults:boolean;continuous:boolean;maxAlternatives:number;start():void;stop():void;abort():void;
@@ -42,7 +44,7 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
   sound.prepare();speech.prepare();speech.stop();setError(null);setInput('');
   const next:Line[]=[...lines,{role:'learner',text:said}];setLines(next);setBusy(true);
   try{
-   const response=await fetch('/api/konus',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({scenario:scenario.id,history:next.map(line=>({role:line.role,text:line.text}))})});
+   const response=await fetch('/api/konus',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({scenario:scenario.id,language:props.language,history:next.map(line=>({role:line.role,text:line.text}))})});
    const data=await response.json().catch(()=>({})) as {reply?:TalkReply;error?:string;signIn?:boolean};
    if(!response.ok||!data.reply){setError({text:data.error??'Şu anda cevap gelmedi. Biraz sonra yeniden dene.',signIn:data.signIn});setLines(lines);setInput(said);return;}
    const reply=data.reply;
@@ -92,13 +94,13 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
  const restart=()=>{stopMic();speech.stop();setLines([opening]);setDone(false);setInput('');setError(null);};
  const partner=scenario.name;
  return <>
-  <p className="kicker" lang="de">Sprechen · {scenario.title}</p><Heading>Konuş: {scenario.title}</Heading>
-  <p className="l1a-tr">{scenario.setting}</p>
-  <div className="l1a-talk-try" lang="de">{scenario.tryPhrases.map(([de,tr])=><span className="l1a-talk-chip" key={de} title={tr}>{de}{!de.includes('…')&&<Say text={de} speech={speech}/>}</span>)}</div>
+  <p className="kicker" lang="de">Sprechen · {scenario.title}</p><Heading>{ut('Konuş: {title}',{title:scenario.title})}</Heading>
+  <p className="l1a-tr">{ut(scenario.setting)}</p>
+  <div className="l1a-talk-try" lang="de">{scenario.tryPhrases.map(([de,tr])=><span className="l1a-talk-chip" key={de} title={ut(tr)}>{de}{!de.includes('…')&&<Say text={de} speech={speech}/>}</span>)}</div>
   <div className={'l1a-dialogue l1a-talk'+(hideTr?' l1a-talk-hide':'')} aria-live="polite">
    {lines.map((line,i)=>line.role==='partner'?<div className="l1a-line a" key={i}>
     <Portrait who={scenario.who} name={partner}/>
-    <div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.text}</span>{line.tr&&<span className="l1a-tr">{line.tr}</span>}</div>
+    <div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.text}</span>{line.tr&&<span className="l1a-tr" lang={i>0?undefined:utLang(line.tr)}>{ut(line.tr)}</span>}</div>
     <Say text={line.text} who={scenario.who} speech={speech}/>
    </div>:<div className="l1a-line b l1a-talk-me" key={i}>
     <div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.text}</span>
@@ -107,18 +109,18 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
     </div>
     {line.better&&<Say text={line.better} speech={speech}/>}
    </div>)}
-   {busy&&<div className="l1a-line a"><Portrait who={scenario.who} name={partner}/><div className="l1a-bubble l1a-talk-wait" aria-label="Yazıyor"><span/><span/><span/></div></div>}
+   {busy&&<div className="l1a-line a"><Portrait who={scenario.who} name={partner}/><div className="l1a-bubble l1a-talk-wait" aria-label={ut('Yazıyor')}><span/><span/><span/></div></div>}
    <div ref={end}/>
   </div>
-  {error&&<p className="l1a-feedback bad" role="status">{error.text}{error.signIn&&<> <a href={'/giris?return_to='+encodeURIComponent(typeof window==='undefined'?'/':window.location.pathname+window.location.search)}>Giriş yap</a></>}</p>}
-  {done?<p className="l1a-feedback ok" role="status">Konuşma bitti 🎉</p>:<form className="l1a-talk-box" onSubmit={event=>{event.preventDefault();void send(input);}}>
-   {canListen&&<button type="button" className={'l1a-talk-mic'+(listening?' on':'')} aria-pressed={listening} aria-label={listening?'Bitir ve gönder':'Bas ve Almanca konuş'} disabled={busy} onClick={listen}>{listening?<Square size={22} aria-hidden="true"/>:<Mic size={24} aria-hidden="true"/>}</button>}
-   <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={listening?'Dinliyorum… bitince ■ dokun':canListen?'Konuş ya da yaz…':'Almanca yaz…'} aria-label="Cevabın" maxLength={300} disabled={busy} onChange={event=>{if(rec.current||want.current)stopMic();setInput(event.target.value);}}/>
-   <button type="submit" className="btn small l1a-talk-send" disabled={busy||!input.trim()} aria-label="Gönder"><Send size={18} aria-hidden="true"/></button>
+  {error&&<p className="l1a-feedback bad" role="status">{ut(error.text)}{error.signIn&&<> <a href={'/giris?return_to='+encodeURIComponent(typeof window==='undefined'?'/':window.location.pathname+window.location.search)}>{ut('Giriş yap')}</a></>}</p>}
+  {done?<p className="l1a-feedback ok" role="status">{ut('Konuşma bitti 🎉')}</p>:<form className="l1a-talk-box" onSubmit={event=>{event.preventDefault();void send(input);}}>
+   {canListen&&<button type="button" className={'l1a-talk-mic'+(listening?' on':'')} aria-pressed={listening} aria-label={ut(listening?'Bitir ve gönder':'Bas ve Almanca konuş')} disabled={busy} onClick={listen}>{listening?<Square size={22} aria-hidden="true"/>:<Mic size={24} aria-hidden="true"/>}</button>}
+   <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={ut(listening?'Dinliyorum… bitince ■ dokun':canListen?'Konuş ya da yaz…':'Almanca yaz…')} aria-label={ut('Cevabın')} maxLength={300} disabled={busy} onChange={event=>{if(rec.current||want.current)stopMic();setInput(event.target.value);}}/>
+   <button type="submit" className="btn small l1a-talk-send" disabled={busy||!input.trim()} aria-label={ut('Gönder')}><Send size={18} aria-hidden="true"/></button>
   </form>}
   <div className="l1a-actions">
-   <button type="button" className="btn secondary small" aria-pressed={hideTr} onClick={()=>setHideTr(!hideTr)}>{hideTr?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{hideTr?'Çeviriyi göster':'Çeviriyi gizle'}</button>
-   {lines.length>1&&<button type="button" className="btn secondary small" onClick={restart}><RotateCcw size={16} aria-hidden="true"/>Baştan</button>}
+   <button type="button" className="btn secondary small" aria-pressed={hideTr} onClick={()=>setHideTr(!hideTr)}>{hideTr?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{ut(hideTr?'Çeviriyi göster':'Çeviriyi gizle')}</button>
+   {lines.length>1&&<button type="button" className="btn secondary small" onClick={restart}><RotateCcw size={16} aria-hidden="true"/>{ut('Baştan')}</button>}
   </div>
  </>;
 }

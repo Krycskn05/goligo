@@ -230,7 +230,7 @@ test('Teil C „Guten Tag!“ (25 October 2026): 26 steps, greetings by the time
  const page=pageCode();
  for(const piece of ['StepViewC','onPart(\'c\',0)','stepsC','stepGroupsC','scoredExercisesC','exact','className="l1a-memory"','className="l1a-moods"','label="Lektion 1C · Test"'])assert(page.includes(piece),piece);
  // Listening exercises: the button's name does not give the answer away.
- assert(page.includes("aria-label={secret?(label==='Dinle'?label:'Dinle '+label):label+': '+text}"));
+ assert(page.includes("aria-label={secret?(label==='Dinle'?shown:ut('Dinle')+' '+shown):shown+': '+text}"));
  assert.equal((page.match(/wide secret\/>/g)||[]).length,5,'A, B (two), C and the dictation rows');
  const css=read('app/willkommen.css');for(const cls of ['.l1a-moods','.l1a-mood-emoji','.l1a-pos-row','.l1a-pos-verb','.l1a-memory','.l1a-mcard.done','.l1a-row-say','.l1a-emoji-cell','.l1a-badge'])assert(css.includes(cls),cls);
  const smoke=read('ci/smoke.cjs');assert(smoke.includes("teil=c&adim=befinden")&&smoke.includes('.lb-toc-row button.lb-toc-open").count()) === 4'));

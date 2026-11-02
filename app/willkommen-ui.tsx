@@ -9,6 +9,7 @@ import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {PaulHoca} from './paul-hoca';
 import {mixedOrder} from '@/lib/mixed-order';
+import {ut,utLang} from '@/lib/unit-i18n';
 
 /*
  * Pieces shared by Lektion 1's lesson pages (Teil A in app/willkommen-study.tsx, Teil B in app/willkommen-b-steps.tsx):
@@ -128,15 +129,29 @@ const sameItems=(a:unknown,b:readonly string[])=>Array.isArray(a)&&a.length===b.
 /** A listen button. `secret`: a listening exercise, so the button's name does not give the answer away. */
 export function Say({text,who,slow,speech,label='Dinle',wide=false,secret=false}:{text:string;who?:string;slow?:boolean;speech:Speech;label?:string;wide?:boolean;secret?:boolean}){
  const warm=speech.warm;useEffect(()=>{warm?.([{text,who}]);},[warm,text,who]);
- const playing=speech.busy&&speech.activeText===text;
- return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={secret?(label==='Dinle'?label:'Dinle '+label):label+': '+text} title={label} data-who={who} onClick={()=>speech.speak({text,who,slow})}><Volume2 size={18} aria-hidden="true"/>{wide&&label}</button>;
+ const playing=speech.busy&&speech.activeText===text;const shown=ut(label);
+ return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={secret?(label==='Dinle'?shown:ut('Dinle')+' '+shown):shown+': '+text} title={shown} data-who={who} onClick={()=>speech.speak({text,who,slow})}><Volume2 size={18} aria-hidden="true"/>{wide&&shown}</button>;
 }
 export function Phrases({items,speech}:{items:readonly (readonly [string,string])[];speech:Speech}){
- return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={de} speech={speech}/></div>)}</>;
+ return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{ut(tr)}</span></div><Say text={de} speech={speech}/></div>)}</>;
 }
 export const Note=({children}:{children:ReactNode})=><div className="l1a-note"><PaulHoca pose="tip" className="l1a-paul"/><p>{children}</p></div>;
-/** `**bold**` inside a text. */
-export function Rich({text}:{text:string}){const parts=text.split(/(\*\*[^*]+\*\*)/g);return <>{parts.map((part,i)=>part.startsWith('**')&&part.endsWith('**')&&part.length>4?<b key={i}>{part.slice(2,-2)}</b>:part)}</>;}
+/** `**bold**` inside a text (a Turkish text is shown in the page's language, lib/unit-i18n.ts). */
+export function Rich({text}:{text:string}){const parts=ut(text).split(/(\*\*[^*]+\*\*)/g);return <>{parts.map((part,i)=>part.startsWith('**')&&part.endsWith('**')&&part.length>4?<b key={i}>{part.slice(2,-2)}</b>:part)}</>;}
+/** A Turkish text with German in it, shown in the page's language (lib/unit-i18n.ts), so a sentence is translated whole:
+ * `*Wort*` is German in bold, `_Wort_` German in plain type and `~Satz~` German in italics (both with `**e**` inside
+ * for a bold ending), `**text**` bold, `[der]` `[die]` `[das]` the article in its colour (app/stadt.css). */
+export function Tx({text,params}:{text:string;params?:Record<string,string|number>}){return <>{markup(ut(text,params),'')}</>;}
+function markup(text:string,key:string):ReactNode[]{
+ return text.split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*|_[^_]+_|~[^~]+~|\[(?:der|die|das)\])/g).filter(part=>part!==undefined).map((part,i)=>{
+  if(part.length>4&&part.startsWith('**')&&part.endsWith('**'))return <b key={key+i}>{part.slice(2,-2)}</b>;
+  if(part.length>2&&part.startsWith('*')&&part.endsWith('*'))return <b key={key+i} lang="de">{part.slice(1,-1)}</b>;
+  if(/^\[(der|die|das)\]$/.test(part))return <span key={key+i} className={'l15-'+part.slice(1,-1)} lang="de">{part.slice(1,-1)}</span>;
+  if(part.length>2&&part.startsWith('~')&&part.endsWith('~'))return <i key={key+i} lang="de">{markup(part.slice(1,-1),key+i+'.')}</i>;
+  if(part.length>2&&part.startsWith('_')&&part.endsWith('_'))return <span key={key+i} lang="de">{markup(part.slice(1,-1),key+i+'.')}</span>;
+  return part;
+ });
+}
 /** A step's heading (h2: the notebook's left page holds the h1 title of the part). */
 export function Heading({children}:{children:ReactNode}){return <h2 id="l1a-heading" tabIndex={-1} className="l1a-heading">{children}</h2>;}
 export function Portrait({who,name}:{who:string;name:string}){return <img className="l1a-portrait" src={portraitSrc(who)} alt={name} width={64} height={64} loading="lazy" decoding="async"/>;}
@@ -144,11 +159,12 @@ export function shuffle<T>(list:readonly T[]):T[]{const out=list.slice();for(let
 export {mixedOrder};
 
 /* ---------- exercises ---------- */
-export type Feedback={ok:boolean;text:string;info?:boolean}|null;
+/** `text` stays Turkish with its {marks} (`params`): the line shows it in the page's language (lib/unit-i18n.ts). */
+export type Feedback={ok:boolean;text:string;info?:boolean;params?:Record<string,string|number>}|null;
 /** The line under an exercise once every row is answered (the learner asked, 2 November 2026): never red, because the last
  * answer may well have been right; a full score is green. */
-export function scoreFeedback(right:number,total:number):Feedback{return right===total?{ok:true,text:`Hepsi doğru! ${right} / ${total}`}:{ok:true,info:true,text:`Bitti: ${right} / ${total} doğru. Yanlışların doğrusu yeşil.`};}
-export function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.info?' info':feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?.text??''}</p>;}
+export function scoreFeedback(right:number,total:number):Feedback{return right===total?{ok:true,text:'Hepsi doğru! {right} / {total}',params:{right,total}}:{ok:true,info:true,text:'Bitti: {right} / {total} doğru. Yanlışların doğrusu yeşil.',params:{right,total}};}
+export function FeedbackLine({feedback}:{feedback:Feedback}){return <p className={'l1a-feedback'+(feedback?feedback.info?' info':feedback.ok?' ok':' bad':'')} role="status" aria-live="polite">{feedback?ut(feedback.text,feedback.params):''}</p>;}
 /** Gaps that check themselves (the learner asked, 30 October 2026: no "Kontrol et", no "Cevapları göster"): a right
  * answer turns green at once; a wrong one turns red when it is final (the learner leaves the box or presses Enter, every
  * letter cell is filled, a word is chosen) and the right answer stays next to it until it is fixed. The score counts the
@@ -207,8 +223,8 @@ export function exerciseLock(groups:readonly {id:string;ids:readonly string[]}[]
 /** What a locked step shows instead of itself (opened from its address or an old bookmark). */
 export function LockedStep({openLabel,onOpen}:{openLabel:string;onOpen:()=>void}){
  return <div className="l1a-locked" role="status"><span className="l1a-locked-icon" aria-hidden="true"><Lock size={26}/></span>
-  <p>Bu bölüm henüz kilitli. Önce alıştırmaları sırayla bitir.</p>
-  <button type="button" className="btn small" onClick={onOpen}>Sıradaki alıştırma: {openLabel}</button></div>;
+  <p>{ut('Bu bölüm henüz kilitli. Önce alıştırmaları sırayla bitir.')}</p>
+  <button type="button" className="btn small" onClick={onOpen}>{ut('Sıradaki alıştırma:')} {ut(openLabel)}</button></div>;
 }
 /** A gap filled from a box of words (the learner chose it, 30 October 2026, option B): a tap on the gap opens the words
  * right under it as big buttons, a tap on a word puts it in and closes the box (Escape or a tap elsewhere closes it too).
@@ -262,13 +278,13 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
  const warm=speech.warm;useEffect(()=>{warm?.(say);},[warm,say]); // the solution read at the end, loaded early
  // The box in mixed order, the same in the list above and in every gap (`bank` writes the list as the lead).
  const [box]=useState(()=>choices?mixedOrder(choices,gaps.map(gap=>gap.answers[0])):undefined);
- const lead=bank&&box?'Kelimeler: '+box.join(' · '):props.lead;
+ const lead=bank&&box?ut('Kelimeler:')+' '+box.join(' · '):ut(props.lead);
  const at=(l:number,g:number)=>gaps.findIndex(item=>item.line===l&&item.gap===g);
  const letters=(text:string)=>Array.from(text).length;
  const total=gaps.length;
  const self=useSelfCheck(total,(i,value)=>accepts(value,gaps[i].answers)&&(!cells||wide||letters(value)>=letters(gaps[i].answers[0])),firstRight=>{
   onScore(step.id,firstRight,total);
-  setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':`Hepsi doğru! İlk denemede ${firstRight} / ${total} doğruydu.`});
+  setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':'Hepsi doğru! İlk denemede {right} / {total} doğruydu.',params:{right:firstRight,total}});
   sound.correct(()=>{if(say.length)speech.speakAll(say);});
  });
  const note=(result:SelfCheckResult)=>selfCheckNote(result,self,choices?'Kırmızıyı değiştir: başka bir kelime dene.':'Kırmızıyı düzelt; doğrusu yanında yazıyor.',setFeedback);
@@ -279,14 +295,15 @@ export function GapExercise(props:StepProps&{kicker:string;title:string;lead?:st
  const chooseWord=(i:number,word:string)=>{prepare();note(self.change(i,word,true));};
  const typeText=(i:number,text:string)=>{prepare();note(self.change(i,text));};
  const field=(l:number,g:number)=>{const i=at(l,g);const state=self.state[i];const cls='l1a-gap'+(wide?' wide':'')+(state===true?' ok':state===false?' bad':'');
-  const input=choices?<WordChoice value={self.values[i]} options={box??choices} state={state} label={`Boşluk ${i+1}`} onChoose={word=>chooseWord(i,word)}/>
-   :cells&&!wide?<LetterCells value={self.values[i]} size={letters(gaps[i].answers[0])} state={state} label={`Boşluk ${i+1}`} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
-   :<input ref={element=>{refs.current[i]=element;}} className={cls} value={self.values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?'Buraya yaz…':''} aria-label={`Boşluk ${i+1}`} enterKeyHint="next"
+  const gapLabel=ut('Boşluk {n}',{n:i+1});
+  const input=choices?<WordChoice value={self.values[i]} options={box??choices} state={state} label={gapLabel} onChoose={word=>chooseWord(i,word)}/>
+   :cells&&!wide?<LetterCells value={self.values[i]} size={letters(gaps[i].answers[0])} state={state} label={gapLabel} exact={exact} inputRef={element=>{refs.current[i]=element;}} onChange={text=>typeCells(i,text)}/>
+   :<input ref={element=>{refs.current[i]=element;}} className={cls} value={self.values[i]} lang="de" dir="ltr" autoCapitalize={exact?'sentences':'off'} autoComplete="off" spellCheck={false} placeholder={wide?ut('Buraya yaz…'):''} aria-label={gapLabel} enterKeyHint="next"
      onChange={event=>typeText(i,event.target.value)} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>;
   return <span className="l1a-gap-wrap" key={g}>{input}{!choices&&self.hinted[i]&&state!==true&&<span className="l1a-hint" lang="de">→ {gaps[i].answers[0]}</span>}</span>;};
  const line=(item:GapLine,l:number)=>{const parts=item.text.split('___');return <span className="l1a-de l1a-gap-text" lang="de" dir="ltr">{parts.map((part,g)=><span key={g}>{part}{g<parts.length-1&&field(l,g)}</span>)}</span>;};
  return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
+  <p className="kicker" lang={utLang(kicker)==="tr"?"de":undefined}>{ut(kicker)}</p><Heading>{ut(title)}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
   <div className="l1a-dialogue">{lines.map((item,l)=>item.who?<div className={'l1a-line '+item.who} key={l}><div className="l1a-bubble">{line(item,l)}</div></div>:<div className={'l1a-row'+(item.say?' l1a-row-say':'')} key={l}>{item.say&&<Say text={sayText(item.say)} who={typeof item.say==='string'?undefined:item.say.who} speech={speech} label={String(l+1)} wide secret/>}{line(item,l)}</div>)}</div>
   {/* No check or show-answers buttons (the learner asked, 30 October 2026): every gap checks itself. */}
   <FeedbackLine feedback={feedback}/>
@@ -305,10 +322,10 @@ export function MatchExercise(props:StepProps&{kicker:string;title:string;lead?:
   else{setWrongAt(i);setMisses(m=>m+1);setFeedback({ok:false,text:'Bu ikisi uymuyor.'});sound.wrong();setTimeout(()=>setWrongAt(null),600);}
  };
  return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">{lead}</p>
+  <p className="kicker" lang={utLang(kicker)==="tr"?"de":undefined}>{ut(kicker)}</p><Heading>{ut(title)}</Heading><p className="l1a-tr">{ut(lead)}</p>
   <div className="l1a-match">
-   <div>{pairs.map((pair,i)=><button type="button" key={i} className={'l1a-mbtn'+(selected===i?' sel':'')+(done.includes(i)?' done':'')} disabled={done.includes(i)} aria-pressed={selected===i} lang="de" dir="ltr" onClick={()=>setSelected(i)}>{pair[0]}</button>)}</div>
-   <div>{order.map(i=><button type="button" key={i} className={'l1a-mbtn'+(done.includes(i)?' done':'')+(wrongAt===i?' bad':'')} disabled={done.includes(i)} lang="de" dir="ltr" onClick={()=>pickRight(i)}>{pairs[i][1]}</button>)}</div>
+   <div>{pairs.map((pair,i)=><button type="button" key={i} className={'l1a-mbtn'+(selected===i?' sel':'')+(done.includes(i)?' done':'')} disabled={done.includes(i)} aria-pressed={selected===i} lang="de" dir="ltr" onClick={()=>setSelected(i)}>{ut(pair[0])}</button>)}</div>
+   <div>{order.map(i=><button type="button" key={i} className={'l1a-mbtn'+(done.includes(i)?' done':'')+(wrongAt===i?' bad':'')} disabled={done.includes(i)} lang="de" dir="ltr" onClick={()=>pickRight(i)}>{ut(pairs[i][1])}</button>)}</div>
   </div>
   <FeedbackLine feedback={feedback}/>
  </>;
@@ -336,7 +353,7 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
  const ended=state==='ok'&&round===orderSentences.length-1;
  useRunSave(runKey,step.id,!ended&&(round>0||picked.length>0||state!=='open')?{round,right,picked,chips,state,...(strict?{miss}:{})}:null);
  const check=()=>{sound.prepare();speech.prepare();const ok=picked.length===sentence.length&&picked.every((p,k)=>sentence[p]===sentence[k]);setState(ok?'ok':'bad');
-  if(ok){const total=right+(strict&&miss?0:1);setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?(word?'Tüm kelimeler doğru!':'Tüm cümleler doğru!'):verbs?.[round]?`Doğru! Fiil „${verbs[round]}“ 2. pozisyonda.`:'Doğru!'});
+  if(ok){const total=right+(strict&&miss?0:1);setRight(total);setFeedback({ok:true,text:round===orderSentences.length-1?(word?'Tüm kelimeler doğru!':'Tüm cümleler doğru!'):verbs?.[round]?'Doğru! Fiil „{verb}“ 2. pozisyonda.':'Doğru!',params:{verb:verbs?.[round]??''}});
    // The sound goes by this last answer (a points test may still have lost a point on an earlier try).
    if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))],true);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
   else{if(strict)setMiss(true);setFeedback({ok:false,text:verbs?'Fiil 2. sırada mı? Sırayı kontrol et.':'Sırayı kontrol et.'});sound.wrong();}};
@@ -347,7 +364,7 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
   const kept=picked.slice(0,keep);if(keep>=sentence.length){setPicked(kept);return;}
   if(strict)setMiss(true);
   const chip=chips.find(item=>item.word===sentence[keep]&&!kept.includes(item.i));if(!chip)return;
-  setPicked([...kept,chip.i]);setState('open');setFeedback({ok:true,info:true,text:'İpucu: sıradaki kelime „'+sentence[keep]+'“.'});};
+  setPicked([...kept,chip.i]);setState('open');setFeedback({ok:true,info:true,text:'İpucu: sıradaki kelime „{word}“.',params:{word:sentence[keep]}});};
  // İleri at the bottom: the next sentence once this one is right (a tap by mistake loses nothing); after the last one the next step.
  useInnerNext(props.setInnerNext,()=>{
   if(ended)return false;
@@ -355,15 +372,15 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
   setFeedback({ok:false,text:word?'Önce kelimeyi kur.':'Önce cümleyi kur.'});return true;
  });
  return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading><p className="l1a-tr">{word?'Kelime':'Cümle'} {round+1} / {orderSentences.length}</p>
-  {meanings?.[round]&&<p className="l1a-order-goal">{goalLabel?<>{goalLabel} <b lang="de">{meanings[round]}</b></>:word?<>Bu kelimeyi kur: <b>{meanings[round]}</b></>:<>Bu cümleyi kur: <b>{meanings[round]}</b></>}</p>}
+  <p className="kicker" lang={utLang(kicker)==="tr"?"de":undefined}>{ut(kicker)}</p><Heading>{ut(title)}</Heading><p className="l1a-tr">{ut(word?'Kelime':'Cümle')} {round+1} / {orderSentences.length}</p>
+  {meanings?.[round]&&<p className="l1a-order-goal">{goalLabel?<>{ut(goalLabel)} <b lang="de">{meanings[round]}</b></>:word?<>{ut('Bu kelimeyi kur:')} <b>{ut(meanings[round])}</b></>:<>{ut('Bu cümleyi kur:')} <b>{ut(meanings[round])}</b></>}</p>}
   <div className={'l1a-answer'+(state==='ok'?' ok':state==='bad'?' bad':'')} lang="de" dir="ltr" aria-live="polite">{text}</div>
   <div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)||state==='ok'} onClick={()=>{setPicked([...picked,chip.i]);setState('open');}}>{chip.word}</button>)}</div>
   <div className="l1a-actions">
-   <button type="button" className="btn secondary small" disabled={!picked.length||state==='ok'} onClick={()=>{setPicked(picked.slice(0,-1));setState('open');}}><Trash2 size={16} aria-hidden="true"/>Sil</button>
-   <button type="button" className="btn secondary small" disabled={state==='ok'||picked.length===sentence.length&&picked.every((p,k)=>sentence[p]===sentence[k])} onClick={hint}><Lightbulb size={16} aria-hidden="true"/>İpucu</button>
-   <button type="button" className="btn small" disabled={picked.length!==sentence.length||state==='ok'} onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button>
-   {state==='ok'&&round<orderSentences.length-1&&<button type="button" className="btn small" onClick={next}>Sonraki<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
+   <button type="button" className="btn secondary small" disabled={!picked.length||state==='ok'} onClick={()=>{setPicked(picked.slice(0,-1));setState('open');}}><Trash2 size={16} aria-hidden="true"/>{ut('Sil')}</button>
+   <button type="button" className="btn secondary small" disabled={state==='ok'||picked.length===sentence.length&&picked.every((p,k)=>sentence[p]===sentence[k])} onClick={hint}><Lightbulb size={16} aria-hidden="true"/>{ut('İpucu')}</button>
+   <button type="button" className="btn small" disabled={picked.length!==sentence.length||state==='ok'} onClick={check}><Check size={16} aria-hidden="true"/>{ut('Kontrol et')}</button>
+   {state==='ok'&&round<orderSentences.length-1&&<button type="button" className="btn small" onClick={next}>{ut('Sonraki')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
   </div>
   <FeedbackLine feedback={feedback}/>
  </>;
@@ -384,10 +401,10 @@ export function ChoiceRows(props:StepProps&{kicker:string;title:string;lead?:str
   if(done===rows.length){setFeedback(scoreFeedback(right,rows.length));finish(right,rows.length,row.say?[row.say]:undefined,ok);}
   else if(ok)sound.correct(say);else sound.wrong(say);};
  return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>{lead&&<p className="l1a-tr">{lead}</p>}{before}
+  <p className="kicker" lang={utLang(kicker)==="tr"?"de":undefined}>{ut(kicker)}</p><Heading>{ut(title)}</Heading>{lead&&<p className="l1a-tr">{ut(lead)}</p>}{before}
   {rows.map((row,i)=><div className={'l1a-arow'+(wide?' wide':'')} key={row.key} data-done={answers[i]!==undefined?'':undefined}>
    {row.before}
-   <div className="l1a-opts" role="group" aria-label={row.label}>{(orders[i]??row.options).map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang={row.optionLang??'de'} onClick={()=>answer(i,option.value)}>{option.label}</button>)}</div>
+   <div className="l1a-opts" role="group" aria-label={ut(row.label)}>{(orders[i]??row.options).map(option=><button type="button" key={option.value} className={'l1a-opt'+(answers[i]!==undefined&&option.value===row.answer?' ok':answers[i]===option.value?' bad':'')} disabled={answers[i]!==undefined} lang={row.optionLang??'de'} onClick={()=>answer(i,option.value)}>{ut(option.label)}</button>)}</div>
    {row.after}
    {answers[i]!==undefined&&row.reveal}
   </div>)}
@@ -426,18 +443,20 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
  useInnerNext(props.setInnerNext,()=>{if(over)return false;if(picked===null){setWait(true);return true;}advance(i,score);return true;});
  const again=()=>{setI(0);setScore(0);setPicked(null);setOptions(shuffle(questions[0][1]));setOver(false);setWait(false);};
  if(over){const percent=Math.round(score/questions.length*100);return <>
-  <p className="kicker" lang="de">{label}</p><Heading>Sonuç</Heading>
+  <p className="kicker" lang={utLang(label)==="tr"?"de":undefined}>{ut(label)}</p><Heading>{ut('Sonuç')}</Heading>
   <p className="l1a-score">{score} / {questions.length}</p>
-  <p className="l1a-big">{percent>=80?'Harika! Bu konuyu öğrendin.':percent>=60?'İyi. Yanlışlarına bir daha bak.':'Konuyu bir kez daha oku, sonra tekrar dene.'}</p>
+  <p className="l1a-big">{ut(percent>=80?'Harika! Bu konuyu öğrendin.':percent>=60?'İyi. Yanlışlarına bir daha bak.':'Konuyu bir kez daha oku, sonra tekrar dene.')}</p>
   {percent>=80&&<PaulHoca pose="cheer" className="l1a-paul-big"/>}
-  <div className="l1a-actions"><button type="button" className="btn" onClick={again}><RotateCcw size={18} aria-hidden="true"/>Testi tekrarla</button></div></>;}
+  <div className="l1a-actions"><button type="button" className="btn" onClick={again}><RotateCcw size={18} aria-hidden="true"/>{ut('Testi tekrarla')}</button></div></>;}
+ // A question or option shown in the page's language (lib/unit-i18n.ts) takes the page's lang; German stays de.
+ const langFor=(text:string,guess:'de'|'tr')=>ut(text)!==text?undefined:guess;
  return <>
-  <p className="kicker" lang="de">{label}</p><Heading>Soru {i+1} / {questions.length}</Heading>
-  <p className="l1a-question" lang={langOf?langOf(question[0]):/[çğışİ]|hangisi|nedir|nasıl|ne demek|cevap/.test(question[0])?'tr':'de'}>{question[0]}</p>
+  <p className="kicker" lang={utLang(label)==="tr"?"de":undefined}>{ut(label)}</p><Heading>{ut('Soru {n} / {total}',{n:i+1,total:questions.length})}</Heading>
+  <p className="l1a-question" lang={langFor(question[0],langOf?langOf(question[0]):/[çğışİ]|hangisi|nedir|nasıl|ne demek|cevap/.test(question[0])?'tr':'de')}>{ut(question[0])}</p>
   {(()=>{const heard=listen?.(i);return heard?<div className="l1a-actions l1a-test-listen"><Say text={typeof heard==='string'?heard:heard.text} who={typeof heard==='string'?undefined:heard.who} speech={speech} secret wide/></div>:null;})()}
-  <div className="l1a-opts column" role="group" aria-label={'Soru '+(i+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={langOf?langOf(option):/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr'} onClick={()=>answer(option)}>{option}</button>)}</div>
-  <p className="l1a-mini">Puan: {score}</p>
-  {wait&&<p className="l1a-feedback bad" role="status">Önce bir cevap seç.</p>}
+  <div className="l1a-opts column" role="group" aria-label={ut('Soru {n}',{n:i+1})}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={langFor(option,langOf?langOf(option):/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr')} onClick={()=>answer(option)}>{ut(option)}</button>)}</div>
+  <p className="l1a-mini">{ut('Puan: {n}',{n:score})}</p>
+  {wait&&<p className="l1a-feedback bad" role="status">{ut('Önce bir cevap seç.')}</p>}
  </>;
 }
 
@@ -457,5 +476,5 @@ export function StepStrip({items,current,scores,onOpen,label,track=false}:{items
   edges();element.addEventListener('scroll',edges,{passive:true});window.addEventListener('resize',edges);
   return()=>{element.removeEventListener('scroll',edges);window.removeEventListener('resize',edges);};
  },[track,current]);
- return <nav className={'l1a-strip'+(track?' l1a-track':'')} ref={row} aria-label={label}>{items.map(item=>{const done=!!scores[item.id]&&item.id!==current;return <button type="button" key={item.id} className={'l1a-strip-pill'+(item.id===current?' on':'')+(done?' done':'')+(item.locked?' locked':'')} aria-current={item.id===current?'step':undefined} title={item.locked?'Önce önceki alıştırmaları bitir':undefined} onClick={()=>onOpen(item.index)}><b aria-hidden="true">{item.locked?<Lock size={12}/>:done?<Check size={13}/>:item.number}</b>{item.label}</button>;})}</nav>;
+ return <nav className={'l1a-strip'+(track?' l1a-track':'')} ref={row} aria-label={ut(label)}>{items.map(item=>{const done=!!scores[item.id]&&item.id!==current;return <button type="button" key={item.id} className={'l1a-strip-pill'+(item.id===current?' on':'')+(done?' done':'')+(item.locked?' locked':'')} aria-current={item.id===current?'step':undefined} title={item.locked?ut('Önce önceki alıştırmaları bitir'):undefined} onClick={()=>onOpen(item.index)}><b aria-hidden="true">{item.locked?<Lock size={12}/>:done?<Check size={13}/>:item.number}</b>{ut(item.label)}</button>;})}</nav>;
 }

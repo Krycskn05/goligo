@@ -12,7 +12,8 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Phrases,Note,Rich,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Phrases,Note,Rich,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
+import {ut} from '@/lib/unit-i18n';
 
 /**
  * Lektion 1, Teil B – Ich spreche ein bisschen Deutsch. (the learner's lesson page, 25 October 2026): the steps.
@@ -27,7 +28,7 @@ export function StepViewB(props:StepProps){
   case 'diller':return <LanguageGrid speech={speech}/>;
   case 'sie-du':return <SieDu speech={speech}/>;
   case 'diyalog-sie':return <DialogueStep speech={speech} title="Resmî diyalog (Sie)" picture={willkommenBPictures.sie} alt="Sabine ve Omar süpermarkette, kasada resmî sohbet" lines={dialogueSie}/>;
-  case 'diyalog-du':return <DialogueStep speech={speech} title="Samimi diyalog (du)" picture={willkommenBPictures.du} alt="Tomasz ve Aisha kurs molasında, ellerinde kahve" lead="Tomasz kursa yeni geldi." lines={dialogueDu} note={<><b lang="de">Ich bin neu hier.</b> = Burada yeniyim. · <b lang="de">Interessant!</b> = İlginç!</>}/>;
+  case 'diyalog-du':return <DialogueStep speech={speech} title="Samimi diyalog (du)" picture={willkommenBPictures.du} alt="Tomasz ve Aisha kurs molasında, ellerinde kahve" lead="Tomasz kursa yeni geldi." lines={dialogueDu} note={<Tx text="*Ich bin neu hier.* = Burada yeniyim. · *Interessant!* = İlginç!"/>}/>;
   case 'fiiller':return <VerbsB speech={speech}/>;
   case 'alfabe':return <Alphabet speech={speech}/>;
   case 'buchstabieren':return <Spelling speech={speech}/>;
@@ -54,22 +55,22 @@ export function StepViewB(props:StepProps){
 /* ---------- small pieces ---------- */
 /** Reads a word letter by letter (one clip per German letter name, slowly). */
 export function SpellButton({word,speech,label}:{word:string;speech:Speech;label?:string}){
- return <button type="button" className={label?'btn secondary small l1a-say-wide':'l12-say'} disabled={speech.busy} aria-label={'Harf harf dinle: '+word} title="Harf harf dinle" onClick={()=>speech.speakAll(spellItems(word))}>{label?<Play size={16} aria-hidden="true"/>:<Volume2 size={18} aria-hidden="true"/>}{label}</button>;
+ return <button type="button" className={label?'btn secondary small l1a-say-wide':'l12-say'} disabled={speech.busy} aria-label={ut('Harf harf dinle')+': '+word} title={ut('Harf harf dinle')} onClick={()=>speech.speakAll(spellItems(word))}>{label?<Play size={16} aria-hidden="true"/>:<Volume2 size={18} aria-hidden="true"/>}{label}</button>;
 }
 /** A dialogue: each line with the speaker's portrait and voice; "Tümünü dinle" reads it as a conversation. */
 export function DialogueLines({lines,speech}:{lines:Line[];speech:Speech}){
  const first=lines[0]?.who;
- return <div className="l1a-dialogue">{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}><Portrait who={line.who} name={line.who[0].toUpperCase()+line.who.slice(1)}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{line.tr}</span></div><Say text={line.say??line.de} who={line.who} speech={speech}/></div>)}</div>;
+ return <div className="l1a-dialogue">{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}><Portrait who={line.who} name={line.who[0].toUpperCase()+line.who.slice(1)}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{ut(line.tr)}</span></div><Say text={line.say??line.de} who={line.who} speech={speech}/></div>)}</div>;
 }
 export function ListenAll({lines,speech}:{lines:Line[];speech:Speech}){
- return <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(lines.map(lineSay))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button></div>;
+ return <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(lines.map(lineSay))}><Play size={16} aria-hidden="true"/>{ut('Tümünü dinle')}</button></div>;
 }
 export function Picture({src,width,height,alt}:{src:string;width:number;height:number;alt:string}){
- return <img className="l1a-cover l1a-scene" src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async"/>;
+ return <img className="l1a-cover l1a-scene" src={src} alt={ut(alt)} width={width} height={height} loading="lazy" decoding="async"/>;
 }
 export function WordTable({items}:{items:readonly (readonly [string,string])[]}){
  const rows:(readonly [string,string])[][]=[];for(let i=0;i<items.length;i+=2)rows.push(items.slice(i,i+2));
- return <table className="l1a-table"><tbody>{rows.map((row,i)=><tr key={i}>{row.map(([de,tr])=><td key={de} colSpan={1}><b lang="de">{de}</b> <span className="l1a-mini">{tr}</span></td>)}</tr>)}</tbody></table>;
+ return <table className="l1a-table"><tbody>{rows.map((row,i)=><tr key={i}>{row.map(([de,tr])=><td key={de} colSpan={1}><b lang="de">{de}</b> <span className="l1a-mini">{ut(tr)}</span></td>)}</tr>)}</tbody></table>;
 }
 export function ProfileCard({card}:{card:Profile}){
  return <div className="l1a-profile"><Portrait who={card.who} name={card.name.split(' ')[0]}/><dl lang="de"><dt>Name:</dt><dd>{card.name}</dd><dt>Land:</dt><dd>{card.land}</dd><dt>Sprachen:</dt><dd>{card.languages}</dd></dl></div>;
@@ -80,75 +81,75 @@ function CoverB(_props:StepProps){ // the part's progress is on the left page (n
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">B — Ich spreche ein bisschen Deutsch.</span></Heading>
-  <p>Bu derste öğreneceklerin:</p>
-  <ul className="l1a-list"><li>Hangi dilleri konuştuğunu söylemek: <b lang="de">Ich spreche …</b></li><li><b lang="de">Sie</b> mi, <b lang="de">du</b> mu? Resmî ve samimi konuşma</li><li>Fiil çekimi: <span lang="de">ich / du / Sie</span></li><li>Alfabe ve adını harf harf söylemek</li><li>Anlamadığında sormak: <b lang="de">Wie bitte?</b></li></ul>
+  <p>{ut('Bu derste öğreneceklerin:')}</p>
+  <ul className="l1a-list"><li><Tx text="Hangi dilleri konuştuğunu söylemek: *Ich spreche …*"/></li><li><Tx text="*Sie* mi, *du* mu? Resmî ve samimi konuşma"/></li><li><Tx text="Fiil çekimi: _ich / du / Sie_"/></li><li>{ut('Alfabe ve adını harf harf söylemek')}</li><li><Tx text="Anlamadığında sormak: *Wie bitte?*"/></li></ul>
  </>;
 }
 function Languages({speech}:{speech:Speech}){
- return <><Heading>Hangi dilleri konuşuyorsunuz?</Heading>
+ return <><Heading>{ut('Hangi dilleri konuşuyorsunuz?')}</Heading>
   <Phrases items={languagePhrases} speech={speech}/>
   <WordTable items={languageWords}/>
-  <Note>Dil adları büyük harfle yazılır ve çoğu ülke adından gelir: <span lang="de">Türkei → <b>Türkisch</b>, Polen → <b>Polnisch</b>, Griechenland → <b>Griechisch</b></span>. Dikkat: <span lang="de">Deutschland → <b>Deutsch</b>, Iran → <b>Farsi</b>, Thailand → <b>Thai</b></span>.</Note></>;
+  <Note><Tx text="Dil adları büyük harfle yazılır ve çoğu ülke adından gelir: _Türkei → **Türkisch**, Polen → **Polnisch**, Griechenland → **Griechisch**_. Dikkat: _Deutschland → **Deutsch**, Iran → **Farsi**, Thailand → **Thai**_."/></Note></>;
 }
 function LanguageGrid({speech}:{speech:Speech}){
- return <><Heading>Diller</Heading><p className="l1a-tr">Dokun, dinle.</p>
-  <div className="l1a-langs">{languages.map(([de,tr])=>{const say=languageSay(de);return <button type="button" key={de} className={'l1a-flag l1a-lang'+(speech.busy&&speech.activeText===say?' playing':'')} onClick={()=>speech.speak(say)} aria-label={'Dinle: '+say}><b lang="de">{de}</b><small>{tr}</small></button>;})}</div></>;
+ return <><Heading>{ut('Diller')}</Heading><p className="l1a-tr">{ut('Dokun, dinle.')}</p>
+  <div className="l1a-langs">{languages.map(([de,tr])=>{const say=languageSay(de);return <button type="button" key={de} className={'l1a-flag l1a-lang'+(speech.busy&&speech.activeText===say?' playing':'')} onClick={()=>speech.speak(say)} aria-label={ut('Dinle')+': '+say}><b lang="de">{de}</b><small>{ut(tr)}</small></button>;})}</div></>;
 }
 function SieDu({speech}:{speech:Speech}){
- return <><Heading><span lang="de">Sie</span> mi, <span lang="de">du</span> mu?</Heading>
+ return <><Heading><Tx text="_Sie_ mi, _du_ mu?"/></Heading>
   <div className="l1a-two">
-   <div><p className="l1a-two-head"><b lang="de">Sie</b> — resmî (siz)</p><p className="l1a-tr">Tanımadığın yetişkinler, resmî yerler. <b lang="de">Herr / Frau</b> + soyadı.</p></div>
-   <div><p className="l1a-two-head"><b lang="de">du</b> — samimi (sen)</p><p className="l1a-tr">Arkadaşlar, aile, çocuklar, kurs arkadaşları. İsimle.</p></div>
+   <div><p className="l1a-two-head"><Tx text="*Sie* — resmî (siz)"/></p><p className="l1a-tr"><Tx text="Tanımadığın yetişkinler, resmî yerler. *Herr / Frau* + soyadı."/></p></div>
+   <div><p className="l1a-two-head"><Tx text="*du* — samimi (sen)"/></p><p className="l1a-tr">{ut('Arkadaşlar, aile, çocuklar, kurs arkadaşları. İsimle.')}</p></div>
   </div>
   <table className="l1a-table l1a-sie-du"><thead><tr><th lang="de">Sie</th><th lang="de">du</th></tr></thead>
    <tbody>{sieDu.map(([sie,du])=><tr key={sie}><td><span lang="de">{sie}</span> <Say text={sie} speech={speech}/></td><td><span lang="de">{du}</span> <Say text={du} speech={speech}/></td></tr>)}</tbody></table>
-  <Note>Selam da değişir: resmîde <b lang="de">Guten Tag!</b>, samimide <b lang="de">Hallo!</b></Note></>;
+  <Note><Tx text="Selam da değişir: resmîde *Guten Tag!*, samimide *Hallo!*"/></Note></>;
 }
 function DialogueStep({speech,title,picture,alt,lead,lines,note}:{speech:Speech;title:string;picture:{src:string;width:number;height:number};alt:string;lead?:string;lines:Line[];note?:ReactNode}){
- return <><Heading>{title}</Heading>
+ return <><Heading>{ut(title)}</Heading>
   <Picture {...picture} alt={alt}/>
-  {lead&&<p className="l1a-tr">{lead}</p>}
+  {lead&&<p className="l1a-tr">{ut(lead)}</p>}
   <DialogueLines lines={lines} speech={speech}/>
   <ListenAll lines={lines} speech={speech}/>
   {note&&<Note>{note}</Note>}</>;
 }
 function VerbsB({speech}:{speech:Speech}){
- return <><Heading>Fiil çekimi: <span lang="de">ich / du / Sie</span></Heading>
+ return <><Heading><Tx text="Fiil çekimi: _ich / du / Sie_"/></Heading>
   <div className="l1a-scroll"><table className="l1a-table l1a-verb-grid" lang="de"><thead><tr><th></th>{verbTable.map(row=><th key={row.verb}>{row.verb}</th>)}</tr></thead>
    <tbody>{(['ich','du','sie'] as const).map(person=><tr key={person}><td><b>{person==='sie'?'Sie':person}</b></td>{verbTable.map(row=><td key={row.verb}><Rich text={row[person]}/></td>)}</tr>)}</tbody></table></div>
   <div className="l1a-actions">{verbTable.map(row=><Say key={row.verb} text={row.say} speech={speech} label={row.verb} wide/>)}</div>
-  <Note>Kural: <b lang="de">ich → -e</b>, <b lang="de">du → -st</b>, <b lang="de">Sie → -en</b>. İstisnalar: <b lang="de">heißen</b> → <span lang="de">du heiß<b>t</b></span> (ß’den sonra sadece <b>-t</b>). <b lang="de">sprechen</b> → <span lang="de">du spr<b>i</b>chst</span> (e → i). <b lang="de">sein</b> düzensiz: <span lang="de">bin / bist / sind</span>.</Note></>;
+  <Note><Tx text="Kural: *ich → -e*, *du → -st*, *Sie → -en*. İstisnalar: *heißen* → _du heiß**t**_ (ß’den sonra sadece **-t**). *sprechen* → _du spr**i**chst_ (e → i). *sein* düzensiz: _bin / bist / sind_."/></Note></>;
 }
 function Alphabet({speech}:{speech:Speech}){
  return <><Heading><span lang="de">Das Alphabet</span></Heading>
   <Picture {...willkommenBPictures.alphabet} alt="Paul Hoca alfabe tahtasının önünde"/>
-  <p className="l1a-tr">Harfe dokun, Almanca adını dinle. Mavi çerçeveliler Türkçeden farklı okunur.</p>
-  <div className="l1a-abc">{alphabet.map(([letter,hint,say])=><button type="button" key={letter} className={'l1a-letter'+(hardLetters.includes(letter)?' hard':'')+(speech.busy&&speech.activeText===say?' playing':'')} onClick={()=>speech.speak(say)} aria-label={'Dinle: '+letter+' ('+hint+')'}><b lang="de">{letter}</b><small>{hint}</small></button>)}</div>
-  <Note>Dikkat: <b>J</b> = yot, <b>V</b> = fau, <b>W</b> = ve, <b>Y</b> = üpsilon, <b>Z</b> = tset, <b>C</b> = tse, <b>E</b> ince “e”, <b>I</b> “i”. Umlautlar: <b>Ä, Ö, Ü</b>. <b>ß</b> = estset, “ss” gibi okunur.</Note></>;
+  <p className="l1a-tr">{ut('Harfe dokun, Almanca adını dinle. Mavi çerçeveliler Türkçeden farklı okunur.')}</p>
+  <div className="l1a-abc">{alphabet.map(([letter,hint,say])=><button type="button" key={letter} className={'l1a-letter'+(hardLetters.includes(letter)?' hard':'')+(speech.busy&&speech.activeText===say?' playing':'')} onClick={()=>speech.speak(say)} aria-label={ut('Dinle')+': '+letter+' ('+ut(hint)+')'}><b lang="de">{letter}</b><small>{ut(hint)}</small></button>)}</div>
+  <Note><Tx text="Dikkat: **J** = yot, **V** = fau, **W** = ve, **Y** = üpsilon, **Z** = tset, **C** = tse, **E** ince “e”, **I** “i”. Umlautlar: **Ä, Ö, Ü**. **ß** = estset, “ss” gibi okunur."/></Note></>;
 }
 function Spelling({speech}:{speech:Speech}){
- return <><Heading>Harf harf söyleme</Heading>
-  {spellPhrases.map(([de,tr,say])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{tr}</span></div><Say text={say} speech={speech}/></div>)}
-  <h3 className="l1a-h2">Diyalog: Yasemin ve Nikos</h3>
+ return <><Heading>{ut('Harf harf söyleme')}</Heading>
+  {spellPhrases.map(([de,tr,say])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{ut(tr)}</span></div><Say text={say} speech={speech}/></div>)}
+  <h3 className="l1a-h2">{ut('Diyalog: Yasemin ve Nikos')}</h3>
   <DialogueLines lines={dialogueSpell} speech={speech}/>
   <ListenAll lines={dialogueSpell} speech={speech}/>
-  <p className="l1a-tr l1a-spell-row">Harfleri tek tek dinle: <b lang="de">NIKOS</b> <SpellButton word="Nikos" speech={speech}/> · <b lang="de">PAPADAKIS</b> <SpellButton word="Papadakis" speech={speech}/></p></>;
+  <p className="l1a-tr l1a-spell-row">{ut('Harfleri tek tek dinle:')} <b lang="de">NIKOS</b> <SpellButton word="Nikos" speech={speech}/> · <b lang="de">PAPADAKIS</b> <SpellButton word="Papadakis" speech={speech}/></p></>;
 }
 function ProfileStep({speech}:{speech:Speech}){
- return <><Heading><span lang="de">Steckbrief</span> (kimlik kartı)</Heading>
-  <p className="l1a-tr">Bir kişinin bilgilerini kısaca yazarsın:</p>
+ return <><Heading><span lang="de">Steckbrief</span> ({ut('kimlik kartı')})</Heading>
+  <p className="l1a-tr">{ut('Bir kişinin bilgilerini kısaca yazarsın:')}</p>
   <ProfileCard card={nikosCard}/>
-  <h3 className="l1a-h2"><span lang="de">Alles richtig?</span> (Hepsi doğru mu?)</h3>
-  <p className="l1a-tr">Karttan cümle kurar, karşındaki doğrular ya da düzeltir:</p>
+  <h3 className="l1a-h2"><span lang="de">Alles richtig?</span> ({ut('Hepsi doğru mu?')})</h3>
+  <p className="l1a-tr">{ut('Karttan cümle kurar, karşındaki doğrular ya da düzeltir:')}</p>
   <DialogueLines lines={dialogueCheck} speech={speech}/>
   <ListenAll lines={dialogueCheck} speech={speech}/>
   <WordTable items={yesNoWords}/>
-  <Note>W-soruları (<b lang="de">Wie? Woher? Welche?</b>) söylenirken ses sonda <b>düşer</b>: {intonation.map(text=><span className="l1a-into" key={text}><span lang="de">{text}</span> ↘ <Say text={text} speech={speech}/></span>)}</Note></>;
+  <Note><Tx text="W-soruları (*Wie? Woher? Welche?*) söylenirken ses sonda **düşer**:"/> {intonation.map(text=><span className="l1a-into" key={text}><span lang="de">{text}</span> ↘ <Say text={text} speech={speech}/></span>)}</Note></>;
 }
 function WordListB({speech}:{speech:Speech}){
- return <><Heading>Kelime listesi</Heading>
-  <table className="l1a-table l1a-words"><tbody>{wordsB.map(([de,tr])=><tr key={de}><td><span className="l1a-de" lang="de">{de}</span></td><td>{tr}</td><td><Say text={wordSay(de)} speech={speech}/></td></tr>)}</tbody></table>
-  <p className="l1a-tr">Konu bitti. Şimdi alıştırmalar başlıyor.</p></>;
+ return <><Heading>{ut('Kelime listesi')}</Heading>
+  <table className="l1a-table l1a-words"><tbody>{wordsB.map(([de,tr])=><tr key={de}><td><span className="l1a-de" lang="de">{de}</span></td><td>{ut(tr)}</td><td><Say text={wordSay(de)} speech={speech}/></td></tr>)}</tbody></table>
+  <p className="l1a-tr">{ut('Konu bitti. Şimdi alıştırmalar başlıyor.')}</p></>;
 }
 
 /* ---------- Teil B's own exercises ---------- */
@@ -164,13 +165,13 @@ function HearExercise(props:StepProps){
   if(done===hearItems.length){setFeedback(scoreFeedback(right,hearItems.length));finish(right,hearItems.length,undefined,ok);}
   else if(ok)sound.correct();else sound.wrong();};
  return <>
-  <p className="kicker" lang="de">Alıştırma 4 · Hören Sie</p><Heading>Dinle: hangi dilleri konuşuyorlar?</Heading>
-  <p className="l1a-tr">Dinle, doğru olanların hepsini işaretle, sonra “Kontrol”.</p>
+  <p className="kicker">{ut('Alıştırma 4 · Hören Sie')}</p><Heading>{ut('Dinle: hangi dilleri konuşuyorlar?')}</Heading>
+  <p className="l1a-tr">{ut('Dinle, doğru olanların hepsini işaretle, sonra “Kontrol”.')}</p>
   {hearItems.map((item,i)=><div className="l1a-listen" key={item.key}>
    <div className="l1a-person"><Portrait who={item.key} name={item.name.split(' ')[0]}/><div className="l1a-phrase-text"><span className="l1a-de">{i+1}. <span lang="de">{item.name}</span></span><span className="l1a-tr" lang="de">Ich spreche …</span></div><Say text={item.text} who={item.key} speech={speech} wide secret/></div>
    <div className="l1a-opts wrap" role="group" aria-label={item.name}>{item.options.map((option,j)=>{const on=ticked[i].includes(j);const state=checked[i]===null?'':item.answers.includes(j)?' ok':on?' bad':'';return <button type="button" key={option} className={'l1a-opt l1a-tick'+(on?' on':'')+state} aria-pressed={on} disabled={checked[i]!==null} lang="de" onClick={()=>toggle(i,j)}>{on?<Check size={15} aria-hidden="true"/>:null}{option}</button>;})}
-    <button type="button" className="btn small" disabled={checked[i]!==null||!ticked[i].length} onClick={()=>check(i)}>Kontrol</button></div>
-   {checked[i]!==null&&<p className={'l1a-mini'+(checked[i]?' l1a-ok-text':' l1a-bad-text')}>{checked[i]?'Doğru!':'Doğrusu yeşil olanlar.'} Metin: <span lang="de" dir="ltr">{item.text}</span></p>}
+    <button type="button" className="btn small" disabled={checked[i]!==null||!ticked[i].length} onClick={()=>check(i)}>{ut('Kontrol')}</button></div>
+   {checked[i]!==null&&<p className={'l1a-mini'+(checked[i]?' l1a-ok-text':' l1a-bad-text')}>{ut(checked[i]?'Doğru!':'Doğrusu yeşil olanlar.')} {ut('Metin:')} <span lang="de" dir="ltr">{item.text}</span></p>}
   </div>)}
   <FeedbackLine feedback={feedback}/>
  </>;
@@ -182,16 +183,16 @@ function NamesExercise(props:StepProps){
  const refs=useRef<(HTMLInputElement|null)[]>([]);
  const total=spellNames.length;
  const self=useSelfCheck(total,(i,value)=>acceptsAnswer(value,[spellNames[i]]),firstRight=>{
-  onScore(step.id,firstRight,total);setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':`Hepsi doğru! İlk denemede ${firstRight} / ${total} doğruydu.`});sound.correct();
+  onScore(step.id,firstRight,total);setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':'Hepsi doğru! İlk denemede {right} / {total} doğruydu.',params:{right:firstRight,total}});sound.correct();
  });
  const note=(result:SelfCheckResult)=>selfCheckNote(result,self,'Kırmızıyı düzelt; doğrusu yanında yazıyor.',setFeedback);
  const focusNext=(i:number)=>{const target=spellNames.findIndex((_,k)=>k>i&&self.stateNow(k)!==true);if(target>=0)refs.current[target]?.focus();};
  return <>
-  <p className="kicker" lang="de">Alıştırma 5 · Buchstabieren</p><Heading>Harf harf dinle, adı yaz</Heading>
-  <p className="l1a-tr">Harfleri dinle, adı kutuya yaz. (ß yerine ss, ü yerine ue yazabilirsin.)</p>
+  <p className="kicker">{ut('Alıştırma 5 · Buchstabieren')}</p><Heading>{ut('Harf harf dinle, adı yaz')}</Heading>
+  <p className="l1a-tr">{ut('Harfleri dinle, adı kutuya yaz. (ß yerine ss, ü yerine ue yazabilirsin.)')}</p>
   {spellNames.map((name,i)=><div className="l1a-arow l1a-name-row" key={name}>
    <SpellButton word={name} speech={speech} label={String(i+1)}/>
-   <span className="l1a-gap-wrap"><input ref={element=>{refs.current[i]=element;}} className={'l1a-gap l1a-name-gap'+(self.state[i]===true?' ok':self.state[i]===false?' bad':'')} value={self.values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} aria-label={'Ad '+(i+1)} enterKeyHint="next"
+   <span className="l1a-gap-wrap"><input ref={element=>{refs.current[i]=element;}} className={'l1a-gap l1a-name-gap'+(self.state[i]===true?' ok':self.state[i]===false?' bad':'')} value={self.values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} aria-label={ut('Ad {n}',{n:i+1})} enterKeyHint="next"
     onChange={event=>{sound.prepare();speech.prepare();note(self.change(i,event.target.value));}} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>{self.hinted[i]&&self.state[i]!==true&&<span className="l1a-hint" lang="de">→ {name}</span>}</span>
   </div>)}
   <FeedbackLine feedback={feedback}/>
@@ -202,7 +203,7 @@ function LetterExercise(props:StepProps){
  const {speech}=props;
  // The options are shuffled once; the say buttons are made on every render (they show whether the voice is busy).
  const [options]=useState(()=>letterQuestions.map(item=>shuffle(item.options)));
- const rows=letterQuestions.map((item,i)=>({key:String(i),label:'Harf '+(i+1),before:<Say text={letterSay(item.answer)} speech={speech} label={String(i+1)} wide secret/>,options:options[i].map(option=>({value:option,label:option})),answer:item.answer,say:letterSay(item.answer) as SayItem}));
+ const rows=letterQuestions.map((item,i)=>({key:String(i),label:ut('Harf {n}',{n:i+1}),before:<Say text={letterSay(item.answer)} speech={speech} label={String(i+1)} wide secret/>,options:options[i].map(option=>({value:option,label:option})),answer:item.answer,say:letterSay(item.answer) as SayItem}));
  return <ChoiceRows kicker="Alıştırma 6 · Welcher Buchstabe?" title="Dinle: hangi harf?" lead="Dinle, duyduğun harfi seç." rows={rows} {...props}/>;
 }
 /** Exercise 11 · now you: write your languages and spell your name (not scored). */
@@ -211,26 +212,26 @@ function OwnB({speech,onScore,step}:StepProps){
  const change=(i:number,value:string)=>{const next=values.slice();next[i]=value;setValues(next);const s=state.slice();s[i]=value.trim()?ownPromptsB[i].pattern.test(normalizeLoose(value)):null;setState(s);if(s.every(value=>value===true))onScore(step.id,s.length,s.length);}; // all sentences fit: the step shows done
  const letters=values[1].replace(/^\s*ich\s+buchstabiere\s*:?/i,'').trim();
  return <>
-  <p className="kicker" lang="de">Alıştırma 11 · Jetzt du</p><Heading>Şimdi sen</Heading><p className="l1a-tr">Kendi dillerinle ve adınla yaz, sonra dinle.</p>
+  <p className="kicker">{ut('Alıştırma 11 · Jetzt du')}</p><Heading>{ut('Şimdi sen')}</Heading><p className="l1a-tr">{ut('Kendi dillerinle ve adınla yaz, sonra dinle.')}</p>
   <div className="l1a-dialogue">{ownPromptsB.map((prompt,i)=><div key={prompt.question}>
    <div className="l1a-line a"><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l1a-de" lang="de">{prompt.question}</span></div><Say text={prompt.question} who="paul" speech={speech}/></div></div>
-   <div className="l1a-line b"><div className="l1a-bubble"><input className={'l1a-gap wide'+(state[i]===true?' ok':state[i]===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" placeholder={prompt.placeholder} aria-label={prompt.question} onChange={event=>change(i,event.target.value)}/>{state[i]===false&&<span className="l1a-mini">Kalıp: <span lang="de">{prompt.placeholder}</span></span>}</div></div>
+   <div className="l1a-line b"><div className="l1a-bubble"><input className={'l1a-gap wide'+(state[i]===true?' ok':state[i]===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" placeholder={prompt.placeholder} aria-label={prompt.question} onChange={event=>change(i,event.target.value)}/>{state[i]===false&&<span className="l1a-mini">{ut('Kalıp:')} <span lang="de">{prompt.placeholder}</span></span>}</div></div>
   </div>)}</div>
   <div className="l1a-actions">
-   <button type="button" className="btn secondary small" disabled={speech.busy||!values[0].trim()} onClick={()=>speech.speak(values[0].trim())}><Volume2 size={16} aria-hidden="true"/>Cümlemi dinle</button>
-   <button type="button" className="btn secondary small" disabled={speech.busy||!letters} onClick={()=>speech.speakAll(spellItems(letters))}><Volume2 size={16} aria-hidden="true"/>Adımı harf harf dinle</button>
+   <button type="button" className="btn secondary small" disabled={speech.busy||!values[0].trim()} onClick={()=>speech.speak(values[0].trim())}><Volume2 size={16} aria-hidden="true"/>{ut('Cümlemi dinle')}</button>
+   <button type="button" className="btn secondary small" disabled={speech.busy||!letters} onClick={()=>speech.speakAll(spellItems(letters))}><Volume2 size={16} aria-hidden="true"/>{ut('Adımı harf harf dinle')}</button>
   </div>
-  <Note>Harfleri Almanca adlarıyla söylemeyi unutma: <b>J</b> = yot, <b>Y</b> = üpsilon, <b>V</b> = fau.</Note>
+  <Note><Tx text="Harfleri Almanca adlarıyla söylemeyi unutma: **J** = yot, **Y** = üpsilon, **V** = fau."/></Note>
  </>;
 }
-function EndB({progress,onGo,onPart}:StepProps){
+function EndB({progress,onGo,onPart,language}:StepProps){
  return <>
-  <Heading>Lektion 1B tamam! 🎉</Heading>
+  <Heading>{ut('Lektion 1B tamam! 🎉')}</Heading>
   <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
-  <p>Artık şunları yapabilirsin:</p>
-  <ul className="l1a-list"><li><b lang="de">Ich spreche … und ein bisschen Deutsch.</b> – dillerini söyleme</li><li><b lang="de">Sie</b> ve <b lang="de">du</b> ile soru sorma</li><li><span lang="de">ich / du / Sie</span> fiil çekimi (<b lang="de">-e / -st / -en</b>)</li><li>Alfabe ve <b lang="de">Ich buchstabiere: …</b></li><li><b lang="de">Wie bitte? Wie schreibt man das?</b> – anlamadığında sorma</li><li><b lang="de">Ja, richtig! / Nein, …</b> – doğrulama</li></ul>
-  <ProgressMeter progress={progress} language={'tr'} label="Lektion 1B"/>
-  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil C – Guten Tag!</b></p>
-  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>onPart('c',0)}>Teil C'ye geç</button><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexB('land-sprache'))}>Alıştırmaları tekrar yap</button><button type="button" className="btn secondary small" onClick={()=>onGo(-1)}>Lektion 1 içindekiler</button></div>
+  <p>{ut('Artık şunları yapabilirsin:')}</p>
+  <ul className="l1a-list"><li><Tx text="*Ich spreche … und ein bisschen Deutsch.* – dillerini söyleme"/></li><li><Tx text="*Sie* ve *du* ile soru sorma"/></li><li><Tx text="_ich / du / Sie_ fiil çekimi (*-e / -st / -en*)"/></li><li><Tx text="Alfabe ve *Ich buchstabiere: …*"/></li><li><Tx text="*Wie bitte? Wie schreibt man das?* – anlamadığında sorma"/></li><li><Tx text="*Ja, richtig! / Nein, …* – doğrulama"/></li></ul>
+  <ProgressMeter progress={progress} language={language} label="Lektion 1B"/>
+  <p className="l1a-tr"><Tx text="Sıradaki bölüm: *Teil C – Guten Tag!*"/></p>
+  <div className="l1a-actions"><button type="button" className="btn small" onClick={()=>onPart('c',0)}>{ut('Teil C\'ye geç')}</button><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexB('land-sprache'))}>{ut('Alıştırmaları tekrar yap')}</button><button type="button" className="btn secondary small" onClick={()=>onGo(-1)}>{ut('Lektion 1 içindekiler')}</button></div>
  </>;
 }

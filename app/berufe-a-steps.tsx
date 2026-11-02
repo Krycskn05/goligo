@@ -13,7 +13,8 @@ import {
 import {ProgressMeter} from './progress-ui';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
-import {Say,Note,Heading,Portrait,Rich,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,Rich,Tx,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
+import {ut,utLang} from '@/lib/unit-i18n';
 
 /**
  * Lektion 2 „Berufe“, Teil A – Ich bin Koch. (the learner's lesson page, 2 November 2026): the steps. The page around
@@ -39,7 +40,7 @@ export function StepViewL2A(props:StepProps){
   case 'harfler':return <GapExercise kicker="Alıştırma 4 · Richtig schreiben" title="Eksik harfleri tamamla" lead="Kelimeyi dinle ve her kutuya bir harf yaz. Doğru kelime yeşil olur. (ä yerine ae de yazabilirsin.)" cells lines={letterLines} say={letterLines.map(line=>line.say)} {...props}/>;
   case 'diyalog':return <DialogueExercise {...props}/>;
   case 'sinav':return <ChoiceExercise kicker="Alıştırma 6 · Prüfung: Sprachbausteine" title="Sınav tipi: doğru kelimeyi seç" lead="Start Deutsch A1 sınavında böyle sorular var: metinde bir boşluk, iki seçenek. Boşluğa dokun ve doğrusunu seç." lines={examLines}
-   after={()=><Note>Hatırlatma: <b lang="de">aus</b> = -den (nereden geldiğin), <b lang="de">in</b> = -de (nerede yaşadığın). <i lang="de">aus der Türkei</i>, <i lang="de">in der Schweiz</i> kalıplarını olduğu gibi ezberle.</Note>} {...props}/>;
+   after={()=><Note><Tx text="Hatırlatma: *aus* = -den (nereden geldiğin), *in* = -de (nerede yaşadığın). ~aus der Türkei~, ~in der Schweiz~ kalıplarını olduğu gibi ezberle."/></Note>} {...props}/>;
   case 'und-du':return <OwnExercise {...props}/>;
   case 'test':return <TestStep label="Lektion 2A · Test" questions={berufeTest} sayFor={i=>berufeTest[i][3]} langOf={text=>isTurkishText(text)?'tr':'de'} {...props}/>;
   case 'konus':return <KonusL2A {...props}/>;
@@ -60,7 +61,7 @@ function WomanForm({de,mark}:{de:string;mark:'in'|'umlaut'}){
 }
 /** One German line with its meaning and a listen button (`who` reads it with that person's voice). */
 export function PhraseRow({de,tr,who,speech}:{de:string;tr?:ReactNode;who?:string;speech:Speech}){
- return <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span>{tr&&<span className="l1a-tr">{tr}</span>}</div><Say text={de} who={who} speech={speech}/></div>;
+ return <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span>{tr&&<span className="l1a-tr">{typeof tr==='string'?ut(tr):tr}</span>}</div><Say text={de} who={who} speech={speech}/></div>;
 }
 /** A dialogue: portrait, name, German and Turkish per line; "Tümünü dinle" reads it as a conversation and the
  * translation can be hidden to listen again. `actions={false}` for a short example. */
@@ -69,12 +70,12 @@ export function Conversation({lines,speech,actions=true}:{lines:readonly (Line&{
  return <>
   <div className={'l1a-dialogue'+(hidden?' l15-hide-tr':'')}>{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}>
    <Portrait who={line.who} name={personName(line.who)}/>
-   <div className="l1a-bubble"><span className="l15-name">{personName(line.who)}{line.from&&<span lang="tr"> · {line.from}</span>}</span><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{line.tr}</span></div>
+   <div className="l1a-bubble"><span className="l15-name">{personName(line.who)}{line.from&&<span lang={utLang(line.from)}> · {ut(line.from)}</span>}</span><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{ut(line.tr)}</span></div>
    <Say text={line.say??line.de} who={line.who} speech={speech}/>
   </div>)}</div>
   {actions&&<div className="l1a-actions">
-   <button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(lines.map(lineSay))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button>
-   <button type="button" className="btn secondary small" aria-pressed={hidden} onClick={()=>setHidden(!hidden)}>{hidden?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{hidden?'Çeviriyi göster':'Çeviriyi gizle'}</button>
+   <button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(lines.map(lineSay))}><Play size={16} aria-hidden="true"/>{ut('Tümünü dinle')}</button>
+   <button type="button" className="btn secondary small" aria-pressed={hidden} onClick={()=>setHidden(!hidden)}>{hidden?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{ut(hidden?'Çeviriyi göster':'Çeviriyi gizle')}</button>
   </div>}
  </>;
 }
@@ -88,12 +89,12 @@ export function QuickChecks({items,speech,sound,title='Hemen kontrol'}:{items:re
   const say=items[i].say;const after=say?()=>speech.speak(say):undefined;
   if(value===items[i].options[0])sound.correct(after);else sound.wrong(after);
  };
- return <section className="l2-checks" aria-label={title}>
-  <h2 className="l1a-h2">{title}</h2>
+ return <section className="l2-checks" aria-label={ut(title)}>
+  <h2 className="l1a-h2">{ut(title)}</h2>
   {items.map((item,i)=>{const picked=answers[i];const right=item.options[0];return <div className="l1a-arow wide" key={item.q} data-done={picked!==undefined?'':undefined}>
-   <p className="l2-check-q" lang={isTurkishText(item.q)?'tr':'de'}>{item.q}</p>
-   <div className="l1a-opts" role="group" aria-label={item.q}>{orders[i].map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==undefined&&option===right?' ok':picked===option?' bad':'')} disabled={picked!==undefined} lang={item.say?'de':'tr'} onClick={()=>answer(i,option)}>{option}</button>)}</div>
-   {picked!==undefined&&<p className={'l1a-feedback '+(picked===right?'ok':'bad')} role="status">{picked===right?'Doğru!':'Doğrusu yeşil olan.'}</p>}
+   <p className="l2-check-q" lang={isTurkishText(item.q)?utLang(item.q):'de'}>{ut(item.q)}</p>
+   <div className="l1a-opts" role="group" aria-label={ut(item.q)}>{orders[i].map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==undefined&&option===right?' ok':picked===option?' bad':'')} disabled={picked!==undefined} lang={item.say?'de':utLang(option)} onClick={()=>answer(i,option)}>{ut(option)}</button>)}</div>
+   {picked!==undefined&&<p className={'l1a-feedback '+(picked===right?'ok':'bad')} role="status">{ut(picked===right?'Doğru!':'Doğrusu yeşil olan.')}</p>}
   </div>;})}
  </section>;
 }
@@ -103,118 +104,118 @@ function CoverL2A(){ // the cover picture and the part's progress are on the not
  return <>
   <p className="kicker" lang="de">Lektion 2 · Berufe</p>
   <Heading><span lang="de">A — Ich bin Koch.</span></Heading>
-  <p>Kursta herkes birbirine mesleğini soruyor. Omar memleketinde kuaför, ama Almanya’da satış görevlisi olarak çalışıyor. Sen ne iş yapıyorsun?</p>
-  <p>Bu bölümde öğreneceklerin:</p>
+  <p>{ut('Kursta herkes birbirine mesleğini soruyor. Omar memleketinde kuaför, ama Almanya’da satış görevlisi olarak çalışıyor. Sen ne iş yapıyorsun?')}</p>
+  <p>{ut('Bu bölümde öğreneceklerin:')}</p>
   <ul className="l1a-list">
-   <li>Meslek sormak: <b lang="de">Was bist du von Beruf?</b></li>
-   <li>Mesleğini söylemek: <b lang="de">Ich bin Köchin von Beruf.</b> (artikelsiz!)</li>
-   <li>Kadın ve erkek meslek adları: <b lang="de">Lehrer → Lehrerin</b></li>
-   <li>Şu anki işin: <b lang="de">Ich arbeite als … / bei …</b> · <b lang="de">Ich arbeite jetzt nicht.</b></li>
-   <li>Fiiller: <i lang="de">ich arbeite, du arbeitest, Sie arbeiten</i></li>
+   <li><Tx text="Meslek sormak: *Was bist du von Beruf?*"/></li>
+   <li><Tx text="Mesleğini söylemek: *Ich bin Köchin von Beruf.* (artikelsiz!)"/></li>
+   <li><Tx text="Kadın ve erkek meslek adları: *Lehrer → Lehrerin*"/></li>
+   <li><Tx text="Şu anki işin: *Ich arbeite als … / bei …* · *Ich arbeite jetzt nicht.*"/></li>
+   <li><Tx text="Fiiller: ~ich arbeite, du arbeitest, Sie arbeiten~"/></li>
   </ul>
-  <h2 className="l1a-h2">Bu dersteki kişiler</h2>
+  <h2 className="l1a-h2">{ut('Bu dersteki kişiler')}</h2>
   <ul className="l15-cast">{castL2A.map(key=><li key={key}><Portrait who={key} name={personName(key)}/><span>{personName(key)}</span></li>)}</ul>
  </>;
 }
 /** The jobs: a picture with a man and a woman, both forms (each row reads itself) and the meaning; the picture reads both. */
 function JobWords({speech}:{speech:Speech}){
- return <><p className="kicker" lang="de">Wortschatz · Berufe</p><Heading>Meslekler</Heading>
-  <p className="l1a-tr">Her meslek iki biçimde: <span className="l15-der" lang="de">der</span> erkek, <span className="l15-die" lang="de">die</span> kadın. Satıra ya da resme dokun, dinle ve yüksek sesle tekrar et.</p>
+ return <><p className="kicker" lang="de">Wortschatz · Berufe</p><Heading>{ut('Meslekler')}</Heading>
+  <p className="l1a-tr"><Tx text="Her meslek iki biçimde: [der] erkek, [die] kadın. Satıra ya da resme dokun, dinle ve yüksek sesle tekrar et."/></p>
   <ul className="l2-jobs">{jobs.map(job=>{const picture=jobPicture(job.key);return <li className="l2-job" key={job.key}>
-   <button type="button" className="l2-job-pic" aria-label={'Dinle: '+pairSay(job)} onClick={()=>speech.speak(pairSay(job))}><img src={picture.src} alt={job.alt} width={picture.width} height={picture.height} loading="lazy" decoding="async"/></button>
+   <button type="button" className="l2-job-pic" aria-label={ut('Dinle')+': '+pairSay(job)} onClick={()=>speech.speak(pairSay(job))}><img src={picture.src} alt={ut(job.alt)} width={picture.width} height={picture.height} loading="lazy" decoding="async"/></button>
    <div className="l2-job-text">
     <ul className="l1a-say-list l2-forms">
      <li><span lang="de"><Art de={job.male}/></span><Say text={job.male} speech={speech}/></li>
      <li><span lang="de"><Art de={job.female}/></span><Say text={job.female} speech={speech}/></li>
     </ul>
-    <span className="l2-job-tr">{job.emoji} {job.tr}</span>
+    <span className="l2-job-tr">{job.emoji} {ut(job.tr)}</span>
    </div>
   </li>;})}</ul></>;
 }
 function OtherWords({speech}:{speech:Speech}){
- return <><p className="kicker" lang="de">Wortschatz · Wörter</p><Heading>Diğer kelimeler</Heading>
-  <p className="l1a-tr">Her satırda kelime, anlamı ve bir örnek cümle var. Satıra dokununca örnek cümle okunur.</p>
-  <div className="l15-word-grid">{otherWords.map(([de,tr,example,exampleTr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{tr}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{exampleTr}</span></div><Say text={example} speech={speech}/></div>)}</div></>;
+ return <><p className="kicker" lang="de">Wortschatz · Wörter</p><Heading>{ut('Diğer kelimeler')}</Heading>
+  <p className="l1a-tr">{ut('Her satırda kelime, anlamı ve bir örnek cümle var. Satıra dokununca örnek cümle okunur.')}</p>
+  <div className="l15-word-grid">{otherWords.map(([de,tr,example,exampleTr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{ut(tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{ut(exampleTr)}</span></div><Say text={example} speech={speech}/></div>)}</div></>;
 }
 function WordCheck({speech,sound,onGo}:{speech:Speech;sound:Sound;onGo:(index:number)=>void}){
- return <><p className="kicker" lang="de">Wortschatz · Kontrolle</p><Heading>Kelimeleri hatırlıyor musun?</Heading>
-  <p className="l1a-tr">Hızlı bir kontrol, puanı yok. Yanlış olursa doğrusu yeşil görünür.</p>
+ return <><p className="kicker" lang="de">Wortschatz · Kontrolle</p><Heading>{ut('Kelimeleri hatırlıyor musun?')}</Heading>
+  <p className="l1a-tr">{ut('Hızlı bir kontrol, puanı yok. Yanlış olursa doğrusu yeşil görünür.')}</p>
   <QuickChecks items={wordChecks} speech={speech} sound={sound} title="8 kısa soru"/>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(berufeStepIndex('meslekler'))}>Meslek kartlarına dön</button></div></>;
+  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(berufeStepIndex('meslekler'))}>{ut('Meslek kartlarına dön')}</button></div></>;
 }
 function AskJob({speech,sound}:{speech:Speech;sound:Sound}){
- return <><p className="kicker" lang="de">Konu 1 · Was bist du von Beruf?</p><Heading>Meslek sorma ve söyleme</Heading>
-  <p>Almancada mesleği sormanın iki yolu var. İkisi de çok sık kullanılır; ikisini de tanı.</p>
-  <h2 className="l1a-h2">1. Soru: <span lang="de">„von Beruf“</span> ile</h2>
+ return <><p className="kicker">{ut('Konu 1 · Was bist du von Beruf?')}</p><Heading>{ut('Meslek sorma ve söyleme')}</Heading>
+  <p>{ut('Almancada mesleği sormanın iki yolu var. İkisi de çok sık kullanılır; ikisini de tanı.')}</p>
+  <h2 className="l1a-h2"><Tx text="1. Soru: _„von Beruf“_ ile"/></h2>
   {askBeruf.map(([de,tr])=><PhraseRow key={de} de={de} tr={tr} speech={speech}/>)}
-  <h2 className="l1a-h2">2. Soru: <span lang="de">„beruflich“</span> ile</h2>
+  <h2 className="l1a-h2"><Tx text="2. Soru: _„beruflich“_ ile"/></h2>
   {askBeruflich.map(([de,tr])=><PhraseRow key={de} de={de} tr={tr} speech={speech}/>)}
-  <h2 className="l1a-h2">Cevap</h2>
+  <h2 className="l1a-h2">{ut('Cevap')}</h2>
   {sayBeruf.map(([de,tr])=><PhraseRow key={de} de={de} tr={tr} speech={speech}/>)}
-  <p>„<span lang="de">von Beruf</span>“ eklemek isteğe bağlı. <b lang="de">Ich bin Lehrerin.</b> ve <b lang="de">Ich bin Lehrerin von Beruf.</b> ikisi de doğru. „<span lang="de">von Beruf</span>“ dediğinde „bu benim mesleğim, öğrendiğim iş“ demiş olursun.</p>
-  <p className="l15-warn"><b>En önemli kural: artikel yok!</b> Mesleğini söylerken <b lang="de">ein / eine / der / die</b> kullanılmaz:<br/>✅ <span lang="de">Ich bin Koch.</span> ❌ <s lang="de">Ich bin ein Koch.</s><br/>✅ <span lang="de">Ich bin Ärztin.</span> ❌ <s lang="de">Ich bin eine Ärztin.</s><br/>Tıpkı Türkçedeki gibi: „Ben aşçıyım“, „Ben bir aşçıyım“ değil.</p>
-  <h2 className="l1a-h2">Örnek 1 — <span lang="de">Sie</span> (siz)</h2>
-  <p className="l1a-tr">Yasemin ve komşusu Nora birbirine <span lang="de">„Sie“</span> der (Lektion 1’den hatırla).</p>
+  <p><Tx text="„_von Beruf_“ eklemek isteğe bağlı. *Ich bin Lehrerin.* ve *Ich bin Lehrerin von Beruf.* ikisi de doğru. „_von Beruf_“ dediğinde „bu benim mesleğim, öğrendiğim iş“ demiş olursun."/></p>
+  <p className="l15-warn"><Tx text="**En önemli kural: artikel yok!** Mesleğini söylerken *ein / eine / der / die* kullanılmaz:"/><br/>✅ <span lang="de">Ich bin Koch.</span> ❌ <s lang="de">Ich bin ein Koch.</s><br/>✅ <span lang="de">Ich bin Ärztin.</span> ❌ <s lang="de">Ich bin eine Ärztin.</s><br/>{ut('Tıpkı Türkçedeki gibi: „Ben aşçıyım“, „Ben bir aşçıyım“ değil.')}</p>
+  <h2 className="l1a-h2"><Tx text="Örnek 1 — _Sie_ (siz)"/></h2>
+  <p className="l1a-tr"><Tx text="Yasemin ve komşusu Nora birbirine _„Sie“_ der (Lektion 1’den hatırla)."/></p>
   <Conversation lines={sieDialogue} speech={speech}/>
-  <h2 className="l1a-h2">Örnek 2 — <span lang="de">du</span> (sen)</h2>
-  <p className="l1a-tr">Kursta herkes birbirine <span lang="de">„du“</span> der.</p>
+  <h2 className="l1a-h2"><Tx text="Örnek 2 — _du_ (sen)"/></h2>
+  <p className="l1a-tr"><Tx text="Kursta herkes birbirine _„du“_ der."/></p>
   <Conversation lines={duDialogue} speech={speech}/>
   <QuickChecks items={askChecks} speech={speech} sound={sound}/></>;
 }
 function Forms({speech,sound}:{speech:Speech;sound:Sound}){
  const haus=jobOf('haus');
- return <><p className="kicker" lang="de">Konu 2 · Mann oder Frau?</p><Heading>Kadın ve erkek meslek adları</Heading>
-  <p>Almancada her mesleğin <b>erkek</b> ve <b>kadın</b> biçimi ayrıdır. Erkek biçimi <b className="l15-der" lang="de">der</b>, kadın biçimi <b className="l15-die" lang="de">die</b> alır. Kendinden bahsederken sana uyan biçimi kullanırsın: bir erkek <i lang="de">„Ich bin Lehrer“</i>, bir kadın <i lang="de">„Ich bin Lehrerin“</i> der.</p>
-  <h2 className="l1a-h2">Ana kural: + <span lang="de">in</span></h2>
-  <p>Kadın biçimi = erkek biçimi + <b lang="de">-in</b>. Bu kural mesleklerin çoğunda işler:</p>
-  <table className="l1a-table"><thead><tr><th><span className="l15-der" lang="de">der</span> erkek</th><th><span className="l15-die" lang="de">die</span> kadın</th><th/></tr></thead>
+ return <><p className="kicker">{ut('Konu 2 · Mann oder Frau?')}</p><Heading>{ut('Kadın ve erkek meslek adları')}</Heading>
+  <p><Tx text="Almancada her mesleğin **erkek** ve **kadın** biçimi ayrıdır. Erkek biçimi [der], kadın biçimi [die] alır. Kendinden bahsederken sana uyan biçimi kullanırsın: bir erkek ~„Ich bin Lehrer“~, bir kadın ~„Ich bin Lehrerin“~ der."/></p>
+  <h2 className="l1a-h2"><Tx text="Ana kural: + _in_"/></h2>
+  <p><Tx text="Kadın biçimi = erkek biçimi + *-in*. Bu kural mesleklerin çoğunda işler:"/></p>
+  <table className="l1a-table"><thead><tr><th><span className="l15-der" lang="de">der</span> {ut('erkek')}</th><th><span className="l15-die" lang="de">die</span> {ut('kadın')}</th><th/></tr></thead>
    <tbody>{inRule.map(key=>{const job=jobOf(key);return <tr key={key}><td lang="de"><Art de={job.male}/></td><td lang="de"><WomanForm de={job.female} mark="in"/></td><td><Say text={pairSay(job)} speech={speech}/></td></tr>;})}</tbody></table>
-  <h2 className="l1a-h2">Dikkat 1: nokta nokta (Umlaut) gelir</h2>
-  <p>Bazı kelimelerde <span lang="de">-in</span> eklenince içerideki <b>o → ö</b>, <b>a → ä</b> olur. Bunları ezberle, kuralı yok:</p>
-  {umlautRule.map(key=>{const job=jobOf(key);return <div className="l1a-phrase" key={key}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={job.male}/> → <WomanForm de={job.female} mark="umlaut"/></span><span className="l1a-tr">{job.tr}</span></div><Say text={pairSay(job)} speech={speech}/></div>;})}
-  <h2 className="l1a-h2">Dikkat 2: <span lang="de">Mann → Frau</span></h2>
-  <p>„<span lang="de">-mann</span>“ ile biten kelimede <span lang="de">-in</span> eklenmez; <b lang="de">Mann</b> yerine <b lang="de">Frau</b> gelir:</p>
-  <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={haus.male}/> → <Art de={haus.female}/></span><span className="l1a-tr">ev erkeği → ev hanımı</span></div><Say text={pairSay(haus)} speech={speech}/></div>
-  <h2 className="l1a-h2">Hepsi bir arada</h2>
-  <table className="l1a-table"><tbody>{jobs.map(job=><tr key={job.key}><td lang="de"><Art de={job.male}/></td><td lang="de"><Art de={job.female}/></td><td className="l1a-mini">{job.tr}</td><td><Say text={pairSay(job)} speech={speech}/></td></tr>)}</tbody></table>
-  <Note>Okurken ipucu: kelimenin sonunda <b lang="de">-in</b> görüyorsan kadından bahsediliyor: <i lang="de">die Verkäufer<b>in</b></i> = kadın satış görevlisi.</Note>
+  <h2 className="l1a-h2">{ut('Dikkat 1: nokta nokta (Umlaut) gelir')}</h2>
+  <p><Tx text="Bazı kelimelerde _-in_ eklenince içerideki **o → ö**, **a → ä** olur. Bunları ezberle, kuralı yok:"/></p>
+  {umlautRule.map(key=>{const job=jobOf(key);return <div className="l1a-phrase" key={key}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={job.male}/> → <WomanForm de={job.female} mark="umlaut"/></span><span className="l1a-tr">{ut(job.tr)}</span></div><Say text={pairSay(job)} speech={speech}/></div>;})}
+  <h2 className="l1a-h2"><Tx text="Dikkat 2: _Mann → Frau_"/></h2>
+  <p><Tx text="„_-mann_“ ile biten kelimede _-in_ eklenmez; *Mann* yerine *Frau* gelir:"/></p>
+  <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={haus.male}/> → <Art de={haus.female}/></span><span className="l1a-tr">{ut('ev erkeği → ev hanımı')}</span></div><Say text={pairSay(haus)} speech={speech}/></div>
+  <h2 className="l1a-h2">{ut('Hepsi bir arada')}</h2>
+  <table className="l1a-table"><tbody>{jobs.map(job=><tr key={job.key}><td lang="de"><Art de={job.male}/></td><td lang="de"><Art de={job.female}/></td><td className="l1a-mini">{ut(job.tr)}</td><td><Say text={pairSay(job)} speech={speech}/></td></tr>)}</tbody></table>
+  <Note><Tx text="Okurken ipucu: kelimenin sonunda *-in* görüyorsan kadından bahsediliyor: ~die Verkäufer**in**~ = kadın satış görevlisi."/></Note>
   <QuickChecks items={formChecks} speech={speech} sound={sound}/></>;
 }
 function Work({speech,sound}:{speech:Speech;sound:Sound}){
- return <><p className="kicker" lang="de">Konu 3 · Ich arbeite als …</p><Heading>Memleketteki meslek, Almanya’daki iş</Heading>
-  <p>Almanya’ya gelen birçok insanın <b>mesleği</b> (öğrendiği iş) ile <b>şu an yaptığı iş</b> farklıdır. Almanca bu ikisini iki ayrı kalıpla söyler. Bu ayrım bu ünitenin kalbi.</p>
+ return <><p className="kicker">{ut('Konu 3 · Ich arbeite als …')}</p><Heading>{ut('Memleketteki meslek, Almanya’daki iş')}</Heading>
+  <p><Tx text="Almanya’ya gelen birçok insanın **mesleği** (öğrendiği iş) ile **şu an yaptığı iş** farklıdır. Almanca bu ikisini iki ayrı kalıpla söyler. Bu ayrım bu ünitenin kalbi."/></p>
   {workSections.map(section=><section key={section.title}>
-   <h2 className="l1a-h2">{section.title}</h2>
+   <h2 className="l1a-h2"><Tx text={section.title}/></h2>
    {section.lead&&<p><Rich text={section.lead}/></p>}
    {section.rows.map(([de,tr])=><PhraseRow key={de} de={de} tr={tr} speech={speech}/>)}
   </section>)}
-  <h2 className="l1a-h2">Dört kişi, dört durum</h2>
-  <p className="l1a-tr">Her kişi kendi sesiyle konuşuyor.</p>
+  <h2 className="l1a-h2">{ut('Dört kişi, dört durum')}</h2>
+  <p className="l1a-tr">{ut('Her kişi kendi sesiyle konuşuyor.')}</p>
   <Conversation lines={fourPeople} speech={speech}/>
   <QuickChecks items={workChecks} speech={speech} sound={sound}/></>;
 }
 function Verbs({speech,sound}:{speech:Speech;sound:Sound}){
- return <><p className="kicker" lang="de">Konu 4 · Verben</p><Heading>Fiiller: <span lang="de">ich, du, Sie</span></Heading>
-  <p>Bu ünitenin fiilleri Lektion 1’deki kurala uyar: <b lang="de">ich → -e</b>, <b lang="de">du → -st</b>, <b lang="de">Sie → -en</b>. Satıra dokun, dinle ve yüksek sesle oku.</p>
+ return <><p className="kicker">{ut('Konu 4 · Verben')}</p><Heading><Tx text="Fiiller: _ich, du, Sie_"/></Heading>
+  <p><Tx text="Bu ünitenin fiilleri Lektion 1’deki kurala uyar: *ich → -e*, *du → -st*, *Sie → -en*. Satıra dokun, dinle ve yüksek sesle oku."/></p>
   <table className="l1a-table l2-verbs"><thead><tr><th/><th lang="de">ich</th><th lang="de">du</th><th lang="de">Sie</th><th/></tr></thead>
    <tbody>{verbTable.map(row=>{const [verb,...forms]=row;return <tr key={verb}><td><b lang="de">{verb}</b></td>{forms.map((form,i)=>{const [stem,end]=verbEnding(verb,form);return <td key={i} lang="de">{stem}<b>{end}</b></td>;})}<td><Say text={verbSay(row)} speech={speech}/></td></tr>;})}</tbody></table>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(verbTable.map(verbSay))}><Play size={16} aria-hidden="true"/>Tabloyu dinle</button></div>
-  <h2 className="l1a-h2">Dikkat: <span lang="de">du arbeit<b>est</b></span></h2>
-  <p>Fiilin gövdesi <b>-t</b> ile bitiyorsa (<span lang="de">arbeit-</span>), <span lang="de">„du“</span> için araya bir <b>e</b> girer: <i lang="de">du arbeit<b>est</b></i>. „arbeitst“ söylemesi zor; bu yüzden „e“ eklenir.</p>
+  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(verbTable.map(verbSay))}><Play size={16} aria-hidden="true"/>{ut('Tabloyu dinle')}</button></div>
+  <h2 className="l1a-h2"><Tx text="Dikkat: _du arbeit**est**_"/></h2>
+  <p><Tx text="Fiilin gövdesi **-t** ile bitiyorsa (_arbeit-_), _„du“_ için araya bir **e** girer: ~du arbeit**est**~. „arbeitst“ söylemesi zor; bu yüzden „e“ eklenir."/></p>
   <PhraseRow de={duArbeitest} tr="Garson olarak çalışıyorsun, doğru mu?" speech={speech}/>
-  <h2 className="l1a-h2">Soruda fiil 2. sırada</h2>
-  <p>Soru kelimesi önde, fiil hemen arkasında, sonra kişi:</p>
-  <table className="l1a-table"><thead><tr><th>1</th><th>2 · fiil</th><th>3</th><th/></tr></thead>
+  <h2 className="l1a-h2">{ut('Soruda fiil 2. sırada')}</h2>
+  <p>{ut('Soru kelimesi önde, fiil hemen arkasında, sonra kişi:')}</p>
+  <table className="l1a-table"><thead><tr><th>1</th><th>{ut('2 · fiil')}</th><th>3</th><th/></tr></thead>
    <tbody>{orderRows.map(row=><tr key={row.join(' ')}><td lang="de">{row[0]}</td><td lang="de"><b>{row[1]}</b></td><td lang="de">{row[2]}</td><td><Say text={orderRowSay(row)} speech={speech}/></td></tr>)}</tbody></table>
   <QuickChecks items={verbChecks} speech={speech} sound={sound}/></>;
 }
 function Phrases({speech}:{speech:Speech}){
- return <><p className="kicker" lang="de">Konu 5 · Redemittel</p><Heading>Bu ünitenin kalıpları</Heading>
-  <p className="l1a-tr">Bunları ezbere bil: dinle → söyle → kaydet → bakmadan söyle.</p>
+ return <><p className="kicker">{ut('Konu 5 · Redemittel')}</p><Heading>{ut('Bu ünitenin kalıpları')}</Heading>
+  <p className="l1a-tr">{ut('Bunları ezbere bil: dinle → söyle → kaydet → bakmadan söyle.')}</p>
   {phrases.map(([de,tr])=><PhraseRow key={de} de={de} tr={tr} speech={speech}/>)}
-  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(phrases.map(([de])=>de))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button></div>
-  <Note>Tahmin oyunu: biri <i lang="de">„Was bin ich von Beruf?“</i> der, diğeri tahmin eder: <i lang="de">„Du bist Koch!“</i> — <b lang="de">„Stimmt! Richtig!“</b> ya da <b lang="de">„Leider falsch!“</b></Note>
-  <p className="l1a-tr">Şimdi alıştırmalar. Sırayla yapılır; bir alıştırma bitmeden sonraki açılmaz.</p></>;
+  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(phrases.map(([de])=>de))}><Play size={16} aria-hidden="true"/>{ut('Tümünü dinle')}</button></div>
+  <Note><Tx text="Tahmin oyunu: biri ~„Was bin ich von Beruf?“~ der, diğeri tahmin eder: ~„Du bist Koch!“~ — *„Stimmt! Richtig!“* ya da *„Leider falsch!“*"/></Note>
+  <p className="l1a-tr">{ut('Şimdi alıştırmalar. Sırayla yapılır; bir alıştırma bitmeden sonraki açılmaz.')}</p></>;
 }
 
 /* ---------- exercises ---------- */
@@ -248,18 +249,18 @@ function PictureQuiz(props:StepProps){
   if(picked!==null){next();return true;}
   setWait(true);return true;
  });
- const feedback:Feedback=over?(right===total?{ok:true,text:`Harika! ${right} / ${total}`}:scoreFeedback(right,total)):picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Doğrusu yeşil olan.'};
+ const feedback:Feedback=over?(right===total?{ok:true,text:'Harika! {right} / {total}',params:{right,total}}:scoreFeedback(right,total)):picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Doğrusu yeşil olan.'};
  return <>
-  <p className="kicker" lang="de">Alıştırma 1 · Was ist das?</p><Heading>Resme bak, mesleği seç</Heading>
-  <p className="l1a-tr">Resmin altındaki ipucuna bak: kadın mı, erkek mi? Doğru biçimi seç.</p>
-  <p className="l1a-mini">Soru {round+1} / {total}</p>
-  <img className="l1a-cover l1a-scene l2-quiz-pic" src={picture.src} alt={job.alt} width={picture.width} height={picture.height} decoding="async"/>
-  <p className="l1a-question">{item.hint}</p>
-  <div className="l1a-opts column" role="group" aria-label={'Soru '+(round+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null||over} lang="de" onClick={()=>choose(option)}><Art de={option}/></button>)}</div>
+  <p className="kicker">{ut('Alıştırma 1 · Was ist das?')}</p><Heading>{ut('Resme bak, mesleği seç')}</Heading>
+  <p className="l1a-tr">{ut('Resmin altındaki ipucuna bak: kadın mı, erkek mi? Doğru biçimi seç.')}</p>
+  <p className="l1a-mini">{ut('Soru {n} / {total}',{n:round+1,total})}</p>
+  <img className="l1a-cover l1a-scene l2-quiz-pic" src={picture.src} alt={ut(job.alt)} width={picture.width} height={picture.height} decoding="async"/>
+  <p className="l1a-question">{ut(item.hint)}</p>
+  <div className="l1a-opts column" role="group" aria-label={ut('Soru {n}',{n:round+1})}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null||over} lang="de" onClick={()=>choose(option)}><Art de={option}/></button>)}</div>
   <FeedbackLine feedback={feedback}/>
   <div className="l1a-actions">
-   {picked!==null&&!over&&<button type="button" className="btn small" onClick={next}>Sonraki<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
-   {over&&<button type="button" className="btn secondary small" onClick={again}><RotateCcw size={16} aria-hidden="true"/>Baştan</button>}
+   {picked!==null&&!over&&<button type="button" className="btn small" onClick={next}>{ut('Sonraki')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
+   {over&&<button type="button" className="btn secondary small" onClick={again}><RotateCcw size={16} aria-hidden="true"/>{ut('Baştan')}</button>}
   </div>
  </>;
 }
@@ -269,9 +270,9 @@ function ChatExercise(props:StepProps){
  return <ChoiceExercise kicker="Alıştırma 2 · Der A1-Kurs-Chat" title="Kurs sohbetini oku" lead="Üç kişi mesleğini yazıyor. Önce oku ve dinle, sonra alttaki cümleleri tamamla."
   before={<>
    <Conversation lines={chatLines} speech={speech}/>
-   <p className="l1a-mini"><span lang="de">„Und ihr?“</span> = „Ya siz?“ (birden çok kişiye). <span lang="de">ihr</span>’i 2C’de öğreneceğiz; şimdilik tanı yeter.</p>
+   <p className="l1a-mini"><Tx text="_„Und ihr?“_ = „Ya siz?“ (birden çok kişiye). _ihr_’i 2C’de öğreneceğiz; şimdilik tanı yeter."/></p>
    <h2 className="l1a-h2" lang="de">Heimatland – Deutschland</h2>
-   <p className="l1a-tr">Memleketteki mesleği ne? Almanya’da ne yapıyor? Boşluğa dokun ve seç. Cümle doğru olunca kişi onu okur.</p>
+   <p className="l1a-tr">{ut('Memleketteki mesleği ne? Almanya’da ne yapıyor? Boşluğa dokun ve seç. Cümle doğru olunca kişi onu okur.')}</p>
   </>}
   lines={chatFill} dialogue {...props}/>;
 }
@@ -283,7 +284,7 @@ function FormWriting(props:StepProps){
  const refs=useRef<(HTMLInputElement|null)[]>([]);const spoken=useRef<boolean[]>(otherForms.map(()=>false));
  const total=otherForms.length;
  const self=useSelfCheck(total,(i,value)=>acceptsAnswer(value,[otherForms[i][2],otherFormSay(otherForms[i])]),firstRight=>{
-  onScore(step.id,firstRight,total);setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':`Hepsi doğru! İlk denemede ${firstRight} / ${total} doğruydu.`});
+  onScore(step.id,firstRight,total);setFeedback({ok:true,text:firstRight===total?'Hepsi doğru!':'Hepsi doğru! İlk denemede {right} / {total} doğruydu.',params:{right:firstRight,total}});
  });
  const note=(result:SelfCheckResult)=>selfCheckNote(result,self,'Kırmızıyı düzelt; doğrusu yanında yazıyor.',setFeedback);
  const change=(i:number,value:string)=>{
@@ -294,22 +295,22 @@ function FormWriting(props:StepProps){
  const focusNext=(i:number)=>{const target=otherForms.findIndex((_,k)=>k>i&&self.stateNow(k)!==true);if(target>=0)refs.current[target]?.focus();};
  const restart=()=>{self.reset();setFeedback(null);spoken.current=otherForms.map(()=>false);};
  return <>
-  <p className="kicker" lang="de">Alıştırma 3 · Mann oder Frau?</p><Heading>Diğer biçimi yaz</Heading>
-  <p className="l1a-tr">Erkek verilmişse kadın biçimini, kadın verilmişse erkek biçimini yaz. Doğru yazınca kutu hemen yeşil olur ve okunur. (ä yerine ae de yazabilirsin.)</p>
+  <p className="kicker">{ut('Alıştırma 3 · Mann oder Frau?')}</p><Heading>{ut('Diğer biçimi yaz')}</Heading>
+  <p className="l1a-tr">{ut('Erkek verilmişse kadın biçimini, kadın verilmişse erkek biçimini yaz. Doğru yazınca kutu hemen yeşil olur ve okunur. (ä yerine ae de yazabilirsin.)')}</p>
   {otherForms.map((row,i)=>{const [given,article,answer]=row;const state=self.state[i]===true?' ok':self.state[i]===false?' bad':'';return <div className="l1a-arow l2-form-row" key={given}>
    <span className="l1a-de l2-form-given" lang="de"><Art de={given}/> → <b className={'l15-'+article}>{article}</b></span>
    <span className="l1a-gap-wrap"><input ref={element=>{refs.current[i]=element;}} className={'l1a-gap'+state} value={self.values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} aria-label={given+' → '+article} enterKeyHint="next"
     onChange={event=>change(i,event.target.value)} onBlur={()=>note(self.leave(i))} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();note(self.leave(i));focusNext(i);}}}/>{self.hinted[i]&&self.state[i]!==true&&<span className="l1a-hint" lang="de">→ {answer}</span>}</span>
   </div>;})}
   <FeedbackLine feedback={feedback}/>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={restart}><RotateCcw size={16} aria-hidden="true"/>Baştan</button></div>
+  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={restart}><RotateCcw size={16} aria-hidden="true"/>{ut('Baştan')}</button></div>
  </>;
 }
 /** Alıştırma 5 · the verbs of the box into the dialogue, then listen to it. */
 function DialogueExercise(props:StepProps){
  const {speech}=props;
  return <ChoiceExercise kicker="Alıştırma 5 · Was passt?" title="Diyaloğu tamamla" bankLead="Kutudaki fiilleri yerleştir:" lines={dialogueLines} dialogue
-  after={done=><div className="l1a-actions"><button type="button" className="btn secondary small" disabled={!done||speech.busy} onClick={()=>speech.speakAll(dialogueSay)}><Play size={16} aria-hidden="true"/>Tamamlanan diyaloğu dinle</button></div>}
+  after={done=><div className="l1a-actions"><button type="button" className="btn secondary small" disabled={!done||speech.busy} onClick={()=>speech.speakAll(dialogueSay)}><Play size={16} aria-hidden="true"/>{ut('Tamamlanan diyaloğu dinle')}</button></div>}
   {...props}/>;
 }
 /** The learner's own sentences (Alıştırma 7), kept in the browser. */
@@ -335,19 +336,19 @@ function OwnExercise({speech,onScore,step}:StepProps){
  const mine=values.filter((value,i)=>fitsOwn(i,value)).map(value=>value.trim());
  const done=isDone(values);
  return <>
-  <p className="kicker" lang="de">Alıştırma 7 · Und du?</p><Heading>Şimdi sen: mesleğin ve işin</Heading>
-  <p className="l1a-tr">Kendi cevaplarını yaz. Kalıba uyan cümle yeşil olur. İlk iki cümle bitince alıştırma tamam; sonra dinle, gizle ve ezberden söyle.</p>
-  {hidden?<p className="l2-hidden-note" role="status">🙈 Cümlelerin gizlendi. Şimdi hepsini ezberden yüksek sesle söyle.</p>
+  <p className="kicker">{ut('Alıştırma 7 · Und du?')}</p><Heading>{ut('Şimdi sen: mesleğin ve işin')}</Heading>
+  <p className="l1a-tr">{ut('Kendi cevaplarını yaz. Kalıba uyan cümle yeşil olur. İlk iki cümle bitince alıştırma tamam; sonra dinle, gizle ve ezberden söyle.')}</p>
+  {hidden?<p className="l2-hidden-note" role="status">{ut('🙈 Cümlelerin gizlendi. Şimdi hepsini ezberden yüksek sesle söyle.')}</p>
   :<div className="l1a-dialogue">{ownPrompts.map((prompt,i)=>{const state=values[i].trim()?fitsOwn(i,values[i]):null;return <div key={prompt.question}>
-   <div className="l1a-line a"><Portrait who="paul" name="Paul Hoca"/><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Paul Hoca</span><span className="l1a-de" lang="de">{prompt.question}</span>{prompt.optional&&<span className="l1a-mini">(isteğe bağlı)</span>}</div><Say text={prompt.question} who="paul" speech={speech}/></div></div>
-   <div className="l1a-line b"><div className="l1a-bubble"><input className={'l1a-gap wide'+(state===true?' ok':state===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={prompt.placeholder} aria-label={prompt.question} onChange={event=>change(i,event.target.value)}/>{state===false&&<span className="l1a-mini">Kalıp: <span lang="de">{prompt.placeholder}</span></span>}</div></div>
+   <div className="l1a-line a"><Portrait who="paul" name="Paul Hoca"/><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Paul Hoca</span><span className="l1a-de" lang="de">{prompt.question}</span>{prompt.optional&&<span className="l1a-mini">{ut('(isteğe bağlı)')}</span>}</div><Say text={prompt.question} who="paul" speech={speech}/></div></div>
+   <div className="l1a-line b"><div className="l1a-bubble"><input className={'l1a-gap wide'+(state===true?' ok':state===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="off" autoComplete="off" spellCheck={false} placeholder={prompt.placeholder} aria-label={prompt.question} onChange={event=>change(i,event.target.value)}/>{state===false&&<span className="l1a-mini">{ut('Kalıp:')} <span lang="de">{prompt.placeholder}</span></span>}</div></div>
   </div>;})}</div>}
   <FeedbackLine feedback={done?{ok:true,text:'Süper! Bunlar artık senin cümlelerin. Konuş adımında yine karşına çıkacak.'}:null}/>
   <div className="l1a-actions">
-   <button type="button" className="btn secondary small" disabled={speech.busy||!mine.length} onClick={()=>speech.speakAll(mine)}><Volume2 size={16} aria-hidden="true"/>Cümlelerimi dinle</button>
-   <button type="button" className="btn secondary small" aria-pressed={hidden} onClick={()=>setHidden(!hidden)}>{hidden?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{hidden?'Göster':'Gizle'}</button>
+   <button type="button" className="btn secondary small" disabled={speech.busy||!mine.length} onClick={()=>speech.speakAll(mine)}><Volume2 size={16} aria-hidden="true"/>{ut('Cümlelerimi dinle')}</button>
+   <button type="button" className="btn secondary small" aria-pressed={hidden} onClick={()=>setHidden(!hidden)}>{hidden?<Eye size={16} aria-hidden="true"/>:<EyeOff size={16} aria-hidden="true"/>}{ut(hidden?'Göster':'Gizle')}</button>
   </div>
-  <Note>Hatırla: mesleğini söylerken artikel yok: <i lang="de">Ich bin Tierarzt.</i> Kadınsan <b lang="de">-in</b>: <i lang="de">Ich bin Tierärztin.</i></Note>
+  <Note><Tx text="Hatırla: mesleğini söylerken artikel yok: ~Ich bin Tierarzt.~ Kadınsan *-in*: ~Ich bin Tierärztin.~"/></Note>
  </>;
 }
 /** The learner's answer in the speaking practice: their own sentence when it fits, else the example. */
@@ -367,18 +368,18 @@ export function SpeakStep({kicker='Konuş · Sprechen',title='Konuşma pratiği'
  const [rating,setRating]=useState<number|null>(null);
  const bubble=(who:string,text:string)=><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">{personName(who)}</span><span className="l1a-de" lang="de" dir="ltr">{text}</span></div><Say text={text} who={who} speech={speech}/></div>;
  return <>
-  <p className="kicker" lang="de">{kicker}</p><Heading>{title}</Heading>
-  <p className="l1a-tr">{lead}</p>{before}
+  <p className="kicker">{ut(kicker)}</p><Heading>{ut(title)}</Heading>
+  <p className="l1a-tr">{typeof lead==='string'?ut(lead):lead}</p>{before}
   <div className="l1a-dialogue">{rows.map(row=><div className="l2-practice" key={row.key}>
    <div className="l1a-line a"><Portrait who={row.who} name={personName(row.who)}/>{bubble(row.who,row.question)}</div>
    {row.model&&<div className="l1a-line b"><Portrait who={row.model.who} name={personName(row.model.who)}/>{bubble(row.model.who,row.model.text)}</div>}
-   <div className="l1a-line b">{row.answer?<div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Sen</span><span className="l1a-de" lang="de" dir="ltr">{row.answer}</span></div><Say text={row.say??row.answer} speech={speech}/></div>
-    :<div className="l1a-bubble"><span className="l15-name">Sen</span><span className="l1a-tr">Şimdi sen söyle.</span></div>}</div>
+   <div className="l1a-line b">{row.answer?<div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">{ut('Sen')}</span><span className="l1a-de" lang="de" dir="ltr">{row.answer}</span></div><Say text={row.say??row.answer} speech={speech}/></div>
+    :<div className="l1a-bubble"><span className="l15-name">{ut('Sen')}</span><span className="l1a-tr">{ut('Şimdi sen söyle.')}</span></div>}</div>
   </div>)}</div>
   {after}
-  <h2 className="l1a-h2">Nasıl gitti?</h2>
-  <div className="l1a-opts" role="group" aria-label="Kendini değerlendir">{speakRatings.map(([mark,de],i)=><button type="button" key={de} className={'l1a-opt'+(rating===i?' ok':'')} aria-pressed={rating===i} lang="de" onClick={()=>{setRating(i);speech.speak(de);onScore(step.id,1,1);}}><span aria-hidden="true">{mark}</span> {de}</button>)}</div>
-  {rating!==null&&<p className="l1a-feedback ok" role="status">{replies[rating]}</p>}
+  <h2 className="l1a-h2">{ut('Nasıl gitti?')}</h2>
+  <div className="l1a-opts" role="group" aria-label={ut('Kendini değerlendir')}>{speakRatings.map(([mark,de],i)=><button type="button" key={de} className={'l1a-opt'+(rating===i?' ok':'')} aria-pressed={rating===i} lang="de" onClick={()=>{setRating(i);speech.speak(de);onScore(step.id,1,1);}}><span aria-hidden="true">{mark}</span> {de}</button>)}</div>
+  {rating!==null&&<p className="l1a-feedback ok" role="status">{ut(replies[rating])}</p>}
  </>;
 }
 /** Konuş of Teil A: the questions of the unit; the first three answers are the learner's own sentences (Alıştırma 7). */
@@ -389,25 +390,25 @@ function KonusL2A(props:StepProps){
   replies={['🎉 Süper! Bu kalıplar artık senin.','👍 İyi. Bir kez daha dinle ve söyle.','Sorun değil. Kalıplar adımına dön, yarın tekrar dene.']} {...props}/>;
 }
 /** The end: what the learner can say now and what comes next. */
-function EndL2A({progress,onGo,onPart}:StepProps){
+function EndL2A({progress,onGo,onPart,language}:StepProps){
  return <>
-  <p className="kicker" lang="de">Bitti</p>
-  <Heading>Lektion 2A tamam! 🎉</Heading>
+  <p className="kicker">{ut('Bitti')}</p>
+  <Heading>{ut('Lektion 2A tamam! 🎉')}</Heading>
   <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
-  <p>Artık şunları yapabilirsin:</p>
+  <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">
-   <li>Meslek sormak: <b lang="de">Was bist du von Beruf?</b> · <b lang="de">Was machen Sie beruflich?</b></li>
-   <li>Mesleğini söylemek: <b lang="de">Ich bin … von Beruf.</b> (artikelsiz!)</li>
-   <li>Kadın ve erkek biçimleri: <b lang="de">-in</b>, <b lang="de">Köchin</b>, <b lang="de">Ärztin</b>, <b lang="de">Hausfrau</b></li>
-   <li>Şu anki işini anlatmak: <b lang="de">Ich arbeite als … bei …</b> · <b lang="de">Ich arbeite jetzt nicht.</b></li>
+   <li><Tx text="Meslek sormak: *Was bist du von Beruf?* · *Was machen Sie beruflich?*"/></li>
+   <li><Tx text="Mesleğini söylemek: *Ich bin … von Beruf.* (artikelsiz!)"/></li>
+   <li><Tx text="Kadın ve erkek biçimleri: *-in*, *Köchin*, *Ärztin*, *Hausfrau*"/></li>
+   <li><Tx text="Şu anki işini anlatmak: *Ich arbeite als … bei …* · *Ich arbeite jetzt nicht.*"/></li>
   </ul>
-  <Note><b>Kısa özet:</b> <span lang="de">Ich bin Koch.</span> (artikel yok) · <span lang="de">Lehrer → Lehrerin</span>, <span lang="de">Koch → Köchin</span>, <span lang="de">Hausmann → Hausfrau</span> · <span lang="de">Ich arbeite als … bei …</span> · <span lang="de">aber</span> · <span lang="de">nicht</span> fiilden sonra · <span lang="de">du arbeitest</span></Note>
-  <ProgressMeter progress={progress} language={'tr'} label="Lektion 2A"/>
-  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil B – Wer ist das?</b></p>
+  <Note><Tx text="**Kısa özet:** _Ich bin Koch._ (artikel yok) · _Lehrer → Lehrerin_, _Koch → Köchin_, _Hausmann → Hausfrau_ · _Ich arbeite als … bei …_ · _aber_ · _nicht_ fiilden sonra · _du arbeitest_"/></Note>
+  <ProgressMeter progress={progress} language={language} label="Lektion 2A"/>
+  <p className="l1a-tr"><Tx text="Sıradaki bölüm: *Teil B – Wer ist das?*"/></p>
   <div className="l1a-actions">
-   <button type="button" className="btn small" onClick={()=>onPart('b',0)}>Teil B’ye geç<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(berufeStepIndex('resim-sec'))}>Alıştırmaları tekrar yap</button>
-   <button type="button" className="btn secondary small" onClick={()=>onGo(-1)}><BookOpen size={16} aria-hidden="true"/>Lektion 2 içindekiler</button>
+   <button type="button" className="btn small" onClick={()=>onPart('b',0)}>{ut('Teil B’ye geç')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
+   <button type="button" className="btn secondary small" onClick={()=>onGo(berufeStepIndex('resim-sec'))}>{ut('Alıştırmaları tekrar yap')}</button>
+   <button type="button" className="btn secondary small" onClick={()=>onGo(-1)}><BookOpen size={16} aria-hidden="true"/>{ut('Lektion 2 içindekiler')}</button>
   </div>
  </>;
 }

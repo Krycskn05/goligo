@@ -26,7 +26,8 @@ import {ProgressMeter} from './progress-ui';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
 import {TopicArt} from './toon-art';
-import {useLessonSpeech,Rich,StepStrip,exerciseLock,LockedStep,type StepProps} from './willkommen-ui';
+import {useLessonSpeech,Rich,Tx,StepStrip,exerciseLock,LockedStep,type StepProps} from './willkommen-ui';
+import {hasUnitPack,loadUnitPack,setUnitLanguage,ut,utLang} from '@/lib/unit-i18n';
 import {StepViewL2A} from './berufe-a-steps';
 import {StepViewL2B} from './berufe-b-steps';
 import {StepViewL2C} from './berufe-c-steps';
@@ -46,7 +47,7 @@ import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
  */
 export default function BerufeStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
- const switchLanguage=useLanguageSwitch(setLanguage);
+ const switchLanguage=useLanguageSwitch(setLanguage,loadUnitPack); // the lesson's own texts (lib/unit-i18n.ts) load with the language
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 2 · Berufe · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  const synced=useSyncVersion('l2'); // progress from another device: read it again (app/lesson-sync.tsx)
@@ -60,7 +61,7 @@ const parts:Record<L2PartId,PartConfig>={
  a:{id:'a',badge:'A',title:berufeParts[0].title??'',lead:berufeParts[0].lead??'',short:berufeStepShort,steps:berufeSteps,groups:berufeGroups,scored:berufeScored,testCount:berufeTest.length,wordCount:berufeWordCount,cover:berufePictures.cover,coverAlt:'Omar süpermarkette tezgâhın arkasında, mavi önlük ve isimlikle ekmek uzatıyor; yanında kasada Sabine',View:StepViewL2A},
  b:{id:'b',badge:'B',title:berufeParts[1].title??'',lead:berufeParts[1].lead??'',short:berufeStepShortB,steps:berufeStepsB,groups:berufeGroupsB,scored:berufeScoredB,testCount:berufeTestB.length,wordCount:berufeWordCountB,cover:berufeBPictures.cover,coverAlt:'Paul Hoca sınıfta Nikos’un fotoğrafını gösteriyor; Yasemin ve Omar bakıyor',View:StepViewL2B},
  c:{id:'c',badge:'C',title:berufeParts[2].title??'',lead:berufeParts[2].lead??'',short:berufeStepShortC,steps:berufeStepsC,groups:berufeGroupsC,scored:berufeScoredC,testCount:berufeTestC.length,wordCount:berufeWordCountC,cover:berufeCPictures.cover,coverAlt:'Yasemin, Omar ve Nikos masada bir formun başında; Yasemin şaşkın, Nikos gülümseyerek formu gösteriyor',View:StepViewL2C},
- d:{id:'d',badge:'D',title:berufeParts[3].title??'',lead:berufeParts[3].lead??'',short:berufeStepShortD,steps:berufeStepsD,groups:berufeGroupsD,scored:berufeScoredD,testCount:berufeTestD.length,testNote:`Alles klar? · ${checkPointsD} puan`,wordCount:berufeWordCountD,cover:berufeDPictures.cover,coverAlt:'Yaşlı bakım servisinin girişinde Nora, mavi hemşire üniformasıyla Rami’ye bir form uzatıyor; Rami biraz şaşkın gülümsüyor',View:StepViewL2D},
+ d:{id:'d',badge:'D',title:berufeParts[3].title??'',lead:berufeParts[3].lead??'',short:berufeStepShortD,steps:berufeStepsD,groups:berufeGroupsD,scored:berufeScoredD,testCount:berufeTestD.length,testNote:'Alles klar? · {n} puan',wordCount:berufeWordCountD,cover:berufeDPictures.cover,coverAlt:'Yaşlı bakım servisinin girişinde Nora, mavi hemşire üniformasıyla Rami’ye bir form uzatıyor; Rami biraz şaşkın gülümsüyor',View:StepViewL2D},
 };
 const partOrder:L2PartId[]=['a','b','c','d'];
 const isPart=(id:string):id is L2PartId=>id in parts;
@@ -73,6 +74,7 @@ function readPlace():Place{
 }
 
 function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
+ setUnitLanguage(language); // every step below shows its Turkish texts in this language (lib/unit-i18n.ts)
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
  const [place,setPlace]=useState<Place>(()=>typeof window==='undefined'?{part:'a',index:-1}:readPlace());
  const [scores,setScores]=useState<Record<L2PartId,L1AScoreMap>>({a:{},b:{},c:{},d:{}});
@@ -138,21 +140,21 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
   <div className="work-layout site-layout"><SiteMenuAside language={language} current="units"/>
   <main id="l2-main" className="object-page housing-page l1a-page l15-page l2-page" lang={language} dir={dir}>
    {guest&&<GuestBanner language={language} back={BERUFE_PATH}/>}
-   {language!=='tr'&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
+   {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
    {speech.warning&&<p className="object-alert" role="status">{speech.warning}</p>}
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} progress={progress} scores={scores[place.part]} language={language} onGo={go} onPart={open}>
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l2-step={step.id} data-l2-teil={config.id}>
      <header className="l1a-top">
-      <div className="l1a-top-row"><span className="eyebrow">{stepGroup?.label??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{step.title} · {index+1}/{config.steps.length}</>}</span></div>
+      <div className="l1a-top-row"><span className="eyebrow">{ut(stepGroup?.label)??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{ut(step.title)} · {index+1}/{config.steps.length}</>}</span></div>
       {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:config.short[id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
-      :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
+      :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={ut(step.title)}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
      </header>
      {stepLocked?<LockedStep openLabel={openLabel} onOpen={()=>go(lock.openIndex)}/>:<View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l2'+place.part+'-run'}/>}
-     <nav className="l1a-pager" aria-label="Adımlar">
-      <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{index===0?'İçindekiler':'Geri'}</button>
-      <button type="button" className={'btn'+(mustFinish?' l1a-next-locked':'')} aria-describedby={mustFinish&&lockNote===step.id?'l1a-lock-note':undefined} onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>İçindekiler</>:<>İleri<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
+     <nav className="l1a-pager" aria-label={ut('Adımlar')}>
+      <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{ut(index===0?'İçindekiler':'Geri')}</button>
+      <button type="button" className={'btn'+(mustFinish?' l1a-next-locked':'')} aria-describedby={mustFinish&&lockNote===step.id?'l1a-lock-note':undefined} onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>{ut('İçindekiler')}</>:<>{ut('İleri')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>
      </nav>
-     {mustFinish&&lockNote===step.id&&<p className="l1a-lock-note" id="l1a-lock-note" role="status"><Lock size={15} aria-hidden="true"/>Önce bu alıştırmayı bitir, sonra sıradakine geçebilirsin.</p>}
+     {mustFinish&&lockNote===step.id&&<p className="l1a-lock-note" id="l1a-lock-note" role="status"><Lock size={15} aria-hidden="true"/>{ut('Önce bu alıştırmayı bitir, sonra sıradakine geçebilirsin.')}</p>}
     </section>
    </PartBook>}
   </main></div>
@@ -190,18 +192,18 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <span className="eyebrow" lang="de">A1.1 · Lektion 2 · Berufe</span>
      <h1 id="l1a-heading" tabIndex={-1} className="lb-title">{unitName}</h1>
      <p className="lb-sub" lang="de">Was sind Sie von Beruf?</p>
-     <p className="lb-lead">Meslek sormak ve söylemek, birini tanıtmak, sayılar 0–20, yardım istemek ve form doldurmak; fiiller altı kişiyle: <i lang="de">ich arbeite, du arbeitest, er arbeitet, wir arbeiten, ihr arbeitet, sie arbeiten</i>.</p>
+     <p className="lb-lead"><Tx text="Meslek sormak ve söylemek, birini tanıtmak, sayılar 0–20, yardım istemek ve form doldurmak; fiiller altı kişiyle: ~ich arbeite, du arbeitest, er arbeitet, wir arbeiten, ihr arbeitet, sie arbeiten~."/></p>
     </div>
     <figure className="lb-photo"><TopicArt id={BERUFE_UNIT} title={unitName}/></figure>
    </div>
-   <section className="lb-goals" aria-labelledby="l2-goals"><h2 id="l2-goals">Bu ünitede</h2><ul>{berufeGoals.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
+   <section className="lb-goals" aria-labelledby="l2-goals"><h2 id="l2-goals">{ut('Bu ünitede')}</h2><ul>{berufeGoals.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
   </>} right={<>
-   <h2 className="lb-heading">İçindekiler</h2>
+   <h2 className="lb-heading">{ut('İçindekiler')}</h2>
    <ol className="lb-toc">{berufeParts.map(row=>{const config=isPart(row.id)?parts[row.id]:null;return config?<li className="lb-toc-row" data-l2-part={row.id} key={row.id}>
     <button type="button" className="lb-toc-open" onClick={()=>onOpen(config.id,0)}>
      <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>
      <span className="lb-toc-photo" aria-hidden="true"><img src={config.cover.src} alt="" width={config.cover.width} height={config.cover.height} decoding="async"/></span>
-     <span className="lb-toc-text"><strong lang="de" dir="ltr">{config.title}</strong><small><Rich text={config.lead}/></small><span className="lb-toc-meta">{config.wordCount} kelime · {config.groups[1].ids.length} alıştırma · {config.testCount} soruluk test</span></span>
+     <span className="lb-toc-text"><strong lang="de" dir="ltr">{config.title}</strong><small><Rich text={config.lead}/></small><span className="lb-toc-meta">{ut('{words} kelime · {exercises} alıştırma · {questions} soruluk test',{words:config.wordCount,exercises:config.groups[1].ids.length,questions:config.testCount})}</span></span>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <ProgressMeter progress={partProgressL2(config.id,scores[config.id])} language={language} label={'Teil '+row.badge} compact/>
@@ -210,7 +212,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
     <div className="lb-toc-open">
      <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>
      <span className="lb-toc-photo l1a-soon-photo" aria-hidden="true">{row.badge}</span>
-     <span className="lb-toc-text"><strong lang="de">Teil {row.badge}</strong><small>Bu bölüm yakında eklenecek.</small><span className="lb-toc-meta l1a-soon-tag">Yakında</span></span>
+     <span className="lb-toc-text"><strong lang="de">Teil {row.badge}</strong><small>{ut('Bu bölüm yakında eklenecek.')}</small><span className="lb-toc-meta l1a-soon-tag">{ut('Yakında')}</span></span>
     </div>
    </li>;})}</ol>
   </>}/>
@@ -226,10 +228,10 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
  const lock=exerciseLock(config.groups,config.steps,scores);
  const tabLocked=(id:StepGroup['id'])=>!!lock.open&&(id==='test'||id==='konus');
  const detail:Record<StepGroup['id'],string>={
-  konu:`${config.groups[0].ids.length} kısa adım`,
-  alistirmalar:exercisesDone?`${exercisesDone} / ${exerciseIds.length} yapıldı`:`${config.groups[1].ids.length} alıştırma`,
-  test:scores.test?`En iyi: ${scores.test.right} / ${scores.test.total}`:config.testNote??`${config.testCount} soru`,
-  konus:'Sesli pratik',
+  konu:ut('{n} kısa adım',{n:config.groups[0].ids.length}),
+  alistirmalar:exercisesDone?ut('{done} / {total} yapıldı',{done:exercisesDone,total:exerciseIds.length}):ut('{n} alıştırma',{n:config.groups[1].ids.length}),
+  test:scores.test?ut('En iyi: {right} / {total}',{right:scores.test.right,total:scores.test.total}):config.testNote?ut(config.testNote,{n:checkPointsD}):ut('{n} soru',{n:config.testCount}),
+  konus:ut('Sesli pratik'),
  };
  const at=partOrder.indexOf(config.id);const previous=partOrder[at-1];const next=partOrder[at+1];
  const nextSoon=!next?berufeParts[berufeParts.findIndex(row=>row.id===config.id)+1]:undefined;
@@ -242,16 +244,16 @@ function PartBook({config,step,scores,progress,language,onGo,onPart,children}:{c
    <span className="eyebrow" lang="de">A1.1 · 2 · Teil {config.badge}</span>
    <h1 id="l2-part-title" lang="de" className="lb-title">{config.title}</h1>
    <p className="lb-lead"><Rich text={config.lead}/></p>
-   <figure className="lb-photo"><img src={config.cover.src} alt={config.coverAlt} width={config.cover.width} height={config.cover.height} decoding="async"/></figure>
+   <figure className="lb-photo"><img src={config.cover.src} alt={ut(config.coverAlt)} width={config.cover.width} height={config.cover.height} decoding="async"/></figure>
    <ProgressMeter progress={progress} language={language} label={'Teil '+config.badge} compact/>
-   <nav className="lb-pager" aria-label="Bölümler">
+   <nav className="lb-pager" aria-label={ut('Bölümler')}>
     {previous?<button type="button" className="text-button" onClick={()=>onPart(previous,0)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>Teil {parts[previous].badge}</button>:<span/>}
-    {next?<button type="button" className="text-button" onClick={()=>onPart(next,0)}>Teil {parts[next].badge}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:nextSoon?<span className="l1a-next-soon" lang="de">Teil {nextSoon.badge} · <span lang="tr">yakında</span></span>:null}
+    {next?<button type="button" className="text-button" onClick={()=>onPart(next,0)}>Teil {parts[next].badge}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>:nextSoon?<span className="l1a-next-soon" lang="de">Teil {nextSoon.badge} · <span lang={utLang('yakında')}>{ut('yakında')}</span></span>:null}
    </nav>
   </div>} right={<>
-   <nav className="l12-steps" id="l1a-tabs" aria-label={'Teil '+config.badge+' bölümleri'}><ol>{config.groups.map((item,i)=><li key={item.id}><button type="button" className={'l12-step'+(group?.id===item.id?' active':'')+(done[item.id]?' done':'')+(tabLocked(item.id)?' locked':'')} aria-current={group?.id===item.id?'step':undefined} data-l2-tab={item.id} title={tabLocked(item.id)?'Önce alıştırmaları bitir':undefined} onClick={()=>onGo(tabLocked(item.id)?lock.openIndex:config.steps.findIndex(entry=>entry.id===item.ids[0]))}>
+   <nav className="l12-steps" id="l1a-tabs" aria-label={ut('Teil {badge} bölümleri',{badge:config.badge})}><ol>{config.groups.map((item,i)=><li key={item.id}><button type="button" className={'l12-step'+(group?.id===item.id?' active':'')+(done[item.id]?' done':'')+(tabLocked(item.id)?' locked':'')} aria-current={group?.id===item.id?'step':undefined} data-l2-tab={item.id} title={tabLocked(item.id)?ut('Önce alıştırmaları bitir'):undefined} onClick={()=>onGo(tabLocked(item.id)?lock.openIndex:config.steps.findIndex(entry=>entry.id===item.ids[0]))}>
     <span className="l12-step-number" aria-hidden="true">{tabLocked(item.id)?<Lock size={15}/>:done[item.id]?<Check size={16}/>:i+1}</span>
-    <span className="l12-step-text"><strong>{item.label}</strong><small>{tabLocked(item.id)?'Önce alıştırmalar':detail[item.id]}</small></span>
+    <span className="l12-step-text"><strong>{ut(item.label)}</strong><small>{tabLocked(item.id)?ut('Önce alıştırmalar'):detail[item.id]}</small></span>
    </button></li>)}</ol></nav>
    <div className="l1a-mini-head" aria-hidden={!folded}><button type="button" className="text-button" tabIndex={folded?undefined:-1} onClick={()=>onGo(-1)}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>Lektion 2</button><span aria-hidden="true">·</span><b lang="de">Teil {config.badge}</b><span aria-hidden="true">·</span><span className="l1a-mini-title" lang="de">{config.title}</span></div>
    {children}

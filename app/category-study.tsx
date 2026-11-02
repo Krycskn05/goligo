@@ -74,8 +74,9 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const synced=useSyncVersion(); // lesson progress from another device (app/lesson-sync.tsx)
  const seen=synced*1000+back; // read the browser's lesson progress again after a sync or when the learner comes back
  // "Kaldığın yerden devam et": the last lesson or study page (lib/last-place.ts; saved by every page, with the account).
+ // Members only (the learner asked, 3 November 2026): a guest's progress is not kept, so a guest sees no such card.
  const [place,setPlace]=useState<LastPlace|null>(null);
- useEffect(()=>{if(course!=='de'||home){setPlace(null);return;}try{setPlace(readLastPlace(localStorage));}catch{setPlace(null);}},[course,home,seen]);
+ useEffect(()=>{if(course!=='de'||home||guest){setPlace(null);return;}try{setPlace(readLastPlace(localStorage));}catch{setPlace(null);}},[course,home,seen,guest]);
  useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setBerufe(null);return;}let alive=true;import('@/lib/berufe-progress').then(({readLessonTwoProgress})=>{if(alive)setBerufe(readLessonTwoProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);

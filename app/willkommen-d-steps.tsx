@@ -11,7 +11,8 @@ import {ProgressMeter} from './progress-ui';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Rich,Heading,FeedbackLine,useFinish,GapExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Rich,Tx,Heading,FeedbackLine,useFinish,GapExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {ut} from '@/lib/unit-i18n';
 import {DialogueLines,Picture} from './willkommen-b-steps';
 
 /**
@@ -47,56 +48,56 @@ function CoverD(_props:StepProps){ // the part's progress is on the left page (n
  return <>
   <p className="kicker" lang="de">Lektion 1 · Willkommen!</p>
   <Heading><span lang="de">D — Ich bin neu hier.</span></Heading>
-  <p>Bu bölümde:</p>
-  <ul className="l1a-list"><li>Çizgi roman: yeni komşuyla tanışma</li><li>Lektion 1’in en önemli cümleleri ve ezber stratejisi</li><li>Lektion 1 özeti</li><li><b lang="de">Alles klar?</b> — puanlı bölüm sınavı</li></ul>
+  <p>{ut('Bu bölümde:')}</p>
+  <ul className="l1a-list"><li>{ut('Çizgi roman: yeni komşuyla tanışma')}</li><li>{ut('Lektion 1’in en önemli cümleleri ve ezber stratejisi')}</li><li>{ut('Lektion 1 özeti')}</li><li><Tx text="*Alles klar?* — puanlı bölüm sınavı"/></li></ul>
  </>;
 }
 function Comic({speech}:{speech:Speech}){
- return <><Heading><span lang="de">Bis bald!</span> — çizgi roman</Heading>
-  <p className="l1a-tr">Yasemin yeni dairesine taşınıyor. Merdivende komşusu Nora ile karşılaşıyor.</p>
-  {comicPanels.map((panel,i)=><section className="l1a-panel" key={i} aria-label={'Kare '+(i+1)}>
+ return <><Heading><span lang="de">Bis bald!</span> — {ut('çizgi roman')}</Heading>
+  <p className="l1a-tr">{ut('Yasemin yeni dairesine taşınıyor. Merdivende komşusu Nora ile karşılaşıyor.')}</p>
+  {comicPanels.map((panel,i)=><section className="l1a-panel" key={i} aria-label={ut('Kare {n}',{n:i+1})}>
    <span className="l1a-panel-num" aria-hidden="true">{i+1}</span>
    <Picture {...willkommenDPictures.comic[i]} alt={panel.alt}/>
    <DialogueLines lines={panel.lines} speech={speech}/>
   </section>)}
-  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(comicLines.map(lineSayD))}><Play size={16} aria-hidden="true"/>Tümünü dinle</button></div>
+  <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(comicLines.map(lineSayD))}><Play size={16} aria-hidden="true"/>{ut('Tümünü dinle')}</button></div>
  </>;
 }
 function Important({speech}:{speech:Speech}){
- return <><Heading><span lang="de">Wichtige Sätze</span> — önemli cümleler</Heading>
-  <p className="l1a-tr">Çizgi romandaki <b lang="de">ich</b> ile başlayan cümleler, kendini tanıtmanın iskeleti:</p>
+ return <><Heading><span lang="de">Wichtige Sätze</span> — {ut('önemli cümleler')}</Heading>
+  <p className="l1a-tr"><Tx text="Çizgi romandaki *ich* ile başlayan cümleler, kendini tanıtmanın iskeleti:"/></p>
   {importantSentences.map(sentence=><div className="l1a-phrase" key={sentence}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{sentence}</span></div><Say text={importantSay(sentence)} speech={speech}/></div>)}
-  <h3 className="l1a-h2">Örnek: Mei</h3>
+  <h3 className="l1a-h2">{ut('Örnek: Mei')}</h3>
   <DialogueLines lines={[meiExample]} speech={speech}/>
-  <Note>Bu üç cümleyi <b>ezbere</b> bilmelisin: adın, ülken, dillerin. Her yerde sorulur.</Note></>;
+  <Note><Tx text="Bu üç cümleyi **ezbere** bilmelisin: adın, ülken, dillerin. Her yerde sorulur."/></Note></>;
 }
 function Strategy(){
- return <><Heading>Strateji: telefonla ezberle</Heading>
+ return <><Heading>{ut('Strateji: telefonla ezberle')}</Heading>
   <Picture {...willkommenDPictures.strategy} alt="Nikos telefona kendini kaydediyor, sonra kulaklıkla dinliyor"/>
-  <ol className="l1a-list l1a-steps-list">{strategySteps.map(([title,text])=><li key={title}><b>{title}</b> {text}</li>)}</ol>
-  <Note>Bu yöntem her ders için geçerli: yeni kalıpları ezberlerken hep kendi sesinle çalış.</Note></>;
+  <ol className="l1a-list l1a-steps-list">{strategySteps.map(([title,text])=><li key={title}><b>{ut(title)}</b> {ut(text)}</li>)}</ol>
+  <Note>{ut('Bu yöntem her ders için geçerli: yeni kalıpları ezberlerken hep kendi sesinle çalış.')}</Note></>;
 }
 function Summary({speech}:{speech:Speech}){
- return <><Heading>Lektion 1 özeti</Heading>
-  <h3 className="l1a-h2">Selam ve veda</h3>
+ return <><Heading>{ut('Lektion 1 özeti')}</Heading>
+  <h3 className="l1a-h2">{ut('Selam ve veda')}</h3>
   <div className="l1a-two">
-   <div><p className="l1a-two-head">Karşılaşınca</p><ul className="l1a-say-list" lang="de">{summaryHellos.map(text=><li key={text}><span>{text}</span><Say text={text} speech={speech}/></li>)}</ul></div>
-   <div><p className="l1a-two-head">Ayrılırken</p><ul className="l1a-say-list" lang="de">{summaryGoodbyes.map(text=><li key={text}><span>{text}</span><Say text={text} speech={speech}/></li>)}</ul></div>
+   <div><p className="l1a-two-head">{ut('Karşılaşınca')}</p><ul className="l1a-say-list" lang="de">{summaryHellos.map(text=><li key={text}><span>{text}</span><Say text={text} speech={speech}/></li>)}</ul></div>
+   <div><p className="l1a-two-head">{ut('Ayrılırken')}</p><ul className="l1a-say-list" lang="de">{summaryGoodbyes.map(text=><li key={text}><span>{text}</span><Say text={text} speech={speech}/></li>)}</ul></div>
   </div>
-  <h3 className="l1a-h2">Dört temel soru</h3>
+  <h3 className="l1a-h2">{ut('Dört temel soru')}</h3>
   <table className="l1a-table l1a-sie-du"><thead><tr><th lang="de">Sie</th><th lang="de">du</th></tr></thead>
    <tbody lang="de">{summaryQuestions.map(([sie,du])=><tr key={sie}><td>{sie} <Say text={sie} speech={speech}/></td><td>{du} <Say text={du} speech={speech}/></td></tr>)}</tbody></table>
-  <h3 className="l1a-h2">Fiiller</h3>
+  <h3 className="l1a-h2">{ut('Fiiller')}</h3>
   <div className="l1a-scroll"><table className="l1a-table l1a-verb-grid" lang="de"><thead><tr><th/>{summaryVerbs.map(row=><th key={row.verb}>{row.verb}</th>)}</tr></thead>
    <tbody>{(['ich','du','sie'] as const).map(person=><tr key={person}><td><b>{person==='sie'?'Sie':person}</b></td>{summaryVerbs.map(row=><td key={row.verb}>{row[person]}</td>)}</tr>)}</tbody></table></div>
   <div className="l1a-actions">{summaryVerbs.map(row=><Say key={row.verb} text={summaryVerbSay(row)} speech={speech} label={row.verb} wide/>)}</div>
-  <h3 className="l1a-h2">Kurallar</h3>
+  <h3 className="l1a-h2">{ut('Kurallar')}</h3>
   <ul className="l1a-list">{summaryRules.map(rule=><li key={rule}><Rich text={rule}/></li>)}</ul></>;
 }
 function WordListD({speech}:{speech:Speech}){
- return <><Heading>Kelime listesi</Heading>
-  <table className="l1a-table l1a-words"><tbody>{wordsD.map(([de,tr])=><tr key={de}><td><span className="l1a-de" lang="de">{de}</span></td><td>{tr}</td><td><Say text={wordSayD(de)} speech={speech}/></td></tr>)}</tbody></table>
-  <p className="l1a-tr">Şimdi alıştırmalar ve <b lang="de">Alles klar?</b> sınavı.</p></>;
+ return <><Heading>{ut('Kelime listesi')}</Heading>
+  <table className="l1a-table l1a-words"><tbody>{wordsD.map(([de,tr])=><tr key={de}><td><span className="l1a-de" lang="de">{de}</span></td><td>{ut(tr)}</td><td><Say text={wordSayD(de)} speech={speech}/></td></tr>)}</tbody></table>
+  <p className="l1a-tr"><Tx text="Şimdi alıştırmalar ve *Alles klar?* sınavı."/></p></>;
 }
 
 /* ---------- Teil D's own exercises ---------- */
@@ -107,15 +108,15 @@ function IchSentences(props:StepProps){
  const check=()=>{
   sound.prepare();speech.prepare();setChecked(true);
   const right=ichSentences.filter((item,i)=>ticked[i]===item.ich).length;
-  setFeedback(right===ichSentences.length?{ok:true,text:'Doğru: 4 cümle “ich” ile başlıyor.'}:{ok:false,text:`${right} / ${ichSentences.length} doğru. Yeşiller “ich” cümleleri; kırmızılar yanlış seçildi.`});
+  setFeedback(right===ichSentences.length?{ok:true,text:'Doğru: 4 cümle “ich” ile başlıyor.'}:{ok:false,text:'{right} / {total} doğru. Yeşiller “ich” cümleleri; kırmızılar yanlış seçildi.',params:{right,total:ichSentences.length}});
   finish(right,ichSentences.length,ichSentences.filter(item=>item.ich).map(item=>({text:item.text,who:item.who})));
  };
  const again=()=>{setTicked(ichSentences.map(()=>false));setChecked(false);setFeedback(null);};
  return <>
-  <p className="kicker" lang="de">Alıştırma 2 · Sätze mit „ich“</p><Heading>“ich” ile kurulan cümleleri işaretle</Heading>
-  <p className="l1a-tr">Hepsini seç, sonra “Kontrol et”. (İpucu: <b lang="de">Ich</b> cümle başında büyük yazılır.)</p>
-  <div className="l1a-opts column" role="group" aria-label="Cümleler">{ichSentences.map((item,i)=>{const state=!checked?'':item.ich?' ok':ticked[i]?' bad':'';return <button type="button" key={item.text} className={'l1a-opt l1a-tick'+(ticked[i]?' on':'')+state} aria-pressed={ticked[i]} disabled={checked} lang="de" onClick={()=>{const next=ticked.slice();next[i]=!next[i];setTicked(next);}}>{ticked[i]?<Check size={15} aria-hidden="true"/>:null}{item.text}</button>;})}</div>
-  <div className="l1a-actions">{checked?<button type="button" className="btn secondary small" onClick={again}>Yeniden dene</button>:<button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button>}</div>
+  <p className="kicker">{ut('Alıştırma 2 · Sätze mit „ich“')}</p><Heading>{ut('“ich” ile kurulan cümleleri işaretle')}</Heading>
+  <p className="l1a-tr"><Tx text="Hepsini seç, sonra “Kontrol et”. (İpucu: *Ich* cümle başında büyük yazılır.)"/></p>
+  <div className="l1a-opts column" role="group" aria-label={ut('Cümleler')}>{ichSentences.map((item,i)=>{const state=!checked?'':item.ich?' ok':ticked[i]?' bad':'';return <button type="button" key={item.text} className={'l1a-opt l1a-tick'+(ticked[i]?' on':'')+state} aria-pressed={ticked[i]} disabled={checked} lang="de" onClick={()=>{const next=ticked.slice();next[i]=!next[i];setTicked(next);}}>{ticked[i]?<Check size={15} aria-hidden="true"/>:null}{item.text}</button>;})}</div>
+  <div className="l1a-actions">{checked?<button type="button" className="btn secondary small" onClick={again}>{ut('Yeniden dene')}</button>:<button type="button" className="btn small" onClick={check}><Check size={16} aria-hidden="true"/>{ut('Kontrol et')}</button>}</div>
   <FeedbackLine feedback={feedback}/>
  </>;
 }
@@ -128,19 +129,19 @@ function OwnD({speech,onScore,step}:StepProps){
  // eslint-disable-next-line react-hooks/exhaustive-deps
  useEffect(()=>{if(allRight)onScore(step.id,values.length,values.length);},[allRight]);
  return <>
-  <p className="kicker" lang="de">Alıştırma 3 · Und Sie?</p><Heading>Şimdi sen: üç cümlen</Heading>
-  <p className="l1a-tr">Yaz → dinle → gizle → ezberden söyle → kendini değerlendir.</p>
-  {hidden?<Note>Cümlelerin gizlendi. Şimdi üçünü ezberden yüksek sesle söyle.</Note>:ownPromptsD.map((prompt,i)=>{const ok=state(i);return <div className="l1a-row" key={prompt.placeholder}>
+  <p className="kicker">{ut('Alıştırma 3 · Und Sie?')}</p><Heading>{ut('Şimdi sen: üç cümlen')}</Heading>
+  <p className="l1a-tr">{ut('Yaz → dinle → gizle → ezberden söyle → kendini değerlendir.')}</p>
+  {hidden?<Note>{ut('Cümlelerin gizlendi. Şimdi üçünü ezberden yüksek sesle söyle.')}</Note>:ownPromptsD.map((prompt,i)=>{const ok=state(i);return <div className="l1a-row" key={prompt.placeholder}>
    <input className={'l1a-gap wide'+(ok===true?' ok':ok===false?' bad':'')} value={values[i]} lang="de" dir="ltr" autoCapitalize="sentences" autoComplete="off" placeholder={prompt.placeholder} aria-label={prompt.placeholder} onChange={event=>{const next=values.slice();next[i]=event.target.value;setValues(next);}}/>
-   {ok===false&&<span className="l1a-mini">Kalıp: <span lang="de">{prompt.placeholder}</span></span>}
+   {ok===false&&<span className="l1a-mini">{ut('Kalıp:')} <span lang="de">{prompt.placeholder}</span></span>}
   </div>;})}
   <div className="l1a-actions">
-   <button type="button" className="btn secondary small" disabled={speech.busy||!values.some(value=>value.trim())} onClick={()=>speech.speakAll(values.map(value=>value.trim()).filter(Boolean))}><Volume2 size={16} aria-hidden="true"/>Dinle</button>
-   <button type="button" className="btn secondary small" disabled={!values.some(value=>value.trim())} onClick={()=>setHidden(!hidden)}>{hidden?<><Eye size={16} aria-hidden="true"/>Göster</>:<><EyeOff size={16} aria-hidden="true"/>Gizle</>}</button>
+   <button type="button" className="btn secondary small" disabled={speech.busy||!values.some(value=>value.trim())} onClick={()=>speech.speakAll(values.map(value=>value.trim()).filter(Boolean))}><Volume2 size={16} aria-hidden="true"/>{ut('Dinle')}</button>
+   <button type="button" className="btn secondary small" disabled={!values.some(value=>value.trim())} onClick={()=>setHidden(!hidden)}>{hidden?<><Eye size={16} aria-hidden="true"/>{ut('Göster')}</>:<><EyeOff size={16} aria-hidden="true"/>{ut('Gizle')}</>}</button>
   </div>
-  <h3 className="l1a-h2">Nasıl gitti?</h3>
-  <div className="l1a-opts" role="group" aria-label="Kendini değerlendir">{selfRatings.map(([mark,de],i)=><button type="button" key={de} className={'l1a-opt'+(rating===i?' ok':'')} aria-pressed={rating===i} lang="de" onClick={()=>{setRating(i);speech.speak(de);}}><span aria-hidden="true">{mark}</span> {de}</button>)}</div>
-  {rating!==null&&<p className="l1a-feedback ok" role="status">{selfRatings[rating][2]}</p>}
+  <h3 className="l1a-h2">{ut('Nasıl gitti?')}</h3>
+  <div className="l1a-opts" role="group" aria-label={ut('Kendini değerlendir')}>{selfRatings.map(([mark,de],i)=><button type="button" key={de} className={'l1a-opt'+(rating===i?' ok':'')} aria-pressed={rating===i} lang="de" onClick={()=>{setRating(i);speech.speak(de);}}><span aria-hidden="true">{mark}</span> {de}</button>)}</div>
+  {rating!==null&&<p className="l1a-feedback ok" role="status">{ut(selfRatings[rating][2])}</p>}
  </>;
 }
 /** The points of "Alles klar?" (like the book: under half the points of a section → "Bitte noch üben!"). */
@@ -150,28 +151,28 @@ function Points({scores,onGo}:StepProps){
  const total=done.reduce((n,row)=>n+Math.min(row.points,row.score!.right),0);const max=done.reduce((n,row)=>n+row.points,0);
  const verdict=max===0?'Henüz bir bölüm yapılmadı. Alles klar? 1 ile başla.':total>=max*.8?'🎉 Lektion 1 geschafft! Sırada Lektion 2.':total>=max*.5?'👍 İyi gidiyor. Zayıf bölümleri bir daha yap.':'📖 Bitte noch üben! Özet adımına dön.';
  return <>
-  <p className="kicker" lang="de">Alles klar? · Ergebnis</p><Heading>Puanların</Heading>
+  <p className="kicker" lang="de">Alles klar? · Ergebnis</p><Heading>{ut('Puanların')}</Heading>
   <Picture {...willkommenDPictures.trophy} alt="Paul Hoca kupayla: Lektion 1 geschafft!"/>
-  <table className="l1a-table l1a-points"><thead><tr><th>Bölüm</th><th/><th>Punkte</th></tr></thead><tbody>
+  <table className="l1a-table l1a-points"><thead><tr><th>{ut('Bölüm')}</th><th/><th>Punkte</th></tr></thead><tbody>
    {rows.map(row=>{const low=!!row.score&&row.score.right<row.points/2;return <tr key={row.id} data-l1a-points={row.id}>
     <td lang="de">{row.label}</td>
-    <td>{row.score?low?<button type="button" className="btn secondary small" lang="de" onClick={()=>onGo(stepIndexD(row.id))}>Bitte noch üben!</button>:<span className="l1a-ok-text">✓</span>:<button type="button" className="text-button l1a-mini" onClick={()=>onGo(stepIndexD(row.id))}>henüz yapılmadı</button>}</td>
+    <td>{row.score?low?<button type="button" className="btn secondary small" lang="de" onClick={()=>onGo(stepIndexD(row.id))}>Bitte noch üben!</button>:<span className="l1a-ok-text">✓</span>:<button type="button" className="text-button l1a-mini" onClick={()=>onGo(stepIndexD(row.id))}>{ut('henüz yapılmadı')}</button>}</td>
     <td className={row.score?low?'l1a-bad-text':'l1a-ok-text':''}>{row.score?`${Math.min(row.points,row.score.right)} / ${row.points}`:`– / ${row.points}`}</td>
    </tr>;})}
-   <tr className="l1a-points-total"><td><b>Toplam</b></td><td/><td><b>{total} / {checkPoints}</b></td></tr>
+   <tr className="l1a-points-total"><td><b>{ut('Toplam')}</b></td><td/><td><b>{total} / {checkPoints}</b></td></tr>
   </tbody></table>
-  <p className="l1a-big" role="status">{verdict}</p>
-  <Note>Kitaptaki gibi: bir bölümde puanın yarıdan azsa <b lang="de">Bitte noch üben!</b> — o konuya dön, sonra bölümü tekrar yap.</Note>
+  <p className="l1a-big" role="status">{ut(verdict)}</p>
+  <Note><Tx text="Kitaptaki gibi: bir bölümde puanın yarıdan azsa *Bitte noch üben!* — o konuya dön, sonra bölümü tekrar yap."/></Note>
  </>;
 }
-function EndD({progress,onGo,onPart}:StepProps){
+function EndD({progress,onGo,onPart,language}:StepProps){
  return <>
-  <Heading>Lektion 1 tamam! 🎉</Heading>
+  <Heading>{ut('Lektion 1 tamam! 🎉')}</Heading>
   <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
-  <p>A’dan D’ye kadar bitirdin. Artık:</p>
-  <ul className="l1a-list"><li>Selamlaşıp vedalaşabilirsin</li><li>Adını, ülkeni, dillerini söyleyebilirsin</li><li><b lang="de">Sie</b> ve <b lang="de">du</b> ile soru sorabilirsin</li><li>Hâl hatır sorabilirsin</li><li>Adını harf harf söyleyebilirsin</li><li>Fiili doğru çekip 2. pozisyona koyabilirsin</li></ul>
-  <ProgressMeter progress={progress} language={'tr'} label="Lektion 1D"/>
-  <p className="l1a-tr">Sırada: <b lang="de">Lektion 2</b>.</p>
-  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexD('puanlar'))}>Puanlarım</button><button type="button" className="btn secondary small" onClick={()=>onPart('c',0)}>Teil C</button><button type="button" className="btn small" onClick={()=>onGo(-1)}>Lektion 1 içindekiler</button></div>
+  <p>{ut('A’dan D’ye kadar bitirdin. Artık:')}</p>
+  <ul className="l1a-list"><li>{ut('Selamlaşıp vedalaşabilirsin')}</li><li>{ut('Adını, ülkeni, dillerini söyleyebilirsin')}</li><li><Tx text="*Sie* ve *du* ile soru sorabilirsin"/></li><li>{ut('Hâl hatır sorabilirsin')}</li><li>{ut('Adını harf harf söyleyebilirsin')}</li><li>{ut('Fiili doğru çekip 2. pozisyona koyabilirsin')}</li></ul>
+  <ProgressMeter progress={progress} language={language} label="Lektion 1D"/>
+  <p className="l1a-tr"><Tx text="Sırada: *Lektion 2*."/></p>
+  <div className="l1a-actions"><button type="button" className="btn secondary small" onClick={()=>onGo(stepIndexD('puanlar'))}>{ut('Puanlarım')}</button><button type="button" className="btn secondary small" onClick={()=>onPart('c',0)}>Teil C</button><button type="button" className="btn small" onClick={()=>onGo(-1)}>{ut('Lektion 1 içindekiler')}</button></div>
  </>;
 }

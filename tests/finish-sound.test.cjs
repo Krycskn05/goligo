@@ -27,13 +27,13 @@ test('sentence building shows what each sentence means',()=>{
  assert.equal(stadt.orderMeanings.length,stadt.orderSentences.length);
  assert.equal(l1.orderMeanings.length,l1.orderSentences.length);
  assert(l1c.orderVerbSentences.every(item=>item.tr&&item.tr.trim()));
- const ui=read('app/willkommen-ui.tsx');assert(ui.includes('Bu cümleyi kur: <b>{meanings[round]}</b>'));
+ const ui=read('app/willkommen-ui.tsx');assert(ui.includes("{ut('Bu cümleyi kur:')} <b>{ut(meanings[round])}</b>"));
  for(const file of ['app/stadt-a-steps.tsx','app/willkommen-study.tsx','app/willkommen-c-steps.tsx'])assert(read(file).split('\n').some(line=>line.includes('<OrderExercise')&&line.includes('meanings=')),file);
 });
 
 test('sentence building has a hint that fixes the end and puts in the next right word',()=>{
  const ui=read('app/willkommen-ui.tsx');
  assert(ui.includes('const hint=()=>{'),'hint function');
- assert(ui.includes('<Lightbulb size={16} aria-hidden="true"/>İpucu</button>'),'hint button');
+ assert(ui.includes('<Lightbulb size={16} aria-hidden="true"/>{ut(\'İpucu\')}</button>'),'hint button');
  assert(ui.includes("while(keep<picked.length&&sentence[picked[keep]]===sentence[keep])keep++;"),'keeps the right start');
 });

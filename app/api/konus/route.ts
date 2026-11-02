@@ -3,7 +3,7 @@ import {getRawDb} from '@/db';
 import {getChatGPTUser} from '@/app/chatgpt-auth';
 import {countAttempt,isLimited} from '@/lib/member-store';
 import {talkScenarios} from '@/lib/talk-scenarios';
-import {TALK_DAILY_LIMIT,TALK_MODEL,TALK_TEXT_MAX,parseTalkReply,talkDone,talkMessages,talkReplySchema,type TalkTurn} from '@/lib/talk-prompt';
+import {TALK_DAILY_LIMIT,TALK_MODEL,TALK_TEXT_MAX,parseTalkReply,talkDone,talkHelpLanguage,talkMessages,talkReplySchema,type TalkTurn} from '@/lib/talk-prompt';
 
 /**
  * "Konuş": one turn of a lesson's spoken role play (the learner asked, 30 October 2026). Members only; the browser sends
@@ -31,7 +31,7 @@ export async function POST(request:Request){
  if(!ai||typeof ai.run!=='function')return json({error:'Konuşma şu anda kullanılamıyor.'},503);
  const db=getRawDb();const key='talk:'+user.userId;
  if(await isLimited(db,key,TALK_DAILY_LIMIT,DAY))return json({error:'Bugünlük konuşma hakkın doldu. Yarın devam edelim!',limit:true},429);
- const messages=talkMessages(scenario,history);
+ const messages=talkMessages(scenario,history,talkHelpLanguage(body.language)); // translation and notes in the lesson's language
  try{
   let raw:unknown;
   try{raw=await ai.run(TALK_MODEL,{messages,max_tokens:350,temperature:0.6,response_format:{type:'json_schema',json_schema:talkReplySchema}});}

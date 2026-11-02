@@ -90,7 +90,7 @@ test('Alles klar?: the points page like Lektion 1D, half a point per Grammatik g
 
 test('Teil D lives in the Lektion 2 notebook: part d, its own scores; all four parts make the unit card',()=>{
  const shell=read('app/berufe-study.tsx');
- for(const piece of ["d:{id:'d',badge:'D'","View:StepViewL2D","testNote:`Alles klar? · ${checkPointsD} puan`","konus:'Sesli pratik'"])assert(shell.includes(piece),piece);
+ for(const piece of ["d:{id:'d',badge:'D'","View:StepViewL2D","testNote:'Alles klar? · {n} puan'","ut(config.testNote,{n:checkPointsD})","konus:ut('Sesli pratik')"])assert(shell.includes(piece),piece);
  assert.equal(a.berufeParts[3].title,'Ich verstehe das nicht.');
  assert.equal(sync.syncLessonOf(progress.L2D_SCORES_KEY),'l2');
  const full=list=>Object.fromEntries(list.map(({id,total})=>[id,{right:total,total}]));

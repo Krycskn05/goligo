@@ -7,7 +7,7 @@ import {useEffect} from 'react';
  * when it is tapped anywhere; the speaker icon stays as a sign that the row can be heard. Rows with answer fields,
  * choice buttons or two listen buttons (Sie / du tables) are left alone, and so are taps on links and buttons.
  */
-export const TAP_ROWS='.l1a-phrase,.l15-word,.l12-word-tile,.l1a-table tbody tr,.l1a-say-list li,.l1a-pos-row';
+export const TAP_ROWS='.l1a-phrase,.l15-word,.l12-word-tile,.l1a-table tbody tr,.l1a-say-list li,.l1a-pos-row,.l15-say-bubble';
 const SKIP='button,a,input,select,textarea,label,summary,[role="button"],[contenteditable="true"]';
 
 /** The row's only listen button, or null when the row is not a plain word row. */

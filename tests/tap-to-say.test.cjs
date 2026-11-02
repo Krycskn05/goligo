@@ -17,3 +17,12 @@ test('word rows of every lesson are covered, the speaker icon stays and exercise
  assert(code.includes("querySelector('input,select,textarea')"),'rows with answer fields are skipped');
  assert(read('app/willkommen.css').includes('.tap-say {'),'tappable rows show a pointer');
 });
+
+test('role play: Mei asks at once, her speaker sits in the bubble and the bubble reads when tapped',()=>{
+ const page=read('app/stadt-a-steps.tsx');
+ const block=page.slice(page.indexOf('function RoleExercise'));
+ assert(block.includes("useEffect(()=>{if(!over)speakRef.current({text:roleQuestions[round].question,who:'mei'});},[round,over]);"));
+ assert(/l15-say-bubble"><div className="l15-say-text">.*<Say text=\{item\.question\} who="mei" speech=\{speech\}\/><\/div><\/div>/.test(block),'speaker inside the bubble');
+ assert(read('app/tap-to-say.tsx').includes('.l15-say-bubble'),'the bubble is tappable');
+ assert(read('app/stadt.css').includes('.l15-say-bubble {'));
+});

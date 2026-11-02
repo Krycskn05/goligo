@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useRef,useState,type KeyboardEvent,type ReactNode} from 'react';
+import {useEffect,useMemo,useRef,useState,type KeyboardEvent,type ReactNode} from 'react';
 import {ArrowRight,BookOpen,Check,Eye,EyeOff,Play,RotateCcw,Trash2} from 'lucide-react';
 import {acceptsAnswer,type SayItem} from '@/lib/willkommen-course';
 import type {Line} from '@/lib/willkommen-b-course';
@@ -438,6 +438,9 @@ function RoleExercise(props:StepProps){
  const [picked,setPicked]=useState<string|null>(null);const [right,setRight]=useState(saved?.right??0);const [over,setOver]=useState(false);const [wait,setWait]=useState(false);
  useRunSave(runKey,step.id,!over&&(round>0||picked!==null)?{round,right,options,picked}:null);
  const item=roleQuestions[round];const answer=item.options[0];
+ // Mei asks at once when her question comes up (the learner asked, 2 November 2026).
+ const speakRef=useRef(speech.speak);speakRef.current=speech.speak;
+ useEffect(()=>{if(!over)speakRef.current({text:roleQuestions[round].question,who:'mei'});},[round,over]);
  const choose=(option:string)=>{
   if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);setWait(false);
   const ok=option===answer;const total=right+(ok?1:0);setRight(total);
@@ -459,7 +462,8 @@ function RoleExercise(props:StepProps){
   <Board board={schoolBoard}/>
   <p className="l1a-mini">Soru {round+1} / {roleQuestions.length}</p>
   <div className="l1a-dialogue">
-   <div className="l1a-line a"><Portrait who="mei" name="Mei"/><div className="l1a-bubble"><span className="l15-name">Mei</span><span className="l1a-de" lang="de" dir="ltr">{item.question}</span></div><Say text={item.question} who="mei" speech={speech}/></div>
+   {/* The speaker sits inside Mei's bubble and a tap anywhere on the bubble reads it (app/tap-to-say.tsx `.l15-say-bubble`). */}
+   <div className="l1a-line a"><Portrait who="mei" name="Mei"/><div className="l1a-bubble l15-say-bubble"><div className="l15-say-text"><span className="l15-name">Mei</span><span className="l1a-de" lang="de" dir="ltr">{item.question}</span></div><Say text={item.question} who="mei" speech={speech}/></div></div>
    {picked!==null&&<div className="l1a-line b"><Portrait who="sabine" name="Sabine"/><div className="l1a-bubble"><span className="l15-name">Sabine</span><span className="l1a-de" lang="de" dir="ltr">{answer}</span></div></div>}
   </div>
   <div className="l1a-opts column" role="group" aria-label={'Soru '+(round+1)}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null||over} lang="de" dir="ltr" onClick={()=>choose(option)}>{option}</button>)}</div>

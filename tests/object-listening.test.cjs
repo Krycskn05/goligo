@@ -14,8 +14,10 @@ const artwork=require(path.join(compiled,'object-toon-art.json'));
 test('every object has one listening question with four unambiguous picture choices in each course',()=>{
  for(const language of ['de','en']){
   const pool=language==='de'?de.objectListeningPool():en.englishObjectListeningPool();
-  assert.equal(pool.length,objectVocabulary.length);
-  assert.equal(new Set(pool.map(q=>q.objectId)).size,objectVocabulary.length);
+  // Meslekler and the Lektion 1 words are German only (2 November 2026).
+  const words=language==='de'?objectVocabulary:objectVocabulary.filter(word=>!['objects-jobs','objects-lektion1'].includes(word.topic));
+  assert.equal(pool.length,words.length);
+  assert.equal(new Set(pool.map(q=>q.objectId)).size,words.length);
   for(const q of pool){
    assert.equal(q.audio,q.answer,q.id);assert.equal(q.image,undefined,'do not reveal the target image: '+q.id);
    assert.equal(new Set(q.pictureOptions).size,4);assert.equal(new Set(q.options).size,4);
@@ -33,6 +35,7 @@ test('every object has one listening question with four unambiguous picture choi
 
 test('listening lengths, category scope, server pools and mistake review match',()=>{
  for(const language of ['de','en'])for(const group of ['all',...objectGroups.map(g=>g.id)]){
+  if(language==='en'&&['objects-jobs','objects-lektion1'].includes(group))continue;
   const pool=language==='de'?de.objectListeningPool(group):en.englishObjectListeningPool(group);
   const pick=(size,reviews=[],review=false,ids)=>language==='de'?de.pickObjectListeningQuiz(group,size,reviews,review,ids):en.pickEnglishObjectQuiz(group,size,reviews,review,ids,false,true);
   for(const size of [5,10,20,'all']){

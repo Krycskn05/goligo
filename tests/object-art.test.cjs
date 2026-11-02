@@ -9,10 +9,10 @@ function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).
 
 // Body parts and health things (21 October 2026) and the 3D sheets (22 October 2026) come from the learner's own
 // picture sheets, not from shader models: the picture file starts with the category's prefix.
-const sheetPrefix={'objects-body':'koerper-','objects-health':'gesundheit-','objects-food':'essen-','objects-drinks':'getraenke-','objects-cooking':'kueche-','objects-school':'schule-','objects-outdoors':'draussen-'};
+const sheetPrefix={'objects-body':'koerper-','objects-health':'gesundheit-','objects-food':'essen-','objects-drinks':'getraenke-','objects-cooking':'kueche-','objects-school':'schule-','objects-outdoors':'draussen-','objects-jobs':'','objects-lektion1':''}; // the new IDs carry their prefix (beruf-, l1-)
 const sheetTopics=new Set(Object.keys(sheetPrefix));
 test('every Nesne Kasası object has a picture: the classic pictures, the tool pictures and the learner\'s body and health sheets',()=>{
- const ids=objects.objectVocabulary.map(word=>word.id);assert.equal(ids.length,295);
+ const ids=objects.objectVocabulary.map(word=>word.id);assert.equal(ids.length,409);
  assert.deepEqual(Object.keys(art).sort(),[...ids].sort());
  for(const id of ids){
   const entry=art[id];const file=path.join('public',entry.src);assert.ok(fs.existsSync(file),id);

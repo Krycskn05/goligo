@@ -3243,5 +3243,1259 @@
       "width": 512,
       "height": 512
     }
+  },
+  "beruf-aerztin": {
+    "src": "/objects/toon/beruf-aerztin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-arzt": {
+    "src": "/objects/toon/beruf-arzt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-zahnaerztin": {
+    "src": "/objects/toon/beruf-zahnaerztin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-zahnarzt": {
+    "src": "/objects/toon/beruf-zahnarzt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-tieraerztin": {
+    "src": "/objects/toon/beruf-tieraerztin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-tierarzt": {
+    "src": "/objects/toon/beruf-tierarzt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-krankenpflegerin": {
+    "src": "/objects/toon/beruf-krankenpflegerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-krankenpfleger": {
+    "src": "/objects/toon/beruf-krankenpfleger.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-altenpflegerin": {
+    "src": "/objects/toon/beruf-altenpflegerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-altenpfleger": {
+    "src": "/objects/toon/beruf-altenpfleger.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-apothekerin": {
+    "src": "/objects/toon/beruf-apothekerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-apotheker": {
+    "src": "/objects/toon/beruf-apotheker.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-lehrerin": {
+    "src": "/objects/toon/beruf-lehrerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-lehrer": {
+    "src": "/objects/toon/beruf-lehrer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-erzieherin": {
+    "src": "/objects/toon/beruf-erzieherin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-erzieher": {
+    "src": "/objects/toon/beruf-erzieher.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-programmiererin": {
+    "src": "/objects/toon/beruf-programmiererin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-programmierer": {
+    "src": "/objects/toon/beruf-programmierer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-verkaeuferin": {
+    "src": "/objects/toon/beruf-verkaeuferin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-verkaeufer": {
+    "src": "/objects/toon/beruf-verkaeufer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-kassiererin": {
+    "src": "/objects/toon/beruf-kassiererin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-kassierer": {
+    "src": "/objects/toon/beruf-kassierer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-baeckerin": {
+    "src": "/objects/toon/beruf-baeckerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-baecker": {
+    "src": "/objects/toon/beruf-baecker.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-kellnerin": {
+    "src": "/objects/toon/beruf-kellnerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-kellner": {
+    "src": "/objects/toon/beruf-kellner.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-koechin": {
+    "src": "/objects/toon/beruf-koechin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-koch": {
+    "src": "/objects/toon/beruf-koch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-friseurin": {
+    "src": "/objects/toon/beruf-friseurin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-friseur": {
+    "src": "/objects/toon/beruf-friseur.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-busfahrerin": {
+    "src": "/objects/toon/beruf-busfahrerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-busfahrer": {
+    "src": "/objects/toon/beruf-busfahrer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-taxifahrerin": {
+    "src": "/objects/toon/beruf-taxifahrerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-taxifahrer": {
+    "src": "/objects/toon/beruf-taxifahrer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-polizistin": {
+    "src": "/objects/toon/beruf-polizistin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-polizist": {
+    "src": "/objects/toon/beruf-polizist.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-mechanikerin": {
+    "src": "/objects/toon/beruf-mechanikerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-mechaniker": {
+    "src": "/objects/toon/beruf-mechaniker.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-elektrikerin": {
+    "src": "/objects/toon/beruf-elektrikerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-elektriker": {
+    "src": "/objects/toon/beruf-elektriker.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-malerin": {
+    "src": "/objects/toon/beruf-malerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-maler": {
+    "src": "/objects/toon/beruf-maler.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-hausmeisterin": {
+    "src": "/objects/toon/beruf-hausmeisterin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-hausmeister": {
+    "src": "/objects/toon/beruf-hausmeister.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-gaertnerin": {
+    "src": "/objects/toon/beruf-gaertnerin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-gaertner": {
+    "src": "/objects/toon/beruf-gaertner.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-ingenieurin": {
+    "src": "/objects/toon/beruf-ingenieurin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "beruf-ingenieur": {
+    "src": "/objects/toon/beruf-ingenieur.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-guten-tag": {
+    "src": "/objects/toon/l1-guten-tag.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-willkommen": {
+    "src": "/objects/toon/l1-willkommen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-danke": {
+    "src": "/objects/toon/l1-danke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wie": {
+    "src": "/objects/toon/l1-wie.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-heissen": {
+    "src": "/objects/toon/l1-heissen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-sie": {
+    "src": "/objects/toon/l1-sie.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-ich": {
+    "src": "/objects/toon/l1-ich.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-ich-bin": {
+    "src": "/objects/toon/l1-ich-bin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-herr": {
+    "src": "/objects/toon/l1-herr.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-frau": {
+    "src": "/objects/toon/l1-frau.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-und": {
+    "src": "/objects/toon/l1-und.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-und-sie": {
+    "src": "/objects/toon/l1-und-sie.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-woher": {
+    "src": "/objects/toon/l1-woher.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-kommen": {
+    "src": "/objects/toon/l1-kommen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-aus": {
+    "src": "/objects/toon/l1-aus.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-sprache": {
+    "src": "/objects/toon/l1-sprache.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-sprechen": {
+    "src": "/objects/toon/l1-sprechen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-welche-sprachen": {
+    "src": "/objects/toon/l1-welche-sprachen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-ein-bisschen": {
+    "src": "/objects/toon/l1-ein-bisschen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-deutsch": {
+    "src": "/objects/toon/l1-deutsch.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-du": {
+    "src": "/objects/toon/l1-du.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-hallo": {
+    "src": "/objects/toon/l1-hallo.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-name": {
+    "src": "/objects/toon/l1-name.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-mein-name": {
+    "src": "/objects/toon/l1-mein-name.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-neu": {
+    "src": "/objects/toon/l1-neu.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-hier": {
+    "src": "/objects/toon/l1-hier.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-neu-hier": {
+    "src": "/objects/toon/l1-neu-hier.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-land": {
+    "src": "/objects/toon/l1-land.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-schreiben": {
+    "src": "/objects/toon/l1-schreiben.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-buchstabieren": {
+    "src": "/objects/toon/l1-buchstabieren.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wie-bitte": {
+    "src": "/objects/toon/l1-wie-bitte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wie-schreibt": {
+    "src": "/objects/toon/l1-wie-schreibt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-bitte": {
+    "src": "/objects/toon/l1-bitte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-ja": {
+    "src": "/objects/toon/l1-ja.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-nein": {
+    "src": "/objects/toon/l1-nein.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-richtig": {
+    "src": "/objects/toon/l1-richtig.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-interessant": {
+    "src": "/objects/toon/l1-interessant.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-guten-morgen": {
+    "src": "/objects/toon/l1-guten-morgen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-guten-abend": {
+    "src": "/objects/toon/l1-guten-abend.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-gute-nacht": {
+    "src": "/objects/toon/l1-gute-nacht.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-auf-wiedersehen": {
+    "src": "/objects/toon/l1-auf-wiedersehen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-tschues": {
+    "src": "/objects/toon/l1-tschues.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-bis-bald": {
+    "src": "/objects/toon/l1-bis-bald.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wie-geht-es-ihnen": {
+    "src": "/objects/toon/l1-wie-geht-es-ihnen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wie-geht-es-dir": {
+    "src": "/objects/toon/l1-wie-geht-es-dir.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wie-gehts": {
+    "src": "/objects/toon/l1-wie-gehts.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-danke-gut": {
+    "src": "/objects/toon/l1-danke-gut.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-und-ihnen": {
+    "src": "/objects/toon/l1-und-ihnen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-sehr": {
+    "src": "/objects/toon/l1-sehr.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-nicht": {
+    "src": "/objects/toon/l1-nicht.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-schlecht": {
+    "src": "/objects/toon/l1-schlecht.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-es-geht": {
+    "src": "/objects/toon/l1-es-geht.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-sagen-wir-du": {
+    "src": "/objects/toon/l1-sagen-wir-du.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-ja-gern": {
+    "src": "/objects/toon/l1-ja-gern.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-gute-reise": {
+    "src": "/objects/toon/l1-gute-reise.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-nachbarin": {
+    "src": "/objects/toon/l1-nachbarin.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-nachbar": {
+    "src": "/objects/toon/l1-nachbar.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wohnung": {
+    "src": "/objects/toon/l1-wohnung.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-wichtig": {
+    "src": "/objects/toon/l1-wichtig.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-satz": {
+    "src": "/objects/toon/l1-satz.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-auswendig": {
+    "src": "/objects/toon/l1-auswendig.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-aufnehmen": {
+    "src": "/objects/toon/l1-aufnehmen.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-ueben": {
+    "src": "/objects/toon/l1-ueben.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-leicht": {
+    "src": "/objects/toon/l1-leicht.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-schwer": {
+    "src": "/objects/toon/l1-schwer.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "l1-alles-klar": {
+    "src": "/objects/toon/l1-alles-klar.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
   }
 }

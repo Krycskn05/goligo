@@ -16,6 +16,7 @@ test('every vault object belongs to exactly one translated subtopic within its e
 });
 test('subtopic rounds, lengths and mistake reviews remain scoped in German and English for every mode',()=>{
  for(const group of objectSubgroups)for(const language of ['de','en'])for(const mode of ['test','write','listen']){
+  if(language==='en'&&['objects-jobs','objects-lektion1'].includes(group.parent))continue; // German only (2 November 2026)
   const isQuestion=language==='de'?(mode==='test'?de.isObjectPictureQuestion:mode==='write'?de.isObjectWritingQuestion:de.isObjectListeningQuestion):(mode==='test'?en.isEnglishObjectPictureQuestion:mode==='write'?en.isEnglishObjectWritingQuestion:en.isEnglishObjectListeningQuestion);
   const pool=Array.from(questionMap.values()).filter(q=>isQuestion(q)&&q.topic===(language==='en'?'en-':'')+group.parent);
   const ids=pool.filter(q=>inObjectSubgroup(q,group.id)).map(q=>q.id);assert(ids.length,group.id+' '+language+' '+mode);

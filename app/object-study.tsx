@@ -5,6 +5,7 @@ import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {objectGroups,objectVocabulary,objectWordMap,type ObjectWord} from '@/lib/object-course';
+import {WORD_TOPICS} from '@/lib/object-word-additions';
 import {objectSubgroups,subgroupName,inObjectSubgroup} from '@/lib/object-subgroups';
 import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake,isObjectSolved,pickObjectListeningQuiz,pickObjectWritingQuiz,pickPictureQuiz,type ObjectPickOptions,type PictureQuizSize} from '@/lib/object-practice';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
@@ -36,8 +37,8 @@ import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
 import {puzzleText} from '@/lib/article-logic';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
-const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors'};
-const groupImages:Record<string,string>={'objects-house':'dach','objects-furniture':'sessel','objects-kitchen':'teekanne','objects-cleaning':'putzeimer','objects-tools':'bohrmaschine','objects-building':'schubkarre','objects-nature':'kaktus','objects-moving':'karton','objects-body':'hand','objects-health':'verbandskasten','objects-food':'brezel','objects-drinks':'kaffee','objects-cooking':'pfanne','objects-school':'tafel','objects-outdoors':'baum'};
+const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors','objects-jobs':'groupJobs','objects-lektion1':'groupLektion1'};
+const groupImages:Record<string,string>={'objects-house':'dach','objects-furniture':'sessel','objects-kitchen':'teekanne','objects-cleaning':'putzeimer','objects-tools':'bohrmaschine','objects-building':'schubkarre','objects-nature':'kaktus','objects-moving':'karton','objects-body':'hand','objects-health':'verbandskasten','objects-food':'brezel','objects-drinks':'kaffee','objects-cooking':'pfanne','objects-school':'tafel','objects-outdoors':'baum','objects-jobs':'beruf-aerztin','objects-lektion1':'l1-hallo'};
 function categoryName(group:string,language:VaultLanguage){return group==='all'?vaultText(language,'allObjects'):groupKeys[group]?vaultText(language,groupKeys[group]):objectGroups.find(item=>item.id===group)?.title??group;}
 function CategoryArt({group,title}:{group:string;title:string}){
  if(group==='all')return <HeroArt variant="objects" alt={title}/>;
@@ -222,7 +223,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     <div className="vault-feature-grid">
      {categoryCard('all',text('allObjects'),true)}
     </div>
-    <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
+    <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.filter(item=>course==='de'||!(WORD_TOPICS as readonly string[]).includes(item.id)).map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
    </section>}
   </main></div><StartWait show={busy&&!session} text={text('preparing')}/><SiteFooter language={language}/>
  </div>;

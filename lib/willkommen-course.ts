@@ -4,6 +4,7 @@
  * Texts for the learner are Turkish (the site's main audience); the German is read aloud with the site voices.
  * Step and exercise ids never change (saved scores are keyed by them).
  */
+import {talkStep,talkGroup} from './talk-switch';
 import {unitGoalsFor} from './unit-goals';
 
 export const WILLKOMMEN_PATH='/a1-1/willkommen';
@@ -263,7 +264,7 @@ export const steps:Step[]=[
  {id:'kutu',title:'Alıştırma 8',kind:'exercise'},
  {id:'sen',title:'Alıştırma 9',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
- {id:'konus',title:'Konuşma',kind:'speak'},
+ ...talkStep(),
  {id:'bitti',title:'Bitti',kind:'end'},
 ];
 export const stepIndex=(id:string)=>steps.findIndex(step=>step.id===id);
@@ -323,6 +324,6 @@ export const stepGroups:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:steps.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:steps.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
- {id:'konus',label:'Konuş',ids:['konus']},
+ ...talkGroup(),
 ];
 export const groupOf=(id:string)=>stepGroups.find(group=>group.ids.includes(id));

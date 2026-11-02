@@ -107,7 +107,7 @@ test('object picture tests retain four choices and writing includes both names a
  const objects=require(path.join(compiled,'object-course.js'));const p=require(path.join(compiled,'object-practice.js'));
  for(const group of ['all',...objects.objectGroups.map(g=>g.id)]){
   const picture=p.pickPictureQuiz(group,'all',[]);assert(picture.every(q=>p.isObjectPictureQuestion(q)&&q.options.length===4));
-  const writing=p.pickObjectWritingQuiz(group,'all',[]);const plural=writing.filter(q=>q.articlePuzzle?.variant==='plural');assert.equal(writing.length-plural.length,picture.length*2);
+  const writing=p.pickObjectWritingQuiz(group,'all',[]);const plural=writing.filter(q=>q.articlePuzzle?.variant==='plural');const phrases=objects.objectVocabulary.filter(word=>word.phrase&&(group==='all'||word.topic===group)).length;assert.equal(writing.length-plural.length,picture.length*2-phrases); // Lektion 1 phrases have no article gap
   assert(writing.every(q=>p.isObjectWritingQuestion(q)&&!q.options));assert(writing.some(q=>q.gap));assert(writing.some(q=>!q.gap));
   const short=p.pickObjectWritingQuiz(group,5,[]);assert.equal(short.length,Math.min(5,writing.length));assert(short.some(q=>q.gap));assert(short.some(q=>!q.gap));
   for(const q of writing){assert(course.gradeAnswer(q,q.answer),q.id);if(q.gap)assert(['der','die','das'].includes(q.answer));}

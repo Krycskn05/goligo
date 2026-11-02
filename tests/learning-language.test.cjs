@@ -38,7 +38,7 @@ test('both catalogues keep twenty units; only the requested German housing chapt
 });
 test('English picture and writing pools preserve categories and four test lengths',()=>{
  const all=objects.pickEnglishObjectQuiz('all','all',[]);
- const count=course.questions.filter(q=>q.id.startsWith('obj-picture-')).length;assert.equal(all.length,count);assert.equal(objects.englishObjectWritingPool().length,count*2);
+ const count=course.questions.filter(q=>q.id.startsWith('obj-picture-')&&!['objects-jobs','objects-lektion1'].includes(q.topic)).length; // Meslekler and Lektion 1 are German onlyassert.equal(all.length,count);assert.equal(objects.englishObjectWritingPool().length,count*2);
  const houseCount=course.questions.filter(q=>q.id.startsWith('obj-picture-')&&q.topic==='objects-house').length;assert.equal(houseCount,23);
  for(const count of [5,10,20,'all']){const q=objects.pickEnglishObjectQuiz('objects-house',count,[]);assert.equal(q.length,count==='all'?houseCount:count);assert(q.every(item=>item.topic==='en-objects-house'));}
  assert(all.every(q=>q.id.startsWith('en-obj-picture-')&&q.options.length===4));

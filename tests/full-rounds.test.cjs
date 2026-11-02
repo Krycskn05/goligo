@@ -21,7 +21,7 @@ test('the server keeps every chosen question of a full Ev ve Yaşam round',()=>{
   const topic=housing.housingSections.find(item=>item.id===section)?.topic??'book-11';
   const saved=study.selectQuestions(mode,topic,ids.length,[],ids).map(q=>q.id);
   assert.deepEqual([...saved].sort(),[...ids].sort(),section+' '+mode);
-  assert(startBody(ids)<20000,section+' '+mode+' request size');
+  assert(startBody(ids)<60000,section+' '+mode+' request size');
  }
 });
 
@@ -33,6 +33,6 @@ test('the server keeps every chosen question of a full Nesne Kasası round',()=>
   assert.equal(ids.length,everything.length-3,group+' '+mode+' all unsolved questions, none solved');
   const saved=study.selectQuestions(server,group==='all'?'objects-all':group,ids.length,[],ids).map(q=>q.id);
   assert.deepEqual([...saved].sort(),[...ids].sort(),group+' '+mode);
-  assert(startBody(ids)<20000,group+' '+mode+' request size');
+  assert(startBody(ids)<60000,group+' '+mode+' request size');
  }
 });

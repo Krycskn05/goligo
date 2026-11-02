@@ -5,6 +5,7 @@
  * person with their own voice (`speakers` in lib/willkommen-course.ts). Step ids never change: saved scores are
  * keyed by them (their own store, lib/willkommen-progress.ts).
  */
+import {talkStep,talkGroup} from './talk-switch';
 import type {GapLine,Phrase,SayItem,Step,StepGroup} from './willkommen-course';
 
 /** Pictures of Teil B (public/toon/lektion1, from the learner's page; cut-outs on white). */
@@ -250,7 +251,7 @@ export const stepsB:Step[]=[
  {id:'richtig',title:'Alıştırma 10',kind:'exercise'},
  {id:'sen',title:'Alıştırma 11',kind:'exercise'},
  {id:'test',title:'Test',kind:'test'},
- {id:'konus',title:'Konuşma',kind:'speak'},
+ ...talkStep(),
  {id:'bitti',title:'Bitti',kind:'end'},
 ];
 export const stepIndexB=(id:string)=>stepsB.findIndex(step=>step.id===id);
@@ -272,7 +273,7 @@ export const stepGroupsB:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:stepsB.filter(step=>step.kind==='teach').map(step=>step.id)},
  {id:'alistirmalar',label:'Alıştırmalar',ids:stepsB.filter(step=>step.kind==='exercise').map(step=>step.id)},
  {id:'test',label:'Test',ids:['test']},
- {id:'konus',label:'Konuş',ids:['konus']},
+ ...talkGroup(),
 ];
 
 /** Every German text Teil B speaks (rendered as site voices by scripts/voices). */

@@ -47,18 +47,19 @@ test('the server: members only, same origin, a daily limit, the prompt from the 
  const vite=read('vite.config.ts');assert(vite.includes('...(productionDatabaseId ? { ai: { binding: "AI" } } : {}),'));
 });
 
-test('the page: a Konuş tab and step after the test in every lesson part, the microphone or typing',()=>{
+test('the page: Konuş is switched off for now (the learner asked, 2 November 2026); the step stays in the code',()=>{
+ assert.equal(load('talk-switch').TALK_ON,false);
  const parts=[[l1.steps,l1.stepGroups],[load('willkommen-b-course').stepsB,load('willkommen-b-course').stepGroupsB],[load('willkommen-c-course').stepsC,load('willkommen-c-course').stepGroupsC],[load('willkommen-d-course').stepsD,load('willkommen-d-course').stepGroupsD],[load('stadt-course').stepsA,load('stadt-course').stepGroupsA]];
  for(const [steps,groups] of parts){
-  const at=steps.findIndex(step=>step.id==='konus');assert(at>0,'konus step');assert.equal(steps[at].kind,'speak');assert.equal(steps[steps.length-1].kind,'end');assert(steps.findIndex(step=>step.id==='test')<at);
-  assert.deepEqual(groups[groups.length-1],{id:'konus',label:'Konuş',ids:['konus']});
+  assert(!steps.some(step=>step.id==='konus'||step.kind==='speak'),'no Konuş step');assert.equal(steps[steps.length-1].kind,'end');
+  assert(!groups.some(group=>group.id==='konus'),'no Konuş tab');
  }
  const views=['app/willkommen-study.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx','app/willkommen-d-steps.tsx','app/stadt-a-steps.tsx'].map(read).join('\n');
  for(const id of ['l1a','l1b','l1c','l1d','l15a'])assert(views.includes("case 'konus':return <TalkStep scenario={talkScenarios."+id+"} {...props}/>"),id);
  const step=read('app/talk-step.tsx');
  for(const piece of ["r.lang='de-DE'","fetch('/api/konus'","speech.speak({text:reply.de,who:scenario.who})","useRunSave(runKey,step.id,","l1a-talk-mic","l1a-talk-input","signIn"])assert(step.includes(piece),piece);
  const css=read('app/willkommen.css');assert(css.includes('.l1a-talk-mic')&&css.includes('.lb.l1a-book .l12-steps ol:has(> li:nth-child(4))'));
- const smoke=read('ci/smoke.cjs');assert(smoke.includes('?adim=konus')&&smoke.includes('dort sekme'));
+ const smoke=read('ci/smoke.cjs');assert(!smoke.includes('?adim=konus')&&smoke.includes('uc sekme'));
 });
 
 test('Konuş waits and stays on the lesson (30 October 2026): at least eight answers, the lesson topic only, the microphone listens until tapped',()=>{

@@ -19,19 +19,22 @@ const categories={
  'objects-cooking':'pfanne topf deckel sieb schneebesen zitronenpresse schneidebrett fleischwolf kaffeemaschine mixer brotschneidemaschine korkenzieher dosenoeffner flaschenoeffner dose einmachglas milchtuete tube korken kronkorken eierschale strohhalm',
  'objects-school':'tafel kreide schwamm tuer tuerklinke ecke decke fussboden lichtschalter papierkorb landkarte buch heft woerterbuch bleistift buntstift kugelschreiber fueller radiergummi lineal tasche rucksack lehrer schueler schuelerin foto radio kassettenrekorder',
  'objects-outdoors':'baum blume gras schmetterling maus stadt turm zaun bank ball unfall kuss picknickdecke rock',
+ // Meslekler and the Lektion 1 words (2 November 2026).
+ 'objects-jobs':'beruf-aerztin beruf-arzt beruf-zahnaerztin beruf-zahnarzt beruf-tieraerztin beruf-tierarzt beruf-krankenpflegerin beruf-krankenpfleger beruf-altenpflegerin beruf-altenpfleger beruf-apothekerin beruf-apotheker beruf-lehrerin beruf-lehrer beruf-erzieherin beruf-erzieher beruf-programmiererin beruf-programmierer beruf-verkaeuferin beruf-verkaeufer beruf-kassiererin beruf-kassierer beruf-baeckerin beruf-baecker beruf-kellnerin beruf-kellner beruf-koechin beruf-koch beruf-friseurin beruf-friseur beruf-busfahrerin beruf-busfahrer beruf-taxifahrerin beruf-taxifahrer beruf-polizistin beruf-polizist beruf-mechanikerin beruf-mechaniker beruf-elektrikerin beruf-elektriker beruf-malerin beruf-maler beruf-hausmeisterin beruf-hausmeister beruf-gaertnerin beruf-gaertner beruf-ingenieurin beruf-ingenieur',
+ 'objects-lektion1':'l1-guten-tag l1-willkommen l1-danke l1-wie l1-heissen l1-sie l1-ich l1-ich-bin l1-herr l1-frau l1-und l1-und-sie l1-woher l1-kommen l1-aus l1-sprache l1-sprechen l1-welche-sprachen l1-ein-bisschen l1-deutsch l1-du l1-hallo l1-name l1-mein-name l1-neu l1-hier l1-neu-hier l1-land l1-schreiben l1-buchstabieren l1-wie-bitte l1-wie-schreibt l1-bitte l1-ja l1-nein l1-richtig l1-interessant l1-guten-morgen l1-guten-abend l1-gute-nacht l1-auf-wiedersehen l1-tschues l1-bis-bald l1-wie-geht-es-ihnen l1-wie-geht-es-dir l1-wie-gehts l1-danke-gut l1-und-ihnen l1-sehr l1-nicht l1-schlecht l1-es-geht l1-sagen-wir-du l1-ja-gern l1-gute-reise l1-nachbarin l1-nachbar l1-wohnung l1-wichtig l1-satz l1-auswendig l1-aufnehmen l1-ueben l1-leicht l1-schwer l1-alles-klar',
 };
-const keys={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors'};
+const keys={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors','objects-jobs':'groupJobs','objects-lektion1':'groupLektion1'};
 
-test('the 295 vault objects are sorted into fifteen categories by meaning',()=>{
+test('the 409 vault words are sorted into seventeen categories by meaning',()=>{
  assert.deepEqual(objects.objectGroups.map(group=>group.id),Object.keys(categories));
  const expected=Object.entries(categories).flatMap(([topic,ids])=>ids.split(' ').map(id=>[id,topic]));
- assert.equal(expected.length,295);assert.equal(objects.objectVocabulary.length,295);
+ assert.equal(expected.length,409);assert.equal(objects.objectVocabulary.length,409);
  for(const [id,topic] of expected){const word=objects.objectWordMap.get(id);assert(word,id);assert.equal(word.topic,topic,id);}
  for(const word of objects.objectVocabulary)for(const kind of ['picture','write','hear-picture']){const q=course.questionMap.get('obj-'+kind+'-'+word.id);assert(q,kind+' '+word.id);assert.equal(q.topic,word.topic);}
  for(const word of objects.objectVocabulary){const groups=subgroups.objectSubgroups.filter(group=>group.wordIds.includes(word.id));assert.equal(groups.length,1,word.id);assert.equal(groups[0].parent,word.topic,word.id);}
  for(const language of copy.vaultLanguages.map(item=>item.id))for(const key of Object.values(keys))assert(copy.vaultText(language,key).trim(),key+' '+language);
  const page=fs.readFileSync('app/object-study.tsx','utf8');
- for(const [topic,key] of Object.entries(keys)){assert(page.includes("'"+topic+"':'"+key+"'"),topic);assert(new RegExp("'"+topic+"':'[a-z]+'").test(page.slice(page.indexOf('const groupImages'))),topic+' picture');}
+ for(const [topic,key] of Object.entries(keys)){assert(page.includes("'"+topic+"':'"+key+"'"),topic);assert(new RegExp("'"+topic+"':'[a-z0-9-]+'").test(page.slice(page.indexOf('const groupImages'))),topic+' picture');}
  for(const topic of Object.keys(categories))assert(progress.objectProgressIds(topic).length>0,topic);
 });
 
@@ -40,7 +43,7 @@ test('every category has picture, writing and listening rounds with four distinc
   const picture=practice.pickPictureQuiz(topic,'all',[]);const listening=practice.pickObjectListeningQuiz(topic,'all',[]);
   assert.equal(picture.length,categories[topic].split(' ').length,topic);assert.equal(listening.length,picture.length,topic);
   assert(picture.every(q=>q.options.length===4&&new Set(q.options).size===4&&q.options.includes(q.answer)),topic);
-  assert(practice.pickObjectWritingQuiz(topic,'all',[]).length>=picture.length*2,topic);
+  assert(practice.pickObjectWritingQuiz(topic,'all',[]).length>=picture.length*2-objects.objectVocabulary.filter(word=>word.topic===topic&&word.phrase).length,topic);
   const ids=picture.map(q=>q.id);
   assert.deepEqual(new Set(study.selectQuestions('visual',topic,ids.length,[],ids).map(q=>q.id)),new Set(ids),topic+' server round');
  }

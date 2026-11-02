@@ -7,6 +7,7 @@ import {buildingObjectMeanings} from './object-building-additions';
 import {toolObjectMeanings} from './object-tool-additions';
 import {bodyObjectMeanings} from './object-body-additions';
 import {everydayObjectMeanings} from './object-everyday-additions';
+import {wordObjectMeanings} from './object-word-additions';
 
 type ForeignMeanings=readonly [en:string,ar:string,uk:string,fr:string];
 // Meanings match the illustrated objects, including Kamin as a chimney.
@@ -16,6 +17,7 @@ export const objectMeanings:Record<string,ForeignMeanings>={
  ...toolObjectMeanings,
  ...bodyObjectMeanings,
  ...everydayObjectMeanings,
+ ...wordObjectMeanings,
  bad:['bathroom','حمّام','ванна кімната','salle de bains'],
  brett:['wooden board','لوح خشبي','дошка','planche de bois'],
  dach:['roof','سقف المنزل','дах','toit'],

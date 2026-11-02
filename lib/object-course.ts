@@ -7,10 +7,12 @@ import {buildingObjectAdditions} from './object-building-additions';
 import {toolObjectAdditions} from './object-tool-additions';
 import {bodyObjectAdditions} from './object-body-additions';
 import {everydayObjectAdditions} from './object-everyday-additions';
+import {wordObjectAdditions} from './object-word-additions';
 
 export type ObjectCrop={x:number;y:number;width:number;height:number;sheetWidth:number;sheetHeight:number};
 export type SceneKey='building'|'moving';
-export type ObjectWord={id:string;de:string;tr:string;topic:string;description:string;descriptionTr:string;note?:string;image:string;crop?:ObjectCrop;extra?:boolean};
+/** `phrase`: a Lektion 1 card without der/die/das (Wie bitte?, heißen, neu): no article questions, no article games. */
+export type ObjectWord={id:string;de:string;tr:string;topic:string;description:string;descriptionTr:string;note?:string;image:string;crop?:ObjectCrop;extra?:boolean;phrase?:boolean};
 export type SceneMark={id:string;x:number;y:number};
 export const objectGroups=[
  {id:'objects-house',title:'Ev ve yapı',de:'Das Haus',subtitle:'Odalar, çatı, su ve elektrik'},
@@ -28,6 +30,8 @@ export const objectGroups=[
  {id:'objects-cooking',title:'Mutfak araçları ve ambalajlar',de:'Küchengeräte und Verpackungen',subtitle:'Mutfak gereçleri, aletler ve ambalajlar'},
  {id:'objects-school',title:'Okul ve sınıf',de:'Schule und Klassenzimmer',subtitle:'Sınıf, okul eşyaları ve kişiler'},
  {id:'objects-outdoors',title:'Doğa, şehir ve diğerleri',de:'Natur, Stadt und mehr',subtitle:'Doğa, şehir ve günlük kavramlar'},
+ {id:'objects-jobs',title:'Meslekler',de:'Berufe',subtitle:'Kadın ve erkek meslek adları'},
+ {id:'objects-lektion1',title:'Lektion 1 kelimeleri',de:'Wörter aus Lektion 1',subtitle:'Selamlaşma, tanışma ve ilk kalıplar'},
 ];
 type Spec=[string,string,string,string,string,string?];
 const house:Spec[]=[
@@ -86,7 +90,7 @@ const objectCategory:Record<string,string>={
  brett:'objects-building',
  pflanze:'objects-nature',palme:'objects-nature',blumentopf:'objects-nature',kaktus:'objects-nature',vogel:'objects-nature',vogelkaefig:'objects-nature',feder:'objects-nature',fisch:'objects-nature',aquarium:'objects-nature',
 };
-export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions,...everydayObjectAdditions]
+export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions,...everydayObjectAdditions,...wordObjectAdditions]
  .map(word=>objectCategory[word.id]?{...word,topic:objectCategory[word.id]}:word);
 export const objectWordMap=new Map(objectVocabulary.map(w=>[w.id,w]));
 export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:number;height:number;marks:SceneMark[]}[]=[
@@ -105,12 +109,20 @@ const nearPairs:[string,string[]][]=[['daumen',['finger','hand']],['finger',['da
  ['ei',['spiegelei','eierschale']],['brot',['broetchen','baguette','brotscheibe']],['brotscheibe',['wurstbrot','kaesebrot']],['zucker',['wuerfelzucker','salz']],
  ['bratwurst',['wuerstchen','salami','wurstbrot']],['fleisch',['braten','kotelett','schinken']],['nudeln',['spaghetti']],['kuchen',['torte']],['gemuese',['karotte','gurke','erbse','tomate','zwiebel','blumenkohl','kartoffel','salat']],
  ['salat',['blumenkohl']],['kaese',['kaesebrot']],
+ // Lektion 1 pictures that tell nearly the same thing are never offered together (2 November 2026).
+ ['l1-ich',['l1-ich-bin','l1-du']],['l1-ich-bin',['l1-heissen','l1-mein-name']],['l1-heissen',['l1-mein-name','l1-name']],['l1-mein-name',['l1-name']],
+ ['l1-guten-tag',['l1-hallo','l1-guten-morgen','l1-guten-abend']],['l1-hallo',['l1-wie-gehts']],['l1-sie',['l1-herr','l1-frau']],['l1-und-sie',['l1-und-ihnen']],
+ ['l1-wie-geht-es-ihnen',['l1-wie-geht-es-dir','l1-wie-gehts']],['l1-wie-geht-es-dir',['l1-wie-gehts']],['l1-danke',['l1-danke-gut','l1-bitte']],
+ ['l1-ja',['l1-richtig','l1-danke-gut','l1-ja-gern']],['l1-nein',['l1-nicht','l1-schlecht']],['l1-neu-hier',['l1-neu','l1-hier']],
+ ['l1-tschues',['l1-auf-wiedersehen','l1-bis-bald','l1-gute-reise']],['l1-auf-wiedersehen',['l1-bis-bald']],['l1-guten-morgen',['l1-gute-nacht']],
+ ['l1-sprache',['l1-sprechen','l1-welche-sprachen']],['l1-sprechen',['l1-welche-sprachen']],['l1-schreiben',['l1-wie-schreibt','l1-buchstabieren']],
+ ['l1-wie',['l1-wie-bitte','l1-wie-schreibt']],['l1-auswendig',['l1-ueben']],['l1-nachbarin',['l1-nachbar']],
  ['apfelsaft',['orangensaft']],['wein',['rotwein','weisswein']],['rotwein',['weisswein']],['glas',['bierglas','weinglas']],['krug',['milchkaennchen','kaffeekanne']],['loeffel',['teeloeffel']],['zuckerdose',['butterdose']],
  ['dose',['einmachglas']],['korken',['kronkorken']],['flaschenoeffner',['dosenoeffner','korkenzieher']],['topf',['deckel']],['mixer',['schneebesen']],
  ['buch',['heft','woerterbuch']],['heft',['woerterbuch']],['bleistift',['buntstift']],['kugelschreiber',['fueller']],['radio',['kassettenrekorder']],['tuer',['tuerklinke']],
  ['tafel',['kreide','schwamm']],['tasche',['rucksack']],['schueler',['schuelerin']],['decke',['ecke','fussboden']],['blume',['gras']],['stadt',['turm']]];
 // Categories whose wrong choices come from the same category (an eye among other body parts, a fork among tableware).
-const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors']);
+const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors','objects-jobs','objects-lektion1']);
 const nearObjects:Record<string,string[]>={};
 for(const [id,others] of nearPairs)for(const other of others){(nearObjects[id]??=[]).push(other);(nearObjects[other]??=[]).push(id);}
 function distractors(w:ObjectWord){
@@ -132,15 +144,16 @@ const objectBank:Question[]=[];
 for(const w of objectVocabulary){
  const other=distractors(w);const options=[w.de,...other.map(x=>x.de)];const explanation=w.de+' = '+w.tr+'.'+(w.note?' '+w.note:'');
  const base={topic:w.topic,objectId:w.id,explanation};
+ // Lektion 1 phrases (w.phrase) have no article: no article choice and no article gap (the learner asked, 2 November 2026).
  objectBank.push(
-  {...base,id:'obj-picture-'+w.id,kind:'choice',prompt:'Resimdeki nesnenin Almanca adını artikeliyle seç.',answer:w.de,options,image:imageOf(w),practice:'visual'},
-  {...base,id:'obj-article-'+w.id,kind:'choice',prompt:'Nesnenin sözlük biçiminde doğru belirli artikelini seç.',answer:w.de,options:[w.de,...['der','die','das','den'].filter(a=>a!==w.de.split(' ')[0]).map(a=>a+' '+w.de.slice(w.de.indexOf(' ')+1)).slice(0,3)],image:imageOf(w),practice:'visual'},
-  {...base,id:'obj-write-'+w.id,kind:'write',prompt:'Bu nesnenin Almanca adını artikeliyle yaz.',answer:w.de,image:imageOf(w),practice:'visual',writingTask:'word'},
-  {...base,id:'obj-gap-'+w.id,kind:'write',prompt:'Boşluğu doğru artikel ile tamamla.',gap:'___ '+w.de.slice(w.de.indexOf(' ')+1),writingTask:'gap',answer:w.de.split(' ')[0],image:imageOf(w)},
+  {...base,id:'obj-picture-'+w.id,kind:'choice',prompt:w.phrase?'Resme uyan Almanca kelimeyi veya ifadeyi seç.':'Resimdeki nesnenin Almanca adını artikeliyle seç.',answer:w.de,options,image:imageOf(w),practice:'visual'},
+  ...(w.phrase?[]:[{...base,id:'obj-article-'+w.id,kind:'choice',prompt:'Nesnenin sözlük biçiminde doğru belirli artikelini seç.',answer:w.de,options:[w.de,...['der','die','das','den'].filter(a=>a!==w.de.split(' ')[0]).map(a=>a+' '+w.de.slice(w.de.indexOf(' ')+1)).slice(0,3)],image:imageOf(w),practice:'visual'}]),
+  {...base,id:'obj-write-'+w.id,kind:'write',prompt:w.phrase?'Resme uyan Almanca kelimeyi veya ifadeyi yaz.':'Bu nesnenin Almanca adını artikeliyle yaz.',answer:w.de,image:imageOf(w),practice:'visual',writingTask:'word'},
+  ...(w.phrase?[]:[{...base,id:'obj-gap-'+w.id,kind:'write',prompt:'Boşluğu doğru artikel ile tamamla.',gap:'___ '+w.de.slice(w.de.indexOf(' ')+1),writingTask:'gap',answer:w.de.split(' ')[0],image:imageOf(w)}]),
   {...base,id:'obj-hear-picture-'+w.id,kind:'listen',prompt:'Dinlediğin nesnenin resmini seç.',answer:w.de,options,audio:w.de,audioTr:w.tr,pictureOptions:[w.id,...other.map(x=>x.id)]},
   {...base,id:'obj-read-'+w.id,kind:'read',prompt:'Bu kısa açıklama hangi nesneyi anlatıyor?',answer:w.de,options,passage:w.description,passageTr:w.descriptionTr},
   {...base,id:'obj-hear-description-'+w.id,kind:'listen',prompt:'Dinlediğin açıklama hangi nesneyi anlatıyor?',answer:w.de,options,audio:w.description,audioTr:w.descriptionTr},
-  {...base,id:'obj-dictation-'+w.id,kind:'write',prompt:'Duyduğun kelimeyi artikeliyle yaz.',answer:w.de,audio:w.de,audioTr:w.tr,practice:'dictation'},
+  {...base,id:'obj-dictation-'+w.id,kind:'write',prompt:w.phrase?'Duyduğun kelimeyi veya ifadeyi yaz.':'Duyduğun kelimeyi artikeliyle yaz.',answer:w.de,audio:w.de,audioTr:w.tr,practice:'dictation'},
  );
  const plural=pluralNouns[w.id];if(plural)objectBank.push({...base,id:'obj-puzzle-plural-'+w.id,kind:'write',writingTask:'gap',prompt:'Çoğul kelimenin artikelini seç.',gap:'___ '+plural,answer:'die',articlePuzzle:{variant:'plural',noun:plural,fullAnswer:'die '+plural},image:imageOf(w),explanation:'Çoğul isimlerde Nominativ belirli artikel die olur: die '+plural+'. Tekil artikel ile karıştırma.'});
 }

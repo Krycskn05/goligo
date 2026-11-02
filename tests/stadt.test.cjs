@@ -8,10 +8,10 @@ const read=file=>fs.readFileSync(file,'utf8');
 const pageCode=()=>['app/stadt-study.tsx','app/stadt-a-steps.tsx'].map(read).join('\n');
 
 test('25 steps in the order of the learner\'s page: cover, 10 teaching steps, 11 exercises, test, summary',()=>{
- assert.equal(lesson.stepsA.length,25);
- assert.deepEqual(lesson.stepsA.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(11).fill('exercise'),'test','speak','end']);
- assert.equal(new Set(lesson.stepsA.map(step=>step.id)).size,25,'ids are unique');
- assert.deepEqual(lesson.stepGroupsA.map(group=>group.ids.length),[10,11,1,1]);
+ assert.equal(lesson.stepsA.length,24); // 25 with Konuş (off for now)
+ assert.deepEqual(lesson.stepsA.map(step=>step.kind),['cover',...Array(10).fill('teach'),...Array(11).fill('exercise'),'test','end']); // Konuş is off for now (lib/talk-switch.ts)
+ assert.equal(new Set(lesson.stepsA.map(step=>step.id)).size,24,'ids are unique');
+ assert.deepEqual(lesson.stepGroupsA.map(group=>group.ids.length),[10,11,1]); // Konuş tab off for now
  assert.equal(lesson.stepIndexA('test'),22);assert.equal(lesson.stepIndexA('yok'),-1);
  assert.equal(lesson.buildingWords.length,13);assert.equal(lesson.officeWords.length,11);assert.equal(lesson.officeVerbs.length,10);assert.equal(lesson.directionWords.length,11);
  assert.equal(lesson.officeDialogue.length,15);assert.equal(lesson.schoolDialogue.length,9);assert.equal(lesson.summaryLines.length,10);

@@ -1,6 +1,7 @@
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {compoundHeads,pluralNouns} from './article-challenges';
 import {objectVocabulary} from './object-course';
+import {jobPartners} from './object-word-additions';
 import {pickText} from './site-languages';
 
 // Compounds whose last part is not listed in compoundHeads (that list also changes the puzzle type, so it stays as it is).
@@ -9,7 +10,7 @@ const moreHeads:Record<string,string>={regenschirm:'der Schirm',vogelkaefig:'der
 const verbNouns:Record<string,string>={verband:'verbinden',vorhang:'vorhängen'};
 // Words that are only used in the plural (die Nudeln, die Pommes): the plural rule, die.
 const pluralOnly=new Set(['nudeln','spaghetti','pommes']);
-export type ArticleRule={key:'compound'|'ending'|'endingException'|'suffix'|'plural'|'diminutive'|'neuterEnding'|'gePrefix'|'masculineEnding'|'verbNoun'|'derEnding'|'derEndingException'|'oneSyllable'|'oneSyllableGroup'|'group'|'memorize';x:string;a?:string;e?:string;v?:string;list?:string};
+export type ArticleRule={key:'personIn'|'personMale'|'compound'|'ending'|'endingException'|'suffix'|'plural'|'diminutive'|'neuterEnding'|'gePrefix'|'masculineEnding'|'verbNoun'|'derEnding'|'derEndingException'|'oneSyllable'|'oneSyllableGroup'|'group'|'memorize';x:string;a?:string;e?:string;v?:string;list?:string};
 /** Vowel groups (au, ei, ie, aa … count once) = syllables of a German noun. */
 export function syllables(noun:string){return (noun.toLowerCase().match(/[aeiouäöüy]+/g)??[]).length;}
 /** Up to three other vault nouns with the same article, from the same category first: a group to learn together. */
@@ -29,6 +30,10 @@ export function articleGroup(id:string,full:string,count=3){
 export function articleRule(id:string,full:string,plural=false):ArticleRule{
  const [article,...rest]=full.split(' ');const noun=rest.join(' ');
  if(plural)return {key:'plural',x:'die '+(pluralNouns[id]??noun)};
+ // Jobs (Meslekler, 2 November 2026): the woman's form ends in -in and takes die; the man's form takes der.
+ const partner=jobPartners[id];
+ if(partner&&article==='die'&&/in$/.test(noun))return {key:'personIn',x:full};
+ if(partner&&article==='der')return {key:'personMale',x:full+' · '+partner};
  if(pluralOnly.has(id))return {key:'plural',x:full};
  const head=compoundHeads[id]??moreHeads[id];
  if(head)return {key:'compound',x:head+' → '+full};
@@ -47,6 +52,8 @@ export function articleRule(id:string,full:string,plural=false):ArticleRule{
  return {key:syllables(noun)===1?'oneSyllableGroup':'group',x:full,a:article,list:group.join(' · ')};
 }
 const copy={
+ personIn:['Kadınlar için meslek adları -in ile biter ve her zaman die alır ({x}).','Berufe für Frauen enden auf -in und haben immer die ({x}).','Job names for women end in -in and always take die ({x}).','أسماء المهن للنساء تنتهي بـ -in وتأخذ دائمًا die ({x}).','Назви професій для жінок закінчуються на -in і завжди мають die ({x}).','Les noms de métiers au féminin se terminent par -in et prennent toujours die ({x}).','Las profesiones para mujeres terminan en -in y siempre llevan die ({x}).','Названия профессий для женщин оканчиваются на -in и всегда имеют die ({x}).','نام شغل‌ها برای زنان به -in ختم می‌شود و همیشه die می‌گیرد ({x}).','Nazwy zawodów dla kobiet kończą się na -in i zawsze mają die ({x}).','I nomi dei mestieri al femminile finiscono in -in e prendono sempre die ({x}).','Os nomes de profissões para mulheres terminam em -in e levam sempre die ({x}).'],
+ personMale:['Erkek için meslek adı der alır; kadın hâli -in ile biter ve die alır ({x}).','Der Beruf für einen Mann hat der; die Form für eine Frau endet auf -in und hat die ({x}).','A job name for a man takes der; the form for a woman ends in -in and takes die ({x}).','اسم المهنة للرجل يأخذ der؛ وصيغة المرأة تنتهي بـ -in وتأخذ die ({x}).','Назва професії для чоловіка має der; жіноча форма закінчується на -in і має die ({x}).','Le nom de métier pour un homme prend der ; la forme féminine se termine par -in et prend die ({x}).','La profesión para un hombre lleva der; la forma para una mujer termina en -in y lleva die ({x}).','Название профессии для мужчины имеет der; женская форма оканчивается на -in и имеет die ({x}).','نام شغل برای مرد der می‌گیرد؛ شکل زنانه به -in ختم می‌شود و die می‌گیرد ({x}).','Nazwa zawodu dla mężczyzny ma der; forma dla kobiety kończy się na -in i ma die ({x}).','Il nome del mestiere per un uomo prende der; la forma femminile finisce in -in e prende die ({x}).','O nome da profissão para um homem leva der; a forma para uma mulher termina em -in e leva die ({x}).'],
  compound:['Birleşik kelime: artikeli son parça belirler ({x}).','Zusammengesetztes Wort: Der letzte Teil bestimmt den Artikel ({x}).','Compound word: the last part decides the article ({x}).','كلمة مركبة: الجزء الأخير يحدد أداة التعريف ({x}).','Складне слово: артикль визначає остання частина ({x}).','Mot composé : c’est la dernière partie qui donne l’article ({x}).','Palabra compuesta: la última parte decide el artículo ({x}).','Сложное слово: артикль определяет последняя часть ({x}).','واژهٔ مرکب: بخش آخر حرف تعریف را تعیین می‌کند ({x}).','Wyraz złożony: rodzajnik zależy od ostatniej części ({x}).','Parola composta: l’ultima parte decide l’articolo ({x}).','Palavra composta: a última parte decide o artigo ({x}).'],
  ending:['-e ile biten isimlerin çoğu die alır ({x}).','Die meisten Nomen auf -e haben den Artikel die ({x}).','Most nouns ending in -e take die ({x}).','معظم الأسماء المنتهية بـ -e تأخذ die ({x}).','Більшість іменників на -e мають артикль die ({x}).','La plupart des noms en -e prennent die ({x}).','La mayoría de los sustantivos en -e llevan die ({x}).','Большинство существительных на -e имеют артикль die ({x}).','بیشتر اسم‌هایی که به -e ختم می‌شوند die می‌گیرند ({x}).','Większość rzeczowników na -e ma rodzajnik die ({x}).','La maggior parte dei nomi in -e prende die ({x}).','A maioria dos substantivos terminados em -e leva die ({x}).'],
  endingException:['-e ile bitiyor ama {a} alıyor: istisna, ayrıca ezberle ({x}).','Endet auf -e, hat aber {a}: eine Ausnahme zum Merken ({x}).','Ends in -e but takes {a}: an exception to remember ({x}).','ينتهي بـ -e لكنه يأخذ {a}: استثناء يجب حفظه ({x}).','Закінчується на -e, але має {a}: виняток, запам’ятай ({x}).','Se termine par -e mais prend {a} : une exception à retenir ({x}).','Termina en -e pero lleva {a}: una excepción para recordar ({x}).','Оканчивается на -e, но имеет {a}: исключение, запомни ({x}).','به -e ختم می‌شود ولی {a} می‌گیرد: استثنایی که باید حفظ کرد ({x}).','Kończy się na -e, ale ma {a}: wyjątek do zapamiętania ({x}).','Finisce in -e ma prende {a}: un’eccezione da ricordare ({x}).','Termina em -e mas leva {a}: uma exceção para memorizar ({x}).'],

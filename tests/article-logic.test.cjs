@@ -6,14 +6,15 @@ const languages=require(path.join(compiled,'site-languages.js')).siteLanguages.m
 test('every vault noun gets an honest article rule in every language',()=>{
  const packs=['bg','zh','ti'].map(id=>JSON.parse(fs.readFileSync('lib/language-packs/'+id+'.json','utf8')));
  for(const key of ['neuterEnding','gePrefix','masculineEnding','verbNoun','derEnding','derEndingException','oneSyllable','oneSyllableGroup','group'])for(const pack of packs)assert.ok(pack[logic.puzzleCopy[key][2]],key+' in the language packs');
- for(const word of objects.objectVocabulary){
+ // Lektion 1 phrases (Wie bitte?, heißen …) have no article and no article rule (2 November 2026).
+ for(const word of objects.objectVocabulary.filter(word=>!word.phrase)){
   const rule=logic.articleRule(word.id,word.de);
   if(rule.key==='compound'){const head=rule.x.split(' → ')[0];assert.equal(head.split(' ')[0],word.de.split(' ')[0],word.id+' head has the same article');}
   if(rule.key==='ending')assert.ok(word.de.startsWith('die ')&&word.de.endsWith('e'),word.id);
   for(const language of languages){const text=logic.articleRuleText(language,rule);assert.ok(text.includes(word.de)&&!/\{[a-z]+\}/.test(text),word.id+' '+language);}
  }
  // Real rules instead of "no rule, learn it with the picture" (the learner asked for more sensible rules).
- const keys=objects.objectVocabulary.map(word=>logic.articleRule(word.id,word.de).key);
+ const keys=objects.objectVocabulary.filter(word=>!word.phrase).map(word=>logic.articleRule(word.id,word.de).key);
  assert.equal(keys.filter(key=>key==='memorize').length,0,'every noun gets a rule or a group to learn with');
  const rule=(id)=>{const word=objects.objectVocabulary.find(item=>item.id===id);return logic.articleRule(id,word.de);};
  assert.deepEqual(rule('keller'),{key:'derEnding',x:'der Keller',e:'er'});

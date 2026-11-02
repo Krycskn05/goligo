@@ -74,7 +74,8 @@ export async function POST(request:Request){
  try{
   const user=await identity();
   const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return json({error:'Geçersiz istek.'},403);
-  if(Number(request.headers.get('content-length')??0)>24000)return json({error:'Metin çok uzun.'},413);
+  // A full "all words" writing round lists every question id (409 vault words since 2 November 2026): room for it.
+  if(Number(request.headers.get('content-length')??0)>64000)return json({error:'Metin çok uzun.'},413);
   const body=await request.json() as Record<string,unknown>;
   if(!user)return guestPost(body);const db=getRawDb();const now=Date.now();
   if(body.action==='start'){

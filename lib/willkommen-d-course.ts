@@ -5,6 +5,7 @@
  * and the end of Lektion 1. Texts for the learner are Turkish; the German is read with the site voices, each person
  * with their own voice (`speakers` in lib/willkommen-course.ts). Step ids never change: saved scores are keyed by them.
  */
+import {talkStep,talkGroup} from './talk-switch';
 import type {GapLine,Phrase,SayItem,Step,StepGroup} from './willkommen-course';
 import type {Line} from './willkommen-b-course';
 
@@ -198,7 +199,7 @@ export const stepsD:Step[]=[
  {id:'steckbrief',title:'Alles klar? 4',kind:'exercise'},
  {id:'test',title:'Alles klar? 5',kind:'test'},
  {id:'puanlar',title:'Puanların',kind:'end'},
- {id:'konus',title:'Konuşma',kind:'speak'},
+ ...talkStep(),
  {id:'bitti',title:'Bitti',kind:'end'},
 ];
 export const stepIndexD=(id:string)=>stepsD.findIndex(step=>step.id===id);
@@ -216,7 +217,7 @@ export const stepGroupsD:StepGroup[]=[
  {id:'konu',label:'Konu anlatımı',ids:['cizgi-roman','onemli','strateji','ozet','kelimeler']},
  {id:'alistirmalar',label:'Alıştırmalar',ids:['tamamla','ich','sen']},
  {id:'test',label:'Alles klar?',ids:['wortschatz','grammatik','kommunikation','steckbrief','test','puanlar']},
- {id:'konus',label:'Konuş',ids:['konus']},
+ ...talkGroup(),
 ];
 
 /** Every German text Teil D speaks (rendered as site voices by scripts/voices). */

@@ -1,6 +1,7 @@
 import type {Question} from './course';
 import {objectVocabulary} from './object-course';
 import {objectMeanings} from './object-translations';
+import {WORD_TOPICS} from './object-word-additions';
 import type {Review} from './study';
 const preferred:Record<string,string>={heizung:'radiator',herd:'stove',regal:'shelf',schrank:'wardrobe',waschbecken:'washbasin',treppe:'stairs',bild:'painting',kissen:'pillow',umzugswagen:'moving truck',
  erbse:'peas',orange:'orange',kirsche:'cherries'};
@@ -8,16 +9,19 @@ const preferred:Record<string,string>={heizung:'radiator',herd:'stove',regal:'sh
 const pluralNames=new Set(['treppe','brille','schere','wuerfelzucker','pommes','gemuese','erbse','traube','kirsche','zuckerzange']);
 const uncountableNames=new Set(['geruest','haar','salbe','hustensaft','brot','butter','marmelade','zucker','salz','pfeffer','essig','oel','kaese','salami','schinken','fleisch','nudeln','spaghetti','reis','sosse','suppe','pudding','kaffee','tee','milch','wasser','apfelsaft','orangensaft','wein','rotwein','weisswein','bier','kreide','gras']);
 export function englishObjectName(id:string){return preferred[id]??objectMeanings[id]?.[0].split(' / ')[0]??'';}
-export const englishObjectQuestions:Question[]=objectVocabulary.flatMap((word,index)=>{
+// Meslekler and the Lektion 1 words (2 November 2026) belong to the German course only: German job pairs and lesson
+// phrases have no good English picture names ("doctor (woman)"), so the English course keeps its own objects.
+const englishWords=objectVocabulary.filter(word=>!(WORD_TOPICS as readonly string[]).includes(word.topic));
+export const englishObjectQuestions:Question[]=englishWords.flatMap((word,index)=>{
  const answer=englishObjectName(word.id);if(!answer)throw new Error('Missing English object name: '+word.id);
  const synonyms=[...new Set([answer,...(objectMeanings[word.id]?.[0].split(' / ')??[])])];
- const other=objectVocabulary.filter(w=>w.id!==word.id&&w.topic===word.topic);
- const wrong=[...new Set([...other.slice(index%Math.max(1,other.length-3)),...other,...objectVocabulary.filter(w=>w.id!==word.id)].map(w=>englishObjectName(w.id)))].filter(value=>value&&value!==answer).slice(0,3);
+ const other=englishWords.filter(w=>w.id!==word.id&&w.topic===word.topic);
+ const wrong=[...new Set([...other.slice(index%Math.max(1,other.length-3)),...other,...englishWords.filter(w=>w.id!==word.id)].map(w=>englishObjectName(w.id)))].filter(value=>value&&value!==answer).slice(0,3);
  const base={topic:'en-'+word.topic,objectId:word.id,answer,accepted:synonyms,answerTr:word.tr,explanation:answer+' = '+word.tr+'.',explanationEn:'The object in the picture is '+answer+'.',image:{src:word.image,alt:word.tr,caption:'Original object illustration',...(word.crop?{crop:word.crop}:{})}};
  const plural=pluralNames.has(word.id);const uncountable=uncountableNames.has(word.id);
  const prefix=plural?'These are ':uncountable?'This is ':'This is '+(/^[aeiou]/i.test(answer)?'an ':'a ');
  const excluded=new Set([word.id,...(word.id==='lastwagen'?['umzugswagen']:word.id==='umzugswagen'?['lastwagen']:[])]);
- const pictures=objectVocabulary.filter(w=>!excluded.has(w.id));
+ const pictures=englishWords.filter(w=>!excluded.has(w.id));
  const pictureCandidates=[...pictures.filter(w=>w.topic===word.topic),...pictures.filter(w=>w.topic!==word.topic)];
  const offset=index%Math.max(1,pictureCandidates.length-2);
  const pictureOptions=[word.id,...pictureCandidates.slice(offset,offset+3).map(w=>w.id)];

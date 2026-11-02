@@ -5,11 +5,16 @@ import {jobPartners} from './object-word-additions';
 import {pickText} from './site-languages';
 
 // Compounds whose last part is not listed in compoundHeads (that list also changes the puzzle type, so it stays as it is).
-const moreHeads:Record<string,string>={regenschirm:'der Schirm',vogelkaefig:'der Käfig',umzugswagen:'der Wagen',staubsauger:'der Sauger',schirmstaender:'der Ständer',zementmischer:'der Mischer',dachziegel:'der Ziegel',lastwagen:'der Wagen',dachfenster:'das Fenster',fallrohr:'das Rohr',zementsack:'der Sack',schraubenzieher:'der Zieher',zeitschrift:'die Schrift'};
+const moreHeads:Record<string,string>={regenschirm:'der Schirm',vogelkaefig:'der Käfig',umzugswagen:'der Wagen',staubsauger:'der Sauger',schirmstaender:'der Ständer',zementmischer:'der Mischer',dachziegel:'der Ziegel',lastwagen:'der Wagen',dachfenster:'das Fenster',fallrohr:'das Rohr',zementsack:'der Sack',schraubenzieher:'der Zieher',zeitschrift:'die Schrift',
+ // Kleidung (2 November 2026).
+ 'kleidung-kapuzenpullover':'der Pullover','kleidung-strickjacke':'die Jacke','kleidung-lederjacke':'die Jacke','kleidung-regenjacke':'die Jacke','kleidung-winterjacke':'die Jacke',
+ 'kleidung-pelzmantel':'der Mantel','kleidung-bademantel':'der Mantel','kleidung-jogginghose':'die Hose','kleidung-unterhose':'die Hose','kleidung-badehose':'die Hose','kleidung-strumpfhose':'die Hose',
+ 'kleidung-trainingsanzug':'der Anzug','kleidung-schlafanzug':'der Anzug','kleidung-badeanzug':'der Anzug','kleidung-nachthemd':'das Hemd','kleidung-unterhemd':'das Hemd',
+ 'kleidung-turnschuh':'der Schuh','kleidung-hausschuh':'der Schuh','kleidung-handschuh':'der Schuh','kleidung-damenhut':'der Hut','kleidung-herrenhut':'der Hut','kleidung-buestenhalter':'der Halter'};
 // Short nouns made from a verb stem (they take der): the verb is shown with the rule.
 const verbNouns:Record<string,string>={verband:'verbinden',vorhang:'vorhängen'};
 // Words that are only used in the plural (die Nudeln, die Pommes): the plural rule, die.
-const pluralOnly=new Set(['nudeln','spaghetti','pommes']);
+const pluralOnly=new Set(['nudeln','spaghetti','pommes','kleidung-leggings']);
 export type ArticleRule={key:'personIn'|'personMale'|'compound'|'ending'|'endingException'|'suffix'|'plural'|'diminutive'|'neuterEnding'|'gePrefix'|'masculineEnding'|'verbNoun'|'derEnding'|'derEndingException'|'oneSyllable'|'oneSyllableGroup'|'group'|'memorize';x:string;a?:string;e?:string;v?:string;list?:string};
 /** Vowel groups (au, ei, ie, aa … count once) = syllables of a German noun. */
 export function syllables(noun:string){return (noun.toLowerCase().match(/[aeiouäöüy]+/g)??[]).length;}

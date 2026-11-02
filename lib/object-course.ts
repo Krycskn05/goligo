@@ -8,6 +8,7 @@ import {toolObjectAdditions} from './object-tool-additions';
 import {bodyObjectAdditions} from './object-body-additions';
 import {everydayObjectAdditions} from './object-everyday-additions';
 import {wordObjectAdditions} from './object-word-additions';
+import {clothesObjectAdditions} from './object-clothes-additions';
 
 export type ObjectCrop={x:number;y:number;width:number;height:number;sheetWidth:number;sheetHeight:number};
 export type SceneKey='building'|'moving';
@@ -30,6 +31,7 @@ export const objectGroups=[
  {id:'objects-cooking',title:'Mutfak araçları ve ambalajlar',de:'Küchengeräte und Verpackungen',subtitle:'Mutfak gereçleri, aletler ve ambalajlar'},
  {id:'objects-school',title:'Okul ve sınıf',de:'Schule und Klassenzimmer',subtitle:'Sınıf, okul eşyaları ve kişiler'},
  {id:'objects-outdoors',title:'Doğa, şehir ve diğerleri',de:'Natur, Stadt und mehr',subtitle:'Doğa, şehir ve günlük kavramlar'},
+ {id:'objects-clothes',title:'Kıyafetler',de:'Kleidung',subtitle:'Giysiler, ayakkabılar ve aksesuarlar'},
  {id:'objects-jobs',title:'Meslekler',de:'Berufe',subtitle:'Kadın ve erkek meslek adları'},
  {id:'objects-lektion1',title:'Lektion 1 kelimeleri',de:'Wörter aus Lektion 1',subtitle:'Selamlaşma, tanışma ve ilk kalıplar'},
 ];
@@ -89,8 +91,9 @@ const objectCategory:Record<string,string>={
  saege:'objects-tools',nagel:'objects-tools',pinsel:'objects-tools',farbrolle:'objects-tools',eimer:'objects-tools',
  brett:'objects-building',
  pflanze:'objects-nature',palme:'objects-nature',blumentopf:'objects-nature',kaktus:'objects-nature',vogel:'objects-nature',vogelkaefig:'objects-nature',feder:'objects-nature',fisch:'objects-nature',aquarium:'objects-nature',
+ rock:'objects-clothes', // der Rock joins the clothes (2 November 2026); its card and picture stay
 };
-export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions,...everydayObjectAdditions,...wordObjectAdditions]
+export const objectVocabulary:ObjectWord[]=[...house.map(s=>fromSpec(s,'objects-house')),...furniture.map(s=>fromSpec(s,'objects-furniture')),...sceneData.extraWords as ObjectWord[],...movingObjectAdditions,...buildingObjectAdditions,...toolObjectAdditions,...bodyObjectAdditions,...everydayObjectAdditions,...wordObjectAdditions,...clothesObjectAdditions]
  .map(word=>objectCategory[word.id]?{...word,topic:objectCategory[word.id]}:word);
 export const objectWordMap=new Map(objectVocabulary.map(w=>[w.id,w]));
 export const objectScenes:{key:SceneKey;title:string;de:string;src:string;width:number;height:number;marks:SceneMark[]}[]=[
@@ -120,9 +123,20 @@ const nearPairs:[string,string[]][]=[['daumen',['finger','hand']],['finger',['da
  ['apfelsaft',['orangensaft']],['wein',['rotwein','weisswein']],['rotwein',['weisswein']],['glas',['bierglas','weinglas']],['krug',['milchkaennchen','kaffeekanne']],['loeffel',['teeloeffel']],['zuckerdose',['butterdose']],
  ['dose',['einmachglas']],['korken',['kronkorken']],['flaschenoeffner',['dosenoeffner','korkenzieher']],['topf',['deckel']],['mixer',['schneebesen']],
  ['buch',['heft','woerterbuch']],['heft',['woerterbuch']],['bleistift',['buntstift']],['kugelschreiber',['fueller']],['radio',['kassettenrekorder']],['tuer',['tuerklinke']],
- ['tafel',['kreide','schwamm']],['tasche',['rucksack']],['schueler',['schuelerin']],['decke',['ecke','fussboden']],['blume',['gras']],['stadt',['turm']]];
+ ['tafel',['kreide','schwamm']],['tasche',['rucksack']],['schueler',['schuelerin']],['decke',['ecke','fussboden']],['blume',['gras']],['stadt',['turm']],
+ // Kleidung (2 November 2026): clothes that look alike, or where one word is the general word for the other.
+ ...([['hemd',['bluse','unterhemd']],['tshirt',['top','unterhemd','sweatshirt']],['top',['unterhemd','bikini']],['pullover',['sweatshirt','kapuzenpullover','strickjacke']],
+ ['sweatshirt',['kapuzenpullover']],['strickjacke',['weste','jacke']],['jacke',['lederjacke','regenjacke','winterjacke','mantel','kapuzenpullover']],
+ ['lederjacke',['winterjacke']],['regenjacke',['winterjacke','mantel']],['winterjacke',['mantel']],['mantel',['pelzmantel','bademantel']],
+ ['hose',['jeans','kurze-hose','jogginghose','leggings','anzug']],['jeans',['jogginghose']],['jogginghose',['leggings','trainingsanzug']],['kurze-hose',['badehose','unterhose']],
+ ['leggings',['strumpfhose']],['kleid',['nachthemd']],['anzug',['trainingsanzug','schlafanzug']],['trainingsanzug',['schlafanzug']],
+ ['unterhose',['slip','badehose']],['slip',['bikini','badehose']],['buestenhalter',['bikini']],['badeanzug',['bikini']],
+ ['socke',['strumpf','strumpfhose']],['strumpf',['strumpfhose']],['schuh',['turnschuh','hausschuh','stiefel','sandale']],['turnschuh',['hausschuh']],['hausschuh',['sandale']],
+ ['damenhut',['herrenhut','muetze','kappe']],['herrenhut',['muetze','kappe']],['muetze',['kappe']]] as [string,string[]][])
+  .map(([id,others]):[string,string[]]=>['kleidung-'+id,others.map(other=>'kleidung-'+other)]),
+ ['rock',['kleidung-kleid','kleidung-kurze-hose','kleidung-strumpfhose']]];
 // Categories whose wrong choices come from the same category (an eye among other body parts, a fork among tableware).
-const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors','objects-jobs','objects-lektion1']);
+const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors','objects-jobs','objects-lektion1','objects-clothes']);
 const nearObjects:Record<string,string[]>={};
 for(const [id,others] of nearPairs)for(const other of others){(nearObjects[id]??=[]).push(other);(nearObjects[other]??=[]).push(id);}
 function distractors(w:ObjectWord){

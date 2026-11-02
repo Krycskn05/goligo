@@ -6,7 +6,8 @@ import type {Review} from './study';
 const preferred:Record<string,string>={heizung:'radiator',herd:'stove',regal:'shelf',schrank:'wardrobe',waschbecken:'washbasin',treppe:'stairs',bild:'painting',kissen:'pillow',umzugswagen:'moving truck',
  erbse:'peas',orange:'orange',kirsche:'cherries'};
 // Gap sentences: "These are ___." for plural names, "This is ___." (no a/an) for things you cannot count.
-const pluralNames=new Set(['treppe','brille','schere','wuerfelzucker','pommes','gemuese','erbse','traube','kirsche','zuckerzange']);
+const pluralNames=new Set(['treppe','brille','schere','wuerfelzucker','pommes','gemuese','erbse','traube','kirsche','zuckerzange',
+ 'kleidung-hose','kleidung-jeans','kleidung-kurze-hose','kleidung-jogginghose','kleidung-leggings','kleidung-schlafanzug','kleidung-unterhose','kleidung-slip','kleidung-badehose','kleidung-strumpfhose']);
 const uncountableNames=new Set(['geruest','haar','salbe','hustensaft','brot','butter','marmelade','zucker','salz','pfeffer','essig','oel','kaese','salami','schinken','fleisch','nudeln','spaghetti','reis','sosse','suppe','pudding','kaffee','tee','milch','wasser','apfelsaft','orangensaft','wein','rotwein','weisswein','bier','kreide','gras']);
 export function englishObjectName(id:string){return preferred[id]??objectMeanings[id]?.[0].split(' / ')[0]??'';}
 // Meslekler and the Lektion 1 words (2 November 2026) belong to the German course only: German job pairs and lesson

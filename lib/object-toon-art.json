@@ -4497,5 +4497,544 @@
       "width": 512,
       "height": 512
     }
+  },
+  "kleidung-anzug": {
+    "src": "/objects/toon/kleidung-anzug.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-badeanzug": {
+    "src": "/objects/toon/kleidung-badeanzug.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-badehose": {
+    "src": "/objects/toon/kleidung-badehose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-bademantel": {
+    "src": "/objects/toon/kleidung-bademantel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-bikini": {
+    "src": "/objects/toon/kleidung-bikini.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-bluse": {
+    "src": "/objects/toon/kleidung-bluse.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-buestenhalter": {
+    "src": "/objects/toon/kleidung-buestenhalter.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-damenhut": {
+    "src": "/objects/toon/kleidung-damenhut.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-guertel": {
+    "src": "/objects/toon/kleidung-guertel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-handschuh": {
+    "src": "/objects/toon/kleidung-handschuh.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-hausschuh": {
+    "src": "/objects/toon/kleidung-hausschuh.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-hemd": {
+    "src": "/objects/toon/kleidung-hemd.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-herrenhut": {
+    "src": "/objects/toon/kleidung-herrenhut.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-hose": {
+    "src": "/objects/toon/kleidung-hose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-jacke": {
+    "src": "/objects/toon/kleidung-jacke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-jeans": {
+    "src": "/objects/toon/kleidung-jeans.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-jogginghose": {
+    "src": "/objects/toon/kleidung-jogginghose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-kappe": {
+    "src": "/objects/toon/kleidung-kappe.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-kapuzenpullover": {
+    "src": "/objects/toon/kleidung-kapuzenpullover.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-kleid": {
+    "src": "/objects/toon/kleidung-kleid.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-krawatte": {
+    "src": "/objects/toon/kleidung-krawatte.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-kurze-hose": {
+    "src": "/objects/toon/kleidung-kurze-hose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-lederjacke": {
+    "src": "/objects/toon/kleidung-lederjacke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-leggings": {
+    "src": "/objects/toon/kleidung-leggings.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-mantel": {
+    "src": "/objects/toon/kleidung-mantel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-muetze": {
+    "src": "/objects/toon/kleidung-muetze.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-nachthemd": {
+    "src": "/objects/toon/kleidung-nachthemd.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-pelzmantel": {
+    "src": "/objects/toon/kleidung-pelzmantel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-pullover": {
+    "src": "/objects/toon/kleidung-pullover.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-regenjacke": {
+    "src": "/objects/toon/kleidung-regenjacke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-sandale": {
+    "src": "/objects/toon/kleidung-sandale.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-schal": {
+    "src": "/objects/toon/kleidung-schal.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-schlafanzug": {
+    "src": "/objects/toon/kleidung-schlafanzug.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-schuh": {
+    "src": "/objects/toon/kleidung-schuh.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-slip": {
+    "src": "/objects/toon/kleidung-slip.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-socke": {
+    "src": "/objects/toon/kleidung-socke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-stiefel": {
+    "src": "/objects/toon/kleidung-stiefel.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-strickjacke": {
+    "src": "/objects/toon/kleidung-strickjacke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-strumpf": {
+    "src": "/objects/toon/kleidung-strumpf.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-strumpfhose": {
+    "src": "/objects/toon/kleidung-strumpfhose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-sweatshirt": {
+    "src": "/objects/toon/kleidung-sweatshirt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-top": {
+    "src": "/objects/toon/kleidung-top.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-trainingsanzug": {
+    "src": "/objects/toon/kleidung-trainingsanzug.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-tshirt": {
+    "src": "/objects/toon/kleidung-tshirt.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-turnschuh": {
+    "src": "/objects/toon/kleidung-turnschuh.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-unterhemd": {
+    "src": "/objects/toon/kleidung-unterhemd.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-unterhose": {
+    "src": "/objects/toon/kleidung-unterhose.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-weste": {
+    "src": "/objects/toon/kleidung-weste.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "kleidung-winterjacke": {
+    "src": "/objects/toon/kleidung-winterjacke.webp",
+    "width": 512,
+    "height": 512,
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    }
   }
 }

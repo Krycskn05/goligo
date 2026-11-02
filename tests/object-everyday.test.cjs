@@ -10,7 +10,7 @@ const groups={
  'objects-drinks':['getraenke-','groupDrinks','kaffee',32],
  'objects-cooking':['kueche-','groupCooking','pfanne',22],
  'objects-school':['schule-','groupSchool','tafel',28],
- 'objects-outdoors':['draussen-','groupOutdoors','baum',14],
+ 'objects-outdoors':['draussen-','groupOutdoors','baum',13], // der Rock moved to Kleidung (2 November 2026)
 };
 const languages=copy.vaultLanguages.map(item=>item.id);
 const fresh=objects.objectVocabulary.filter(word=>groups[word.topic]);
@@ -18,7 +18,7 @@ const fresh=objects.objectVocabulary.filter(word=>groups[word.topic]);
 function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).toString(),'RIFF');assert.equal(b.slice(8,12).toString(),'WEBP');const kind=b.slice(12,16).toString();
  if(kind==='VP8X')return [b.readUIntLE(24,3)+1,b.readUIntLE(27,3)+1];if(kind==='VP8 ')return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];throw Error(file+' '+kind);}
 
-test('five new categories with 151 objects, plus der Zahn in Vücut; the pictured things the vault had stay where they were',()=>{
+test('five new categories with 150 objects (der Rock is now in Kleidung), plus der Zahn in Vücut; the pictured things the vault had stay where they were',()=>{
  const page=fs.readFileSync('app/object-study.tsx','utf8');
  for(const [topic,[,key,picture,count]] of Object.entries(groups)){
   assert(objects.objectGroups.some(group=>group.id===topic),topic);
@@ -27,7 +27,7 @@ test('five new categories with 151 objects, plus der Zahn in Vücut; the picture
   assert(page.includes("'"+topic+"':'"+key+"'")&&page.includes("'"+topic+"':'"+picture+"'"),topic);
   assert(englishCourse.englishTopics.some(item=>item.id==='en-'+topic),topic+' in the English course');
  }
- assert.equal(fresh.length,151);assert.equal(objects.objectWordMap.get('zahn').de,'der Zahn');assert.equal(objects.objectWordMap.get('zahn').topic,'objects-body');
+ assert.equal(fresh.length,150);assert.equal(objects.objectWordMap.get('zahn').de,'der Zahn');assert.equal(objects.objectWordMap.get('zahn').topic,'objects-body');
  assert.equal(new Set(objects.objectVocabulary.map(word=>word.id)).size,objects.objectVocabulary.length,'no duplicate object IDs');
  for(const [id,topic] of Object.entries({tasse:'objects-kitchen',teller:'objects-kitchen',teekanne:'objects-kitchen',flasche:'objects-kitchen',tischdecke:'objects-kitchen',apfel:'objects-kitchen',tisch:'objects-furniture',stuhl:'objects-furniture',lampe:'objects-furniture',bild:'objects-furniture',fenster:'objects-house',steckdose:'objects-house',fisch:'objects-nature',eimer:'objects-tools',schere:'objects-health',verband:'objects-health',hand:'objects-body',fuss:'objects-body'}))
   assert.equal(objects.objectWordMap.get(id).topic,topic,id+' keeps its category');

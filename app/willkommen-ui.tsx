@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
-import {ArrowRight,Check,Lock,RotateCcw,Trash2,Volume2} from 'lucide-react';
+import {ArrowRight,Check,Lightbulb,Lock,RotateCcw,Trash2,Volume2} from 'lucide-react';
 import type {StudyLanguage} from '@/lib/study-languages';
 import type {TopicProgress} from '@/lib/progress';
 import {siteClipUrls,warmClip} from '@/lib/site-voices';
@@ -336,6 +336,12 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
    if(round===orderSentences.length-1)finish(total,orderSentences.length,[orderSay(sentence.join(' '))]);else sound.correct(()=>speech.speak(orderSay(sentence.join(' '))));}
   else{setFeedback({ok:false,text:verbs?'Fiil 2. sırada mı? Sırayı kontrol et.':'Sırayı kontrol et.'});sound.wrong();}};
  const next=()=>{const r=round+1;setRound(r);setChips(deal(r));setPicked([]);setState('open');setFeedback(null);};
+ // İpucu (the learner asked, 2 November 2026): a wrong word at the end is taken back and the next right word is put in.
+ const hint=()=>{if(state==='ok')return;sound.prepare();
+  let keep=0;while(keep<picked.length&&sentence[picked[keep]]===sentence[keep])keep++;
+  const kept=picked.slice(0,keep);if(keep>=sentence.length){setPicked(kept);return;}
+  const chip=chips.find(item=>item.word===sentence[keep]&&!kept.includes(item.i));if(!chip)return;
+  setPicked([...kept,chip.i]);setState('open');setFeedback({ok:true,info:true,text:'İpucu: sıradaki kelime „'+sentence[keep]+'“.'});};
  // İleri at the bottom: the next sentence once this one is right (a tap by mistake loses nothing); after the last one the next step.
  useInnerNext(props.setInnerNext,()=>{
   if(ended)return false;
@@ -349,6 +355,7 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
   <div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)||state==='ok'} onClick={()=>{setPicked([...picked,chip.i]);setState('open');}}>{chip.word}</button>)}</div>
   <div className="l1a-actions">
    <button type="button" className="btn secondary small" disabled={!picked.length||state==='ok'} onClick={()=>{setPicked(picked.slice(0,-1));setState('open');}}><Trash2 size={16} aria-hidden="true"/>Sil</button>
+   <button type="button" className="btn secondary small" disabled={state==='ok'||picked.length===sentence.length&&picked.every((p,k)=>sentence[p]===sentence[k])} onClick={hint}><Lightbulb size={16} aria-hidden="true"/>İpucu</button>
    <button type="button" className="btn small" disabled={picked.length!==sentence.length||state==='ok'} onClick={check}><Check size={16} aria-hidden="true"/>Kontrol et</button>
    {state==='ok'&&round<orderSentences.length-1&&<button type="button" className="btn small" onClick={next}>Sonraki<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
   </div>

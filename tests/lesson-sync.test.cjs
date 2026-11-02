@@ -65,7 +65,8 @@ test('every lesson page reads progress from another device again; the sync and t
  for(const [file,lesson,component] of [['app/willkommen-study.tsx','l1','WillkommenLesson'],['app/stadt-study.tsx','l15','StadtLesson'],['app/berufe-study.tsx','l2','BerufeLesson'],['app/ausbildung-study.tsx','l12','AusbildungLesson'],['app/ausbildung-hoeren.tsx','l12','HoerenPage']]){
   const code=read(file);assert(code.includes(`useSyncVersion('${lesson}')`),file);assert(code.includes(`<${component} key={synced}`),file);
  }
- assert.equal((read('app/category-study.tsx').match(/\},\[course,home,synced\]\);/g)||[]).length,4,'the unit cards read Lektion 1, 2, 12 and 15 again');
+ const units=read('app/category-study.tsx');assert.equal((units.match(/\},\[course,home,seen\]\);/g)||[]).length,5,'the unit cards (Lektion 1, 2, 12, 15) and the continue card read again');
+ assert(units.includes('const seen=synced*1000+back;')&&units.includes("document.addEventListener('visibilitychange',visible)"),'after a sync and when the learner comes back');
  const client=read('app/lesson-sync.tsx');
  for(const piece of ["fetch('/api/ilerleme'",'15000',"'visibilitychange'","'pagehide'",'response.status===401','SYNC_EVENT'])assert(client.includes(piece),piece);
 });

@@ -11,7 +11,7 @@
  * beats a known change, and two score lists of unknown age are joined (exercises done on one device and others done on
  * the other device both stay).
  */
-export const SYNC_LESSONS=['l1','l2','l12','l15'] as const;
+export const SYNC_LESSONS=['l1','l2','l12','l15','site'] as const;
 export type SyncLesson=typeof SYNC_LESSONS[number];
 export type SyncItem={v:string|null;t:number};
 export type SyncItems=Record<string,SyncItem>;
@@ -30,9 +30,14 @@ const DEVICE_ONLY=new Set(['lernkoko-l12-speed']);
  * stays on this device only (the learner asked, 2 November 2026); it is never sent to the account. */
 const OWN_DATA=/^lernkoko-l2[a-d]-(own|form)$/;
 
+/** Progress of the site that is no lesson (`site`, 2 November 2026): "Kaldığın yerden devam et" (lib/last-place.ts) and
+ * the best scores of the games (Oyunlar). */
+const SITE_KEY=/^lernkoko-(last-place$|verb-game:)/;
+
 /** The lesson a browser key belongs to, or null for keys that are not synced. */
 export function syncLessonOf(key:string):SyncLesson|null{
  if(DEVICE_ONLY.has(key)||OWN_DATA.test(key))return null;
+ if(SITE_KEY.test(key))return 'site';
  const match=/^lernkoko-l(1[a-d]?|12|15[a-d]?|2[a-d]?)[-:]/.exec(key);
  if(!match)return null;
  return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':match[1].startsWith('2')?'l2':'l1';
@@ -72,10 +77,20 @@ function asObject(value:string|null):Record<string,unknown>|null{
  if(value===null)return null;
  try{const parsed=JSON.parse(value) as unknown;return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed as Record<string,unknown>:null;}catch{return null;}
 }
+/** A list of exercise scores (`lernkoko-l1a-scores`, `lernkoko-l12-scores` …): every entry has `right`. */
+const isScoreList=(key:string)=>/-scores$/.test(key);
+const rightOf=(score:unknown)=>score&&typeof score==='object'&&typeof (score as {right?:unknown}).right==='number'?(score as {right:number}).right:-1;
+/** Two score lists joined: every exercise done on either device stays, with its better result. */
+function joinScores(kept:Record<string,unknown>,incoming:Record<string,unknown>){
+ const out={...kept};for(const [id,score] of Object.entries(incoming))if(!(id in out)||rightOf(score)>rightOf(out[id]))out[id]=score;
+ return out;
+}
 /**
  * Merges what a device sends (`incoming`) into what is kept (`kept`). The newer change of a key wins; a key of
  * unknown age (t 0) loses to a known change, and two JSON objects of which one has unknown age are joined (the
- * kept side wins where both have the same entry). `now` stamps a joined value so it reaches every device.
+ * kept side wins where both have the same entry). Two score lists are always joined, whatever their age, so exercises
+ * done on two devices at about the same time are both kept (the learner asked, 2 November 2026); removing a list (a
+ * reset) still travels as the newer change. `now` stamps a joined value so it reaches every device.
  */
 export function mergeItems(kept:SyncItems,incoming:SyncItems,now:number):SyncItems{
  const out:SyncItems={...kept};
@@ -83,6 +98,10 @@ export function mergeItems(kept:SyncItems,incoming:SyncItems,now:number):SyncIte
   const theirs=kept[key];
   if(!theirs){out[key]=mine;continue;}
   if(theirs.v===mine.v){out[key]={v:mine.v,t:Math.max(theirs.t,mine.t)};continue;}
+  if(isScoreList(key)){
+   const a=asObject(theirs.v),b=asObject(mine.v);
+   if(a&&b){const joined=JSON.stringify(joinScores(a,b));out[key]=joined===theirs.v?theirs:joined===mine.v?mine:{v:joined,t:now};continue;}
+  }
   if(mine.t===0||theirs.t===0){
    const a=asObject(theirs.v),b=asObject(mine.v);
    if(a&&b){out[key]={v:JSON.stringify({...b,...a}),t:now};continue;}

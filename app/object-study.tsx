@@ -1,4 +1,5 @@
 'use client';
+import {saveLastPlace} from '@/lib/last-place';
 import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState} from 'react';
@@ -110,6 +111,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
   void refresh();
   return()=>{mounted.current=false;};
  },[]);
+ useEffect(()=>{if(course==='de')saveLastPlace(localStorage,{id:'vault'});},[course]); // "Kaldığın yerden devam et" (lib/last-place.ts)
  useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=vaultDirection(language);document.title=vaultText(language,'vaultTitle')+' · '+SITE_NAME;stopFeedback();},[language]);
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}

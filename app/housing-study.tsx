@@ -1,5 +1,6 @@
 'use client';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
+import {saveLastPlace} from '@/lib/last-place';
 import {OptionText} from './option-fit';
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,Loader2,Lock,RotateCcw,Star,Volume2,X} from 'lucide-react';
@@ -36,6 +37,7 @@ export default function HousingStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
+ useEffect(()=>{saveLastPlace(localStorage,{id:'housing'});},[]); // "Kaldığın yerden devam et" on the units page (lib/last-place.ts)
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title=housingText(language,'title')+' · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  // Nothing is drawn until the chosen language is in place, so the page never shows German first (the learner saw it
  // switch, 22 October 2026) — as on the other parts of the site.

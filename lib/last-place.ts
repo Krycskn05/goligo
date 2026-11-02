@@ -1,12 +1,17 @@
 /**
- * The last part of the site the learner worked in, kept in this browser, so the home page can offer
- * "Kaldığın yerden devam et". Each study page saves itself when it opens (and Lektion 12 when a part
- * or a listening task opens). Only known site paths are accepted when it is read back.
+ * The last part of the site the learner worked in, so the units page can offer "Kaldığın yerden devam et" (wired on
+ * 2 November 2026; the learner: "the place where I stopped is forgotten"). Each study page saves itself when it opens,
+ * a lesson page (Lektion 1, 2, 12, 15) with its part and step. The key travels with the account (lib/lesson-sync.ts,
+ * `site`). Only known site paths are accepted when it is read back.
  */
-export type PlaceId='housing'|'ausbildung'|'hoeren'|'vault'|'verbs';
+export type PlaceId='housing'|'ausbildung'|'hoeren'|'vault'|'verbs'|'willkommen'|'berufe'|'stadt';
 export type LastPlace={id:PlaceId;href:string;detail?:string;at:number};
 export const LAST_PLACE_KEY='lernkoko-last-place';
-const paths:Record<PlaceId,string>={housing:'/a1-2/ev-ve-yasam',ausbildung:'/a1-2/ausbildung',hoeren:'/a1-2/ausbildung/hoeren',vault:'/ev-esyalar',verbs:'/fiiller'};
+const paths:Record<PlaceId,string>={housing:'/a1-2/ev-ve-yasam',ausbildung:'/a1-2/ausbildung',hoeren:'/a1-2/ausbildung/hoeren',vault:'/ev-esyalar',verbs:'/fiiller',willkommen:'/a1-1/willkommen',berufe:'/a1-1/berufe',stadt:'/a1-2/wege-in-der-stadt'};
+/** The textbook unit of a lesson place (its name on the units page); the other places have their own titles. */
+export const placeUnit:Partial<Record<PlaceId,string>>={ausbildung:'book-12',hoeren:'book-12',willkommen:'book-01',berufe:'book-02',stadt:'book-15'};
+/** A lesson step's address: Teil A without `teil`, the other parts with it. */
+export const lessonStepHref=(id:'willkommen'|'berufe'|'stadt',part:string,step:string)=>paths[id]+'?'+(part==='a'?'':'teil='+part+'&')+'adim='+step;
 const isPlaceId=(value:unknown):value is PlaceId=>typeof value==='string'&&Object.hasOwn(paths,value);
 /** The page path itself, optionally with a plain query (letters, digits, = & . _ -). */
 export function isPlaceHref(id:PlaceId,href:unknown):href is string{

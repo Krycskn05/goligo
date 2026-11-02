@@ -1,8 +1,8 @@
-import {starsFor,stageFor,type TopicProgress} from './progress';
-import {scoredExercises} from './willkommen-course';
-import {scoredExercisesB} from './willkommen-b-course';
-import {scoredExercisesC} from './willkommen-c-course';
-import {scoredExercisesD} from './willkommen-d-course';
+import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress';
+import {scoredExercises,steps} from './willkommen-course';
+import {scoredExercisesB,stepsB} from './willkommen-b-course';
+import {scoredExercisesC,stepsC} from './willkommen-c-course';
+import {scoredExercisesD,stepsD} from './willkommen-d-course';
 
 /** Lektion 1's parts (Teil A since 24 October, Teil B, C and D since 25 October 2026). */
 export type L1PartId='a'|'b'|'c'|'d';
@@ -20,6 +20,8 @@ export const L1D_STEP_KEY='lernkoko-l1d-step';
 export const L1_PART_KEY='lernkoko-l1-part';
 export const partKeys:Record<L1PartId,{scores:string;step:string}>={a:{scores:L1A_SCORES_KEY,step:L1A_STEP_KEY},b:{scores:L1B_SCORES_KEY,step:L1B_STEP_KEY},c:{scores:L1C_SCORES_KEY,step:L1C_STEP_KEY},d:{scores:L1D_SCORES_KEY,step:L1D_STEP_KEY}};
 export const partScored:Record<L1PartId,{id:string;total:number}[]>={a:scoredExercises,b:scoredExercisesB,c:scoredExercisesC,d:scoredExercisesD};
+/** What the percentages count: the scored exercises and the teaching steps (lib/progress.ts `lessonItems`). */
+export const partCounted:Record<L1PartId,{id:string;total:number}[]>={a:lessonItems(scoredExercises,steps),b:lessonItems(scoredExercisesB,stepsB),c:lessonItems(scoredExercisesC,stepsC),d:lessonItems(scoredExercisesD,stepsD)};
 
 export function readPartScores(part:L1PartId):L1AScoreMap{
  try{const value=JSON.parse(localStorage.getItem(partKeys[part].scores)??'{}');return value&&typeof value==='object'?value as L1AScoreMap:{};}catch{return {};}
@@ -45,14 +47,14 @@ function progressOf(list:readonly {id:string;total:number}[],scores:L1AScoreMap)
  return {total,tried,learned,percent,triedPercent:Math.max(percent,ratio(tried,total)),stars:starsFor(percent),stage:stageFor(percent,tried)};
 }
 /** Teil A's progress: answers given and answers right. */
-export function willkommenProgress(scores:L1AScoreMap):TopicProgress{return progressOf(scoredExercises,scores);}
+export function willkommenProgress(scores:L1AScoreMap):TopicProgress{return progressOf(partCounted.a,scores);}
 /** One part's progress (its notebook page and its row on the contents page). */
-export function partProgressL1(part:L1PartId,scores:L1AScoreMap):TopicProgress{return progressOf(partScored[part],scores);}
+export function partProgressL1(part:L1PartId,scores:L1AScoreMap):TopicProgress{return progressOf(partCounted[part],scores);}
 /** Lektion 1 as a whole (the unit card on Üniteler and the contents page): every scored exercise of every part. */
 export function lessonOneProgress(all:Partial<Record<L1PartId,L1AScoreMap>>):TopicProgress{
- const list=(Object.keys(partScored) as L1PartId[]).flatMap(part=>partScored[part].map(exercise=>({id:part+':'+exercise.id,total:exercise.total})));
+ const list=(Object.keys(partCounted) as L1PartId[]).flatMap(part=>partCounted[part].map(exercise=>({id:part+':'+exercise.id,total:exercise.total})));
  const scores:L1AScoreMap={};
- for(const part of Object.keys(partScored) as L1PartId[])for(const [id,score] of Object.entries(all[part]??{}))scores[part+':'+id]=score;
+ for(const part of Object.keys(partCounted) as L1PartId[])for(const [id,score] of Object.entries(all[part]??{}))scores[part+':'+id]=score;
  return progressOf(list,scores);
 }
 export function readLessonOneProgress():TopicProgress{return lessonOneProgress({a:readPartScores('a'),b:readPartScores('b'),c:readPartScores('c'),d:readPartScores('d')});}

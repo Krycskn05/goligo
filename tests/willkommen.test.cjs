@@ -38,11 +38,12 @@ test('every German text the lesson speaks is listed for the site voices',()=>{
 });
 
 test('scores stay in the browser and make the progress of the unit card',()=>{
- const empty=progress.willkommenProgress({});assert.equal(empty.total,lesson.scoredExercises.reduce((n,e)=>n+e.total,0));assert.equal(empty.percent,0);assert.equal(empty.stage,'new');
+ const empty=progress.willkommenProgress({});assert.equal(empty.total,progress.partCounted.a.reduce((n,e)=>n+e.total,0));assert.equal(empty.percent,0);assert.equal(empty.stage,'new');
  const half=progress.willkommenProgress({test:{right:10,total:10},aus:{right:5,total:10}});
  assert.equal(half.learned,15);assert.equal(half.tried,20);assert(half.percent>0&&half.percent<100);
- const full=progress.willkommenProgress(Object.fromEntries(lesson.scoredExercises.map(e=>[e.id,{right:e.total,total:e.total}])));
- assert.equal(full.percent,100);assert.equal(full.stage,'master');assert.equal(full.stars,3);
+ const full=progress.willkommenProgress(Object.fromEntries(progress.partCounted.a.map(e=>[e.id,{right:e.total,total:e.total}])));
+ assert.equal(full.percent,100);
+ assert(progress.willkommenProgress(Object.fromEntries(lesson.scoredExercises.map(e=>[e.id,{right:e.total,total:e.total}]))).percent<100,'the teaching steps count too (2 November 2026)');assert.equal(full.stage,'master');assert.equal(full.stars,3);
  assert.deepEqual(lesson.scoredExercises.map(e=>e.id),['harfler','eslestir','sirala','ayir','aus','dinle','soru','kutu','test']);
 });
 
@@ -106,7 +107,9 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  for(const piece of ['<LessonBook className="l1a-book"','<LessonBook variant="wide" className="l1a-book lb-tabbed"','data-l1a-part={row.id}','id="l1a-tabs"','className="lb-toc"','className="lb-goals"','onGo(-1)'])assert(page.includes(piece),piece);
  assert(page.includes('<h2 id="l1a-heading"'),'a step heading is an h2 under the notebook title');
  // The "Kaldığın yerden devam et" and "Testler" notes were removed at the learner's request.
- for(const gone of ['l1a-resume','l1a-test-note','Kaldığın yerden devam et','readLast('])assert(!page.includes(gone),gone);
+ for(const gone of ['l1a-resume','l1a-test-note','readLast('])assert(!page.includes(gone),gone);
+ // Since 2 November 2026 (the learner: "the place where I stopped is forgotten") a small link in the row of the part opened last.
+ assert(page.includes('<ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>'));
  // No A1.1 breadcrumb (the learner asked); the contents notebook fills the screen on a computer and never makes the page scroll.
  assert(!read('app/willkommen-study.tsx').includes('className="object-breadcrumb"'));
  assert(page.includes("element.style.setProperty('--l1a-fill'")&&page.includes('book.style.zoom=String(zoom)')&&read('app/willkommen.css').includes('.l1a-contents .lb-spread { min-height:var(--l1a-fill,0px); }'));
@@ -158,7 +161,7 @@ test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps
  // Scores: their own store; the unit card adds the parts.
  assert.equal(progress.partKeys.b.scores,'lernkoko-l1b-scores');assert.notEqual(progress.partKeys.a.scores,progress.partKeys.b.scores);
  const both=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}}});
- assert.equal(both.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC,lessonD.scoredExercisesD].flat().reduce((n,e)=>n+e.total,0),'every part counts, also one not started');assert.equal(both.learned,22);
+ assert.equal(both.total,['a','b','c','d'].flatMap(part=>progress.partCounted[part]).reduce((n,e)=>n+e.total,0),'every part counts, also one not started');assert.equal(both.learned,22);
  const page=pageCode();
  for(const piece of ["params.get('teil')","url.searchParams.set('teil',part)",'StepViewB','onPart(\'b\',0)','speech.speakAll(spellItems(word))','who="yasemin"',"who:'nikos'"])assert(page.includes(piece),piece);
 });
@@ -223,7 +226,7 @@ test('Teil C „Guten Tag!“ (25 October 2026): 26 steps, greetings by the time
  // Scores: their own store; the unit card adds all three parts.
  assert.equal(progress.partKeys.c.scores,'lernkoko-l1c-scores');assert.equal(progress.partKeys.c.step,'lernkoko-l1c-step');
  const all=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}},c:{test:{right:12,total:12}}});
- assert.equal(all.total,[lesson.scoredExercises,lessonB.scoredExercisesB,lessonC.scoredExercisesC,lessonD.scoredExercisesD].flat().reduce((n,e)=>n+e.total,0));assert.equal(all.learned,34);
+ assert.equal(all.total,['a','b','c','d'].flatMap(part=>progress.partCounted[part]).reduce((n,e)=>n+e.total,0));assert.equal(all.learned,34);
  const page=pageCode();
  for(const piece of ['StepViewC','onPart(\'c\',0)','stepsC','stepGroupsC','scoredExercisesC','exact','className="l1a-memory"','className="l1a-moods"','label="Lektion 1C · Test"'])assert(page.includes(piece),piece);
  // Listening exercises: the button's name does not give the answer away.
@@ -307,6 +310,7 @@ test('exercise fixes (30 October 2026): mixed word boxes, clear Sie/du rows, eve
  assert(read('app/willkommen-d-steps.tsx').includes('useEffect(()=>{if(allRight)onScore(step.id,values.length,values.length);},[allRight]);'));
  assert(read('app/willkommen-c-steps.tsx').includes('if(done.length===moods.length){props.onScore(props.step.id,1,1);'));
  assert(read('app/talk-step.tsx').includes('if(reply.done){setDone(true);props.onScore(step.id,1,1);}'));
- // Scores of unscored steps never change the percentage.
- assert.equal(load('willkommen-progress').partProgressL1('b',{sen:{right:2,total:2},sprachen:{right:1,total:1}}).learned,0);
+ // An unscored exercise never changes the percentage; a teaching step that was opened counts one point (2 November 2026).
+ const teach=lessonB.stepsB.find(step=>step.kind==='teach').id;
+ assert.equal(load('willkommen-progress').partProgressL1('b',{sen:{right:2,total:2},[teach]:{right:1,total:1}}).learned,1);
 });

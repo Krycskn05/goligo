@@ -76,7 +76,7 @@ test('Teil B lives in the Lektion 2 notebook: part b, its own scores, the unit c
  for(const piece of ["const partOrder:L2PartId[]=['a','b','c','d'];","b:{id:'b',badge:'B'","View:StepViewL2B","label:config.short[id]??","useState<Record<L2PartId,L1AScoreMap>>({a:{},b:{},c:{},d:{}})"])assert(shell.includes(piece),piece);
  assert.equal(a.berufeParts[1].title,'Wer ist das?');
  assert.equal(sync.syncLessonOf(progress.L2B_SCORES_KEY),'l2');assert.equal(sync.syncLessonOf('lernkoko-l2b-run'),'l2');
- const fullA={},fullB={};for(const {id,total} of a.berufeScored)fullA[id]={right:total,total};for(const {id,total} of lesson.berufeScoredB)fullB[id]={right:total,total};
+ const fullA={},fullB={};for(const {id,total} of progress.l2PartCounted.a)fullA[id]={right:total,total};for(const {id,total} of progress.l2PartCounted.b)fullB[id]={right:total,total};
  assert.equal(progress.partProgressL2('b',fullB).percent,100);
  assert.equal(progress.lessonTwoProgress({a:fullA}).percent<100,true,'Teil B counts too');
  assert(progress.lessonTwoProgress({a:fullA,b:fullB}).percent<100,'Teil C and D count too (tests/berufe-c.test.cjs, berufe-d.test.cjs)');

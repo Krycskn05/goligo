@@ -88,7 +88,7 @@ test('Teil C lives in the Lektion 2 notebook: part c, its own scores, Konuş, th
  for(const piece of ["c:{id:'c',badge:'C'","View:StepViewL2C","import {StepViewL2C} from './berufe-c-steps';"])assert(shell.includes(piece),piece);
  assert.equal(a.berufeParts[2].title,'Wir brauchen Hilfe.');
  assert.equal(sync.syncLessonOf(progress.L2C_SCORES_KEY),'l2');assert.equal(sync.syncLessonOf('lernkoko-l2c-run'),'l2');
- const full={};for(const {id,total} of lesson.berufeScoredC)full[id]={right:total,total};
+ const full={};for(const {id,total} of progress.l2PartCounted.c)full[id]={right:total,total};
  assert.equal(progress.partProgressL2('c',full).percent,100);
  const steps=read('app/berufe-c-steps.tsx');for(const step of lesson.berufeStepsC)assert(steps.includes(`case '${step.id}':`),step.id);
  assert(steps.includes("onClick={()=>onPart('d',0)}"),'the end of Teil C opens Teil D');

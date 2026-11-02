@@ -1,7 +1,7 @@
 'use client';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useEffect,useState} from 'react';
-import {Clock} from 'lucide-react';
+import {ArrowRight,Clock,Play} from 'lucide-react';
 import {SITE_NAME} from '@/lib/site-brand';
 import {courseUnits,type CourseLevel} from '@/lib/textbook-curriculum';
 import {englishCourseUnits} from '@/lib/english-course';
@@ -27,6 +27,7 @@ import {SiteMenu} from './site-menu';
 import {SiteTour} from './site-tour';
 import {GuestBanner} from './guest-taste';
 import {useSyncVersion} from './lesson-sync';
+import {readLastPlace,placeUnit,type LastPlace} from '@/lib/last-place';
 
 /** home = the welcome page at "/" (Koko's tour of the site); units = the units catalogue at /konular. */
 export type HomePage='home'|'units';
@@ -53,7 +54,15 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null);
  // Progress is read from the signed-in learner's saved answers; it stays hidden if they cannot be loaded.
  // The home page only introduces the site, so it loads no progress.
- useEffect(()=>{if(course!=='de'||home){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course,home]);
+ // Coming back to the tab (or with the browser's back button) reads everything again, so work done on another device or
+ // in another tab shows without a reload (the learner asked, 2 November 2026).
+ const [back,setBack]=useState(0);
+ useEffect(()=>{
+  const visible=()=>{if(document.visibilityState==='visible')setBack(n=>n+1);};const shown=(event:PageTransitionEvent)=>{if(event.persisted)setBack(n=>n+1);};
+  document.addEventListener('visibilitychange',visible);window.addEventListener('pageshow',shown);
+  return()=>{document.removeEventListener('visibilitychange',visible);window.removeEventListener('pageshow',shown);};
+ },[]);
+ useEffect(()=>{if(course!=='de'||home){setSnapshot(null);return;}let alive=true;api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de').then(next=>{if(alive)setSnapshot(next);}).catch(()=>{if(alive)setSnapshot(null);});return()=>{alive=false;};},[course,home,back]);
  // Lektion 12 keeps its progress in this browser; its helpers load only when the catalogue needs them.
  const [ausbildung,setAusbildung]=useState<TopicProgress|null>(null);
  // Lektion 1 (Teil A and B) keeps its scores in the browser (lib/willkommen-progress.ts): read them here for the unit card.
@@ -63,10 +72,14 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  // Lektion 2 (Teil A–D since 2 November 2026) keeps its scores in the browser, too (lib/berufe-progress.ts).
  const [berufe,setBerufe]=useState<TopicProgress|null>(null);
  const synced=useSyncVersion(); // lesson progress from another device (app/lesson-sync.tsx)
- useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
- useEffect(()=>{if(course!=='de'||home){setBerufe(null);return;}let alive=true;import('@/lib/berufe-progress').then(({readLessonTwoProgress})=>{if(alive)setBerufe(readLessonTwoProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
- useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
- useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
+ const seen=synced*1000+back; // read the browser's lesson progress again after a sync or when the learner comes back
+ // "Kaldığın yerden devam et": the last lesson or study page (lib/last-place.ts; saved by every page, with the account).
+ const [place,setPlace]=useState<LastPlace|null>(null);
+ useEffect(()=>{if(course!=='de'||home){setPlace(null);return;}try{setPlace(readLastPlace(localStorage));}catch{setPlace(null);}},[course,home,seen]);
+ useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
+ useEffect(()=>{if(course!=='de'||home){setBerufe(null);return;}let alive=true;import('@/lib/berufe-progress').then(({readLessonTwoProgress})=>{if(alive)setBerufe(readLessonTwoProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
+ useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
+ useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
  const units=allUnits.filter(unit=>unit.level===level);
  return <div className="category-app toon-app" dir={languageDirection(language)} lang={language}>
@@ -80,6 +93,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
     {/* The "Almanca Eğitimi · Üniteler ve konular" banner with its picture was removed at the learner's request
         (30 October 2026): the notebook starts at the top; the heading stays for screen readers. */}
     <h1 id="work-heading" className="sr-only" tabIndex={-1}>{c(language,'catalogTitle')}</h1>
+    {place&&<a className="nb-continue" href={place.href} data-continue={place.id}><span className="nb-continue-icon" aria-hidden="true"><Play size={20}/></span><span className="nb-continue-text"><small>{c(language,'continueTitle')}</small><strong>{placeTitle(place,language)}</strong>{place.detail&&<small lang="de">{place.detail}</small>}</span><ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/></a>}
     {/* The catalogue as a spiral notebook: level tabs, ruled paper, unit photos taped onto the page. */}
     <section id="curriculum" className="nb" aria-labelledby="curriculum-heading">
      <div className="nb-tabs" role="group" aria-label={c(language,'levelLabel')}>{(['A1.1','A1.2'] as const).map(value=><button type="button" key={value} className={level===value?'active':''} aria-pressed={level===value} onClick={()=>setLevel(value)}><strong>{value}</strong><span>{c(language,'categories')}</span></button>)}</div>
@@ -103,4 +117,10 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
    </main>
   </div><SiteFooter language={language}/>
  </div>;
+}
+/** The name of a saved place: the textbook unit of a lesson, else the study area's own title. */
+function placeTitle(place:LastPlace,language:StudyLanguage){
+ const unit=placeUnit[place.id];
+ if(unit){const found=courseUnits.find(item=>item.id===unit);return found?translate(found.names,language):'';}
+ return place.id==='housing'?housingText(language,'title'):place.id==='vault'?vaultText(language,'vaultTitle'):verbText(language,'verbsTitle');
 }

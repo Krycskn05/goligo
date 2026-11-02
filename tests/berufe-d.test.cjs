@@ -94,7 +94,7 @@ test('Teil D lives in the Lektion 2 notebook: part d, its own scores; all four p
  assert.equal(a.berufeParts[3].title,'Ich verstehe das nicht.');
  assert.equal(sync.syncLessonOf(progress.L2D_SCORES_KEY),'l2');
  const full=list=>Object.fromEntries(list.map(({id,total})=>[id,{right:total,total}]));
- const all={a:full(a.berufeScored),b:full(b.berufeScoredB),c:full(c.berufeScoredC),d:full(lesson.berufeScoredD)};
+ const all={a:full(progress.l2PartCounted.a),b:full(progress.l2PartCounted.b),c:full(progress.l2PartCounted.c),d:full(progress.l2PartCounted.d)};
  assert.equal(progress.partProgressL2('d',all.d).percent,100);
  assert.equal(progress.lessonTwoProgress(all).percent,100);assert(progress.lessonTwoProgress({...all,d:{}}).percent<100);
  const steps=read('app/berufe-d-steps.tsx');for(const step of lesson.berufeStepsD)assert(steps.includes(`case '${step.id}':`),step.id);

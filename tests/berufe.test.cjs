@@ -113,7 +113,9 @@ test('the page: route, guest access, unit card, progress and sync like Lektion 1
  assert(read('app/layout.tsx').includes('import "./berufe.css";'));
  assert(read('app/stadt-a-steps.tsx').includes('export function ChoiceExercise('),'the sentence choices are shared');
  // Scores: the best result stays; the unit's progress counts every scored exercise.
- const full={};for(const {id,total} of lesson.berufeScored)full[id]={right:total,total};
+ const full={};for(const {id,total} of progress.l2PartCounted.a)full[id]={right:total,total};
+ assert.equal(progress.l2PartCounted.a.length,lesson.berufeScored.length+9,'the eight teaching steps and Konuş count one point each (2 November 2026)');
+ const exercisesOnly={};for(const {id,total} of lesson.berufeScored)exercisesOnly[id]={right:total,total};assert(progress.partProgressL2('a',exercisesOnly).percent<100);
  assert.equal(progress.partProgressL2('a',full).percent,100);assert.equal(progress.partProgressL2('a',{}).percent,0);
  assert(progress.lessonTwoProgress({a:full}).percent>0,'Teil A counts for the unit card (Teil B too, tests/berufe-b.test.cjs)');
 });

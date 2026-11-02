@@ -31,6 +31,8 @@ import {talkScenarios} from '@/lib/talk-scenarios';
 import {StepViewC} from './willkommen-c-steps';
 import {StepViewD} from './willkommen-d-steps';
 import {useSyncVersion} from './lesson-sync';
+import {ResumeLink,useResume} from './lesson-resume';
+import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
 
 /**
  * Lektion 1 „Willkommen!“ (the learner's own lesson pages): the contents page is an open notebook like Lektion 11 and
@@ -103,11 +105,13 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
  },[]);
  const go=useCallback((next:number)=>open(place.part,next),[open,place.part]);
  // The step the learner is on (also when opened from its address) stays saved in the browser for later use.
- useEffect(()=>{if(place.index>=0)try{localStorage.setItem(partKeys[place.part].step,parts[place.part].steps[place.index].id);localStorage.setItem(L1_PART_KEY,place.part);}catch{}},[place]);
+ // It is read back by "Kaldığın yerden devam et" on the contents page and on the units page (lib/last-place.ts).
+ useEffect(()=>{if(place.index>=0)try{const step=parts[place.part].steps[place.index];localStorage.setItem(partKeys[place.part].step,step.id);localStorage.setItem(L1_PART_KEY,place.part);
+  saveLastPlace(localStorage,{id:'willkommen',href:lessonStepHref('willkommen',place.part,step.id),detail:'Lektion 1 · Teil '+parts[place.part].badge+' · '+step.title});}catch{}},[place]);
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:savePartScore(part,id,right,total)}));},[place.part]);
  // Steps without a score are marked done as well (the learner asked, 30 October 2026: "I did it, but it does not show done"):
  // a topic page once it is opened, here; "Şimdi sen", the memory game and Konuş when they are finished (their components).
- // These marks do not change the percentage, which counts only the scored exercises.
+ // A teaching step (and Konuş) counts one point in the percentage since 2 November 2026 (lib/progress.ts `lessonItems`).
  useEffect(()=>{if(place.index<0)return;const step=parts[place.part].steps[place.index];if(step.kind!=='teach'&&step.id!=='puanlar')return;const part=place.part;if(!readPartScores(part)[step.id])setScores(previous=>({...previous,[part]:savePartScore(part,step.id,1,1)}));},[place]);
  // An exercise that shows one item at a time (a sentence, a test question) takes the page's İleri for its next item first
  // (the learner asked, 30 October 2026, like Lektion 15); `useInnerNext` in app/willkommen-ui.tsx registers it.
@@ -169,7 +173,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
  // notebook (the learner asked, 25 October 2026): a notebook shorter than the screen stretches to its bottom (--l1a-fill),
  // a taller one is drawn a little smaller (CSS zoom) until it fits. Measured on load, resize and font loading; only styles
  // change, no state, so nothing draws again.
- const box=useRef<HTMLElement>(null);
+ const box=useRef<HTMLElement>(null);const resume=useResume(L1_PART_KEY,partKeys,parts);
  useEffect(()=>{
   const element=box.current;const book=element?.querySelector<HTMLElement>('.lb');if(!element||!book)return;
   let frame=0;
@@ -207,6 +211,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <ProgressMeter progress={partProgressL1(config.id,scores[config.id])} language={language} label={'Teil '+row.badge} compact/>
+    <ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>
    </li>:<li className="lb-toc-row l1a-soon" data-l1a-part={row.id} key={row.id} aria-disabled="true">
     <div className="lb-toc-open">
      <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>

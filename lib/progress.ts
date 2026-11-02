@@ -5,11 +5,14 @@ import {objectQuestions,objectWordMap} from './object-course';
 import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake} from './object-practice';
 import {verbQuestions,inVerbTopic} from './verb-course';
 import {isVerbExercise} from './verb-practice';
+import {verbSteps} from './verb-workshop';
 
 /**
  * Learning progress shown in the interface. Everything here is derived from the
  * existing review rows and answer counts; no question, topic or session ID changes.
- * An exercise counts as learned while its most recent answer was correct (streak ≥ 1).
+ * An exercise counts as learned once it was answered right (the learner asked, 2 November 2026: "the percentage does not
+ * go up" — a later wrong answer used to take it away again; mistakes still go to Yanlışlarım by their own rule).
+ * A written exercise and its four-choice copy (`<id>-test`, Ev ve Yaşam) are one exercise: either of them counts.
  */
 export type TopicProgress={total:number;tried:number;learned:number;percent:number;triedPercent:number;stars:0|1|2|3;stage:ProgressStage};
 export type ProgressStage='new'|'started'|'warming'|'half'|'almost'|'master';
@@ -28,15 +31,26 @@ function ratio(part:number,total:number){
  if(part>=total)return 100;
  return Math.min(99,Math.max(1,Math.round(part*100/total)));
 }
+/** What a lesson part's percentage counts (Lektion 1, 2, 15): every scored exercise with its answers, and every teaching
+ * step and Konuş as one item each — a teaching step counts once it is opened, Konuş once the learner rated it (the learner
+ * asked, 2 November 2026: reading a topic did not move the percentage). */
+export function lessonItems(scored:readonly {id:string;total:number}[],steps:readonly {id:string;kind:string}[]){
+ return [...scored,...steps.filter(step=>(step.kind==='teach'||step.kind==='speak')&&!scored.some(item=>item.id===step.id)).map(step=>({id:step.id,total:1}))];
+}
 export function starsFor(percent:number):0|1|2|3{return percent>=75?3:percent>=50?2:percent>=25?1:0;}
 export function stageFor(percent:number,tried:number):ProgressStage{
  return percent>=100?'master':percent>=75?'almost':percent>=50?'half':percent>=25?'warming':tried>0||percent>0?'started':'new';
 }
+/** Answered right at least once (a row counts every answer in `seen` and every wrong one in `wrong_count`). */
+export function isLearned(row:Pick<Review,'seen'|'streak'|'wrong_count'>|undefined){return !!row&&row.seen>0&&(row.streak>=1||row.seen>row.wrong_count);}
+/** The exercise an id belongs to: a four-choice copy `<id>-test` belongs to its written exercise. */
+export const exerciseKey=(id:string)=>id.replace(/-test$/,'');
 export function topicProgress(ids:readonly string[],reviews:readonly Review[]):TopicProgress{
- const unique=[...new Set(ids)];const byId=new Map(reviews.map(row=>[row.question_id,row]));
+ const groups=new Map<string,string[]>();for(const id of new Set(ids)){const key=exerciseKey(id);groups.set(key,[...(groups.get(key)??[]),id]);}
+ const byId=new Map(reviews.map(row=>[row.question_id,row]));
  let tried=0,learned=0;
- for(const id of unique){const row=byId.get(id);if(!row||!(row.seen>0))continue;tried++;if(row.streak>=1)learned++;}
- const total=unique.length;const percent=ratio(learned,total);
+ for(const members of groups.values()){const rows=members.map(id=>byId.get(id)).filter(row=>!!row&&row.seen>0);if(!rows.length)continue;tried++;if(rows.some(isLearned))learned++;}
+ const total=groups.size;const percent=ratio(learned,total);
  return {total,tried,learned,percent,triedPercent:Math.max(percent,ratio(tried,total)),stars:starsFor(percent),stage:stageFor(percent,tried)};
 }
 
@@ -49,20 +63,23 @@ export function isVaultExercise(q:Question){return isObjectPictureQuestion(q)||i
 export function objectProgressIds(group:string){
  return objectQuestions.filter(q=>(group==='all'||q.topic===group)&&isVaultExercise(q)).map(q=>q.id);
 }
-/** Choice, writing and listening exercises of one Fiiller group (verbs-all = every verb). */
+/** The Fiiller exercises that can be practised (the learner asked, 2 November 2026: the percentage stopped near 31%):
+ * the four steps of every verb in Fiil Atölyesi (meaning, writing, the past form, writing it), not the older exercises
+ * that no page asks any more. */
+const workshopTasks=new Set<string>(verbSteps);
 export function verbProgressIds(topic:string){
- return verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&isVerbExercise(q)).map(q=>q.id);
+ return verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&isVerbExercise(q)&&!!q.verbTask&&workshopTasks.has(q.verbTask)).map(q=>q.id);
 }
 export function verbProgress(topic:string,reviews:readonly Review[]){return topicProgress(verbProgressIds(topic),reviews);}
 /**
- * Verbs learned: a verb counts once every one of its exercises counts as learned (as topicProgress). Shown next to the
- * exercise count so the two numbers are not mixed up ("72 fiil" next to "80/936" read like 80 verbs; the learner asked).
+ * Verbs learned: a verb counts once every one of its exercises (verbProgressIds) counts as learned (as topicProgress).
+ * Shown next to the exercise count so the two numbers are not mixed up ("72 fiil" next to "80/288" read like 80 verbs).
  */
 export function learnedVerbs(topic:string,reviews:readonly Review[]){
  const byId=new Map(reviews.map(row=>[row.question_id,row]));const verbsSeen=new Map<string,boolean>();
  for(const q of verbQuestions){
-  if(!q.verbId||!inVerbTopic(q.topic,topic)||!isVerbExercise(q))continue;
-  const row=byId.get(q.id);const done=!!row&&row.seen>0&&row.streak>=1;
+  if(!q.verbId||!inVerbTopic(q.topic,topic)||!isVerbExercise(q)||!q.verbTask||!workshopTasks.has(q.verbTask))continue;
+  const done=isLearned(byId.get(q.id));
   verbsSeen.set(q.verbId,(verbsSeen.get(q.verbId)??true)&&done);
  }
  return {learned:[...verbsSeen.values()].filter(Boolean).length,total:verbsSeen.size};

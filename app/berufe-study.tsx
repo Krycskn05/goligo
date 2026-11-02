@@ -32,6 +32,8 @@ import {StepViewL2B} from './berufe-b-steps';
 import {StepViewL2C} from './berufe-c-steps';
 import {StepViewL2D} from './berufe-d-steps';
 import {useSyncVersion} from './lesson-sync';
+import {ResumeLink,useResume} from './lesson-resume';
+import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
 
 /**
  * Lektion 2 „Berufe“ (A1.1): the contents page is an open notebook like Lektion 1 and 15 (Teil A – Ich bin Koch., B – Wer
@@ -100,7 +102,9 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
  const go=useCallback((next:number)=>open(place.part,next),[open,place.part]);
  const toPart=useCallback((part:string,next:number)=>{if(isPart(part))open(part,next);},[open]);
  // The step the learner is on (also when opened from its address) stays saved in the browser for later use.
- useEffect(()=>{if(place.index>=0)try{localStorage.setItem(l2PartKeys[place.part].step,parts[place.part].steps[place.index].id);localStorage.setItem(L2_PART_KEY,place.part);}catch{}},[place]);
+ // It is read back by "Kaldığın yerden devam et" on the contents page and on the units page (lib/last-place.ts).
+ useEffect(()=>{if(place.index>=0)try{const step=parts[place.part].steps[place.index];localStorage.setItem(l2PartKeys[place.part].step,step.id);localStorage.setItem(L2_PART_KEY,place.part);
+  saveLastPlace(localStorage,{id:'berufe',href:lessonStepHref('berufe',place.part,step.id),detail:'Lektion 2 · Teil '+parts[place.part].badge+' · '+step.title});}catch{}},[place]);
  // An exercise that shows one item at a time (a word, a sentence, a question) takes the page's İleri for its next item
  // first (the learner asked, 30 October 2026); `useInnerNext` in app/willkommen-ui.tsx registers it.
  const innerNext=useRef<(()=>boolean)|null>(null);
@@ -114,7 +118,7 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
  const score=useCallback((id:string,right:number,total:number)=>{const part=place.part;setScores(previous=>({...previous,[part]:saveL2Score(part,id,right,total)}));},[place.part]);
  // Steps without a score are marked done as well (the learner asked, 30 October 2026: "I did it, but it does not show done"):
  // a topic page once it is opened, here; Konuş when they are finished (their components).
- // These marks do not change the percentage, which counts only the scored exercises.
+ // A teaching step (and Konuş) counts one point in the percentage since 2 November 2026 (lib/progress.ts `lessonItems`).
  useEffect(()=>{if(place.index<0)return;const step=parts[place.part].steps[place.index];if(step.kind!=='teach')return;const part=place.part;if(!readL2Scores(part)[step.id])setScores(previous=>({...previous,[part]:saveL2Score(part,step.id,1,1)}));},[place]);
  const config=parts[place.part];const index=place.index;const step=index>=0?config.steps[index]:null;
  // The open index tab's steps sit inside the blue progress bar (the learner chose it, 30 October 2026, option C);
@@ -163,7 +167,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
  // On a computer the notebook fits the screen below the header — no scrolling, neither the page nor inside the notebook
  // (the learner asked for Lektion 1, 25 October 2026): a shorter notebook stretches to the bottom (--l1a-fill), a taller
  // one is drawn a little smaller (CSS zoom). Measured on load, resize and font loading; only styles change, no state.
- const box=useRef<HTMLElement>(null);
+ const box=useRef<HTMLElement>(null);const resume=useResume(L2_PART_KEY,l2PartKeys,parts);
  useEffect(()=>{
   const element=box.current;const book=element?.querySelector<HTMLElement>('.lb');if(!element||!book)return;
   let frame=0;
@@ -201,6 +205,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <ProgressMeter progress={partProgressL2(config.id,scores[config.id])} language={language} label={'Teil '+row.badge} compact/>
+    <ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>
    </li>:<li className="lb-toc-row l1a-soon" data-l2-part={row.id} key={row.id} aria-disabled="true">
     <div className="lb-toc-open">
      <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>

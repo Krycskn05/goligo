@@ -1,5 +1,5 @@
-import {starsFor,stageFor,type TopicProgress} from './progress';
-import {scoredExercisesA} from './stadt-course';
+import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress';
+import {scoredExercisesA,stepsA} from './stadt-course';
 import type {L1AScoreMap} from './willkommen-progress';
 
 /**
@@ -13,6 +13,8 @@ export const L15A_STEP_KEY='lernkoko-l15a-step';
 export const L15_PART_KEY='lernkoko-l15-part';
 export const l15PartKeys:Record<L15PartId,{scores:string;step:string}>={a:{scores:L15A_SCORES_KEY,step:L15A_STEP_KEY}};
 export const l15PartScored:Record<L15PartId,{id:string;total:number}[]>={a:scoredExercisesA};
+/** What the percentages count: the scored exercises and the teaching steps (lib/progress.ts `lessonItems`). */
+export const l15PartCounted:Record<L15PartId,{id:string;total:number}[]>={a:lessonItems(scoredExercisesA,stepsA)};
 
 export function readL15Scores(part:L15PartId):L1AScoreMap{
  try{const value=JSON.parse(localStorage.getItem(l15PartKeys[part].scores)??'{}');return value&&typeof value==='object'?value as L1AScoreMap:{};}catch{return {};}
@@ -36,11 +38,11 @@ function progressOf(list:readonly {id:string;total:number}[],scores:L1AScoreMap)
  return {total,tried,learned,percent,triedPercent:Math.max(percent,ratio(tried,total)),stars:starsFor(percent),stage:stageFor(percent,tried)};
 }
 /** One part's progress (its notebook page and its row on the contents page). */
-export function partProgressL15(part:L15PartId,scores:L1AScoreMap):TopicProgress{return progressOf(l15PartScored[part],scores);}
+export function partProgressL15(part:L15PartId,scores:L1AScoreMap):TopicProgress{return progressOf(l15PartCounted[part],scores);}
 /** Lektion 15 as a whole (the unit card on Üniteler): every scored exercise of every part that has a lesson. */
 export function lessonFifteenProgress(all:Partial<Record<L15PartId,L1AScoreMap>>):TopicProgress{
- const parts=Object.keys(l15PartScored) as L15PartId[];
- const list=parts.flatMap(part=>l15PartScored[part].map(exercise=>({id:part+':'+exercise.id,total:exercise.total})));
+ const parts=Object.keys(l15PartCounted) as L15PartId[];
+ const list=parts.flatMap(part=>l15PartCounted[part].map(exercise=>({id:part+':'+exercise.id,total:exercise.total})));
  const scores:L1AScoreMap={};
  for(const part of parts)for(const [id,score] of Object.entries(all[part]??{}))scores[part+':'+id]=score;
  return progressOf(list,scores);

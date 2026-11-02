@@ -166,9 +166,12 @@ test('rounds follow the chosen group and mode, solved questions wait and the sam
  const review=practice.pickVerbRound('test','verbs-1',reviews,true,undefined,{starred:new Set([ids[2]])}).map(q=>q.id).sort();
  assert.deepEqual(review,[ids[0],ids[2]].sort());
  assert.equal(study.selectQuestions('test','verbs-1',50,reviews,ids)[0].id,ids[0],'open mistakes come first');
- assert.equal(progress.verbProgressIds('verbs-all').length,72*13);
+ assert.equal(progress.verbProgressIds('verbs-all').length,72*4,'the four steps of Fiil Atölyesi (2 November 2026: the older exercises are asked nowhere)');
  assert.ok(progress.verbProgressIds('verbs-3').every(id=>course.questionMap.get(id).topic==='verbs-3'));
- assert.equal(progress.verbProgress('verbs-1',reviews).learned,1);
+ // The percentage counts the four steps of Fiil Atölyesi; an exercise counts once it was answered right (2 November 2026).
+ const step=progress.verbProgressIds('verbs-1')[0];
+ assert.equal(progress.verbProgress('verbs-1',[{question_id:step,wrong_count:1,streak:0,seen:2,last_answer:'x',last_wrong:'y',last_at:1,due_at:1}]).learned,1,'right once, then wrong: still learned');
+ assert.equal(progress.verbProgress('verbs-1',[{question_id:step,wrong_count:1,streak:0,seen:1,last_answer:'x',last_wrong:'x',last_at:1,due_at:1}]).learned,0,'only wrong: not learned');
 });
 
 test('every text of the page exists in every site language',()=>{

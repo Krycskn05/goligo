@@ -257,3 +257,7 @@
  .lb .l12-step { transition:none; }
 }
 html[data-lernkoko-motion=reduced] .lb .lb-note,html[data-lernkoko-motion=reduced] .lb .l12-step { transition:none; }
+/* "Kaldığın yerden devam et" in the contents row of the part opened last (app/lesson-resume.tsx, 2 November 2026) */
+.lb-toc-row>.lb-toc-resume { display:flex; align-items:center; gap:6px; margin:6px 0 0; margin-inline-start:152px; min-height:36px; padding:0 4px; color:#28706a; font-weight:750; font-size:14px; text-align:start; }
+@media (min-width:1180px) { .l1a-contents .lb-toc-row>.lb-toc-resume { margin-inline-start:138px; min-height:28px; margin-top:4px; } }
+@media (max-width:650px) { .lb-toc-row>.lb-toc-resume { margin-inline-start:0; } }

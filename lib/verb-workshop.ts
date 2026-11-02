@@ -129,9 +129,18 @@ export function partAnswered(session:RoundSummary|null|undefined,family:VerbFami
 export function findPartSession<T extends RoundSummary>(sessions:readonly T[],family:VerbFamily):T|null{
  return sessions.find(session=>sessionPart(session)?.id===family.id)??null;
 }
-/** Every part with its saved round and progress. */
+/** Every part with its saved round and progress. `completed`: some round of the part was finished — practising a finished
+ * part again keeps its tick, its full ring and its stickers (the learner asked, 2 November 2026: "the tick disappears"),
+ * while the new round goes on from its own progress. */
 export function partsStatus<T extends RoundSummary>(sessions:readonly T[]){
- return verbFamilies.map(family=>{const session=findPartSession(sessions,family);return {family,session,...partProgress(family,session?summaryIds(session):partIds(family),session?summaryAnswered(session):0)};});
+ return verbFamilies.map(family=>{
+  const session=findPartSession(sessions,family);
+  const progress=partProgress(family,session?summaryIds(session):partIds(family),session?summaryAnswered(session):0);
+  const completed=progress.finished||sessions.some(item=>sessionPart(item)?.id===family.id&&partProgress(family,summaryIds(item),summaryAnswered(item)).finished);
+  if(!completed||progress.finished)return {family,session,...progress,completed};
+  const full=family.verbs.map(()=>({meaning:true,perfekt:true}));
+  return {family,session,...progress,completed,marks:full,meaningDone:family.verbs.length,perfektDone:family.verbs.length};
+ });
 }
 /** The part to continue: the open part practised last, else the first part not finished, else part 1. */
 export function currentPart<T extends RoundSummary>(sessions:readonly T[]){

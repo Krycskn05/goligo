@@ -1,4 +1,5 @@
 'use client';
+import {saveLastPlace} from '@/lib/last-place';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useState} from 'react';
 import {ArrowLeft,ArrowRight,Check,Headphones,Lock} from 'lucide-react';
@@ -30,6 +31,7 @@ export default function AusbildungHoeren({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
  const switchLanguage=useLanguageSwitch(setLanguage,loadL12Pack);
  useEffect(()=>{switchLanguage(browserLanguage(),()=>setLoaded(true));},[switchLanguage]);
+ useEffect(()=>{saveLastPlace(localStorage,{id:'hoeren',detail:'Lektion 12 · Hören'});},[]); // "Kaldığın yerden devam et" (lib/last-place.ts)
  useEffect(()=>{if(!loaded)return;document.documentElement.lang=language;document.documentElement.dir=languageDirection(language);document.title='Lektion 12 – Hören · '+SITE_NAME;rememberSiteLanguage(language);},[language,loaded]);
  const synced=useSyncVersion('l12'); // progress from another device: read it again (app/lesson-sync.tsx)
  if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;

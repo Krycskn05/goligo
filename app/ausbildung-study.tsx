@@ -1,4 +1,5 @@
 'use client';
+import {saveLastPlace} from '@/lib/last-place';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,BookOpen,Check,Headphones,Layers,PenLine,Play,RotateCcw,Trophy} from 'lucide-react';
@@ -46,7 +47,8 @@ const StepIcon=({step,size=18}:{step:L12Step;size?:number})=>step==='kelimeler'?
 type Last={part:L12PartId;step:L12Step;ex?:number};
 const LAST_KEY='lernkoko-l12-last';
 function readLast():Last|null{try{const value=JSON.parse(localStorage.getItem(LAST_KEY)??'null') as Last|null;return value&&partParam(value.part)&&isStep(value.step)?value:null;}catch{return null;}}
-function saveLast(value:Last){try{localStorage.setItem(LAST_KEY,JSON.stringify(value));}catch{}}
+function saveLast(value:Last){try{localStorage.setItem(LAST_KEY,JSON.stringify(value));}catch{}
+ saveLastPlace(localStorage,{id:'ausbildung',href:AUSBILDUNG_PATH+'?bolum='+value.part+'&adim='+value.step,detail:'Lektion 12 · '+(lessonPartMap.get(value.part)?.de??'')});} // also for the units page (lib/last-place.ts)
 const SEEN_KEY='lernkoko-l12-seen';
 function readSeen():Record<string,boolean>{try{const value=JSON.parse(localStorage.getItem(SEEN_KEY)??'{}');return value&&typeof value==='object'?value:{};}catch{return {};}}
 function markSeen(id:string){try{localStorage.setItem(SEEN_KEY,JSON.stringify({...readSeen(),[id]:true}));}catch{}}
@@ -177,6 +179,9 @@ function PartPage({part,step,scores,tick,speech,onScore,onOpen,language}:{part:L
  const words=useMemo(()=>partWords(part),[part]);
  const [known,setKnown]=useState<Set<string>>(new Set());const [seen,setSeen]=useState<Record<string,boolean>>({});const [listened,setListened]=useState(0);
  useEffect(()=>{setKnown(readKnown(part.id));setSeen(readSeen());setListened((part.listen??[]).filter(number=>{const task=taskMap.get(number);return task&&listenResult(task);}).length);},[part,tick,taskMap]);
+ // The topic counts as read once it is opened, however the learner got there (tabs, pager, the button at the bottom), like
+ // the teaching steps of Lektion 1, 2 and 15 (the learner asked, 2 November 2026: the tick did not come).
+ useEffect(()=>{if(step==='konu'&&!readSeen()[part.id]){markSeen(part.id);setSeen(readSeen());}},[part.id,step]);
  const checkable=part.exercises.filter(isCheckable);const checked=checkable.filter(exercise=>scores[exercise.id]).length;
  const detail:Record<L12Step,string>={
   kelimeler:t('{known} / {total} biliyorum',{known:known.size,total:words.length}),

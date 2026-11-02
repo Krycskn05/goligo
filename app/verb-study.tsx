@@ -1,4 +1,5 @@
 'use client';
+import {saveLastPlace} from '@/lib/last-place';
 import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {OptionText} from './option-fit';
@@ -150,6 +151,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   void refresh().finally(()=>{if(mounted.current)setInitializing(false);});
   return()=>{mounted.current=false;};
  },[]);
+ useEffect(()=>{if(part!=='games'&&part!=='mistakes')saveLastPlace(localStorage,{id:'verbs'});},[part]); // "Kaldığın yerden devam et" (lib/last-place.ts)
  useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=dir;// The tab title names the part that is open (Oyunlar, Yanlışlarım), as the page's own metadata does.
  document.title=verbText(language,part==='games'?'gamesTitle':part==='mistakes'?'mistakesTitle':'workshopTitle')+' · '+SITE_NAME;stopFeedback();},[language,part]);
  // The meanings of the example sentences come in a small file per language; load it before the first answer.
@@ -452,10 +454,11 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
      {parts.map(part=>{
       const family=part.family;
       // Every part is open: the one in progress is marked, finished parts get a check, none has a lock.
-      const state=part.finished?'done':family.id===path.family.id&&!path.finished?'current':'';
+      const state=part.completed?'done':family.id===path.family.id&&!path.finished?'current':'';
+      const ring=part.completed?100:part.percent;
       const members=family.verbs.map(id=>verbMap.get(id)!);
       const locked=guest&&family.id!==GUEST_VERB_PART;
-      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state+(locked?' guest-locked':'')} style={{'--p':part.percent} as CSSProperties} data-verb-island={family.id}>
+      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state+(locked?' guest-locked':'')} style={{'--p':ring} as CSSProperties} data-verb-island={family.id}>
        {state==='current'&&<span className="verb-here"><Compass size={15} aria-hidden="true"/>{t('hereBadge')}</span>}
        {state==='done'&&<span className="verb-lock done" aria-hidden="true"><CheckCircle2 size={20}/></span>}
        <span className="verb-island-number">{family.number}</span>
@@ -465,7 +468,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
         <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
         {locked?<GuestLock language={language} back={back} className="verb-island-go"/>:<button type="button" className="verb-island-go" onClick={()=>openPart(family)} data-verb-island-go={family.id}>{t('partOpen',{n:family.number})}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
        </div>
-       <span className="verb-ring" data-v={part.percent+'%'}/>
+       <span className="verb-ring" data-v={ring+'%'}/>
       </article>;
      })}
     </section>

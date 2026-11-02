@@ -80,10 +80,10 @@ test('every German text the lesson speaks is listed for the site voices',()=>{
 
 test('scores stay in the browser and make the progress of the unit card',()=>{
  assert.equal(progress.L15A_SCORES_KEY,'lernkoko-l15a-scores');assert.equal(progress.L15A_STEP_KEY,'lernkoko-l15a-step');
- const total=lesson.scoredExercisesA.reduce((n,e)=>n+e.total,0);
+ const total=progress.l15PartCounted.a.reduce((n,e)=>n+e.total,0);assert(total>lesson.scoredExercisesA.reduce((n,e)=>n+e.total,0),'the teaching steps count too');
  const empty=progress.partProgressL15('a',{});assert.equal(empty.total,total);assert.equal(empty.percent,0);assert.equal(empty.stage,'new');
  const some=progress.lessonFifteenProgress({a:{test:{right:14,total:14},wohin:{right:20,total:21}}});assert.equal(some.learned,34);assert(some.percent>0&&some.percent<100);
- const full=progress.partProgressL15('a',Object.fromEntries(lesson.scoredExercisesA.map(e=>[e.id,{right:e.total,total:e.total}])));
+ const full=progress.partProgressL15('a',Object.fromEntries(progress.l15PartCounted.a.map(e=>[e.id,{right:e.total,total:e.total}])));
  assert.equal(full.percent,100);assert.equal(full.stars,3);
  const units=read('app/category-study.tsx');assert(units.includes("unit.id==='book-15'?'/a1-2/wege-in-der-stadt'")&&units.includes('readLessonFifteenProgress')&&units.includes("unit.id==='book-15'?stadt"));
 });

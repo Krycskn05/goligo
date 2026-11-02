@@ -1,19 +1,22 @@
 import {starsFor,stageFor,type TopicProgress} from './progress';
 import {berufeScored} from './berufe-course';
+import {berufeScoredB} from './berufe-b-course';
 import type {L1AScoreMap} from './willkommen-progress';
 
 /**
  * Lektion 2 „Berufe“ keeps its scores in the browser, like Lektion 15 (lib/stadt-progress.ts): the best result of every
- * scored exercise of a part, by step id. Teil A since 2 November 2026; B–D come later. The keys travel with the account
+ * scored exercise of a part, by step id. Teil A and B since 2 November 2026; C–D come later. The keys travel with the account
  * (lib/lesson-sync.ts, lesson `l2`).
  */
-export type L2PartId='a';
+export type L2PartId='a'|'b';
 export const L2A_SCORES_KEY='lernkoko-l2a-scores';
 export const L2A_STEP_KEY='lernkoko-l2a-step';
+export const L2B_SCORES_KEY='lernkoko-l2b-scores';
+export const L2B_STEP_KEY='lernkoko-l2b-step';
 /** The part the learner opened last. */
 export const L2_PART_KEY='lernkoko-l2-part';
-export const l2PartKeys:Record<L2PartId,{scores:string;step:string}>={a:{scores:L2A_SCORES_KEY,step:L2A_STEP_KEY}};
-export const l2PartScored:Record<L2PartId,{id:string;total:number}[]>={a:berufeScored};
+export const l2PartKeys:Record<L2PartId,{scores:string;step:string}>={a:{scores:L2A_SCORES_KEY,step:L2A_STEP_KEY},b:{scores:L2B_SCORES_KEY,step:L2B_STEP_KEY}};
+export const l2PartScored:Record<L2PartId,{id:string;total:number}[]>={a:berufeScored,b:berufeScoredB};
 
 export function readL2Scores(part:L2PartId):L1AScoreMap{
  try{const value=JSON.parse(localStorage.getItem(l2PartKeys[part].scores)??'{}');return value&&typeof value==='object'?value as L1AScoreMap:{};}catch{return {};}
@@ -46,4 +49,4 @@ export function lessonTwoProgress(all:Partial<Record<L2PartId,L1AScoreMap>>):Top
  for(const part of parts)for(const [id,score] of Object.entries(all[part]??{}))scores[part+':'+id]=score;
  return progressOf(list,scores);
 }
-export function readLessonTwoProgress():TopicProgress{return lessonTwoProgress({a:readL2Scores('a')});}
+export function readLessonTwoProgress():TopicProgress{return lessonTwoProgress({a:readL2Scores('a'),b:readL2Scores('b')});}

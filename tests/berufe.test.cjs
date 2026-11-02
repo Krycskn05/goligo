@@ -101,7 +101,7 @@ test('the page: route, guest access, unit card, progress and sync like Lektion 1
  const units=read('app/category-study.tsx');
  assert(units.includes("unit.id==='book-02'?'/a1-1/berufe'")&&units.includes('readLessonTwoProgress')&&units.includes("unit.id==='book-02'?berufe:"));
  assert(goals.unitGoalsFor('book-02').length>=8);assert.deepEqual(lesson.berufeGoals,goals.unitGoalsFor('book-02'));
- assert.equal(lesson.berufeParts.length,4);assert.equal(lesson.berufeParts.filter(part=>part.title).length,1,'Teil A now, B–D later');
+ assert.equal(lesson.berufeParts.length,4);assert.equal(lesson.berufeParts.filter(part=>part.title).length,2,'Teil A and B now, C–D later');
  assert(sync.SYNC_LESSONS.includes('l2'));for(const key of [progress.L2A_SCORES_KEY,progress.L2A_STEP_KEY,progress.L2_PART_KEY,'lernkoko-l2a-run'])assert.equal(sync.syncLessonOf(key),'l2',key);
  assert(read('app/api/ilerleme/route.ts').includes("SYNC_LESSONS.map(()=>'?').join(',')"),'the server reads every lesson of the list');
  const code=pageCode();
@@ -112,7 +112,7 @@ test('the page: route, guest access, unit card, progress and sync like Lektion 1
  // Scores: the best result stays; the unit's progress counts every scored exercise.
  const full={};for(const {id,total} of lesson.berufeScored)full[id]={right:total,total};
  assert.equal(progress.partProgressL2('a',full).percent,100);assert.equal(progress.partProgressL2('a',{}).percent,0);
- assert.equal(progress.lessonTwoProgress({a:full}).percent,100);
+ assert(progress.lessonTwoProgress({a:full}).percent>0,'Teil A counts for the unit card (Teil B too, tests/berufe-b.test.cjs)');
 });
 
 test('the job rows read themselves on a tap (the speaker icon stays), the picture reads both forms',()=>{

@@ -336,7 +336,7 @@ async function languageFlow(browser) {
   }
   // Lektion 2 „Berufe“ (2 Kasim 2026): Lektion 15 gibi bir defter (Teil A acik, B-D yakinda); Teil A 18 adim.
   await visit(page, "/a1-1/berufe", "03e-lektion-2.png", errors);
-  record("Lektion 2: defter girisi (Teil A acik, B-D yakinda)", (await page.locator(".l2-book .lb-toc-row button.lb-toc-open").count()) === 1 && (await page.locator(".l2-book .l1a-soon").count()) === 3, "");
+  record("Lektion 2: defter girisi (Teil A ve B acik, C-D yakinda)", (await page.locator(".l2-book .lb-toc-row button.lb-toc-open").count()) === 2 && (await page.locator(".l2-book .l1a-soon").count()) === 2, "");
   await page.locator("[data-l2-part='a'] button.lb-toc-open").click();
   await page.waitForTimeout(600);
   record("Lektion 2A: kapak, 18 adim, uc sekme", (await page.locator("[data-l2-step='kapak']").count()) === 1 && /1\/18/.test((await page.locator(".l1a-where").textContent()) || "") && (await page.locator("#l1a-tabs .l12-step").count()) === 3, (await page.locator(".l1a-where").textContent()) || "");
@@ -344,6 +344,11 @@ async function languageFlow(browser) {
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, "03f-lektion-2a-meslekler.png"), fullPage: true });
   record("Lektion 2A: meslek kartlari (15 resim, her biri iki satir)", (await page.locator("[data-l2-step='meslekler'] .l2-job").count()) === 15 && (await page.locator("[data-l2-step='meslekler'] .l2-forms li").count()) === 30, "");
+  // Lektion 2B „Wer ist das?“ (2 Kasim 2026): Teil B ayni defterde, 18 adim; resimli "kim ne yapiyor" kartlari.
+  await page.goto(BASE + "/a1-1/berufe?teil=b&adim=ne-yapiyor", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: path.join(OUT, "03g-lektion-2b.png"), fullPage: true });
+  record("Lektion 2B: Teil B aciliyor (6 resimli kart)", (await page.locator("[data-l2-teil='b'][data-l2-step='ne-yapiyor'] .l2-job").count()) === 6, "");
   await page.goto(BASE + "/konular?level=A1.2", { waitUntil: "networkidle", timeout: 90000 });
   record("Uniteler: Lektion 15 karti Lektion 15A'ya aciliyor", (await page.locator("[data-unit='book-15'] a.housing-open[href='/a1-2/wege-in-der-stadt']").count()) === 1, "");
   await page.goto(BASE + "/konular?level=A1.1", { waitUntil: "networkidle", timeout: 90000 });

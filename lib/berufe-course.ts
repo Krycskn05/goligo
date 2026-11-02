@@ -263,7 +263,7 @@ export const berufeTest:BerufeTestQuestion[]=[
  q('„Stimmt! Richtig!“ ne demek?',['Doğru! Evet, öyle!','Maalesef yanlış!','Bilmiyorum.'],''),
 ];
 /** Turkish questions and options of the test and the quick checks (for their language on the page). */
-export const isTurkishText=(text:string)=>/[çğışİÇĞŞ]|\b(ne demek|erkek|etmek)\b|Bilmiyorum/.test(text);
+export const isTurkishText=(text:string)=>/[çğışİÇĞŞ]|\b(ne demek|erkek|etmek|onlar|ben)\b|Bilmiyorum|Selanik/.test(text);
 /** The summary: speaking practice. A person asks, the learner answers (their own sentence from Exercise 7 when there is
  * one, else the example). */
 export type PracticeItem={who:string;question:string;answer:string;own?:number[]};
@@ -321,11 +321,12 @@ export const berufeGroups:StepGroup[]=[
 export const berufeWordCount=jobs.length+otherWords.length;
 
 /* ---------- the notebook ---------- */
-/** Lektion 2's parts on the contents page: Teil A; B–D come later (a part without a title shows as coming soon). */
+/** Lektion 2's parts on the contents page: Teil A and B; C–D come later (a part without a title shows as coming soon). */
 export type BerufePart={id:'a'|'b'|'c'|'d';badge:string;title?:string;lead?:string};
 export const berufeParts:BerufePart[]=[
  {id:'a',badge:'A',title:'Ich bin Koch.',lead:'Meslek sorma ve söyleme: **Was bist du von Beruf?**, kadın meslek adları **-in**, **Ich arbeite als … / bei …** ve **nicht**.'},
- {id:'b',badge:'B'},{id:'c',badge:'C'},{id:'d',badge:'D'},
+ {id:'b',badge:'B',title:'Wer ist das?',lead:'Birini tanıtmak: **Das ist … Er / Sie kommt aus …**, **er · sie · sie** ile fiiller, **Woher? Wo? Wer?** ve büyük harf.'},
+ {id:'c',badge:'C'},{id:'d',badge:'D'},
 ];
 /** What Lektion 2 teaches ("Bu ünitede" on the left page of the contents): lib/unit-goals.ts. */
 export const berufeGoals=unitGoalsFor(BERUFE_UNIT);

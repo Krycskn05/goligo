@@ -11,6 +11,7 @@ import {turkishNote} from '@/lib/ausbildung-course';
 import type {L1AScoreMap} from '@/lib/willkommen-progress';
 import type {Step,StepGroup} from '@/lib/willkommen-course';
 import {BERUFE_PATH,BERUFE_UNIT,berufeParts,berufeGoals,berufePictures,berufeStepShort,berufeSteps,berufeGroups,berufeScored,berufeTest,berufeWordCount} from '@/lib/berufe-course';
+import {berufeBPictures,berufeStepShortB,berufeStepsB,berufeGroupsB,berufeScoredB,berufeTestB,berufeWordCountB} from '@/lib/berufe-b-course';
 import {L2_PART_KEY,l2PartKeys,readL2Scores,saveL2Score,partProgressL2,type L2PartId} from '@/lib/berufe-progress';
 import type {TopicProgress} from '@/lib/progress';
 import {useLanguageSwitch} from './language-switch';
@@ -24,11 +25,12 @@ import {LessonBook} from './lesson-book';
 import {TopicArt} from './toon-art';
 import {useLessonSpeech,Rich,StepStrip,exerciseLock,LockedStep,type StepProps} from './willkommen-ui';
 import {StepViewL2A} from './berufe-a-steps';
+import {StepViewL2B} from './berufe-b-steps';
 import {useSyncVersion} from './lesson-sync';
 
 /**
  * Lektion 2 „Berufe“ (A1.1): the contents page is an open notebook like Lektion 1 and 15 (Teil A–D; Teil A – Ich bin
- * Koch., the learner's lesson page of 2 November 2026, 18 steps; B–D come later). A part opens on a wide spread, one
+ * Koch. and Teil B – Wer ist das?, the learner's lesson pages of 2 November 2026, 18 steps each; C–D come later). A part opens on a wide spread, one
  * step at a time, with the pieces of Lektion 1 (app/willkommen-ui.tsx) and the same look (the l1a-* and l15-* styles;
  * Lektion 2's own pieces in app/berufe.css). German is read with the site voices, each person with their own voice;
  * answers get the site's sounds and Paul; scores stay in the browser (lib/berufe-progress.ts) and travel with the account
@@ -45,11 +47,12 @@ export default function BerufeStudy({guest=false}:{guest?:boolean}){
 }
 
 /** A part with a lesson: its steps, tabs, scored exercises, picture and step view. */
-type PartConfig={id:L2PartId;badge:string;title:string;lead:string;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode};
+type PartConfig={id:L2PartId;badge:string;title:string;lead:string;short:Record<string,string>;steps:Step[];groups:StepGroup[];scored:{id:string;total:number}[];testCount:number;wordCount:number;cover:{src:string;width:number;height:number};coverAlt:string;View:(props:StepProps)=>ReactNode};
 const parts:Record<L2PartId,PartConfig>={
- a:{id:'a',badge:'A',title:berufeParts[0].title??'',lead:berufeParts[0].lead??'',steps:berufeSteps,groups:berufeGroups,scored:berufeScored,testCount:berufeTest.length,wordCount:berufeWordCount,cover:berufePictures.cover,coverAlt:'Omar süpermarkette tezgâhın arkasında, mavi önlük ve isimlikle ekmek uzatıyor; yanında kasada Sabine',View:StepViewL2A},
+ a:{id:'a',badge:'A',title:berufeParts[0].title??'',lead:berufeParts[0].lead??'',short:berufeStepShort,steps:berufeSteps,groups:berufeGroups,scored:berufeScored,testCount:berufeTest.length,wordCount:berufeWordCount,cover:berufePictures.cover,coverAlt:'Omar süpermarkette tezgâhın arkasında, mavi önlük ve isimlikle ekmek uzatıyor; yanında kasada Sabine',View:StepViewL2A},
+ b:{id:'b',badge:'B',title:berufeParts[1].title??'',lead:berufeParts[1].lead??'',short:berufeStepShortB,steps:berufeStepsB,groups:berufeGroupsB,scored:berufeScoredB,testCount:berufeTestB.length,wordCount:berufeWordCountB,cover:berufeBPictures.cover,coverAlt:'Paul Hoca sınıfta Nikos’un fotoğrafını gösteriyor; Yasemin ve Omar bakıyor',View:StepViewL2B},
 };
-const partOrder:L2PartId[]=['a'];
+const partOrder:L2PartId[]=['a','b'];
 const isPart=(id:string):id is L2PartId=>id in parts;
 
 /** Where the learner is: a part and a step (`?adim=<id>`; a later part with `teil`), or the contents page (index -1). */
@@ -62,12 +65,12 @@ function readPlace():Place{
 function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  // This component only mounts in the browser (the parent shows a loading line first), so the address can be read at once.
  const [place,setPlace]=useState<Place>(()=>typeof window==='undefined'?{part:'a',index:-1}:readPlace());
- const [scores,setScores]=useState<Record<L2PartId,L1AScoreMap>>({a:{}});
+ const [scores,setScores]=useState<Record<L2PartId,L1AScoreMap>>({a:{},b:{}});
  const speech=useLessonSpeech();const sound=useAnswerSound();
  // useAnswerSound gives a new object on every render: keep the latest speech and sound in a ref, so the effects and
  // callbacks below do not run again on every render (that would be an endless update loop, see Lektion 1).
  const latest=useRef({speech,sound});latest.current={speech,sound};
- useEffect(()=>{setScores({a:readL2Scores('a')});},[]);
+ useEffect(()=>{setScores({a:readL2Scores('a'),b:readL2Scores('b')});},[]);
  useEffect(()=>{const pop=()=>{latest.current.speech.stop();latest.current.sound.stop();setPlace(readPlace());};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
  /** Opens a step of a part; a negative number opens the contents page. */
  const open=useCallback((part:L2PartId,next:number)=>{
@@ -114,7 +117,7 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
  const lock=exerciseLock(config.groups,config.steps,scores[place.part]);
  const stepLocked=!!step&&lock.locked.has(step.id);
  const mustFinish=!!step&&lock.isExercise(step.id)&&!scores[place.part][step.id];
- const openLabel=lock.open?(berufeStepShort[lock.open]??config.steps[lock.openIndex]?.title??''):'';
+ const openLabel=lock.open?(config.short[lock.open]??config.steps[lock.openIndex]?.title??''):'';
  const progress=partProgressL2(place.part,scores[place.part]);
  const dir=languageDirection(language);const View=config.View;
  return <div className="category-app toon-app housing-app l12-app l1a-app l15-app l2-app" lang={language} dir={dir}>
@@ -129,7 +132,7 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l2-step={step.id} data-l2-teil={config.id}>
      <header className="l1a-top">
       <div className="l1a-top-row"><span className="eyebrow">{stepGroup?.label??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{step.title} · {index+1}/{config.steps.length}</>}</span></div>
-      {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:berufeStepShort[id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
+      {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:config.short[id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
       :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={step.title}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
      </header>
      {stepLocked?<LockedStep openLabel={openLabel} onOpen={()=>go(lock.openIndex)}/>:<View key={config.id+':'+step.id} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l2'+place.part+'-run'}/>}

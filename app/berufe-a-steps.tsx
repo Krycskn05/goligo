@@ -50,7 +50,7 @@ export function StepViewL2A(props:StepProps){
 /* ---------- small pieces ---------- */
 const lineSay=(line:Line)=>({text:line.say??line.de,who:line.who});
 /** der, die and das in their colours (blue, red, green), the rest of the word as it is. */
-function Art({de}:{de:string}){const article=articleOf(de);return article?<><span className={'l15-'+article}>{article}</span>{de.slice(article.length)}</>:<>{de}</>;}
+export function Art({de}:{de:string}){const article=articleOf(de);return article?<><span className={'l15-'+article}>{article}</span>{de.slice(article.length)}</>:<>{de}</>;}
 /** The woman's form with its new letters in bold: + in (die Lehrer**in**) or the Umlaut (die K**ö**chin). */
 function WomanForm({de,mark}:{de:string;mark:'in'|'umlaut'}){
  const rest=de.slice(4);
@@ -58,12 +58,12 @@ function WomanForm({de,mark}:{de:string;mark:'in'|'umlaut'}){
  return <><span className="l15-die">die</span> {rest.split(/([äöüÄÖÜ])/).map((part,i)=>i%2?<b key={i}>{part}</b>:part)}</>;
 }
 /** One German line with its meaning and a listen button (`who` reads it with that person's voice). */
-function PhraseRow({de,tr,who,speech}:{de:string;tr?:ReactNode;who?:string;speech:Speech}){
+export function PhraseRow({de,tr,who,speech}:{de:string;tr?:ReactNode;who?:string;speech:Speech}){
  return <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span>{tr&&<span className="l1a-tr">{tr}</span>}</div><Say text={de} who={who} speech={speech}/></div>;
 }
 /** A dialogue: portrait, name, German and Turkish per line; "Tümünü dinle" reads it as a conversation and the
  * translation can be hidden to listen again. `actions={false}` for a short example. */
-function Conversation({lines,speech,actions=true}:{lines:readonly (Line&{from?:string})[];speech:Speech;actions?:boolean}){
+export function Conversation({lines,speech,actions=true}:{lines:readonly (Line&{from?:string})[];speech:Speech;actions?:boolean}){
  const [hidden,setHidden]=useState(false);const first=lines[0]?.who;
  return <>
   <div className={'l1a-dialogue'+(hidden?' l15-hide-tr':'')}>{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}>
@@ -79,7 +79,7 @@ function Conversation({lines,speech,actions=true}:{lines:readonly (Line&{from?:s
 }
 /** Quick checks inside a teaching step (not scored): one tap per question, the site's sound, then the right answer is
  * read when it is German (never the question or a Turkish answer). The options are mixed once. */
-function QuickChecks({items,speech,sound,title='Hemen kontrol'}:{items:readonly QuickCheck[];speech:Speech;sound:Sound;title?:string}){
+export function QuickChecks({items,speech,sound,title='Hemen kontrol'}:{items:readonly QuickCheck[];speech:Speech;sound:Sound;title?:string}){
  const [orders]=useState(()=>items.map(item=>shuffle(item.options)));
  const [answers,setAnswers]=useState<Record<number,string>>({});
  const answer=(i:number,value:string)=>{
@@ -353,7 +353,7 @@ function practiceAnswer(item:PracticeItem,own:readonly string[]){
  return item.answer;
 }
 /** The end: what the learner can say now, a speaking practice with their own sentences and what comes next. */
-function EndL2A({progress,onGo,speech}:StepProps){
+function EndL2A({progress,onGo,onPart,speech}:StepProps){
  const [own]=useState(readOwn);
  return <>
   <p className="kicker" lang="de">Zusammenfassung · Sprechen</p>
@@ -374,8 +374,9 @@ function EndL2A({progress,onGo,speech}:StepProps){
   </div>;})}</div>
   <Note><b>Kısa özet:</b> <span lang="de">Ich bin Koch.</span> (artikel yok) · <span lang="de">Lehrer → Lehrerin</span>, <span lang="de">Koch → Köchin</span>, <span lang="de">Hausmann → Hausfrau</span> · <span lang="de">Ich arbeite als … bei …</span> · <span lang="de">aber</span> · <span lang="de">nicht</span> fiilden sonra · <span lang="de">du arbeitest</span></Note>
   <ProgressMeter progress={progress} language={'tr'} label="Lektion 2A"/>
-  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil B – Wer ist das?</b> · yakında.</p>
+  <p className="l1a-tr">Sıradaki bölüm: <b lang="de">Teil B – Wer ist das?</b></p>
   <div className="l1a-actions">
+   <button type="button" className="btn small" onClick={()=>onPart('b',0)}>Teil B’ye geç<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
    <button type="button" className="btn secondary small" onClick={()=>onGo(berufeStepIndex('resim-sec'))}>Alıştırmaları tekrar yap</button>
    <button type="button" className="btn secondary small" onClick={()=>onGo(-1)}><BookOpen size={16} aria-hidden="true"/>Lektion 2 içindekiler</button>
   </div>

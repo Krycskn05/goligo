@@ -43,6 +43,8 @@ for(const text of load('willkommen-d-course').willkommenDSpeechTexts())add(text)
 for(const text of load('stadt-course').stadtSpeechTexts())add(text);
 // Lektion 2A „Ich bin Koch.“: the jobs (both forms), words, phrases, dialogues, the course chat, exercises, test and practice.
 for(const text of load('berufe-course').berufeSpeechTexts())add(text);
+// Lektion 2B „Wer ist das?“: who does what, er / sie / sie, the verbs, introducing someone, questions, Rami, exercises, test and practice.
+for(const text of load('berufe-b-course').berufeBSpeechTexts())add(text);
 // "Konuş" (the AI role plays): the partners' opening lines and the phrases to try.
 for(const text of load('talk-scenarios').talkSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

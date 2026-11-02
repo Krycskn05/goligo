@@ -1,7 +1,7 @@
 /**
  * Lesson progress on every device (the learner asked, 30 October 2026: "my progress on the tablet does not show on
- * the computer"). Lektion 1, 12 and 15 keep their scores, the last step and half-done exercises in the browser
- * (localStorage keys `lernkoko-l1…`, `lernkoko-l12…`, `lernkoko-l15…`). For a member these keys also live in the
+ * the computer"). Lektion 1, 2, 12 and 15 keep their scores, the last step and half-done exercises in the browser
+ * (localStorage keys `lernkoko-l1…`, `lernkoko-l2…`, `lernkoko-l12…`, `lernkoko-l15…`). For a member these keys also live in the
  * account: app/lesson-sync.tsx sends this browser's keys to app/api/ilerleme, the server merges them with what other
  * devices sent (`mergeItems`) and answers with the merged keys, which the browser writes back. Pure functions, checked
  * by tests/lesson-sync.test.cjs.
@@ -11,7 +11,7 @@
  * beats a known change, and two score lists of unknown age are joined (exercises done on one device and others done on
  * the other device both stay).
  */
-export const SYNC_LESSONS=['l1','l12','l15'] as const;
+export const SYNC_LESSONS=['l1','l2','l12','l15'] as const;
 export type SyncLesson=typeof SYNC_LESSONS[number];
 export type SyncItem={v:string|null;t:number};
 export type SyncItems=Record<string,SyncItem>;
@@ -30,9 +30,9 @@ const DEVICE_ONLY=new Set(['lernkoko-l12-speed']);
 /** The lesson a browser key belongs to, or null for keys that are not synced. */
 export function syncLessonOf(key:string):SyncLesson|null{
  if(DEVICE_ONLY.has(key))return null;
- const match=/^lernkoko-l(1[a-d]?|12|15[a-d]?)[-:]/.exec(key);
+ const match=/^lernkoko-l(1[a-d]?|12|15[a-d]?|2[a-d]?)[-:]/.exec(key);
  if(!match)return null;
- return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':'l1';
+ return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':match[1].startsWith('2')?'l2':'l1';
 }
 /** A short fingerprint of a value (FNV-1a and the length); '-' for a missing key. */
 export function fingerprint(value:string|null){

@@ -141,15 +141,17 @@ function distractors(w:ObjectWord){
  const at=objectVocabulary.indexOf(w)%Math.max(1,all.length-3);return all.slice(at,at+3);
 }
 const objectBank:Question[]=[];
+/** Questions only for a word with an article (a Lektion 1 phrase has none); typed so the literals stay Question's. */
+const notPhrase=(w:{phrase?:boolean},items:Question[]):Question[]=>w.phrase?[]:items;
 for(const w of objectVocabulary){
  const other=distractors(w);const options=[w.de,...other.map(x=>x.de)];const explanation=w.de+' = '+w.tr+'.'+(w.note?' '+w.note:'');
  const base={topic:w.topic,objectId:w.id,explanation};
  // Lektion 1 phrases (w.phrase) have no article: no article choice and no article gap (the learner asked, 2 November 2026).
  objectBank.push(
   {...base,id:'obj-picture-'+w.id,kind:'choice',prompt:w.phrase?'Resme uyan Almanca kelimeyi veya ifadeyi seç.':'Resimdeki nesnenin Almanca adını artikeliyle seç.',answer:w.de,options,image:imageOf(w),practice:'visual'},
-  ...(w.phrase?[]:[{...base,id:'obj-article-'+w.id,kind:'choice',prompt:'Nesnenin sözlük biçiminde doğru belirli artikelini seç.',answer:w.de,options:[w.de,...['der','die','das','den'].filter(a=>a!==w.de.split(' ')[0]).map(a=>a+' '+w.de.slice(w.de.indexOf(' ')+1)).slice(0,3)],image:imageOf(w),practice:'visual'}]),
+  ...notPhrase(w,[{...base,id:'obj-article-'+w.id,kind:'choice',prompt:'Nesnenin sözlük biçiminde doğru belirli artikelini seç.',answer:w.de,options:[w.de,...['der','die','das','den'].filter(a=>a!==w.de.split(' ')[0]).map(a=>a+' '+w.de.slice(w.de.indexOf(' ')+1)).slice(0,3)],image:imageOf(w),practice:'visual'}]),
   {...base,id:'obj-write-'+w.id,kind:'write',prompt:w.phrase?'Resme uyan Almanca kelimeyi veya ifadeyi yaz.':'Bu nesnenin Almanca adını artikeliyle yaz.',answer:w.de,image:imageOf(w),practice:'visual',writingTask:'word'},
-  ...(w.phrase?[]:[{...base,id:'obj-gap-'+w.id,kind:'write',prompt:'Boşluğu doğru artikel ile tamamla.',gap:'___ '+w.de.slice(w.de.indexOf(' ')+1),writingTask:'gap',answer:w.de.split(' ')[0],image:imageOf(w)}]),
+  ...notPhrase(w,[{...base,id:'obj-gap-'+w.id,kind:'write',prompt:'Boşluğu doğru artikel ile tamamla.',gap:'___ '+w.de.slice(w.de.indexOf(' ')+1),writingTask:'gap',answer:w.de.split(' ')[0],image:imageOf(w)}]),
   {...base,id:'obj-hear-picture-'+w.id,kind:'listen',prompt:'Dinlediğin nesnenin resmini seç.',answer:w.de,options,audio:w.de,audioTr:w.tr,pictureOptions:[w.id,...other.map(x=>x.id)]},
   {...base,id:'obj-read-'+w.id,kind:'read',prompt:'Bu kısa açıklama hangi nesneyi anlatıyor?',answer:w.de,options,passage:w.description,passageTr:w.descriptionTr},
   {...base,id:'obj-hear-description-'+w.id,kind:'listen',prompt:'Dinlediğin açıklama hangi nesneyi anlatıyor?',answer:w.de,options,audio:w.description,audioTr:w.descriptionTr},

@@ -3,7 +3,7 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
-const l1=load('willkommen-course'),l1b=load('willkommen-b-course'),l1c=load('willkommen-c-course'),l1d=load('willkommen-d-course'),stadt=load('stadt-course');
+const l1=load('willkommen-course'),l1b=load('willkommen-b-course'),l1c=load('willkommen-c-course'),l1d=load('willkommen-d-course'),stadt=load('stadt-course'),berufe=load('berufe-course');
 const hoeren=load('ausbildung-hoeren'),{siteVoices}=load('site-voices');
 const read=file=>fs.readFileSync(file,'utf8');
 const styleOf=key=>l1.speakers.find(s=>s.key===key)?.style;
@@ -31,7 +31,7 @@ test('the voice of a text: the person it names wins over the given speaker; othe
 });
 
 test('the lessons read every self-introduction with the person\'s own voice, and nobody borrows a voice next to its owner',()=>{
- const texts=[...l1.willkommenSpeechTexts(),...l1b.willkommenBSpeechTexts(),...l1c.willkommenCSpeechTexts(),...l1d.willkommenDSpeechTexts(),...stadt.stadtSpeechTexts()];
+ const texts=[...l1.willkommenSpeechTexts(),...l1b.willkommenBSpeechTexts(),...l1c.willkommenCSpeechTexts(),...l1d.willkommenDSpeechTexts(),...stadt.stadtSpeechTexts(),...berufe.berufeSpeechTexts()];
  let named=0;
  for(const text of texts){const key=l1.speakerOf(text);if(!key)continue;named++;
   const speaker=l1.speakers.find(s=>s.key===key);assert(text.toLowerCase().includes(speaker.name.split(' ')[0].toLowerCase()),text);}
@@ -48,6 +48,7 @@ test('the lessons read every self-introduction with the person\'s own voice, and
   'B kutu':l1.withSpeakers(l1b.boxSayB,{a:'aisha',b:'tomasz'}),'C kutu':l1.withSpeakers(l1c.boxSayC,{a:'nikos',b:'nora'}),
   'D comic':l1.withSpeakers(l1d.comicGapSay,{a:'nora',b:'yasemin'}),'D vocab':l1.withSpeakers(l1d.vocabSay,{a:'tomasz',b:'sabine'}),
   'D talk':l1.withSpeakers(l1d.talkSay,{a:'nora',b:'rami'}),'15 Amt':stadt.officeDialogue.map(asSay),'15 Schule':stadt.schoolDialogue.map(asSay),
+  '2A sohbet':berufe.chatLines.map(asSay),'2A dört kişi':berufe.fourPeople.map(asSay),'2A diyalog':berufe.dialogueSay,'2A pratik':berufe.practiceItems.map(item=>({text:item.question,who:item.who})),
  };
  for(const [id,items] of Object.entries(steps)){const keys=owners(items);assert(keys.length,id);
   assert.equal(new Set(keys.map(styleOf)).size,keys.length,id+': '+keys.join(','));}
@@ -71,7 +72,7 @@ test('the speech of every lesson uses the name rule, and Teil B reads the whole 
  const ui=read('app/willkommen-ui.tsx');
  assert(ui.includes('const say=useCallback((item:SayItem)=>{const who=voiceOwner(item);'),'reading');
  assert(ui.includes('const who=voiceOwner(item);const url=siteClipUrls('),'loading the clips early');
- for(const page of ['app/willkommen-study.tsx','app/stadt-study.tsx'])assert(read(page).includes('useLessonSpeech()'),page);
+ for(const page of ['app/willkommen-study.tsx','app/stadt-study.tsx','app/berufe-study.tsx'])assert(read(page).includes('useLessonSpeech()'),page);
  assert(l1b.endingSay.includes('Ich bin neu hier.')&&l1b.endingSay.includes('Welche Sprachen sprichst du?')&&l1b.endingSay.includes('Sie heißen Frau Krüger.'));
  assert(l1b.endingSay.every(text=>!text.includes('___')));
 });

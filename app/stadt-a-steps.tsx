@@ -251,9 +251,9 @@ function DialogueStep({speech,kicker,title,picture,alt,lead,board,lines}:{speech
  * site's sound); a finished line is read by its person (`say`). The score is the gaps right at the first choice, saved
  * once every gap is right. `dialogue` shows the lines as a conversation with portraits. The choices are always mixed (the
  * learner asked, 30 October 2026: in the written order they gave the answers away); a word box shared by every gap is mixed
- * once, the same in every gap and in the list above (`bankLead`).
+ * once, the same in every gap and in the list above (`bankLead`). Lektion 2A uses it too (app/berufe-a-steps.tsx).
  */
-function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactNode;bankLead?:string;before?:ReactNode;lines:readonly ChoiceLine[];dialogue?:boolean;after?:(done:boolean)=>ReactNode}){
+export function ChoiceExercise(props:StepProps&{kicker:string;title:string;lead?:ReactNode;bankLead?:string;before?:ReactNode;lines:readonly ChoiceLine[];dialogue?:boolean;after?:(done:boolean)=>ReactNode}){
  const {kicker,title,bankLead,before,lines,dialogue=false,after,speech,sound,onScore,step}=props;
  const gaps=useMemo(()=>lines.flatMap((line,l)=>lineGaps(line).map((gap,g)=>({line:l,gap:g,options:gap.options,answer:gap.answer}))),[lines]);
  const mix=()=>{const shared=gaps.length>1&&gaps.every(gap=>gap.options===gaps[0].options);const bank=shared?mixedOrder(gaps[0].options,gaps.map(gap=>gap.answer)):null;return gaps.map(gap=>bank??shuffle(gap.options));};

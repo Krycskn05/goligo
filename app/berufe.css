@@ -1,0 +1,33 @@
+/* Lektion 2 „Berufe“ (app/berufe-study.tsx, app/berufe-a-steps.tsx): the lesson uses the look of Lektion 1 and 15
+   (the l1a-* styles of app/willkommen.css, the l15-* pieces of app/stadt.css); these are only its own pieces — the job
+   cards with their pictures, the quick checks, the picture quiz and the form rows. Phone first. */
+/* the jobs: picture (a tap reads both forms), der / die rows that read themselves, the meaning */
+.l2-jobs { list-style:none; margin:8px 0; padding:0; display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+.l2-job { display:flex; align-items:center; gap:12px; padding:8px 10px; border:2px solid var(--toy-line,#dce5da); border-radius:16px; background:#fff; }
+.l2-job-pic { flex:none; width:112px; padding:0; border:0; border-radius:12px; background:#f4f8fc; cursor:pointer; overflow:hidden; line-height:0; }
+.l2-job-pic img { display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit:contain; }
+.l2-job-pic:focus-visible { outline:3px solid var(--blue-2,#2f7fd6); outline-offset:2px; }
+.l2-job-text { flex:1; min-width:0; display:grid; gap:2px; }
+.l2-forms { margin:0; gap:2px; }
+.l2-forms li { font-size:16px; line-height:1.3; overflow-wrap:break-word; hyphens:auto; -webkit-hyphens:auto; }
+.l2-job-tr { font-size:14px; line-height:1.35; color:var(--ink-2,#3d5a7a); }
+@media (min-width:641px) { .l2-jobs { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:380px) { .l2-job-pic { width:92px; } .l2-forms li { font-size:15px; } }
+/* quick checks inside a teaching step (not scored) */
+.l2-checks { margin:14px 0 6px; }
+.l2-check-q { margin:0; font-weight:800; color:var(--ink,#1f3b5c); }
+.l2-checks .l1a-arow { padding:10px 0; }
+.l2-checks .l1a-feedback { margin:0; min-height:0; }
+/* the picture quiz: one picture at a time */
+.l2-quiz-pic { max-height:300px; object-fit:contain; background:transparent; box-shadow:none; }
+/* Mann oder Frau?: the given form, then the box */
+.l2-form-row { justify-content:space-between; }
+.l2-form-given { font-size:17px; }
+.l2-form-row .l1a-gap { width:11em; max-width:100%; }
+/* Und du?: the sentences hidden to say them by heart; the speaking practice */
+.l2-hidden-note { margin:10px 0; padding:12px 14px; border-radius:14px; background:#eef6fc; color:var(--ink,#1f3b5c); font-weight:700; }
+.l2-practice { padding:4px 0 8px; border-bottom:1px dashed var(--toy-line,#dce5da); }
+.l2-practice:last-child { border-bottom:0; }
+/* the verbs: ich, du, Sie with the ending in bold */
+.l2-verbs td:not(:first-child):not(:last-child) { white-space:nowrap; }
+@media (max-width:400px) { .l2-verbs { font-size:14px; } .l2-verbs td,.l2-verbs th { padding-inline:4px; } }

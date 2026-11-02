@@ -10,6 +10,7 @@ import "./members.css";
 import "./ausbildung.css";
 import "./willkommen.css";
 import "./stadt.css";
+import "./berufe.css";
 import "./notebook.css";
 import "./lesson-book.css";
 import "./home-tour.css";

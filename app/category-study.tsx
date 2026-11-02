@@ -60,8 +60,11 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const [willkommen,setWillkommen]=useState<TopicProgress|null>(null);
  // Lektion 15 (Teil A since 30 October 2026) keeps its scores in the browser, too (lib/stadt-progress.ts).
  const [stadt,setStadt]=useState<TopicProgress|null>(null);
+ // Lektion 2 (Teil A since 2 November 2026) keeps its scores in the browser, too (lib/berufe-progress.ts).
+ const [berufe,setBerufe]=useState<TopicProgress|null>(null);
  const synced=useSyncVersion(); // lesson progress from another device (app/lesson-sync.tsx)
  useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
+ useEffect(()=>{if(course!=='de'||home){setBerufe(null);return;}let alive=true;import('@/lib/berufe-progress').then(({readLessonTwoProgress})=>{if(alive)setBerufe(readLessonTwoProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
  useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
  useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home,synced]);
  const allUnits=course==='en'?englishCourseUnits:courseUnits;
@@ -84,14 +87,14 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
       <div className="nb-spiral" aria-hidden="true">{Array.from({length:30},(_,i)=><span key={i}/>)}</div>
       <div className="nb-page">
        <h2 id="curriculum-heading" className="nb-title">{level} · {c(language,'categories')}</h2>
-       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-01'?'/a1-1/willkommen':unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':unit.id==='book-15'?'/a1-2/wege-in-der-stadt':null:null;const progress=course!=='de'?null:unit.id==='book-01'?willkommen:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:unit.id==='book-15'?stadt:null;
+       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-01'?'/a1-1/willkommen':unit.id==='book-02'?'/a1-1/berufe':unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':unit.id==='book-15'?'/a1-2/wege-in-der-stadt':null:null;const progress=course!=='de'?null:unit.id==='book-01'?willkommen:unit.id==='book-02'?berufe:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:unit.id==='book-15'?stadt:null;
         return <li className={'nb-card tape-'+(i%4)+(lesson?' has-lesson':'')} key={unit.id} data-unit={unit.id}>
          <span className="nb-tape" aria-hidden="true"/>
          <div className="nb-photo"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/></div>
          <span className="nb-num" lang={course} dir="ltr">{course==='de'?'Lektion':'Unit'} {unit.number}</span>
          <h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}
          {progress&&<ProgressMeter progress={progress} language={language} label={title} compact/>}
-         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
+         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'||unit.id==='book-02'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
         </li>;})}</ul>
       </div>
      </div>

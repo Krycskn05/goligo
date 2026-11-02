@@ -8,8 +8,8 @@ function json(data:unknown,status=200){return Response.json(data,{status,headers
 
 /**
  * Lesson progress on every device (lib/lesson-sync.ts, app/lesson-sync.tsx; the learner asked, 30 October 2026).
- * POST {lessons:{l1:{key:{v,t}},l12:…,l15:…}} merges this browser's keys into the member's (study_notes rows
- * `sync:l1`, `sync:l12`, `sync:l15`) and answers {lessons:{…}} with the merged keys. An empty list only reads.
+ * POST {lessons:{l1:{key:{v,t}},l2:…,l12:…,l15:…}} merges this browser's keys into the member's (study_notes rows
+ * `sync:l1`, `sync:l2`, `sync:l12`, `sync:l15`) and answers {lessons:{…}} with the merged keys. An empty list only reads.
  * Members only: the user comes from the server-checked session, never from the request.
  */
 export async function POST(request:Request){
@@ -23,7 +23,7 @@ export async function POST(request:Request){
   try{body=JSON.parse(text) as {lessons?:Record<string,unknown>};}catch{return json({error:'Geçersiz istek.'},400);}
   const lessons=body&&typeof body.lessons==='object'&&body.lessons?body.lessons:{};
   const db=getRawDb();const now=Date.now();
-  const rows=await db.prepare('SELECT key,value FROM study_notes WHERE user_id=? AND key IN (?,?,?)').bind(user,...SYNC_LESSONS.map(lesson=>'sync:'+lesson)).all<{key:string;value:string}>();
+  const rows=await db.prepare('SELECT key,value FROM study_notes WHERE user_id=? AND key IN ('+SYNC_LESSONS.map(()=>'?').join(',')+')').bind(user,...SYNC_LESSONS.map(lesson=>'sync:'+lesson)).all<{key:string;value:string}>();
   const stored=new Map(rows.results.map(row=>[row.key,row.value]));
   const out={} as Record<SyncLesson,SyncItems>;const writes:D1PreparedStatement[]=[];
   for(const lesson of SYNC_LESSONS){

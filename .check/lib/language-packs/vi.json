@@ -1781,5 +1781,11 @@
     "Body, health and clothes": "C\u01a1 th\u1ec3, s\u1ee9c kh\u1ecfe v\u00e0 qu\u1ea7n \u00e1o",
     "Work and jobs": "C\u00f4ng vi\u1ec7c v\u00e0 ngh\u1ec1 nghi\u1ec7p",
     "School, nature and town": "Tr\u01b0\u1eddng h\u1ecdc, thi\u00ean nhi\u00ean v\u00e0 th\u00e0nh ph\u1ed1",
-    "Words from the lessons": "T\u1eeb v\u1ef1ng trong c\u00e1c b\u00e0i h\u1ecdc"
+    "Words from the lessons": "T\u1eeb v\u1ef1ng trong c\u00e1c b\u00e0i h\u1ecdc",
+    "Reset progress": "\u0110\u1eb7t l\u1ea1i ti\u1ebfn \u0111\u1ed9",
+    "I want to start over": "T\u00f4i mu\u1ed1n b\u1eaft \u0111\u1ea7u l\u1ea1i t\u1eeb \u0111\u1ea7u",
+    "Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.": "\u0110i\u1ec3m c\u00e1c b\u00e0i h\u1ecdc, v\u1ecb tr\u00ed b\u1ea1n \u0111\u00e3 d\u1eebng, ph\u1ea7n luy\u1ec7n t\u1eeb v\u1ef1ng, l\u1ed7i sai, \u0111i\u1ec3m th\u01b0\u1edfng, chu\u1ed7i ng\u00e0y h\u1ecdc v\u00e0 k\u1ef7 l\u1ee5c tr\u00f2 ch\u01a1i c\u1ee7a b\u1ea1n s\u1ebd b\u1ecb x\u00f3a tr\u00ean m\u1ecdi thi\u1ebft b\u1ecb. T\u00e0i kho\u1ea3n, c\u00e1c t\u1eeb g\u1eafn sao v\u00e0 c\u00e0i \u0111\u1eb7t c\u1ee7a b\u1ea1n v\u1eabn gi\u1eef nguy\u00ean. Kh\u00f4ng th\u1ec3 ho\u00e0n t\u00e1c thao t\u00e1c n\u00e0y.",
+    "I understand that all my progress will be deleted.": "T\u00f4i hi\u1ec3u r\u1eb1ng to\u00e0n b\u1ed9 ti\u1ebfn \u0111\u1ed9 c\u1ee7a t\u00f4i s\u1ebd b\u1ecb x\u00f3a.",
+    "Reset my progress": "\u0110\u1eb7t l\u1ea1i ti\u1ebfn \u0111\u1ed9 c\u1ee7a t\u00f4i",
+    "Your progress has been reset. You can start again from the beginning.": "Ti\u1ebfn \u0111\u1ed9 c\u1ee7a b\u1ea1n \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u1eb7t l\u1ea1i. B\u1ea1n c\u00f3 th\u1ec3 b\u1eaft \u0111\u1ea7u l\u1ea1i t\u1eeb \u0111\u1ea7u."
 }

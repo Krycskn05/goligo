@@ -1,10 +1,10 @@
-// Üyelik API'si: üye ol, giriş yap, çıkış, şifremi unuttum (e-postayla yenileme), ad ve şifre değiştir, hesabı sil,
-// verilerimi indir.
+// Üyelik API'si: üye ol, giriş yap, çıkış, şifremi unuttum (e-postayla yenileme), ad ve şifre değiştir, ilerlemeyi
+// sıfırla, hesabı sil, verilerimi indir.
 // Kimlik yalnızca HttpOnly oturum çerezinden (lk_session) okunur; istemcinin gönderdiği
 // kimlik başlıklarına güvenilmez (lib/site-gate.ts onları zaten siler).
 import {getMailer,getRawDb} from '@/db';
 import {DUMMY_HASH,SESSION_COOKIE,cleanName,clearSessionCookie,hashPassword,newMemberId,normalizeEmail,passwordIssue,passwordProblem,readCookie,safeReturnTo,sessionCookie,validEmail,verifyPassword} from '@/lib/member-auth';
-import {clearAttempts,countAttempt,createMember,createPasswordReset,createSession,deleteMember,deleteMemberSessions,deleteSession,exportMember,finishPasswordReset,isLimited,memberByEmail,memberById,memberForReset,memberForToken,setMemberName,setPasswordHash,type Db} from '@/lib/member-store';
+import {clearAttempts,countAttempt,createMember,createPasswordReset,createSession,deleteMember,deleteMemberSessions,deleteSession,exportMember,finishPasswordReset,isLimited,memberByEmail,memberById,memberForReset,memberForToken,resetProgress,setMemberName,setPasswordHash,type Db} from '@/lib/member-store';
 import {resetLink,resetMail} from '@/lib/reset-mail';
 import {requestLanguage} from '@/lib/device-language';
 import {isSiteLanguage} from '@/lib/site-languages';
@@ -25,7 +25,7 @@ const FORGOT_WINDOW=60*MINUTE;
 const FORGOT_EMAIL_LIMIT=3;
 const FORGOT_IP_LIMIT=10;
 const RESET_IP_LIMIT=20;
-const ACTIONS=new Set(['register','login','logout','forgot','reset','profile','password','delete']);
+const ACTIONS=new Set(['register','login','logout','forgot','reset','profile','password','progress','delete']);
 
 function json(data:unknown,status=200,cookie?:string){
  const headers=new Headers({'Cache-Control':'no-store'});
@@ -150,6 +150,13 @@ export async function POST(request:Request){
    const name=cleanName(body.name);if(!name)return json({error:'Adını yaz.',code:'errName',field:'name'},400);
    await setMemberName(db,member.id,name);
    return json({ok:true,name});
+  }
+
+  // İlerlememi sıfırla (the learner asked, 3 November 2026): the account stays, the study progress goes.
+  if(body.action==='progress'){
+   if(body.confirm!==true)return json({error:'Silmeyi onaylamak için kutuyu işaretle.',code:'errConfirm',field:'confirm'},400);
+   await resetProgress(db,member.id,now);
+   return json({ok:true});
   }
 
   if(body.action==='password'||body.action==='delete'){

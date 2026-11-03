@@ -9,7 +9,7 @@ const copy_fill_1 = require("./copy-fill");
  * (app/api/auth) and the form shows them with these texts (authMessage in lib/copy-fill.ts).
  */
 exports.AUTH_FORM_KEYS = ['nameLabel', 'emailLabel', 'passwordLabel', 'hidePassword', 'showPassword', 'passwordHelp', 'acceptText', 'genericError', 'offline', 'register', 'signIn', ...copy_fill_1.AUTH_CODES];
-exports.ACCOUNT_KEYS = ['myAccount', 'memberSince', 'backToLessons', 'signOut', 'nameLabel', 'displayName', 'save', 'nameSaved', 'changePassword', 'currentPassword', 'newPassword', 'minChars', 'passwordChanged', 'tourCard', 'tourText', 'tourStart', 'dataCard', 'dataText', 'dataDownload', 'deleteCard', 'deleteSummary', 'deleteWarning', 'yourPassword', 'deleteConfirm', 'deleteButton', 'deleted', 'genericError', 'offline', ...copy_fill_1.AUTH_CODES];
+exports.ACCOUNT_KEYS = ['myAccount', 'memberSince', 'backToLessons', 'signOut', 'nameLabel', 'displayName', 'save', 'nameSaved', 'changePassword', 'currentPassword', 'newPassword', 'minChars', 'passwordChanged', 'tourCard', 'tourText', 'tourStart', 'dataCard', 'dataText', 'dataDownload', 'progressCard', 'progressSummary', 'progressWarning', 'progressConfirm', 'progressButton', 'progressDone', 'deleteCard', 'deleteSummary', 'deleteWarning', 'yourPassword', 'deleteConfirm', 'deleteButton', 'deleted', 'genericError', 'offline', ...copy_fill_1.AUTH_CODES];
 /** "Şifremi unuttum" on the sign in page and the page of the emailed link (app/sifre-yenile). */
 exports.FORGOT_FORM_KEYS = ['forgotLead', 'emailLabel', 'sendLink', 'forgotSent', 'genericError', 'offline', ...copy_fill_1.AUTH_CODES];
 exports.RESET_FORM_KEYS = ['newPassword', 'hidePassword', 'showPassword', 'passwordHelp', 'resetSave', 'backToSignIn', 'genericError', 'offline', ...copy_fill_1.AUTH_CODES];

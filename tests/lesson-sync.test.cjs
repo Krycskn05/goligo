@@ -60,6 +60,24 @@ test('what the server accepts and stores',()=>{
  assert(read('app/api/study/route.ts').includes("key NOT LIKE 'sync:%'"),'the study screens do not load the progress rows');
 });
 
+test('"İlerlememi sıfırla" (3 November 2026): removals newer than every change, so no device brings old progress back',()=>{
+ for(const key of ['lernkoko-l1a-scores','lernkoko-l12:a3','lernkoko-last-place','lernkoko-verb-game:artikel','lernkoko-l2a-own','lernkoko-l2d-form','lernkoko-puzzle:s1:q1','lernkoko-housing-puzzle:s1:q1','lernkoko-housing-free:s1:q1'])assert.ok(sync.isProgressKey(key),key);
+ for(const key of ['german-study-language','lernkoko-learning-language','lernkoko-l12-speed','lernkoko-effects-v1','lernkoko-tour-v1','lernkoko-sync-meta','lernkoko-paul-visit','lernkoko-speech:de'])assert.ok(!sync.isProgressKey(key),key);
+ const now=1000000;
+ const kept={'lernkoko-l1a-scores':{v:'{"a":{"right":3,"total":3}}',t:900000},'lernkoko-l1a-step':{v:'"b"',t:0},'lernkoko-l12-scores':{v:'{"x":{"right":1,"total":2}}',t:now+5000},'lernkoko-l1b-step':{v:null,t:500}};
+ const reset=sync.resetItems(kept,now);
+ assert.deepEqual(Object.keys(reset).sort(),Object.keys(kept).sort());
+ for(const [key,item] of Object.entries(reset)){assert.equal(item.v,null,key);assert.ok(item.t>kept[key].t&&item.t>=now,key);}
+ // Another device still has the old values (with their times or of unknown age): the removal wins, score lists are not joined back.
+ const tablet={'lernkoko-l1a-scores':{v:'{"a":{"right":3,"total":3},"b":{"right":1,"total":1}}',t:950000},'lernkoko-l1a-step':{v:'"c"',t:0},'lernkoko-l12-scores':{v:'{"x":{"right":2,"total":2}}',t:now+5000}};
+ const merged=sync.mergeItems(reset,tablet,now+10);
+ for(const key of Object.keys(tablet))assert.equal(merged[key].v,null,key);
+ assert.deepEqual(sync.toWrite(merged,{'lernkoko-l1a-scores':'x','lernkoko-l1a-step':'"c"'}),{'lernkoko-l1a-scores':null,'lernkoko-l1a-step':null});
+ // Progress made after the reset counts again.
+ const fresh=sync.mergeItems(merged,{'lernkoko-l1a-scores':{v:'{"a":{"right":1,"total":3}}',t:now+20000}},now+20001);
+ assert.equal(fresh['lernkoko-l1a-scores'].v,'{"a":{"right":1,"total":3}}');
+});
+
 test('every lesson page reads progress from another device again; the sync and the letter row run on every page',()=>{
  const layout=read('app/layout.tsx');assert(layout.includes('<LetterBar/><LessonSync/>'));
  for(const [file,lesson,component] of [['app/willkommen-study.tsx','l1','WillkommenLesson'],['app/stadt-study.tsx','l15','StadtLesson'],['app/berufe-study.tsx','l2','BerufeLesson'],['app/ausbildung-study.tsx','l12','AusbildungLesson'],['app/ausbildung-hoeren.tsx','l12','HoerenPage']]){

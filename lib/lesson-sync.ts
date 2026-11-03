@@ -42,6 +42,19 @@ export function syncLessonOf(key:string):SyncLesson|null{
  if(!match)return null;
  return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':match[1].startsWith('2')?'l2':'l1';
 }
+/** Half-done answers of word and verb rounds (`lernkoko-puzzle:<round>:<question>` …): they belong to a round of the account. */
+const ROUND_DRAFT=/^lernkoko-(puzzle|housing-puzzle|housing-free):/;
+/**
+ * The keys Hesabım → "İlerlememi sıfırla" removes from this browser (the learner asked, 3 November 2026): every synced
+ * key, the learner's own Lektion 2 entries and half-done round answers. Settings (language, voices, effects, the tour) stay.
+ */
+export function isProgressKey(key:string){return syncLessonOf(key)!==null||OWN_DATA.test(key)||ROUND_DRAFT.test(key);}
+/** The account's keys after a reset: each one removed, newer than its last change, so no device brings an old value back. */
+export function resetItems(items:SyncItems,now:number):SyncItems{
+ const out:SyncItems={};
+ for(const [key,item] of Object.entries(items))out[key]={v:null,t:Math.max(now,item.t+1)};
+ return out;
+}
 /** A short fingerprint of a value (FNV-1a and the length); '-' for a missing key. */
 export function fingerprint(value:string|null){
  if(value===null)return '-';

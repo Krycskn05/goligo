@@ -1072,5 +1072,11 @@
 "{n} unsolved questions left":"Zosta\u0142o nierozwi\u0105zanych pyta\u0144: {n}",
 "{site} is a free website for learning German and English. This text explains which of your details are kept when you sign up, why they are kept and what rights you have over them.":"{site} to bezp\u0142atna strona do nauki niemieckiego i angielskiego. Ten tekst wyja\u015bnia, jakie twoje dane s\u0105 przechowywane, gdy si\u0119 rejestrujesz, dlaczego s\u0105 przechowywane i jakie masz do nich prawa.",
 "{site} is free at the moment. The site is offered as it is; we cannot guarantee that it will always work without interruptions or errors. Lessons, exercises and features may change over time.":"Korzystanie z {site} jest obecnie bezp\u0142atne. Strona jest udost\u0119pniana w takiej postaci, w jakiej jest; nie mo\u017cemy zagwarantowa\u0107, \u017ce zawsze b\u0119dzie dzia\u0142a\u0107 bez przerw i b\u0142\u0119d\u00f3w. Lekcje, \u0107wiczenia i funkcje mog\u0105 si\u0119 z czasem zmienia\u0107.",
-"{site}: reset your password":"{site}: zresetuj has\u0142o"
+"{site}: reset your password":"{site}: zresetuj has\u0142o",
+"Reset progress":"Zresetuj post\u0119py",
+"I want to start over":"Chc\u0119 zacz\u0105\u0107 od nowa",
+"Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.":"Twoje wyniki z lekcji, ostatnie miejsca w lekcjach, \u0107wiczenia s\u0142\u00f3wek, b\u0142\u0119dy, punkty, seria dni i rekordy w grach zostan\u0105 usuni\u0119te na wszystkich twoich urz\u0105dzeniach. Twoje konto, s\u0142owa z gwiazdk\u0105 i ustawienia zostaj\u0105. Tego nie mo\u017cna cofn\u0105\u0107.",
+"I understand that all my progress will be deleted.":"Rozumiem, \u017ce wszystkie moje post\u0119py zostan\u0105 usuni\u0119te.",
+"Reset my progress":"Zresetuj moje post\u0119py",
+"Your progress has been reset. You can start again from the beginning.":"Twoje post\u0119py zosta\u0142y zresetowane. Mo\u017cesz zacz\u0105\u0107 od pocz\u0105tku."
 }

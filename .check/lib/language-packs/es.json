@@ -1073,5 +1073,11 @@
     "{n} unsolved questions left": "Quedan {n} preguntas sin resolver",
     "{site} is a free website for learning German and English. This text explains which of your details are kept when you sign up, why they are kept and what rights you have over them.": "{site} es un sitio web gratuito para aprender alem\u00e1n e ingl\u00e9s. Este texto explica qu\u00e9 datos tuyos se guardan cuando te registras, por qu\u00e9 se guardan y qu\u00e9 derechos tienes sobre ellos.",
     "{site} is free at the moment. The site is offered as it is; we cannot guarantee that it will always work without interruptions or errors. Lessons, exercises and features may change over time.": "{site} es gratuito por ahora. El sitio se ofrece tal cual; no podemos garantizar que funcione siempre sin interrupciones ni errores. Las lecciones, los ejercicios y las funciones pueden cambiar con el tiempo.",
-    "{site}: reset your password": "{site}: restablece tu contrase\u00f1a"
+    "{site}: reset your password": "{site}: restablece tu contrase\u00f1a",
+    "Reset progress": "Restablecer el progreso",
+    "I want to start over": "Quiero empezar de nuevo",
+    "Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.": "Tus resultados de las lecciones, los puntos donde lo dejaste, tus pr\u00e1cticas de vocabulario, tus errores, tus puntos, tu racha y tus r\u00e9cords en los juegos se borrar\u00e1n en todos tus dispositivos. Tu cuenta, tus palabras con estrella y tus ajustes se mantienen. Esto no se puede deshacer.",
+    "I understand that all my progress will be deleted.": "Entiendo que se borrar\u00e1 todo mi progreso.",
+    "Reset my progress": "Restablecer mi progreso",
+    "Your progress has been reset. You can start again from the beginning.": "Tu progreso se ha restablecido. Puedes empezar de nuevo desde el principio."
 }

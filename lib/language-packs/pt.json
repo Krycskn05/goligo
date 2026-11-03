@@ -1074,5 +1074,11 @@
 "{n} unsolved questions left":"Faltam {n} perguntas para resolver",
 "{site} is a free website for learning German and English. This text explains which of your details are kept when you sign up, why they are kept and what rights you have over them.":"O {site} \u00e9 um site gratuito para aprender alem\u00e3o e ingl\u00eas. Este texto explica quais dados seus s\u00e3o guardados quando voc\u00ea se cadastra, por que eles s\u00e3o guardados e quais direitos voc\u00ea tem sobre eles.",
 "{site} is free at the moment. The site is offered as it is; we cannot guarantee that it will always work without interruptions or errors. Lessons, exercises and features may change over time.":"No momento, o {site} \u00e9 gratuito. O site \u00e9 oferecido como est\u00e1; n\u00e3o podemos garantir que ele v\u00e1 funcionar sempre sem interrup\u00e7\u00f5es nem erros. As li\u00e7\u00f5es, os exerc\u00edcios e os recursos podem mudar com o tempo.",
-"{site}: reset your password":"{site}: redefina sua senha"
+"{site}: reset your password":"{site}: redefina sua senha",
+"Reset progress":"Redefinir progresso",
+"I want to start over":"Quero come\u00e7ar de novo",
+"Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.":"Seus resultados nas li\u00e7\u00f5es, os pontos onde voc\u00ea parou, seus exerc\u00edcios de vocabul\u00e1rio, seus erros, seus pontos, sua sequ\u00eancia e seus recordes nos jogos ser\u00e3o apagados em todos os seus dispositivos. Sua conta, suas palavras com estrela e suas configura\u00e7\u00f5es continuam. Isso n\u00e3o pode ser desfeito.",
+"I understand that all my progress will be deleted.":"Entendo que todo o meu progresso ser\u00e1 apagado.",
+"Reset my progress":"Redefinir meu progresso",
+"Your progress has been reset. You can start again from the beginning.":"Seu progresso foi redefinido. Voc\u00ea pode come\u00e7ar de novo desde o in\u00edcio."
 }

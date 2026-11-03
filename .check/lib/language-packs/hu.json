@@ -1779,5 +1779,11 @@
     "Body, health and clothes": "Test, eg\u00e9szs\u00e9g \u00e9s ruha",
     "Work and jobs": "Munka \u00e9s foglalkoz\u00e1sok",
     "School, nature and town": "Iskola, term\u00e9szet \u00e9s v\u00e1ros",
-    "Words from the lessons": "Szavak a leck\u00e9kb\u0151l"
+    "Words from the lessons": "Szavak a leck\u00e9kb\u0151l",
+    "Reset progress": "Halad\u00e1s null\u00e1z\u00e1sa",
+    "I want to start over": "El\u00f6lr\u0151l szeretn\u00e9m kezdeni",
+    "Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.": "A leck\u00e9kben el\u00e9rt eredm\u00e9nyeid, a helyek, ahol abbahagytad, a sz\u00f3gyakorl\u00e1said, a hib\u00e1id, a pontjaid, a napi sorozatod \u00e9s a j\u00e1t\u00e9krekordjaid minden eszk\u00f6z\u00f6d\u00f6n t\u00f6rl\u0151dnek. A fi\u00f3kod, a csillagozott szavaid \u00e9s a be\u00e1ll\u00edt\u00e1said megmaradnak. Ez nem vonhat\u00f3 vissza.",
+    "I understand that all my progress will be deleted.": "\u00c9rtem, hogy a teljes halad\u00e1som t\u00f6rl\u0151dik.",
+    "Reset my progress": "Halad\u00e1som null\u00e1z\u00e1sa",
+    "Your progress has been reset. You can start again from the beginning.": "A halad\u00e1sod null\u00e1zva. El\u00f6lr\u0151l kezdheted."
 }

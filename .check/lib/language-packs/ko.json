@@ -1781,5 +1781,11 @@
     "Body, health and clothes": "\ubab8, \uac74\uac15\uacfc \uc637",
     "Work and jobs": "\uc77c\uacfc \uc9c1\uc5c5",
     "School, nature and town": "\ud559\uad50, \uc790\uc5f0\uacfc \ub3c4\uc2dc",
-    "Words from the lessons": "\uc218\uc5c5 \ub2e8\uc5b4"
+    "Words from the lessons": "\uc218\uc5c5 \ub2e8\uc5b4",
+    "Reset progress": "\uc9c4\ud589 \uc0c1\ud669 \ucd08\uae30\ud654",
+    "I want to start over": "\ucc98\uc74c\ubd80\ud130 \ub2e4\uc2dc \uc2dc\uc791\ud558\uace0 \uc2f6\uc5b4\uc694",
+    "Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.": "\ub808\uc2a8 \uc810\uc218, \uba48\ucd98 \uc704\uce58, \ub2e8\uc5b4 \uc5f0\uc2b5, \ud2c0\ub9b0 \ubb38\uc81c, \ud3ec\uc778\ud2b8, \uc5f0\uc18d \ud559\uc2b5\uc77c, \uac8c\uc784 \uae30\ub85d\uc774 \ubaa8\ub4e0 \uae30\uae30\uc5d0\uc11c \uc0ad\uc81c\ub3fc\uc694. \uacc4\uc815, \ubcc4\ud45c\ud55c \ub2e8\uc5b4, \uc124\uc815\uc740 \uadf8\ub300\ub85c \ub0a8\uc544\uc694. \uc774 \uc791\uc5c5\uc740 \ub418\ub3cc\ub9b4 \uc218 \uc5c6\uc5b4\uc694.",
+    "I understand that all my progress will be deleted.": "\ubaa8\ub4e0 \uc9c4\ud589 \uc0c1\ud669\uc774 \uc0ad\uc81c\ub41c\ub2e4\ub294 \uac83\uc744 \uc774\ud574\ud574\uc694.",
+    "Reset my progress": "\ub0b4 \uc9c4\ud589 \uc0c1\ud669 \ucd08\uae30\ud654",
+    "Your progress has been reset. You can start again from the beginning.": "\uc9c4\ud589 \uc0c1\ud669\uc774 \ucd08\uae30\ud654\ub418\uc5c8\uc5b4\uc694. \ucc98\uc74c\ubd80\ud130 \ub2e4\uc2dc \uc2dc\uc791\ud560 \uc218 \uc788\uc5b4\uc694."
 }

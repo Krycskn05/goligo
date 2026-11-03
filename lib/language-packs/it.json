@@ -1073,5 +1073,11 @@
 "{n} unsolved questions left":"Restano {n} domande non risolte",
 "{site} is a free website for learning German and English. This text explains which of your details are kept when you sign up, why they are kept and what rights you have over them.":"{site} \u00e8 un sito gratuito per imparare il tedesco e l\u2019inglese. Questo testo spiega quali tuoi dati vengono conservati quando ti registri, perch\u00e9 vengono conservati e quali diritti hai su di essi.",
 "{site} is free at the moment. The site is offered as it is; we cannot guarantee that it will always work without interruptions or errors. Lessons, exercises and features may change over time.":"Al momento {site} \u00e8 gratuito. Il sito viene offerto cos\u00ec com\u2019\u00e8; non possiamo garantire che funzioni sempre senza interruzioni n\u00e9 errori. Lezioni, esercizi e funzioni possono cambiare nel tempo.",
-"{site}: reset your password":"{site}: reimposta la password"
+"{site}: reset your password":"{site}: reimposta la password",
+"Reset progress":"Azzera i progressi",
+"I want to start over":"Voglio ricominciare da capo",
+"Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.":"I tuoi risultati delle lezioni, i punti di ripresa, gli esercizi di vocaboli, i tuoi errori, i tuoi punti, la tua serie e i tuoi record nei giochi saranno cancellati su tutti i tuoi dispositivi. Il tuo account, le parole con la stella e le tue impostazioni restano. Non si pu\u00f2 annullare.",
+"I understand that all my progress will be deleted.":"Capisco che tutti i miei progressi saranno cancellati.",
+"Reset my progress":"Azzera i miei progressi",
+"Your progress has been reset. You can start again from the beginning.":"I tuoi progressi sono stati azzerati. Puoi ricominciare dall\u2019inizio."
 }

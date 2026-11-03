@@ -243,6 +243,33 @@ test('API: ad ve şifre değiştirme, verilerimi indir, hesabı silme',async()=>
  assert.equal((await call({action:'login',email:'ada@example.com',password:'Yeni-Sifre 2026'})).status,401);
 });
 
+test('API: ilerlemeyi sıfırla — hesap, ad, yıldızlar ve tanışma metni kalır; diğer cihazlar eski ilerlemeyi geri getiremez',async()=>{
+ const db=fakeDb();const {call}=api(db);const reg=await call(newUser);const id=(await store.memberForToken(db,reg.cookie)).id;addStudy(db,id);addStudy(db,'someone-else');
+ const note=(user,key,value)=>db.sql.prepare('INSERT INTO study_notes (user_id,key,value,updated_at) VALUES (?,?,?,?)').run(user,key,value,1);
+ const old=Date.now()-60000;
+ note(id,'star:q1','1');note(id,'tour','done');note(id,'lesson:t1','done');note('someone-else','lesson:t1','done');
+ note(id,'sync:l1',JSON.stringify({items:{'lernkoko-l1a-scores':{v:'{"a":{"right":3,"total":3}}',t:old},'lernkoko-l1a-step':{v:'"b"',t:0}}}));
+ note(id,'sync:site',JSON.stringify({items:{'lernkoko-last-place':{v:'"/a1-1/willkommen"',t:old}}}));
+ note('someone-else','sync:l1',JSON.stringify({items:{'lernkoko-l1a-scores':{v:'{}',t:old}}}));
+ assert.equal((await call({action:'progress'},{cookie:reg.cookie})).body.field,'confirm');
+ assert.equal((await call({action:'progress',confirm:true})).status,401,'girişsiz sıfırlanamaz');
+ assert.equal((await call({action:'progress',confirm:true},{cookie:reg.cookie,origin:'https://evil.example'})).status,403);
+ assert.equal(count(db,'study_answers','user_id=?',id),1,'onaysız hiçbir şey silinmez');
+ const done=await call({action:'progress',confirm:true},{cookie:reg.cookie});assert.equal(done.status,200);assert.equal(done.body.ok,true);
+ for(const table of ['study_sessions','study_answers','study_review'])assert.equal(count(db,table,'user_id=?',id),0,table);
+ const notes=Object.fromEntries(db.sql.prepare('SELECT key,value FROM study_notes WHERE user_id=?').all(id).map(row=>[row.key,row.value]));
+ assert.deepEqual(Object.keys(notes).sort(),['profile','star:q1','sync:l1','sync:site','tour']);
+ for(const key of ['sync:l1','sync:site'])for(const [name,item] of Object.entries(JSON.parse(notes[key]).items)){assert.equal(item.v,null,name);assert.ok(item.t>old,name);}
+ assert.equal(count(db,'members'),1);assert.ok(await store.memberForToken(db,reg.cookie),'oturum açık kalır');
+ for(const table of ['study_sessions','study_answers','study_review'])assert.equal(count(db,table,'user_id=?','someone-else'),1,'başkasının kayıtlarına dokunulmaz: '+table);
+ assert.equal(count(db,'study_notes','user_id=?','someone-else'),3);
+ assert.equal(JSON.parse(db.sql.prepare("SELECT value FROM study_notes WHERE user_id='someone-else' AND key='sync:l1'").get().value).items['lernkoko-l1a-scores'].v,'{}');
+ // The page: a confirmed form, this browser forgets its progress too, the texts come in the page's language.
+ const panel=fs.readFileSync('app/account-panel.tsx','utf8');
+ for(const piece of ["action:'progress'",'forgetProgress','isProgressKey(key)','localStorage.removeItem(key)','data-account-progress','texts.progressWarning','type="checkbox" required'])assert.ok(panel.includes(piece),piece);
+ for(const key of ['progressCard','progressSummary','progressWarning','progressConfirm','progressButton','progressDone'])assert.ok(fs.readFileSync('lib/auth-texts.ts','utf8').includes("'"+key+"'"),key);
+});
+
 test('API: veritabanı yoksa açık bir hata verir',async()=>{
  const db=fakeDb();db.broken=true;const {call,get}=api(db);const error=console.error;console.error=()=>{};
  try{assert.equal((await call(newUser)).status,503);assert.equal((await get('',auth.newToken())).status,503);assert.equal((await get('')).status,200,'çerez yoksa veritabanına gerek yok');}finally{console.error=error;}

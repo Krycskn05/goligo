@@ -10,6 +10,7 @@ exports.memberForToken = memberForToken;
 exports.deleteSession = deleteSession;
 exports.deleteMemberSessions = deleteMemberSessions;
 exports.deleteMember = deleteMember;
+exports.resetProgress = resetProgress;
 exports.exportMember = exportMember;
 exports.isLimited = isLimited;
 exports.countAttempt = countAttempt;
@@ -20,6 +21,7 @@ exports.memberForReset = memberForReset;
 exports.finishPasswordReset = finishPasswordReset;
 // Goliqo üyelik kayıtları (Cloudflare D1). Tablolar: migration/database/members.sql.
 const member_auth_1 = require("./member-auth");
+const lesson_sync_1 = require("./lesson-sync");
 const MEMBER_COLUMNS = 'id,email,name,created_at,last_login_at';
 async function memberByEmail(db, email) {
     return db.prepare(`SELECT ${MEMBER_COLUMNS},password_hash FROM members WHERE email=?`).bind(email).first();
@@ -80,6 +82,28 @@ async function deleteMember(db, memberId, email) {
         db.prepare('DELETE FROM member_logins WHERE member_id=?').bind(memberId),
         db.prepare('DELETE FROM auth_attempts WHERE key=?').bind('login:' + email),
         db.prepare('DELETE FROM members WHERE id=?').bind(memberId),
+    ]);
+}
+/**
+ * Hesabım → İlerlememi sıfırla: cevaplar, tekrar listesi (yanlışlar), testler ve "çalıştım" işaretleri silinir. Ders
+ * ilerlemesi (`sync:…` satırları, lib/lesson-sync.ts) silinmez, her anahtarı "kaldırıldı" diye yazılır; diğer cihazlar
+ * bir sonraki eşitlemede kendi kopyalarını da siler. Hesap, ad, yıldızlar, tanışma metni ve tur kaydı kalır.
+ */
+async function resetProgress(db, memberId, now = Date.now()) {
+    const keys = lesson_sync_1.SYNC_LESSONS.map((lesson) => 'sync:' + lesson);
+    const rows = await db
+        .prepare(`SELECT key,value FROM study_notes WHERE user_id=? AND key IN (${keys.map(() => '?').join(',')})`)
+        .bind(memberId, ...keys)
+        .all();
+    await db.batch([
+        db.prepare('DELETE FROM study_answers WHERE user_id=?').bind(memberId),
+        db.prepare('DELETE FROM study_review WHERE user_id=?').bind(memberId),
+        db.prepare('DELETE FROM study_sessions WHERE user_id=?').bind(memberId),
+        db.prepare("DELETE FROM study_notes WHERE user_id=? AND key LIKE 'lesson:%'").bind(memberId),
+        ...rows.results.map((row) => {
+            const items = (0, lesson_sync_1.resetItems)((0, lesson_sync_1.parseStored)(row.key.slice(5), row.value), now);
+            return db.prepare('UPDATE study_notes SET value=?,updated_at=? WHERE user_id=? AND key=?').bind(JSON.stringify({ items }), now, memberId, row.key);
+        }),
     ]);
 }
 /** Üyenin kendi kayıtlarının dökümü (Hesabım → Verilerimi indir). */

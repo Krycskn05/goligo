@@ -1,5 +1,6 @@
 // Goliqo üyelik kayıtları (Cloudflare D1). Tablolar: migration/database/members.sql.
 import { RESET_MS, SESSION_MS, newToken, tokenHash, validToken } from './member-auth';
+import { SYNC_LESSONS, parseStored, resetItems, type SyncLesson } from './lesson-sync';
 
 /** D1'in burada kullanılan kısmı (testlerde node:sqlite ile taklit edilir). */
 export type Statement = {
@@ -85,6 +86,29 @@ export async function deleteMember(db: Db, memberId: string, email: string): Pro
     db.prepare('DELETE FROM member_logins WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM auth_attempts WHERE key=?').bind('login:' + email),
     db.prepare('DELETE FROM members WHERE id=?').bind(memberId),
+  ]);
+}
+
+/**
+ * Hesabım → İlerlememi sıfırla: cevaplar, tekrar listesi (yanlışlar), testler ve "çalıştım" işaretleri silinir. Ders
+ * ilerlemesi (`sync:…` satırları, lib/lesson-sync.ts) silinmez, her anahtarı "kaldırıldı" diye yazılır; diğer cihazlar
+ * bir sonraki eşitlemede kendi kopyalarını da siler. Hesap, ad, yıldızlar, tanışma metni ve tur kaydı kalır.
+ */
+export async function resetProgress(db: Db, memberId: string, now = Date.now()): Promise<void> {
+  const keys = SYNC_LESSONS.map((lesson) => 'sync:' + lesson);
+  const rows = await db
+    .prepare(`SELECT key,value FROM study_notes WHERE user_id=? AND key IN (${keys.map(() => '?').join(',')})`)
+    .bind(memberId, ...keys)
+    .all<{ key: string; value: string }>();
+  await db.batch([
+    db.prepare('DELETE FROM study_answers WHERE user_id=?').bind(memberId),
+    db.prepare('DELETE FROM study_review WHERE user_id=?').bind(memberId),
+    db.prepare('DELETE FROM study_sessions WHERE user_id=?').bind(memberId),
+    db.prepare("DELETE FROM study_notes WHERE user_id=? AND key LIKE 'lesson:%'").bind(memberId),
+    ...rows.results.map((row) => {
+      const items = resetItems(parseStored(row.key.slice(5) as SyncLesson, row.value), now);
+      return db.prepare('UPDATE study_notes SET value=?,updated_at=? WHERE user_id=? AND key=?').bind(JSON.stringify({ items }), now, memberId, row.key);
+    }),
   ]);
 }
 

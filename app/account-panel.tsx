@@ -1,10 +1,11 @@
 'use client';
 import {useState,type FormEvent,type ReactNode} from 'react';
-import {Compass,Download,KeyRound,Loader2,LogOut,Trash2} from 'lucide-react';
+import {Compass,Download,KeyRound,Loader2,LogOut,RotateCcw,Trash2} from 'lucide-react';
 import {TopIcon} from './top-icons';
 import {BrandMascot} from './site-logo';
 import {authMessage,fillText} from '@/lib/copy-fill';
 import type {AccountTexts} from '@/lib/auth-texts';
+import {isProgressKey} from '@/lib/lesson-sync';
 
 type Props={name:string;email:string;since:string;texts:AccountTexts};
 type Result={ok?:boolean;error?:string;code?:string;n?:number;field?:string;name?:string};
@@ -18,6 +19,14 @@ async function send(body:Record<string,unknown>):Promise<{ok:boolean;result:Resu
  }catch{return {ok:false,result:{},offline:true};}
 }
 
+/** After a reset this browser forgets its progress too; the removals reach the other devices with the next sync (app/lesson-sync.tsx). */
+function forgetProgress(){
+ try{
+  const keys:string[]=[];for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&isProgressKey(key))keys.push(key);}
+  for(const key of keys)localStorage.removeItem(key);
+ }catch{}
+}
+
 function Status({error,done}:{error:string;done:string}){
  if(error)return <p className="lk-form-error" role="alert">{error}</p>;
  return done?<p className="lk-form-done" role="status">{done}</p>:null;
@@ -27,7 +36,7 @@ function Card({icon,title,id,children}:{icon:ReactNode;title:string;id?:string;c
  return <section className="lk-account-card" id={id}><h2>{icon}{title}</h2>{children}</section>;
 }
 
-/** Hesabım: ad, şifre, site turu, verilerimi indir, çıkış ve hesabı silme; sayfanın dilinde (`texts` sunucudan gelir). */
+/** Hesabım: ad, şifre, site turu, verilerimi indir, ilerlemeyi sıfırlama, çıkış ve hesabı silme; sayfanın dilinde (`texts` sunucudan gelir). */
 export default function AccountPanel({name:initialName,email,since,texts}:Props){
  const [name,setName]=useState(initialName);
  const [busy,setBusy]=useState<string|null>(null);
@@ -41,6 +50,7 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
  const value=(form:HTMLFormElement,field:string)=>String(new FormData(form).get(field)??'');
  function rename(event:FormEvent<HTMLFormElement>){event.preventDefault();const form=event.currentTarget;void run('name',{action:'profile',name:value(form,'name')},null,texts.nameSaved,result=>{if(result.name)setName(result.name);});}
  function password(event:FormEvent<HTMLFormElement>){event.preventDefault();const form=event.currentTarget;void run('password',{action:'password',current:value(form,'current'),next:value(form,'next')},form,texts.passwordChanged);}
+ function reset(event:FormEvent<HTMLFormElement>){event.preventDefault();const form=event.currentTarget;void run('progress',{action:'progress',confirm:new FormData(form).get('confirm')==='on'},form,texts.progressDone,forgetProgress);}
  function remove(event:FormEvent<HTMLFormElement>){event.preventDefault();const form=event.currentTarget;void run('delete',{action:'delete',current:value(form,'current'),confirm:new FormData(form).get('confirm')==='on'},form,texts.deleted,()=>window.location.assign('/'));}
  async function logout(){if(busy)return;setBusy('logout');await send({action:'logout'});window.location.assign('/');}
  const spin=(key:string)=>busy===key?<Loader2 className="lk-spin" size={18} aria-hidden="true"/>:null;
@@ -79,6 +89,19 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
   <Card icon={<Download size={20} aria-hidden="true"/>} title={texts.dataCard}>
    <p>{texts.dataText}</p>
    <a className="btn secondary small" href="/api/auth?export=1" download="goliqo-verilerim.json" data-account-export>{texts.dataDownload}</a>
+  </Card>
+
+  {/* Start over (the learner asked, 3 November 2026): lib/member-store.ts resetProgress; the account, stars and settings stay. */}
+  <Card icon={<RotateCcw size={20} aria-hidden="true"/>} title={texts.progressCard} id="ilerleme">
+   <details className="lk-danger">
+    <summary>{texts.progressSummary}</summary>
+    <p>{texts.progressWarning}</p>
+    <form className="lk-auth-form" onSubmit={reset} data-account-progress>
+     <label className="lk-check"><input name="confirm" type="checkbox" required/><span>{texts.progressConfirm}</span></label>
+     <Status error={errors.progress??''} done={done.progress??''}/>
+     <button className="btn lk-danger-button small" type="submit" disabled={!!busy}>{spin('progress')}{texts.progressButton}</button>
+    </form>
+   </details>
   </Card>
 
   <Card icon={<Trash2 size={20} aria-hidden="true"/>} title={texts.deleteCard}>

@@ -1,6 +1,6 @@
 // Goliqo duman testi: yerel geliştirme sunucusunu (http://localhost:5173)
 // gerçek bir tarayıcıyla açar, ekran görüntüsü alır; üyelik akışını (üye ol, çıkış,
-// giriş, Hesabım, hesabı silme) yerel bir deneme hesabıyla dener ve kayıt API'sini
+// giriş, Hesabım, ilerlemeyi sıfırlama, hesabı silme) yerel bir deneme hesabıyla dener ve kayıt API'sini
 // yerel giriş taklidiyle (local_seedy) dener. Yalnızca yerel veritabanına yazar.
 const { chromium, devices } = require("playwright");
 const fs = require("node:fs");
@@ -103,8 +103,26 @@ async function memberFlow(browser) {
     await m.waitForLoadState("networkidle");
     return [(await m.locator("[data-account]").count()) === 1, m.url()];
   });
+  // İlerlememi sıfırla (3 Kasım 2026): hesap ve ayarlar kalır; testler, cevaplar ve bu cihazdaki ders ilerlemesi gider.
+  await step("Uyelik: ilerleme sifirlaninca hesap ve ayarlar kaliyor, kayitlar ve ders ilerlemesi gidiyor", async () => {
+    const headers = { origin: BASE, "content-type": "application/json" };
+    const id = "kurulum-sifirla-" + Date.now();
+    const start = await m.request.post(BASE + "/api/study", { headers, data: { action: "start", id, mode: "mixed", topic: "all", count: 1 } });
+    await m.evaluate(() => { localStorage.setItem("lernkoko-l1a-scores", JSON.stringify({ alfabe: { right: 3, total: 3 } })); localStorage.setItem("lernkoko-tour-v1", "done"); });
+    const before = ((await (await m.request.get(BASE + "/api/study")).json().catch(() => ({}))).sessions || []).length;
+    await m.locator("[data-account-progress]").locator("xpath=ancestor::details").locator("summary").click();
+    await m.check('[data-account-progress] input[name="confirm"]');
+    await m.screenshot({ path: path.join(OUT, "24-telefon-ilerlemeyi-sifirla.png"), fullPage: true });
+    await m.click('[data-account-progress] button[type="submit"]');
+    const done = ((await m.locator("[data-account-progress] .lk-form-done").textContent({ timeout: 15000 })) || "").trim();
+    const after = ((await (await m.request.get(BASE + "/api/study")).json().catch(() => ({}))).sessions || []).length;
+    const local = await m.evaluate(() => ({ scores: localStorage.getItem("lernkoko-l1a-scores"), tour: localStorage.getItem("lernkoko-tour-v1") }));
+    const me = await (await m.request.get(BASE + "/api/auth")).json().catch(() => ({}));
+    const ok = start.status() === 201 && before >= 1 && after === 0 && !!done && local.scores === null && local.tour === "done" && me.member && me.member.email === email;
+    return [ok, `test ${before} → ${after}, ders puani ${local.scores === null ? "silindi" : "kaldi"}, tur ${local.tour}, hesap ${me.member ? "acik" : "yok"} · ${done}`];
+  });
   await step("Uyelik: hesap silinince kayitlar gidiyor ve giris artik olmuyor", async () => {
-    await m.locator(".lk-danger summary").click();
+    await m.locator("[data-account-delete]").locator("xpath=ancestor::details").locator("summary").click();
     await m.fill('[data-account-delete] input[name="current"]', password);
     await m.check('[data-account-delete] input[name="confirm"]');
     await m.screenshot({ path: path.join(OUT, "24-telefon-hesabi-sil.png"), fullPage: true });

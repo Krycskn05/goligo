@@ -48,6 +48,9 @@ test('Turkish words without ç/ğ/ı/ş (Almanya, evet, merdiven …) are in eve
   const rows=load(name)[key];assert.ok(rows?.length,name+'.'+key);
   for(const row of rows)for(const id of languages)assert.ok(Object.prototype.hasOwnProperty.call(packs[id],row[column]),id+' '+name+'.'+key+': '+row[column]);
  }
+ // The short names of Lektion 1's exercise strip (a map in the page, read through ut()).
+ const shortMap=fs.readFileSync('app/willkommen-study.tsx','utf8').split('const shortNames')[1].split('};')[0];
+ for(const [,text] of shortMap.matchAll(/[a-z0-9-]+'?:'([^']*)'/g))for(const id of languages)assert.ok(Object.prototype.hasOwnProperty.call(packs[id],text),id+' short name: '+text);
  for(const text of ['Dillerini söyle: **Ich spreche … und ein bisschen Deutsch.**','Bürgeramt’ta','Türkiye’den geliyorum.','Diyalog: Bürgeramt','Diyalog: Sie','Kapak','Katlar','Alfabe','olmak','doktor','merdiven','asansör (= der Lift, der Fahrstuhl)'])
   for(const id of languages)assert.ok(packs[id][text]?.trim(),id+': '+text);
 });

@@ -22,3 +22,7 @@ migration/BAGIMSIZ-YAYIN.md ve migration/VERITABANI-AKTARIMI.md dosyalarını ok
   başlıklarına güvenerek üretim kimlik doğrulaması yapma.
 - Yayımdaki kaynakta bulunmayan ayrı kategori yüzdelik panelini mevcutmuş gibi sunma.
 - Test veya derleme sonucu olmadan projeyi doğrulandı diye raporlama.
+- Yeni her ünite/konu, konu anlatımlarıyla birlikte beş dilde gelir: Türkçe,
+  İngilizce, Arapça, Ukraynaca ve Almanca (kullanıcı istedi, 3 Kasım 2026).
+  Lektion 1, 2, 15 tipi sayfalarda metinler lib/unit-packs/{en,ar,uk,de}.json
+  içine girer; tests/unit-i18n.test.cjs eksik çeviriyi yakalar.

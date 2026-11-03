@@ -141,7 +141,7 @@ function BerufeLesson({language,onLanguage,guest}:{language:StudyLanguage;onLang
   <main id="l2-main" className="object-page housing-page l1a-page l15-page l2-page" lang={language} dir={dir}>
    {guest&&<GuestBanner language={language} back={BERUFE_PATH}/>}
    {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
-   {speech.warning&&<p className="object-alert" role="status">{speech.warning}</p>}
+   {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:vaultText(language,'audioWarning')}</p>}
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} progress={progress} scores={scores[place.part]} language={language} onGo={go} onPart={open}>
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l2-step={step.id} data-l2-teil={config.id} data-paul-mood={paulMood(step)}>
      <header className="l1a-top">

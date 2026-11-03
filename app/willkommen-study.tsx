@@ -144,7 +144,7 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
    {/* No breadcrumb (the learner asked, 25 October 2026): the menu's Üniteler and the notebook's own Lektion 1 button lead back. */}
    {guest&&<GuestBanner language={language} back={WILLKOMMEN_PATH}/>}
    {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
-   {speech.warning&&<p className="object-alert" role="status">{speech.warning}</p>}
+   {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:vaultText(language,'audioWarning')}</p>}
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} scores={scores[place.part]} progress={progress} language={language} onGo={go} onPart={open}>
     <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id} data-paul-mood={paulMood(step)}>
      <header className="l1a-top">

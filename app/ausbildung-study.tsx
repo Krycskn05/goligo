@@ -8,7 +8,7 @@ import {studyLanguages,isStudyLanguage,translate,type StudyLanguage} from '@/lib
 import {languageDirection} from '@/lib/site-languages';
 import {courseUnits} from '@/lib/textbook-curriculum';
 import {housingText} from '@/lib/housing-copy';
-import {vaultText} from '@/lib/object-vault-copy';
+import {isVaultLanguage,vaultText} from '@/lib/object-vault-copy';
 import {AUSBILDUNG_PATH,lessonPartMap,turkishNote,type L12Part,type L12PartId,type L12Word} from '@/lib/ausbildung-course';
 import type {HoerenTask} from '@/lib/ausbildung-hoeren';
 import {exerciseAnswerCount,isCheckable,isStep,isWordSection,lessonProgress,partProgress,partSteps,testPoints,type L12ScoreMap,type L12Step} from '@/lib/ausbildung-progress';
@@ -104,7 +104,7 @@ export function AusbildungLesson({language,onLanguage,guest=false}:{language:Stu
    {/* The breadcrumb was removed at the learner's request (30 October 2026: "remove these everywhere"); the header leads back. */}
    {guest&&<GuestBanner language={language} back={AUSBILDUNG_PATH}/>}
    {language!=='tr'&&!hasL12Pack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={languageDirection(language)}>{turkishNote[language]}</p>}
-   {german.warning&&<p className="object-alert" role="status">{german.warning}</p>}
+   {german.warning&&<p className="object-alert" role="status">{language==='tr'?german.warning:vaultText(language,'audioWarning')}</p>}
    {current&&step&&guest&&current.id!==GUEST_L12_PART?<section className="panel" aria-labelledby="l12-heading" data-guest-part={current.id}><h1 id="l12-heading" tabIndex={-1} lang="de">{current.title}</h1><GuestMore language={language} back={AUSBILDUNG_PATH}/></section>:current&&step?<PartPage key={current.id} part={current} step={step} scores={scores} tick={tick} speech={speech} onScore={refresh} onOpen={open} language={language}/>:<Overview unitName={unitName} scores={scores} tick={tick} onOpen={open} language={language} guest={guest}/>}
   </main></div>
   <SiteFooter language={language}/>
@@ -282,11 +282,11 @@ function Results({part,scores,onJump,onOpen,language}:{part:L12Part;scores:L12Sc
 }
 
 function ListenStep({part}:{part:L12Part}){
- const {t,taskMap}=useL12();const player=useListenPlayer();
+ const {t,taskMap,language}=useL12();const player=useListenPlayer();
  const tasks=(part.listen??[]).map(number=>taskMap.get(number)).filter((task):task is HoerenTask=>!!task);
  return <div className="l12-step-body">
   <div className="panel l12-listen-head"><div><h2><Headphones size={22} aria-hidden="true"/>{t('Dinleme')}</h2><p className="l12-p">{t('Kitaptaki gibi: önce metni görmeden iki kez dinle, soruları cevapla, „Kontrol et" de. En son metni açıp dinlerken oku. Dinlerken cümle cümle geri ve ileri gidebilir, hızı 0,5x ile 2x arasında seçebilirsin.')}</p></div></div>
-  {player.warning&&<p className="object-alert" role="status">{player.warning}</p>}
+  {player.warning&&<p className="object-alert" role="status">{language!=='tr'&&isVaultLanguage(language)?vaultText(language,'audioWarning'):player.warning}</p>}
   {tasks.map(task=><ListenTask key={task.id} task={task} player={player}/>)}
  </div>;
 }

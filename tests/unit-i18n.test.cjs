@@ -29,6 +29,27 @@ test('every text a lesson page shows has an English, Arabic, Ukrainian and Germa
  for(const id of languages)for(const text of texts)assert(typeof packs[id][text]==='string'&&packs[id][text].trim(),id+': '+text);
 });
 
+// Texts that reach ut() without a literal ut('…') call stayed Turkish in every language (the learner saw it in German,
+// 3 November 2026): exercise titles, leads, box labels and picture texts given as props, the summary's said('…'), feedback
+// text:'…' and the strings of ut(a ? '…' : '…'). Each has a translation unless it is German on purpose.
+const germanOnly=text=>/^Alles klar\? · /.test(text)||['___','wir','Ich buchstabiere','mein / meine · dein / deine','An der Information','Am Eingang','Dialog · In der Sprachschule'].includes(text);
+test('titles, leads, box labels, picture texts, feedback and ut(a ? b : c) texts are translated too (3 November 2026)',()=>{
+ const texts=new Set();
+ for(const file of pages){
+  const source=fs.readFileSync(file,'utf8');
+  for(const m of source.matchAll(/\b(?:title|lead|bankLead|kicker|alt)="([^"]+)"/g))texts.add(m[1]);
+  for(const m of source.matchAll(/\bsaid\('([^']*)'\)/g))texts.add(m[1]);
+  for(const m of source.matchAll(/\btext:'((?:\\.|[^'\\])*)'/g))texts.add(m[1].replace(/\\(.)/g,'$1'));
+  for(const m of source.matchAll(/\but\(([^()]*\?[^()]*)\)/g))for(const q of m[1].matchAll(/'((?:\\.|[^'\\])*)'/g))texts.add(q[1]);
+ }
+ assert(texts.size>250,texts.size);
+ for(const text of texts)if(!germanOnly(text))for(const id of languages)assert.ok(packs[id][text]?.trim(),id+': '+text);
+ // The greeting-time rows and the „no German voice“ notice are shown in the language too.
+ assert.match(fs.readFileSync('app/willkommen-c-steps.tsx','utf8'),/\{ut\(item\.time\)\}/);
+ for(const file of ['app/willkommen-study.tsx','app/berufe-study.tsx','app/stadt-study.tsx','app/ausbildung-study.tsx'])assert.match(fs.readFileSync(file,'utf8'),/vaultText\(language,'audioWarning'\)/,file);
+ for(const text of ['Eksik harfleri tamamla','Resmî diyalog (Sie)','Kutu:','Dinliyorum… bitince ■ dokun','ad sorma'])assert.ok(texts.has(text),text);
+});
+
 test('the Turkish texts of the lessons’ data are in every pack',()=>{
  const strong=/[çğışİŞĞ]/;let count=0;
  for(const name of ['willkommen-course','willkommen-b-course','willkommen-c-course','willkommen-d-course','berufe-course','berufe-b-course','berufe-c-course','berufe-d-course','stadt-course','unit-goals']){

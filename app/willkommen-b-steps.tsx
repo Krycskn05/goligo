@@ -8,12 +8,12 @@ import {
  landLanguage,sieOrDu,sieOrDuSay,endingLines,endingSay,hearItems,spellNames,letterQuestions,boxWordsB,boxLinesB,boxSayB,turnLines,turnSay,
  cardLines,cardSay,checkItems,ownPromptsB,testQuestionsB,stepIndexB,type Line,type Profile,
 } from '@/lib/willkommen-b-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Phrases,Note,Rich,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
-import {ut} from '@/lib/unit-i18n';
+import {ut,utBeside} from '@/lib/unit-i18n';
 
 /**
  * Lektion 1, Teil B – Ich spreche ein bisschen Deutsch. (the learner's lesson page, 25 October 2026): the steps.
@@ -60,7 +60,7 @@ export function SpellButton({word,speech,label}:{word:string;speech:Speech;label
 /** A dialogue: each line with the speaker's portrait and voice; "Tümünü dinle" reads it as a conversation. */
 export function DialogueLines({lines,speech}:{lines:Line[];speech:Speech}){
  const first=lines[0]?.who;
- return <div className="l1a-dialogue">{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}><Portrait who={line.who} name={line.who[0].toUpperCase()+line.who.slice(1)}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{ut(line.tr)}</span></div><Say text={line.say??line.de} who={line.who} speech={speech}/></div>)}</div>;
+ return <div className="l1a-dialogue">{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}><Portrait who={line.who} name={line.who[0].toUpperCase()+line.who.slice(1)}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{utBeside(line.de,line.tr)}</span></div><Say text={line.say??line.de} who={line.who} speech={speech}/></div>)}</div>;
 }
 export function ListenAll({lines,speech}:{lines:Line[];speech:Speech}){
  return <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(lines.map(lineSay))}><Play size={16} aria-hidden="true"/>{ut('Tümünü dinle')}</button></div>;
@@ -70,7 +70,7 @@ export function Picture({src,width,height,alt}:{src:string;width:number;height:n
 }
 export function WordTable({items}:{items:readonly (readonly [string,string])[]}){
  const rows:(readonly [string,string])[][]=[];for(let i=0;i<items.length;i+=2)rows.push(items.slice(i,i+2));
- return <table className="l1a-table"><tbody>{rows.map((row,i)=><tr key={i}>{row.map(([de,tr])=><td key={de} colSpan={1}><b lang="de">{de}</b> <span className="l1a-mini">{ut(tr)}</span></td>)}</tr>)}</tbody></table>;
+ return <table className="l1a-table"><tbody>{rows.map((row,i)=><tr key={i}>{row.map(([de,tr])=><td key={de} colSpan={1}><b lang="de">{de}</b> <span className="l1a-mini">{utBeside(de,tr)}</span></td>)}</tr>)}</tbody></table>;
 }
 export function ProfileCard({card}:{card:Profile}){
  return <div className="l1a-profile"><Portrait who={card.who} name={card.name.split(' ')[0]}/><dl lang="de"><dt>Name:</dt><dd>{card.name}</dd><dt>Land:</dt><dd>{card.land}</dd><dt>Sprachen:</dt><dd>{card.languages}</dd></dl></div>;
@@ -129,7 +129,7 @@ function Alphabet({speech}:{speech:Speech}){
 }
 function Spelling({speech}:{speech:Speech}){
  return <><Heading>{ut('Harf harf söyleme')}</Heading>
-  {spellPhrases.map(([de,tr,say])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{ut(tr)}</span></div><Say text={say} speech={speech}/></div>)}
+  {spellPhrases.map(([de,tr,say])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{utBeside(de,tr)}</span></div><Say text={say} speech={speech}/></div>)}
   <h3 className="l1a-h2">{ut('Diyalog: Yasemin ve Nikos')}</h3>
   <DialogueLines lines={dialogueSpell} speech={speech}/>
   <ListenAll lines={dialogueSpell} speech={speech}/>

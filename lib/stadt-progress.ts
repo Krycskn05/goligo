@@ -1,4 +1,4 @@
-import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress';
+import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress-core';
 import {scoredExercisesA,stepsA} from './stadt-course';
 import type {L1AScoreMap} from './willkommen-progress';
 

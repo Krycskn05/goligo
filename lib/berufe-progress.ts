@@ -1,4 +1,4 @@
-import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress';
+import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress-core';
 import {berufeScored,berufeSteps} from './berufe-course';
 import {berufeScoredB,berufeStepsB} from './berufe-b-course';
 import {berufeScoredC,berufeStepsC} from './berufe-c-course';

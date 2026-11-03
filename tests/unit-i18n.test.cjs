@@ -5,7 +5,8 @@ const {test}=require('node:test');const assert=require('node:assert/strict');con
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
 const i18n=load('unit-i18n'),prompt=load('talk-prompt'),talk=load('talk-scenarios');
-const languages=['en','ar','uk'];
+// German since 3 November 2026: every unit comes in tr, en, ar, uk and de (CLAUDE.md).
+const languages=['en','ar','uk','de'];
 const packs=Object.fromEntries(languages.map(id=>[id,JSON.parse(fs.readFileSync(`lib/unit-packs/${id}.json`,'utf8'))]));
 const pages=['app/willkommen-ui.tsx','app/willkommen-study.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx','app/willkommen-d-steps.tsx',
  'app/berufe-study.tsx','app/berufe-a-steps.tsx','app/berufe-b-steps.tsx','app/berufe-c-steps.tsx','app/berufe-d-steps.tsx',
@@ -23,7 +24,7 @@ function pageTexts(){
 const marks=text=>[...text.matchAll(/\{\w+\}/g)].map(m=>m[0]).sort().join(' ');
 const german=text=>[...text.replace(/\*\*[^*]+\*\*/g,'').matchAll(/\*(?!\*)[^*\s][^*]*\*(?!\*)|~[^~]+~|\[(?:der|die|das)\]/g)].map(m=>m[0]).sort().join(' | ');
 
-test('every text a lesson page shows has an English, Arabic and Ukrainian translation',()=>{
+test('every text a lesson page shows has an English, Arabic, Ukrainian and German translation',()=>{
  const texts=pageTexts();assert(texts.length>500,texts.length);
  for(const id of languages)for(const text of texts)assert(typeof packs[id][text]==='string'&&packs[id][text].trim(),id+': '+text);
 });
@@ -71,7 +72,11 @@ test('a text without a pack or a translation stays Turkish; {marks} are filled',
  assert.equal(i18n.unitText('fr','Soru {n}',{n:3}),'Soru 3');
  i18n.setUnitLanguage('en');assert.equal(i18n.ut('Soru {n}',{n:1}),'Question 1');assert.equal(i18n.utLang('Soru {n}'),'en');assert.equal(i18n.utLang('Yok'),'tr');
  i18n.setUnitLanguage('tr');
- assert.deepEqual(i18n.unitPackLanguages.sort(),['ar','en','uk']);
+ assert.deepEqual(i18n.unitPackLanguages.sort(),['ar','de','en','uk']);
+ // A meaning beside German that only repeats it is left out (German help: „Italien – Italien“, a sentence prompt that gives the answer).
+ i18n.registerUnitPack('de',{'İtalya':'Italien','Ülkeler':'Länder'});i18n.setUnitLanguage('de');
+ assert.equal(i18n.utBeside('Italien','İtalya'),'');assert.equal(i18n.utBeside('die Schweiz','İtalya'),'Italien');assert.equal(i18n.utBeside('Länder?','Ülkeler'),'');
+ i18n.setUnitLanguage('tr');assert.equal(i18n.utBeside('Italien','İtalya'),'İtalya');
 });
 
 test('the lesson pages load the pack with the language and drop the “only in Turkish” note when it is there',()=>{
@@ -93,4 +98,8 @@ test('Konuş: the translation and the notes come in the lesson’s language; Tur
  assert(prompt.talkMessages(scenario,[{role:'learner',text:'Hallo'}],'en')[0].content.includes('English-speaking adult'));
  assert(fs.readFileSync('app/api/konus/route.ts','utf8').includes('talkMessages(scenario,history,talkHelpLanguage(body.language))'));
  assert(fs.readFileSync('app/talk-step.tsx','utf8').includes('language:props.language'));
+ // German help: explanations in simple German, „tr“ a simpler German paraphrase (no translation into the same language).
+ const german=prompt.talkSystemPrompt(scenario,0,'de');
+ assert(german.includes('wants every explanation in simple German')&&german.includes('even simpler German words')&&!german.includes('German-speaking adult'));
+ assert.equal(prompt.talkHelpLanguage('de'),'de');
 });

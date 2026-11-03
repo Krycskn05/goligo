@@ -7,7 +7,7 @@ exports.willkommenProgress = willkommenProgress;
 exports.partProgressL1 = partProgressL1;
 exports.lessonOneProgress = lessonOneProgress;
 exports.readLessonOneProgress = readLessonOneProgress;
-const progress_1 = require("./progress");
+const progress_core_1 = require("./progress-core");
 const willkommen_course_1 = require("./willkommen-course");
 const willkommen_b_course_1 = require("./willkommen-b-course");
 const willkommen_c_course_1 = require("./willkommen-c-course");
@@ -25,7 +25,7 @@ exports.L1_PART_KEY = 'lernkoko-l1-part';
 exports.partKeys = { a: { scores: exports.L1A_SCORES_KEY, step: exports.L1A_STEP_KEY }, b: { scores: exports.L1B_SCORES_KEY, step: exports.L1B_STEP_KEY }, c: { scores: exports.L1C_SCORES_KEY, step: exports.L1C_STEP_KEY }, d: { scores: exports.L1D_SCORES_KEY, step: exports.L1D_STEP_KEY } };
 exports.partScored = { a: willkommen_course_1.scoredExercises, b: willkommen_b_course_1.scoredExercisesB, c: willkommen_c_course_1.scoredExercisesC, d: willkommen_d_course_1.scoredExercisesD };
 /** What the percentages count: the scored exercises and the teaching steps (lib/progress.ts `lessonItems`). */
-exports.partCounted = { a: (0, progress_1.lessonItems)(willkommen_course_1.scoredExercises, willkommen_course_1.steps), b: (0, progress_1.lessonItems)(willkommen_b_course_1.scoredExercisesB, willkommen_b_course_1.stepsB), c: (0, progress_1.lessonItems)(willkommen_c_course_1.scoredExercisesC, willkommen_c_course_1.stepsC), d: (0, progress_1.lessonItems)(willkommen_d_course_1.scoredExercisesD, willkommen_d_course_1.stepsD) };
+exports.partCounted = { a: (0, progress_core_1.lessonItems)(willkommen_course_1.scoredExercises, willkommen_course_1.steps), b: (0, progress_core_1.lessonItems)(willkommen_b_course_1.scoredExercisesB, willkommen_b_course_1.stepsB), c: (0, progress_core_1.lessonItems)(willkommen_c_course_1.scoredExercisesC, willkommen_c_course_1.stepsC), d: (0, progress_core_1.lessonItems)(willkommen_d_course_1.scoredExercisesD, willkommen_d_course_1.stepsD) };
 function readPartScores(part) {
     try {
         const value = JSON.parse(localStorage.getItem(exports.partKeys[part].scores) ?? '{}');
@@ -63,7 +63,7 @@ function progressOf(list, scores) {
         learned += Math.max(0, Math.min(exercise.total, score.right));
     }
     const percent = ratio(learned, total);
-    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_1.starsFor)(percent), stage: (0, progress_1.stageFor)(percent, tried) };
+    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_core_1.starsFor)(percent), stage: (0, progress_core_1.stageFor)(percent, tried) };
 }
 /** Teil A's progress: answers given and answers right. */
 function willkommenProgress(scores) { return progressOf(exports.partCounted.a, scores); }

@@ -451,3 +451,6 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 /* Sentence building: what the sentence means, so the learner knows what to build (2 November 2026). */
 .l1a-order-goal { margin:4px 0 12px; padding:10px 14px; border-radius:14px; background:#f3f9ff; border:1.5px solid #d6e4f2; font-size:17px; color:var(--ink,#1f3b5c); }
 .l1a-order-goal b { font-weight:800; }
+
+/* A meaning that would only repeat the German is left out (lib/unit-i18n.ts utBeside; German help, 3 November 2026). */
+.l1a-tr:empty, .l1a-mini:empty, .l15-word-tr:empty, .l2-job-tr:empty { display:none; }

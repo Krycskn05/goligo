@@ -1,7 +1,7 @@
 import {pluralPick} from './copy-fill';
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {languageLocale,pickText} from './site-languages';
-import type {ProgressStage} from './progress';
+import type {ProgressStage} from './progress-core';
 
 /** Progress, XP and streak copy. Tuple order follows vaultLanguages (tr de en ar uk fr es ru fa pl it pt). */
 export const progressCopy={

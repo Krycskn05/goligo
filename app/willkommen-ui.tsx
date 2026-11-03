@@ -9,7 +9,7 @@ import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
 import {PaulHoca} from './paul-hoca';
 import {mixedOrder} from '@/lib/mixed-order';
-import {ut,utLang} from '@/lib/unit-i18n';
+import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
 /*
  * Pieces shared by Lektion 1's lesson pages (Teil A in app/willkommen-study.tsx, Teil B in app/willkommen-b-steps.tsx):
@@ -133,7 +133,7 @@ export function Say({text,who,slow,speech,label='Dinle',wide=false,secret=false}
  return <button type="button" className={(wide?'btn secondary small l1a-say-wide':'l12-say')+(playing?' playing':'')} disabled={speech.busy&&!playing} aria-label={secret?(label==='Dinle'?shown:ut('Dinle')+' '+shown):shown+': '+text} title={shown} data-who={who} onClick={()=>speech.speak({text,who,slow})}><Volume2 size={18} aria-hidden="true"/>{wide&&shown}</button>;
 }
 export function Phrases({items,speech}:{items:readonly (readonly [string,string])[];speech:Speech}){
- return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{ut(tr)}</span></div><Say text={de} speech={speech}/></div>)}</>;
+ return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{utBeside(de,tr)}</span></div><Say text={de} speech={speech}/></div>)}</>;
 }
 export const Note=({children}:{children:ReactNode})=><div className="l1a-note"><PaulHoca pose="tip" className="l1a-paul"/><p>{children}</p></div>;
 /** `**bold**` inside a text (a Turkish text is shown in the page's language, lib/unit-i18n.ts). */
@@ -373,7 +373,7 @@ export function OrderExercise(props:StepProps&{kicker:string;title:string;senten
  });
  return <>
   <p className="kicker" lang={utLang(kicker)==="tr"?"de":undefined}>{ut(kicker)}</p><Heading>{ut(title)}</Heading><p className="l1a-tr">{ut(word?'Kelime':'Cümle')} {round+1} / {orderSentences.length}</p>
-  {meanings?.[round]&&<p className="l1a-order-goal">{goalLabel?<>{ut(goalLabel)} <b lang="de">{meanings[round]}</b></>:word?<>{ut('Bu kelimeyi kur:')} <b>{ut(meanings[round])}</b></>:<>{ut('Bu cümleyi kur:')} <b>{ut(meanings[round])}</b></>}</p>}
+  {meanings?.[round]&&(goalLabel||utBeside(sentence.join(word?'':' '),meanings[round]))&&<p className="l1a-order-goal">{goalLabel?<>{ut(goalLabel)} <b lang="de">{meanings[round]}</b></>:word?<>{ut('Bu kelimeyi kur:')} <b>{utBeside(sentence.join(''),meanings[round])}</b></>:<>{ut('Bu cümleyi kur:')} <b>{utBeside(sentence.join(' '),meanings[round])}</b></>}</p>}
   <div className={'l1a-answer'+(state==='ok'?' ok':state==='bad'?' bad':'')} lang="de" dir="ltr" aria-live="polite">{text}</div>
   <div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)||state==='ok'} onClick={()=>{setPicked([...picked,chip.i]);setState('open');}}>{chip.word}</button>)}</div>
   <div className="l1a-actions">

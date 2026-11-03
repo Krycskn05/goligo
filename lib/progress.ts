@@ -6,6 +6,8 @@ import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestio
 import {verbQuestions,inVerbTopic} from './verb-course';
 import {isVerbExercise} from './verb-practice';
 import {verbSteps} from './verb-workshop';
+import {starsFor,stageFor,type ProgressStage,type TopicProgress} from './progress-core';
+export * from './progress-core';
 
 /**
  * Learning progress shown in the interface. Everything here is derived from the
@@ -14,8 +16,6 @@ import {verbSteps} from './verb-workshop';
  * go up" — a later wrong answer used to take it away again; mistakes still go to Yanlışlarım by their own rule).
  * A written exercise and its four-choice copy (`<id>-test`, Ev ve Yaşam) are one exercise: either of them counts.
  */
-export type TopicProgress={total:number;tried:number;learned:number;percent:number;triedPercent:number;stars:0|1|2|3;stage:ProgressStage};
-export type ProgressStage='new'|'started'|'warming'|'half'|'almost'|'master';
 export type DayCount={day:number;answers:number;correct:number};
 export type StudyStats={answers:number;correct:number;days:DayCount[];today:number};
 export type LevelInfo={level:number;xp:number;levelStart:number;nextLevel:number;intoLevel:number;span:number;toNext:number;percent:number};
@@ -30,16 +30,6 @@ function ratio(part:number,total:number){
  if(!total||part<=0)return 0;
  if(part>=total)return 100;
  return Math.min(99,Math.max(1,Math.round(part*100/total)));
-}
-/** What a lesson part's percentage counts (Lektion 1, 2, 15): every scored exercise with its answers, and every teaching
- * step and Konuş as one item each — a teaching step counts once it is opened, Konuş once the learner rated it (the learner
- * asked, 2 November 2026: reading a topic did not move the percentage). */
-export function lessonItems(scored:readonly {id:string;total:number}[],steps:readonly {id:string;kind:string}[]){
- return [...scored,...steps.filter(step=>(step.kind==='teach'||step.kind==='speak')&&!scored.some(item=>item.id===step.id)).map(step=>({id:step.id,total:1}))];
-}
-export function starsFor(percent:number):0|1|2|3{return percent>=75?3:percent>=50?2:percent>=25?1:0;}
-export function stageFor(percent:number,tried:number):ProgressStage{
- return percent>=100?'master':percent>=75?'almost':percent>=50?'half':percent>=25?'warming':tried>0||percent>0?'started':'new';
 }
 /** Answered right at least once (a row counts every answer in `seen` and every wrong one in `wrong_count`). */
 export function isLearned(row:Pick<Review,'seen'|'streak'|'wrong_count'>|undefined){return !!row&&row.seen>0&&(row.streak>=1||row.seen>row.wrong_count);}

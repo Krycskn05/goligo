@@ -93,7 +93,7 @@ function primeSounds() {
         return;
     primed = true;
     const chosen = readEffects();
-    for (const id of [chosen.tap === 'tap' ? 'tap' : chosen.tap, chosen.page, chosen.correct, chosen.wrong, chosen.complete, 'paulDrum']) {
+    for (const id of [chosen.tap === 'tap' ? 'tap' : chosen.tap, chosen.page, chosen.correct, chosen.wrong, chosen.complete]) {
         if (!(id in effect_sounds_1.soundRecipes) || ready.get(id)?.length)
             continue;
         try {

@@ -12,12 +12,12 @@ import {
  berufeTestB,practiceItemsB,berufeStepIndexB,type Pronoun,type PersonText,type VerbRow,
 } from '@/lib/berufe-b-course';
 import {personName} from '@/lib/berufe-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,SpeakStep} from './berufe-a-steps';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,useSelfCheck,selfCheckNote,type SelfCheckResult,ChoiceRows,OrderExercise,TestStep,mixedOrder,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
-import {ut} from '@/lib/unit-i18n';
+import {ut,utBeside} from '@/lib/unit-i18n';
 
 /**
  * Lektion 2 „Berufe“, Teil B – Wer ist das? (the learner's lesson page, 2 November 2026): the steps. The notebook around
@@ -63,7 +63,7 @@ function Pron({kind,children}:{kind:Pronoun;children?:ReactNode}){return <span c
 function PersonCard({text,speech}:{text:PersonText;speech:Speech}){
  return <div className="l1a-dialogue"><div className="l1a-line a l2-person">
   <span className="l2-faces">{text.people.map(key=><Portrait key={key} who={key} name={personName(key)}/>)}</span>
-  <div className="l1a-bubble"><span className="l15-name">{text.name}</span><span className="l1a-de" lang="de" dir="ltr">{text.de}</span><span className="l1a-tr">{ut(text.tr)}</span></div>
+  <div className="l1a-bubble"><span className="l15-name">{text.name}</span><span className="l1a-de" lang="de" dir="ltr">{text.de}</span><span className="l1a-tr">{utBeside(text.de,text.tr)}</span></div>
   <Say text={text.de} who={NARRATOR} speech={speech}/>
  </div></div>;
 }
@@ -102,14 +102,14 @@ function Doings({speech}:{speech:Speech}){
      {doing.job&&<li><span lang="de"><Art de={doing.job}/></span><Say text={doing.job} speech={speech}/></li>}
      <li><span lang="de">{doing.sentence}</span><Say text={doing.sentence} speech={speech}/></li>
     </ul>
-    <span className="l2-job-tr">{ut(doing.tr)}</span>
+    <span className="l2-job-tr">{utBeside(doing.sentence,doing.tr)}</span>
    </div>
   </li>;})}</ul></>;
 }
 function WordsB({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Wörter</p><Heading>{ut('Bu bölümün kelimeleri')}</Heading>
   <p className="l1a-tr"><Tx text="Her satırda kelime, anlamı ve bir örnek cümle var. Satıra dokununca örnek cümle okunur. *er* ve *sie* bu bölümün en önemli kelimeleri."/></p>
-  <div className="l15-word-grid">{wordsB.map(([de,tr,example,exampleTr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{ut(tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{ut(exampleTr)}</span></div><Say text={example} speech={speech}/></div>)}</div></>;
+  <div className="l15-word-grid">{wordsB.map(([de,tr,example,exampleTr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{utBeside(de,tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{utBeside(example,exampleTr)}</span></div><Say text={example} speech={speech}/></div>)}</div></>;
 }
 function Pronouns({speech,sound}:{speech:Speech;sound:Sound}){
  return <><p className="kicker">{ut('Konu 1 · er, sie, sie')}</p><Heading><Tx text="Üçüncü kişi: _er · sie · sie_ (onlar)"/></Heading>
@@ -118,7 +118,7 @@ function Pronouns({speech,sound}:{speech:Speech;sound:Sound}){
    <tbody>{pronounRows.map(([kind,de,tr,example])=><tr key={kind}><td><Pron kind={kind}>{de}</Pron></td><td>{ut(tr)}</td><td lang="de"><Marked text={example}/></td><td><Say text={plainText(example)} speech={speech}/></td></tr>)}</tbody></table>
   <h2 className="l1a-h2"><Tx text="Aynı kelime, iki anlam: _sie_"/></h2>
   <p><Tx text="*sie* hem „o (kadın)“ hem „onlar“ demek. Hangisi olduğunu **fiilin eki** söyler:"/></p>
-  {sieTwo.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Marked text={de}/></span><span className="l1a-tr">{ut(tr)}</span></div><Say text={plainText(de)} speech={speech}/></div>)}
+  {sieTwo.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Marked text={de}/></span><span className="l1a-tr">{utBeside(de,tr)}</span></div><Say text={plainText(de)} speech={speech}/></div>)}
   <h2 className="l1a-h2"><Tx text="Üçüncü _„Sie“_: siz (resmî)"/></h2>
   <p><Tx text="Lektion 1’den hatırla: *Sie* büyük harfle = siz (resmî). Fiili de „onlar“ gibi *-en* alır: ~Woher kommen Sie?~ Cümlenin ortasında büyük **S** görürsen „siz“, küçük **s** görürsen „o (kadın)“ ya da „onlar“ demektir."/></p>
   <table className="l1a-table"><thead><tr><th>{ut('kelime')}</th><th>{ut('anlam')}</th><th>{ut('fiil')}</th></tr></thead>
@@ -154,7 +154,7 @@ function Intro({speech,sound}:{speech:Speech;sound:Sound}){
   <p><Tx text="Önce şehri söyleyip sonra ülkeyi eklemek çok doğal bir kalıp: ~Er kommt aus Thessaloniki. Das ist in Griechenland.~ Böylece dinleyen kişi şehri bilmese de anlar."/></p>
   <PhraseRow de={cityPhrase[0]} tr={cityPhrase[1]} speech={speech}/>
   <h2 className="l1a-h2"><Tx text="Ne zamandır? _„schon lange“_ ve _„jetzt“_"/></h2>
-  {timePhrases.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Marked text={de}/></span><span className="l1a-tr">{ut(tr)}</span></div><Say text={plainText(de)} speech={speech}/></div>)}
+  {timePhrases.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Marked text={de}/></span><span className="l1a-tr">{utBeside(de,tr)}</span></div><Say text={plainText(de)} speech={speech}/></div>)}
   <h2 className="l1a-h2">{ut('Bir kişi: Tomasz')}</h2>
   <PersonCard text={tomaszText} speech={speech}/>
   <h2 className="l1a-h2">{ut('İki kişi: Yasemin ve Mei')}</h2>
@@ -167,7 +167,7 @@ function Questions({speech,sound}:{speech:Speech;sound:Sound}){
  return <><p className="kicker">{ut('Konu 4 · W-Fragen')}</p><Heading>{ut('Başkası hakkında soru sorma')}</Heading>
   <p><Tx text="Soru kelimesi başta, fiil hemen arkasında (2. sırada), sonra kişi. Lektion 1’deki soruların aynısı; sadece *du/Sie* yerine *er/sie* var."/></p>
   <table className="l1a-table"><thead><tr><th>{ut('Soru')}</th><th>{ut('Cevap')}</th><th/></tr></thead>
-   <tbody>{questionRows.map(row=><tr key={row[0]}><td><span lang="de"><Marked text={row[0]}/></span><br/><span className="l1a-mini">{ut(row[1])}</span></td><td lang="de">{row[2]}</td><td><Say text={questionRowSay(row)} speech={speech}/></td></tr>)}</tbody></table>
+   <tbody>{questionRows.map(row=><tr key={row[0]}><td><span lang="de"><Marked text={row[0]}/></span><br/><span className="l1a-mini">{utBeside(row[0],row[1])}</span></td><td lang="de">{row[2]}</td><td><Say text={questionRowSay(row)} speech={speech}/></td></tr>)}</tbody></table>
   <h2 className="l1a-h2"><Tx text="_Woher_ ve _Wo_’yu karıştırma"/></h2>
   <p><Tx text="*Woher* = nere**den** → cevap *aus* ile: ~Woher kommt er? – Aus Polen.~"/><br/><Tx text="*Wo* = nere**de** → cevap *in* ile: ~Wo wohnt er? – In Hamburg.~"/></p>
   <h2 className="l1a-h2"><Tx text="Onlar için: fiil _-en_"/></h2>

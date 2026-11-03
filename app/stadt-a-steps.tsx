@@ -11,12 +11,12 @@ import {
  hearItems,achIchRows,orderSentences,orderSay,roleQuestions,testQuestionsA,isTurkishText,summaryLines,stepIndexA,lineGaps,
  type Word,type BoardRow,type ChoiceLine,type ChoiceGap,
 } from '@/lib/stadt-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
-import {ut,utLang} from '@/lib/unit-i18n';
+import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
 /**
  * Lektion 15 „Wege in der Stadt“, Teil A – Gehen Sie die Treppe hoch. (the learner's lesson page, 30 October 2026):
@@ -70,7 +70,7 @@ function WordRows({words,speech}:{words:readonly Word[];speech:Speech}){
   <span className="l15-word-text">
    <span className="l1a-de" lang="de"><Art de={word.de}/></span>
    {word.plural&&<span className="l15-plural">{ut('Çoğul:')} <span lang="de">{word.plural}</span></span>}
-   <span className="l15-word-tr">{ut(word.tr)}</span>
+   <span className="l15-word-tr">{utBeside(word.de,word.tr)}</span>
    {word.example&&<span className="l15-example" lang="de">{word.example}</span>}
   </span>
   <Say text={word.de} speech={speech}/>
@@ -87,7 +87,7 @@ function Conversation({lines,speech,actions=true}:{lines:readonly Line[];speech:
  return <>
   <div className={'l1a-dialogue'+(hidden?' l15-hide-tr':'')}>{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}>
    <Portrait who={line.who} name={personName(line.who)}/>
-   <div className="l1a-bubble"><span className="l15-name">{personName(line.who)}</span><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{ut(line.tr)}</span></div>
+   <div className="l1a-bubble"><span className="l15-name">{personName(line.who)}</span><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{utBeside(line.de,line.tr)}</span></div>
    <Say text={line.say??line.de} who={line.who} speech={speech}/>
   </div>)}</div>
   {actions&&<div className="l1a-actions">
@@ -143,12 +143,12 @@ function OfficeWords({speech}:{speech:Speech}){
   <p className="l1a-tr"><Tx text="Berlin’de bu işler için *Bürgeramt*’a, *Ausländerbehörde*’ye veya *Führerscheinstelle*’ye gidilir."/></p>
   <WordRows words={officeWords} speech={speech}/>
   <h2 className="l1a-h2">{ut('Fiiller')}</h2>
-  <div className="l15-word-grid">{officeVerbs.map(([de,tr,example])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{ut(tr)}</span><span className="l15-example" lang="de">{example}</span></div><Say text={example} speech={speech}/></div>)}</div>
+  <div className="l15-word-grid">{officeVerbs.map(([de,tr,example])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{utBeside(de,tr)}</span><span className="l15-example" lang="de">{example}</span></div><Say text={example} speech={speech}/></div>)}</div>
   <Note><Tx text="*ab|holen, an|melden, ab|melden, hoch|gehen* ayrılabilen fiillerdir: ~Ich **hole** meinen Ausweis **ab**.~ — ~Gehen Sie die Treppe **hoch**.~"/></Note></>;
 }
 function Directions({speech}:{speech:Speech}){
  return <><p className="kicker">{ut('Wortschatz · Yön')}</p><Heading><span lang="de">Wo? Wohin?</span></Heading>
-  <div className="l15-word-grid">{directionWords.map(row=>{const [emoji,de,tr,example]=row;return <div className="l1a-phrase" key={de}><span className="l15-emoji" aria-hidden="true">{emoji}</span><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{ut(tr)}</span>{example&&<span className="l15-example" lang="de">{example}</span>}</div><Say text={directionSay(row)} speech={speech}/></div>;})}</div>
+  <div className="l15-word-grid">{directionWords.map(row=>{const [emoji,de,tr,example]=row;return <div className="l1a-phrase" key={de}><span className="l15-emoji" aria-hidden="true">{emoji}</span><div className="l1a-phrase-text"><span className="l1a-de" lang="de">{de}</span><span className="l1a-tr">{utBeside(de,tr)}</span>{example&&<span className="l15-example" lang="de">{example}</span>}</div><Say text={directionSay(row)} speech={speech}/></div>;})}</div>
   <Note><Tx text="*links* = solda (_Wo?_ Nerede?) · *nach links* = sola (_Wohin?_ Nereye?)"/><br/><i lang="de">Der Aufzug ist links.</i> — <i lang="de">Gehen Sie nach links.</i></Note></>;
 }
 /** The floors of a house: tap a floor (or the roof) to hear it. */
@@ -202,7 +202,7 @@ function ZumZur({speech}:{speech:Speech}){
   ]}/>
   <h2 className="l1a-h2">{ut('Hangi iş, hangi yer?')}</h2>
   <table className="l1a-table l15-tasks"><thead><tr><th lang="de">Ich möchte …</th><th lang="de">Dann müssen Sie …</th></tr></thead>
-   <tbody>{tasks.map(([de,tr,place])=><tr key={de}><td><span lang="de">{de}</span><br/><span className="l1a-mini">{ut(tr)}</span></td><td lang="de"><b>{place}</b> gehen</td></tr>)}</tbody></table></>;
+   <tbody>{tasks.map(([de,tr,place])=><tr key={de}><td><span lang="de">{de}</span><br/><span className="l1a-mini">{utBeside(de,tr)}</span></td><td lang="de"><b>{place}</b> gehen</td></tr>)}</tbody></table></>;
 }
 function Instructions({speech}:{speech:Speech}){
  return <><p className="kicker">{ut('Konu 3 · Wegbeschreibung')}</p><Heading><span lang="de">Gehen Sie …!</span></Heading>
@@ -350,7 +350,7 @@ function BuildExercise(props:StepProps){
   <p className="kicker">{ut('Alıştırma 2 · Bilden Sie Wörter')}</p><Heading>{ut('Kelimeyi kur')}</Heading>
   <p className="l1a-tr">{ut('Parçalara sırayla dokun, sonra artikeli seç. İpucu: artikel son parçadan gelir.')}</p>
   <p className="l1a-mini">{ut('Kelime {n} / {total}',{n:round+1,total:buildWords.length})}</p>
-  <p className="l1a-question">{ut(item.tr)}</p>
+  {utBeside(item.word,item.tr)&&<p className="l1a-question">{utBeside(item.word,item.tr)}</p>}
   <div className={'l1a-answer'+(stage!=='parts'?' ok':wrongParts?' bad':'')} lang="de" dir="ltr" aria-live="polite">{stage==='done'?<Art de={buildSay(item)}/>:stage==='article'?item.word:picked.map(partOf).join(' + ')}</div>
   {stage==='parts'&&<div className="l1a-chips">{chips.map(chip=><button type="button" key={chip.i} className="l1a-chip" lang="de" dir="ltr" disabled={picked.includes(chip.i)} onClick={()=>pick(chip.i)}>{chip.part}</button>)}</div>}
   {stage!=='parts'&&<div className="l1a-opts l15-articles" role="group" aria-label="Artikel">{(['der','die','das'] as const).map(article=><button type="button" key={article} className={'l1a-opt l15-'+article+(stage==='done'&&article===item.article?' ok':wrongArticles.includes(article)?' bad':'')} disabled={stage==='done'||wrongArticles.includes(article)} lang="de" onClick={()=>choose(article)}>{article}</button>)}</div>}

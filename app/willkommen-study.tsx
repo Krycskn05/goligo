@@ -20,12 +20,12 @@ import {useAnswerSound} from './study-shared';
 import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
-import {ProgressMeter} from './progress-ui';
-import {PaulHoca} from './paul-hoca';
+import {ProgressMeter} from './progress-meter';
+import {PaulHoca,paulMood} from './paul-hoca';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
 import {StepStrip,exerciseLock,LockedStep,useLessonSpeech,Say,Phrases,Note,Rich,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
-import {hasUnitPack,loadUnitPack,setUnitLanguage,ut,utLang} from '@/lib/unit-i18n';
+import {hasUnitPack,loadUnitPack,setUnitLanguage,ut,utBeside,utLang} from '@/lib/unit-i18n';
 import {StepViewB} from './willkommen-b-steps';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
@@ -146,7 +146,7 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
    {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
    {speech.warning&&<p className="object-alert" role="status">{speech.warning}</p>}
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} scores={scores[place.part]} progress={progress} language={language} onGo={go} onPart={open}>
-    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id}>
+    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id} data-paul-mood={paulMood(step)}>
      <header className="l1a-top">
       <div className="l1a-top-row"><span className="eyebrow">{ut(stepGroup?.label)??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{ut(step.title)} · {index+1}/{config.steps.length}</>}</span></div>
       {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:shortNames[config.id][id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
@@ -324,7 +324,7 @@ function Origin({speech}:{speech:Speech}){
   <table className="l1a-table"><tbody><tr><td><b lang="de">woher</b></td><td>{ut('nereden')}</td></tr><tr><td><b lang="de">kommen</b></td><td>{ut('gelmek')}</td></tr><tr><td><b lang="de">aus</b></td><td>{ut('-den / -dan')}</td></tr></tbody></table></>;
 }
 function Countries({speech}:{speech:Speech}){
- const flag=(c:readonly [string,string,string,string],art:boolean)=><button type="button" key={c[1]} className={'l1a-flag'+(art?' art':'')+(speech.busy&&speech.activeText===c[3]?' playing':'')} onClick={()=>speech.speak(c[3])} aria-label={ut('Dinle')+': '+c[3]}><span className="l1a-flag-emoji" aria-hidden="true">{c[0]}</span><b lang="de">{art?c[3]:c[1]}</b><small>{ut(c[2])}</small></button>;
+ const flag=(c:readonly [string,string,string,string],art:boolean)=><button type="button" key={c[1]} className={'l1a-flag'+(art?' art':'')+(speech.busy&&speech.activeText===c[3]?' playing':'')} onClick={()=>speech.speak(c[3])} aria-label={ut('Dinle')+': '+c[3]}><span className="l1a-flag-emoji" aria-hidden="true">{c[0]}</span><b lang="de">{art?c[3]:c[1]}</b>{utBeside(c[1],c[2])&&<small>{utBeside(c[1],c[2])}</small>}</button>;
  // No rule here (the learner asked, 30 October 2026): the countries with der / dem / den are only learnt by heart, the
  // why comes in a later lesson. Their cards show the whole "aus der Türkei" to memorise.
  return <><Heading>{ut('Ülkeler')}</Heading><p className="l1a-tr">{ut('Dokun, dinle ve ezberle: “aus …” biçimiyle okunur.')}</p>
@@ -335,12 +335,12 @@ function Verbs({speech}:{speech:Speech}){
  const cell=(text:string)=><td><span lang="de">{text}</span> <Say text={text} speech={speech}/></td>;
  return <><Heading><Tx text="Üç fiil: _ich / Sie_"/></Heading>
   <table className="l1a-table l1a-verbs"><thead><tr><th></th><th><span lang="de">ich</span> ({ut('ben')})</th><th><span lang="de">Sie</span> ({ut('siz')})</th></tr></thead>
-  <tbody>{verbForms.map(form=><tr key={form.verb}><td><b lang="de">{form.verb}</b><br/><span className="l1a-mini">{ut(form.tr)}</span></td>{cell(form.ich)}{cell(form.sie)}</tr>)}</tbody></table>
+  <tbody>{verbForms.map(form=><tr key={form.verb}><td><b lang="de">{form.verb}</b><br/><span className="l1a-mini">{utBeside(form.verb,form.tr)}</span></td>{cell(form.ich)}{cell(form.sie)}</tr>)}</tbody></table>
   <Note><Tx text="Kural: *ich* → fiil **-e** ile biter (_heiß**e**, komm**e**_). *Sie* → fiil **-en** ile biter (_heiß**en**, komm**en**_). *sein* düzensizdir: _bin / sind_."/></Note></>;
 }
 function Dialogue({speech}:{speech:Speech}){
  return <><Heading>{ut('Diyalog: Sabine ve Omar')}</Heading><p className="l1a-tr">{ut('Sabine Krüger bir süpermarket işletiyor. Omar Nasser yeni geldi.')}</p>
-  <div className="l1a-dialogue">{dialogue.map(([who,de,tr],i)=><div className={'l1a-line '+(who==='S'?'a':'b')} key={i}><Portrait who={dialogueSpeaker(who)} name={who==='S'?'Sabine':'Omar'}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{ut(tr)}</span></div><Say text={de} who={dialogueSpeaker(who)} speech={speech}/></div>)}</div>
+  <div className="l1a-dialogue">{dialogue.map(([who,de,tr],i)=><div className={'l1a-line '+(who==='S'?'a':'b')} key={i}><Portrait who={dialogueSpeaker(who)} name={who==='S'?'Sabine':'Omar'}/><div className="l1a-bubble"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{utBeside(de,tr)}</span></div><Say text={de} who={dialogueSpeaker(who)} speech={speech}/></div>)}</div>
   <div className="l1a-actions"><button type="button" className="btn secondary small" disabled={speech.busy} onClick={()=>speech.speakAll(dialogue.map(([who,de])=>({text:de,who:dialogueSpeaker(who)})))}><Play size={16} aria-hidden="true"/>{ut('Tümünü dinle')}</button></div></>;
 }
 function People({speech}:{speech:Speech}){

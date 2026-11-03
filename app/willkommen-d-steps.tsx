@@ -7,7 +7,7 @@ import {
  summaryVerbs,summaryVerbSay,summaryRules,wordsD,wordSayD,comicBox,comicGapLines,comicGapSay,ichSentences,ownPromptsD,selfRatings,vocabBox,vocabLines,
  vocabSay,grammarLines,grammarSay,talkLines,talkSay,profileLines,testQuestionsD,checkSections,checkPoints,stepIndexD,lineSayD,
 } from '@/lib/willkommen-d-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
@@ -168,7 +168,7 @@ function Points({scores,onGo}:StepProps){
 function EndD({progress,onGo,onPart,language}:StepProps){
  return <>
   <Heading>{ut('Lektion 1 tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <PaulHoca pose="trophy" className="l1a-paul-big" sound="appear"/>
   <p>{ut('A’dan D’ye kadar bitirdin. Artık:')}</p>
   <ul className="l1a-list"><li>{ut('Selamlaşıp vedalaşabilirsin')}</li><li>{ut('Adını, ülkeni, dillerini söyleyebilirsin')}</li><li><Tx text="*Sie* ve *du* ile soru sorabilirsin"/></li><li>{ut('Hâl hatır sorabilirsin')}</li><li>{ut('Adını harf harf söyleyebilirsin')}</li><li>{ut('Fiili doğru çekip 2. pozisyona koyabilirsin')}</li></ul>
   <ProgressMeter progress={progress} language={language} label="Lektion 1D"/>

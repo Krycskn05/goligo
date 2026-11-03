@@ -6,7 +6,7 @@ exports.saveL15Score = saveL15Score;
 exports.partProgressL15 = partProgressL15;
 exports.lessonFifteenProgress = lessonFifteenProgress;
 exports.readLessonFifteenProgress = readLessonFifteenProgress;
-const progress_1 = require("./progress");
+const progress_core_1 = require("./progress-core");
 const stadt_course_1 = require("./stadt-course");
 exports.L15A_SCORES_KEY = 'lernkoko-l15a-scores';
 exports.L15A_STEP_KEY = 'lernkoko-l15a-step';
@@ -15,7 +15,7 @@ exports.L15_PART_KEY = 'lernkoko-l15-part';
 exports.l15PartKeys = { a: { scores: exports.L15A_SCORES_KEY, step: exports.L15A_STEP_KEY } };
 exports.l15PartScored = { a: stadt_course_1.scoredExercisesA };
 /** What the percentages count: the scored exercises and the teaching steps (lib/progress.ts `lessonItems`). */
-exports.l15PartCounted = { a: (0, progress_1.lessonItems)(stadt_course_1.scoredExercisesA, stadt_course_1.stepsA) };
+exports.l15PartCounted = { a: (0, progress_core_1.lessonItems)(stadt_course_1.scoredExercisesA, stadt_course_1.stepsA) };
 function readL15Scores(part) {
     try {
         const value = JSON.parse(localStorage.getItem(exports.l15PartKeys[part].scores) ?? '{}');
@@ -49,7 +49,7 @@ function progressOf(list, scores) {
         learned += Math.max(0, Math.min(exercise.total, score.right));
     }
     const percent = ratio(learned, total);
-    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_1.starsFor)(percent), stage: (0, progress_1.stageFor)(percent, tried) };
+    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_core_1.starsFor)(percent), stage: (0, progress_core_1.stageFor)(percent, tried) };
 }
 /** One part's progress (its notebook page and its row on the contents page). */
 function partProgressL15(part, scores) { return progressOf(exports.l15PartCounted[part], scores); }

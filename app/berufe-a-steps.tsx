@@ -10,11 +10,11 @@ import {
  duArbeitest,orderRows,orderRowSay,pictureItems,chatLines,chatFill,otherForms,otherFormSay,letterLines,dialogueLines,dialogueSay,
  examLines,ownPrompts,L2A_OWN_KEY,berufeTest,isTurkishText,practiceItems,berufeStepIndex,type QuickCheck,type PracticeItem,
 } from '@/lib/berufe-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Say,Note,Heading,Portrait,Rich,Tx,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
-import {ut,utLang} from '@/lib/unit-i18n';
+import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
 /**
  * Lektion 2 „Berufe“, Teil A – Ich bin Koch. (the learner's lesson page, 2 November 2026): the steps. The page around
@@ -70,7 +70,7 @@ export function Conversation({lines,speech,actions=true}:{lines:readonly (Line&{
  return <>
   <div className={'l1a-dialogue'+(hidden?' l15-hide-tr':'')}>{lines.map((line,i)=><div className={'l1a-line '+(line.who===first?'a':'b')} key={i}>
    <Portrait who={line.who} name={personName(line.who)}/>
-   <div className="l1a-bubble"><span className="l15-name">{personName(line.who)}{line.from&&<span lang={utLang(line.from)}> · {ut(line.from)}</span>}</span><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{ut(line.tr)}</span></div>
+   <div className="l1a-bubble"><span className="l15-name">{personName(line.who)}{line.from&&<span lang={utLang(line.from)}> · {ut(line.from)}</span>}</span><span className="l1a-de" lang="de" dir="ltr">{line.de}</span><span className="l1a-tr">{utBeside(line.de,line.tr)}</span></div>
    <Say text={line.say??line.de} who={line.who} speech={speech}/>
   </div>)}</div>
   {actions&&<div className="l1a-actions">
@@ -135,7 +135,7 @@ function JobWords({speech}:{speech:Speech}){
 function OtherWords({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Wörter</p><Heading>{ut('Diğer kelimeler')}</Heading>
   <p className="l1a-tr">{ut('Her satırda kelime, anlamı ve bir örnek cümle var. Satıra dokununca örnek cümle okunur.')}</p>
-  <div className="l15-word-grid">{otherWords.map(([de,tr,example,exampleTr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{ut(tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{ut(exampleTr)}</span></div><Say text={example} speech={speech}/></div>)}</div></>;
+  <div className="l15-word-grid">{otherWords.map(([de,tr,example,exampleTr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{utBeside(de,tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{utBeside(example,exampleTr)}</span></div><Say text={example} speech={speech}/></div>)}</div></>;
 }
 function WordCheck({speech,sound,onGo}:{speech:Speech;sound:Sound;onGo:(index:number)=>void}){
  return <><p className="kicker" lang="de">Wortschatz · Kontrolle</p><Heading>{ut('Kelimeleri hatırlıyor musun?')}</Heading>
@@ -172,12 +172,12 @@ function Forms({speech,sound}:{speech:Speech;sound:Sound}){
    <tbody>{inRule.map(key=>{const job=jobOf(key);return <tr key={key}><td lang="de"><Art de={job.male}/></td><td lang="de"><WomanForm de={job.female} mark="in"/></td><td><Say text={pairSay(job)} speech={speech}/></td></tr>;})}</tbody></table>
   <h2 className="l1a-h2">{ut('Dikkat 1: nokta nokta (Umlaut) gelir')}</h2>
   <p><Tx text="Bazı kelimelerde _-in_ eklenince içerideki **o → ö**, **a → ä** olur. Bunları ezberle, kuralı yok:"/></p>
-  {umlautRule.map(key=>{const job=jobOf(key);return <div className="l1a-phrase" key={key}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={job.male}/> → <WomanForm de={job.female} mark="umlaut"/></span><span className="l1a-tr">{ut(job.tr)}</span></div><Say text={pairSay(job)} speech={speech}/></div>;})}
+  {umlautRule.map(key=>{const job=jobOf(key);return <div className="l1a-phrase" key={key}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={job.male}/> → <WomanForm de={job.female} mark="umlaut"/></span><span className="l1a-tr">{utBeside(job.male,job.tr)}</span></div><Say text={pairSay(job)} speech={speech}/></div>;})}
   <h2 className="l1a-h2"><Tx text="Dikkat 2: _Mann → Frau_"/></h2>
   <p><Tx text="„_-mann_“ ile biten kelimede _-in_ eklenmez; *Mann* yerine *Frau* gelir:"/></p>
   <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={haus.male}/> → <Art de={haus.female}/></span><span className="l1a-tr">{ut('ev erkeği → ev hanımı')}</span></div><Say text={pairSay(haus)} speech={speech}/></div>
   <h2 className="l1a-h2">{ut('Hepsi bir arada')}</h2>
-  <table className="l1a-table"><tbody>{jobs.map(job=><tr key={job.key}><td lang="de"><Art de={job.male}/></td><td lang="de"><Art de={job.female}/></td><td className="l1a-mini">{ut(job.tr)}</td><td><Say text={pairSay(job)} speech={speech}/></td></tr>)}</tbody></table>
+  <table className="l1a-table"><tbody>{jobs.map(job=><tr key={job.key}><td lang="de"><Art de={job.male}/></td><td lang="de"><Art de={job.female}/></td><td className="l1a-mini">{utBeside(job.male,job.tr)}</td><td><Say text={pairSay(job)} speech={speech}/></td></tr>)}</tbody></table>
   <Note><Tx text="Okurken ipucu: kelimenin sonunda *-in* görüyorsan kadından bahsediliyor: ~die Verkäufer**in**~ = kadın satış görevlisi."/></Note>
   <QuickChecks items={formChecks} speech={speech} sound={sound}/></>;
 }

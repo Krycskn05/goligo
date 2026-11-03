@@ -2,7 +2,7 @@
  * Lektion 12 progress, kept in the learner's browser: which exercises were checked and how many
  * answers were right. Shown with the site's usual percentage bars and stars.
  */
-import {starsFor,stageFor,type TopicProgress} from './progress';
+import {starsFor,stageFor,type TopicProgress} from './progress-core';
 import {lessonParts,type L12Exercise,type L12Part} from './ausbildung-course';
 
 export type L12Score={right:number;total:number;points?:number};

@@ -10,7 +10,7 @@ exports.wordArticle = wordArticle;
  * Lektion 12 progress, kept in the learner's browser: which exercises were checked and how many
  * answers were right. Shown with the site's usual percentage bars and stars.
  */
-const progress_1 = require("./progress");
+const progress_core_1 = require("./progress-core");
 const ausbildung_course_1 = require("./ausbildung-course");
 /** How many answers an exercise checks (blanks, choices, sentences); free writing has none. */
 function exerciseAnswerCount(exercise) {
@@ -40,7 +40,7 @@ function exercisesProgress(exercises, scores) {
         learned += Math.max(0, Math.min(count, score.right));
     }
     const percent = ratio(learned, total);
-    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_1.starsFor)(percent), stage: (0, progress_1.stageFor)(percent, tried) };
+    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_core_1.starsFor)(percent), stage: (0, progress_core_1.stageFor)(percent, tried) };
 }
 const partProgress = (part, scores) => exercisesProgress(part.exercises, scores);
 exports.partProgress = partProgress;

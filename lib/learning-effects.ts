@@ -58,7 +58,7 @@ let primed=false;
 function primeSounds(){
  if(primed||typeof window==='undefined'||typeof window.Audio!=='function')return;primed=true;
  const chosen=readEffects();
- for(const id of [chosen.tap==='tap'?'tap':chosen.tap,chosen.page,chosen.correct,chosen.wrong,chosen.complete,'paulDrum'] as SoundId[]){
+ for(const id of [chosen.tap==='tap'?'tap':chosen.tap,chosen.page,chosen.correct,chosen.wrong,chosen.complete] as SoundId[]){
   if(!(id in soundRecipes)||ready.get(id)?.length)continue;
   try{const media=new window.Audio(soundUrl(id));media.preload='auto';(media as HTMLAudioElement&{load?:()=>void}).load?.();ready.set(id,[media]);}catch{}
  }

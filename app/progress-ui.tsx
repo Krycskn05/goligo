@@ -5,19 +5,8 @@ import type {VaultLanguage} from '@/lib/object-vault-copy';
 import {progressSummary,roundXp,topicProgress,housingProgress,objectProgress,verbProgress,housingProgressIds,objectProgressIds,verbProgressIds,type StudyStats,type TopicProgress} from '@/lib/progress';
 import {progressText,stageText,formatPercent,type ProgressCopyKey} from '@/lib/progress-copy';
 
-function Stars({count}:{count:number}){
- return <span className="progress-stars" aria-hidden="true">{[1,2,3].map(i=><Star key={i} size={13} className={i<=count?'on':''}/>)}</span>;
-}
-/** Percentage bar for one topic: solid = learned, light = tried. */
-export function ProgressMeter({progress,language,label,compact=false}:{progress:TopicProgress;language:VaultLanguage;label:string;compact?:boolean}){
- const value=formatPercent(progress.percent,language);
- const learned=progressText(language,'learned',{n:progress.learned,total:progress.total});
- return <div className={'progress-meter stage-'+progress.stage+(compact?' compact':'')} data-progress={progress.percent}>
-  <div className="progress-meter-head"><strong className="progress-meter-value">{value}</strong><span className="progress-badge">{progress.stage==='master'?<Crown size={14} aria-hidden="true"/>:<Stars count={progress.stars}/>}{stageText(language,progress.stage)}</span></div>
-  <div className="progress-track" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent} aria-valuetext={value+' · '+learned}><span className="progress-tried" style={{width:progress.triedPercent+'%'}}/><span className="progress-fill" style={{width:progress.percent+'%'}}/></div>
-  {!compact&&<small className="progress-meter-note">{learned}</small>}
- </div>;
-}
+import {ProgressMeter} from './progress-meter';
+export {ProgressMeter};
 function GoalRing({percent}:{percent:number}){
  const radius=19,circle=2*Math.PI*radius;
  return <span className="progress-ring" aria-hidden="true"><svg className="progress-ring-svg" viewBox="0 0 46 46"><circle cx="23" cy="23" r={radius} className="progress-ring-bg"/><circle cx="23" cy="23" r={radius} className="progress-ring-fill" strokeDasharray={circle} strokeDashoffset={circle*(1-percent/100)}/></svg><Target size={18}/></span>;

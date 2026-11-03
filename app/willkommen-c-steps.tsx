@@ -9,12 +9,12 @@ import {
  type Register,
 } from '@/lib/willkommen-c-course';
 import {lineSay} from '@/lib/willkommen-b-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
-import {ut} from '@/lib/unit-i18n';
+import {ut,utBeside} from '@/lib/unit-i18n';
 import {DialogueLines,ListenAll,Picture} from './willkommen-b-steps';
 
 /**
@@ -118,7 +118,7 @@ function VerbPosition({speech}:{speech:Speech}){
 function World({speech}:{speech:Speech}){
  return <><Heading>{ut('Dünyada selamlaşma')}</Heading>
   <Picture {...willkommenCPictures.world} alt="Dünyada selamlaşma biçimleri: el sıkma, sarılma, el sallama, yanaktan öpme, eğilme"/>
-  <table className="l1a-table"><tbody>{worldGreetings.map(([emoji,de,tr])=><tr key={de}><td className="l1a-emoji-cell" aria-hidden="true">{emoji}</td><td><b lang="de">{de}</b> <Say text={de} speech={speech}/></td><td className="l1a-tr">{ut(tr)}</td></tr>)}</tbody></table>
+  <table className="l1a-table"><tbody>{worldGreetings.map(([emoji,de,tr])=><tr key={de}><td className="l1a-emoji-cell" aria-hidden="true">{emoji}</td><td><b lang="de">{de}</b> <Say text={de} speech={speech}/></td><td className="l1a-tr">{utBeside(de,tr)}</td></tr>)}</tbody></table>
   <Note><Tx text="Almanya’da ilk karşılaşmada ve resmî ortamda **el sıkılır**, göz teması kurulur. Yanaktan öpme sadece yakın arkadaşlar arasında olur."/></Note></>;
 }
 function Writing(){

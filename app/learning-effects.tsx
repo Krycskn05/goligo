@@ -9,7 +9,7 @@ import {effectsText,type EffectsCopyKey} from '@/lib/effects-copy';
 import {isVaultLanguage,type VaultLanguage} from '@/lib/object-vault-copy';
 import {defaultEffects,EFFECTS_CHANGED,EFFECTS_KEY,LEARNING_REACTION,readEffects,saveEffects,motionAllowed,playLearningSound,canPlayEffects,stopAllEffects,warmEffects,type EffectsPreferences,type LearningReaction} from '@/lib/learning-effects';
 import {languageDirection,loadLanguagePack} from '@/lib/site-languages';
-import {PAUL_PICTURES,PaulPeek,playPaulSound,type PaulPose} from './paul-hoca';
+import {PaulPeek,nextPaul,paulSrc,playPaulSound,upcomingPaul,type PaulAnimation,type PaulPose} from './paul-hoca';
 import {TopIcon} from './top-icons';
 
 // Buttons and links that open another view get a soft gust of wind instead of a tap.
@@ -18,9 +18,10 @@ const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-featu
 export const VOICE_SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
 const OPEN_EFFECTS='lernkoko-open-effects';
-/** Paul Hoca reacts in the answer badge: "Harika!" — he drums on the desk (the learner chose it), "Bir daha
- * deneyelim" — a gentle raised finger, end of a round — he claps, with applause. Right and wrong answers keep only
- * their own effect sound (then the right answer is read). The badge stays long enough to see his animation. */
+/** Paul Hoca reacts in the answer badge with the learner's animations, a different one each time (app/paul-hoca.tsx):
+ * "Harika!" — thumbs up, a wink, fists up or a happy "wow"; "Bir daha deneyelim" — a raised finger, "try again" or
+ * "slow down"; end of a round — clapping, "we did it" or the cup, with applause. Right and wrong answers keep only their
+ * own effect sound (then the right answer is read). The badge stays long enough to see his animation. */
 const REACTION_MS={correct:2000,wrong:2100,complete:2600} as const;
 const REACTION_POSE:Record<LearningReaction,PaulPose>={correct:'desk',wrong:'wrong',complete:'cheer'};
 /** The sound groups of the dialog: the moment, its title and the sounds to choose from (the first is the default). */
@@ -49,7 +50,7 @@ export default function LearningEffects() {
  const [message,setMessage]=useState<EffectsCopyKey|null>(null);
  // Three tabs instead of one long panel (the learner asked, 22 October 2026): Telaffuz, Efektler, Animasyonlar.
  const [tab,setTab]=useState<'voice'|'effects'|'motion'>('voice');
- const [reaction,setReaction]=useState<{kind:LearningReaction;id:number;pose:PaulPose}|null>(null);
+ const [reaction,setReaction]=useState<{kind:LearningReaction;id:number;pose:PaulPose;anim:PaulAnimation}|null>(null);
  const dialog=useRef<HTMLDialogElement>(null);
  const previewStop=useRef<(()=>void)|null>(null);
  const reactionTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -78,7 +79,9 @@ export default function LearningEffects() {
    if(!['correct','wrong','complete'].includes(kind)||document.hidden||!motionAllowed())return;
    if(reactionTimer.current)clearTimeout(reactionTimer.current);
    const pose=REACTION_POSE[kind];
-   setReaction({kind,id:++sequence.current,pose});reactionTimer.current=setTimeout(()=>setReaction(null),REACTION_MS[kind]);
+   setReaction({kind,id:++sequence.current,pose,anim:nextPaul(pose)});reactionTimer.current=setTimeout(()=>setReaction(null),REACTION_MS[kind]);
+   // Fetch his next animation for this moment now, so it shows at once the next time.
+   try{const picture=new Image();picture.decoding='async';picture.src=paulSrc(upcomingPaul(pose));}catch{}
    if(kind==='complete')playPaulSound(pose);
   };
   const tap=(event:MouseEvent)=>{
@@ -94,7 +97,7 @@ export default function LearningEffects() {
    setTimeout(()=>{if(target.dataset.lkTap===String(mark)){target.classList.remove('lk-tap-pop');delete target.dataset.lkTap;}},440);
   };
   // After the first tap: fetch the sounds and Paul's answer pictures, so his first reaction shows at once.
-  const warm=()=>{warmEffects();for(const pose of ['desk','wrong','cheer','hello'] as const){const picture=new Image();picture.decoding='async';picture.src=PAUL_PICTURES[pose];}};
+  const warm=()=>{warmEffects();for(const pose of ['desk','wrong','cheer','hello'] as const){const picture=new Image();picture.decoding='async';picture.src=paulSrc(upcomingPaul(pose));}};
   const visibility=()=>{if(document.hidden){stopAllEffects();previewStop.current?.();setPlaying(null);setReaction(null);}};
   window.addEventListener(EFFECTS_CHANGED,sync);window.addEventListener('storage',storage);window.addEventListener(OPEN_EFFECTS,open);window.addEventListener(LEARNING_REACTION,feedback);
   document.addEventListener('click',tap,true);document.addEventListener('pointerdown',warm,{once:true,capture:true});document.addEventListener('visibilitychange',visibility);media.addEventListener('change',sync);
@@ -111,7 +114,7 @@ export default function LearningEffects() {
  return <>
   <PaulPeek/>
   {reaction&&<div key={reaction.id} className={'lk-reaction-layer '+(reaction.kind==='wrong'?'retry':'celebrate')+' kind-'+reaction.kind} aria-hidden="true">
-   <div className="lk-reaction-badge"><img className="lk-reaction-paul" src={PAUL_PICTURES[reaction.pose]} alt="" width={224} height={224} decoding="async"/><strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
+   <div className="lk-reaction-badge"><img className="lk-reaction-paul" src={paulSrc(reaction.anim)} alt="" width={288} height={288} decoding="async" data-paul={reaction.anim}/><strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
    {confetti&&Array.from({length:reaction.kind==='complete'?24:14},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%430)-215}px`,'--lk-y':`${85+i*43%175}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={14} fill="currentColor"/>:null}</span>)}
   </div>}
   <dialog ref={dialog} className="lk-effects-dialog" aria-labelledby="lk-effects-title" lang={language} dir={languageDirection(language)} data-no-effects onClose={()=>{previewStop.current?.();setPlaying(null);speech.stop();}} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();}}}>

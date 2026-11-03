@@ -10,13 +10,13 @@ import {
  listenNumbers,numberRows,numberRowSay,phoneDigits,dice,diceSentence,diceLines,helpLines,helpSay,fieldQuestions,fieldSay,
  possessiveLines,wirIhrLines,berufeTestC,practiceItemsC,berufeStepIndexC,type PersonGapLine,
 } from '@/lib/berufe-c-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,Conversation,SpeakStep} from './berufe-a-steps';
 import {Marked} from './berufe-b-steps';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,ChoiceRows,TestStep,shuffle,useFinish,useInnerNext,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
-import {ut} from '@/lib/unit-i18n';
+import {ut,utBeside} from '@/lib/unit-i18n';
 
 /**
  * Lektion 2 „Berufe“, Teil C – Wir brauchen Hilfe. (the learner's lesson page, 2 November 2026): the steps. The notebook
@@ -100,7 +100,7 @@ function Numbers({speech}:{speech:Speech}){
 function WordsC({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Wörter</p><Heading>{ut('Bu bölümün kelimeleri')}</Heading>
   <p className="l1a-tr">{ut('Formdaki alanlar ve yardım isteme kelimeleri. Her satırda kelime, anlamı ve bir örnek var; satıra dokununca örnek okunur.')}</p>
-  <div className="l15-word-grid">{wordsC.map(row=>{const [de,tr,example,exampleTr]=row;return <div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{ut(tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{ut(exampleTr)}</span></div><Say text={wordSayC(row)} speech={speech}/></div>;})}</div></>;
+  <div className="l15-word-grid">{wordsC.map(row=>{const [de,tr,example,exampleTr]=row;return <div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{utBeside(de,tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{utBeside(example,exampleTr)}</span></div><Say text={wordSayC(row)} speech={speech}/></div>;})}</div></>;
 }
 function NumberRules({speech,sound}:{speech:Speech;sound:Sound}){
  return <><p className="kicker">{ut('Konu 1 · Zahlen 0–20')}</p><Heading>{ut('Sayılar nasıl kurulur?')}</Heading>

@@ -22,7 +22,7 @@ import {SiteMenuAside} from './site-menu';
 import {BrandMascot} from './site-logo';
 import {RasterArt,TopicArt} from './toon-art';
 import {hoerenPicture,partPictures} from '@/lib/ausbildung-art';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {LessonBook} from './lesson-book';
 import {GUEST_L12_PART} from '@/lib/guest-parts';
 import {GuestBanner,GuestLock,GuestMore} from './guest-taste';

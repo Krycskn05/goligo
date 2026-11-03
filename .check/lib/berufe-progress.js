@@ -6,7 +6,7 @@ exports.saveL2Score = saveL2Score;
 exports.partProgressL2 = partProgressL2;
 exports.lessonTwoProgress = lessonTwoProgress;
 exports.readLessonTwoProgress = readLessonTwoProgress;
-const progress_1 = require("./progress");
+const progress_core_1 = require("./progress-core");
 const berufe_course_1 = require("./berufe-course");
 const berufe_b_course_1 = require("./berufe-b-course");
 const berufe_c_course_1 = require("./berufe-c-course");
@@ -24,7 +24,7 @@ exports.L2_PART_KEY = 'lernkoko-l2-part';
 exports.l2PartKeys = { a: { scores: exports.L2A_SCORES_KEY, step: exports.L2A_STEP_KEY }, b: { scores: exports.L2B_SCORES_KEY, step: exports.L2B_STEP_KEY }, c: { scores: exports.L2C_SCORES_KEY, step: exports.L2C_STEP_KEY }, d: { scores: exports.L2D_SCORES_KEY, step: exports.L2D_STEP_KEY } };
 exports.l2PartScored = { a: berufe_course_1.berufeScored, b: berufe_b_course_1.berufeScoredB, c: berufe_c_course_1.berufeScoredC, d: berufe_d_course_1.berufeScoredD };
 /** What the percentages count: the scored exercises, the teaching steps and Konuş (lib/progress.ts `lessonItems`). */
-exports.l2PartCounted = { a: (0, progress_1.lessonItems)(berufe_course_1.berufeScored, berufe_course_1.berufeSteps), b: (0, progress_1.lessonItems)(berufe_b_course_1.berufeScoredB, berufe_b_course_1.berufeStepsB), c: (0, progress_1.lessonItems)(berufe_c_course_1.berufeScoredC, berufe_c_course_1.berufeStepsC), d: (0, progress_1.lessonItems)(berufe_d_course_1.berufeScoredD, berufe_d_course_1.berufeStepsD) };
+exports.l2PartCounted = { a: (0, progress_core_1.lessonItems)(berufe_course_1.berufeScored, berufe_course_1.berufeSteps), b: (0, progress_core_1.lessonItems)(berufe_b_course_1.berufeScoredB, berufe_b_course_1.berufeStepsB), c: (0, progress_core_1.lessonItems)(berufe_c_course_1.berufeScoredC, berufe_c_course_1.berufeStepsC), d: (0, progress_core_1.lessonItems)(berufe_d_course_1.berufeScoredD, berufe_d_course_1.berufeStepsD) };
 function readL2Scores(part) {
     try {
         const value = JSON.parse(localStorage.getItem(exports.l2PartKeys[part].scores) ?? '{}');
@@ -58,7 +58,7 @@ function progressOf(list, scores) {
         learned += Math.max(0, Math.min(exercise.total, score.right));
     }
     const percent = ratio(learned, total);
-    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_1.starsFor)(percent), stage: (0, progress_1.stageFor)(percent, tried) };
+    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_core_1.starsFor)(percent), stage: (0, progress_core_1.stageFor)(percent, tried) };
 }
 /** One part's progress (its notebook page and its row on the contents page). */
 function partProgressL2(part, scores) { return progressOf(exports.l2PartCounted[part], scores); }

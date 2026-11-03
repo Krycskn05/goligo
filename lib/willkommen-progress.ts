@@ -1,4 +1,4 @@
-import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress';
+import {starsFor,stageFor,lessonItems,type TopicProgress} from './progress-core';
 import {scoredExercises,steps} from './willkommen-course';
 import {scoredExercisesB,stepsB} from './willkommen-b-course';
 import {scoredExercisesC,stepsC} from './willkommen-c-course';

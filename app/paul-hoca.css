@@ -43,3 +43,9 @@
  .verb-learn .paul-box>.paul-hoca { display:none; }
 }
 @media (prefers-reduced-motion:reduce) { .paul-peek { display:none; } }
+
+/* Konuş: Paul gives the turn to the learner and thanks at the end (3 November 2026). */
+.l1a-talk-setting { margin:4px 0 10px; }
+.l1a-talk-setting>.paul-hoca, .l1a-feedback.paul-box>.paul-hoca { width:84px; height:84px; margin-block:-6px; }
+.l1a-feedback.paul-box p { margin:0; }
+@media (max-width:560px) { .l1a-talk-setting>.paul-hoca, .l1a-feedback.paul-box>.paul-hoca { width:64px; height:64px; } }

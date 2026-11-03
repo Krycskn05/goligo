@@ -12,13 +12,13 @@ import {
  L2D_FORM_KEY,ownFields,ownFieldOk,vocabLinesD,grammarLinesD,grammarSpeakersD,grammarSayD,talkQuestionsD,talkAnswersD,tomaszExam,
  tomaszExamSay,examFormD,berufeTestD,checkSectionsD,checkPointsD,examTalk,berufeStepIndexD,type OwnField,
 } from '@/lib/berufe-d-course';
-import {ProgressMeter} from './progress-ui';
+import {ProgressMeter} from './progress-meter';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,Conversation,SpeakStep,ownJobSentence} from './berufe-a-steps';
 import {Marked} from './berufe-b-steps';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,useSelfCheck,selfCheckNote,type SelfCheckResult,WordChoice,GapExercise,ChoiceRows,OrderExercise,TestStep,shuffle,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
-import {ut,utLang} from '@/lib/unit-i18n';
+import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
 /**
  * Lektion 2 „Berufe“, Teil D – Ich verstehe das nicht. (the learner's lesson page, 2 November 2026): the steps. The
@@ -62,7 +62,7 @@ export function StepViewL2D(props:StepProps){
 
 /* ---------- small pieces ---------- */
 function SayRow({de,tr,say,speech}:{de:string;tr?:string;say:string;speech:Speech}){
- return <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span>{tr&&<span className="l1a-tr">{ut(tr)}</span>}</div><Say text={say} speech={speech}/></div>;
+ return <div className="l1a-phrase"><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span>{tr&&<span className="l1a-tr">{utBeside(de,tr)}</span>}</div><Say text={say} speech={speech}/></div>;
 }
 const personLabels=['ich','du','er / sie','wir','ihr','sie / Sie'];
 
@@ -87,7 +87,7 @@ function CoverL2D(){ // the cover picture and the part's progress are on the not
 function WordsD({speech}:{speech:Speech}){
  return <><p className="kicker" lang="de">Wortschatz · Wörter</p><Heading>{ut('Bu bölümün kelimeleri')}</Heading>
   <p className="l1a-tr">{ut('İş yerinde ilk gün ve form kelimeleri; sonda pantomim oyununun fiilleri. Satıra dokununca örnek okunur.')}</p>
-  <div className="l15-word-grid">{wordsD.map(row=>{const [de,tr,example,exampleTr]=row;return <div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{ut(tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{ut(exampleTr)}</span></div><Say text={wordSayD(row)} speech={speech}/></div>;})}</div></>;
+  <div className="l15-word-grid">{wordsD.map(row=>{const [de,tr,example,exampleTr]=row;return <div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de"><Art de={de}/></span><span className="l1a-tr">{utBeside(de,tr)}</span><span className="l15-example" lang="de">{example}</span><span className="l1a-mini">{utBeside(example,exampleTr)}</span></div><Say text={wordSayD(row)} speech={speech}/></div>;})}</div></>;
 }
 function AllVerbs({speech,sound}:{speech:Speech;sound:Sound}){
  return <><p className="kicker">{ut('Konu 1 · Verben: Präsens')}</p><Heading>{ut('Fiil çekimi: altı kişi, bir tablo')}</Heading>
@@ -314,7 +314,7 @@ function EndL2D({progress,onGo,onPart,language}:StepProps){
  return <>
   <p className="kicker">{ut('Bitti')}</p>
   <Heading>{ut('Lektion 2 tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <PaulHoca pose="trophy" className="l1a-paul-big" sound="appear"/>
   <p>{ut('A’dan D’ye kadar bitirdin. Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">
    <li><Tx text="Mesleğini ve işini söylemek: *Ich bin … von Beruf. Ich arbeite als …*"/></li>

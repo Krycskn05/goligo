@@ -1,9 +1,20 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.exerciseKey = exports.DAILY_GOAL = exports.XP_TRY = exports.XP_CORRECT = void 0;
-exports.lessonItems = lessonItems;
-exports.starsFor = starsFor;
-exports.stageFor = stageFor;
 exports.isLearned = isLearned;
 exports.topicProgress = topicProgress;
 exports.housingProgressIds = housingProgressIds;
@@ -29,6 +40,8 @@ const object_practice_1 = require("./object-practice");
 const verb_course_1 = require("./verb-course");
 const verb_practice_1 = require("./verb-practice");
 const verb_workshop_1 = require("./verb-workshop");
+const progress_core_1 = require("./progress-core");
+__exportStar(require("./progress-core"), exports);
 exports.XP_CORRECT = 10;
 exports.XP_TRY = 2;
 exports.DAILY_GOAL = 20;
@@ -39,16 +52,6 @@ function ratio(part, total) {
     if (part >= total)
         return 100;
     return Math.min(99, Math.max(1, Math.round(part * 100 / total)));
-}
-/** What a lesson part's percentage counts (Lektion 1, 2, 15): every scored exercise with its answers, and every teaching
- * step and Konuş as one item each — a teaching step counts once it is opened, Konuş once the learner rated it (the learner
- * asked, 2 November 2026: reading a topic did not move the percentage). */
-function lessonItems(scored, steps) {
-    return [...scored, ...steps.filter(step => (step.kind === 'teach' || step.kind === 'speak') && !scored.some(item => item.id === step.id)).map(step => ({ id: step.id, total: 1 }))];
-}
-function starsFor(percent) { return percent >= 75 ? 3 : percent >= 50 ? 2 : percent >= 25 ? 1 : 0; }
-function stageFor(percent, tried) {
-    return percent >= 100 ? 'master' : percent >= 75 ? 'almost' : percent >= 50 ? 'half' : percent >= 25 ? 'warming' : tried > 0 || percent > 0 ? 'started' : 'new';
 }
 /** Answered right at least once (a row counts every answer in `seen` and every wrong one in `wrong_count`). */
 function isLearned(row) { return !!row && row.seen > 0 && (row.streak >= 1 || row.seen > row.wrong_count); }
@@ -73,7 +76,7 @@ function topicProgress(ids, reviews) {
     }
     const total = groups.size;
     const percent = ratio(learned, total);
-    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: starsFor(percent), stage: stageFor(percent, tried) };
+    return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_core_1.starsFor)(percent), stage: (0, progress_core_1.stageFor)(percent, tried) };
 }
 /** Exercises that can actually be practised on the Ev ve Yaşam page (write or four-choice). */
 function housingProgressIds(section) {

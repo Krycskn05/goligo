@@ -13,6 +13,8 @@ export type UnitPack=Record<string,string>;
 
 const loaders:Partial<Record<SiteLanguage,()=>Promise<unknown>>>={
  en:()=>import('./unit-packs/en.json'),ar:()=>import('./unit-packs/ar.json'),uk:()=>import('./unit-packs/uk.json'),
+ // German explanations (the learner asked, 3 November 2026: every unit in tr, en, ar, uk and de).
+ de:()=>import('./unit-packs/de.json'),
 };
 /** The languages with a pack for these lessons (Turkish is the original). */
 export const unitPackLanguages=Object.keys(loaders) as SiteLanguage[];
@@ -53,5 +55,14 @@ export type UnitT=ReturnType<typeof unitT>;
 let current='tr';
 export function setUnitLanguage(language:string){current=language;}
 export function ut<T extends string|undefined>(text:T,params?:Record<string,string|number>):T{return unitText(current,text,params);}
+/** Loose comparison: case, a leading article, markup and punctuation do not count. */
+const loose=(text:string)=>text.toLowerCase().replace(/[*~_|·]/g,' ').replace(/^\s*(der|die|das)\s+/,'').replace(/[.!?,;:„“"()…–—-]+/g,' ').replace(/\s+/g,' ').trim();
+/**
+ * A meaning shown beside German, or a prompt whose answer is German: nothing when, in the help language, it would only
+ * repeat that German (with German help „Italien – Italien“, or a „build this sentence“ prompt that gives the answer away).
+ */
+export function utBeside(german:string,text:string,params?:Record<string,string|number>):string{
+ const shown=unitText(current,text,params);return current!=='tr'&&loose(shown)===loose(german)?'':shown;
+}
 /** The lang of a Turkish text where it is shown: 'tr' while it is still Turkish, otherwise the page's language. */
 export function utLang(text:string){return unitText(current,text)===text?'tr':current;}

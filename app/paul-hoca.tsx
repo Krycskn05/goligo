@@ -4,23 +4,50 @@ import {EFFECTS_CHANGED,EFFECTS_KEY,motionAllowed,playLearningSound} from '@/lib
 import type {PaulSoundId} from '@/lib/effect-sounds';
 
 /**
- * Paul Hoca, the learner's teacher, in the animations the learner made from his photos (public/paul: 224 × 224
- * animated WebP with a clear background, 31 frames, about 2.5 s, looping; `-still.webp` is the first frame).
- * Shown at a middle size (about 110–150 px on a computer, a little smaller on phones):
- * - hello: now and then he pops up somewhere on the screen and waves (`PaulPeek`), with a cheerful "hello" sound
- *   the first time in a visit; between two waves he shows his other animations there in turn;
- * - desk / wrong: drumming on the desk for "Harika!" (with a knocking sound next to the chosen correct sound) and a
- *   gentle raised finger in the answer badge (only the wrong sound there);
- * - cheer: clapping at the end of a round, with applause;
- * - correct: thumbs up, among his visits on the screen;
- * - tip: pointing at his little board next to hints and rules ("pling" when the learner opens a hint);
- * - think: hand on the chin with a question mark on the Yanlışlarım page ("hm-hm?").
+ * Paul Hoca in the learner's 20 animations (3 November 2026; public/paul/v2: 288 × 288 animated WebP with a clear
+ * background, made from the 1024 px originals, 6 frames, a 1.08 s loop; `-still` is the learner's preview frame).
+ * Every situation has a few animations that fit it (PAUL_POSES) and Paul goes through them in turn, so the same one
+ * does not come again and again (the learner asked: "change them so it does not get boring, but always meaningful"):
+ * - hello: waving or winking (his visits on the screen, the tour);
+ * - correct / desk: thumbs up, wink, fists up, a happy "wow" in the answer badge;
+ * - wrong: a gentle raised finger, "try again", "slow down";
+ * - cheer: clapping, "we did it", the cup at the end of a round or a part;
+ * - tip: "I've got an idea" or pointing at the hint (to the right, to the left in right-to-left languages);
+ * - think (Yanlışlarım), listen (listening), speak (Konuş), ready (a test begins), read (the topic), write (writing),
+ *   trophy (a lesson finished) and thanks (a conversation finished).
  * His sounds are effects, never speech: after an answer only the right answer is read aloud.
  */
-export const PAUL_PICTURES={hello:'/paul/paul-merhaba.webp',correct:'/paul/paul-dogru.webp',wrong:'/paul/paul-yanlis.webp',tip:'/paul/paul-ipucu.webp',think:'/paul/paul-dusunuyor.webp',cheer:'/paul/paul-tebrik.webp',desk:'/paul/paul-sira.webp'} as const;
-export type PaulPose=keyof typeof PAUL_PICTURES;
-export const PAUL_STILL:Record<PaulPose,string>=Object.fromEntries(Object.entries(PAUL_PICTURES).map(([pose,src])=>[pose,src.replace('.webp','-still.webp')])) as Record<PaulPose,string>;
-export const PAUL_SOUNDS:Partial<Record<PaulPose,PaulSoundId>>={hello:'paulHello',tip:'paulTip',think:'paulHmm',cheer:'paulClap',desk:'paulDrum'};
+export const PAUL_ANIMATIONS={welcome:'01-hos-geldin',correct:'02-dogru-cevap',applause:'03-alkis',wrong:'04-yanlis-cevap',retry:'05-tekrar-dene',think:'06-dusunuyor',idea:'07-fikir-buldum',wink:'08-goz-kirpiyor',listen:'09-dinliyor',speak:'10-konusma-sirasi',slow:'11-yavasla',ready:'12-hazir-misin',pointRight:'13-saga-goster',pointLeft:'14-sola-goster',read:'15-kitap-okuyor',write:'16-not-aliyor',trophy:'17-kupa-kazandi',success:'18-basardik',surprised:'19-sasirdi',thanks:'20-tesekkur'} as const;
+export type PaulAnimation=keyof typeof PAUL_ANIMATIONS;
+export const paulSrc=(id:PaulAnimation,still=false)=>'/paul/v2/'+PAUL_ANIMATIONS[id]+(still?'-still':'')+'.webp';
+/** What Paul reacts to and the animations that fit it, in the order he goes through them ('point' looks at the text). */
+export const PAUL_POSES={
+ hello:['welcome','wink'],correct:['correct','wink','success','surprised'],desk:['correct','wink','success','surprised'],
+ wrong:['wrong','retry','slow'],cheer:['applause','success','trophy'],tip:['idea','point'],think:['think'],
+ listen:['listen'],speak:['speak'],ready:['ready'],read:['read'],write:['write'],trophy:['trophy'],thanks:['thanks'],
+} as const satisfies Record<string,readonly (PaulAnimation|'point')[]>;
+export type PaulPose=keyof typeof PAUL_POSES;
+const resolve=(id:PaulAnimation|'point',dir:'ltr'|'rtl'):PaulAnimation=>id==='point'?(dir==='rtl'?'pointLeft':'pointRight'):id;
+/** The first animation of each situation (the tour and other fixed places). */
+export const PAUL_PICTURES:Record<PaulPose,string>=Object.fromEntries(Object.entries(PAUL_POSES).map(([pose,pool])=>[pose,paulSrc(resolve(pool[0],'ltr'))])) as Record<PaulPose,string>;
+export const PAUL_STILL:Record<PaulPose,string>=Object.fromEntries(Object.entries(PAUL_POSES).map(([pose,pool])=>[pose,paulSrc(resolve(pool[0],'ltr'),true)])) as Record<PaulPose,string>;
+export const PAUL_SOUNDS:Partial<Record<PaulPose,PaulSoundId>>={hello:'paulHello',tip:'paulTip',think:'paulHmm',cheer:'paulClap',trophy:'paulClap'};
+const TURN_KEY='lernkoko-paul-turn-';
+const turns=new Map<PaulPose,number>();
+function turnOf(pose:PaulPose){
+ let n=turns.get(pose);
+ if(n===undefined){try{n=Number(sessionStorage.getItem(TURN_KEY+pose))||0;}catch{n=0;}turns.set(pose,n);}
+ return n;
+}
+const pageDir=():'ltr'|'rtl'=>{try{return document.documentElement.dir==='rtl'||document.querySelector('[dir="rtl"]')?'rtl':'ltr';}catch{return 'ltr';}};
+/** The animation Paul shows next for this situation, without using it up (to fetch it early). */
+export function upcomingPaul(pose:PaulPose):PaulAnimation{const pool=PAUL_POSES[pose];return resolve(pool[turnOf(pose)%pool.length],pageDir());}
+/** The next animation for this situation; the turn is kept for the browser session, so a new page goes on from there. */
+export function nextPaul(pose:PaulPose):PaulAnimation{
+ const id=upcomingPaul(pose);const n=turnOf(pose)+1;turns.set(pose,n);
+ try{sessionStorage.setItem(TURN_KEY+pose,String(n));}catch{}
+ return id;
+}
 
 /** True while animations may move (the site's motion setting and the device's "reduce motion"). */
 export function usePaulMotion(){
@@ -44,26 +71,44 @@ export function playPaulSound(pose:PaulPose){const id=PAUL_SOUNDS[pose];return i
  */
 export function PaulHoca({pose,className='',sound,once}:{pose:PaulPose;className?:string;sound?:'appear';once?:string}){
  const motion=usePaulMotion();
+ const [id,setId]=useState<PaulAnimation|null>(null);
+ useEffect(()=>{setId(nextPaul(pose));},[pose]);
  useEffect(()=>{
   if(sound!=='appear')return;
   if(once){try{if(sessionStorage.getItem(once))return;sessionStorage.setItem(once,'1');}catch{}}
   const stop=playPaulSound(pose);return stop;
  },[pose,sound,once]);
  return <picture className={('paul-hoca paul-'+pose+' '+className).trim()} aria-hidden="true">
-  <source media="(prefers-reduced-motion: reduce)" srcSet={PAUL_STILL[pose]}/>
-  <img src={motion?PAUL_PICTURES[pose]:PAUL_STILL[pose]} alt="" width={224} height={224} loading="lazy" decoding="async" draggable={false}/>
+  {id&&<source media="(prefers-reduced-motion: reduce)" srcSet={paulSrc(id,true)}/>}
+  <img src={id?paulSrc(id,!motion):undefined} alt="" width={288} height={288} loading="lazy" decoding="async" draggable={false} data-paul={id??undefined}/>
  </picture>;
 }
+
+/**
+ * What the learner is doing in a lesson step, for Paul's visits (`data-paul-mood` on the step card): reading the topic,
+ * listening, writing, a test or speaking. Other exercises have no mood (his visits then go through his other animations).
+ */
+export function paulMood(step:{id:string;kind:string;title?:string}):PaulPose|undefined{
+ if(step.kind==='cover'||step.kind==='teach')return 'read';
+ if(step.kind==='test')return 'ready';
+ if(step.kind==='speak')return 'speak';
+ if(step.kind==='end')return 'cheer';
+ const text=(step.id+' '+(step.title??'')).toLowerCase();
+ if(/dinle|hoeren|hören|diktat|telaffuz|phonetik|ach-ich/.test(text))return 'listen';
+ if(/yaz|schreib|buchstab|harf|formular|form-/.test(text))return 'write';
+ return undefined;
+}
+const isPose=(value:string|null|undefined):value is PaulPose=>!!value&&Object.prototype.hasOwnProperty.call(PAUL_POSES,value);
 
 /** Pages without Paul's visits: the admin panel, the sign-in pages and the legal pages. */
 const QUIET_PAGES=/^\/(yonetim|giris|uye-ol|gizlilik|kullanim-kosullari)(\/|$)/;
 /** First visit 9 s after a page opens, then one every 75 s: every other visit he waves (so a wave every 2.5 min). */
 export const PEEK_FIRST_MS=9000,PEEK_EVERY_MS=150000,PEEK_GAP_MS=PEEK_EVERY_MS/2,PEEK_SHOW_MS=3600;
-/** Between two waves he shows one of his other animations, in turn (the raised finger stays for wrong answers). */
-export const PEEK_OTHER_POSES:readonly PaulPose[]=['correct','cheer','think','tip','desk'];
+/** Between two greetings he shows one of his friendly animations, in turn (the wrong-answer ones stay for wrong answers). */
+export const PEEK_OTHER:readonly PaulAnimation[]=['idea','read','listen','write','ready','applause','think','surprised','correct','success','speak','thanks'];
 const VISIT_KEY='lernkoko-paul-visit',SPOT_KEY='lernkoko-paul-spot';
-/** The n-th visit in this browser session: even visits wave, odd ones bring the next other animation. */
-export function peekPose(n:number):PaulPose{return n%2===0?'hello':PEEK_OTHER_POSES[(n>>1)%PEEK_OTHER_POSES.length];}
+/** The n-th visit in this browser session: even visits greet (waving, then winking), odd ones bring the next other animation. */
+export function peekPose(n:number):PaulAnimation{return n%2===0?(n%4===0?'welcome':'wink'):PEEK_OTHER[(n>>1)%PEEK_OTHER.length];}
 /** He comes up only from the bottom edge of the screen (the learner asked: not from the top, the left or the right),
  * at any point along it (10–90 %), at least a quarter of the screen away from his last visit. `random` is Math.random
  * in the page. */
@@ -86,7 +131,7 @@ function busyScreen(){
  */
 export function PaulPeek(){
  const motion=usePaulMotion();
- const [visit,setVisit]=useState<{n:number;pose:PaulPose;at:number}|null>(null);
+ const [visit,setVisit]=useState<{n:number;pose:PaulAnimation;at:number}|null>(null);
  const timers=useRef<ReturnType<typeof setTimeout>[]>([]);
  useEffect(()=>{
   if(!motion||QUIET_PAGES.test(window.location.pathname))return;
@@ -94,19 +139,21 @@ export function PaulPeek(){
   const count=()=>{try{return Number(sessionStorage.getItem(VISIT_KEY))||0;}catch{return 0;}};
   const peek=()=>{
    if(busyScreen()){later(peek,12000);return;}
-   const n=count();const pose=peekPose(n);
+   // Every other visit he greets; in between he does what the learner is doing (data-paul-mood), or his next other animation.
+   const n=count();const mood=document.querySelector('[data-paul-mood]')?.getAttribute('data-paul-mood');
+   const pose=n%2===1&&isPose(mood)?nextPaul(mood):peekPose(n);
    let last:number|null=null;try{const saved=sessionStorage.getItem(SPOT_KEY);last=saved===null?null:Number(saved);}catch{}
    const at=peekSpot(Number.isFinite(last)?last:null);
    try{sessionStorage.setItem(VISIT_KEY,String(n+1));sessionStorage.setItem(SPOT_KEY,String(at));}catch{}
    setVisit({n,pose,at});
-   if(pose==='hello')try{if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}}catch{}
+   if(pose==='welcome')try{if(!sessionStorage.getItem('lernkoko-paul-hello')){sessionStorage.setItem('lernkoko-paul-hello','1');playPaulSound('hello');}}catch{}
    // Fetch the next animation early, so it is ready when he comes again.
-   try{const image=new Image();image.src=PAUL_PICTURES[peekPose(n+1)];}catch{}
+   try{const image=new Image();image.src=paulSrc(peekPose(n+1));}catch{}
    later(()=>setVisit(null),PEEK_SHOW_MS);later(peek,PEEK_GAP_MS);
   };
   later(peek,PEEK_FIRST_MS);
   return()=>{timers.current.forEach(clearTimeout);timers.current=[];setVisit(null);};
  },[motion]);
  if(!visit)return null;
- return <div key={visit.n} className={'paul-peek edge-bottom pose-'+visit.pose} style={{'--peek-at':visit.at+'%'} as CSSProperties} aria-hidden="true"><img src={PAUL_PICTURES[visit.pose]} alt="" width={224} height={224} decoding="async" draggable={false}/></div>;
+ return <div key={visit.n} className={'paul-peek edge-bottom pose-'+visit.pose} style={{'--peek-at':visit.at+'%'} as CSSProperties} aria-hidden="true"><img src={paulSrc(visit.pose)} alt="" width={224} height={224} decoding="async" draggable={false}/></div>;
 }

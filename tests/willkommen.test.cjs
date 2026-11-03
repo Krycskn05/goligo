@@ -108,8 +108,8 @@ test('the entry is a notebook like Lektion 11 and 12: contents with Teil A–D, 
  assert(page.includes('<h2 id="l1a-heading"'),'a step heading is an h2 under the notebook title');
  // The "Kaldığın yerden devam et" and "Testler" notes were removed at the learner's request.
  for(const gone of ['l1a-resume','l1a-test-note','readLast('])assert(!page.includes(gone),gone);
- // Since 2 November 2026 (the learner: "the place where I stopped is forgotten") a small link in the row of the part opened last.
- assert(page.includes('<ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>'));
+ // The small "continue" link in the contents (2 November 2026) went too: no such button anywhere (3 November 2026).
+ assert(!page.includes('ResumeLink'));
  // No A1.1 breadcrumb (the learner asked); the contents notebook fills the screen on a computer and never makes the page scroll.
  assert(!read('app/willkommen-study.tsx').includes('className="object-breadcrumb"'));
  assert(page.includes("element.style.setProperty('--l1a-fill'")&&page.includes('book.style.zoom=String(zoom)')&&read('app/willkommen.css').includes('.l1a-contents .lb-spread { min-height:var(--l1a-fill,0px); }'));

@@ -43,10 +43,9 @@ const stepLabel:Record<L12Step,string>={kelimeler:ui('Kelimeler'),konu:ui('Konu 
 const stepGo:Record<L12Step,string>={kelimeler:ui('Kelimelere geç'),konu:ui('Konu anlatımına geç'),alistirmalar:ui('Alıştırmalara geç'),dinleme:ui('Dinlemeye geç')};
 const StepIcon=({step,size=18}:{step:L12Step;size?:number})=>step==='kelimeler'?<Layers size={size} aria-hidden="true"/>:step==='konu'?<BookOpen size={size} aria-hidden="true"/>:step==='alistirmalar'?<PenLine size={size} aria-hidden="true"/>:<Headphones size={size} aria-hidden="true"/>;
 
-/** Where the learner was last (part, step, exercise), so the overview can offer "continue". */
+/** Where the learner was last (part, step, exercise); the units page's "continue" card read it until 3 November 2026. */
 type Last={part:L12PartId;step:L12Step;ex?:number};
 const LAST_KEY='lernkoko-l12-last';
-function readLast():Last|null{try{const value=JSON.parse(localStorage.getItem(LAST_KEY)??'null') as Last|null;return value&&partParam(value.part)&&isStep(value.step)?value:null;}catch{return null;}}
 function saveLast(value:Last){try{localStorage.setItem(LAST_KEY,JSON.stringify(value));}catch{}
  saveLastPlace(localStorage,{id:'ausbildung',href:AUSBILDUNG_PATH+'?bolum='+value.part+'&adim='+value.step,detail:'Lektion 12 · '+(lessonPartMap.get(value.part)?.de??'')});} // also for the units page (lib/last-place.ts)
 const SEEN_KEY='lernkoko-l12-seen';
@@ -121,10 +120,9 @@ function partSummary(part:L12Part,t:L12Texts['t']){
 /** What Lektion 12 teaches, ticked off on the overview's left page. */
 const GOALS=[ui('Ne yapabildiğini anlat: *Ich kann gut kochen.*'),ui('Planını söyle: *Ich will eine Ausbildung machen.*'),ui('Geçmişi anlat: *Ich bin nach Berlin gekommen.*'),ui('Zamanı söyle: *seit 2019 · vor zwei Jahren · in einem Jahr*'),ui('Resmî e-posta yaz: *Sehr geehrte Damen und Herren, …*')];
 function Overview({unitName,scores,tick,onOpen,language,guest=false}:{unitName:string;scores:L12ScoreMap;tick:number;onOpen:(part:L12PartId,step?:L12Step)=>void;language:StudyLanguage;guest?:boolean}){
- const {t,parts:lessonParts,partMap,tasks:hoerenTasks}=useL12();
- const [last,setLast]=useState<Last|null>(null);const [listened,setListened]=useState(0);
- useEffect(()=>{setLast(readLast());setListened(hoerenTasks.filter(task=>listenResult(task)).length);},[tick,hoerenTasks]);
- const lastPart=last?partMap.get(last.part):undefined;
+ const {t,parts:lessonParts,tasks:hoerenTasks}=useL12();
+ const [listened,setListened]=useState(0);
+ useEffect(()=>{setListened(hoerenTasks.filter(task=>listenResult(task)).length);},[tick,hoerenTasks]);
  const total=lessonProgress(scores);
  // One line of the contents page: badge, taped picture, title, what is inside, progress.
  // The guest taste: only Teil A opens; the other rows carry a lock and lead to the sign-up card.
@@ -145,9 +143,9 @@ function Overview({unitName,scores,tick,onOpen,language,guest=false}:{unitName:s
    <p className="lb-lead">{t('Meslek eğitimi, staj ve hayat hikâyeni anlatmak:')} <Rich text={t('*können / wollen*, Perfekt mit *sein*, *seit / vor / in* ve resmî e-posta.')}/></p>
    <figure className="lb-photo"><TopicArt id="book-12" title={unitName}/></figure>
    <div className="lb-notes">
-    <button type="button" className="housing-feature lb-note l12-resume" onClick={()=>last&&!(guest&&last.part!==GUEST_L12_PART)?onOpen(last.part,last.step):onOpen('a','kelimeler')}>
+    <button type="button" className="housing-feature lb-note l12-resume" onClick={()=>onOpen('a','kelimeler')}>
      <span className="housing-letter l12-letter" aria-hidden="true"><Play size={24}/></span>
-     <div><h2>{last?t('Kaldığın yerden devam et'):t('Derse başla')}</h2><p>{lastPart&&last?lastPart.de+' · '+t(stepLabel[last.step]):'Teil A · '+t('Kelimeler')}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
+     <div><h2>{t('Derse başla')}</h2><p>{'Teil A · '+t('Kelimeler')}</p><ProgressMeter progress={total} language={language} label="Lektion 12" compact/></div>
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <a className="housing-feature lb-note l12-listen-feature" href={AUSBILDUNG_PATH+'/hoeren'}>

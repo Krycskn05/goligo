@@ -6,12 +6,13 @@ import {verbPicture,verbRules,verbRuleKeys,ruleText,sentenceText,type VerbTense}
 import {sentenceRound,sentenceCorrect,auxRound,auxCorrect,buildRound,buildCorrect,buildTarget,buildSuffix,matchRound,matchKinds,bestKey,type GameId,type MatchKind,type Tile} from '@/lib/verb-games';
 import {MatchPreview,useMatchPreview} from './object-games';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
+import {isVerbTheme} from '@/lib/verb-themes';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {PaulHoca} from './paul-hoca';
 import {RainGame,CatchGame,QuickGame,SearchGame,RescueGame,PluralGame,type GameFeedback} from './object-games';
 
 type Feedback=GameFeedback;
-type Props={game:GameId;language:VaultLanguage;topic:string;onTopic:(topic:string)=>void;onExit:()=>void;feedback:Feedback};
+type Props={game:GameId;language:VaultLanguage;topic:string;onTopic:(topic:string)=>void;onExit:()=>void;feedback:Feedback;backLabel?:string};
 export {gameName,gameDetail} from '@/lib/game-names';
 import {gameName} from '@/lib/game-names';
 
@@ -33,7 +34,7 @@ function useTiles(){
  return {placed,reset:()=>setPlaced([]),add:(tile:Tile)=>setPlaced(list=>list.some(item=>item.id===tile.id)?list:[...list,tile]),remove:(tile:Tile)=>setPlaced(list=>list.filter(item=>item.id!==tile.id))};
 }
 
-export function VerbGame({game,language,topic,onTopic,onExit,feedback}:Props){
+export function VerbGame({game,language,topic,onTopic,onExit,feedback,backLabel}:Props){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  const dir=vaultDirection(language);
  const [seed,setSeed]=useState(0);
@@ -41,9 +42,10 @@ export function VerbGame({game,language,topic,onTopic,onExit,feedback}:Props){
  const topics=['verbs-all',...verbGroups.map(group=>group.id)];
  const topicName=(id:string)=>id==='verbs-all'?t('allVerbs'):t('groupTitle',{n:verbGroups.findIndex(group=>group.id===id)+1});
  return <section className="verb-game panel" data-verb-game={game} lang={language} dir={dir}>
-  <button type="button" className="text-button vault-back-categories" onClick={()=>{feedback.stop();onExit();}}><ArrowLeft size={18} className="vault-direction-icon"/>{t('backGames')}</button>
+  <button type="button" className="text-button vault-back-categories" onClick={()=>{feedback.stop();onExit();}}><ArrowLeft size={18} className="vault-direction-icon"/>{backLabel??t('backGames')}</button>
   <h1 id="verb-game-heading" tabIndex={-1}>{gameName(game,language)}</h1>
-  {/* No group chips (the learner removed them): the matching cards always use all verbs. Other games keep the choice. */}
+  {/* No group chips (the learner removed them): the matching cards use all verbs, or a Fiil grupları topic when a group
+      starts them (3 November 2026). Other games keep the choice. */}
   {(game==='sentence'||game==='aux'||game==='build')&&<div className="verb-game-topics" role="group" aria-label={t('chooseGroup')}>{topics.map(id=><button type="button" key={id} className={'verb-topic-chip'+(id===topic?' active':'')} aria-pressed={id===topic} onClick={()=>{feedback.stop();onTopic(id);setSeed(value=>value+1);}}>{topicName(id)}</button>)}</div>}
   {game==='sentence'?<SentenceGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='aux'?<AuxGame key={topic+seed} language={language} topic={topic} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
@@ -54,7 +56,7 @@ export function VerbGame({game,language,topic,onTopic,onExit,feedback}:Props){
    game==='search'?<SearchGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='rescue'?<RescueGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
    game==='plural'?<PluralGame key={seed} language={language} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>:
-   <MatchGame key={'verbs-all'+seed} language={language} topic="verbs-all" feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>}
+   <MatchGame key={(isVerbTheme(topic)?topic:'verbs-all')+seed} language={language} topic={isVerbTheme(topic)?topic:'verbs-all'} feedback={feedback} onRestart={()=>setSeed(value=>value+1)}/>}
  </section>;
 }
 type GameProps={language:VaultLanguage;topic:string;feedback:Feedback;onRestart:()=>void};

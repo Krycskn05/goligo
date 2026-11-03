@@ -898,3 +898,13 @@ html[data-lernkoko-motion="reduced"] .puzzle-empty.filled,html[data-lernkoko-mot
 .letter-bar button:active{background:#d1d5db;box-shadow:none;transform:translateY(1px)}
 body::after{content:"";display:block;height:var(--letter-bar-space,0px)}
 @media (max-width:420px){.letter-bar{gap:5px;padding:6px}.letter-bar button{height:42px;font-size:21px}}
+
+/* Kelime Kasası: the categories under headings, in smaller cards (the learner asked, 3 November 2026; lib/vault-sections.ts). */
+.vault-section + .vault-section { margin-top:8px; }
+.vault-section .vault-category-section-title { display:flex; align-items:center; gap:10px; margin:28px 0 14px; }
+.vault-section:first-of-type .vault-category-section-title { margin-top:8px; }
+.vault-section-emoji { display:grid; place-items:center; flex:none; width:44px; height:44px; border-radius:50%; background:#fff7e3; border:2px solid #f6e3b4; font-size:22px; line-height:1; }
+.vault-section .vault-category-art { height:150px; }
+@media(max-width:1100px) { .vault-section .vault-category-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:900px) { .vault-section .vault-category-art { height:130px; } }
+@media(max-width:620px) { .vault-section .vault-category-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .vault-section .vault-category-art { height:104px; } .vault-section-emoji { width:36px; height:36px; font-size:18px; } }

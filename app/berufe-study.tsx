@@ -33,7 +33,6 @@ import {StepViewL2B} from './berufe-b-steps';
 import {StepViewL2C} from './berufe-c-steps';
 import {StepViewL2D} from './berufe-d-steps';
 import {useSyncVersion} from './lesson-sync';
-import {ResumeLink,useResume} from './lesson-resume';
 import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
 
 /**
@@ -169,7 +168,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
  // On a computer the notebook fits the screen below the header — no scrolling, neither the page nor inside the notebook
  // (the learner asked for Lektion 1, 25 October 2026): a shorter notebook stretches to the bottom (--l1a-fill), a taller
  // one is drawn a little smaller (CSS zoom). Measured on load, resize and font loading; only styles change, no state.
- const box=useRef<HTMLElement>(null);const resume=useResume(L2_PART_KEY,l2PartKeys,parts);
+ const box=useRef<HTMLElement>(null);
  useEffect(()=>{
   const element=box.current;const book=element?.querySelector<HTMLElement>('.lb');if(!element||!book)return;
   let frame=0;
@@ -207,7 +206,6 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <ProgressMeter progress={partProgressL2(config.id,scores[config.id])} language={language} label={'Teil '+row.badge} compact/>
-    <ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>
    </li>:<li className="lb-toc-row l1a-soon" data-l2-part={row.id} key={row.id} aria-disabled="true">
     <div className="lb-toc-open">
      <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>

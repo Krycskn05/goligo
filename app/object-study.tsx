@@ -6,6 +6,7 @@ import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,CheckCircle2,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {objectGroups,objectVocabulary,objectWordMap,type ObjectWord} from '@/lib/object-course';
+import {sectionsFor,sectionTitle} from '@/lib/vault-sections';
 import {WORD_TOPICS} from '@/lib/object-word-additions';
 import {objectSubgroups,subgroupName,inObjectSubgroup} from '@/lib/object-subgroups';
 import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake,isObjectSolved,pickObjectListeningQuiz,pickObjectWritingQuiz,pickPictureQuiz,type ObjectPickOptions,type PictureQuizSize} from '@/lib/object-practice';
@@ -222,10 +223,13 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     {ready&&<p className="housing-remaining">{unsolved?text('remaining',{n:unsolved}):text('allSolved')}</p>}{ready&&unsolved>0&&unsolved<availableCount&&<button type="button" className="text-button vault-restart-all" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all><RotateCcw size={15} aria-hidden="true"/>{text('restartAll')}</button>}{course==='de'&&!guest&&<p className="housing-tip">{text('starTip')}</p>}
    </section>:<section className="vault-categories" aria-labelledby="vault-heading">
     <h1 id="vault-heading" tabIndex={-1}>{text('vaultTitle')}</h1>
-    <div className="vault-feature-grid">
-     {categoryCard('all',text('allObjects'),true)}
-    </div>
-    <h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{objectGroups.filter(item=>course==='de'||!(WORD_TOPICS as readonly string[]).includes(item.id)).map(item=>categoryCard(item.id,categoryName(item.id,language)))}</div>
+    {/* No "Tüm kelimeler" card; the categories under a few headings (the learner asked, 3 November 2026; lib/vault-sections.ts). */}
+    {(()=>{const shown=objectGroups.filter(item=>course==='de'||!(WORD_TOPICS as readonly string[]).includes(item.id)).map(item=>item.id);const {list,rest}=sectionsFor(shown);
+     return <>{list.map(({section,groups})=><section key={section.id} className="vault-section" aria-labelledby={'vault-section-'+section.id} data-vault-section={section.id}>
+      <h2 id={'vault-section-'+section.id} className="vault-category-section-title"><span className="vault-section-emoji" aria-hidden="true">{section.emoji}</span>{sectionTitle(section,language)}</h2>
+      <div className="vault-category-grid">{groups.map(id=>categoryCard(id,categoryName(id,language)))}</div>
+     </section>)}
+     {rest.length>0&&<section className="vault-section"><h2 className="vault-category-section-title">{text('categories')}</h2><div className="vault-category-grid">{rest.map(id=>categoryCard(id,categoryName(id,language)))}</div></section>}</>;})()}
    </section>}
   </main></div><StartWait show={busy&&!session} text={text('preparing')}/><SiteFooter language={language}/>
  </div>;

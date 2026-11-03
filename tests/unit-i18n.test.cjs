@@ -41,6 +41,17 @@ test('the Turkish texts of the lessons’ data are in every pack',()=>{
  assert(count>800,count);
 });
 
+test('Turkish words without ç/ğ/ı/ş (Almanya, evet, merdiven …) are in every pack too (3 November 2026)',()=>{
+ const tables=[['willkommen-course','countries',2],['willkommen-course','articleCountries',2],['willkommen-b-course','languages',1],['willkommen-b-course','wordsB',1],['willkommen-c-course','moods',2],['willkommen-d-course','wordsD',1],
+  ['berufe-course','otherWords',1],['berufe-b-course','wordsB',1],['berufe-c-course','wordsC',1],['berufe-d-course','wordsD',1],['stadt-course','officeVerbs',1],['stadt-course','directionWords',2]];
+ for(const [name,key,column] of tables){
+  const rows=load(name)[key];assert.ok(rows?.length,name+'.'+key);
+  for(const row of rows)for(const id of languages)assert.ok(Object.prototype.hasOwnProperty.call(packs[id],row[column]),id+' '+name+'.'+key+': '+row[column]);
+ }
+ for(const text of ['Dillerini söyle: **Ich spreche … und ein bisschen Deutsch.**','Bürgeramt’ta','Türkiye’den geliyorum.','Diyalog: Bürgeramt','Diyalog: Sie','Kapak','Katlar','Alfabe','olmak','doktor','merdiven','asansör (= der Lift, der Fahrstuhl)'])
+  for(const id of languages)assert.ok(packs[id][text]?.trim(),id+': '+text);
+});
+
 test('translations keep the {marks}, the German parts and the coloured articles',()=>{
  for(const id of languages)for(const [key,value] of Object.entries(packs[id])){
   assert.equal(marks(value),marks(key),id+' marks: '+key);

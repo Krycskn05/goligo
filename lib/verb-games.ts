@@ -1,5 +1,6 @@
 import {verbs,verbMeaning,verbPronoun,type Verb} from './verb-course';
 import type {VaultLanguage} from './object-vault-copy';
+import {verbThemeMap} from './verb-themes';
 import {sentenceChunks,sentenceDistractor,participlePieces,participleWrongPieces,praesensPieces,praesensWrongPieces,verbPicture,verbPrefix,type VerbTense,type SentenceChunk} from './verb-logic';
 
 /** Fiiller games: rounds are built here (pure functions), the page only shows them. */
@@ -11,7 +12,8 @@ export const gameIds:GameId[]=['match','rain','catch','quick','search','rescue',
 export type Tile={id:string;text:string};
 type Random=()=>number;
 export function mix<T>(items:readonly T[],random:Random=Math.random):T[]{const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}
-export function gameVerbs(topic:string){return verbs.filter(verb=>topic==='verbs-all'||verb.group===topic);}
+/** The verbs of a round: all, a textbook group, or a Fiil grupları topic (lib/verb-themes.ts). */
+export function gameVerbs(topic:string){const theme=verbThemeMap.get(topic);return verbs.filter(verb=>topic==='verbs-all'||verb.group===topic||!!theme?.verbs.includes(verb.id));}
 const tiles=(texts:readonly string[],prefix:string)=>texts.map((text,index)=>({id:prefix+index,text}));
 
 export type SentenceTask={verbId:string;tense:VerbTense;chunks:SentenceChunk[];tiles:Tile[]};

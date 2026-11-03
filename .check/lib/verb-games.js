@@ -15,6 +15,7 @@ exports.matchKinds = matchKinds;
 exports.matchRound = matchRound;
 exports.bestKey = bestKey;
 const verb_course_1 = require("./verb-course");
+const verb_themes_1 = require("./verb-themes");
 const verb_logic_1 = require("./verb-logic");
 // Offered on the page: the matching cards and the new games (the learner asked for them, October 2026; their rounds are
 // in lib/object-games.ts). Cümle kurma, hat mı ist mi? and Biçim yapbozu were taken off at the learner's request (their
@@ -24,7 +25,8 @@ function mix(items, random = Math.random) { const result = [...items]; for (let 
     const j = Math.floor(random() * (i + 1));
     [result[i], result[j]] = [result[j], result[i]];
 } return result; }
-function gameVerbs(topic) { return verb_course_1.verbs.filter(verb => topic === 'verbs-all' || verb.group === topic); }
+/** The verbs of a round: all, a textbook group, or a Fiil grupları topic (lib/verb-themes.ts). */
+function gameVerbs(topic) { const theme = verb_themes_1.verbThemeMap.get(topic); return verb_course_1.verbs.filter(verb => topic === 'verbs-all' || verb.group === topic || !!theme?.verbs.includes(verb.id)); }
 const tiles = (texts, prefix) => texts.map((text, index) => ({ id: prefix + index, text }));
 /** Put the sentence parts in order; one tempting wrong form is mixed in. */
 function sentenceRound(topic, count = 10, random = Math.random) {

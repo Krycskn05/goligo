@@ -59,7 +59,7 @@ test('two devices: score lists are joined even when both changed; the continue p
  assert.equal(sync.syncLessonOf('lernkoko-last-placex'),null);
 });
 
-test('"Kaldığın yerden devam et": every page saves its place; the units page and the lesson contents read it back',()=>{
+test('every page saves its place; no "Kaldığın yerden devam et" button anywhere (the learner asked, 3 November 2026)',()=>{
  assert.equal(place.lessonStepHref('berufe','b','fiil-tablo'),'/a1-1/berufe?teil=b&adim=fiil-tablo');
  assert.equal(place.lessonStepHref('willkommen','a','kapak'),'/a1-1/willkommen?adim=kapak');
  const store={};const storage={setItem:(k,v)=>{store[k]=v;},getItem:k=>store[k]??null};
@@ -67,9 +67,10 @@ test('"Kaldığın yerden devam et": every page saves its place; the units page 
  assert.deepEqual(place.readLastPlace(storage),{id:'berufe',href:'/a1-1/berufe?teil=c&adim=zar',at:5,detail:'Lektion 2 · Teil C · Alıştırma 4'});
  place.saveLastPlace(storage,{id:'stadt',href:'/evil?x'});assert.equal(place.readLastPlace(storage).href,'/a1-2/wege-in-der-stadt','only the page\'s own address');
  for(const [file,piece] of [['app/housing-study.tsx',"saveLastPlace(localStorage,{id:'housing'})"],['app/object-study.tsx',"saveLastPlace(localStorage,{id:'vault'})"],['app/verb-study.tsx',"saveLastPlace(localStorage,{id:'verbs'})"],['app/ausbildung-study.tsx',"saveLastPlace(localStorage,{id:'ausbildung'"],['app/ausbildung-hoeren.tsx',"saveLastPlace(localStorage,{id:'hoeren'"],['app/willkommen-study.tsx',"saveLastPlace(localStorage,{id:'willkommen'"],['app/berufe-study.tsx',"saveLastPlace(localStorage,{id:'berufe'"],['app/stadt-study.tsx',"saveLastPlace(localStorage,{id:'stadt'"]])assert(read(file).includes(piece),file);
- const units=read('app/category-study.tsx');assert(units.includes('readLastPlace(localStorage)')&&units.includes('className="nb-continue"'));
- for(const file of ['app/willkommen-study.tsx','app/berufe-study.tsx','app/stadt-study.tsx'])assert(read(file).includes('<ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>'),file);
- assert(read('app/lesson-resume.tsx').includes('return index>0?{part:part as P,index}:null;'));
+ const units=read('app/category-study.tsx');assert(!units.includes('readLastPlace(')&&!units.includes('nb-continue'),'no card on the units page');
+ for(const file of ['app/willkommen-study.tsx','app/berufe-study.tsx','app/stadt-study.tsx'])assert(!read(file).includes('ResumeLink'),file+': no link in the contents');
+ assert(!fs.existsSync('app/lesson-resume.tsx'));
+ const l12=read('app/ausbildung-study.tsx');assert(!l12.includes("t('Kaldığın yerden devam et')")&&l12.includes("onClick={()=>onOpen('a','kelimeler')}"),'Lektion 12 starts at Teil A');
 });
 
 test('Lektion 12: the topic tick comes when the topic is opened, however the learner got there',()=>{

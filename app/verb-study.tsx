@@ -42,6 +42,8 @@ import {progressText} from '@/lib/progress-copy';
 import {GUEST_GAMES,GUEST_VERB_PART} from '@/lib/guest-parts';
 import {guestText} from '@/lib/guest-copy';
 import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
+import {VerbThemeCards,VerbThemeView} from './verb-themes';
+import {verbThemeMap,isVerbTheme,themeTitle,type VerbTheme} from '@/lib/verb-themes';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 type VerbSection='games'|'mistakes';
@@ -72,6 +74,18 @@ export function readWorkshopView():{family:VerbFamily;verbId?:string}|null{
  if(!family)return null;const verbId=params.get('fiil')??'';
  return family.verbs.includes(verbId)?{family,verbId}:{family};
 }
+/** The Fiil grupları group open in the workshop (?grup=theme-…), or null. */
+function readThemeView():VerbTheme|null{
+ if(typeof window==='undefined')return null;
+ return verbThemeMap.get(new URLSearchParams(window.location.search).get('grup')??'')??null;
+}
+function writeThemeView(theme:VerbTheme|null){
+ try{
+  const url=new URL(window.location.href);
+  if(theme)url.searchParams.set('grup',theme.id);else url.searchParams.delete('grup');
+  if(url.href!==window.location.href)window.history.replaceState(window.history.state,'',url);
+ }catch{}
+}
 /** Keeps the open part and verb card in the address without a new history entry (Back still leaves the page as before). */
 function writeWorkshopView(view:{family:VerbFamily;verbId?:string}|null){
  try{
@@ -99,6 +113,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  // (?parca=verbs-w1&fiil=…), so a reload keeps the open card instead of going back to the map (2 November 2026).
  const [view,setView]=useState<{family:VerbFamily;verbId?:string}|null>(()=>part?null:readWorkshopView());
  useEffect(()=>{if(part)return;writeWorkshopView(view);},[view,part]);
+ // A Fiil grupları group opened under the map (3 November 2026), kept in the address like a part.
+ const [theme,setTheme]=useState<VerbTheme|null>(()=>part?null:readThemeView());
+ useEffect(()=>{if(part)return;writeThemeView(theme);},[theme,part]);
  // Oyunlar (/oyunlar) and Yanlışlarım (/yanlislarim) are parts of the site of their own (the learner asked, 22 October
  // 2026): this component draws them with `part`; the old addresses /fiiller?bolum=oyunlar|yanlislar move there.
  const [section,setSection]=useState<VerbSection|null>(part??null);
@@ -164,6 +181,11 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  function openPart(family:VerbFamily){stopFeedback();setView({family});focus('verb-part-heading');}
  function openVerb(family:VerbFamily,id:string){stopFeedback();setView({family,verbId:id});focus('verb-detail-heading');}
  function closeView(){stopFeedback();setView(null);focus('vault-heading');}
+ function openTheme(value:VerbTheme){stopFeedback();setView(null);setTheme(value);focus('verb-theme-heading');}
+ /** Back to the group cards: the list scrolls to them, not to the top of the page. */
+ function closeTheme(){stopFeedback();setTheme(null);requestAnimationFrame(()=>{const heading=document.getElementById('verb-themes-heading');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start',behavior:'instant'});});}
+ /** The matching cards with the group's verbs only. */
+ function playTheme(value:VerbTheme){stopFeedback();setGameTopic(value.id);setGame('match');focus('verb-game-heading');}
  function closeSection(){stopFeedback();setSection(null);setGame(null);try{const url=new URL(window.location.href);url.searchParams.delete('bolum');window.history.replaceState(null,'',url);}catch{}focus('vault-heading');}
  /** Moves focus to whichever card is on screen: the part card, the learning card or the question. */
  function focusCurrent(){requestAnimationFrame(()=>{(document.getElementById('verb-chapter-heading')??document.getElementById('verb-learn-heading')??document.getElementById('object-question-heading'))?.focus({preventScroll:true});toPractice();});}
@@ -391,7 +413,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
     <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
     {otherQuestion(q)}
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
-   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
+   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} backLabel={theme&&isVerbTheme(gameTopic)?themeTitle(theme,language):undefined} onExit={()=>{setGame(null);if(isVerbTheme(gameTopic))setGameTopic('verbs-all');focus(section?'verb-section-heading':theme?'verb-theme-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
    section==='games'?<section className="verb-section" aria-labelledby="verb-section-heading" data-verb-section="games">
     <div className="verb-section-head">{!part&&<button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button>}<h1 id="verb-section-heading" tabIndex={-1}>{t('gamesTitle')}</h1></div>
     <div className="game-cards verb-section-games">{gameIds.map(id=>guest&&!GUEST_GAMES.includes(id)?<a key={id} className={'game-card game-'+id+' guest-locked'} href={guestSignUp(back)} data-verb-game-card={id} data-guest-locked><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{guestText(language,'guestLocked')}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Lock size={16} aria-hidden="true"/>{t('play')}</span></a>:<button type="button" key={id} className={'game-card game-'+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{gameDetail(id,language)}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Play size={16} aria-hidden="true"/>{t('play')}</span></button>)}</div>
@@ -437,6 +459,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
     if(at>=0){const item=members[at];return <VerbDetail verb={item} family={part.family} position={at+1} total={members.length} marks={stickers.get(item.id)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={()=>openPart(part.family)} onPrev={at>0?()=>openVerb(part.family,members[at-1].id):undefined} onNext={at<members.length-1?()=>openVerb(part.family,members[at+1].id):undefined}/>;}
     return <PartVerbs family={part.family} part={part} verbs={members} marks={stickers} language={language} disabled={busy||!ready} onStart={restart=>void enterPart(part.family,restart)} onOpen={item=>openVerb(part.family,item.id)} onBack={closeView}/>;
    })():
+   theme?<VerbThemeView theme={theme} language={language} marks={stickers} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={closeTheme} onPlay={()=>playTheme(theme)}/>:
    <section className="verb-home" aria-labelledby="vault-heading" data-verb-workshop="">
     {/* Only the title on top (the learner removed the "0 / 19 fiil" card): the pencil badge of the menu, the title in
         the site's navy with a gold wavy line under "Atölyesi", and the count of verbs and parts. The map below shows
@@ -472,6 +495,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
       </article>;
      })}
     </section>
+    <VerbThemeCards language={language} marks={stickers} onOpen={openTheme}/>
     <article className="panel verb-collection">
      <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}</p>
      {/* Two counts, each with its own name: whole verbs learned and single exercises done (the learner asked). */}

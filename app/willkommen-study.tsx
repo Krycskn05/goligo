@@ -32,7 +32,6 @@ import {talkScenarios} from '@/lib/talk-scenarios';
 import {StepViewC} from './willkommen-c-steps';
 import {StepViewD} from './willkommen-d-steps';
 import {useSyncVersion} from './lesson-sync';
-import {ResumeLink,useResume} from './lesson-resume';
 import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
 
 /**
@@ -175,7 +174,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
  // notebook (the learner asked, 25 October 2026): a notebook shorter than the screen stretches to its bottom (--l1a-fill),
  // a taller one is drawn a little smaller (CSS zoom) until it fits. Measured on load, resize and font loading; only styles
  // change, no state, so nothing draws again.
- const box=useRef<HTMLElement>(null);const resume=useResume(L1_PART_KEY,partKeys,parts);
+ const box=useRef<HTMLElement>(null);
  useEffect(()=>{
   const element=box.current;const book=element?.querySelector<HTMLElement>('.lb');if(!element||!book)return;
   let frame=0;
@@ -213,7 +212,6 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <ArrowRight size={20} className="vault-direction-icon" aria-hidden="true"/>
     </button>
     <ProgressMeter progress={partProgressL1(config.id,scores[config.id])} language={language} label={'Teil '+row.badge} compact/>
-    <ResumeLink resume={resume} parts={parts} part={config.id} onOpen={onOpen}/>
    </li>:<li className="lb-toc-row l1a-soon" data-l1a-part={row.id} key={row.id} aria-disabled="true">
     <div className="lb-toc-open">
      <span className="lb-toc-badge" aria-hidden="true">{row.badge}</span>

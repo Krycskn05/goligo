@@ -59,8 +59,10 @@ test('oturum anahtarı, çerez ve dönüş adresi',async()=>{
  assert.equal(auth.signInPath('/fiiller'),'/giris?return_to=%2Ffiiller');assert.equal(auth.signInPath('/'),'/giris');
  for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/favicon.svg','/verbs/abfahren.webp','/assets/app.js','/_next/x'])assert.ok(auth.isPublicPath(open),open);
  for(const closed of ['/hesabim','/yonetim','/apis','/fiiller/x'])assert.ok(!auth.isPublicPath(closed),closed);
- // The guest taste: the study pages open for visitors too (the first part of each; app/api/study saves nothing for them).
- for(const taste of ['/konular','/ev-esyalar','/fiiller','/a1-2/ev-ve-yasam','/a1-2/ausbildung','/a1-2/ausbildung/hoeren'])assert.ok(auth.isPublicPath(taste),taste);
+ // The guest taste: the study pages open for visitors too (the first part of each; app/api/study saves nothing for them);
+ // of the units only Lektion 1 (3 November 2026).
+ for(const taste of ['/konular','/ev-esyalar','/fiiller','/a1-1/willkommen'])assert.ok(auth.isPublicPath(taste),taste);
+ for(const unit of ['/a1-1/berufe','/a1-2/ev-ve-yasam','/a1-2/ausbildung','/a1-2/ausbildung/hoeren','/a1-2/wege-in-der-stadt'])assert.ok(!auth.isPublicPath(unit),unit);
 });
 
 test('oturumlar: açılır, süresi dolar, kapanır; deneme sınırı pencere içinde sayılır',async()=>{
@@ -97,7 +99,9 @@ const location=r=>{assert.ok(r instanceof Response,'yönlendirme bekleniyordu');
 
 test('kapı: girişsiz ziyaretçi tanıtım ve yasal sayfaları görür, ders sayfaları girişe yönlenir',async()=>{
  const db=fakeDb();const env={DB:db};
- for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/verbs/abfahren.webp','/fiiller','/konular','/a1-2/ausbildung/hoeren']){const out=await gate.siteGate(req(open),env);assert.ok(out instanceof Request,open);assert.equal(out.headers.get('oai-authenticated-user-id'),null,open);}
+ for(const open of ['/','/giris','/uye-ol','/sifre-yenile','/gizlilik','/kullanim-kosullari','/api/study','/api/auth','/verbs/abfahren.webp','/fiiller','/konular','/a1-1/willkommen']){const out=await gate.siteGate(req(open),env);assert.ok(out instanceof Request,open);assert.equal(out.headers.get('oai-authenticated-user-id'),null,open);}
+ // Of the units only Lektion 1 opens for a visitor (3 November 2026).
+ assert.equal(location(await gate.siteGate(req('/a1-2/ausbildung/hoeren'),env)),'/giris?return_to=%2Fa1-2%2Fausbildung%2Fhoeren');
  assert.equal(location(await gate.siteGate(req('/yonetim'),env)),'/giris?return_to=%2Fyonetim');
  assert.equal(location(await gate.siteGate(req('/hesabim?x=1'),env)),'/giris?return_to=%2Fhesabim%3Fx%3D1');
  assert.equal(location(await gate.siteGate(req('/hesabim'),env)),'/giris?return_to=%2Fhesabim');

@@ -3,6 +3,8 @@
  * open — the first one; nothing is saved, and the rest shows "üyelere açık" with a free sign-up. Kept apart from the
  * question bank so the pages stay light; lib/guest-taste.ts checks a visitor's rounds against it on the server.
  */
+/** The only unit a visitor opens (the learner asked, 3 November 2026): Lektion 1; the other units are for members. */
+export const GUEST_UNIT='book-01';
 export const GUEST_HOUSING_SECTION='a';
 export const GUEST_HOUSING_TOPIC='book-11-a';
 export const GUEST_OBJECT_GROUP='objects-house';

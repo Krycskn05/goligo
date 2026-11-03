@@ -25,7 +25,8 @@ import {HomeTour} from './home-tour';
 import {InstallGuide} from './install-guide';
 import {SiteMenu} from './site-menu';
 import {SiteTour} from './site-tour';
-import {GuestBanner} from './guest-taste';
+import {GuestBanner,GuestLock} from './guest-taste';
+import {GUEST_UNIT} from '@/lib/guest-parts';
 import {useSyncVersion} from './lesson-sync';
 import {readLastPlace,placeUnit,type LastPlace} from '@/lib/last-place';
 
@@ -109,7 +110,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
          <span className="nb-num" lang={course} dir="ltr">{course==='de'?'Lektion':'Unit'} {unit.number}</span>
          <h3>{title}</h3>{language!==course&&<p lang={course} dir="ltr">{unit.de}</p>}
          {progress&&<ProgressMeter progress={progress} language={language} label={title} compact/>}
-         {lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
+         {lesson&&guest&&unit.id!==GUEST_UNIT?<GuestLock language={language} back={lesson}/>:lesson?<a className="btn small housing-open" href={lesson} data-l12-open={unit.id==='book-12'?'':undefined}>{housingText(language,unit.id==='book-15'?'openA':'open')}</a>:<span className="nb-soon"><Clock size={15} aria-hidden="true"/>{c(language,'comingSoon')}</span>}
         </li>;})}</ul>
       </div>
      </div>

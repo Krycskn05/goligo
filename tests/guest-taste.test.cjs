@@ -22,9 +22,10 @@ test('the open part of each section is its first one',()=>{
  const housing=load('housing-course').housingSections[0];assert.equal(parts.GUEST_HOUSING_SECTION,housing.id);assert.equal(parts.GUEST_HOUSING_TOPIC,housing.topic);
  assert.equal(parts.GUEST_L12_PART,load('ausbildung-course').lessonParts[0].id);
  assert.deepEqual(parts.GUEST_GAMES,[load('verb-games').gameIds[0]]);
- // Pages that open for visitors; Hesabım and the admin page stay for members.
- for(const page of ['/konular','/ev-esyalar','/fiiller','/a1-2/ev-ve-yasam','/a1-2/ausbildung','/a1-2/ausbildung/hoeren'])assert.ok(auth.isPublicPath(page),page);
- for(const page of ['/hesabim','/yonetim'])assert.ok(!auth.isPublicPath(page),page);
+ // Pages that open for visitors; of the units only Lektion 1 (3 November 2026); Hesabım and the admin page stay for members.
+ assert.equal(parts.GUEST_UNIT,'book-01');
+ for(const page of ['/konular','/ev-esyalar','/fiiller','/oyunlar','/a1-1/willkommen'])assert.ok(auth.isPublicPath(page),page);
+ for(const page of ['/hesabim','/yonetim','/a1-1/berufe','/a1-2/ev-ve-yasam','/a1-2/ausbildung','/a1-2/ausbildung/hoeren','/a1-2/wege-in-der-stadt'])assert.ok(!auth.isPublicPath(page),page);
 });
 
 test('only questions of the open parts count for a visitor',()=>{
@@ -33,7 +34,7 @@ test('only questions of the open parts count for a visitor',()=>{
  for(const q of load('verb-workshop').partIds(load('verb-families').verbFamilies[1]))assert.ok(!guest.guestQuestion(q),q);
  const house=course.questions.filter(q=>q.topic==='objects-house');assert.ok(house.length>20);for(const q of house)assert.ok(guest.guestQuestion(q.id),q.id);
  assert.ok(!guest.guestQuestion(course.questions.find(q=>q.topic==='objects-kitchen').id));
- assert.ok(guest.guestQuestion(course.questions.find(q=>q.topic==='book-11-a').id));assert.ok(!guest.guestQuestion(course.questions.find(q=>q.topic==='book-11-b').id));
+ for(const topic of ['book-11-a','book-11-b'])assert.ok(!guest.guestQuestion(course.questions.find(q=>q.topic===topic).id),'Ev ve Yaşam is a unit: members only');
  assert.ok(!guest.guestQuestion('nope'));
  assert.ok(guest.guestRound('workshop','verbs-all',verbIds));assert.ok(!guest.guestRound('review','verbs-all',verbIds),'no review rounds');
  assert.ok(!guest.guestRound('workshop','verbs-all',[]),'never the whole bank');assert.ok(!guest.guestRound('mixed','all',[house[0].id]));
@@ -51,7 +52,7 @@ test('API: a visitor starts and answers the open parts, and nothing is written',
  const house=course.questions.filter(item=>item.topic==='objects-house'&&item.id.startsWith('obj-picture-')).slice(0,5).map(item=>item.id);
  assert.equal((await a.post({action:'start',id:id(2),mode:'visual',topic:'objects-house',count:5,onlyIds:house})).status,201);
  const housing=course.questions.filter(item=>item.topic==='book-11-a'&&item.kind==='write').slice(0,4).map(item=>item.id);
- assert.equal((await a.post({action:'start',id:id(3),mode:'write',topic:'book-11-a',count:4,onlyIds:housing})).status,201);
+ assert.equal((await a.post({action:'start',id:id(3),mode:'write',topic:'book-11-a',count:4,onlyIds:housing})).status,401,'Ev ve Yaşam is for members');
  assert.equal(a.rows(),0,'nothing saved for a visitor');
  // The rest asks for an account.
  const locked=await a.post({action:'start',id:id(4),mode:'workshop',topic:'verbs-all',count:4,onlyIds:load('verb-workshop').partIds(load('verb-families').verbFamilies[1]).slice(0,4)});
@@ -77,6 +78,7 @@ test('pages: the first part opens, the rest carries a lock and the sign-up, ever
  assert.ok(read('app/object-study.tsx').includes('if(guest&&id!==GUEST_OBJECT_GROUP)return <article'));
  assert.ok(read('app/housing-study.tsx').includes('const lockedSection=(id:HousingSection|\'all\')=>guest&&id!==GUEST_HOUSING_SECTION;'));
  assert.ok(read('app/ausbildung-study.tsx').includes('{current&&step&&guest&&current.id!==GUEST_L12_PART?'));
+ assert.ok(read('app/category-study.tsx').includes('{lesson&&guest&&unit.id!==GUEST_UNIT?<GuestLock language={language} back={lesson}/>:'),'the unit cards but Lektion 1 carry a lock');
  assert.ok(read('app/site-header.tsx').includes('<AccountMenu language={language} guest={guest}/>')&&read('app/account-menu.tsx').includes("href:'/giris?return_to='+encodeURIComponent(back)"),'a visitor gets sign in and sign up in the account menu');
  const shared=read('app/guest-taste.tsx');assert.ok(shared.includes("'/uye-ol?return_to='+encodeURIComponent(back)"));
  // The landing page offers the try-out on every part but Yanlışlarım.

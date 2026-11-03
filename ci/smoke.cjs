@@ -228,11 +228,17 @@ async function languageFlow(browser) {
   await visit(page, "/", "01-tanitim.png", errors);
   record("Girissiz ana sayfada tanitim ve uye ol dugmesi var",
     (await page.locator("[data-landing]").count()) === 1 && (await page.locator("[data-landing-register]").count()) === 1, "");
-  for (const target of ["/ev-esyalar", "/fiiller", "/a1-2/ev-ve-yasam", "/a1-1/willkommen", "/a1-1/berufe", "/a1-2/wege-in-der-stadt"]) {
+  for (const target of ["/ev-esyalar", "/fiiller", "/a1-1/willkommen"]) {
     await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
     const at = new URL(page.url());
     const banner = await page.locator("[data-guest-banner]").count();
     record(`Girissiz ${target} tadimlik olarak aciliyor`, at.pathname === target && banner === 1, `${page.url()} · not ${banner}`);
+  }
+  // Unitelerden yalnizca Lektion 1 acik (ogrenci istedi, 3 Kasim 2026); digerleri giris ister.
+  for (const target of ["/a1-1/berufe", "/a1-2/ev-ve-yasam", "/a1-2/ausbildung", "/a1-2/wege-in-der-stadt"]) {
+    await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
+    const at = new URL(page.url());
+    record(`Girissiz ${target} giris sayfasina yonleniyor`, at.pathname === "/giris" && at.searchParams.get("return_to") === target, page.url());
   }
   {
     await page.goto(BASE + "/hesabim", { waitUntil: "networkidle", timeout: 90000 });

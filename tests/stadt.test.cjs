@@ -90,7 +90,7 @@ test('scores stay in the browser and make the progress of the unit card',()=>{
 
 test('the page: a notebook like Lektion 1 (Teil A open, B–D coming), its pictures, guest access and the menu',()=>{
  assert(fs.existsSync('app/a1-2/wege-in-der-stadt/page.tsx'));assert.equal(lesson.STADT_PATH,'/a1-2/wege-in-der-stadt');assert.equal(lesson.STADT_UNIT,'book-15');
- assert(auth.GUEST_PAGES.has('/a1-2/wege-in-der-stadt')&&auth.isPublicPath('/a1-2/wege-in-der-stadt'),'visitors without an account open Teil A');
+ assert(!auth.GUEST_PAGES.has('/a1-2/wege-in-der-stadt')&&!auth.isPublicPath('/a1-2/wege-in-der-stadt'),'members only: a visitor opens Lektion 1 alone (3 November 2026)');
  assert.deepEqual(lesson.stadtParts.map(part=>part.badge),['A','B','C','D']);
  assert(lesson.stadtParts[0].title&&lesson.stadtParts[0].lead);assert(lesson.stadtParts.slice(1).every(part=>!part.title),'B–D are coming soon');
  assert(lesson.stadtGoals.length>=8);assert.deepEqual(lesson.stadtGoals,goals.unitGoalsFor('book-15'));

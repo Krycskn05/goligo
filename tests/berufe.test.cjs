@@ -99,7 +99,7 @@ test('a man is read by a man, a woman by a woman: every person is one of the sit
 
 test('the page: route, guest access, unit card, progress and sync like Lektion 15',()=>{
  assert(fs.existsSync('app/a1-1/berufe/page.tsx'));assert.equal(lesson.BERUFE_PATH,'/a1-1/berufe');
- assert(auth.GUEST_PAGES.has('/a1-1/berufe'),'visitors without an account open the lesson');
+ assert(!auth.GUEST_PAGES.has('/a1-1/berufe'),'members only: a visitor opens Lektion 1 alone (3 November 2026)');
  const units=read('app/category-study.tsx');
  assert(units.includes("unit.id==='book-02'?'/a1-1/berufe'")&&units.includes('readLessonTwoProgress')&&units.includes("unit.id==='book-02'?berufe:"));
  assert(goals.unitGoalsFor('book-02').length>=8);assert.deepEqual(lesson.berufeGoals,goals.unitGoalsFor('book-02'));

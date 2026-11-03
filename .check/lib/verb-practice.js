@@ -35,7 +35,8 @@ function verbPracticeMode(sessionMode) { return sessionMode === 'write' ? 'write
 function verbPool(mode, topic) { return verb_course_1.verbQuestions.filter(q => verbModePredicate(mode)(q) && (0, verb_course_1.inVerbTopic)(q.topic, topic)); }
 const isVerbMistake = (row) => !!row && row.wrong_count > 0 && row.streak < 3;
 exports.isVerbMistake = isVerbMistake;
-const isVerbSolved = (row) => !!row && !(0, exports.isVerbMistake)(row);
+/** Answered right at least once (3 November 2026, as in Nesne Kasası): a later wrong answer goes to the review button only. */
+const isVerbSolved = (row) => !!row && (row.streak > 0 || row.seen > row.wrong_count);
 exports.isVerbSolved = isVerbSolved;
 /**
  * Questions for one round. Review = open mistakes plus starred questions.

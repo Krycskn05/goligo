@@ -165,7 +165,9 @@ test('rounds follow the chosen group and mode, solved questions wait and the sam
  assert.ok(fresh.includes(ids[0])&&!fresh.includes(ids[1]));assert.equal(fresh.length,59);
  const review=practice.pickVerbRound('test','verbs-1',reviews,true,undefined,{starred:new Set([ids[2]])}).map(q=>q.id).sort();
  assert.deepEqual(review,[ids[0],ids[2]].sort());
- assert.equal(study.selectQuestions('test','verbs-1',50,reviews,ids)[0].id,ids[0],'open mistakes come first');
+ // Open mistakes come first only in a review round; a normal round mixes them with the new questions (3 November 2026).
+ assert.equal(study.selectQuestions('review','verbs-1',50,reviews,ids)[0].id,ids[0],'open mistakes come first in a review round');
+ assert.ok(Array.from({length:10},()=>study.selectQuestions('test','verbs-1',50,reviews,ids)[0].id).some(id=>id!==ids[0]),'a normal round is not led by the open mistake');
  assert.equal(progress.verbProgressIds('verbs-all').length,72*4,'the four steps of Fiil Atölyesi (2 November 2026: the older exercises are asked nowhere)');
  assert.ok(progress.verbProgressIds('verbs-3').every(id=>course.questionMap.get(id).topic==='verbs-3'));
  // The percentage counts the four steps of Fiil Atölyesi; an exercise counts once it was answered right (2 November 2026).

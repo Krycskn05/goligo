@@ -25,8 +25,16 @@ export function selectQuestions(mode:string,topic:string,count:number,reviews:Re
  // Yanlışlarım's one round of every mistake (review of the whole site with the chosen ids) also takes the verbs.
  const everyPart=course==='de'&&mode==='review'&&topic==='all'&&!!onlyIds;
  const source=course==='en'?englishQuestions:everyPart?[...questions,...verbQuestions]:questions;const sourceTopics=course==='en'?englishTopics:topics;
- const rank=(q:Question)=>{const r=byId.get(q.id);if(!r)return 100;if(r.wrong_count&&r.streak<3)return 200+r.wrong_count*5-r.streak*5;if(r.due_at<=Date.now())return 80;return 20-r.seen;};
- // Fiiller rounds: open mistakes first, then new and due questions; never the same verb twice in a row.
+ // New and never solved questions first (shuffled together), then right answers due again. Open mistakes go first only in
+ // a review round: a normal test is not filled with old mistakes (the learner asked, 3 November 2026).
+ const rank=(q:Question)=>{
+  const r=byId.get(q.id);if(!r)return 100;
+  if(mode==='review'&&r.wrong_count&&r.streak<3)return 200+r.wrong_count*5-r.streak*5;
+  if(!(r.streak>0||r.seen>r.wrong_count))return 100;
+  if(r.streak>0&&r.due_at<=Date.now())return 80;
+  return 20-r.seen;
+ };
+ // Fiiller rounds: new and unsolved questions first (open mistakes first only in a review round); never the same verb twice in a row.
  if(isVerbTopic(topic)){
   let verbPool=verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&(!only||only.has(q.id)));
   // Fiil Atölyesi: the learner walks the verbs in a fixed order, so the requested order is kept as it is.

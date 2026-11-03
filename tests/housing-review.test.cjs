@@ -18,7 +18,9 @@ test('every round is shuffled anew and skips questions that are already solved',
  }
  const allSolved=pool.map(q=>row(q.id,0,1));
  assert.equal(housing.pickHousingQuestions('a','write',10,allSolved,0,false,undefined,new Set(),seeded(3)).length,10,'when everything is solved the round mixes all of them again');
- assert(housing.isHousingSolved(row('x',1,3)),'three correct answers in a row clear a mistake');assert(!housing.isHousingSolved(row('x',1,1)));
+ // Answered right once = solved (3 November 2026); the mistakes list still waits for three right answers in a row.
+ assert(housing.isHousingSolved(row('x',1,3))&&housing.isHousingSolved(row('x',1,1))&&!housing.isHousingSolved(row('x',1,0)));
+ assert(housing.isHousingMistake(row('x',1,1))&&!housing.isHousingMistake(row('x',1,3)),'three correct answers in a row clear a mistake');
 });
 
 test('the review button covers mistakes and starred questions in both test and writing',()=>{

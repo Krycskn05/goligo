@@ -54,7 +54,12 @@ function pickObjectQuestions(mode, group, count, reviews, scene) {
 }
 const isObjectMistake = (row) => !!row && row.wrong_count > 0 && row.streak < 3;
 exports.isObjectMistake = isObjectMistake;
-const isObjectSolved = (row) => !!row && !(0, exports.isObjectMistake)(row);
+/**
+ * Solved = answered right at least once: once every question here is solved, a normal round mixes them all again and
+ * a new test must not be only the old mistakes again (the learner asked, 3 November 2026). A later wrong answer puts it
+ * on the mistakes list (the review button), not back into the normal rounds.
+ */
+const isObjectSolved = (row) => !!row && (row.streak > 0 || row.seen > row.wrong_count);
 exports.isObjectSolved = isObjectSolved;
 function mix(items, random = Math.random) { const result = [...items]; for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));

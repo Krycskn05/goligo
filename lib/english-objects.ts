@@ -41,7 +41,9 @@ export function englishObjectWritingPool(group='all'){return englishObjectQuesti
 export function pickEnglishObjectQuiz(group:string,count:number|'all',reviews:Review[],reviewOnly=false,onlyIds?:string[],writing=false,listening=false){
  const byId=new Map(reviews.map(r=>[r.question_id,r]));const allowed=onlyIds?new Set(onlyIds):null;
  const pool=englishObjectQuestions.filter(q=>(writing?isEnglishObjectWritingQuestion(q):listening?isEnglishObjectListeningQuestion(q):isEnglishObjectPictureQuestion(q))&&(group==='all'||q.topic==='en-'+group)&&(!allowed||allowed.has(q.id))&&(!reviewOnly||!!byId.get(q.id)?.wrong_count&&byId.get(q.id)!.streak<3));
- const rank=(q:Question)=>{const r=byId.get(q.id);return r?.wrong_count&&r.streak<3?100+r.wrong_count*5-r.streak:!r?50:r.due_at<=Date.now()?25:5-r.seen;};
+ // Unsolved questions first (never answered right), then all the others shuffled; open mistakes are not put first, they
+ // have the review button (the learner asked, 3 November 2026: after solving everything a test was only old mistakes).
+ const rank=(q:Question)=>{const r=byId.get(q.id);return !r||!(r.streak>0||r.seen>r.wrong_count)?1:0;};
  const ordered=pool.map(q=>({q,tie:Math.random()})).sort((a,b)=>rank(b.q)-rank(a.q)||a.tie-b.tie).map(item=>item.q);
  const limit=count==='all'?pool.length:Math.min(count,pool.length);
  if(!writing)return ordered.slice(0,limit);

@@ -28,7 +28,8 @@ export function verbPracticeMode(sessionMode:string):PracticeMode{return session
 
 export function verbPool(mode:string,topic:string){return verbQuestions.filter(q=>verbModePredicate(mode)(q)&&inVerbTopic(q.topic,topic));}
 export const isVerbMistake=(row:Review|undefined)=>!!row&&row.wrong_count>0&&row.streak<3;
-export const isVerbSolved=(row:Review|undefined)=>!!row&&!isVerbMistake(row);
+/** Answered right at least once (3 November 2026, as in Nesne Kasası): a later wrong answer goes to the review button only. */
+export const isVerbSolved=(row:Review|undefined)=>!!row&&(row.streak>0||row.seen>row.wrong_count);
 export type VerbPickOptions={starred?:ReadonlySet<string>;fresh?:boolean};
 /**
  * Questions for one round. Review = open mistakes plus starred questions.

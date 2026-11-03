@@ -20,7 +20,12 @@ export function pickObjectQuestions(mode:ObjectMode,group:string,count:number,re
 /** Options for the vault rounds: starred question IDs, whether solved questions are left out, and a test hook for the shuffle. */
 export type ObjectPickOptions={starred?:ReadonlySet<string>;fresh?:boolean;random?:()=>number};
 export const isObjectMistake=(row:Review|undefined)=>!!row&&row.wrong_count>0&&row.streak<3;
-export const isObjectSolved=(row:Review|undefined)=>!!row&&!isObjectMistake(row);
+/**
+ * Solved = answered right at least once: once every question here is solved, a normal round mixes them all again and
+ * a new test must not be only the old mistakes again (the learner asked, 3 November 2026). A later wrong answer puts it
+ * on the mistakes list (the review button), not back into the normal rounds.
+ */
+export const isObjectSolved=(row:Review|undefined)=>!!row&&(row.streak>0||row.seen>row.wrong_count);
 function mix<T>(items:T[],random:()=>number=Math.random):T[]{const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}
 /** Review = open mistakes plus starred questions. A fresh round leaves out solved questions until none are left. */
 function roundPool(pool:Question[],reviews:Review[],reviewOnly:boolean,options:ObjectPickOptions){

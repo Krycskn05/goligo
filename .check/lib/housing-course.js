@@ -268,8 +268,12 @@ const housingBaseId = (id) => id.replace(/-test$/, '');
 exports.housingBaseId = housingBaseId;
 const isHousingMistake = (row) => !!row && row.wrong_count > 0 && row.streak < 3;
 exports.isHousingMistake = isHousingMistake;
-/** Answered correctly at least once and not waiting in the mistakes list. */
-const isHousingSolved = (row) => !!row && !(0, exports.isHousingMistake)(row);
+/**
+ * Answered right at least once: once every question here is solved, a normal round mixes them all again and
+ * a new test must not be only the old mistakes again (the learner asked, 3 November 2026). A later wrong answer puts it
+ * on the mistakes list (the review button), not back into the normal rounds.
+ */
+const isHousingSolved = (row) => !!row && (row.streak > 0 || row.seen > row.wrong_count);
 exports.isHousingSolved = isHousingSolved;
 /** A normal round shows unsolved questions in a new random order every time (trick
  * questions included); solved ones come back only when nothing new is left. The review

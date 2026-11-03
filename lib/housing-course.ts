@@ -249,8 +249,12 @@ export function housingMeaning(q:HousingExercise,language:StudyLanguage){return 
 /** The writing and test versions of one exercise share a star: ...-test → base id. */
 export const housingBaseId=(id:string)=>id.replace(/-test$/,'');
 export const isHousingMistake=(row:Review|undefined)=>!!row&&row.wrong_count>0&&row.streak<3;
-/** Answered correctly at least once and not waiting in the mistakes list. */
-export const isHousingSolved=(row:Review|undefined)=>!!row&&!isHousingMistake(row);
+/**
+ * Answered right at least once: once every question here is solved, a normal round mixes them all again and
+ * a new test must not be only the old mistakes again (the learner asked, 3 November 2026). A later wrong answer puts it
+ * on the mistakes list (the review button), not back into the normal rounds.
+ */
+export const isHousingSolved=(row:Review|undefined)=>!!row&&(row.streak>0||row.seen>row.wrong_count);
 /** A normal round shows unsolved questions in a new random order every time (trick
  * questions included); solved ones come back only when nothing new is left. The review
  * round shows mistakes and starred questions. */

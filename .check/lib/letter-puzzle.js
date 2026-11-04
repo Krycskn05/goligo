@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.noHints = exports.noMistakes = exports.puzzleCharacter = void 0;
+exports.noHints = exports.PUZZLE_HINTS = exports.PUZZLE_TRIES = exports.noMistakes = exports.puzzleCharacter = void 0;
 exports.makeLetterPuzzle = makeLetterPuzzle;
 exports.completeLetterPuzzle = completeLetterPuzzle;
 exports.readPuzzleDraft = readPuzzleDraft;
@@ -13,6 +13,8 @@ exports.letterFits = letterFits;
 exports.tileForLetter = tileForLetter;
 exports.scoredLetterAnswer = scoredLetterAnswer;
 exports.hintLimit = hintLimit;
+exports.triesLeft = triesLeft;
+exports.triedLetterAnswer = triedLetterAnswer;
 exports.readPuzzleExtras = readPuzzleExtras;
 const puzzleCharacter = (value) => Array.from(value.normalize('NFC')).filter(character => /[\p{L}\p{N}]/u.test(character));
 exports.puzzleCharacter = puzzleCharacter;
@@ -140,11 +142,21 @@ exports.noMistakes = { count: 0, first: null, boxes: [] };
 function scoredLetterAnswer(puzzle, letters, mistakes) {
     return puzzle.parts.map(part => mistakes.first && part.index === mistakes.first.index ? mistakes.first.letter : part.editable ? (letters[part.index] ?? '') : part.character).join('');
 }
-/** Hints place the next right letter; about a third of the boxes (at least one) can be helped. */
-function hintLimit(puzzle) { return Math.max(1, Math.floor(puzzle.editable.length / 3)); }
+/** Hints place the next right letter; about a third of the boxes (at least one) can be helped, or a fixed number (never
+ * every box, so the learner always writes at least one letter). */
+function hintLimit(puzzle, fixed) { return fixed ? Math.max(1, Math.min(fixed, puzzle.editable.length - 1)) : Math.max(1, Math.floor(puzzle.editable.length / 3)); }
+/** Nesne Kasası and Fiil Atölyesi (the learner asked, 4 November 2026: "give a rule of 3 tries for a wrong spelling, and 3
+ * hints too"): a wrong letter shakes and goes back and takes one of 3 tries; while a try is left the word still counts as
+ * right; the third wrong letter ends the question as a mistake. And 3 hints for every word. */
+exports.PUZZLE_TRIES = 3, exports.PUZZLE_HINTS = 3;
+function triesLeft(mistakes, tries) { return Math.max(0, tries - mistakes.count); }
+/** The answer sent for checking: with tries, a wrong letter that went back counts only once the tries are used up. */
+function triedLetterAnswer(puzzle, letters, mistakes, tries) {
+    return scoredLetterAnswer(puzzle, letters, tries && triesLeft(mistakes, tries) > 0 ? exports.noMistakes : mistakes);
+}
 exports.noHints = { used: 0, boxes: [] };
 /** Mistakes and hints saved with the draft, so leaving and coming back keeps them. */
-function readPuzzleExtras(puzzle, key) {
+function readPuzzleExtras(puzzle, key, fixedHints) {
     try {
         const data = JSON.parse(localStorage.getItem(key) ?? '{}');
         if (data?.version !== 3)
@@ -154,7 +166,7 @@ function readPuzzleExtras(puzzle, key) {
         const first = m.first && inPuzzle(m.first.index) && typeof m.first.letter === 'string' && (0, exports.puzzleCharacter)(m.first.letter).length === 1 ? { index: m.first.index, letter: (0, exports.puzzleCharacter)(m.first.letter)[0] } : null;
         const mistakes = { count: first ? Math.max(1, Number(m.count) || 1) : 0, first, boxes: Array.isArray(m.boxes) ? m.boxes.filter(inPuzzle) : [] };
         const h = data.hints ?? {};
-        const hints = { used: Math.min(hintLimit(puzzle), Math.max(0, Number(h.used) || 0)), boxes: Array.isArray(h.boxes) ? h.boxes.filter(inPuzzle) : [] };
+        const hints = { used: Math.min(hintLimit(puzzle, fixedHints), Math.max(0, Number(h.used) || 0)), boxes: Array.isArray(h.boxes) ? h.boxes.filter(inPuzzle) : [] };
         return { mistakes, hints };
     }
     catch {

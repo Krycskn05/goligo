@@ -29,6 +29,7 @@ import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLangua
 import {readVaultLanguage,saveVaultLanguage} from '@/lib/vault-language-preference';
 import {useLanguageSwitch} from './language-switch';
 import {LetterPuzzle} from './letter-puzzle';
+import {PUZZLE_HINTS,PUZZLE_TRIES} from '@/lib/letter-puzzle';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
 import {StartWait} from './start-wait';
@@ -402,11 +403,12 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
      {writing?<>
       {task==='write-perfekt'&&<div className="verb-aux"><span className="verb-aux-label">{t('helperVerb')}</span><div className="article-bank" role="group" aria-label={t('helperVerb')} dir="ltr" lang="de">{(['hat','ist'] as const).map(value=>{const right=value===verb.aux||(verb.alsoIst&&value==='ist');return <button type="button" key={value} className={'article-choice verb-aux-choice '+(aux===value?'selected ':'')+(feedback?(right&&(aux===value||!feedback.correct)?'right':aux===value?'wrong':''):'')} aria-pressed={aux===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setAux(value);setAuxWarning(false);if(selected&&!feedback)void submit(value+' '+selected);}}>{value}</button>;})}</div>{auxWarning&&!aux&&<p className="verb-aux-warning" role="alert">{t('helperMissing')}</p>}</div>}
       {task==='write-praesens'&&verbPrefix(verb)&&<div className="verb-aux"><span className="verb-aux-label">{t('prefixChoice')}</span><div className="article-bank" role="group" aria-label={t('prefixChoice')} dir="ltr" lang="de">{prefixOptions(verb).map(value=>{const right=value===verbPrefix(verb);return <button type="button" key={value} className={'article-choice verb-aux-choice '+(prefix===value?'selected ':'')+(feedback?(right&&(prefix===value||!feedback.correct)?'right':prefix===value?'wrong':''):'')} aria-pressed={prefix===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setPrefix(value);setPrefixWarning(false);if(selected&&!feedback)void submit(selected+' '+value);}}>{value}</button>;})}</div>{prefixWarning&&!prefix&&<p className="verb-aux-warning" role="alert">{t('prefixMissing')}</p>}</div>}
-      <LetterPuzzle key={session.id+':'+q.id} answer={task==='write-perfekt'?verb.participle:task==='write-praesens'?praesensStem(verb):task==='write'?verb.display:q.answer} storageKey={'lernkoko-puzzle:'+session.id+':'+q.id} language={language} course="de" onChange={setSelected} onSubmit={answer=>{
-       if(task==='write-perfekt'){if(!aux){setAuxWarning(true);return;}void submit(aux+' '+answer);}
-       else if(task==='write-praesens'&&verbPrefix(verb)){if(!prefix){setPrefixWarning(true);return;}void submit(answer+' '+prefix);}
+      <LetterPuzzle key={session.id+':'+q.id} answer={task==='write-perfekt'?verb.participle:task==='write-praesens'?praesensStem(verb):task==='write'?verb.display:q.answer} storageKey={'lernkoko-puzzle:'+session.id+':'+q.id} language={language} course="de" onChange={setSelected} onSubmit={(answer,out)=>{
+       // The last try used up (out): the question ends as a mistake even without the helper verb or the prefix chosen.
+       if(task==='write-perfekt'){if(!aux&&!out){setAuxWarning(true);return;}void submit((aux?aux+' ':'')+answer);}
+       else if(task==='write-praesens'&&verbPrefix(verb)){if(!prefix&&!out){setPrefixWarning(true);return;}void submit(answer+(prefix?' '+prefix:''));}
        else void submit(answer.replace('|',''));
-      }} busy={actionDisabled} locked={!!feedback||!!pendingAnswer.current} result={feedback?!!feedback.correct:undefined} strictCase={q.strictCase}/>
+      }} busy={actionDisabled} locked={!!feedback||!!pendingAnswer.current} result={feedback?!!feedback.correct:undefined} strictCase={q.strictCase} tries={PUZZLE_TRIES} hintCount={PUZZLE_HINTS}/>
      </>:<div className={'object-options picture-word-options verb-options'+(listening?' verb-listen-options':'')} role="group" aria-labelledby="object-question-heading">{options.map((option,i)=><button key={option} type="button" className={'object-option '+(feedback&&option===q.answer?'right ':'')+(feedback&&!feedback.correct&&feedback.answer===option?'wrong ':'')+(!feedback&&selected===option?'selected':'')} disabled={!!feedback||actionDisabled||!!pendingAnswer.current||(listening&&heardQuestionId!==q.id)} onClick={()=>void submit(option)}><span className="object-option-number">{String.fromCharCode(65+i)}</span>{optionLabel(q,option)}{feedback&&option===q.answer&&<CheckCircle2 size={20}/>}</button>)}</div>}
      {busy&&!feedback&&<p className="picture-quiz-saving" role="status"><Loader2 size={16} className="spinner"/>{v('savingAnswer')}</p>}
     </article>}

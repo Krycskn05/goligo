@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useId,useMemo,useRef,useState} from 'react';
-import {Lightbulb} from 'lucide-react';
-import {makeLetterPuzzle,makeLetterBank,remainingLetterChoices,completeLetterPuzzle,placedLetters,readLetterBankDraft,readPuzzleExtras,letterFits,tileForLetter,scoredLetterAnswer,hintLimit,noMistakes,noHints,type LetterPlacements,type PuzzleMistakes,type PuzzleHints} from '@/lib/letter-puzzle';
+import {Heart,Lightbulb} from 'lucide-react';
+import {makeLetterPuzzle,makeLetterBank,remainingLetterChoices,completeLetterPuzzle,placedLetters,readLetterBankDraft,readPuzzleExtras,letterFits,tileForLetter,triedLetterAnswer,triesLeft,hintLimit,noMistakes,noHints,type LetterPlacements,type PuzzleMistakes,type PuzzleHints} from '@/lib/letter-puzzle';
 import {vaultText,type VaultLanguage} from '@/lib/object-vault-copy';
 import {puzzleText} from '@/lib/article-logic';
 import type {LearningLanguage} from '@/lib/learning-language';
@@ -10,9 +10,11 @@ import type {LearningLanguage} from '@/lib/learning-language';
  * Fill the gaps letter by letter. A tapped letter jumps into the next empty box; a right letter pops in,
  * a wrong one shakes and goes back (the question then counts as a mistake). Tapping a filled box sends its
  * letter back, the hint places the next right letter, and the answer is checked by itself as soon as every box
- * is full — there is no button to press.
+ * is full — there is no button to press. With `tries` (Nesne Kasası, Fiil Atölyesi) a wrong letter takes one of the
+ * hearts instead: while one is left the word still counts as right, the last one ends the question as a mistake; and
+ * `hintCount` gives every word the same number of hints.
  */
-export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=false,locked=false,result,strictCase=false,course='de'}:{answer:string;course?:LearningLanguage;storageKey:string;language:VaultLanguage;onChange:(answer:string)=>void;onSubmit:(answer:string)=>void;busy?:boolean;locked?:boolean;result?:boolean;strictCase?:boolean}){
+export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=false,locked=false,result,strictCase=false,course='de',tries,hintCount}:{answer:string;course?:LearningLanguage;storageKey:string;language:VaultLanguage;onChange:(answer:string)=>void;onSubmit:(answer:string,out?:boolean)=>void;busy?:boolean;locked?:boolean;result?:boolean;strictCase?:boolean;tries?:number;hintCount?:number}){
  const text=(key:Parameters<typeof vaultText>[1],params?:Record<string,string|number>)=>vaultText(language,key,params,course);
  const puzzle=useMemo(()=>makeLetterPuzzle(answer,storageKey,course),[answer,storageKey,course]);
  const bank=useMemo(()=>makeLetterBank(puzzle,storageKey,course),[puzzle,storageKey,course]);
@@ -20,23 +22,26 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
  const [mistakes,setMistakes]=useState<PuzzleMistakes>(noMistakes);const [hints,setHints]=useState<PuzzleHints>(noHints);
  const [shake,setShake]=useState<{index:number;letter:string;turn:number}|null>(null);const [note,setNote]=useState(false);
  const fields=useRef(new Map<number,HTMLButtonElement>());const id=useId();const sent=useRef(false);const turn=useRef(0);
- const letters=placedLetters(placements,bank);const completed=completeLetterPuzzle(puzzle,letters);const unavailable=busy||locked||!ready;
- const scored=scoredLetterAnswer(puzzle,letters,mistakes);
- const choices=remainingLetterChoices(bank,placements);const hintsLeft=hintLimit(puzzle)-hints.used;
- useEffect(()=>{const saved=readLetterBankDraft(puzzle,bank,storageKey);const extras=readPuzzleExtras(puzzle,storageKey);setPlacements(saved);setMistakes(extras.mistakes);setHints(extras.hints);setActive(puzzle.editable.find(index=>!saved[index])??puzzle.editable[0]);sent.current=false;setReady(true);},[puzzle,bank,storageKey]);
- useEffect(()=>{onChange(completed.complete?scored:'');},[completed.complete,scored,onChange]);
+ const letters=placedLetters(placements,bank);const completed=completeLetterPuzzle(puzzle,letters);
+ const left=tries?triesLeft(mistakes,tries):0;const out=!!tries&&left===0;const finished=completed.complete||out;
+ const blocked=busy||locked||!ready;const unavailable=blocked||out;
+ const scored=triedLetterAnswer(puzzle,letters,mistakes,tries);
+ const choices=remainingLetterChoices(bank,placements);const hintsLeft=hintLimit(puzzle,hintCount)-hints.used;
+ useEffect(()=>{const saved=readLetterBankDraft(puzzle,bank,storageKey);const extras=readPuzzleExtras(puzzle,storageKey,hintCount);setPlacements(saved);setMistakes(extras.mistakes);setHints(extras.hints);setActive(puzzle.editable.find(index=>!saved[index])??puzzle.editable[0]);sent.current=false;setReady(true);},[puzzle,bank,storageKey,hintCount]);
+ useEffect(()=>{onChange(finished?scored:'');},[finished,scored,onChange]);
  useEffect(()=>{if(!ready)return;try{if(result!==undefined)localStorage.removeItem(storageKey);else localStorage.setItem(storageKey,JSON.stringify({version:3,slots:placements,mistakes,hints}));}catch{}},[placements,mistakes,hints,storageKey,result,ready]);
- // Every box full: a short moment to see the last letter, then the answer is checked by itself. If the page could not
- // take it yet (a sound still ending), it is tried again a few times; the page ignores a second answer to the same question.
- const submitLatest=useRef(()=>{});submitLatest.current=()=>onSubmit(scored);
+ // Every box full (or the last try used up): a short moment to see the last letter, then the answer is checked by itself.
+ // If the page could not take it yet (a sound still ending), it is tried again a few times; the page ignores a second
+ // answer to the same question.
+ const submitLatest=useRef(()=>{});submitLatest.current=()=>onSubmit(scored,out);
  useEffect(()=>{
-  if(!completed.complete){sent.current=false;return;}
-  if(unavailable||result!==undefined)return;
+  if(!finished){sent.current=false;return;}
+  if(blocked||result!==undefined)return;
   let tries=0;
   const first=setTimeout(()=>{sent.current=true;submitLatest.current();},350);
   const again=setInterval(()=>{tries++;if(tries>6){clearInterval(again);return;}submitLatest.current();},1200);
   return()=>{clearTimeout(first);clearInterval(again);};
- },[completed.complete,unavailable,result]);
+ },[finished,blocked,result]);
  useEffect(()=>{if(!shake)return;const timer=setTimeout(()=>setShake(current=>current?.turn===shake.turn?null:current),520);return()=>clearTimeout(timer);},[shake]);
  function focus(index:number|undefined){if(index!==undefined)requestAnimationFrame(()=>fields.current.get(index)?.focus({preventScroll:true}));}
  /** The box a letter goes into: the chosen box if it is empty, otherwise the first empty one. */
@@ -90,7 +95,9 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
  const words:typeof puzzle.parts[]=[];let group:typeof puzzle.parts=[];for(const part of puzzle.parts){if(/\s/.test(part.character)){if(group.length)words.push(group);group=[];}else group.push(part);}if(group.length)words.push(group);
  const done=completed.complete&&!locked;
  return <form className={'letter-puzzle letter-bank-puzzle'+(done?' complete':'')} onSubmit={event=>{event.preventDefault();if(completed.complete&&!unavailable){sent.current=true;onSubmit(scored);}}}>
-  {!locked&&<p id={id+'-hint'} className="puzzle-hint">{text('letterBankHint')}</p>}
+  {/* The note about a wrong letter takes the place of the instructions (same spot, the taller of the two), so the board
+      and the letters never move when it appears (the learner's rule: nothing shifts in a practice). */}
+  {!locked&&<div className="puzzle-hint-slot"><p id={id+'-hint'} className={'puzzle-hint'+(note?' covered':'')}>{text('letterBankHint')}</p>{note&&<p className="puzzle-mistake-note" role="alert">{tries?text('puzzleWrongLetter')+(out?'':' '+text('puzzleTriesLeft',{n:left})):text('puzzleMistakeNote')}</p>}</div>}
   <fieldset className="puzzle-board" dir="ltr" lang={course} aria-describedby={id+'-hint '+id+'-progress'}><legend className="sr-only" lang={language}>{text('puzzlePrompt')}</legend>
    {words.map((word,number)=><span className="puzzle-word" key={number}>{word.map(part=>{
     if(!part.editable)return <span key={part.index} className={'puzzle-letter '+(/[\p{L}\p{N}]/u.test(part.character)?'puzzle-given':'puzzle-punctuation')} aria-label={/[\p{L}\p{N}]/u.test(part.character)?text('puzzleGiven',{letter:part.character}):undefined}>{part.character}</span>;
@@ -107,10 +114,10 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
    })}</span>)}
   </fieldset>
   <div className="puzzle-meta">
-   <p id={id+'-progress'} className="puzzle-letter-progress" role="status">{text('puzzleFilled',{n:completed.filled,total:puzzle.editable.length})}{mistakes.count>0&&<span className="puzzle-mistakes"> · {text('puzzleMistakes',{n:mistakes.count})}</span>}</p>
+   <p id={id+'-progress'} className="puzzle-letter-progress" role="status">{text('puzzleFilled',{n:completed.filled,total:puzzle.editable.length})}{!tries&&mistakes.count>0&&<span className="puzzle-mistakes"> · {text('puzzleMistakes',{n:mistakes.count})}</span>}</p>
+   {!!tries&&<span className={'puzzle-tries'+(left===1?' last':'')} role="img" aria-label={text('puzzleTriesLeft',{n:left})} title={text('puzzleTriesLeft',{n:left})} data-tries-left={left}>{Array.from({length:tries},(_,i)=><Heart key={i} size={15} fill={i<left?'currentColor':'none'} className={i<left?'':'lost'} aria-hidden="true"/>)}</span>}
    {!locked&&<button type="button" className="puzzle-hint-button" disabled={unavailable||hintsLeft<=0||completed.complete} onClick={hint} aria-label={text('puzzleHintAria',{n:hintsLeft})} title={text('puzzleHintAria',{n:hintsLeft})}><Lightbulb size={15} aria-hidden="true"/>{text('puzzleHintButton')}<span className="puzzle-hint-count" aria-hidden="true">{hintsLeft}</span></button>}
   </div>
-  {note&&!locked&&<p className="puzzle-mistake-note" role="alert">{text('puzzleMistakeNote')}</p>}
   {!locked&&choices.length>0&&<div className="letter-bank-wrap"><div className="letter-bank-heading"><strong>{text('letterBank')}</strong></div>
    <div className="letter-bank" role="group" aria-label={text('letterBank')} dir="ltr" lang={course}>{choices.map(choice=><button type="button" key={choice.letter} className="letter-tile" disabled={unavailable} data-letter={choice.letter} data-token-id={choice.id} aria-label={text('puzzleCopies',{letter:choice.letter,n:choice.count})} onClick={()=>pick(choice.id)}><span>{choice.letter}</span>{choice.count>1&&<small className="letter-tile-count" aria-hidden="true">{choice.count}</small>}</button>)}</div>
   </div>}

@@ -46,7 +46,7 @@ test('every vault noun gets an honest article rule in every language',()=>{
 test('word puzzles ask for the article and letter puzzles accept the keyboard',()=>{
  const page=fs.readFileSync('app/object-study.tsx','utf8');
  assert.ok(page.includes("/^(der|die|das) (.+)$/.exec(q.answer)"),'the article is chosen, not given');
- assert.ok(page.includes("void submit(nounArticle+' '+answer)"));
+ assert.ok(page.includes("void submit((nounArticle?nounArticle+' ':'')+answer)"));
  assert.ok(page.includes("puzzleText(language,showHint?'hideHint':'showHint')"));
  const puzzle=fs.readFileSync('app/letter-puzzle.tsx','utf8');
  assert.ok(puzzle.includes("window.addEventListener('keydown',listener)")&&puzzle.includes('typeLetter(event.key)'));

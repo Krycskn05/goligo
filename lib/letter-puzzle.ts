@@ -76,18 +76,28 @@ export const noMistakes:PuzzleMistakes={count:0,first:null,boxes:[]};
 export function scoredLetterAnswer(puzzle:LetterPuzzleModel,letters:PuzzleLetters,mistakes:PuzzleMistakes){
  return puzzle.parts.map(part=>mistakes.first&&part.index===mistakes.first.index?mistakes.first.letter:part.editable?(letters[part.index]??''):part.character).join('');
 }
-/** Hints place the next right letter; about a third of the boxes (at least one) can be helped. */
-export function hintLimit(puzzle:LetterPuzzleModel){return Math.max(1,Math.floor(puzzle.editable.length/3));}
+/** Hints place the next right letter; about a third of the boxes (at least one) can be helped, or a fixed number (never
+ * every box, so the learner always writes at least one letter). */
+export function hintLimit(puzzle:LetterPuzzleModel,fixed?:number){return fixed?Math.max(1,Math.min(fixed,puzzle.editable.length-1)):Math.max(1,Math.floor(puzzle.editable.length/3));}
+/** Nesne Kasası and Fiil Atölyesi (the learner asked, 4 November 2026: "give a rule of 3 tries for a wrong spelling, and 3
+ * hints too"): a wrong letter shakes and goes back and takes one of 3 tries; while a try is left the word still counts as
+ * right; the third wrong letter ends the question as a mistake. And 3 hints for every word. */
+export const PUZZLE_TRIES=3,PUZZLE_HINTS=3;
+export function triesLeft(mistakes:PuzzleMistakes,tries:number){return Math.max(0,tries-mistakes.count);}
+/** The answer sent for checking: with tries, a wrong letter that went back counts only once the tries are used up. */
+export function triedLetterAnswer(puzzle:LetterPuzzleModel,letters:PuzzleLetters,mistakes:PuzzleMistakes,tries?:number){
+ return scoredLetterAnswer(puzzle,letters,tries&&triesLeft(mistakes,tries)>0?noMistakes:mistakes);
+}
 export type PuzzleHints={used:number;boxes:number[]};
 export const noHints:PuzzleHints={used:0,boxes:[]};
 /** Mistakes and hints saved with the draft, so leaving and coming back keeps them. */
-export function readPuzzleExtras(puzzle:LetterPuzzleModel,key:string):{mistakes:PuzzleMistakes;hints:PuzzleHints}{
+export function readPuzzleExtras(puzzle:LetterPuzzleModel,key:string,fixedHints?:number):{mistakes:PuzzleMistakes;hints:PuzzleHints}{
  try{
   const data=JSON.parse(localStorage.getItem(key)??'{}');if(data?.version!==3)return {mistakes:noMistakes,hints:noHints};
   const inPuzzle=(value:unknown):value is number=>typeof value==='number'&&puzzle.editable.includes(value);
   const m=data.mistakes??{};const first=m.first&&inPuzzle(m.first.index)&&typeof m.first.letter==='string'&&puzzleCharacter(m.first.letter).length===1?{index:m.first.index,letter:puzzleCharacter(m.first.letter)[0]}:null;
   const mistakes={count:first?Math.max(1,Number(m.count)||1):0,first,boxes:Array.isArray(m.boxes)?m.boxes.filter(inPuzzle):[]};
-  const h=data.hints??{};const hints={used:Math.min(hintLimit(puzzle),Math.max(0,Number(h.used)||0)),boxes:Array.isArray(h.boxes)?h.boxes.filter(inPuzzle):[]};
+  const h=data.hints??{};const hints={used:Math.min(hintLimit(puzzle,fixedHints),Math.max(0,Number(h.used)||0)),boxes:Array.isArray(h.boxes)?h.boxes.filter(inPuzzle):[]};
   return {mistakes,hints};
  }catch{return {mistakes:noMistakes,hints:noHints};}
 }

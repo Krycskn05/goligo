@@ -321,7 +321,7 @@ test('the writing puzzles use sentences, the prefix choice and the | mark of sep
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
  assert.ok(page.includes("task==='write'?verb.display"),'separable verbs are written with the | mark');
  assert.ok(page.includes("answer.replace('|','')"),'the | mark is not part of the saved answer');
- assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+' '+prefix)"));
+ assert.ok(page.includes('prefixOptions(verb)')&&page.includes("void submit(answer+(prefix?' '+prefix:''))"));
  assert.ok(page.includes('<VerbGame ')&&page.includes('gameIds.map'));
  const gamesLib=load('verb-games');assert.deepEqual([...gamesLib.gameIds],['match','rain','catch','quick','search','rescue','plural'],'the matching cards and the new games (not Cümle kurma, hat mı ist mi?, Biçim yapbozu)');
  const copy=load('verb-copy');for(const key of ['gamesTitle','gameSentence','gameAux','gameBuild','gameMatch','gapPraesens','gapPerfekt'])assert.ok(copy.verbCopy[key]);
@@ -620,6 +620,15 @@ test('letter puzzles: a wrong letter goes back and counts, hints help, a full wo
  const q={id:'t',topic:'t',kind:'write',prompt:'',answer:'fahren',explanation:''};
  assert.equal(course.gradeAnswer(q,scored),false,'a wrong letter makes the question a mistake');assert.equal(course.gradeAnswer(q,'fahren'),true);
  assert.equal(puzzle.hintLimit(puzzle.makeLetterPuzzle('ab','s')),1);assert.equal(puzzle.hintLimit({parts:[],editable:[1,2,3,4,5,6,7]}),2);
+ // Nesne Kasası and Fiil Atölyesi (4 November 2026): 3 tries for a wrong letter, 3 hints for every word (never every box).
+ assert.equal(puzzle.PUZZLE_TRIES,3);assert.equal(puzzle.PUZZLE_HINTS,3);
+ assert.equal(puzzle.hintLimit({parts:[],editable:[1,2,3,4,5,6,7]},3),3);assert.equal(puzzle.hintLimit({parts:[],editable:[1,2,3]},3),2);assert.equal(puzzle.hintLimit(puzzle.makeLetterPuzzle('ab','s'),3),1);
+ const missed=n=>({count:n,first:{index:first,letter:wrong},boxes:[first]});
+ assert.equal(puzzle.triesLeft(missed(1),3),2);assert.equal(puzzle.triesLeft(missed(3),3),0);assert.equal(puzzle.triesLeft(missed(5),3),0);
+ assert.equal(puzzle.triedLetterAnswer(model,letters,missed(1),3),'fahren','one wrong letter: two tries left, the word still counts');
+ assert.equal(puzzle.triedLetterAnswer(model,letters,missed(2),3),'fahren','two wrong letters: one try left, still right');
+ assert.equal(course.gradeAnswer(q,puzzle.triedLetterAnswer(model,letters,missed(3),3)),false,'the third wrong letter ends the question as a mistake');
+ assert.equal(course.gradeAnswer(q,puzzle.triedLetterAnswer(model,letters,missed(1))),false,'without tries (Ev ve Yaşam) one wrong letter still counts');
  const choices=[{id:'a',letter:'A',count:1},{id:'b',letter:'b',count:1}];
  assert.equal(puzzle.tileForLetter(choices,'a').id,'a');assert.equal(puzzle.tileForLetter(choices,'b').id,'b');assert.equal(puzzle.tileForLetter(choices,'c'),undefined);
  const ui=fs.readFileSync('app/letter-puzzle.tsx','utf8');
@@ -630,7 +639,7 @@ test('letter puzzles: a wrong letter goes back and counts, hints help, a full wo
  for(const language of languages)assert.ok(load('object-vault-copy').vaultText(language,'letterBankHint').split(/[.!。।۔።؟]\s*/).filter(Boolean).length>=3,language+' the hint says it checks by itself');
  assert.ok(ui.includes("if(letterFits(puzzle,index,token.letter,strictCase,course))place(index,tokenId);else miss(index,token.letter);"),'right letters go in, wrong ones shake');
  assert.ok(ui.includes('onClick={hint}'),'hint button');
- for(const language of languages)for(const key of ['puzzleHintButton','puzzleHintAria','puzzleMistakes','puzzleMistakeNote','letterBankHint'])assert.ok(load('object-vault-copy').vaultText(language,key,{n:2}).trim(),language+' '+key);
+ for(const language of languages)for(const key of ['puzzleHintButton','puzzleHintAria','puzzleMistakes','puzzleMistakeNote','letterBankHint','puzzleWrongLetter','puzzleTriesLeft'])assert.ok(load('object-vault-copy').vaultText(language,key,{n:2}).trim(),language+' '+key);
 });
 
 test('games write one pronoun for a verb, like its picture: sie for a woman, er for a man, never "sie/er" (25 October 2026)',()=>{

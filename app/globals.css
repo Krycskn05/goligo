@@ -875,7 +875,20 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 .puzzle-hint-button:disabled { opacity:.45; cursor:default; }
 .puzzle-hint-count { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 4px; border-radius:9px; background:#f0c75a; color:#4a3200; font-size:11px; }
 .puzzle-mistakes { color:#c0552a; font-weight:700; }
+/* Three tries (Nesne Kasası, Fiil Atölyesi): a heart for each, a used one turns pale; they sit in the row between the
+   filled count and the hint button, so nothing moves when one is lost. */
+.puzzle-tries { display:inline-flex; align-items:center; gap:3px; color:#e0475b; line-height:0; }
+.puzzle-tries .lost { color:#d9c4c7; }
+.puzzle-tries.last svg:not(.lost) { animation:puzzle-last-try 1s ease-in-out 2; }
+@keyframes puzzle-last-try { 50% { transform:scale(1.25); } }
+@media (prefers-reduced-motion:reduce) { .puzzle-tries.last svg { animation:none; } }
+html[data-lernkoko-motion="reduced"] .puzzle-tries.last svg { animation:none; }
 .puzzle-mistake-note { margin:0 0 6px; font-size:12px; line-height:1.35; color:#b3471f; }
+/* The instructions and the wrong-letter note share one spot (the taller one sets its height), so nothing moves. */
+.puzzle-hint-slot { display:grid; }
+.puzzle-hint-slot>* { grid-area:1 / 1; }
+.puzzle-hint-slot .puzzle-hint.covered { visibility:hidden; }
+.puzzle-hint-slot .puzzle-mistake-note { align-self:center; font-weight:700; }
 .letter-tile { transition:transform .12s ease; }
 .letter-tile:active:enabled { transform:scale(.88); }
 @keyframes puzzle-pop { 0% { transform:scale(.55); } 70% { transform:scale(1.14); } 100% { transform:scale(1); } }

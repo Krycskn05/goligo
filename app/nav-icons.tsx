@@ -21,7 +21,7 @@ const SHAPES:Record<NavIconName,ReactNode>={
  * Ana sayfa, Üniteler ve konular, Nesne Kasası, Fiil Atölyesi, Oyunlar, Yanlışlarım, Uygulama olarak indir. Ev ve Yaşam
  * and Ausbildung have no picture yet and keep their two-tone drawing on a round white sticker.
  */
-export const NAV_PICTURES:Partial<Record<NavIconName,string>>={home:'/icons/menu/home.webp',units:'/icons/menu/units.webp',vault:'/icons/menu/vault.webp',verbs:'/icons/menu/verbs.webp',games:'/icons/menu/games.webp',mistakes:'/icons/menu/mistakes.webp',app:'/icons/menu/app.webp'};
+export const NAV_PICTURES:Partial<Record<NavIconName,string>>={home:'/icons/menu/home.webp',units:'/icons/menu/units.webp',vault:'/icons/menu/kelime-kasasi.webp',verbs:'/icons/menu/verbs.webp',games:'/icons/menu/games.webp',mistakes:'/icons/menu/mistakes.webp',app:'/icons/menu/app.webp'};
 
 /**
  * A left-menu icon: the learner's picture, or for parts without one the two-tone drawing on a round white sticker

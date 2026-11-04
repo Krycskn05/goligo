@@ -37,12 +37,14 @@ function pickPictures(now = Date.now()) {
  * learner (Goliqo-ana-sayfa-kapaklari.zip, 4 November 2026: "the pictures were made for the topics, never change
  * them"). Always the same, no 30-minute change; only the welcome picture of the introduction page still changes.
  */
+// Their own file names (public/toon/kapak): phones and browsers keep a picture under the same address for days, so new
+// covers under old names did not show (the learner saw the old ones, 4 November 2026).
 exports.HOME_COVERS = {
-    units: '/toon/home/units.webp',
-    vault: '/toon/home/vault.webp',
-    verbs: '/toon/landing/fiil-atolyesi-2.webp',
-    games: '/toon/landing/oyunlar-3.webp',
-    mistakes: '/toon/landing/yanlislarim.webp',
+    units: '/toon/kapak/units.webp',
+    vault: '/toon/kapak/vault.webp',
+    verbs: '/toon/kapak/verbs.webp',
+    games: '/toon/kapak/games.webp',
+    mistakes: '/toon/kapak/mistakes.webp',
 };
 /** Milliseconds until the pictures change next. */
 function nextPictureChange(now = Date.now()) { return exports.PICTURE_PERIOD_MS - now % exports.PICTURE_PERIOD_MS; }

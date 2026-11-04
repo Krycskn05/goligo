@@ -108,8 +108,10 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  // Seven soft 3D icons (128 × 128, clear background) for the left menu; Ev ve Yaşam and Ausbildung keep their drawing.
  const icons=read('app/nav-icons.tsx');
  for(const name of ['home','units','vault','verbs','games','mistakes','app']){
-  assert.ok(icons.includes(name+":'/icons/menu/"+name+".webp'"),name);
-  assert.deepEqual(size('public/icons/menu/'+name+'.webp'),[128,128],name);
+  // Kelime Kasası's chest has its own file name (4 November 2026), so browsers that kept the old icon load the new one.
+  const file=name==='vault'?'kelime-kasasi':name;
+  assert.ok(icons.includes(name+":'/icons/menu/"+file+".webp'"),name);
+  assert.deepEqual(size('public/icons/menu/'+file+'.webp'),[128,128],name);
  }
  for(const name of ['housing','ausbildung'])assert.ok(!icons.includes(name+":'/icons/menu/"),name+' keeps its drawing');
  assert.ok(icons.includes("if(picture)return <span className={'nav-icon has-picture nav-icon-'+name} aria-hidden=\"true\"><img src={picture} alt=\"\" width={128} height={128}"));
@@ -118,7 +120,7 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  const tour=read('app/home-tour.tsx');
  assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
  const covers=require(path.join(compiled,'site-pictures.js')).HOME_COVERS;
- assert.deepEqual(covers,{units:'/toon/home/units.webp',vault:'/toon/home/vault.webp',verbs:'/toon/landing/fiil-atolyesi-2.webp',games:'/toon/landing/oyunlar-3.webp',mistakes:'/toon/landing/yanlislarim.webp'});
+ assert.deepEqual(covers,{units:'/toon/kapak/units.webp',vault:'/toon/kapak/vault.webp',verbs:'/toon/kapak/verbs.webp',games:'/toon/kapak/games.webp',mistakes:'/toon/kapak/mistakes.webp'},'their own names: no old picture kept by a browser shows instead');
  for(const src of Object.values(covers))assert.deepEqual(size('public'+src),[1200,600],src+': 2 : 1 like every card frame, so the card shows it whole and even');
  const pictures=read('lib/site-pictures.ts');
  for(const id of ['units','vault','verbs','games','mistakes']){

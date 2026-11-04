@@ -11,8 +11,8 @@ const size=file=>{const d=fs.readFileSync(file);assert.equal(d.toString('ascii',
  throw Error('no size: '+file);};
 
 test('Kelime Kasası in the menu: the learner\'s chest, 128 × 128 like the other menu icons',()=>{
- assert.deepEqual(size('public/icons/menu/vault.webp'),[128,128],'menu icons are 128 × 128');
- assert.ok(read('app/nav-icons.tsx').includes("vault:'/icons/menu/vault.webp'"),'the menu, the home cards and the vault page take it from here');
+ assert.deepEqual(size('public/icons/menu/kelime-kasasi.webp'),[128,128],'menu icons are 128 × 128');
+ assert.ok(read('app/nav-icons.tsx').includes("vault:'/icons/menu/kelime-kasasi.webp'"),'its own file name, so a browser that kept the old icon loads the new one');
  // The header's calendar and clock went back to their own drawings (the learner asked, 4 November 2026).
  assert.ok(!fs.existsSync('public/icons/header/clock.webp')&&!read('app/site-greeting.tsx').includes('/icons/header/'));
 });

@@ -14,7 +14,7 @@ test('article questions are answered with the tap on der/die/das',()=>{
 
 test('Dinle ve Bul plays the first word and every next word by itself',()=>{
  const page=read('app/object-study.tsx');
- assert.ok(page.includes("if(practiceMode==='listen')speech.prepare();"),'prepared in the start tap for phones');
+ assert.ok(page.includes("if(mode==='listen')speech.prepare();"),'prepared in the start tap for phones');
  assert.ok(page.includes("const first=data.session.mode==='listen'?questionMap.get(data.session.questions[data.session.answers.length]?.id??''):undefined;")&&page.includes('if(first?.audio){setHeardQuestionId(first.id);speech.speak(first.audio);}'));
  assert.ok(page.includes('if(following?.audio){setHeardQuestionId(following.id);speech.speak(following.audio);}'),'the next word too');
  // Only the listening word: picture and writing questions are never read aloud by themselves.

@@ -54,8 +54,10 @@
    app/learning-effects.tsx puts it there). He stands in the lower corner, so the object itself stays in view. */
 [data-paul-picture]>.object-picture { position:relative; }
 .lk-picture-reaction { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; border-radius:inherit; }
-.lk-picture-paul { position:absolute; bottom:0; inset-inline-end:3%; width:auto; height:min(64%,180px); aspect-ratio:1; object-fit:contain; transform-origin:50% 100%; animation:lk-picture-paul 2s both; }
-.lk-picture-reaction.kind-wrong .lk-picture-paul { animation-duration:2.1s; }
+/* The picture rules of the answer card (koko-theme.css) size every img in it; Paul keeps his own corner box. */
+.toon-app [data-paul-picture]>.object-picture>.lk-picture-reaction>img.lk-picture-paul { position:absolute; bottom:0; inset-inline-end:3%; width:min(56%,180px); height:min(64%,180px); max-width:none; max-height:none; margin:0; object-fit:contain; object-position:100% 100%; transform-origin:100% 100%; animation:lk-picture-paul 2s both; }
+.toon-app[dir=rtl] [data-paul-picture]>.object-picture>.lk-picture-reaction>img.lk-picture-paul { object-position:0 100%; transform-origin:0 100%; }
+.toon-app [data-paul-picture]>.object-picture>.lk-picture-reaction.kind-wrong>img.lk-picture-paul { animation-duration:2.1s; }
 .lk-picture-reaction .lk-confetti { top:34%; }
 @keyframes lk-picture-paul {
  0% { opacity:0; transform:translateY(28%) scale(.75); }

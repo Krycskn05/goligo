@@ -90,7 +90,7 @@ test('Paul pops up all over the screen now and then (waving every other time, hi
  assert.ok(effects.includes('<img className="lk-reaction-paul" src={paulSrc(reaction.anim)}'));
  // The answer badge: a different fitting animation each time; the next one is fetched at once.
  assert.ok(effects.includes("const REACTION_POSE:Record<LearningReaction,PaulPose>={correct:'desk',wrong:'wrong',complete:'cheer'};")&&effects.includes("if(kind==='complete')playPaulSound(pose);"));
- assert.ok(effects.includes('setReaction({kind,id:++sequence.current,pose,anim:nextPaul(pose)});')&&effects.includes('picture.src=paulSrc(upcomingPaul(pose));'));
+ assert.ok(effects.includes('setReaction({kind,id:++sequence.current,pose,anim:nextPaul(pose),host});')&&effects.includes('picture.src=paulSrc(upcomingPaul(pose));'));
  assert.ok(effects.includes('const REACTION_MS={correct:2000,wrong:2100,complete:2600} as const;')&&effects.includes('<PaulPeek/>'));
  const css=read('app/paul-hoca.css');
  for(const [kind,ms] of [['correct','2s'],['wrong','2.1s'],['complete','2.6s']])assert.ok(css.includes('.kind-'+kind+' .lk-reaction-badge:has(.lk-reaction-paul) { animation:lk-paul-badge '+ms+' both; }'),kind);

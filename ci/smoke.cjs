@@ -194,7 +194,8 @@ async function languageFlow(browser) {
     await page.locator("[data-verb-island-go]").first().click();
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT, "34-uyesiz-fiiller.png") });
-    record("Uyesiz: Fiil Atolyesi'nin 1. bolumu acik, digerleri kilitli", verbs.banner === 1 && verbs.open === 1 && verbs.locked === 3, JSON.stringify(verbs));
+    // 4 Kasim 2026: harita 6 konu (kitap bolumleri yerine); uyesiz 1. konu acik, 5'i kilitli.
+    record("Uyesiz: Fiil Atolyesi'nin 1. konusu acik, digerleri kilitli", verbs.banner === 1 && verbs.open === 1 && verbs.locked === 5, JSON.stringify(verbs));
     await page.goto(BASE + "/ev-esyalar", { waitUntil: "networkidle", timeout: 90000 });
     const vault = { banner: await page.locator("[data-guest-banner]").count(), open: await page.locator('[data-vault-category]:not(.guest-locked)').count() };
     record("Uyesiz: Nesne Kasasi'nda ilk grup acik", vault.banner === 1 && vault.open === 1, JSON.stringify(vault));
@@ -422,7 +423,7 @@ async function languageFlow(browser) {
   await visit(page, "/fiiller", "06-fiiller.png", errors);
   const workshopPanels = await page.locator("[data-verb-workshop]").count();
   const islands = await page.locator("[data-verb-island]").count();
-  record("Fiil Atolyesi sayfasinda baslik ve dort bolum var", workshopPanels === 1 && islands === 4, `atolye ${workshopPanels}, bolum ${islands}`);
+  record("Fiil Atolyesi sayfasinda baslik ve alti konu var", workshopPanels === 1 && islands === 6, `atolye ${workshopPanels}, konu ${islands}`);
 
   const phone = await browser.newContext({ ...devices["iPhone 13"], locale: "tr-TR" });
   const p2 = await phone.newPage();
@@ -517,7 +518,7 @@ async function languageFlow(browser) {
     await p2.waitForTimeout(700);
     await p2.screenshot({ path: path.join(OUT, "13-telefon-bolum-listesi.png"), fullPage: true });
     const listed = await p2.locator("[data-verb-open]").count();
-    info("Telefon: bolum listesinde fiiller gorunuyor", listed === 19, `${listed} fiil`);
+    info("Telefon: konu listesinde fiiller gorunuyor", listed === 13, `${listed} fiil`);
     await p2.locator("[data-verb-open]").first().click();
     await p2.waitForSelector("#verb-detail-heading", { timeout: 20000 });
     await p2.waitForTimeout(1500);

@@ -1785,5 +1785,11 @@
     "Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.": "A leck\u00e9kben el\u00e9rt eredm\u00e9nyeid, a helyek, ahol abbahagytad, a sz\u00f3gyakorl\u00e1said, a hib\u00e1id, a pontjaid, a napi sorozatod \u00e9s a j\u00e1t\u00e9krekordjaid minden eszk\u00f6z\u00f6d\u00f6n t\u00f6rl\u0151dnek. A fi\u00f3kod, a csillagozott szavaid \u00e9s a be\u00e1ll\u00edt\u00e1said megmaradnak. Ez nem vonhat\u00f3 vissza.",
     "I understand that all my progress will be deleted.": "\u00c9rtem, hogy a teljes halad\u00e1som t\u00f6rl\u0151dik.",
     "Reset my progress": "Halad\u00e1som null\u00e1z\u00e1sa",
-    "Your progress has been reset. You can start again from the beginning.": "A halad\u00e1sod null\u00e1zva. El\u00f6lr\u0151l kezdheted."
+    "Your progress has been reset. You can start again from the beginning.": "A halad\u00e1sod null\u00e1zva. El\u00f6lr\u0151l kezdheted.",
+    "Questions": "K\u00e9rd\u00e9sek",
+    "Done": "K\u00e9sz",
+    "Current question": "Aktu\u00e1lis k\u00e9rd\u00e9s",
+    "Coming up": "Hamarosan",
+    "Back to the current question": "Vissza az aktu\u00e1lis k\u00e9rd\u00e9shez",
+    "You solved this one before.": "Ezt a k\u00e9rd\u00e9st m\u00e1r megoldottad."
 }

@@ -62,8 +62,9 @@ test('stars on Nesne Kasası questions are saved for the signed-in learner',asyn
 
 test('the Nesne Kasası page shows the star and the combined review button',()=>{
  const page=fs.readFileSync('app/object-study.tsx','utf8');
- assert(page.includes('toggleStar(q.id)')&&page.includes('starredQuestionIds(snapshot.notes)'));
- assert(page.includes("{starred,fresh:!reviewOnly&&!onlyIds&&!all}"),'normal rounds skip solved questions, reviews add stars');
+ // The star marks the question on screen: the current one, or a done one opened from the strip (4 November 2026).
+ assert(page.includes('toggleStar(shownId)')&&page.includes("const shownId=viewQ?viewQ.id:q?.id??'';")&&page.includes('starredQuestionIds(snapshot.notes)'));
+ assert(page.includes("const fresh=!reviewOnly&&!onlyIds&&!all;")&&page.includes("(group,count,history,reviewOnly,eligibleIds,{starred,fresh})"),'normal rounds skip solved questions, reviews add stars');
  // "Hepsini baştan çöz" (the learner asked to solve the solved ones again): shown while some are solved and some are not.
  assert(page.includes("{ready&&unsolved>0&&unsolved<availableCount&&<button type=\"button\" className=\"text-button vault-restart-all\" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all>"));
  assert(page.includes('disabled={busy||!ready||!marked.length}'),'the review button is active whenever there are mistakes or stars');

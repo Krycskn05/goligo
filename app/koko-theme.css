@@ -619,7 +619,7 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 .toon-app .vault-strip ol { display:flex; gap:7px; width:max-content; margin:0; padding:0; padding-inline-end:26px; list-style:none; }
 .toon-app .vault-strip button { position:relative; display:grid; place-items:center; width:44px; height:44px; min-height:0; margin:0; padding:0; border:2px solid #e6e1d4; border-radius:13px; background:#fffaf1; box-shadow:none; color:#a3ab9f; font:800 14px/1 inherit; cursor:pointer; }
 .toon-app .vault-strip button:disabled { cursor:default; opacity:1; }
-.toon-app .vault-strip img { display:block; width:36px; height:36px; object-fit:contain; border-radius:8px; }
+.toon-app .vault-strip .toon-art { display:block; width:36px; height:36px; max-width:none; max-height:none; margin:0; border-radius:8px; pointer-events:none; }
 .toon-app .vault-strip-badge { position:absolute; inset-inline-end:-6px; bottom:-6px; display:grid; place-items:center; width:19px; height:19px; border:2px solid #fff; border-radius:50%; background:#5fae45; color:#fff; }
 .toon-app .vault-strip-item.wrong .vault-strip-badge { background:#ec7d5b; }
 .toon-app .vault-strip-item.right button,.toon-app .vault-strip-item.done button { border-color:#9bd282; }
@@ -627,10 +627,48 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 .toon-app .vault-strip-item.later button { border-style:dashed; background:#fbfaf6; }
 .toon-app .vault-strip-item.current button { border:3px solid #2f80ed; background:#fff; color:#2f80ed; font-size:17px; }
 .toon-app .vault-strip-item.shown button { border-color:#2f80ed; box-shadow:0 0 0 3px #2f80ed40; }
+/* After an answer the result card already shows the right answer (and in writing the learner's own): the instruction line,
+   the letter bank and the der/die/das buttons under the word are left out, so writing questions fit a phone too. */
+.toon-app .object-question.vault-answered .article-puzzle .puzzle-hint,
+.toon-app .object-question.vault-answered .article-puzzle .article-bank,
+.toon-app .object-question.vault-answered .letter-puzzle .puzzle-hint,
+.toon-app .object-question.vault-answered .letter-puzzle .letter-bank-wrap,
+.toon-app .object-question.vault-answered .letter-puzzle .puzzle-keyboard-tip { display:none; }
 @media (max-width:760px) {
+ .toon-app .object-question.vault-answered>#object-feedback { padding:10px 11px; gap:5px; }
+ .toon-app .object-question.vault-answered>#object-feedback h2 { font-size:16px; line-height:1.25; }
+ .toon-app .object-question.vault-answered>#object-feedback .object-answer-meaning strong { font-size:19px; line-height:1.3; }
+ .toon-app .object-question.vault-viewing>#object-feedback>.vault-back-current { min-height:0; padding:9px 10px; gap:6px; font-size:15px; line-height:1.2; }
+}
+/* Short computer screens (the learner asked, 4 November 2026: no mouse-wheel scrolling on the computer either): before
+   the answer the writing picture and tips and the listening box get as compact as on phones. */
+@media (min-width:761px) and (max-height:860px) {
+ .toon-app:has(.vault-strip) .object-question.panel { padding-top:18px; padding-bottom:20px; }
+ .toon-app:has(.vault-strip) .object-question h1 { margin-bottom:6px; }
+ .toon-app:has(.vault-strip) .object-question:not(.vault-answered):has(form) .object-picture:not(.small)>.toon-art,
+ .toon-app:has(.vault-strip) .object-question:not(.vault-answered):has(form) .object-picture:not(.small) img { max-height:clamp(80px,14vh,170px); }
+ .toon-app:has(.vault-strip) .object-question:not(.vault-answered):has(form) .object-picture { margin:4px auto 6px; }
+ .toon-app:has(.vault-strip) .object-question:has(form) .vault-hint-wrap .text-button { min-height:30px; }
+ .toon-app:has(.vault-strip) .vault-article-choice { margin:2px 0 4px; }
+ .toon-app:has(.vault-strip) .letter-puzzle .puzzle-hint { font-size:12.5px; line-height:1.35; margin-bottom:6px; }
+ .toon-app:has(.vault-strip) .letter-bank-heading,
+ .toon-app:has(.vault-strip) .puzzle-keyboard-tip { display:none; }
+ .toon-app:has(.vault-strip) .vault-listen-player { padding:12px; gap:8px; }
+ .toon-app:has(.vault-strip) .vault-listen-player>svg { display:none; }
+}
+/* In the top row between the mode and the counter on wider screens (one row less, so the question fits a short computer
+   screen); on phones the strip gets a row of its own under them. */
+.toon-app .object-practice-top:has(.vault-strip) { flex-wrap:wrap; gap:8px 14px; }
+.toon-app .object-practice-top>.vault-strip { flex:1 1 0; min-width:0; margin:0; padding:2px 2px 7px; }
+.toon-app .object-practice-top>.vault-strip~span { margin-inline-start:auto; }
+@media (min-width:761px) {
+ .toon-app .object-practice-top>.vault-strip button { width:42px; height:42px; }
+}
+@media (max-width:760px) {
+ .toon-app .object-practice-top>.vault-strip { order:9; flex:1 0 100%; }
  .toon-app .vault-strip ol { gap:6px; }
  .toon-app .vault-strip button { width:40px; height:40px; border-radius:12px; }
- .toon-app .vault-strip img { width:32px; height:32px; }
+ .toon-app .vault-strip .toon-art { width:32px; height:32px; }
 }
 /* Wide screens: "Tekrar dinle" and "Sonraki" side by side under the answer; in Dinle ve Bul the four pictures in one
    lower row (before and after the answer), so the green one is on the screen too. */

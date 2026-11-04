@@ -13,7 +13,7 @@ import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestio
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {PaulHoca,playPaulSound} from './paul-hoca';
-import {ObjectArt,HeroArt,objectArtSrc} from './toon-art';
+import {ObjectArt,HeroArt} from './toon-art';
 import {objectMeaning} from '@/lib/object-translations';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {readVaultLanguage,saveVaultLanguage} from '@/lib/vault-language-preference';
@@ -235,13 +235,15 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!session.answers.some(a=>!a.correct)} onClick={()=>void start(false,session.answers.filter(a=>!a.correct).map(a=>a.question_id))}><RotateCcw size={18}/>{text(session.mode==='write'?'reviewPuzzleMistakes':'reviewRoundMistakes')}</button><button type="button" className="btn secondary" disabled={busy} onClick={backToCategory} data-vault-back-category><ArrowLeft size={18} className="vault-direction-icon"/>{categoryName(group,language)}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=questionMap.get(a.question_id);const word=item?.objectId?objectWordMap.get(item.objectId):undefined;return word?<div className="object-result-row" key={a.id}><ObjectPicture word={word} language={language} small/><div>{item&&answerMeaning(item,word)}<small>{text(session.mode==='write'?'yourAnswer':'yourChoice')}: <span lang={course} dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&currentWord?<section className="object-practice picture-quiz-practice">
-    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span><span>{text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:stripShown+1,total:strip.length})}</span>{course==='de'&&!guest&&<button type="button" className={'housing-star'+(starred.has(shownId)?' active':'')} aria-pressed={starred.has(shownId)} aria-label={text(starred.has(shownId)?'unstar':'star')} title={text(starred.has(shownId)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(shownId)}><Star size={20} fill={starred.has(shownId)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={text('exitTest')}><X size={20}/></button></div>
-    {/* The picture strip instead of the progress bar (the learner chose "Resimli şerit", 4 November 2026). */}
-    <nav className="vault-strip" aria-label={text('navQuestions')}><ol>{strip.map((item,i)=>{const word=item.word;const shown=item.id===shownId;const result=item.result;
+    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span>
+     {/* The picture strip instead of the progress bar (the learner chose "Resimli şerit", 4 November 2026): in the top row
+         on wider screens, a row of its own on phones. */}
+     <nav className="vault-strip" aria-label={text('navQuestions')}><ol>{strip.map((item,i)=>{const word=item.word;const shown=item.id===shownId;const result=item.result;
      return <li key={item.id} className={'vault-strip-item '+(result??'later')+(item.current?' current':'')+(shown?' shown':'')}><button type="button" disabled={busy||(!result&&!item.current)} aria-current={shown?'step':undefined} aria-label={(i+1)+' · '+text(item.current&&!result?'navCurrent':result==='wrong'?'wrong':result?'navDone':'navLater')} onClick={()=>showQuestion(item.current?null:item.id)}>
-      {result&&word&&objectArtSrc(word.id)?<img src={objectArtSrc(word.id)} alt="" width={44} height={44} loading="lazy" decoding="async"/>:<span className="vault-strip-number">{i+1}</span>}
+      {result&&word?<ObjectArt id={word.id} title={objectMeaning(word.id,language)}/>:<span className="vault-strip-number">{i+1}</span>}
       {result&&<span className="vault-strip-badge" aria-hidden="true">{result==='wrong'?<X size={11} strokeWidth={3.4}/>:<Check size={11} strokeWidth={3.4}/>}</span>}
      </button></li>;})}</ol></nav>
+     <span>{text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:stripShown+1,total:strip.length})}</span>{course==='de'&&!guest&&<button type="button" className={'housing-star'+(starred.has(shownId)?' active':'')} aria-pressed={starred.has(shownId)} aria-label={text(starred.has(shownId)?'unstar':'star')} title={text(starred.has(shownId)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(shownId)}><Star size={20} fill={starred.has(shownId)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={text('exitTest')}><X size={20}/></button></div>
     {viewQ&&viewWord?<article className={'object-question panel vault-answered vault-viewing'}>
      <h1 id="object-question-heading" tabIndex={-1}>{text(session.mode==='write'?(course==='de'&&isArticleChallenge(viewQ)?'articleTask':'puzzlePrompt'):session.mode==='listen'?'listenPrompt':'questionPrompt')}</h1>
      <ObjectPicture word={viewWord} language={language}/>

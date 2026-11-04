@@ -34,7 +34,7 @@ test('Nesne Kasası opens the next question by itself 4 seconds after an answer,
  // The timer starts with each answer and again after "Tekrar dinle"; it waits while the right answer is read.
  assert.ok(page.includes('timer=setTimeout(tick,AUTO_NEXT_MS);'));
  assert.ok(page.includes('const reading=(speech.isActive()||answerAudio.isWaiting())&&now<due+AUTO_NEXT_GRACE_MS;'));
- assert.ok(page.includes('},[feedback,replays]);'));
+ assert.ok(page.includes('},[feedback,replays,viewId]);'));
  assert.ok(page.includes('nextRef.current();'));
  const css=read('app/koko-theme.css');
  assert.ok(css.includes('.vault-auto-next { position:absolute;')&&css.includes('animation:vault-auto-next 4s linear both;'));
@@ -49,7 +49,8 @@ test('a mode card in Nesne Kasası starts its round at once; no "Teste başla" b
  assert.ok(page.includes('<PracticeModes labels={modeLabels} topicLabel={categoryName(group,language)} active={practiceMode} starts disabled={busy||!ready} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;void start(false,undefined,false,mode);}}/>'));
  // The chosen mode, not the one shown before the tap, decides the questions, their history and the sound preparation.
  assert.ok(page.includes("if(mode==='listen')speech.prepare();"));
- assert.ok(page.includes("(mode==='write'?pickWriting:mode==='listen'?pickListening:pickPicture)(group,count,mode===practiceMode?reviews:snapshot.reviews.filter(r=>modePredicate(mode)(questionMap.get(r.question_id))),"));
+ assert.ok(page.includes("const history=mode===practiceMode?reviews:snapshot.reviews.filter(r=>modePredicate(mode)(questionMap.get(r.question_id)));"));
+ assert.ok(page.includes("(mode==='write'?pickWriting:mode==='listen'?pickListening:pickPicture)(group,count,history,reviewOnly,eligibleIds,{starred,fresh})"));
  assert.ok(page.includes("mode:mode==='write'?'write':mode==='listen'?'listen':'visual'"));
  for(const gone of ["'startTest'","'startPuzzles'","'startListening'",'housing-remaining',"text('remaining'"])assert.ok(!page.includes(gone),gone);
  // The cards start something, so they are not toggle buttons there.

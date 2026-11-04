@@ -25,7 +25,7 @@ test('the question card keeps one place for the question and the result; no next
  // Only the right answer is spoken by itself; the example sentence only when tapped.
  assert.ok(cards.includes("onClick={()=>speech.speak(row.text)} data-verb-example="));
  assert.ok(/\.verb-slot \{ position:relative; height:var\(--slot\);/.test(css),'the place has a fixed height');
- assert.ok(css.includes('.verb-practice .verb-options .object-option>svg { position:absolute;'),'the tick does not make the right choice taller');
+ assert.ok(css.includes('.verb-app .verb-practice .verb-options .object-option>svg { position:absolute;'),'the tick does not make the right choice taller');
  assert.ok(css.includes('.verb-practice .verb-conj-grid { grid-template-columns:repeat(3,minmax(0,1fr));'),'the Präsens table in two rows');
  assert.ok(read('app/koko-theme.css').includes('.toon-app:has(.verb-practice) .work-layout>.work-sidebar,'),'on phones the menu goes away while practising');
  assert.ok(!/\.verb-slot[^{]*\{[^}]*overflow(-y)?:(auto|scroll)/.test(css),'no scrolling inside the card');

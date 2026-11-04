@@ -125,8 +125,8 @@ export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamil
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id}>
   <p className="verb-learn-kicker">{t('chapterOf',{n:family.number})} · {t('verbsCount',{n:verbs.length})}</p>
-  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang="de" dir="ltr">{familyTitle(family,language)}</span> · {t('stageBoth')}</h1>
-  <p className="verb-chapter-rule">{familyRule(family,language)}</p>
+  <h1 id="verb-chapter-heading" tabIndex={-1}><span lang={family.german?language:'de'} dir={family.german?vaultDirection(language):'ltr'}>{familyTitle(family,language)}</span> · {t('stageBoth')}</h1>
+  {familyRule(family,language)&&<p className="verb-chapter-rule">{familyRule(family,language)}</p>}
   <p className="verb-chapter-rule verb-chapter-flow">{t('verbFlow')}</p>
   <ul className="verb-chapter-verbs">{verbs.map(verb=><li key={verb.id}>{verbPicture(verb)&&<img src={verbPicture(verb)!} alt="" width={96} height={96} loading="lazy" decoding="async"/>}<span lang="de" dir="ltr" className={kindClass(verb)}>{verb.display}</span></li>)}</ul>
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('chapterStart')}<ArrowRight size={18} className="vault-direction-icon"/></button>
@@ -159,7 +159,8 @@ export function PartVerbs({family,part,verbs,marks,language,disabled,onStart,onO
    <span className="verb-island-number" aria-hidden="true">{family.number}</span>
    <div>
     <p className="verb-learn-kicker">{t('chapterOf',{n:family.number})} · {t('verbsCount',{n:verbs.length})}</p>
-    <h1 id="verb-part-heading" tabIndex={-1} lang="de" dir="ltr">{familyTitle(family,language)}</h1>
+    <h1 id="verb-part-heading" tabIndex={-1}>{familyTitle(family,language)}</h1>
+    {language!=='de'&&family.german&&<p className="verb-part-german" lang="de" dir="ltr">{family.german}</p>}
     <p className="verb-part-progress">{t('stageMeanings')} {part.meaningDone}/{verbs.length} · {t('stepPerfekt')} {part.perfektDone}/{verbs.length}</p>
    </div>
   </div>

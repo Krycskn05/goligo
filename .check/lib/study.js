@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.starNoteKey = exports.STAR_NOTE_PREFIX = exports.guestRound = exports.guestQuestion = void 0;
+exports.starNoteKey = exports.STAR_NOTE_PREFIX = exports.guestRound = exports.guestQuestion = exports.VERB_TOPIC_ROUND = void 0;
 exports.starredQuestionIds = starredQuestionIds;
 exports.selectQuestions = selectQuestions;
 exports.getTopicTitle = getTopicTitle;
@@ -9,6 +9,8 @@ const course_levels_1 = require("./course-levels");
 const course_1 = require("./course");
 const english_course_1 = require("./english-course");
 const verb_course_1 = require("./verb-course");
+var verb_course_2 = require("./verb-course");
+Object.defineProperty(exports, "VERB_TOPIC_ROUND", { enumerable: true, get: function () { return verb_course_2.VERB_TOPIC_ROUND; } });
 /** The guest taste (a visitor without an account): which questions and rounds app/api/study serves without saving. */
 var guest_taste_1 = require("./guest-taste");
 Object.defineProperty(exports, "guestQuestion", { enumerable: true, get: function () { return guest_taste_1.guestQuestion; } });

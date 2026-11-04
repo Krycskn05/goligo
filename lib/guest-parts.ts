@@ -8,7 +8,7 @@ export const GUEST_UNIT='book-01';
 export const GUEST_HOUSING_SECTION='a';
 export const GUEST_HOUSING_TOPIC='book-11-a';
 export const GUEST_OBJECT_GROUP='objects-house';
-/** verbFamilies[0].id (tests/guest-taste.test.cjs checks it). */
-export const GUEST_VERB_PART='verbs-w1';
+/** verbFamilies[0].id, the first topic of Fiil Atölyesi since 4 November 2026 (tests/guest-taste.test.cjs checks it). */
+export const GUEST_VERB_PART='theme-unterwegs';
 export const GUEST_GAMES:readonly string[]=['match'];
 export const GUEST_L12_PART='a';

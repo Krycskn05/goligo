@@ -199,8 +199,14 @@ for(const verb of verbs){
  add('verb-hear-perfekt-'+verb.id,'hear-perfekt',{kind:'listen',prompt:'Dinle: bu biçim hangi fiile ait?',audio:spokenSubject(verb)+' '+verb.perfekt,answer:verb.infinitive,options:[verb.infinitive,...formDistractors(verb,'hear-perfekt-'+verb.id)]});
 }
 export const verbQuestions:Question[]=verbBank;
-export const isVerbTopic=(topic:string)=>topic==='verbs-all'||verbGroups.some(group=>group.id===topic);
-export const inVerbTopic=(questionTopic:string,topic:string)=>topic==='verbs-all'?questionTopic.startsWith('verbs-'):questionTopic===topic;
+/**
+ * Fiil Atölyesi rounds by topic (the learner asked, 4 November 2026: the map is the six topics of lib/verb-themes.ts
+ * instead of the four book parts). Such a round is saved with this topic, so it is never mistaken for a book part round
+ * saved before (those keep 'verbs-all'). It holds the same verb questions as 'verbs-all'; no question id changes.
+ */
+export const VERB_TOPIC_ROUND='verbs-topics';
+export const isVerbTopic=(topic:string)=>topic==='verbs-all'||topic===VERB_TOPIC_ROUND||verbGroups.some(group=>group.id===topic);
+export const inVerbTopic=(questionTopic:string,topic:string)=>topic==='verbs-all'||topic===VERB_TOPIC_ROUND?questionTopic.startsWith('verbs-'):questionTopic===topic;
 /** Keeps the given order where it can, but never asks about the same verb twice in a row when that is avoidable. */
 export function spreadVerbRound<T extends {verbId?:string}>(items:readonly T[]):T[]{
  const rest=[...items];const result:T[]=[];const left=new Map<string,number>();

@@ -1,16 +1,24 @@
 import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {pickText} from './site-languages';
 
+import {verbThemes} from './verb-themes';
+
 /**
- * Fiil Atölyesi: the 72 verbs in four parts, in the order of the textbook pages, each page split at the
- * line the learner drew (after "essen" on the first page, after "treffen" on the second). Every verb belongs
- * to exactly one part. Part IDs `verbs-w1` … `verbs-w4` are separate from the textbook group topics, which stay untouched.
+ * Fiil Atölyesi's parts. Since 4 November 2026 the map is the six topics of lib/verb-themes.ts (the learner asked:
+ * "categorise the verbs too", like Kelime Kasası): `verbFamilies` below, ids `theme-…`, one round per topic.
+ * The four book parts (`bookParts`, ids `verbs-w1` … `verbs-w4`) are not on the map any more; they stay only to read the
+ * rounds saved before (topic 'verbs-all'), so every verb keeps what was done in them. No question id changes.
+ * `rule` is the book part's text (topics have none); `german`: the topic's German name, shown under its title.
  */
-export type VerbFamily={id:string;number:number;verbs:readonly string[];tone:string;title:VaultTranslations;rule:VaultTranslations};
+export type VerbFamily={id:string;number:number;verbs:readonly string[];tone:string;title:VaultTranslations;rule?:VaultTranslations;german?:string};
 const define=(number:number,verbs:readonly string[],tone:string,title:VaultTranslations,rule:VaultTranslations):VerbFamily=>({id:'verbs-w'+number,number,verbs,tone,title,rule});
 const same=(text:string):VaultTranslations=>[text,text,text,text,text,text,text,text,text,text,text,text];
 
-export const verbFamilies:readonly VerbFamily[]=[
+/**
+ * The four book parts, in the order of the textbook pages, each page split at the line the learner drew (after "essen"
+ * on the first page, after "treffen" on the second). Only for rounds saved before 4 November 2026.
+ */
+export const bookParts:readonly VerbFamily[]=[
  define(1,['abfahren','abgeben','anbieten','anfangen','ankommen','anrufen','anziehen','aufstehen','aussehen','aussteigen','ausziehen','beginnen','bekommen','bleiben','bringen','denken','einladen','empfehlen','essen'],'teal',
   same('ab|fahren → essen'),
   ['Kitaptaki ilk 19 fiil, çizgiye kadar. Her fiilde önce anlamı, sonra geçmiş hali (fahren → gefahren).','Die ersten 19 Verben aus dem Buch, bis zum Strich. Bei jedem Verb erst die Bedeutung, dann das Partizip II (fahren → gefahren).','The first 19 verbs of the book, down to the line. For each verb its meaning first, then its past form (fahren → gefahren).','أول 19 فعلًا في الكتاب حتى الخط. لكل فعل معناه أولًا، ثم صيغة الماضي (fahren → gefahren).','Перші 19 дієслів із книги, до риски. Для кожного дієслова спочатку значення, потім минула форма (fahren → gefahren).','Les 19 premiers verbes du livre, jusqu’au trait. Pour chaque verbe, d’abord le sens, puis le participe passé (fahren → gefahren).','Los primeros 19 verbos del libro, hasta la línea. En cada verbo, primero el significado y luego el participio (fahren → gefahren).','Первые 19 глаголов из книги, до черты. У каждого глагола сначала значение, потом прошедшая форма (fahren → gefahren).','۱۹ فعل اول کتاب تا خط. در هر فعل اول معنا، بعد شکل گذشته (fahren → gefahren).','Pierwsze 19 czasowników z książki, do kreski. Przy każdym czasowniku najpierw znaczenie, potem forma przeszła (fahren → gefahren).','I primi 19 verbi del libro, fino alla riga. Per ogni verbo prima il significato, poi il participio (fahren → gefahren).','Os primeiros 19 verbos do livro, até à linha. Em cada verbo, primeiro o significado e depois o particípio (fahren → gefahren).']),
@@ -24,11 +32,16 @@ export const verbFamilies:readonly VerbFamily[]=[
   same('trinken → zurück|kommen'),
   ['İkinci sayfanın son 17 fiili, çizgiden sonra. Her fiilde önce anlamı, sonra geçmiş hali (trinken → getrunken).','Die letzten 17 Verben der zweiten Seite, nach dem Strich. Bei jedem Verb erst die Bedeutung, dann das Partizip II (trinken → getrunken).','The last 17 verbs of the second page, after the line. For each verb its meaning first, then its past form (trinken → getrunken).','آخر 17 فعلًا في الصفحة الثانية بعد الخط. لكل فعل معناه أولًا، ثم صيغة الماضي (trinken → getrunken).','Останні 17 дієслів другої сторінки, після риски. Для кожного дієслова спочатку значення, потім минула форма (trinken → getrunken).','Les 17 derniers verbes de la deuxième page, après le trait. Pour chaque verbe, d’abord le sens, puis le participe passé (trinken → getrunken).','Los últimos 17 verbos de la segunda página, después de la línea. En cada verbo, primero el significado y luego el participio (trinken → getrunken).','Последние 17 глаголов второй страницы, после черты. У каждого глагола сначала значение, потом прошедшая форма (trinken → getrunken).','۱۷ فعل آخر صفحهٔ دوم بعد از خط. در هر فعل اول معنا، بعد شکل گذشته (trinken → getrunken).','Ostatnie 17 czasowników z drugiej strony, za kreską. Przy każdym czasowniku najpierw znaczenie, potem forma przeszła (trinken → getrunken).','Gli ultimi 17 verbi della seconda pagina, dopo la riga. Per ogni verbo prima il significato, poi il participio (trinken → getrunken).','Os últimos 17 verbos da segunda página, depois da linha. Em cada verbo, primeiro o significado e depois o particípio (trinken → getrunken).']),
 ];
+/** The map: one part per topic, numbered in the order of lib/verb-themes.ts. The topics' own colours. */
+export const verbFamilies:readonly VerbFamily[]=verbThemes.map((theme,i)=>({id:theme.id,number:i+1,verbs:theme.verbs,tone:theme.tone,title:theme.title,german:theme.title[1]}));
 export const verbFamilyMap=new Map(verbFamilies.map(family=>[family.id,family]));
 const familyOfVerb=new Map(verbFamilies.flatMap(family=>family.verbs.map(verb=>[verb,family] as const)));
+const bookPartOfVerb=new Map(bookParts.flatMap(family=>family.verbs.map(verb=>[verb,family] as const)));
 export const isVerbFamilyTopic=(topic:string)=>verbFamilyMap.has(topic);
-/** The part a verb belongs to (every verb has exactly one). */
+/** The topic a verb belongs to (every verb has exactly one). */
 export function verbFamilyOf(verbId:string){return familyOfVerb.get(verbId);}
+/** The book part a verb was in (for rounds saved before 4 November 2026). */
+export function bookPartOf(verbId:string){return bookPartOfVerb.get(verbId);}
 export function familyTitle(family:VerbFamily,language:VaultLanguage){return pickText(family.title,language);}
-/** What the part is about, in the chosen language (shown on the part's opening card). */
-export function familyRule(family:VerbFamily,language:VaultLanguage){return pickText(family.rule,language);}
+/** What a book part is about, in the chosen language; a topic has no such text. */
+export function familyRule(family:VerbFamily,language:VaultLanguage){return family.rule?pickText(family.rule,language):'';}

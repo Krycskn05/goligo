@@ -11,7 +11,7 @@ exports.GUEST_UNIT = 'book-01';
 exports.GUEST_HOUSING_SECTION = 'a';
 exports.GUEST_HOUSING_TOPIC = 'book-11-a';
 exports.GUEST_OBJECT_GROUP = 'objects-house';
-/** verbFamilies[0].id (tests/guest-taste.test.cjs checks it). */
-exports.GUEST_VERB_PART = 'verbs-w1';
+/** verbFamilies[0].id, the first topic of Fiil Atölyesi since 4 November 2026 (tests/guest-taste.test.cjs checks it). */
+exports.GUEST_VERB_PART = 'theme-unterwegs';
 exports.GUEST_GAMES = ['match'];
 exports.GUEST_L12_PART = 'a';

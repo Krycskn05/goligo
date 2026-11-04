@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.inVerbTopic = exports.isVerbTopic = exports.verbQuestions = exports.verbTopics = exports.womanInPicture = exports.verbMap = exports.verbs = exports.verbGroups = void 0;
+exports.inVerbTopic = exports.isVerbTopic = exports.VERB_TOPIC_ROUND = exports.verbQuestions = exports.verbTopics = exports.womanInPicture = exports.verbMap = exports.verbs = exports.verbGroups = void 0;
 exports.verbMeaning = verbMeaning;
 exports.verbPronoun = verbPronoun;
 exports.withPronoun = withPronoun;
@@ -226,9 +226,15 @@ for (const verb of exports.verbs) {
     add('verb-hear-perfekt-' + verb.id, 'hear-perfekt', { kind: 'listen', prompt: 'Dinle: bu biçim hangi fiile ait?', audio: spokenSubject(verb) + ' ' + verb.perfekt, answer: verb.infinitive, options: [verb.infinitive, ...formDistractors(verb, 'hear-perfekt-' + verb.id)] });
 }
 exports.verbQuestions = verbBank;
-const isVerbTopic = (topic) => topic === 'verbs-all' || exports.verbGroups.some(group => group.id === topic);
+/**
+ * Fiil Atölyesi rounds by topic (the learner asked, 4 November 2026: the map is the six topics of lib/verb-themes.ts
+ * instead of the four book parts). Such a round is saved with this topic, so it is never mistaken for a book part round
+ * saved before (those keep 'verbs-all'). It holds the same verb questions as 'verbs-all'; no question id changes.
+ */
+exports.VERB_TOPIC_ROUND = 'verbs-topics';
+const isVerbTopic = (topic) => topic === 'verbs-all' || topic === exports.VERB_TOPIC_ROUND || exports.verbGroups.some(group => group.id === topic);
 exports.isVerbTopic = isVerbTopic;
-const inVerbTopic = (questionTopic, topic) => topic === 'verbs-all' ? questionTopic.startsWith('verbs-') : questionTopic === topic;
+const inVerbTopic = (questionTopic, topic) => topic === 'verbs-all' || topic === exports.VERB_TOPIC_ROUND ? questionTopic.startsWith('verbs-') : questionTopic === topic;
 exports.inVerbTopic = inVerbTopic;
 /** Keeps the given order where it can, but never asks about the same verb twice in a row when that is avoidable. */
 function spreadVerbRound(items) {

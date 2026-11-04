@@ -2,12 +2,12 @@ import type {VaultLanguage,VaultTranslations} from './object-vault-copy';
 import {pickText} from './site-languages';
 
 /**
- * Fiil grupları (the learner asked, 3 November 2026: "group the verb workshop, make a fun part"): the 72 verbs of
- * Fiil Atölyesi by topic, next to the four parts in book order (lib/verb-families.ts), which stay as they are with their
- * progress. Every verb is in exactly one group; a group shows its verbs (picture, meaning, Perfekt, listen) and plays the
- * matching cards with just those verbs. The ids (`theme-…`) only name the groups and the games' best scores: no question
- * id changes. Titles are ordered like the site languages (tr de en ar uk fr es ru fa pl it pt); the German one is shown
- * under the title.
+ * The 72 verbs of Fiil Atölyesi by topic (made 3 November 2026 as "Fiil grupları" under the map). Since 4 November 2026
+ * they are the map itself: each topic is a part with its own round (lib/verb-families.ts, verbFamilies), and Oyunlar
+ * plays the matching cards with all verbs or one topic (the learner asked: "categorise the verbs too, move the game to
+ * Oyunlar"). Every verb is in exactly one topic. The ids (`theme-…`) name the parts, the address (?parca=) and the games'
+ * best scores: no question id changes. Titles are ordered like the site languages (tr de en ar uk fr es ru fa pl it pt);
+ * the German one is shown under the title.
  */
 export type VerbTheme={id:string;emoji:string;tone:string;verbs:readonly string[];title:VaultTranslations};
 const define=(id:string,emoji:string,tone:string,verbs:readonly string[],title:VaultTranslations):VerbTheme=>({id:'theme-'+id,emoji,tone,verbs,title});

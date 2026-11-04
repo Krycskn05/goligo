@@ -22,7 +22,7 @@ import {GAME_LEVEL,gameLength} from '@/lib/game-names';
 import {LearnCard,PathStepper,AnswerResult,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
-import {WORKSHOP_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,continuationIds,roundEnd,learnStage,MISTAKES_MODE,workshopMistakeIds,mistakeVerbs} from '@/lib/verb-workshop';
+import {WORKSHOP_TOPIC,PART_ROUND_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,remainingIds,roundEnd,learnStage,MISTAKES_MODE,workshopMistakeIds,mistakeVerbs} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
@@ -42,8 +42,6 @@ import {progressText} from '@/lib/progress-copy';
 import {GUEST_GAMES,GUEST_VERB_PART} from '@/lib/guest-parts';
 import {guestText} from '@/lib/guest-copy';
 import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
-import {VerbThemeCards,VerbThemeView} from './verb-themes';
-import {verbThemeMap,isVerbTheme,themeTitle,type VerbTheme} from '@/lib/verb-themes';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 type VerbSection='games'|'mistakes';
@@ -67,29 +65,18 @@ export default function VerbStudy({guest=false,part}:{guest?:boolean;part?:VerbS
  useEffect(()=>{if(!ready)return;try{saveVaultLanguage(localStorage,language);}catch{}},[language,ready]);
  return ready?<VerbWorkshop language={language} onLanguage={switchLanguage} guest={guest} part={part}/>:<div className="course-loading" role="status">{SITE_NAME}…</div>;
 }
-/** The part and the verb card open in the workshop, read from the address (null: the map). This component only mounts in the browser. */
+/** The part and the verb card open in the workshop, read from the address (null: the map). An old address of a topic
+ * group (?grup=theme-…, 3 November 2026) opens that topic. This component only mounts in the browser. */
 export function readWorkshopView():{family:VerbFamily;verbId?:string}|null{
  if(typeof window==='undefined')return null;
- const params=new URLSearchParams(window.location.search);const family=verbFamilyMap.get(params.get('parca')??'');
+ const params=new URLSearchParams(window.location.search);const family=verbFamilyMap.get(params.get('parca')??params.get('grup')??'');
  if(!family)return null;const verbId=params.get('fiil')??'';
  return family.verbs.includes(verbId)?{family,verbId}:{family};
-}
-/** The Fiil grupları group open in the workshop (?grup=theme-…), or null. */
-function readThemeView():VerbTheme|null{
- if(typeof window==='undefined')return null;
- return verbThemeMap.get(new URLSearchParams(window.location.search).get('grup')??'')??null;
-}
-function writeThemeView(theme:VerbTheme|null){
- try{
-  const url=new URL(window.location.href);
-  if(theme)url.searchParams.set('grup',theme.id);else url.searchParams.delete('grup');
-  if(url.href!==window.location.href)window.history.replaceState(window.history.state,'',url);
- }catch{}
 }
 /** Keeps the open part and verb card in the address without a new history entry (Back still leaves the page as before). */
 function writeWorkshopView(view:{family:VerbFamily;verbId?:string}|null){
  try{
-  const url=new URL(window.location.href);
+  const url=new URL(window.location.href);url.searchParams.delete('grup');
   if(view){url.searchParams.set('parca',view.family.id);if(view.verbId)url.searchParams.set('fiil',view.verbId);else url.searchParams.delete('fiil');}
   else{url.searchParams.delete('parca');url.searchParams.delete('fiil');}
   if(url.href!==window.location.href)window.history.replaceState(window.history.state,'',url);
@@ -113,9 +100,6 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  // (?parca=verbs-w1&fiil=…), so a reload keeps the open card instead of going back to the map (2 November 2026).
  const [view,setView]=useState<{family:VerbFamily;verbId?:string}|null>(()=>part?null:readWorkshopView());
  useEffect(()=>{if(part)return;writeWorkshopView(view);},[view,part]);
- // A Fiil grupları group opened under the map (3 November 2026), kept in the address like a part.
- const [theme,setTheme]=useState<VerbTheme|null>(()=>part?null:readThemeView());
- useEffect(()=>{if(part)return;writeThemeView(theme);},[theme,part]);
  // Oyunlar (/oyunlar) and Yanlışlarım (/yanlislarim) are parts of the site of their own (the learner asked, 22 October
  // 2026): this component draws them with `part`; the old addresses /fiiller?bolum=oyunlar|yanlislar move there.
  const [section,setSection]=useState<VerbSection|null>(part??null);
@@ -149,9 +133,10 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[overlay,index,session?.id]);
  const starred=starredQuestionIds(snapshot.notes);
- // No part is locked: every part has its own round; the hero continues the part practised last.
- const parts=partsStatus(snapshot.sessions);const path=currentPart(snapshot.sessions);
- const stickers=verbStatus(snapshot.sessions);
+ // No topic is locked: every topic has its own round; the map marks the topic practised last. What a verb finished
+ // anywhere (also in the book part rounds before 4 November 2026) counts in its topic.
+ const parts=partsStatus(snapshot.sessions,snapshot.reviews);const path=currentPart(snapshot.sessions,snapshot.reviews);
+ const stickers=verbStatus(snapshot.sessions,snapshot.reviews);
  // Yanlışlarım: workshop questions whose last answer was wrong; one right answer takes a question off the list.
  const otherMistakes=ready&&section==='mistakes'?partMistakes(snapshot.reviews):null;
  const allMistakes=ready&&section==='mistakes'?allMistakeIds(snapshot.reviews,workshopMistakeIds(snapshot.reviews)):[];
@@ -181,11 +166,6 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  function openPart(family:VerbFamily){stopFeedback();setView({family});focus('verb-part-heading');}
  function openVerb(family:VerbFamily,id:string){stopFeedback();setView({family,verbId:id});focus('verb-detail-heading');}
  function closeView(){stopFeedback();setView(null);focus('vault-heading');}
- function openTheme(value:VerbTheme){stopFeedback();setView(null);setTheme(value);focus('verb-theme-heading');}
- /** Back to the group cards: the list scrolls to them, not to the top of the page. */
- function closeTheme(){stopFeedback();setTheme(null);requestAnimationFrame(()=>{const heading=document.getElementById('verb-themes-heading');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start',behavior:'instant'});});}
- /** The matching cards with the group's verbs only. */
- function playTheme(value:VerbTheme){stopFeedback();setGameTopic(value.id);setGame('match');focus('verb-game-heading');}
  function closeSection(){stopFeedback();setSection(null);setGame(null);try{const url=new URL(window.location.href);url.searchParams.delete('bolum');window.history.replaceState(null,'',url);}catch{}focus('vault-heading');}
  /** Moves focus to whichever card is on screen: the part card, the learning card or the question. */
  function focusCurrent(){requestAnimationFrame(()=>{(document.getElementById('verb-chapter-heading')??document.getElementById('verb-learn-heading')??document.getElementById('object-question-heading'))?.focus({preventScroll:true});toPractice();});}
@@ -193,21 +173,20 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  function toPractice(){const box=document.querySelector('.verb-practice');if(box&&window.matchMedia('(max-width: 760px)').matches)box.scrollIntoView({block:'start',behavior:'instant'});else window.scrollTo({top:0,behavior:'instant'});}
  function openSession(restored:Session){setSession(restored);setIndex(restored.answers.length);setDismissed(new Set());clearAnswer();focusCurrent();}
  /** Enter a part (none is locked): continue its saved round, or start a new one. A round saved in the older order
-  * (all meanings first, or Perfekt with hat/ist) is not continued as it was: the part goes on verb by verb with the questions still left. */
+  * (all meanings first, or Perfekt with hat/ist) is not continued as it was. A new round of a topic holds only what is
+  * still to do — verbs finished anywhere, also in the book parts before 4 November 2026, are not asked again — or the
+  * whole topic when it is practised again. */
  async function enterPart(family:VerbFamily,restart=false){
   if(mutation.current)return;mutation.current=true;setBusy(true);setError(null);stopFeedback();speech.prepare();
   try{
-   let ids=partIds(family);
    const saved=!restart?findPartSession(snapshot.sessions,family):null;
    if(saved&&!saved.finished_at){
     const data=await api<{session:Session}>(undefined,'session='+encodeURIComponent(saved.id),'de');
     if(!mounted.current)return;
-    if(isPartRound(data.session,family)&&data.session.answers.length<roundEnd(data.session)){
-     if(!isOlderRound(data.session.questions)){openSession(data.session);return;}
-     ids=continuationIds(family,data.session);
-    }
+    if(isPartRound(data.session,family)&&data.session.answers.length<roundEnd(data.session)&&!isOlderRound(data.session.questions)){openSession(data.session);return;}
    }
-   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
+   const ids=restart?partIds(family):remainingIds(family,stickers,snapshot.reviews);
+   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:PART_ROUND_TOPIC,count:ids.length,onlyIds:ids},'','de');
    if(!mounted.current)return;openSession(data.session);
   }catch(e){fail(e,'startError');}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
@@ -413,7 +392,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
     <progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>
     {otherQuestion(q)}
    </section>:<p role="alert">{v('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{t('backWorkshop')}</button></p>:
-   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} backLabel={theme&&isVerbTheme(gameTopic)?themeTitle(theme,language):undefined} onExit={()=>{setGame(null);if(isVerbTheme(gameTopic))setGameTopic('verbs-all');focus(section?'verb-section-heading':theme?'verb-theme-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
+   game?<VerbGame game={game} language={language} topic={gameTopic} onTopic={setGameTopic} onExit={()=>{setGame(null);focus(section?'verb-section-heading':'vault-heading');}} feedback={{answer:answerAudio.answer,stop:answerAudio.stop,complete:answerAudio.complete,busy:cueBusy||speech.busy,speak:text=>speech.speak(text),prepare:()=>speech.prepare()}}/>:
    section==='games'?<section className="verb-section" aria-labelledby="verb-section-heading" data-verb-section="games">
     <div className="verb-section-head">{!part&&<button type="button" className="text-button verb-back" onClick={closeSection}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{t('backWorkshop')}</button>}<h1 id="verb-section-heading" tabIndex={-1}>{t('gamesTitle')}</h1></div>
     <div className="game-cards verb-section-games">{gameIds.map(id=>guest&&!GUEST_GAMES.includes(id)?<a key={id} className={'game-card game-'+id+' guest-locked'} href={guestSignUp(back)} data-verb-game-card={id} data-guest-locked><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{guestText(language,'guestLocked')}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Lock size={16} aria-hidden="true"/>{t('play')}</span></a>:<button type="button" key={id} className={'game-card game-'+id} data-verb-game-card={id} disabled={busy} onClick={()=>{stopFeedback();setGame(id);focus('verb-game-heading');}}><GameIcon game={id}/><span className="game-card-text"><strong>{gameName(id,language)}</strong><small>{gameDetail(id,language)}</small></span><span className="game-card-meta">{GAME_LEVEL} · {gameLength(id,language)}</span><span className="game-card-play"><Play size={16} aria-hidden="true"/>{t('play')}</span></button>)}</div>
@@ -459,7 +438,6 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
     if(at>=0){const item=members[at];return <VerbDetail verb={item} family={part.family} position={at+1} total={members.length} marks={stickers.get(item.id)} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={()=>openPart(part.family)} onPrev={at>0?()=>openVerb(part.family,members[at-1].id):undefined} onNext={at<members.length-1?()=>openVerb(part.family,members[at+1].id):undefined}/>;}
     return <PartVerbs family={part.family} part={part} verbs={members} marks={stickers} language={language} disabled={busy||!ready} onStart={restart=>void enterPart(part.family,restart)} onOpen={item=>openVerb(part.family,item.id)} onBack={closeView}/>;
    })():
-   theme?<VerbThemeView theme={theme} language={language} marks={stickers} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={closeTheme} onPlay={()=>playTheme(theme)}/>:
    <section className="verb-home" aria-labelledby="vault-heading" data-verb-workshop="">
     {/* Only the title on top (the learner removed the "0 / 19 fiil" card): the pencil badge of the menu, the title in
         the site's navy with a gold wavy line under "Atölyesi", and the count of verbs and parts. The map below shows
@@ -486,7 +464,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
        {state==='done'&&<span className="verb-lock done" aria-hidden="true"><CheckCircle2 size={20}/></span>}
        <span className="verb-island-number">{family.number}</span>
        <div className="verb-island-text">
-        <h3 lang="de" dir="ltr">{familyTitle(family,language)}</h3>
+        <h3>{familyTitle(family,language)}{language!=='de'&&family.german&&<small lang="de" dir="ltr">{family.german}</small>}</h3>
         <p>{t('verbsCount',{n:family.verbs.length})} · {t('stageMeanings')} {part.meaningDone}/{family.verbs.length} · {t('stepPerfekt')} {part.perfektDone}/{family.verbs.length}</p>
         <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
         {locked?<GuestLock language={language} back={back} className="verb-island-go"/>:<button type="button" className="verb-island-go" onClick={()=>openPart(family)} data-verb-island-go={family.id}>{t('partOpen',{n:family.number})}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
@@ -495,7 +473,6 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
       </article>;
      })}
     </section>
-    <VerbThemeCards language={language} marks={stickers} onOpen={openTheme}/>
     <article className="panel verb-collection">
      <h2>{t('collectionTitle')}</h2><p className="verb-collection-lead">{t('collectionLead')}</p>
      {/* Two counts, each with its own name: whole verbs learned and single exercises done (the learner asked). */}

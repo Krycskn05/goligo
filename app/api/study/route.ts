@@ -1,7 +1,7 @@
 import {getRawDb} from '@/db';
 import {getChatGPTUser} from '@/app/chatgpt-auth';
 import {gradeAnswer,questionMap,modeLabels,learningTopics as topics,shuffle} from '@/lib/course';
-import {guestQuestion,guestRound,selectQuestions,STAR_NOTE_PREFIX,type Review,type SessionQuestion} from '@/lib/study';
+import {guestQuestion,guestRound,selectQuestions,STAR_NOTE_PREFIX,VERB_TOPIC_ROUND,type Review,type SessionQuestion} from '@/lib/study';
 
 export const dynamic='force-dynamic';
 const noCache={'Cache-Control':'no-store'};
@@ -82,7 +82,7 @@ export async function POST(request:Request){
   if(!user)return guestPost(body);const db=getRawDb();const now=Date.now();
   if(body.action==='start'){
    const id=typeof body.id==='string'?body.id:'';const mode=String(body.mode??'mixed');const english=body.course==='en';const requestedTopic=String(body.topic??'all');const topic=english&&requestedTopic==='all'?'en-all':requestedTopic;
-   const count=Number(body.count??20);if(!/^[a-zA-Z0-9-]{16,64}$/.test(id)||!modeLabels[mode]||!['all','unit-1','unit-8','unit-9',...topics.map(t=>t.id)].includes(topic)||(topic!=='all'&&topic.startsWith('en-')!==english)||!Number.isInteger(count)||count<1||count>2000)return json({error:'Test seçenekleri geçersiz.'},400);
+   const count=Number(body.count??20);if(!/^[a-zA-Z0-9-]{16,64}$/.test(id)||!modeLabels[mode]||!['all','unit-1','unit-8','unit-9',...(mode==='workshop'?[VERB_TOPIC_ROUND]:[]),...topics.map(t=>t.id)].includes(topic)||(topic!=='all'&&topic.startsWith('en-')!==english)||!Number.isInteger(count)||count<1||count>2000)return json({error:'Test seçenekleri geçersiz.'},400);
    const existing=await loadSession(db,user,id);if(existing)return existing.topic.startsWith('en-')===english?json({session:existing}):json({error:'Testin eğitim dili farklı.'},409);
    const {results:reviews}=await db.prepare('SELECT * FROM study_review WHERE user_id=?').bind(user).all<Review>();
    const onlyIds=Array.isArray(body.onlyIds)?body.onlyIds.filter((x):x is string=>typeof x==='string'&&questionMap.has(x)).slice(0,2000):undefined;

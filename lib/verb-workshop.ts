@@ -1,12 +1,12 @@
 import type {Question} from './course';
 import type {Review,Session,SessionSummary} from './study';
-import {verbs,verbMap,verbQuestions,type Verb,type VerbTask} from './verb-course';
-import {verbFamilies,verbFamilyOf,type VerbFamily} from './verb-families';
+import {verbs,verbMap,verbQuestions,VERB_TOPIC_ROUND,type Verb,type VerbTask} from './verb-course';
+import {verbFamilies,verbFamilyOf,bookParts,bookPartOf,type VerbFamily} from './verb-families';
 import {isVerbExercise} from './verb-practice';
 
 /**
- * Fiil Atölyesi: one path through all 72 verbs in four parts (the textbook order, each page split at
- * the learner's line). Each verb is finished in one go before the next one: its card with the
+ * Fiil Atölyesi: one path through all 72 verbs in six topics (lib/verb-themes.ts; until 4 November 2026 four book parts,
+ * see lib/verb-families.ts). Each verb is finished in one go before the next one: its card with the
  * meaning, then the meaning test, then spelling it with letters, then its past form: the infinitive
  * is shown and the Partizip II is chosen (abfahren → abgefahren; no hat/ist, no other verbs), then spelled.
  * No part is locked: each part is its own saved round (mode `workshop`), so the learner can start
@@ -15,7 +15,10 @@ import {isVerbExercise} from './verb-practice';
  * from their own list of questions; they are not continued as they were: the part goes on in a new
  * round with the questions still left (`continuationIds`), and what that round leaves out counts as done.
  */
+/** Book part rounds saved before 4 November 2026, and the mistakes rounds of Yanlışlarım. */
 export const WORKSHOP_TOPIC='verbs-all';
+/** A topic round of the map (since 4 November 2026): read by its topic, never as a book part. */
+export const PART_ROUND_TOPIC=VERB_TOPIC_ROUND;
 export const WORKSHOP_MODE='workshop';
 export type LearnStage='meaning'|'praesens'|'perfekt';
 export type WorkshopStep='meaning'|'write'|'partizip'|'write-partizip';
@@ -26,23 +29,23 @@ export const verbSteps:readonly WorkshopStep[]=['meaning','write','partizip','wr
 const pastTasks:readonly VerbTask[]=['partizip','write-partizip','perfekt','write-perfekt','meaning-perfekt'];
 /** Every task a workshop round has ever held. */
 const workshopTasks=new Set<string>([...verbSteps,...pastTasks]);
-/** The verbs in path order: part 1 first, then part 2, 3 and 4. */
+/** The verbs in path order: topic 1 first, then topic 2 … 6. */
 export const workshopVerbs:Verb[]=verbFamilies.flatMap(family=>family.verbs.map(id=>verbMap.get(id)!));
 export const questionId=(step:string,verbId:string)=>'verb-'+step+'-'+verbId;
 const questionById=new Map(verbQuestions.map(q=>[q.id,q]));
 /** One part's questions in order: verb by verb, each with its four steps. */
 export function partIds(family:VerbFamily){return family.verbs.flatMap(id=>verbSteps.map(step=>questionId(step,id)));}
 export function partTotal(family:VerbFamily){return partIds(family).length;}
-/** Every question of the path in order: part 1, then part 2, 3 and 4. */
+/** Every question of the path in order: topic 1, then topic 2 … 6. */
 export function workshopIds(){return verbFamilies.flatMap(family=>partIds(family));}
 export const WORKSHOP_TOTAL=workshopIds().length;
 /** The whole path as the first rounds saved it (152 questions, the two parts of the first page): per part all meanings,
  * then all Perfekt forms with hat/ist. The parts of the second page came later and were never part of it. */
-const firstPageFamilies=verbFamilies.slice(0,2);
+const firstPageFamilies=bookParts.slice(0,2);
 export const legacyWorkshopIds=firstPageFamilies.flatMap(family=>[...family.verbs.flatMap(id=>['meaning','write'].map(step=>questionId(step,id))),...family.verbs.flatMap(id=>['perfekt','write-perfekt'].map(step=>questionId(step,id)))]);
 export const LEGACY_WORKSHOP_TOTAL=legacyWorkshopIds.length;
 /** Where that whole-path round stops: the end of part 1. */
-const LEGACY_PART_END=verbFamilies[0].verbs.length*4;
+const LEGACY_PART_END=bookParts[0].verbs.length*4;
 /** Which learning card a task belongs to: the past form belongs to the verb's meaning card (no card of its own). */
 export function learnStage(task:VerbTask|undefined):LearnStage{
  return task==='perfekt'||task==='write-perfekt'||task==='meaning-perfekt'||task==='hear-perfekt'?'perfekt':task==='praesens'||task==='write-praesens'||task==='hear-praesens'?'praesens':'meaning';
@@ -52,18 +55,19 @@ const idsOf=(questions:RoundQuestions)=>questions.map(q=>q.id??'');
 const sameIds=(a:readonly string[],b:readonly string[])=>a.length===b.length&&a.every((id,i)=>id===b[i]);
 /** Whether a saved round was made in an earlier order: it holds Perfekt questions with hat/ist, all meanings come first,
  * or a verb in it stops before the last step (the round was made before that step was added). */
-export function isOlderRound(questions:RoundQuestions){
+export function isOlderRound(questions:RoundQuestions,partOf:(verbId:string)=>VerbFamily|undefined=verbFamilyOf){
  const ids=idsOf(questions);
  if(ids.some(id=>!verbSteps.includes(questionById.get(id)?.verbTask as WorkshopStep)))return true;
- const family=roundFamily(questions);if(!family)return true;
+ const family=roundFamily(questions,partOf);if(!family)return true;
  const order=new Map(partIds(family).map((id,i)=>[id,i]));
  if(ids.some((id,i)=>i>0&&(order.get(id)??-1)<(order.get(ids[i-1])??-1)))return true;
  const held=new Set(ids);const last=verbSteps[verbSteps.length-1];
  return [...new Set(ids.map(id=>questionById.get(id)?.verbId??''))].some(verbId=>!held.has(questionId(last,verbId)));
 }
-/** The part of a round: the part of its first verb (the older whole path starts with part 1). */
-export function roundFamily(questions:RoundQuestions):VerbFamily|undefined{
- const first=questionById.get(questions[0]?.id??'');return first?.verbId?verbFamilyOf(first.verbId):undefined;
+/** The part of a round: the topic of its first verb, or with `partOf` = bookPartOf its book part (the older whole path
+ * starts with book part 1). */
+export function roundFamily(questions:RoundQuestions,partOf:(verbId:string)=>VerbFamily|undefined=verbFamilyOf):VerbFamily|undefined{
+ const first=questionById.get(questions[0]?.id??'');return first?.verbId?partOf(first.verbId):undefined;
 }
 /** The questions of a part still to do after an older round: the part in the current order, without what that round answered. */
 export function continuationIds(family:VerbFamily,session:Pick<Session,'questions'|'answers'>){
@@ -90,11 +94,13 @@ export function pathPlace(questions:readonly {id:string}[],index:number,lookup:(
 export type VerbMarks={meaning:boolean;perfekt:boolean};
 /** A workshop round as the study API lists it: `ids` are the questions of an open round in order; a finished round carries only its first. */
 type RoundSummary=Pick<SessionSummary,'id'|'mode'|'topic'|'total'|'answered'|'finished_at'>&{first?:string|null;ids?:readonly string[]|null};
+/** Topic rounds are read by topic, every other workshop round (saved before 4 November 2026) by book part. */
+const partFinder=(session:Pick<RoundSummary,'topic'>)=>session.topic===PART_ROUND_TOPIC?verbFamilyOf:bookPartOf;
 /** The questions of a summarised round, in order: its list; without one (a finished round) its part, or the older whole path. */
 export function summaryIds(session:RoundSummary):string[]{
  if(session.ids?.length)return [...session.ids];
- if(session.total===LEGACY_WORKSHOP_TOTAL)return [...legacyWorkshopIds];
- const family=roundFamily([{id:session.first??''}]);
+ if(session.topic!==PART_ROUND_TOPIC&&session.total===LEGACY_WORKSHOP_TOTAL)return [...legacyWorkshopIds];
+ const family=roundFamily([{id:session.first??''}],partFinder(session));
  return family?partIds(family):[];
 }
 /** A finished round counts whole. */
@@ -113,11 +119,12 @@ export function partProgress(family:VerbFamily,ids:readonly string[],answered:nu
  const nextVerbId=next?.verbId&&family.verbs.includes(next.verbId)?next.verbId:family.verbs[Math.min(family.verbs.length-1,verbsDone)];
  return {done,count,percent:Math.round(done/Math.max(1,count)*100),finished,started:done>0,verbsDone,verbCount:family.verbs.length,nextVerbId,meaningDone,perfektDone,marks};
 }
-/** The part a saved workshop round belongs to: the part of its first verb (an older round of the whole path: part 1). */
+/** The part a saved workshop round belongs to: a topic round its topic; an older round the book part of its first verb
+ * (an older round of the whole path: book part 1). */
 export function sessionPart(session:RoundSummary):VerbFamily|undefined{
  if(session.mode!==WORKSHOP_MODE||!session.topic.startsWith('verbs-'))return undefined;
  const ids=summaryIds(session);
- return ids.length?roundFamily(ids.map(id=>({id}))):undefined;
+ return ids.length?roundFamily(ids.map(id=>({id})),partFinder(session)):undefined;
 }
 /** Questions answered in a round as its part counts them; the whole-path round only up to part 1's end. */
 export function partAnswered(session:RoundSummary|null|undefined,family:VerbFamily){
@@ -129,11 +136,11 @@ export function partAnswered(session:RoundSummary|null|undefined,family:VerbFami
 export function findPartSession<T extends RoundSummary>(sessions:readonly T[],family:VerbFamily):T|null{
  return sessions.find(session=>sessionPart(session)?.id===family.id)??null;
 }
-/** Every part with its saved round and progress. `completed`: some round of the part was finished — practising a finished
- * part again keeps its tick, its full ring and its stickers (the learner asked, 2 November 2026: "the tick disappears"),
- * while the new round goes on from its own progress. */
-export function partsStatus<T extends RoundSummary>(sessions:readonly T[]){
- return verbFamilies.map(family=>{
+/** Every book part with its saved round and progress (rounds saved before 4 November 2026). `completed`: some round of
+ * the part was finished — practising a finished part again kept its tick, its full ring and its stickers (the learner
+ * asked, 2 November 2026: "the tick disappears"). */
+export function bookPartsStatus<T extends RoundSummary>(sessions:readonly T[]){
+ return bookParts.map(family=>{
   const session=findPartSession(sessions,family);
   const progress=partProgress(family,session?summaryIds(session):partIds(family),session?summaryAnswered(session):0);
   const completed=progress.finished||sessions.some(item=>sessionPart(item)?.id===family.id&&partProgress(family,summaryIds(item),summaryAnswered(item)).finished);
@@ -142,22 +149,77 @@ export function partsStatus<T extends RoundSummary>(sessions:readonly T[]){
   return {family,session,...progress,completed,marks:full,meaningDone:family.verbs.length,perfektDone:family.verbs.length};
  });
 }
-/** The part to continue: the open part practised last, else the first part not finished, else part 1. */
-export function currentPart<T extends RoundSummary>(sessions:readonly T[]){
- const parts=partsStatus(sessions);
+/** For every verb: what the book part rounds saved before 4 November 2026 finished (the same rules as then). */
+export function bookVerbStatus<T extends RoundSummary>(sessions:readonly T[]){
+ const status=new Map<string,VerbMarks>();
+ for(const part of bookPartsStatus(sessions))part.family.verbs.forEach((id,i)=>status.set(id,part.marks[i]));
+ return status;
+}
+/** The questions answered at least once, right or wrong (a review row is written with every answer). */
+function answeredIds(reviews:readonly Pick<Review,'question_id'|'seen'>[]){return new Set(reviews.filter(row=>row.seen>0).map(row=>row.question_id));}
+/** A verb's ticks from its answers: the meaning after the meaning test and spelling, the past form after the past form
+ * and its spelling (or, in older rounds, the Perfekt with hat/ist and its spelling). */
+function answeredMarks(verbId:string,answered:ReadonlySet<string>):VerbMarks{
+ const has=(step:string)=>answered.has(questionId(step,verbId));
+ return {meaning:meaningSteps.every(has),perfekt:(has('partizip')&&has('write-partizip'))||(has('perfekt')&&has('write-perfekt'))};
+}
+const pastSteps:readonly WorkshopStep[]=['partizip','write-partizip'];
+/**
+ * Every topic of the map with its progress. A verb is done in a topic as soon as it was done anywhere on the path: in a
+ * book part round saved before 4 November 2026, in a topic round, or by its answers — so nothing done before the topics
+ * came is lost, and a verb is never counted twice. `session`: the topic's newest round; `completed`: every verb of the
+ * topic has both ticks, which stays so when the topic is practised again (its tick, full ring and stickers);
+ * `finished`: completed with no open round left.
+ */
+export function partsStatus<T extends RoundSummary>(sessions:readonly T[],reviews:readonly Pick<Review,'question_id'|'seen'>[]=[]){
+ const book=bookVerbStatus(sessions);const answered=answeredIds(reviews);
+ return verbFamilies.map(family=>{
+  const session=findPartSession(sessions,family);
+  const rounds=sessions.filter(item=>item.topic===PART_ROUND_TOPIC&&sessionPart(item)?.id===family.id).map(item=>partProgress(family,summaryIds(item),summaryAnswered(item)).marks);
+  const marks:VerbMarks[]=family.verbs.map((id,i)=>{const own=answeredMarks(id,answered);const old=book.get(id);
+   return {meaning:own.meaning||!!old?.meaning||rounds.some(list=>list[i].meaning),perfekt:own.perfekt||!!old?.perfekt||rounds.some(list=>list[i].perfekt)};});
+  const done=family.verbs.reduce((sum,id,i)=>sum+(marks[i].meaning?meaningSteps.length:meaningSteps.filter(step=>answered.has(questionId(step,id))).length)+(marks[i].perfekt?pastSteps.length:pastSteps.filter(step=>answered.has(questionId(step,id))).length),0);
+  const count=family.verbs.length*verbSteps.length;
+  const meaningDone=marks.filter(mark=>mark.meaning).length;const perfektDone=marks.filter(mark=>mark.perfekt).length;
+  const verbsDone=marks.filter(mark=>mark.meaning&&mark.perfekt).length;const completed=verbsDone===family.verbs.length;
+  // An open round of the topic (also one practising a done topic again) is continued, never thrown away: the topic counts
+  // as finished only when every verb is done and no round of it is open.
+  const openRound=!!session&&!session.finished_at&&session.answered<(session.ids?.length||session.total);
+  const open=openRound&&session?.ids?.length?questionById.get(session.ids[session.answered]):undefined;
+  const nextVerbId=open?.verbId&&family.verbs.includes(open.verbId)?open.verbId:family.verbs[Math.max(0,marks.findIndex(mark=>!(mark.meaning&&mark.perfekt)))];
+  return {family,session,done,count,percent:Math.round(done/count*100),finished:completed&&!openRound,completed,started:done>0||openRound,verbsDone,verbCount:family.verbs.length,nextVerbId,meaningDone,perfektDone,marks};
+ });
+}
+/** The topic to continue: the open topic practised last, else the first topic not finished, else topic 1. */
+export function currentPart<T extends RoundSummary>(sessions:readonly T[],reviews:readonly Pick<Review,'question_id'|'seen'>[]=[]){
+ const parts=partsStatus(sessions,reviews);
  for(const session of sessions){const part=parts.find(item=>item.session?.id===session.id);if(part&&!part.finished)return part;}
  return parts.find(part=>!part.finished)??parts[0];
 }
 /** For every verb: whether its meaning and its past form are done (for the sticker collection). */
-export function verbStatus<T extends RoundSummary>(sessions:readonly T[]){
+export function verbStatus<T extends RoundSummary>(sessions:readonly T[],reviews:readonly Pick<Review,'question_id'|'seen'>[]=[]){
  const status=new Map<string,VerbMarks>();
- for(const part of partsStatus(sessions))part.family.verbs.forEach((id,i)=>status.set(id,part.marks[i]));
+ for(const part of partsStatus(sessions,reviews))part.family.verbs.forEach((id,i)=>status.set(id,part.marks[i]));
  return status;
 }
-/** A saved round of this part: its questions are workshop questions of the part's verbs (the older whole path counts for part 1). */
+/**
+ * The questions of a new topic round: the verbs not done yet, each with the steps still to do (the steps answered before
+ * are not asked again). A verb always ends with its last step; when its steps would not, it is asked whole. Nothing left
+ * (or `restart`): the whole topic.
+ */
+export function remainingIds(family:VerbFamily,marks:ReadonlyMap<string,VerbMarks>,reviews:readonly Pick<Review,'question_id'|'seen'>[]=[]){
+ const answered=answeredIds(reviews);const last=verbSteps[verbSteps.length-1];
+ const ids=family.verbs.flatMap(verbId=>{
+  const mark=marks.get(verbId);if(mark?.meaning&&mark.perfekt)return [];
+  const steps=verbSteps.filter(step=>!(meaningSteps.includes(step)?mark?.meaning:mark?.perfekt)&&!answered.has(questionId(step,verbId)));
+  return (steps.includes(last)?steps:verbSteps).map(step=>questionId(step,verbId));
+ });
+ return ids.length?ids:partIds(family);
+}
+/** A saved round of this part: its questions are workshop questions of the part's verbs (the older whole path counts for book part 1). */
 export function isPartRound(session:Pick<Session,'mode'|'questions'>,family:VerbFamily){
  if(session.mode!==WORKSHOP_MODE||!session.questions.length)return false;
- if(session.questions.length===LEGACY_WORKSHOP_TOTAL&&sameIds(idsOf(session.questions),legacyWorkshopIds))return family.id===verbFamilies[0].id;
+ if(session.questions.length===LEGACY_WORKSHOP_TOTAL&&sameIds(idsOf(session.questions),legacyWorkshopIds))return family.id===bookParts[0].id;
  const members=new Set(family.verbs);
  return session.questions.every(item=>{const q=questionById.get(item.id);return !!q?.verbId&&members.has(q.verbId)&&workshopTasks.has(q.verbTask??'');});
 }

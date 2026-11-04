@@ -22,12 +22,14 @@ test('an exercise answered right once stays learned; a written exercise and its 
 test('Fiiller counts the steps Fiil Atölyesi asks, and a finished part keeps its tick when it is practised again',()=>{
  assert.equal(progress.verbProgressIds('verbs-all').length,workshop.WORKSHOP_TOTAL);
  assert.deepEqual(new Set(progress.verbProgressIds('verbs-all')),new Set(workshop.workshopIds()));
+ // Since 4 November 2026 the parts are the topics; their rounds are saved with the topic round name.
  const w1=families.verbFamilies[0];const ids=workshop.partIds(w1);
- const round=(id,answered,finished_at=null)=>({id,mode:'workshop',topic:'verbs-all',first:ids[0],total:ids.length,answered,finished_at,ids:finished_at?null:ids});
+ const round=(id,answered,finished_at=null)=>({id,mode:'workshop',topic:workshop.PART_ROUND_TOPIC,first:ids[0],total:ids.length,answered,finished_at,ids:finished_at?null:ids});
  const part=workshop.partsStatus([round('again',2),round('done',ids.length,9)])[0];
- assert.equal(part.session.id,'again','the new round goes on');assert(!part.finished);assert(part.completed,'but the part stays done');
- assert.equal(part.meaningDone,w1.verbs.length,'its stickers stay');assert.equal(part.done,2);
+ assert.equal(part.session.id,'again','the new round goes on');assert(!part.finished,'the open round is continued');assert(part.completed,'but the part stays done');
+ assert.equal(part.meaningDone,w1.verbs.length,'its stickers stay');assert.equal(part.percent,100,'and its full ring');
  assert(!workshop.partsStatus([round('open',5)])[0].completed);
+ assert(workshop.partsStatus([round('done',ids.length,9)])[0].finished,'done and nothing open: practise it again');
  const page=read('app/verb-study.tsx');assert(page.includes("const state=part.completed?'done'")&&page.includes('const ring=part.completed?100:part.percent;'));
 });
 

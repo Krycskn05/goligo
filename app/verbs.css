@@ -557,76 +557,19 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .mixed-practice .mixed-question .vault-writing-form { display:grid; gap:8px; }
 .mixed-practice .mixed-question .writing-input { min-height:48px; font-size:18px; }
 
-/* Fiil grupları (app/verb-themes.tsx; the learner asked, 3 November 2026): the verbs by topic, as playful cards. */
-.verb-themes { margin-top:40px; }
-.verb-themes-title { display:flex; align-items:center; gap:10px; margin:0 0 6px; font-size:30px; font-weight:800; color:#1f3b5c; }
-.verb-themes-title svg { color:#f2a91a; flex:none; }
-.verb-themes-title:focus { outline:none; }
-.verb-themes-lead { margin:0 0 18px; color:#3d5a7a; font-weight:600; }
-.verb-theme-grid { list-style:none; margin:0; padding:22px 0 0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:38px 18px; }
-.verb-theme-card, .verb-theme-view { --c1:#8fd3ff; --c2:#2f7fd6; --p:0%; }
-:is(.verb-theme-card,.verb-theme-view).tone-sky { --c1:#8fd3ff; --c2:#2f7fd6; }
-:is(.verb-theme-card,.verb-theme-view).tone-orange { --c1:#ffc48a; --c2:#e9792b; }
-:is(.verb-theme-card,.verb-theme-view).tone-green { --c1:#a8e6a1; --c2:#3a9d4a; }
-:is(.verb-theme-card,.verb-theme-view).tone-violet { --c1:#c9b8ff; --c2:#7c5ce0; }
-:is(.verb-theme-card,.verb-theme-view).tone-gold { --c1:#ffe08a; --c2:#c99a12; }
-:is(.verb-theme-card,.verb-theme-view).tone-rose { --c1:#ffb8c9; --c2:#e0577e; }
-.verb-theme-card { position:relative; display:grid; gap:10px; width:100%; height:100%; padding:46px 18px 16px; border:2px solid #fff; border-radius:26px; background:linear-gradient(180deg,color-mix(in srgb,var(--c1) 45%,#fff) 0,#fff 42%); box-shadow:0 8px 22px rgba(28,82,130,.1); color:#1f3b5c; font:inherit; text-align:start; cursor:pointer; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
-.verb-theme-grid li:nth-child(odd) .verb-theme-card:hover { transform:translateY(-4px) rotate(-1deg); }
-.verb-theme-grid li:nth-child(even) .verb-theme-card:hover { transform:translateY(-4px) rotate(1deg); }
-.verb-theme-card:hover { border-color:var(--c1); box-shadow:0 14px 30px rgba(28,82,130,.16); }
-.verb-theme-card:focus-visible { outline:3px solid var(--c2); outline-offset:3px; }
-.verb-theme-card.done { border-color:#7fd08a; }
-.verb-theme-emoji { position:absolute; top:-22px; inset-inline-start:18px; display:grid; place-items:center; width:62px; height:62px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#fff 0,var(--c1) 55%,var(--c2) 100%); border:4px solid #fff; box-shadow:0 6px 14px rgba(0,0,0,.12); font-size:30px; line-height:1; }
-.verb-theme-card:hover .verb-theme-emoji { animation:verb-theme-wiggle .5s ease; }
-@keyframes verb-theme-wiggle { 0%,100% { transform:rotate(0); } 30% { transform:rotate(-12deg) scale(1.08); } 65% { transform:rotate(9deg); } }
-.verb-theme-words { display:grid; gap:2px; min-width:0; }
-.verb-theme-words strong { font-size:19px; font-weight:800; line-height:1.25; }
-.verb-theme-words small { color:var(--c2); font-weight:800; font-size:13.5px; }
-.verb-theme-pics { display:flex; }
-.verb-theme-pics img { width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #fff; background:#fff; box-shadow:0 2px 6px rgba(28,82,130,.15); margin-inline-end:-10px; }
-.verb-theme-meta { display:inline-flex; align-items:center; gap:6px; color:#3d5a7a; font-weight:700; font-size:13.5px; }
-.verb-theme-card.done .verb-theme-meta, .verb-theme-view .verb-theme-meta svg { color:#2e7d32; }
-.verb-theme-bar { display:block; height:8px; border-radius:999px; background:#e8eef6; overflow:hidden; }
-.verb-theme-bar span { display:block; width:var(--p); height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--c1),var(--c2)); }
-.verb-theme-go { display:inline-flex; align-items:center; justify-self:start; gap:6px; margin-top:2px; padding:8px 14px; border-radius:999px; background:var(--c2); color:#fff; font-weight:800; font-size:14.5px; }
-
-.verb-theme-view { margin-top:8px; padding:22px 26px 26px; background:linear-gradient(180deg,color-mix(in srgb,var(--c1) 35%,#fff) 0,#fff 220px); }
-.verb-theme-view .verb-back { margin-bottom:10px; }
-.verb-theme-head { display:flex; align-items:center; gap:18px; }
-.verb-theme-emoji.big { position:static; flex:none; width:84px; height:84px; font-size:42px; }
-.verb-theme-head h1 { margin:0; font-size:30px; font-weight:800; color:#1f3b5c; line-height:1.15; }
-.verb-theme-head h1:focus { outline:none; }
-.verb-theme-head p { margin:0; }
-.verb-theme-head p[lang="de"] { color:var(--c2); font-weight:800; }
-.verb-theme-head .verb-theme-bar { width:min(320px,100%); margin-top:6px; }
-.verb-theme-play { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:20px 0 6px; padding:16px 18px; border-radius:20px; background:#fff; border:2px dashed var(--c1); }
-.verb-theme-play div { display:grid; gap:2px; }
-.verb-theme-play strong { font-size:18px; font-weight:800; color:#1f3b5c; }
-.verb-theme-play small { color:#3d5a7a; font-weight:600; font-size:14px; }
-.verb-theme-play .btn { flex:none; min-height:48px; }
-.verb-theme-tap { margin:14px 0 10px; color:#3d5a7a; font-weight:700; font-size:14px; }
-.verb-theme-tiles { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
-.verb-theme-tile { position:relative; display:grid; justify-items:center; gap:3px; width:100%; height:100%; padding:10px 8px 12px; border:2px solid #e3ebf5; border-radius:18px; background:#fff; color:#1f3b5c; font:inherit; text-align:center; cursor:pointer; transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
-.verb-theme-tile:hover:not(:disabled) { transform:translateY(-3px); border-color:var(--c1); box-shadow:0 8px 18px rgba(28,82,130,.12); }
-.verb-theme-tile:active:not(:disabled) { transform:scale(.97); }
-.verb-theme-tile:focus-visible { outline:3px solid var(--c2); outline-offset:2px; }
-.verb-theme-tile:disabled { cursor:default; }
-.verb-theme-tile img { width:100%; max-width:120px; aspect-ratio:1; border-radius:14px; object-fit:cover; background:#f6f9fd; }
-.verb-theme-tile strong { font-size:17px; font-weight:800; overflow-wrap:anywhere; }
-.verb-theme-tile span { font-size:14px; color:#3d5a7a; font-weight:600; }
-.verb-theme-tile small { font-size:13px; color:var(--c2); font-weight:800; }
-.verb-theme-tile.got { border-color:#cfe6ff; }
-.verb-theme-tile.full { border-color:#8fd59a; background:#f6fcf6; }
-.verb-theme-tile-sound { position:absolute; top:8px; inset-inline-start:8px; color:#8aa0b8; }
-.verb-theme-tile-check { position:absolute; top:8px; inset-inline-end:8px; color:#2e7d32; }
-@media (max-width:1000px) { .verb-theme-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:620px) {
- .verb-theme-grid { grid-template-columns:1fr; gap:28px; }
- .verb-themes-title, .verb-theme-head h1 { font-size:24px; }
- .verb-theme-view { padding:18px 16px 20px; }
- .verb-theme-emoji.big { width:64px; height:64px; font-size:32px; }
- .verb-theme-play { flex-direction:column; align-items:stretch; }
- .verb-theme-tiles { grid-template-columns:repeat(2,minmax(0,1fr)); }
+/* Fiil Atölyesi's map is the six topics (lib/verb-themes.ts; the learner asked, 4 November 2026): each island and part
+   page in its topic's colour, the topic's name in the learner's language with the German name under it. */
+:is(.verb-island,.verb-part-view).tone-sky { --c1:#8fd3ff; --c2:#2f7fd6; }
+:is(.verb-island,.verb-part-view).tone-orange { --c1:#ffc48a; --c2:#e9792b; }
+:is(.verb-island,.verb-part-view).tone-green { --c1:#a8e6a1; --c2:#3a9d4a; }
+:is(.verb-island,.verb-part-view).tone-gold { --c1:#ffe08a; --c2:#c99a12; }
+.verb-island-text h3 small { display:block; margin-top:2px; color:var(--c2); font-size:15px; font-weight:800; }
+.verb-part-german { margin:0; color:var(--c2); font-weight:800; }
+/* Oyunlar: the matching cards with all verbs or one topic. On a phone the seven chips are one row that slides sideways,
+   so the cards stay on the first screen. */
+.verb-match-topics .verb-topic-chip span { margin-inline-end:2px; }
+@media (max-width:760px) {
+ .verb-match-topics { flex-wrap:nowrap; overflow-x:auto; margin:0 -4px 12px; padding:3px 4px 6px; scrollbar-width:none; }
+ .verb-match-topics::-webkit-scrollbar { display:none; }
+ .verb-match-topics .verb-topic-chip { flex:none; min-height:38px; padding:4px 12px; font-size:14.5px; white-space:nowrap; }
 }
-@media (prefers-reduced-motion:reduce) { .verb-theme-card, .verb-theme-tile { transition:none; } .verb-theme-card:hover, .verb-theme-grid li .verb-theme-card:hover, .verb-theme-tile:hover:not(:disabled) { transform:none; } .verb-theme-card:hover .verb-theme-emoji { animation:none; } }

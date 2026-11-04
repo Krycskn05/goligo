@@ -3,6 +3,7 @@ import {curriculumTopicIds,courseUnitForTopic} from './course-levels';
 import {questions,topics,shuffle,type Question} from './course';
 import {englishQuestions,englishTopics,englishUnitContains} from './english-course';
 import {verbQuestions,isVerbTopic,inVerbTopic,spreadVerbRound} from './verb-course';
+export {VERB_TOPIC_ROUND} from './verb-course';
 import {type LearningLanguage} from './learning-language';
 import type {StudyStats} from './progress';
 /** The guest taste (a visitor without an account): which questions and rounds app/api/study serves without saving. */

@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
+import {createPortal} from 'react-dom';
 import {Check,ChevronDown,Play,Square,Star,Volume2,X} from 'lucide-react';
 import {wrongSoundIds,tapChoiceIds,pageSoundIds,correctSoundIds,completeSoundIds,nextTapSound,type SoundId} from '@/lib/effect-sounds';
 import {germanSpeechPreview} from '@/lib/german-speech';
@@ -50,7 +51,7 @@ export default function LearningEffects() {
  const [message,setMessage]=useState<EffectsCopyKey|null>(null);
  // Three tabs instead of one long panel (the learner asked, 22 October 2026): Telaffuz, Efektler, Animasyonlar.
  const [tab,setTab]=useState<'voice'|'effects'|'motion'>('voice');
- const [reaction,setReaction]=useState<{kind:LearningReaction;id:number;pose:PaulPose;anim:PaulAnimation}|null>(null);
+ const [reaction,setReaction]=useState<{kind:LearningReaction;id:number;pose:PaulPose;anim:PaulAnimation;host:HTMLElement|null}|null>(null);
  const dialog=useRef<HTMLDialogElement>(null);
  const previewStop=useRef<(()=>void)|null>(null);
  const reactionTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -79,7 +80,9 @@ export default function LearningEffects() {
    if(!['correct','wrong','complete'].includes(kind)||document.hidden||!motionAllowed())return;
    if(reactionTimer.current)clearTimeout(reactionTimer.current);
    const pose=REACTION_POSE[kind];
-   setReaction({kind,id:++sequence.current,pose,anim:nextPaul(pose)});reactionTimer.current=setTimeout(()=>setReaction(null),REACTION_MS[kind]);
+   // Nesne Kasası: Paul reacts inside the question picture (the learner asked, 4 November 2026); elsewhere in the badge.
+   const host=kind==='complete'?null:document.querySelector<HTMLElement>('[data-paul-picture]>.object-picture');
+   setReaction({kind,id:++sequence.current,pose,anim:nextPaul(pose),host});reactionTimer.current=setTimeout(()=>setReaction(null),REACTION_MS[kind]);
    // Fetch his next animation for this moment now, so it shows at once the next time.
    try{const picture=new Image();picture.decoding='async';picture.src=paulSrc(upcomingPaul(pose));}catch{}
    if(kind==='complete')playPaulSound(pose);
@@ -113,7 +116,11 @@ export default function LearningEffects() {
  const confetti=reaction&&reaction.kind!=='wrong';
  return <>
   <PaulPeek/>
-  {reaction&&<div key={reaction.id} className={'lk-reaction-layer '+(reaction.kind==='wrong'?'retry':'celebrate')+' kind-'+reaction.kind} aria-hidden="true">
+  {reaction?.host?.isConnected&&createPortal(<div className={'lk-picture-reaction kind-'+reaction.kind} aria-hidden="true">
+   <img className="lk-picture-paul" src={paulSrc(reaction.anim)} alt="" width={288} height={288} decoding="async" data-paul={reaction.anim}/>
+   {confetti&&Array.from({length:12},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%240)-120}px`,'--lk-y':`${30+i*43%90}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={12} fill="currentColor"/>:null}</span>)}
+  </div>,reaction.host,String(reaction.id))}
+  {reaction&&!reaction.host?.isConnected&&<div key={reaction.id} className={'lk-reaction-layer '+(reaction.kind==='wrong'?'retry':'celebrate')+' kind-'+reaction.kind} aria-hidden="true">
    <div className="lk-reaction-badge"><img className="lk-reaction-paul" src={paulSrc(reaction.anim)} alt="" width={288} height={288} decoding="async" data-paul={reaction.anim}/><strong>{text(reaction.kind==='complete'?'done':reaction.kind==='correct'?'great':'retry')}</strong></div>
    {confetti&&Array.from({length:reaction.kind==='complete'?24:14},(_,i)=><span key={i} className={'lk-confetti piece-'+i%4} style={{'--lk-x':`${(i*83%430)-215}px`,'--lk-y':`${85+i*43%175}px`,'--lk-rotate':`${i*71}deg`,'--lk-delay':`${i%5*24}ms`} as CSSProperties}>{i%3===0?<Star size={14} fill="currentColor"/>:null}</span>)}
   </div>}

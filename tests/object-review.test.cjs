@@ -60,14 +60,15 @@ test('stars on Nesne Kasası questions are saved for the signed-in learner',asyn
  assert.deepEqual([...study.starredQuestionIds(snapshot.notes)].sort(),[picture,write].sort());
 });
 
-test('the Nesne Kasası page shows the star, the combined review button and the unsolved counter',()=>{
+test('the Nesne Kasası page shows the star and the combined review button',()=>{
  const page=fs.readFileSync('app/object-study.tsx','utf8');
  assert(page.includes('toggleStar(q.id)')&&page.includes('starredQuestionIds(snapshot.notes)'));
  assert(page.includes("{starred,fresh:!reviewOnly&&!onlyIds&&!all}"),'normal rounds skip solved questions, reviews add stars');
  // "Hepsini baştan çöz" (the learner asked to solve the solved ones again): shown while some are solved and some are not.
  assert(page.includes("{ready&&unsolved>0&&unsolved<availableCount&&<button type=\"button\" className=\"text-button vault-restart-all\" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all>"));
  assert(page.includes('disabled={busy||!ready||!marked.length}'),'the review button is active whenever there are mistakes or stars');
- assert(page.includes("text(course==='de'?'reviewMarked':'reviewMistakes')")&&page.includes("text('remaining',{n:unsolved})"));
+ // No "… çözülmemiş soru kaldı" line any more (the learner asked, 4 November 2026); the copy stays for Ev ve Yaşam.
+ assert(page.includes("text(course==='de'?'reviewMarked':'reviewMistakes')")&&!page.includes("text('remaining',{n:unsolved})"));
  for(const {id} of copy.vaultLanguages)for(const key of ['star','unstar','reviewMarked','remaining','allSolved','restartAll','starTip','starError']){
   const value=copy.vaultText(id,key,{n:7});assert(value&&value.trim()&&value!==key,id+' '+key);assert(!value.includes('{n}'),id+' '+key);
  }

@@ -601,6 +601,14 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 .toon-app .object-question.vault-answered>.object-options,
 .toon-app .object-question.vault-answered>.vault-article-choice,
 .toon-app .object-question.vault-answered>.letter-puzzle { margin-top:12px; }
+/* No "Sonraki" button: the next question opens 4 seconds after the answer (the learner asked, 4 November 2026); this bar
+   along the bottom of the result card empties in those 4 seconds (app/object-study.tsx, AUTO_NEXT_MS). */
+.toon-app .object-question.vault-answered>#object-feedback { position:relative; overflow:hidden; padding-bottom:16px; }
+.vault-auto-next { position:absolute; inset-inline:0; bottom:0; height:5px; background:#5fae45; transform-origin:left center; animation:vault-auto-next 4s linear both; }
+[dir=rtl] .vault-auto-next { transform-origin:right center; }
+#object-feedback.retry .vault-auto-next { background:#e98d3a; }
+@keyframes vault-auto-next { from { transform:scaleX(1); } to { transform:scaleX(0); } }
+@media (prefers-reduced-motion:reduce) { .vault-auto-next { animation:none; opacity:.45; } }
 /* Wide screens: "Tekrar dinle" and "Sonraki" side by side under the answer; in Dinle ve Bul the four pictures in one
    lower row (before and after the answer), so the green one is on the screen too. */
 @media (min-width:1100px) {

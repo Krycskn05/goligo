@@ -615,7 +615,7 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-slot .verb-result-title strong { font-size:24px; }
 .verb-slot .verb-result-status { font-size:13.5px; line-height:1.25; }
 /* The tick on the right choice sits in its corner, so the choice keeps its size after the answer. */
-.verb-practice .verb-options .object-option { position:relative; }
+.verb-practice .verb-options .object-option { position:relative; padding-inline-end:30px; }
 .verb-practice .verb-options .object-option>svg { position:absolute; top:6px; inset-inline-end:6px; width:18px; height:18px; margin:0; }
 .verb-one-example { display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:8px; align-items:center; max-width:100%; margin-top:4px; padding:4px 10px; border-radius:12px; border:1px solid #d9e7f5; background:#fff; color:inherit; font:inherit; text-align:start; cursor:pointer; }
 .verb-one-example:disabled { cursor:default; color:inherit; opacity:1; }

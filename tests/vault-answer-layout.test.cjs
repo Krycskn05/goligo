@@ -39,8 +39,10 @@ test('Nesne Kasası opens the next question by itself 3 seconds after an answer,
  assert.ok(page.includes('nextRef.current();'));
  const css=read('app/koko-theme.css');
  assert.ok(css.includes('.vault-auto-next { position:absolute;')&&css.includes('animation:vault-auto-next 3s linear both;'));
- // Fiil Atölyesi and Ev ve Yaşam keep their own "Sonraki" buttons.
- for(const file of ['app/verb-study.tsx','app/housing-study.tsx'])assert.ok(!read(file).includes('AUTO_NEXT_MS'),file);
+ // Ev ve Yaşam keeps its own "Sonraki" button; Fiil Atölyesi goes on by itself too since 4 November 2026
+ // (tests/verb-practice-fit.test.cjs).
+ assert.ok(!read('app/housing-study.tsx').includes('AUTO_NEXT_MS'));
+ assert.ok(read('app/verb-study.tsx').includes('const AUTO_NEXT_MS=3000,AUTO_NEXT_GRACE_MS=6000;'));
 });
 
 test('a mode card in Nesne Kasası starts its round at once; no "Teste başla" button or unsolved counter',()=>{

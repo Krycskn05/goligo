@@ -59,7 +59,7 @@ test('the header clock: every tap says another German sentence about now',()=>{
  assert.ok(bubble.includes("<span className={'site-greeting-part part-'+moment.part}><PartOfDayIcon part={moment.part}/>{PART_NOUN[moment.part]}</span>"));
  for(const gone of ['site-greeting-time','site-greeting-facts','site-greeting-say','Math.random'])assert.ok(!bubble.includes(gone),gone);
  assert.ok(bubble.includes('setInterval(tick,motion?1000:15000)'),'the clock ticks every second');
- assert.ok(bubble.includes('transform={`rotate(${angle} ${x} ${y})`}')&&bubble.includes('const hourAngle=(h+m/60)*30,minuteAngle=(m+sec/60)*6,secondAngle=sec*6;'),'the hands turn around the face centre of the clock picture (tests/new-icons.test.cjs)');
+ assert.ok(bubble.includes('transform={`rotate(${angle} 50 50)`}')&&bubble.includes('const hourAngle=(h+m/60)*30,minuteAngle=(m+sec/60)*6,secondAngle=sec*6;'));
  for(const part of ['morgen','vormittag','mittag','nachmittag','abend','nacht'])assert.ok(bubble.includes(part),'a picture for '+part);
  // No window (the learner asked, 21 October 2026): a tap says the time the next way (lib/clock-sayings.ts, tested in
  // tests/clock-sayings.test.cjs) and shows it in a small box under the clock.

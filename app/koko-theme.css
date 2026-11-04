@@ -541,24 +541,17 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .site-header:not(.lk-public-header) .site-home,.site-header:not(.lk-public-header) .object-back,.site-header:not(.lk-public-header) .lk-effects-button,.site-header:not(.lk-public-header) .site-language { width:34px; height:34px; min-height:34px; }
 }
 
-/* During a test (a question card on the page): a slim header with only the logo and the round buttons, no breadcrumb
-   (the ✕ of the test leads back), a smaller picture and lower answer buttons, so the question and all four answers fit
-   on one phone screen (the learner asked, 22 October 2026). */
-.toon-app:has(.object-question) .site-header .site-greeting,
-.toon-app:has(.object-question) .site-header .site-language,
-.toon-app:has(.object-question) .site-header .site-sparkle,
+/* During a test (a question card on the page): no breadcrumb (the ✕ of the test leads back), a smaller picture and lower
+   answer buttons, so the question and all four answers fit on one phone screen (the learner asked, 22 October 2026).
+   The header stays the same as on the home page, with the calendar and the clock (the learner asked, 4 November 2026:
+   "the top bar the size it has on the home page, on every page"). */
 .toon-app:has(.object-question) .object-breadcrumb { display:none; }
-.toon-app:has(.object-question) .work-header.site-header { display:flex; align-items:center; gap:10px; padding-block:8px; }
-.toon-app:has(.object-question) .site-header .site-logo-brand { width:clamp(104px,28vw,150px); }
-.toon-app:has(.object-question) .site-header .site-header-tools { display:flex; width:auto; margin-inline-start:auto; }
 .toon-app:has(.object-question) .object-practice { margin-top:8px; }
 .toon-app:has(.object-question) .object-practice-top { margin-bottom:10px; }
 .toon-app:has(.object-question) .object-question .object-picture { margin:10px auto; }
 .toon-app:has(.object-question) .object-question .object-picture:not(.small)>.toon-art { max-height:clamp(120px,27vh,280px); }
 .toon-app:has(.object-question) .object-question .object-picture:not(.small) img { max-height:clamp(120px,27vh,280px); }
 @media (max-width:760px) {
- .toon-app:has(.object-question) .work-header.site-header { margin-top:6px; border-radius:20px; padding:6px 10px; }
- .toon-app:has(.object-question) .site-header .site-header-buttons { gap:6px; }
  .toon-app:has(.object-question) .object-question.panel { padding:14px 12px 16px; }
  .toon-app:has(.object-question) .object-question h1 { font-size:18px; line-height:1.35; margin-bottom:6px; }
  .toon-app:has(.object-question) .object-question .object-picture { margin:6px auto 10px; }
@@ -709,18 +702,17 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
    29 October 2026, with the clock moved to the other side): a small calendar leaf first — the German month short on an
    orange strip (OKT), the day of the month under it — then the weekday and the part of the day, the clock at the end.
    The capsule is mirrored to match: a little room before the leaf, the round clock close to the end. */
-/* Since 4 November 2026 the learner's own calendar picture (Goliqo-ikonlar.zip); the month and the day on its page. */
-.sg-leaf { flex:none; position:relative; display:block; width:40px; height:40px; background:url(/icons/header/calendar.webp) center / contain no-repeat; text-align:center; }
-.sg-leaf-month { position:absolute; inset-inline:0; top:37%; color:#e8742c; font-size:8.5px; font-weight:900; letter-spacing:.04em; line-height:1; }
-.sg-leaf-day { position:absolute; inset-inline:0; top:51%; color:var(--ink); font-size:15px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+.sg-leaf { flex:none; display:grid; grid-template-rows:auto 1fr; width:34px; height:36px; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 0 0 1.5px #f0c9a8,0 2px 0 #f0d9bd; text-align:center; }
+.sg-leaf-month { display:block; background:linear-gradient(180deg,#f28a4b,#e8742c); color:#fff; font-size:9px; font-weight:800; letter-spacing:.06em; line-height:12px; }
+.sg-leaf-day { display:grid; place-items:center; color:var(--ink); font-size:17px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
 @media (min-width:761px) {
  .site-header:not(.lk-public-header) .site-greeting { padding-block:3px; padding-inline:8px 3px; }
 }
 @media (max-width:760px) {
  .site-header:not(.lk-public-header) .site-greeting { padding-block:2px; padding-inline:5px 2px; }
- .sg-leaf { width:30px; height:30px; }
- .sg-leaf-month { font-size:6.5px; }
- .sg-leaf-day { font-size:11.5px; }
+ .sg-leaf { width:25px; height:27px; border-radius:6px; }
+ .sg-leaf-month { font-size:7px; line-height:9px; }
+ .sg-leaf-day { font-size:13px; }
 }
 /* Below 381 px the clock face is hidden: the capsule ends with the words. */
 @media (max-width:380px) {
@@ -731,9 +723,9 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .site-header:not(.lk-public-header) .site-logo-brand { width:58px; }
  .site-header:not(.lk-public-header) .site-greeting { padding-inline:2px 4px; }
  .site-header:not(.lk-public-header) .site-greeting-button { gap:4px; }
- .sg-leaf { width:26px; height:26px; }
- .sg-leaf-month { display:none; }
- .sg-leaf-day { top:42%; font-size:11px; }
+ .sg-leaf { width:21px; height:24px; border-radius:5px; }
+ .sg-leaf-month { font-size:6.5px; line-height:8px; }
+ .sg-leaf-day { font-size:12px; }
  .site-header:not(.lk-public-header) .site-greeting-day { font-size:11.5px; }
  .site-header:not(.lk-public-header) .site-greeting-part .sg-part-icon { display:none; }
 }

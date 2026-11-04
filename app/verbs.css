@@ -612,9 +612,9 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-slot>.vault-listen-player { box-sizing:border-box; height:100%; margin:0; }
 .verb-slot>.verb-result { box-sizing:border-box; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:16px; height:100%; padding:10px calc(var(--paul) + 8px) 13px 14px; border-radius:18px; background:#eafbe4; overflow:hidden; }
 .verb-slot>.verb-result.retry { background:#fff0f4; }
-.verb-slot>.verb-result>.verb-picture { width:calc(var(--qslot) - 24px); max-width:none; margin:0; border-radius:16px; }
+.verb-slot>.verb-result>.verb-picture { width:calc(var(--qslot) - 64px); max-width:none; margin:0; border-radius:16px; }
 .verb-slot .verb-result-text { gap:2px; }
-.verb-slot .verb-result-title strong { font-size:24px; }
+.verb-slot .verb-result-title strong { font-size:22px; }
 .verb-slot .verb-result-status { font-size:13.5px; line-height:1.25; }
 /* The tick on the right choice sits on its corner, outside the text, so the choice keeps its size after the answer. */
 .verb-app .verb-practice .verb-options.picture-word-options .object-option { position:relative; overflow:visible; }
@@ -625,7 +625,7 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-one-example .verb-person-meaning { grid-column:1; font-size:12.5px; line-height:1.25; color:#7d8ea3; }
 .verb-one-example svg { grid-column:2; grid-row:1 / span 2; color:#2f7fd6; }
 @media (max-width:760px) {
- .verb-practice { --slot:216px; --qslot:250px; --paul:76px; --pic:100px; }
+ .verb-practice { --slot:216px; --qslot:260px; --paul:64px; --pic:84px; }
  .verb-step-chips { gap:4px; margin-bottom:6px; }
  .verb-step-chips li { padding:4px 3px; font-size:11px; }
  .verb-practice .verb-learn { gap:8px; padding:12px; }
@@ -650,7 +650,7 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  .verb-practice .verb-slot>.verb-result>.verb-result-text { display:contents; }
  .verb-practice .verb-slot .verb-result-status,.verb-practice .verb-slot .verb-result-title,.verb-practice .verb-slot .verb-result-meaning { grid-column:2; }
  .verb-practice .verb-slot .verb-result-chosen,.verb-practice .verb-slot .verb-one-example { grid-column:1 / -1; justify-self:start; }
- .verb-slot .verb-result-title strong { font-size:20px; }
+ .verb-slot .verb-result-title strong { font-size:17px; }
  .verb-slot .verb-result-meaning { font-size:13.5px; }
  .verb-one-example { padding:3px 8px; }
  .verb-one-example .verb-person-text { font-size:13px; }

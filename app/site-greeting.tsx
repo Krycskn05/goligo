@@ -23,30 +23,27 @@ export function PartOfDayIcon({part}:{part:PartOfDay}){
  </svg>;
 }
 
-/** Where the face is in the clock picture (public/icons/header/clock.webp, in a 100 × 100 box): its centre and radius. */
-export const CLOCK_FACE={x:50.52,y:49.05,r:33.16};
-/** A small analog clock for the learner's own time (the learner asked for it instead of digits). Since 4 November 2026 the
- * learner's own picture (Goliqo-ikonlar.zip): a turquoise clock on a mango stand, its painted hands taken out, with the time
- * of now drawn on it — turquoise hands, a mango centre and, with motion on, a ticking second hand. */
+/** A small analog clock for the learner's own time (the learner asked for it instead of digits): turquoise rim, mango
+ * hour marks, navy hands and, with motion on, a ticking second hand. */
 export function AnalogClock({date,seconds=true,className=''}:{date:Date;seconds?:boolean;className?:string}){
  const h=date.getHours()%12,m=date.getMinutes(),sec=date.getSeconds();
  const hourAngle=(h+m/60)*30,minuteAngle=(m+sec/60)*6,secondAngle=sec*6;
- const {x,y,r}=CLOCK_FACE;
- const hand=(angle:number,length:number,width:number,color:string,key:string)=><line key={key} className={'clock-'+key} x1={x} y1={y} x2={x} y2={y-length} stroke={color} strokeWidth={width} strokeLinecap="round" transform={`rotate(${angle} ${x} ${y})`}/>;
+ const hand=(angle:number,length:number,width:number,color:string,key:string)=><line key={key} className={'clock-'+key} x1="50" y1="50" x2="50" y2={50-length} stroke={color} strokeWidth={width} strokeLinecap="round" transform={`rotate(${angle} 50 50)`}/>;
  return <svg className={('analog-clock '+className).trim()} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-  <image href="/icons/header/clock.webp" x="0" y="0" width="100" height="100"/>
-  {hand(hourAngle,r*0.5,5.2,'#147f7c','hour')}
-  {hand(minuteAngle,r*0.76,3.8,'#147f7c','minute')}
-  {seconds&&hand(secondAngle,r*0.82,1.7,'#e8742c','second')}
-  <circle cx={x} cy={y} r="3.6" fill="#f2b23a" stroke="#c98a16" strokeWidth="1"/>
+  <circle cx="50" cy="50" r="46" fill="#fff" stroke="#0d9fad" strokeWidth="7"/>
+  {Array.from({length:12},(_,i)=><line key={i} x1="50" y1="11" x2="50" y2={i%3===0?20:16} stroke={i%3===0?'#f6bd47':'#9fd8de'} strokeWidth={i%3===0?5:3} strokeLinecap="round" transform={`rotate(${i*30} 50 50)`}/>)}
+  {hand(hourAngle,22,7,'#1f3b5c','hour')}
+  {hand(minuteAngle,32,5,'#1f3b5c','minute')}
+  {seconds&&hand(secondAngle,34,2.2,'#e8742c','second')}
+  <circle cx="50" cy="50" r="5" fill="#f6bd47" stroke="#1f3b5c" strokeWidth="2"/>
  </svg>;
 }
 
 /** The short German month on the calendar leaf of the header (OKT for Oktober). */
 export const MONTH_SHORT=['JAN','FEB','MÄR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DEZ'];
 
-/** A small calendar for today (the learner chose it, 29 October 2026; since 4 November 2026 the learner's own picture,
- * public/icons/header/calendar.webp): the month short and the day of the month written on its page. */
+/** A small calendar leaf for today (the learner chose it, 29 October 2026): the month short on an orange strip and the
+ * day of the month under it. */
 export function DateLeaf({date}:{date:Date}){
  return <span className="sg-leaf" aria-hidden="true"><span className="sg-leaf-month">{MONTH_SHORT[date.getMonth()]}</span><span className="sg-leaf-day">{date.getDate()}</span></span>;
 }

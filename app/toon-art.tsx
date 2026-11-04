@@ -23,6 +23,8 @@ export function RasterArt({art,title,className=''}:{art:RasterSprite;title:strin
 export function TopicArt({id,title}:{id:string;title:string}){
  const art=(topicArt.units as Record<string,RasterSprite>)[id];return art?<RasterArt art={art} title={title}/>:null;
 }
+/** The picture file of an object (the small tiles of the Nesne Kasası strip use it as a plain image). */
+export const objectArtSrc=(id:string):string|undefined=>(objectArt as Record<string,RasterSprite>)[id]?.src;
 export function ObjectArt({id,title}:{id:string;title:string}){
  const art=(objectArt as Record<string,RasterSprite>)[id];return art?<RasterArt art={art} title={title}/>:null;
 }

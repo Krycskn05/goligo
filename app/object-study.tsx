@@ -3,7 +3,7 @@ import {saveLastPlace} from '@/lib/last-place';
 import {browserLanguage} from '@/lib/device-language';
 import {SITE_NAME} from '@/lib/site-brand';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,CheckCircle2,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,Check,CheckCircle2,Headphones,House,Loader2,RotateCcw,Star,Volume2,X} from 'lucide-react';
 import {gradeAnswer,questionMap,type Question} from '@/lib/course';
 import {objectGroups,objectVocabulary,objectWordMap,type ObjectWord} from '@/lib/object-course';
 import {sectionsFor,sectionTitle} from '@/lib/vault-sections';
@@ -13,7 +13,7 @@ import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestio
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {PaulHoca,playPaulSound} from './paul-hoca';
-import {ObjectArt,HeroArt} from './toon-art';
+import {ObjectArt,HeroArt,objectArtSrc} from './toon-art';
 import {objectMeaning} from '@/lib/object-translations';
 import {vaultLanguages,isVaultLanguage,vaultDirection,vaultText,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
 import {readVaultLanguage,saveVaultLanguage} from '@/lib/vault-language-preference';
@@ -81,6 +81,9 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  const [session,setSession]=useState<Session|null>(null);const [index,setIndex]=useState(0);
  const [feedback,setFeedback]=useState<Answer|null>(null);const [selected,setSelected]=useState('');
  const [heardQuestionId,setHeardQuestionId]=useState<string|null>(null);const [starBusy,setStarBusy]=useState(false);
+ // The picture strip (the learner asked, 4 November 2026): questions solved in earlier rounds stay in it as done, and
+ // any done question can be opened again to look at (it is not answered again).
+ const [earlier,setEarlier]=useState<string[]>([]);const [viewId,setViewId]=useState<string|null>(null);
  const [replays,setReplays]=useState(0); // "Tekrar dinle" taps on the answer card: each one gives 4 seconds again
  const [nounArticle,setNounArticle]=useState('');const [articleWarning,setArticleWarning]=useState(false);const [showHint,setShowHint]=useState(false);
  const speech=useGermanSpeech(course);const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
@@ -88,7 +91,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  // From Yanlışlarım (/yanlislarim): ?tekrar=1 opens all objects, where the mistakes can be practised (once).
  const reviewLink=useRef(false);
  useEffect(()=>{if(!ready||reviewLink.current)return;reviewLink.current=true;if(new URLSearchParams(window.location.search).get('tekrar')==='1')chooseCategory('all');},[ready]);// eslint-disable-line react-hooks/exhaustive-deps
- const pendingStart=useRef<{key:string;id:string;ids:string[];topic:string}|null>(null);
+ const pendingStart=useRef<{key:string;id:string;ids:string[];topic:string;earlier:string[]}|null>(null);
  const pendingAnswer=useRef<{questionId:string;answer:string}|null>(null);
  const reviews=snapshot.reviews.filter(r=>modePredicate(practiceMode)(questionMap.get(r.question_id)));
  const candidate=session?.questions[index]?questionMap.get(session.questions[index].id):undefined;
@@ -97,7 +100,8 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  const articleQuestion=course==='de'&&q&&isArticleChallenge(q)?q:undefined;
  const pronunciation=articleQuestion?articleFullAnswer(articleQuestion):currentWord?(course==='en'?englishObjectName(currentWord.id):currentWord.de):q?.answer??'';
  const finished=!!session&&index>=session.questions.length;
- const scopedQuestions=Array.from(questionMap.values()).filter(item=>modePredicate(practiceMode)(item)&&(group==='all'||item.topic===(course==='en'?'en-':'')+group)&&inObjectSubgroup(item,subgroup));
+ const scopeFor=(mode:string)=>Array.from(questionMap.values()).filter(item=>modePredicate(mode)(item)&&(group==='all'||item.topic===(course==='en'?'en-':'')+group)&&inObjectSubgroup(item,subgroup));
+ const scopedQuestions=scopeFor(practiceMode);
  const availableCount=scopedQuestions.length;
  const selectedSubgroup=objectSubgroups.find(item=>item.id===subgroup);
  // Review = mistakes plus starred questions; a normal round skips what is already solved.
@@ -119,7 +123,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  useEffect(()=>{document.documentElement.lang=language;document.documentElement.dir=vaultDirection(language);document.title=vaultText(language,'vaultTitle')+' · '+SITE_NAME;stopFeedback();},[language]);
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
- function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setNounArticle('');setArticleWarning(false);setShowHint(false);pendingAnswer.current=null;}
+ function clearAnswer(){setViewId(null);setFeedback(null);setSelected('');setHeardQuestionId(null);setNounArticle('');setArticleWarning(false);setShowHint(false);pendingAnswer.current=null;}
  function overview(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('categories');setError(null);void refresh();focus('vault-heading');}
  // The end of a round (the learner asked, 29 October 2026): back to the same category's screen (Gör ve Seç / Yazarak Pekiştir /
  // Dinle ve Bul), not to the list of all categories; the mode just played stays chosen.
@@ -133,12 +137,18 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
   if(mode==='listen')speech.prepare();
   const eligibleIds=subgroup==='all'?onlyIds:scopedQuestions.filter(item=>!onlyIds||onlyIds.includes(item.id)).map(item=>item.id);
   const key=JSON.stringify([course,mode,group,subgroup,count,reviewOnly,all,eligibleIds??null]);const topic=(course==='en'?'en-':'')+(group==='all'?'objects-all':group);
-  if(pendingStart.current?.key!==key){const picked=(mode==='write'?pickWriting:mode==='listen'?pickListening:pickPicture)(group,count,mode===practiceMode?reviews:snapshot.reviews.filter(r=>modePredicate(mode)(questionMap.get(r.question_id))),reviewOnly,eligibleIds,{starred,fresh:!reviewOnly&&!onlyIds&&!all});pendingStart.current={key,id:crypto.randomUUID(),ids:picked.map(x=>x.id),topic};}
+  if(pendingStart.current?.key!==key){
+   const history=mode===practiceMode?reviews:snapshot.reviews.filter(r=>modePredicate(mode)(questionMap.get(r.question_id)));const fresh=!reviewOnly&&!onlyIds&&!all;
+   const picked=(mode==='write'?pickWriting:mode==='listen'?pickListening:pickPicture)(group,count,history,reviewOnly,eligibleIds,{starred,fresh});const ids=picked.map(x=>x.id);
+   // A normal round asks the unsolved ones; the solved ones stay in its strip as done (not asked again).
+   const rows=new Map(history.map(r=>[r.question_id,r]));const earlierIds=fresh?scopeFor(mode).filter(item=>!ids.includes(item.id)&&isObjectSolved(rows.get(item.id))).map(item=>item.id):[];
+   pendingStart.current={key,id:crypto.randomUUID(),ids,topic,earlier:earlierIds};
+  }
   const request=pendingStart.current;
   if(!request.ids.length){setError(reviewOnly?'emptyReview':'emptyQuestions');mutation.current=false;setBusy(false);return;}
   try{
    const data=await api<{session:Session}>({action:'start',id:request.id,mode:mode==='write'?'write':mode==='listen'?'listen':'visual',topic:request.topic,count:request.ids.length,onlyIds:request.ids},'',course);
-   if(!mounted.current)return;setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;focus();
+   if(!mounted.current)return;setEarlier(request.earlier);setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;focus();
    const first=data.session.mode==='listen'?questionMap.get(data.session.questions[data.session.answers.length]?.id??''):undefined;
    if(first?.audio){setHeardQuestionId(first.id);speech.speak(first.audio);}
   }catch(e){fail(e,'startError');}
@@ -174,7 +184,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  // button). It waits while the right answer is still being read (a few seconds at most) and while the page is hidden.
  const nextRef=useRef(next);nextRef.current=next;
  useEffect(()=>{
-  if(!feedback)return;
+  if(!feedback||viewId)return; // paused while a done question is open; 4 seconds again after coming back
   let due=Date.now()+AUTO_NEXT_MS;let timer:ReturnType<typeof setTimeout>;
   const tick=()=>{
    const now=Date.now();if(document.hidden)due=Math.max(due,now+AUTO_NEXT_MS);
@@ -184,7 +194,12 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
   };
   timer=setTimeout(tick,AUTO_NEXT_MS);
   return()=>clearTimeout(timer);
- },[feedback,replays]);// eslint-disable-line react-hooks/exhaustive-deps
+ },[feedback,replays,viewId]);// eslint-disable-line react-hooks/exhaustive-deps
+ // Open a done question from the strip, or come back to the current one.
+ function showQuestion(id:string|null){if(mutation.current)return;stopFeedback();setViewId(id&&id!==q?.id?id:null);focus();}
+ function sayFor(item:Question){const word=item.objectId?objectWordMap.get(item.objectId):undefined;const article=course==='de'&&isArticleChallenge(item)?item:undefined;return article?articleFullAnswer(article):word?(course==='en'?englishObjectName(word.id):word.de):item.answer;}
+ // Keep the current (or opened) tile in sight in the strip.
+ useEffect(()=>{document.querySelector('.vault-strip [aria-current]')?.scrollIntoView({block:'nearest',inline:'center'});},[index,viewId,session?.id]);
  const options=q?(session?.questions[index]?.options??q.options??[]):[];
  // Word puzzles: the learner chooses der/die/das and spells the noun (the article is no longer given away).
  const articleSplit=course==='de'&&session?.mode==='write'&&q&&!articleQuestion?/^(der|die|das) (.+)$/.exec(q.answer):null;
@@ -192,6 +207,11 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  function answerMeaning(question:Question,word:ObjectWord){return question.articlePuzzle?<span className="object-answer-meaning"><strong lang="de" dir="ltr">{articleFullAnswer(question)}</strong><span className="object-answer-translation" lang={language}>{objectMeaning(word.id,language)} · {text('pluralLabel')}</span></span>:<ObjectAnswerMeaning word={word} language={language} course={course}/>;}
  function hearQuestion(slow=false){if(!q?.audio||busy||cueBusy)return;setHeardQuestionId(q.id);speech.speak(q.audio,slow);}
  const modeLabels={test:text('testPractice'),write:text('writePractice'),listen:text('listenPractice'),testDetail:text('testDetail'),writeDetail:text('writeDetail'),listenDetail:text('listenDetail')};
+ // The strip: done earlier (category order), then this round's questions; only done ones open.
+ const strip=session?[...earlier.map(id=>({id,result:'done' as 'done'|'right'|'wrong'|undefined,current:false})),...session.questions.map((item,i)=>{const a=session.answers.find(x=>x.question_id===item.id);return {id:item.id,result:a?(a.correct?'right':'wrong') as 'right'|'wrong':undefined,current:i===index};})].map(item=>{const question=questionMap.get(item.id);return {...item,word:question?.objectId?objectWordMap.get(question.objectId):undefined};}):[];
+ const viewQ=viewId?questionMap.get(viewId):undefined;const viewWord=viewQ?.objectId?objectWordMap.get(viewQ.objectId):undefined;
+ const viewAnswer=viewId?session?.answers.find(a=>a.question_id===viewId):undefined;
+ const shownId=viewQ?viewQ.id:q?.id??'';const stripShown=Math.max(0,strip.findIndex(item=>item.id===shownId));
  const showProgress=ready&&course==='de';
  function categoryCard(id:string,title:string,featured=false){const total=id==='all'?objectVocabulary.length:objectVocabulary.filter(word=>word.topic===id).length;
   // The guest taste: only the first group opens; the others lead to the free sign-up.
@@ -215,9 +235,24 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!session.answers.some(a=>!a.correct)} onClick={()=>void start(false,session.answers.filter(a=>!a.correct).map(a=>a.question_id))}><RotateCcw size={18}/>{text(session.mode==='write'?'reviewPuzzleMistakes':'reviewRoundMistakes')}</button><button type="button" className="btn secondary" disabled={busy} onClick={backToCategory} data-vault-back-category><ArrowLeft size={18} className="vault-direction-icon"/>{categoryName(group,language)}</button></div>
     {session.answers.filter(a=>!a.correct).map(a=>{const item=questionMap.get(a.question_id);const word=item?.objectId?objectWordMap.get(item.objectId):undefined;return word?<div className="object-result-row" key={a.id}><ObjectPicture word={word} language={language} small/><div>{item&&answerMeaning(item,word)}<small>{text(session.mode==='write'?'yourAnswer':'yourChoice')}: <span lang={course} dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&currentWord?<section className="object-practice picture-quiz-practice">
-    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span><span>{text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:index+1,total:session.questions.length})}</span>{course==='de'&&!guest&&<button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={text(starred.has(q.id)?'unstar':'star')} title={text(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={text('exitTest')}><X size={20}/></button></div>
-    <progress max={session.questions.length} value={index} aria-label={text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:index+1,total:session.questions.length})}/>
-    <article className={'object-question panel'+(feedback?' vault-answered':'')+(session.mode==='listen'?' vault-listen':'')} data-paul-picture>
+    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span><span>{text(session.mode==='write'?'puzzleRoundProgress':'progress',{n:stripShown+1,total:strip.length})}</span>{course==='de'&&!guest&&<button type="button" className={'housing-star'+(starred.has(shownId)?' active':'')} aria-pressed={starred.has(shownId)} aria-label={text(starred.has(shownId)?'unstar':'star')} title={text(starred.has(shownId)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(shownId)}><Star size={20} fill={starred.has(shownId)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={text('exitTest')}><X size={20}/></button></div>
+    {/* The picture strip instead of the progress bar (the learner chose "Resimli şerit", 4 November 2026). */}
+    <nav className="vault-strip" aria-label={text('navQuestions')}><ol>{strip.map((item,i)=>{const word=item.word;const shown=item.id===shownId;const result=item.result;
+     return <li key={item.id} className={'vault-strip-item '+(result??'later')+(item.current?' current':'')+(shown?' shown':'')}><button type="button" disabled={busy||(!result&&!item.current)} aria-current={shown?'step':undefined} aria-label={(i+1)+' · '+text(item.current&&!result?'navCurrent':result==='wrong'?'wrong':result?'navDone':'navLater')} onClick={()=>showQuestion(item.current?null:item.id)}>
+      {result&&word&&objectArtSrc(word.id)?<img src={objectArtSrc(word.id)} alt="" width={44} height={44} loading="lazy" decoding="async"/>:<span className="vault-strip-number">{i+1}</span>}
+      {result&&<span className="vault-strip-badge" aria-hidden="true">{result==='wrong'?<X size={11} strokeWidth={3.4}/>:<Check size={11} strokeWidth={3.4}/>}</span>}
+     </button></li>;})}</ol></nav>
+    {viewQ&&viewWord?<article className={'object-question panel vault-answered vault-viewing'}>
+     <h1 id="object-question-heading" tabIndex={-1}>{text(session.mode==='write'?(course==='de'&&isArticleChallenge(viewQ)?'articleTask':'puzzlePrompt'):session.mode==='listen'?'listenPrompt':'questionPrompt')}</h1>
+     <ObjectPicture word={viewWord} language={language}/>
+     <div id="object-feedback" tabIndex={-1} className={'object-feedback '+(viewAnswer&&!viewAnswer.correct?'retry':'success')}>
+      <h2>{viewAnswer&&!viewAnswer.correct?<X size={23}/>:<CheckCircle2 size={23}/>} {text(!viewAnswer?'navDone':viewAnswer.correct?'correct':session.mode==='write'?'wrongAnswer':'wrong')}</h2>
+      {!viewAnswer&&<p>{text('doneEarlier')}</p>}<p>{text('correctAnswer')}: {answerMeaning(viewQ,viewWord)}</p>
+      {session.mode==='write'&&viewAnswer&&<p>{text('yourAnswer')}: <span lang={course} dir="ltr">{viewAnswer.answer}</span></p>}
+      <button type="button" className="btn secondary small" disabled={cueBusy} onClick={()=>speech.speak(sayFor(viewQ))}><Volume2 size={18}/>{text('repeatAudio')}</button>
+      <button type="button" className="btn vault-back-current" onClick={()=>showQuestion(null)}>{text('backToCurrent')}<ArrowRight size={18} className="vault-direction-icon"/></button>
+     </div>
+    </article>:    <article className={'object-question panel'+(feedback?' vault-answered':'')+(session.mode==='listen'?' vault-listen':'')} data-paul-picture>
      <h1 id="object-question-heading" tabIndex={-1}>{text(session.mode==='write'?(articleQuestion?'articleTask':'puzzlePrompt'):session.mode==='listen'?'listenPrompt':'questionPrompt')}</h1>{session.mode!=='listen'&&<ObjectPicture word={currentWord} language={language} concealed={!feedback}/>}
      {course==='de'&&session.mode==='write'&&!feedback&&<div className="vault-hint-wrap"><button type="button" className="text-button" aria-expanded={showHint} onClick={()=>setShowHint(value=>{if(!value)playPaulSound('tip');return !value;})}>{puzzleText(language,showHint?'hideHint':'showHint')}</button>{showHint&&<div className="vault-hint paul-box"><p className="paul-box-text"><span lang="de" dir="ltr">{currentWord.description}</span>{language==='tr'&&<span>{currentWord.descriptionTr}</span>}</p><PaulHoca pose="tip"/></div>}</div>}
      {session.mode==='listen'&&<div className="vault-listen-player"><Headphones size={32} aria-hidden="true"/><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{text(heardQuestionId===q.id?'repeatAudio':'listenAudio')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{text('speechSlow')}</button></div><p role="status">{text(speech.busy?'listenPlaying':heardQuestionId===q.id?'listenChoose':'listenFirst')}</p></div>}
@@ -233,7 +268,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
       {/* No "Sonraki" button: the bar empties in 4 seconds and the next question opens (AUTO_NEXT_MS). */}
       <span key={replays} className="vault-auto-next" aria-hidden="true"/>
      </div>}
-    </article>
+    </article>}
    </section>:<p role="alert">{text('missingQuestion')} <button type="button" className="text-button" onClick={overview}>{text('categories')}</button></p>:
    view==='configure'?<section className="vault-config panel">
     <button type="button" className="text-button vault-back-categories" disabled={busy} onClick={overview}><ArrowLeft size={18} className="vault-direction-icon"/>{text('backCategories')}</button>

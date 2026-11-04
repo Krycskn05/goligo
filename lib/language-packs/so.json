@@ -1786,5 +1786,11 @@
 "Your lesson scores, where you left off, your word practice, your mistakes, your points, your streak and your game records will be deleted on all your devices. Your account, your starred words and your settings stay. This cannot be undone.":"Natiijooyinkaaga casharrada, meelihii aad ku joogsatay, layliyada erayada, khaladaadkaaga, dhibcahaaga, taxanaha maalmaha iyo rikoorrada ciyaaraha waa laga tirtiri doonaa dhammaan qalabkaaga. Akoonkaaga, erayada xiddigga leh iyo dejimahaaga way sii jiri doonaan. Tan dib looma celin karo.",
 "I understand that all my progress will be deleted.":"Waan fahmay in horumarkayga oo dhan la tirtiri doono.",
 "Reset my progress":"Dib u deji horumarkayga",
-"Your progress has been reset. You can start again from the beginning.":"Horumarkaaga dib ayaa loo dejiyay. Waxaad ka bilaabi kartaa bilowga."
+"Your progress has been reset. You can start again from the beginning.":"Horumarkaaga dib ayaa loo dejiyay. Waxaad ka bilaabi kartaa bilowga.",
+"Questions":"Su'aalaha",
+"Done":"La dhammeeyay",
+"Current question":"Su'aasha hadda",
+"Coming up":"Way soo socotaa",
+"Back to the current question":"Ku noqo su'aasha hadda",
+"You solved this one before.":"Su'aashan hore ayaad u xalisay."
 }

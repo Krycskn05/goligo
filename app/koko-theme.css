@@ -609,6 +609,29 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 #object-feedback.retry .vault-auto-next { background:#e98d3a; }
 @keyframes vault-auto-next { from { transform:scaleX(1); } to { transform:scaleX(0); } }
 @media (prefers-reduced-motion:reduce) { .vault-auto-next { animation:none; opacity:.45; } }
+/* Nesne Kasası picture strip instead of the progress bar (the learner chose "Resimli şerit", 4 November 2026): every
+   question of the round, the ones solved in earlier rounds too. Done ones show their picture with ✓ / ✗ and open again
+   to look at; the current one is framed; the rest wait with their number. It slides sideways and stays one row high,
+   so the question still fits the screen with no scrolling. */
+.toon-app .vault-strip { margin:0 0 8px; padding:3px 2px 7px; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); }
+.toon-app[dir=rtl] .vault-strip { -webkit-mask-image:linear-gradient(270deg,#000 calc(100% - 26px),transparent); mask-image:linear-gradient(270deg,#000 calc(100% - 26px),transparent); }
+.toon-app .vault-strip::-webkit-scrollbar { display:none; }
+.toon-app .vault-strip ol { display:flex; gap:7px; width:max-content; margin:0; padding:0; padding-inline-end:26px; list-style:none; }
+.toon-app .vault-strip button { position:relative; display:grid; place-items:center; width:44px; height:44px; min-height:0; margin:0; padding:0; border:2px solid #e6e1d4; border-radius:13px; background:#fffaf1; box-shadow:none; color:#a3ab9f; font:800 14px/1 inherit; cursor:pointer; }
+.toon-app .vault-strip button:disabled { cursor:default; opacity:1; }
+.toon-app .vault-strip img { display:block; width:36px; height:36px; object-fit:contain; border-radius:8px; }
+.toon-app .vault-strip-badge { position:absolute; inset-inline-end:-6px; bottom:-6px; display:grid; place-items:center; width:19px; height:19px; border:2px solid #fff; border-radius:50%; background:#5fae45; color:#fff; }
+.toon-app .vault-strip-item.wrong .vault-strip-badge { background:#ec7d5b; }
+.toon-app .vault-strip-item.right button,.toon-app .vault-strip-item.done button { border-color:#9bd282; }
+.toon-app .vault-strip-item.wrong button { border-color:#f2b29b; }
+.toon-app .vault-strip-item.later button { border-style:dashed; background:#fbfaf6; }
+.toon-app .vault-strip-item.current button { border:3px solid #2f80ed; background:#fff; color:#2f80ed; font-size:17px; }
+.toon-app .vault-strip-item.shown button { border-color:#2f80ed; box-shadow:0 0 0 3px #2f80ed40; }
+@media (max-width:760px) {
+ .toon-app .vault-strip ol { gap:6px; }
+ .toon-app .vault-strip button { width:40px; height:40px; border-radius:12px; }
+ .toon-app .vault-strip img { width:32px; height:32px; }
+}
 /* Wide screens: "Tekrar dinle" and "Sonraki" side by side under the answer; in Dinle ve Bul the four pictures in one
    lower row (before and after the answer), so the green one is on the screen too. */
 @media (min-width:1100px) {

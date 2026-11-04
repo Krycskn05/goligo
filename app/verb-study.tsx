@@ -375,7 +375,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={section==='games'?'games':section==='mistakes'?'mistakes':'verbs'}/>
   <main id="object-main" className="object-page">
    {/* The "Ana sayfa › …" breadcrumb was removed at the learner's request (30 October 2026); the menu above leads home. */}
-   {guest&&<GuestBanner language={language} back={back}/>}
+   {/* Not during a round: the question fits one screen for visitors too (4 November 2026). On Fiil Atölyesi it says
+       that every topic is open. */}
+   {guest&&!(session&&!finished)&&<GuestBanner language={language} back={back} note={part?'guestNote':'guestNoteVerbs'}/>}
    {error&&<div className="object-alert" role="alert"><p>{errorText(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{v('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}
    {session?finished?<section className="object-results panel verb-results">

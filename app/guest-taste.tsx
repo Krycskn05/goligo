@@ -10,10 +10,11 @@ import type {SiteLanguage} from '@/lib/site-languages';
 export const guestSignUp=(back:string)=>'/uye-ol?return_to='+encodeURIComponent(back);
 export const guestSignIn=(back:string)=>'/giris?return_to='+encodeURIComponent(back);
 
-export function GuestBanner({language,back}:{language:SiteLanguage;back:string}){
+/** `note`: on Fiil Atölyesi, where every topic is open to visitors (4 November 2026), it says so. */
+export function GuestBanner({language,back,note='guestNote'}:{language:SiteLanguage;back:string;note?:'guestNote'|'guestNoteVerbs'}){
  return <div className="guest-banner" role="note" data-guest-banner>
   <Sparkles size={20} aria-hidden="true"/>
-  <p>{guestText(language,'guestNote')}</p>
+  <p>{guestText(language,note)}</p>
   <div className="guest-actions"><a className="btn small" href={guestSignUp(back)}>{guestText(language,'guestSignUp')}</a><a className="btn secondary small" href={guestSignIn(back)}>{guestText(language,'guestSignIn')}</a></div>
  </div>;
 }

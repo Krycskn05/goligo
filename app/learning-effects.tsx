@@ -81,7 +81,9 @@ export default function LearningEffects() {
    if(reactionTimer.current)clearTimeout(reactionTimer.current);
    const pose=REACTION_POSE[kind];
    // Nesne Kasası: Paul reacts inside the question picture (the learner asked, 4 November 2026); elsewhere in the badge.
-   const host=kind==='complete'?null:document.querySelector<HTMLElement>('[data-paul-picture]>.object-picture');
+   // Inside the question's picture (Nesne Kasası) or the answer frame of Fiil Atölyesi (4 November 2026: beside the
+   // picture and the words, never over them); elsewhere the small badge.
+   const host=kind==='complete'?null:document.querySelector<HTMLElement>('[data-paul-picture]>.object-picture')??document.querySelector<HTMLElement>('[data-paul-slot]');
    setReaction({kind,id:++sequence.current,pose,anim:nextPaul(pose),host});reactionTimer.current=setTimeout(()=>setReaction(null),REACTION_MS[kind]);
    // Fetch his next animation for this moment now, so it shows at once the next time.
    try{const picture=new Image();picture.decoding='async';picture.src=paulSrc(upcomingPaul(pose));}catch{}

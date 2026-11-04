@@ -17,7 +17,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.guestQuestion = guestQuestion;
 exports.guestRound = guestRound;
 const course_1 = require("./course");
-const verb_families_1 = require("./verb-families");
 const verb_workshop_1 = require("./verb-workshop");
 const guest_parts_1 = require("./guest-parts");
 __exportStar(require("./guest-parts"), exports);
@@ -26,9 +25,9 @@ __exportStar(require("./guest-parts"), exports);
  * use. The pages that open for visitors are GUEST_PAGES in lib/member-auth.ts; app/api/study grades a visitor's answers
  * without writing anything.
  */
-const verbFamily = verb_families_1.verbFamilies.find(family => family.id === guest_parts_1.GUEST_VERB_PART) ?? verb_families_1.verbFamilies[0];
-const verbIds = new Set((0, verb_workshop_1.partIds)(verbFamily));
-/** A question a visitor may answer: the first group of Nesne Kasası, topic 1 of Fiil Atölyesi (Ev ve Yaşam is a unit:
+// Every question of the Fiil Atölyesi path, all six topics (since 4 November 2026).
+const verbIds = new Set((0, verb_workshop_1.workshopIds)());
+/** A question a visitor may answer: the first group of Nesne Kasası, all of Fiil Atölyesi (Ev ve Yaşam is a unit:
  * members only since 3 November 2026). */
 function guestQuestion(id) {
     const q = course_1.questionMap.get(id);

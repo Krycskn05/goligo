@@ -27,5 +27,17 @@ export function pickPictures(now:number=Date.now()):PicturePick{
  for(const part of Object.keys(PART_PICTURES) as PicturePart[]){const list=PART_PICTURES[part];pick[part]=list[(slot+STEP[part])%list.length];}
  return pick;
 }
+/**
+ * The covers of the parts on the home page and on the introduction page: one picture per part, made for it by the
+ * learner (Goliqo-ana-sayfa-kapaklari.zip, 4 November 2026: "the pictures were made for the topics, never change
+ * them"). Always the same, no 30-minute change; only the welcome picture of the introduction page still changes.
+ */
+export const HOME_COVERS:Record<Exclude<PicturePart,'welcome'>,string>={
+ units:'/toon/home/units.webp',
+ vault:'/toon/home/vault.webp',
+ verbs:'/toon/landing/fiil-atolyesi-2.webp',
+ games:'/toon/landing/oyunlar-3.webp',
+ mistakes:'/toon/landing/yanlislarim.webp',
+};
 /** Milliseconds until the pictures change next. */
 export function nextPictureChange(now:number=Date.now()){return PICTURE_PERIOD_MS-now%PICTURE_PERIOD_MS;}

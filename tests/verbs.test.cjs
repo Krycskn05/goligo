@@ -440,8 +440,8 @@ test('Fiil Atölyesi: six topics on the map (the four book parts only read older
  // The page: islands start or continue their part; no lock is shown.
  const pageSrc=fs.readFileSync('app/verb-study.tsx','utf8');
  assert.ok(pageSrc.includes('onClick={()=>openPart(family)}')&&!pageSrc.includes("'locked'"),'every part opens from the map');
- // Only a visitor without an account (the guest taste) finds parts 2–4 locked.
- assert.ok(pageSrc.includes('const locked=guest&&family.id!==GUEST_VERB_PART;')&&pageSrc.includes('{locked?<GuestLock language={language} back={back} className="verb-island-go"/>:'),'members find no lock');
+ // Visitors without an account open every topic too (4 November 2026).
+ assert.ok(!pageSrc.includes('GUEST_VERB_PART')&&!pageSrc.includes('<GuestLock '),'no lock on the map for anyone');
  for(const language of languages)for(const key of ['chapterContinue','chapterAgain'])assert.ok(copy.verbText(language,key).trim(),key);
  for(const language of languages)assert.ok(copy.verbText(language,'partDone',{n:2,total:19}).includes('19'),language);
  // Sentence task: the verb is shown, the answer is its form for the subject, the wrong options are the other persons (du, ich, wir, ihr), the prefix at the end.
@@ -571,7 +571,7 @@ test('after an answer every person gets an example sentence: Präsens after mean
  const page=fs.readFileSync('app/verb-study.tsx','utf8');const cards=fs.readFileSync('app/verb-workshop.tsx','utf8');
  const result=cards.slice(cards.indexOf('export function AnswerResult'),cards.indexOf('export function ChapterCard'));
  assert.ok(result.includes('{example}')&&result.includes('<VerbPicture verb={verb}')&&!result.includes('<PersonSentences'),'picture, verb and one example sentence');
- assert.ok(page.includes('<div className="verb-slot">{feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)}'),'an answer opens the result in the place of the question card');
+ assert.ok(page.includes('<div className="verb-slot" data-paul-slot="">{feedback?<AnswerResult verb={verb} stage={learnStage(q.verbTask)}'),'an answer opens the result in the place of the question card');
  assert.ok(page.includes("tense={q.verbTask==='partizip'||q.verbTask==='write-partizip'||learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'} pick={index}"),'the past-form questions show a Perfekt sentence');
  assert.ok(page.includes('spoken={pronunciation}')&&page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'),'after the effect only the correct answer is spoken');
  assert.ok(!page.includes('<PersonSentences'),'no example sentences after spelling');

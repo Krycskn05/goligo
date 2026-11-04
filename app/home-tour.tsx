@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState,type ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import {NavIcon,type NavIconName} from './nav-icons';
 import type {StudyLanguage} from '@/lib/study-languages';
 import {homeText,type HomeCopyKey} from '@/lib/home-copy';
@@ -11,16 +11,16 @@ import {verbs} from '@/lib/verb-course';
 import {gameIds} from '@/lib/verb-games';
 import {gameNameList} from '@/lib/game-names';
 import {fillText} from '@/lib/copy-fill';
-import {nextPictureChange,pickPictures,type PicturePick} from '@/lib/site-pictures';
+import {HOME_COVERS} from '@/lib/site-pictures';
 
 type Part={id:string;icon:NavIconName;href:string;title:string;de:string;text:string;art:ReactNode};
 
 /** The main parts of the site, exactly the items of the left menu, in the same order (no lessons inside them). */
-function siteParts(language:StudyLanguage,pictures:PicturePick):Part[]{
+function siteParts(language:StudyLanguage):Part[]{
  const h=(key:HomeCopyKey)=>homeText(language,key);
- // The learner's pictures for each card, from all their sets, changing every 30 minutes (lib/site-pictures.ts; the
- // learner asked: not always the same, each picture where it fits).
- const art=(id:keyof PicturePick)=><img src={pictures[id]} alt="" width={1200} height={600} loading="lazy" decoding="async"/>;
+ // Each card has its own cover, made by the learner for that part, always the same (lib/site-pictures.ts HOME_COVERS;
+ // 4 November 2026: "never change them").
+ const art=(id:keyof typeof HOME_COVERS)=><img src={HOME_COVERS[id]} alt="" width={1200} height={600} loading="lazy" decoding="async"/>;
  return [
   {id:'units',icon:'units',href:'/konular',title:c(language,'catalogTitle'),de:'A1.1 · A1.2',text:h('unitsText'),art:art('units')},
   {id:'vault',icon:'vault',href:'/ev-esyalar?learn=de',title:vaultText(language,'vaultTitle'),de:vaultText(language,'objectsCount',{n:objectVocabulary.length}),text:h('vaultText'),art:art('vault')},
@@ -38,14 +38,11 @@ function siteParts(language:StudyLanguage,pictures:PicturePick):Part[]{
  */
 export function HomeTour({language}:{language:StudyLanguage}){
  const h=(key:HomeCopyKey)=>homeText(language,key);
- const [pictures,setPictures]=useState<PicturePick>(()=>pickPictures());
- // While the page stays open, the next pictures come at the next half hour.
- useEffect(()=>{let timer:ReturnType<typeof setTimeout>;const next=()=>{timer=setTimeout(()=>{setPictures(pickPictures());next();},nextPictureChange()+500);};next();return()=>clearTimeout(timer);},[]);
  return <div className="ht" data-home-tour="">
   {/* The welcome box and the "Sitede neler var?" heading were removed (the learner asked, 25 October 2026): the cards fill
       one screen. The page keeps its heading for screen readers. */}
   <h1 id="work-heading" className="sr-only" tabIndex={-1}>{h('welcome')}</h1>
-  <ul className="ht-grid">{siteParts(language,pictures).map(part=><li key={part.id} data-home-part={part.id}>
+  <ul className="ht-grid">{siteParts(language).map(part=><li key={part.id} data-home-part={part.id}>
    <a className="ht-card panel" href={part.href}>
     <span className="ht-art" aria-hidden="true">{part.art}</span>
     <span className="ht-name"><NavIcon name={part.icon}/><strong>{part.title}</strong></span>

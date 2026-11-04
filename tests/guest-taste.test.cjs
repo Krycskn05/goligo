@@ -16,8 +16,8 @@ function app(){
 }
 const id=n=>'guest-round-000000000'+n;
 
-test('the open part of each section is its first one',()=>{
- assert.equal(parts.GUEST_VERB_PART,load('verb-families').verbFamilies[0].id);
+test('the open part of each section is its first one; Fiil Atölyesi is open in full',()=>{
+ assert.equal(parts.GUEST_ALL_VERBS,true,'every topic of Fiil Atölyesi (4 November 2026: the learner shares it with friends)');
  assert.equal(parts.GUEST_OBJECT_GROUP,load('object-course').objectGroups[0].id);
  const housing=load('housing-course').housingSections[0];assert.equal(parts.GUEST_HOUSING_SECTION,housing.id);assert.equal(parts.GUEST_HOUSING_TOPIC,housing.topic);
  assert.equal(parts.GUEST_L12_PART,load('ausbildung-course').lessonParts[0].id);
@@ -30,13 +30,12 @@ test('the open part of each section is its first one',()=>{
 
 test('only questions of the open parts count for a visitor',()=>{
  const verbIds=load('verb-workshop').partIds(load('verb-families').verbFamilies[0]);
- for(const q of verbIds)assert.ok(guest.guestQuestion(q),q);
- for(const q of load('verb-workshop').partIds(load('verb-families').verbFamilies[1]))assert.ok(!guest.guestQuestion(q),q);
+ for(const q of load('verb-workshop').workshopIds())assert.ok(guest.guestQuestion(q),q);
  const house=course.questions.filter(q=>q.topic==='objects-house');assert.ok(house.length>20);for(const q of house)assert.ok(guest.guestQuestion(q.id),q.id);
  assert.ok(!guest.guestQuestion(course.questions.find(q=>q.topic==='objects-kitchen').id));
  for(const topic of ['book-11-a','book-11-b'])assert.ok(!guest.guestQuestion(course.questions.find(q=>q.topic===topic).id),'Ev ve Yaşam is a unit: members only');
  assert.ok(!guest.guestQuestion('nope'));
- assert.ok(guest.guestRound('workshop','verbs-all',verbIds));assert.ok(!guest.guestRound('review','verbs-all',verbIds),'no review rounds');
+ assert.ok(guest.guestRound('workshop','verbs-all',verbIds));assert.ok(guest.guestRound('workshop','verbs-topics',load('verb-workshop').partIds(load('verb-families').verbFamilies[5])),'the last topic too');assert.ok(!guest.guestRound('review','verbs-all',verbIds),'no review rounds');
  assert.ok(!guest.guestRound('workshop','verbs-all',[]),'never the whole bank');assert.ok(!guest.guestRound('mixed','all',[house[0].id]));
 });
 
@@ -55,7 +54,8 @@ test('API: a visitor starts and answers the open parts, and nothing is written',
  assert.equal((await a.post({action:'start',id:id(3),mode:'write',topic:'book-11-a',count:4,onlyIds:housing})).status,401,'Ev ve Yaşam is for members');
  assert.equal(a.rows(),0,'nothing saved for a visitor');
  // The rest asks for an account.
- const locked=await a.post({action:'start',id:id(4),mode:'workshop',topic:'verbs-all',count:4,onlyIds:load('verb-workshop').partIds(load('verb-families').verbFamilies[1]).slice(0,4)});
+ assert.equal((await a.post({action:'start',id:id(4),mode:'workshop',topic:'verbs-topics',count:4,onlyIds:load('verb-workshop').partIds(load('verb-families').verbFamilies[1]).slice(0,4)})).status,201,'every verb topic is open');
+ const locked=await a.post({action:'start',id:id(5),mode:'review',topic:'verbs-all',count:1,onlyIds:verbIds.slice(0,1)});
  assert.equal(locked.status,401);assert.equal((await locked.json()).guest,true);
  const kitchen=course.questions.find(item=>item.topic==='objects-kitchen');
  assert.equal((await a.post({action:'answer',sessionId:id(2),questionId:kitchen.id,answer:kitchen.answer})).status,401);

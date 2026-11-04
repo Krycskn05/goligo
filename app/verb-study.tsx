@@ -39,9 +39,9 @@ import {PaulHoca} from './paul-hoca';
 import {verbProgress,learnedVerbs,partMistakes,allMistakeIds} from '@/lib/progress';
 import {RoundReward} from './progress-ui';
 import {progressText} from '@/lib/progress-copy';
-import {GUEST_GAMES,GUEST_VERB_PART} from '@/lib/guest-parts';
+import {GUEST_GAMES} from '@/lib/guest-parts';
 import {guestText} from '@/lib/guest-copy';
-import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
+import {GuestBanner,GuestMore,guestSignUp} from './guest-taste';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 type VerbSection='games'|'mistakes';
@@ -479,8 +479,8 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
       const state=part.completed?'done':family.id===path.family.id&&!path.finished?'current':'';
       const ring=part.completed?100:part.percent;
       const members=family.verbs.map(id=>verbMap.get(id)!);
-      const locked=guest&&family.id!==GUEST_VERB_PART;
-      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state+(locked?' guest-locked':'')} style={{'--p':ring} as CSSProperties} data-verb-island={family.id}>
+      // Visitors open every topic too (4 November 2026); nothing of theirs is saved.
+      return <article key={family.id} className={'verb-island tone-'+family.tone+' '+state} style={{'--p':ring} as CSSProperties} data-verb-island={family.id}>
        {state==='current'&&<span className="verb-here"><Compass size={15} aria-hidden="true"/>{t('hereBadge')}</span>}
        {state==='done'&&<span className="verb-lock done" aria-hidden="true"><CheckCircle2 size={20}/></span>}
        <span className="verb-island-number">{family.number}</span>
@@ -488,7 +488,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
         <h3>{familyTitle(family,language)}{language!=='de'&&family.german&&<small lang="de" dir="ltr">{family.german}</small>}</h3>
         <p>{t('verbsCount',{n:family.verbs.length})} · {t('stageMeanings')} {part.meaningDone}/{family.verbs.length} · {t('stepPerfekt')} {part.perfektDone}/{family.verbs.length}</p>
         <div className="verb-island-pics">{members.slice(0,4).map(item=><img key={item.id} src={verbPicture(item)??''} alt="" width={96} height={96} loading="lazy" decoding="async"/>)}</div>
-        {locked?<GuestLock language={language} back={back} className="verb-island-go"/>:<button type="button" className="verb-island-go" onClick={()=>openPart(family)} data-verb-island-go={family.id}>{t('partOpen',{n:family.number})}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
+        <button type="button" className="verb-island-go" onClick={()=>openPart(family)} data-verb-island-go={family.id}>{t('partOpen',{n:family.number})}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>
        </div>
        <span className="verb-ring" data-v={ring+'%'}/>
       </article>;

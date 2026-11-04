@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PICTURE_PERIOD_MS = exports.PART_PICTURES = void 0;
+exports.HOME_COVERS = exports.PICTURE_PERIOD_MS = exports.PART_PICTURES = void 0;
 exports.pickPictures = pickPictures;
 exports.nextPictureChange = nextPictureChange;
 /**
@@ -32,5 +32,17 @@ function pickPictures(now = Date.now()) {
     }
     return pick;
 }
+/**
+ * The covers of the parts on the home page and on the introduction page: one picture per part, made for it by the
+ * learner (Goliqo-ana-sayfa-kapaklari.zip, 4 November 2026: "the pictures were made for the topics, never change
+ * them"). Always the same, no 30-minute change; only the welcome picture of the introduction page still changes.
+ */
+exports.HOME_COVERS = {
+    units: '/toon/home/units.webp',
+    vault: '/toon/home/vault.webp',
+    verbs: '/toon/landing/fiil-atolyesi-2.webp',
+    games: '/toon/landing/oyunlar-3.webp',
+    mistakes: '/toon/landing/yanlislarim.webp',
+};
 /** Milliseconds until the pictures change next. */
 function nextPictureChange(now = Date.now()) { return exports.PICTURE_PERIOD_MS - now % exports.PICTURE_PERIOD_MS; }

@@ -194,8 +194,8 @@ async function languageFlow(browser) {
     await page.locator("[data-verb-island-go]").first().click();
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT, "34-uyesiz-fiiller.png") });
-    // 4 Kasim 2026: harita 6 konu (kitap bolumleri yerine); uyesiz 1. konu acik, 5'i kilitli.
-    record("Uyesiz: Fiil Atolyesi'nin 1. konusu acik, digerleri kilitli", verbs.banner === 1 && verbs.open === 1 && verbs.locked === 5, JSON.stringify(verbs));
+    // 4 Kasim 2026: harita 6 konu; ogrenci arkadaslarina gonderiyor, uyesiz de 6 konunun hepsi acik (kilit yok).
+    record("Uyesiz: Fiil Atolyesi'nin 6 konusu da acik", verbs.banner === 1 && verbs.open === 6 && verbs.locked === 0, JSON.stringify(verbs));
     await page.goto(BASE + "/ev-esyalar", { waitUntil: "networkidle", timeout: 90000 });
     const vault = { banner: await page.locator("[data-guest-banner]").count(), open: await page.locator('[data-vault-category]:not(.guest-locked)').count() };
     record("Uyesiz: Nesne Kasasi'nda ilk grup acik", vault.banner === 1 && vault.open === 1, JSON.stringify(vault));

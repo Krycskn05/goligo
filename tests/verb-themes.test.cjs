@@ -23,7 +23,7 @@ test('every workshop verb is in exactly one topic; the map is the six topics, th
  assert.deepEqual(families.verbFamilies.map(family=>family.number),[1,2,3,4,5,6]);
  families.verbFamilies.forEach((family,i)=>{const theme=themes.verbThemes[i];assert.deepEqual(family.verbs,theme.verbs);assert.equal(family.tone,theme.tone);assert.equal(family.german,theme.title[1]);assert.deepEqual(family.title,theme.title);});
  assert.deepEqual(families.bookParts.map(family=>family.id),['verbs-w1','verbs-w2','verbs-w3','verbs-w4'],'the book part ids stay (saved rounds)');
- assert.equal(load('guest-parts').GUEST_VERB_PART,families.verbFamilies[0].id,'a visitor opens topic 1');
+ assert.equal(load('guest-parts').GUEST_ALL_VERBS,true,'a visitor opens every topic');
 });
 
 test('the matching cards of a topic use only its verbs; Oyunlar offers all verbs and every topic',()=>{
@@ -59,7 +59,7 @@ test('the page: the topics are the map; no group cards and no game left in Fiil 
  assert.ok(css.includes('.verb-match-topics { flex-wrap:nowrap; overflow-x:auto;'),'on a phone the topic chips are one sliding row');
  // The server takes a topic round of the workshop (and only of the workshop); a visitor may start topic 1.
  const route=read('app/api/study/route.ts');assert.ok(route.includes("...(mode==='workshop'?[VERB_TOPIC_ROUND]:[])"));
- assert.ok(read('lib/guest-taste.ts').includes('(topic===PART_ROUND_TOPIC||topic===WORKSHOP_TOPIC)&&mode===WORKSHOP_MODE'));
+ assert.ok(read('lib/guest-taste.ts').includes('(topic===PART_ROUND_TOPIC||topic===WORKSHOP_TOPIC)&&mode===WORKSHOP_MODE')&&read('lib/guest-taste.ts').includes('const verbIds=new Set(workshopIds());'));
 });
 
 test('every topic name and the Oyunlar chips in every site language',()=>{

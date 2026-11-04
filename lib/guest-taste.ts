@@ -1,7 +1,6 @@
 import {questionMap} from './course';
-import {verbFamilies} from './verb-families';
-import {partIds,WORKSHOP_MODE,WORKSHOP_TOPIC,PART_ROUND_TOPIC} from './verb-workshop';
-import {GUEST_OBJECT_GROUP,GUEST_VERB_PART} from './guest-parts';
+import {workshopIds,WORKSHOP_MODE,WORKSHOP_TOPIC,PART_ROUND_TOPIC} from './verb-workshop';
+import {GUEST_OBJECT_GROUP} from './guest-parts';
 export * from './guest-parts';
 
 /**
@@ -9,9 +8,9 @@ export * from './guest-parts';
  * use. The pages that open for visitors are GUEST_PAGES in lib/member-auth.ts; app/api/study grades a visitor's answers
  * without writing anything.
  */
-const verbFamily=verbFamilies.find(family=>family.id===GUEST_VERB_PART)??verbFamilies[0];
-const verbIds=new Set(partIds(verbFamily));
-/** A question a visitor may answer: the first group of Nesne Kasası, topic 1 of Fiil Atölyesi (Ev ve Yaşam is a unit:
+// Every question of the Fiil Atölyesi path, all six topics (since 4 November 2026).
+const verbIds=new Set(workshopIds());
+/** A question a visitor may answer: the first group of Nesne Kasası, all of Fiil Atölyesi (Ev ve Yaşam is a unit:
  * members only since 3 November 2026). */
 export function guestQuestion(id:string){
  const q=questionMap.get(id);if(!q)return false;

@@ -19,9 +19,11 @@ function everyLanguage(tuple,label){
  }
 }
 
-test('during a test the header is slim and the question and its answers fit on one phone screen',()=>{
+test('during a test the header is the home page header and the question and its answers fit on one phone screen',()=>{
  const css=read('app/koko-theme.css');
- for(const rule of ['.toon-app:has(.object-question) .site-header .site-greeting,','.toon-app:has(.object-question) .object-breadcrumb { display:none; }',
+ // Since 4 November 2026 the header keeps its size, the calendar and the clock during a test (the learner asked).
+ assert.ok(!css.includes('.toon-app:has(.object-question) .site-header .site-greeting')&&!css.includes('.toon-app:has(.object-question) .work-header.site-header {'),'no slim test header');
+ for(const rule of ['.toon-app:has(.object-question) .object-breadcrumb { display:none; }',
   '.toon-app:has(.object-question) .object-question .object-picture:not(.small)>.toon-art { max-height:clamp(120px,27vh,280px); }',
   '.toon-app:has(.object-question) .vault-listening-options .object-picture .toon-art { height:clamp(72px,14vh,136px); max-height:none; }',
   '.toon-app:has(.object-question) .work-layout>.work-sidebar,'])assert.ok(css.includes(rule),rule);

@@ -65,7 +65,7 @@ test('Paul reacts inside the question picture in Nesne Kasası',()=>{
  const page=read('app/object-study.tsx');
  assert.ok(page.includes("(session.mode==='listen'?' vault-listen':'')} data-paul-picture>"));
  const effects=read('app/learning-effects.tsx');
- assert.ok(effects.includes("const host=kind==='complete'?null:document.querySelector<HTMLElement>('[data-paul-picture]>.object-picture');"));
+ assert.ok(effects.includes("const host=kind==='complete'?null:document.querySelector<HTMLElement>('[data-paul-picture]>.object-picture')??document.querySelector<HTMLElement>('[data-paul-slot]');"));
  assert.ok(effects.includes('{reaction?.host?.isConnected&&createPortal('));
  assert.ok(effects.includes('{reaction&&!reaction.host?.isConnected&&<div key={reaction.id} className={\'lk-reaction-layer \''));
  const css=read('app/paul-hoca.css');

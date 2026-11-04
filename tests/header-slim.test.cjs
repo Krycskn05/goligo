@@ -23,8 +23,8 @@ test('computers and tablets: one thin row with the day in a small capsule',()=>{
  assert.ok(wide.includes('.site-greeting-button .analog-clock { width:36px; height:36px; filter:none; }'));
  assert.ok(wide.includes('.site-language-label { display:none; }'),'no "Site dili" label, the globe says it');
  assert.ok(wide.includes('.lk-effects-button { width:40px; height:40px; min-height:40px;'));
- // The test header (logo and buttons only) still wins during a question: it comes later in the file.
- assert.ok(css.indexOf('Header "Tek satır şerit"')<css.indexOf('.toon-app:has(.object-question) .work-header.site-header { display:flex;'));
+ // During a question the same header (4 November 2026: no slim test header any more).
+ assert.ok(!css.includes('.toon-app:has(.object-question) .work-header.site-header { display:flex;'));
 });
 
 test('small tablets show the language as the round TR button so long names still fit',()=>{

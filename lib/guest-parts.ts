@@ -8,7 +8,8 @@ export const GUEST_UNIT='book-01';
 export const GUEST_HOUSING_SECTION='a';
 export const GUEST_HOUSING_TOPIC='book-11-a';
 export const GUEST_OBJECT_GROUP='objects-house';
-/** verbFamilies[0].id, the first topic of Fiil Atölyesi since 4 November 2026 (tests/guest-taste.test.cjs checks it). */
-export const GUEST_VERB_PART='theme-unterwegs';
+/** Fiil Atölyesi is open to visitors in full: every topic, nothing saved (the learner asked, 4 November 2026: "I send the
+ * verbs to my friends, open every lock there; the other parts stay as they are"). */
+export const GUEST_ALL_VERBS=true;
 export const GUEST_GAMES:readonly string[]=['match'];
 export const GUEST_L12_PART='a';

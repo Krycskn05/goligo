@@ -113,10 +113,13 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  }
  for(const name of ['housing','ausbildung'])assert.ok(!icons.includes(name+":'/icons/menu/"),name+' keeps its drawing');
  assert.ok(icons.includes("if(picture)return <span className={'nav-icon has-picture nav-icon-'+name} aria-hidden=\"true\"><img src={picture} alt=\"\" width={128} height={128}"));
- // One picture of the learner's per home page card (1200 × 600) from all their sets, changing every 30 minutes
- // (lib/site-pictures.ts; the learner asked: not always the same).
+ // Since 4 November 2026 every home page card has its own cover, made by the learner for that part, always the same
+ // (Goliqo-ana-sayfa-kapaklari.zip: "never change them"); the sets below stay for the welcome picture's turns.
  const tour=read('app/home-tour.tsx');
- assert.ok(tour.includes("const art=(id:keyof PicturePick)=><img src={pictures[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;")&&tour.includes('useState<PicturePick>(()=>pickPictures())')&&tour.includes('nextPictureChange()'));
+ assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
+ const covers=require(path.join(compiled,'site-pictures.js')).HOME_COVERS;
+ assert.deepEqual(covers,{units:'/toon/home/units.webp',vault:'/toon/home/vault.webp',verbs:'/toon/landing/fiil-atolyesi-2.webp',games:'/toon/landing/oyunlar-3.webp',mistakes:'/toon/landing/yanlislarim.webp'});
+ for(const src of Object.values(covers))assert.deepEqual(size('public'+src),[1200,600],src+': 2 : 1 like every card frame, so the card shows it whole and even');
  const pictures=read('lib/site-pictures.ts');
  for(const id of ['units','vault','verbs','games','mistakes']){
   assert.ok(tour.includes("art:art('"+id+"')"),id);
@@ -125,7 +128,7 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
   for(const src of list)assert.deepEqual(size('public'+src),[1200,600],src);
  }
  const landing=read('app/landing.tsx');
- assert.ok(landing.includes('const pictures=pickPictures();')&&landing.includes('<img src={pictures.welcome}')&&landing.includes('<img src={pictures[item.part]}'));
+ assert.ok(landing.includes('const pictures=pickPictures();')&&landing.includes('<img src={pictures.welcome}')&&landing.includes('<img src={HOME_COVERS[item.part]}'));
  for(const src of ['/toon/landing/karsilama.webp','/toon/landing/karsilama-2.webp','/toon/landing/karsilama-3.webp'])assert.deepEqual(size('public'+src),[1400,700],src);
 });
 

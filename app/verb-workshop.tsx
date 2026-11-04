@@ -91,33 +91,47 @@ export function LearnCard({verb,stage,language,speech,onContinue}:{verb:Verb;sta
     <div className="verb-learn-title"><h1 id="verb-learn-heading" tabIndex={-1} className={'verb-learn-form'+(stage==='meaning'?' '+kindClass(verb):'')} lang="de" dir="ltr">{stage==='meaning'?verb.display:<><span className="verb-learn-subject">{verb.subject}</span> <VerbForm verb={verb} stage={stage}/></>}</h1><button type="button" className="verb-learn-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={20}/></button></div>
     <p className="verb-learn-meaning" lang={language} dir={dir}>{verbMeaning(verb,language)}</p>
     {stage==='meaning'&&prefix&&<p className="verb-learn-note">{t('separableNote',{p:prefix})}</p>}
+    {stage==='meaning'&&<p className="verb-learn-perfekt" lang="de" dir="ltr"><small>Perfekt</small> {verb.subject} <VerbForm verb={verb} stage="perfekt"/></p>}
    </div>
   </div>
   {/* No example sentences while learning; the meaning card shows the Präsens forms for every person instead. */}
   {stage==='meaning'?<ConjugationTable verb={verb} language={language} speech={speech}/>:<RuleBox lines={verbRules(verb,stage,language)} language={language}/>}
   {stage==='perfekt'&&verb.alsoIst&&<p className="verb-note">{t('liegenNote',{verb:'ist '+verb.participle})}</p>}
-  <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button>
+  <div className="verb-learn-foot"><button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('gotIt')}<ArrowRight size={18} className="vault-direction-icon"/></button></div>
  </article>;
 }
-/** After a test answer, in one card that fits a phone screen: the picture and the verb at the top (tap the speaker to hear it again), right or wrong,
- * then one example sentence per person (not after the last Perfekt step: the learner has just seen them). */
-/** The card after a test answer. `past`: the past-form question — the infinitive → its Partizip II, with the past-tense example sentences. */
-export function AnswerResult({verb,stage,language,speech,correct,status,chosen,spoken,note,nextLabel,onNext,busy,examples=true,past=false}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;correct:boolean;status:string;chosen?:ReactNode;spoken:string;note?:string;nextLabel:string;onNext:()=>void;busy:boolean;examples?:boolean;past?:boolean}){
+/** One example sentence after an answer, with its meaning in the learner's language; the persons take turns from question
+ * to question (`pick`). Read aloud only when tapped (after an answer only the right answer is spoken by itself). */
+export function OneExample({verb,tense,pick,language,speech}:{verb:Verb;tense:PersonTense;pick:number;language:VaultLanguage;speech:Speech}){
+ const rows=personSentences(verb,tense);const meanings=useExampleMeanings(language);const dir=vaultDirection(language);
+ if(!rows.length)return null;
+ const row=rows[Math.abs(pick)%rows.length];const meaning=exampleMeaning(meanings,verb.id,tense,row.index);
+ return <button type="button" className="verb-one-example" disabled={speech.busy} aria-label={row.text+(meaning?' – '+meaning:'')} onClick={()=>speech.speak(row.text)} data-verb-example={verb.id+':'+tense}>
+  <span className="verb-person-text" lang="de" dir="ltr">{row.parts.flatMap((part,i)=>[i?' ':null,<span key={i} className={part.role==='plain'?undefined:'mark '+part.role}>{part.text}</span>])}{row.mark}</span>
+  {meaning&&<span className="verb-person-meaning" lang={language} dir={dir}>{meaning}</span>}
+  <Volume2 size={15} aria-hidden="true"/>
+ </button>;
+}
+/**
+ * After an answer (choice or spelling), in the place the question card had: the picture, right or wrong, the verb (tap the
+ * speaker to hear it again), its meaning, what was chosen when wrong, and one example sentence. The choices or the letters
+ * below stay where they are (the learner asked, 4 November 2026: nothing moves, nothing scrolls), and the next question
+ * comes after 3 seconds — the bar at the bottom shows it (`replays` restarts it). `past`: the past-form questions — the
+ * infinitive → its Partizip II.
+ */
+export function AnswerResult({verb,stage,language,speech,correct,status,chosen,spoken,past=false,example,replays=0}:{verb:Verb;stage:LearnStage;language:VaultLanguage;speech:Speech;correct:boolean;status:string;chosen?:ReactNode;spoken:string;past?:boolean;example?:ReactNode;replays?:number}){
  const dir=vaultDirection(language);
  const form=past?'':stage==='perfekt'?verb.subject+' '+perfektLabel(verb):stage==='praesens'?verb.subject+' '+verb.praesens:'';
  return <div id="object-feedback" tabIndex={-1} className={'verb-result '+(correct?'success':'retry')} role="status" aria-live="polite" data-verb-result={stage}>
-  <div className="verb-result-head">
-   <VerbPicture verb={verb} language={language}/>
-   <div className="verb-result-text">
-    <div className="verb-result-line"><p className={'verb-result-status '+(correct?'right':'wrong')}>{correct?<CheckCircle2 size={18}/>:<X size={18}/>}{status}</p></div>
-    <div className="verb-result-title"><strong lang="de" dir="ltr" className={stage==='meaning'&&!past?kindClass(verb):undefined}>{past?<><span className={kindClass(verb)}>{verb.display}</span> → <span className={verbKindInfo(verb).irregularPartizip?'verb-irregular-form':undefined}>{verb.participle}</span></>:stage==='meaning'?verb.display:<>{verb.subject} <VerbForm verb={verb} stage={stage}/></>}</strong><button type="button" className="verb-result-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/></button></div>
-    <span className="verb-result-meaning">{form&&<b className="verb-result-infinitive" lang="de" dir="ltr">{verb.display} · </b>}<span lang={language} dir={dir}>{verbMeaning(verb,language)}</span></span>
-    {chosen&&<span className="verb-result-chosen">{chosen}</span>}
-   </div>
+  <VerbPicture verb={verb} language={language}/>
+  <div className="verb-result-text">
+   <p className={'verb-result-status '+(correct?'right':'wrong')}>{correct?<CheckCircle2 size={18}/>:<X size={18}/>}{status}</p>
+   <div className="verb-result-title"><strong lang="de" dir="ltr" className={stage==='meaning'&&!past?kindClass(verb):undefined}>{past?<><span className={kindClass(verb)}>{verb.display}</span> → <span className={verbKindInfo(verb).irregularPartizip?'verb-irregular-form':undefined}>{verb.participle}</span></>:stage==='meaning'?verb.display:<>{verb.subject} <VerbForm verb={verb} stage={stage}/></>}</strong><button type="button" className="verb-result-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={18}/></button></div>
+   <span className="verb-result-meaning">{form&&<b className="verb-result-infinitive" lang="de" dir="ltr">{verb.display} · </b>}<span lang={language} dir={dir}>{verbMeaning(verb,language)}</span></span>
+   {chosen&&<span className="verb-result-chosen">{chosen}</span>}
+   {example}
   </div>
-  {examples&&<PersonSentences verb={verb} tense={past||stage==='perfekt'?'perfekt':'praesens'} language={language} speech={speech}/>}
-  {note&&<p className="verb-note">{note}</p>}
-  <button type="button" className="btn object-next verb-result-next" disabled={busy} onClick={onNext}>{nextLabel}<ArrowRight size={18} className="vault-direction-icon"/></button>
+  <span key={replays} className="vault-auto-next" aria-hidden="true"/>
  </div>;
 }
 /** The card that opens a part: its verbs and what each verb brings, one verb after the other (card, meaning test, spelling, past form). */
@@ -132,13 +146,11 @@ export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamil
   <button type="button" className="btn verb-learn-next" onClick={onContinue}>{t('chapterStart')}<ArrowRight size={18} className="vault-direction-icon"/></button>
  </article>;
 }
-/** Where the learner is on the path: the verb and the steps of its current stage. */
+/** Where the learner is in the verb: its steps as small chips under the top bar (done, now, to come). The verb and its
+ * number are in the picture strip above (4 November 2026: the practice fits one screen, like Nesne Kasası). */
 export function PathStepper({place,language}:{place:PathPlace;language:VaultLanguage}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- return <div className="verb-stepper" data-verb-step={place.step} data-verb-stage={place.stage}>
-  <div className="verb-stepper-head"><span className="verb-stepper-verb" lang="de" dir="ltr">{place.verb.display}</span><span className="verb-stepper-count">{t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})}</span></div>
-  <ol className="verb-stepper-steps" style={{gridTemplateColumns:'repeat('+place.steps.length+',minmax(0,1fr))'}}>{place.steps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}><span className="verb-stepper-dot"/><span className="verb-stepper-label">{t(stepLabels[step])}</span></li>)}</ol>
- </div>;
+ return <ol className="verb-stepper verb-step-chips" data-verb-step={place.step} data-verb-stage={place.stage} aria-label={place.verb.display+' · '+t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})} style={{gridTemplateColumns:'repeat('+place.steps.length+',minmax(0,1fr))'}}>{place.steps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}>{i<place.step&&<Check size={13} aria-hidden="true"/>}<span>{t(stepLabels[step])}</span></li>)}</ol>;
 }
 type PartState={done:number;count:number;percent:number;finished:boolean;started:boolean;meaningDone:number;perfektDone:number};
 /** Done or not, for one verb: the meaning and the Perfekt, each with a tick. */

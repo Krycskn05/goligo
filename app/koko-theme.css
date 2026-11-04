@@ -690,6 +690,7 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 .site-layout>main.object-page { min-width:0; width:100%; }
 @media (max-width:760px) {
  .toon-app:has(.object-question) .work-layout>.work-sidebar,
+ .toon-app:has(.verb-practice) .work-layout>.work-sidebar,
  .toon-app:has(.verb-game) .work-layout>.work-sidebar { display:none; }
 }
 

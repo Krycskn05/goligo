@@ -48,3 +48,31 @@ CREATE TABLE IF NOT EXISTS password_resets (
   expires_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS password_resets_member ON password_resets(member_id);
+
+-- Ziyaret istatistikleri (yönetici paneli, 4 Kasım 2026; lib/visits.ts). Çerez ve IP adresi saklanmaz: ziyaretçi,
+-- o güne özel rastgele bir tuzla alınmış bir özetle sayılır (visitor). Tuzlar iki gün sonra silinir, satırlar 90 gün.
+-- source: gelinen sitenin adı ('-' doğrudan, '' site içi); device: phone/tablet/computer; country: iki harfli kod.
+CREATE TABLE IF NOT EXISTS site_visits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  at INTEGER NOT NULL,
+  day INTEGER NOT NULL,
+  visitor TEXT NOT NULL,
+  member INTEGER NOT NULL DEFAULT 0,
+  path TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT '',
+  device TEXT NOT NULL DEFAULT '',
+  country TEXT NOT NULL DEFAULT '',
+  language TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS site_visits_at ON site_visits(at);
+CREATE INDEX IF NOT EXISTS site_visits_day ON site_visits(day, visitor);
+CREATE TABLE IF NOT EXISTS visit_salts (
+  day INTEGER PRIMARY KEY,
+  salt TEXT NOT NULL
+);
+
+-- Üyenin sitede en son görüldüğü an (yönetici panelinde "şu an çevrimiçi"); hesap silinince silinir.
+CREATE TABLE IF NOT EXISTS member_seen (
+  member_id TEXT PRIMARY KEY,
+  at INTEGER NOT NULL
+);

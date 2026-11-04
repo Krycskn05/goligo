@@ -580,6 +580,37 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .toon-app:has(.object-question) .vault-listening-options .object-option { min-height:0; padding:6px; }
 }
 
+/* Nesne Kasası after an answer (the learner asked, 4 November 2026: no scrolling down after a right or wrong answer;
+   of three designs they chose "Yan yana"): the picture moves to the left and the result card stands next to it, in
+   the picture's place, so the page does not grow and "Sonraki" is on the screen on phone, tablet and computer. In
+   Dinle ve Bul the card takes the place of the listening buttons (it has its own "Tekrar dinle"). */
+.toon-app .object-question.vault-answered { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,3fr); column-gap:12px; }
+.toon-app .object-question.vault-answered>* { grid-column:1 / -1; }
+.toon-app .object-question.vault-answered>h1 { grid-row:1; }
+.toon-app .object-question.vault-answered>.object-picture { grid-row:2; grid-column:1; width:100%; margin:0; align-self:stretch; }
+.toon-app .object-question.vault-answered>.object-picture:not(.small)>.toon-art,
+.toon-app .object-question.vault-answered>.object-picture:not(.small) img { max-height:clamp(110px,24vh,240px); }
+.toon-app .object-question.vault-answered>.vault-listen-player { display:none; }
+.toon-app .object-question.vault-answered>#object-feedback { grid-row:2; grid-column:2; align-self:stretch; display:flex; flex-direction:column; justify-content:center; gap:6px; margin:0; padding:12px 14px; border-width:2px; }
+.toon-app .object-question.vault-answered.vault-listen>#object-feedback { grid-column:1 / -1; }
+.toon-app .object-question.vault-answered>#object-feedback.success { background:#effaea; border-color:#86c96a; }
+.toon-app .object-question.vault-answered>#object-feedback.retry { background:#fff3e6; border-color:#f0a35e; }
+.toon-app .object-question.vault-answered>#object-feedback h2 { margin:0; font-size:18px; }
+.toon-app .object-question.vault-answered>#object-feedback>p { margin:0; line-height:1.3; }
+.toon-app .object-question.vault-answered>#object-feedback>.btn { width:100%; margin:0; justify-content:center; }
+.toon-app .object-question.vault-answered>.object-options,
+.toon-app .object-question.vault-answered>.vault-article-choice,
+.toon-app .object-question.vault-answered>.letter-puzzle { margin-top:12px; }
+/* Wide screens: "Tekrar dinle" and "Sonraki" side by side under the answer; in Dinle ve Bul the four pictures in one
+   lower row (before and after the answer), so the green one is on the screen too. */
+@media (min-width:1100px) {
+ .toon-app .object-question.vault-listen>.vault-listening-options { grid-template-columns:repeat(4,minmax(0,1fr)); }
+ .toon-app .object-question.vault-listen>.vault-listening-options .object-picture .toon-art { height:clamp(96px,18vh,175px); max-height:none; }
+ .toon-app .object-question.vault-answered>#object-feedback { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-content:center; }
+ .toon-app .object-question.vault-answered>#object-feedback>h2,
+ .toon-app .object-question.vault-answered>#object-feedback>p { grid-column:1 / -1; }
+}
+
 /* The same left menu on every part of the site (app/site-menu.tsx; the learner asked, 22 October 2026). The section
    pages keep their own page width inside the menu layout; on phones the menu goes away while a test or a game is open,
    so the question and its answers stay on one screen. */

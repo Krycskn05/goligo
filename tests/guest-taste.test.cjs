@@ -71,8 +71,10 @@ test('pages: the first part opens, the rest carries a lock and the sign-up, ever
   const page=read(file);assert.ok(page.includes('<'+component+' guest={!(await getChatGPTUser())}/>'),file);
  }
  for(const file of ['app/category-study.tsx','app/verb-study.tsx','app/object-study.tsx','app/housing-study.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx']){
-  const code=read(file);assert.ok(code.includes('{guest&&<GuestBanner language={language} back=')&&code.includes('guest={guest}/>'),file);
+  const code=read(file);assert.ok((code.includes('{guest&&<GuestBanner language={language} back=')||code.includes('{guest&&!(session&&!finished)&&<GuestBanner language={language} back={back} note={part?\'guestNote\':\'guestNoteVerbs\'}/>}'))&&code.includes('guest={guest}/>'),file);
  }
+ // Fiil Atölyesi: the box says every verb topic is open (in every language, checked with all guest texts below), and it
+ // steps aside during a round (4 November 2026).
  for(const file of ['app/verb-study.tsx','app/object-study.tsx','app/housing-study.tsx'])assert.ok(read(file).includes('{guest&&<GuestMore language={language} back={back}/>}'),file+': a sign-up card at the end of a round');
  const verb=read('app/verb-study.tsx');assert.ok(verb.includes("guest&&!GUEST_GAMES.includes(id)?<a key={id} className={'game-card game-'+id+' guest-locked'} href={guestSignUp(back)}")&&verb.includes("section==='mistakes'&&guest?"));
  assert.ok(read('app/object-study.tsx').includes('if(guest&&id!==GUEST_OBJECT_GROUP)return <article'));

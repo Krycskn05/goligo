@@ -67,7 +67,14 @@ test('the Nesne Kasası page shows the star and the combined review button',()=>
  assert(page.includes("const fresh=!reviewOnly&&!onlyIds&&!all;")&&page.includes("(group,count,history,reviewOnly,eligibleIds,{starred,fresh})"),'normal rounds skip solved questions, reviews add stars');
  // "Hepsini baştan çöz" (the learner asked to solve the solved ones again): shown while some are solved and some are not.
  assert(page.includes("{ready&&unsolved>0&&unsolved<availableCount&&<button type=\"button\" className=\"text-button vault-restart-all\" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all>"));
- assert(page.includes('disabled={busy||!ready||!marked.length}'),'the review button is active whenever there are mistakes or stars');
+ // The button shows only while there are mistakes still to fix (last answer wrong) or stars, and goes once they are
+ // answered right; no tip line under it (the learner asked, 4 November 2026).
+ assert(page.includes("const marked=scopedQuestions.filter(item=>isOpenObjectMistake(reviewRows.get(item.id))||starred.has(item.id));"));
+ assert(page.includes("{!guest&&marked.length>0&&<div className=\"object-actions\"><button type=\"button\" className=\"btn secondary\" disabled={busy||!ready} onClick={()=>void start(true,marked.map(item=>item.id))}>"),'hidden when there is nothing to practise; the round asks what it counts');
+ assert(!page.includes("text('starTip')"),'no tip line under the button');
+ const open=practice.isOpenObjectMistake;const rec=(wrong,streak,seen)=>({question_id:'q',wrong_count:wrong,streak,seen,last_answer:'',last_wrong:'',last_at:0,due_at:0});
+ assert(open(rec(1,0,1))&&open(rec(2,0,3)),'last answer wrong: still to fix');
+ assert(!open(rec(1,1,2))&&!open(rec(0,1,1))&&!open(undefined),'answered right since: fixed');
  // No "… çözülmemiş soru kaldı" line any more (the learner asked, 4 November 2026); the copy stays for Ev ve Yaşam.
  assert(page.includes("text(course==='de'?'reviewMarked':'reviewMistakes')")&&!page.includes("text('remaining',{n:unsolved})"));
  for(const {id} of copy.vaultLanguages)for(const key of ['star','unstar','reviewMarked','remaining','allSolved','restartAll','starTip','starError']){

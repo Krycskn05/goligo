@@ -293,6 +293,10 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
  .ht .ht-grid>li:first-child .ht-art img { object-fit:contain; -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent); mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent); }
 }
 @media (max-width:760px) {
+ /* On a phone or an upright tablet every card picture is as wide as its card, the same gap on both sides (the learner
+    asked, 4 November 2026: the pictures did not look symmetric). home-tour.css loads later and its 150 px height made the
+    2:1 frame only 300 px wide, against the left edge of the card. */
+ .ht .ht-art { width:100%; height:auto; aspect-ratio:2 / 1; }
  .nav-icon.has-picture { width:32px; height:32px; }
  .verb-hero-badge .nav-icon.has-picture { width:54px; height:54px; }
  .verb-hero-badge .nav-icon.has-picture img { width:40px; height:40px; }
@@ -601,10 +605,10 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 .toon-app .object-question.vault-answered>.object-options,
 .toon-app .object-question.vault-answered>.vault-article-choice,
 .toon-app .object-question.vault-answered>.letter-puzzle { margin-top:12px; }
-/* No "Sonraki" button: the next question opens 4 seconds after the answer (the learner asked, 4 November 2026); this bar
-   along the bottom of the result card empties in those 4 seconds (app/object-study.tsx, AUTO_NEXT_MS). */
+/* No "Sonraki" button: the next question opens 3 seconds after the answer (the learner asked, 4 November 2026); this bar
+   along the bottom of the result card empties in those 3 seconds (app/object-study.tsx, AUTO_NEXT_MS). */
 .toon-app .object-question.vault-answered>#object-feedback { position:relative; overflow:hidden; padding-bottom:16px; }
-.vault-auto-next { position:absolute; inset-inline:0; bottom:0; height:5px; background:#5fae45; transform-origin:left center; animation:vault-auto-next 4s linear both; }
+.vault-auto-next { position:absolute; inset-inline:0; bottom:0; height:5px; background:#5fae45; transform-origin:left center; animation:vault-auto-next 3s linear both; }
 [dir=rtl] .vault-auto-next { transform-origin:right center; }
 #object-feedback.retry .vault-auto-next { background:#e98d3a; }
 @keyframes vault-auto-next { from { transform:scaleX(1); } to { transform:scaleX(0); } }

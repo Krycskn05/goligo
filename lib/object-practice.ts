@@ -21,6 +21,12 @@ export function pickObjectQuestions(mode:ObjectMode,group:string,count:number,re
 export type ObjectPickOptions={starred?:ReadonlySet<string>;fresh?:boolean;random?:()=>number};
 export const isObjectMistake=(row:Review|undefined)=>!!row&&row.wrong_count>0&&row.streak<3;
 /**
+ * A mistake still to fix: the last answer was wrong. The review button of a Nesne Kasası category counts only these (and
+ * the starred ones) and goes away once they are answered right (the learner asked, 4 November 2026); Yanlışlarım keeps
+ * the three-in-a-row rule of every part.
+ */
+export const isOpenObjectMistake=(row:Review|undefined)=>!!row&&row.wrong_count>0&&row.streak===0;
+/**
  * Solved = answered right at least once: once every question here is solved, a normal round mixes them all again and
  * a new test must not be only the old mistakes again (the learner asked, 3 November 2026). A later wrong answer puts it
  * on the mistakes list (the review button), not back into the normal rounds.

@@ -9,7 +9,7 @@ import {objectGroups,objectVocabulary,objectWordMap,type ObjectWord} from '@/lib
 import {sectionsFor,sectionTitle} from '@/lib/vault-sections';
 import {WORD_TOPICS} from '@/lib/object-word-additions';
 import {objectSubgroups,subgroupName,inObjectSubgroup} from '@/lib/object-subgroups';
-import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake,isObjectSolved,pickObjectListeningQuiz,pickObjectWritingQuiz,pickPictureQuiz,type ObjectPickOptions,type PictureQuizSize} from '@/lib/object-practice';
+import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isOpenObjectMistake,isObjectSolved,pickObjectListeningQuiz,pickObjectWritingQuiz,pickPictureQuiz,type ObjectPickOptions,type PictureQuizSize} from '@/lib/object-practice';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
 import {PaulHoca,playPaulSound} from './paul-hoca';
@@ -39,8 +39,9 @@ import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
 import {puzzleText} from '@/lib/article-logic';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
-/** The next question opens 4 seconds after an answer; reading the right answer may hold it up to 6 seconds more. */
-const AUTO_NEXT_MS=4000,AUTO_NEXT_GRACE_MS=6000;
+/** The next question opens 3 seconds after an answer (the learner asked for 3 instead of 4, 4 November 2026); reading the
+ * right answer may hold it up to 6 seconds more. */
+const AUTO_NEXT_MS=3000,AUTO_NEXT_GRACE_MS=6000;
 const groupKeys:Record<string,VaultCopyKey>={'objects-house':'groupHouse','objects-furniture':'groupFurniture','objects-kitchen':'groupKitchen','objects-cleaning':'groupCleaning','objects-tools':'groupTools','objects-building':'groupBuilding','objects-nature':'groupNature','objects-moving':'groupMoving','objects-body':'groupBody','objects-health':'groupHealth','objects-food':'groupFood','objects-drinks':'groupDrinks','objects-cooking':'groupCooking','objects-school':'groupSchool','objects-outdoors':'groupOutdoors','objects-jobs':'groupJobs','objects-lektion1':'groupLektion1','objects-clothes':'groupClothes'};
 const groupImages:Record<string,string>={'objects-house':'dach','objects-furniture':'sessel','objects-kitchen':'teekanne','objects-cleaning':'putzeimer','objects-tools':'bohrmaschine','objects-building':'schubkarre','objects-nature':'kaktus','objects-moving':'karton','objects-body':'hand','objects-health':'verbandskasten','objects-food':'brezel','objects-drinks':'kaffee','objects-cooking':'pfanne','objects-school':'tafel','objects-outdoors':'baum','objects-jobs':'beruf-aerztin','objects-lektion1':'l1-hallo','objects-clothes':'kleidung-tshirt'};
 function categoryName(group:string,language:VaultLanguage){return group==='all'?vaultText(language,'allObjects'):groupKeys[group]?vaultText(language,groupKeys[group]):objectGroups.find(item=>item.id===group)?.title??group;}
@@ -84,7 +85,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  // The picture strip (the learner asked, 4 November 2026): questions solved in earlier rounds stay in it as done, and
  // any done question can be opened again to look at (it is not answered again).
  const [earlier,setEarlier]=useState<string[]>([]);const [viewId,setViewId]=useState<string|null>(null);
- const [replays,setReplays]=useState(0); // "Tekrar dinle" taps on the answer card: each one gives 4 seconds again
+ const [replays,setReplays]=useState(0); // "Tekrar dinle" taps on the answer card: each one gives 3 seconds again
  const [nounArticle,setNounArticle]=useState('');const [articleWarning,setArticleWarning]=useState(false);const [showHint,setShowHint]=useState(false);
  const speech=useGermanSpeech(course);const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
  const mutation=useRef(false);const mounted=useRef(true);
@@ -106,7 +107,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  const selectedSubgroup=objectSubgroups.find(item=>item.id===subgroup);
  // Review = mistakes plus starred questions; a normal round skips what is already solved.
  const starred=course==='de'?starredQuestionIds(snapshot.notes):new Set<string>();const reviewRows=new Map(reviews.map(r=>[r.question_id,r]));
- const marked=scopedQuestions.filter(item=>isObjectMistake(reviewRows.get(item.id))||starred.has(item.id));
+ const marked=scopedQuestions.filter(item=>isOpenObjectMistake(reviewRows.get(item.id))||starred.has(item.id));
  const unsolved=scopedQuestions.filter(item=>!isObjectSolved(reviewRows.get(item.id))).length;
  // "Hepsini baştan çöz" (the learner asked): a round from every question here, the solved ones too, while unsolved ones are left.
  function fail(e:unknown,fallback:VaultCopyKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
@@ -180,11 +181,11 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  // "Sonraki dinleme" (listening round): the next word is heard at once, as the learner asked; it is started in this tap
  // so phones allow the sound, and the picture choices open after it as with the listen button.
  function next(){if(mutation.current||!session||!feedback)return;stopFeedback();const following=session.mode==='listen'?questionMap.get(session.questions[index+1]?.id??''):undefined;setIndex(i=>i+1);clearAnswer();focus();if(following?.audio){setHeardQuestionId(following.id);speech.speak(following.audio);}if(index+1>=session.questions.length){answerAudio.complete();void refresh();}}
- // After an answer the next question comes by itself after 4 seconds (the learner asked, 4 November 2026: no "Sonraki"
+ // After an answer the next question comes by itself after 3 seconds (the learner asked, 4 November 2026: no "Sonraki"
  // button). It waits while the right answer is still being read (a few seconds at most) and while the page is hidden.
  const nextRef=useRef(next);nextRef.current=next;
  useEffect(()=>{
-  if(!feedback||viewId)return; // paused while a done question is open; 4 seconds again after coming back
+  if(!feedback||viewId)return; // paused while a done question is open; 3 seconds again after coming back
   let due=Date.now()+AUTO_NEXT_MS;let timer:ReturnType<typeof setTimeout>;
   const tick=()=>{
    const now=Date.now();if(document.hidden)due=Math.max(due,now+AUTO_NEXT_MS);
@@ -267,7 +268,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
       {session.mode==='write'&&<p>{text('yourAnswer')}: <span lang={course} dir="ltr">{feedback.answer}</span></p>}
       {/* No "Kural" (article rule) box after an answer: the learner asked for it to go (24 October 2026). */}
       <button type="button" className="btn secondary small" disabled={busy||cueBusy} onClick={()=>{speech.speak(pronunciation);setReplays(n=>n+1);}}><Volume2 size={18}/>{text('repeatAudio')}</button>
-      {/* No "Sonraki" button: the bar empties in 4 seconds and the next question opens (AUTO_NEXT_MS). */}
+      {/* No "Sonraki" button: the bar empties in 3 seconds and the next question opens (AUTO_NEXT_MS). */}
       <span key={replays} className="vault-auto-next" aria-hidden="true"/>
      </div>}
     </article>}
@@ -278,8 +279,9 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
     {/* Tapping Gör ve Seç, Yazarak Pekiştir or Dinle ve Bul opens that round at once; no "Teste başla" button and no
         "… çözülmemiş soru kaldı" line (the learner asked, 4 November 2026). */}
     <PracticeModes labels={modeLabels} topicLabel={categoryName(group,language)} active={practiceMode} starts disabled={busy||!ready} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;void start(false,undefined,false,mode);}}/>
-    {!guest&&<div className="object-actions"><button type="button" className="btn secondary" disabled={busy||!ready||!marked.length} onClick={()=>void start(true)}><RotateCcw size={18}/>{text(course==='de'?'reviewMarked':'reviewMistakes')}{marked.length>0&&<span className="object-count">{marked.length}</span>}</button></div>}
-    {ready&&unsolved>0&&unsolved<availableCount&&<button type="button" className="text-button vault-restart-all" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all><RotateCcw size={15} aria-hidden="true"/>{text('restartAll')}</button>}{course==='de'&&!guest&&<p className="housing-tip">{text('starTip')}</p>}
+    {/* Only while there is something to practise; the round asks exactly what the button counts. */}
+    {!guest&&marked.length>0&&<div className="object-actions"><button type="button" className="btn secondary" disabled={busy||!ready} onClick={()=>void start(true,marked.map(item=>item.id))}><RotateCcw size={18}/>{text(course==='de'?'reviewMarked':'reviewMistakes')}{marked.length>0&&<span className="object-count">{marked.length}</span>}</button></div>}
+    {ready&&unsolved>0&&unsolved<availableCount&&<button type="button" className="text-button vault-restart-all" disabled={busy} onClick={()=>void start(false,undefined,true)} data-vault-restart-all><RotateCcw size={15} aria-hidden="true"/>{text('restartAll')}</button>}
    </section>:<section className="vault-categories" aria-labelledby="vault-heading">
     <h1 id="vault-heading" tabIndex={-1}>{text('vaultTitle')}</h1>
     {/* No "Tüm kelimeler" card; the categories under a few headings (the learner asked, 3 November 2026; lib/vault-sections.ts). */}

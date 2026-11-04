@@ -25,19 +25,20 @@ test('the answered question card puts the result next to the picture, only in Ne
  assert.ok(page.includes("onClick={()=>{speech.speak(pronunciation);setReplays(n=>n+1);}}><Volume2 size={18}/>{text('repeatAudio')}</button>"));
 });
 
-test('Nesne Kasası opens the next question by itself 4 seconds after an answer, with no "Sonraki" button',()=>{
+test('Nesne Kasası opens the next question by itself 3 seconds after an answer, with no "Sonraki" button',()=>{
  // The learner asked, 4 November 2026.
  const page=read('app/object-study.tsx');
- assert.ok(page.includes('const AUTO_NEXT_MS=4000,AUTO_NEXT_GRACE_MS=6000;'));
+ // 4 seconds at first; the learner asked for 3 (4 November 2026).
+ assert.ok(page.includes('const AUTO_NEXT_MS=3000,AUTO_NEXT_GRACE_MS=6000;'));
  assert.ok(!page.includes('object-next'),'no next button in Nesne Kasası');
- assert.ok(page.includes("<span key={replays} className=\"vault-auto-next\" aria-hidden=\"true\"/>"),'the bar that empties in 4 seconds');
+ assert.ok(page.includes("<span key={replays} className=\"vault-auto-next\" aria-hidden=\"true\"/>"),'the bar that empties in 3 seconds');
  // The timer starts with each answer and again after "Tekrar dinle"; it waits while the right answer is read.
  assert.ok(page.includes('timer=setTimeout(tick,AUTO_NEXT_MS);'));
  assert.ok(page.includes('const reading=(speech.isActive()||answerAudio.isWaiting())&&now<due+AUTO_NEXT_GRACE_MS;'));
  assert.ok(page.includes('},[feedback,replays,viewId]);'));
  assert.ok(page.includes('nextRef.current();'));
  const css=read('app/koko-theme.css');
- assert.ok(css.includes('.vault-auto-next { position:absolute;')&&css.includes('animation:vault-auto-next 4s linear both;'));
+ assert.ok(css.includes('.vault-auto-next { position:absolute;')&&css.includes('animation:vault-auto-next 3s linear both;'));
  // Fiil Atölyesi and Ev ve Yaşam keep their own "Sonraki" buttons.
  for(const file of ['app/verb-study.tsx','app/housing-study.tsx'])assert.ok(!read(file).includes('AUTO_NEXT_MS'),file);
 });

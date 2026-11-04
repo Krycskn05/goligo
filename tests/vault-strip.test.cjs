@@ -22,7 +22,7 @@ test('done questions open to look at; the current one comes back; later ones sta
  const view=page.slice(page.indexOf("{viewQ&&viewWord?<article"),page.indexOf("</article>:",page.indexOf("{viewQ&&viewWord?<article")));
  assert.ok(view.includes("vault-answered vault-viewing")&&view.includes("text('doneEarlier')")&&view.includes("text('backToCurrent')"));
  assert.ok(!view.includes('submit('),'nothing is answered again');
- // No automatic move while a done question is open; the 4 seconds start again after coming back.
+ // No automatic move while a done question is open; the 3 seconds start again after coming back.
  assert.ok(page.includes("if(!feedback||viewId)return;"));
  // Done tiles show their own picture, cut from the picture sheet like everywhere else.
  assert.ok(page.includes("{result&&word?<ObjectArt id={word.id} title={objectMeaning(word.id,language)}/>:<span className=\"vault-strip-number\">{i+1}</span>}"));

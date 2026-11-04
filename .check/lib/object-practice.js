@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isObjectSolved = exports.isObjectMistake = void 0;
+exports.isObjectSolved = exports.isOpenObjectMistake = exports.isObjectMistake = void 0;
 exports.pickObjectQuestions = pickObjectQuestions;
 exports.objectReviewWords = objectReviewWords;
 exports.isObjectPictureQuestion = isObjectPictureQuestion;
@@ -54,6 +54,13 @@ function pickObjectQuestions(mode, group, count, reviews, scene) {
 }
 const isObjectMistake = (row) => !!row && row.wrong_count > 0 && row.streak < 3;
 exports.isObjectMistake = isObjectMistake;
+/**
+ * A mistake still to fix: the last answer was wrong. The review button of a Nesne Kasası category counts only these (and
+ * the starred ones) and goes away once they are answered right (the learner asked, 4 November 2026); Yanlışlarım keeps
+ * the three-in-a-row rule of every part.
+ */
+const isOpenObjectMistake = (row) => !!row && row.wrong_count > 0 && row.streak === 0;
+exports.isOpenObjectMistake = isOpenObjectMistake;
 /**
  * Solved = answered right at least once: once every question here is solved, a normal round mixes them all again and
  * a new test must not be only the old mistakes again (the learner asked, 3 November 2026). A later wrong answer puts it

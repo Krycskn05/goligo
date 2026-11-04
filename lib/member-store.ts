@@ -85,6 +85,7 @@ export async function deleteMember(db: Db, memberId: string, email: string): Pro
     db.prepare('DELETE FROM password_resets WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM member_logins WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM member_seen WHERE member_id=?').bind(memberId),
+    db.prepare('DELETE FROM member_pages WHERE member_id=?').bind(memberId),
     db.prepare('DELETE FROM auth_attempts WHERE key=?').bind('login:' + email),
     db.prepare('DELETE FROM members WHERE id=?').bind(memberId),
   ]);

@@ -3,7 +3,8 @@
 // - Çerez yok, IP adresi saklanmaz. Ziyaretçi, IP + tarayıcı bilgisinin o güne özel rastgele bir tuzla alınmış özetiyle
 //   sayılır; tuz iki gün sonra silinir, özet bir kişiye geri götürülemez. Aynı kişi iki gün gelirse iki ziyaret sayılır.
 // - Yalnızca bilinen sayfa adresleri tutulur (sorgu kısmı hiç), kaynak olarak yalnızca gelinen sitenin adı.
-// - Satırlar 90 gün saklanır. Üyelerin yalnızca sitede en son görüldüğü an tutulur (member_seen; hesapla silinir).
+// - Satırlar 90 gün saklanır. Üyelerin sitede en son görüldüğü an (member_seen) ve açtıkları sayfalar (member_pages,
+//   "Kim ne yaptı") hesaplarına bağlı tutulur; ikisi de hesapla silinir.
 // - Site yöneticisinin kendi ziyaretleri ve botlar sayılmaz.
 // Tablolar: migration/database/members.sql. Gizlilik metni: lib/legal-copy.ts whatVisits.
 import type { Db } from './member-store';
@@ -146,8 +147,13 @@ export async function recordVisit(db: Db, input: VisitInput, now = Date.now()): 
   if (!repeat) writes.push(db.prepare('INSERT INTO site_visits (at,day,visitor,member,path,source,device,country,language) VALUES (?,?,?,?,?,?,?,?,?)')
     .bind(now, day, visitor, input.memberId ? 1 : 0, path, sourceOf(input.referrer, input.host, input.internal === true), deviceOf(input.device), countryOf(input.country), languageOf(input.language)));
   if (input.memberId) writes.push(db.prepare('INSERT INTO member_seen (member_id,at) VALUES (?,?) ON CONFLICT(member_id) DO UPDATE SET at=excluded.at').bind(input.memberId, now));
+  // Üyenin açtığı sayfa hesabına bağlı da tutulur ("Kim ne yaptı"; gizlilik metni whatJourneys).
+  if (input.memberId && !repeat) writes.push(db.prepare('INSERT INTO member_pages (member_id,at,path) VALUES (?,?,?)').bind(input.memberId, now, path));
   // Eski satırlar ara sıra silinir (her istekte değil).
-  if (Math.random() < 0.05) writes.push(db.prepare('DELETE FROM site_visits WHERE at<?').bind(now - VISIT_KEEP_MS));
+  if (Math.random() < 0.05) writes.push(
+    db.prepare('DELETE FROM site_visits WHERE at<?').bind(now - VISIT_KEEP_MS),
+    db.prepare('DELETE FROM member_pages WHERE at<?').bind(now - VISIT_KEEP_MS),
+  );
   if (writes.length) await db.batch(writes);
   return !repeat;
 }

@@ -13,3 +13,10 @@ test('on phones the language and the sounds are lines of the account menu; the c
  for(const rule of ['.site-account-list .site-account-phone { display:block; }','.site-header:not(.lk-public-header) .lk-effects-button { display:none; }','grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);','.site-header:not(.lk-public-header) .site-greeting { justify-self:center; margin-inline:0; }'])assert.ok(phone.includes(rule),rule);
  assert.ok(phone.includes('@media (max-width:380px) { .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { display:block;'),'the clock face on narrow phones too');
 });
+test('the home page header keeps the site language on phones (the learner asked the same day), not repeated in the menu',()=>{
+ const css=read('app/koko-theme.css');
+ assert.ok(css.includes('.category-app:has(.ht) .site-header:not(.lk-public-header) .site-language { display:inline-flex; }'));
+ assert.ok(css.includes('.category-app:has(.ht) .site-header:not(.lk-public-header) .site-header-tools { display:flex; flex-wrap:nowrap; align-items:center; justify-content:flex-end; gap:6px; width:auto;'),'right next to the account button, away from the clock');
+ assert.ok(css.includes('.category-app:has(.ht) .site-account-list .site-account-phone[data-account-item=language] { display:none; }'));
+ assert.ok(css.indexOf('.category-app:has(.ht) .site-header:not(.lk-public-header) .site-language')>css.indexOf('.site-header:not(.lk-public-header) .lk-effects-button { display:none; }'),'after the rule that hides it on other pages');
+});

@@ -24,6 +24,7 @@ export function PrivacyView({language,signedIn}:{language:SiteLanguage;signedIn:
     <li>{rich('whatDeviceLanguage')}</li>
     <li>{rich('whatLimit')}</li>
     <li>{rich('whatVisits')}</li>
+    <li>{rich('whatJourneys')}</li>
     <li>{rich('whatBrowser')}</li>
    </ul>
 

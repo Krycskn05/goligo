@@ -87,6 +87,21 @@
 .adm-habits h3 small { color:var(--ink-3); font-weight:700; }
 .adm-habits h3 + .adm-facts + h3 { margin-top:18px; }
 .adm-seen { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+/* Kim ne yaptı: one line per person and day; opened, the pages and tests in order with their time. */
+.adm-journey-list { list-style:none; margin:0; padding:0; display:grid; gap:6px; max-height:560px; overflow-y:auto; }
+.adm-journey { border:1px solid #e3e9f0; border-radius:12px; background:#fbfcfe; }
+.adm-journey[open] { background:#fff; }
+.adm-journey summary { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 12px; padding:8px 12px; cursor:pointer; }
+.adm-journey-who, .adm-journey-when { display:grid; gap:2px; }
+.adm-journey-who small, .adm-journey-when small { color:var(--ink-3); font-size:12px; }
+.adm-journey-when { text-align:end; font-size:13px; }
+.adm-journey.guest .adm-journey-who strong { color:#5a6b80; }
+.adm-steps { margin:0; padding:4px 12px 10px; list-style:none; display:grid; gap:3px; border-top:1px dashed #e3e9f0; }
+.adm-steps li { display:grid; grid-template-columns:44px minmax(0,1fr); gap:8px; font-size:13px; }
+.adm-steps time { color:var(--ink-3); font-variant-numeric:tabular-nums; }
+.adm-steps li.round span { font-weight:700; color:#1f6fc4; }
+.adm-steps li.round small { font-weight:400; color:var(--ink-3); }
+.adm-steps li.more { grid-template-columns:minmax(0,1fr); color:var(--ink-3); }
 .adm-seen li { display:flex; align-items:center; gap:10px; }
 .adm-seen li .adm-ago { margin-inline-start:auto; }
 .adm-seen-dot { flex:none; width:10px; height:10px; border-radius:50%; background:#cfd8e2; }

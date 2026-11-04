@@ -5,7 +5,7 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {signInPath} from '@/lib/member-auth';
 import type {Db} from '@/lib/member-store';
 import {isAdminEmail,loadOverview,loadAreas,loadMembers,loadTopMistakes,loadSessions,loadMember,formatTime,ago,percent,modeName,topicName,dayStart,zoneOffsetMs,type DayRow,type AreaRow,type SessionRow} from '@/lib/admin-stats';
-import {loadVisits,loadMemberHabits,type VisitOverview,type VisitDay,type CountRow,type MemberHabits} from '@/lib/visit-stats';
+import {loadVisits,loadMemberHabits,loadJourneys,loadMemberJourneys,type VisitOverview,type VisitDay,type CountRow,type MemberHabits,type Journey,type Journeys} from '@/lib/visit-stats';
 import {getChatGPTUser} from '../chatgpt-auth';
 import {PublicPage} from '../public-shell';
 /** The admin panel is written in Turkish (the site owner's language), so its header and footer are Turkish too. */
@@ -29,16 +29,17 @@ export default async function AdminPage({searchParams}:{searchParams:Search}){
  const db=getRawDb() as unknown as Db;const now=Date.now();
  try{
   if(memberId){
-   const member=await loadMember(db,memberId,now);
-   return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="member">{member?<MemberView member={member} now={now}/>:<section className="adm-card"><a className="adm-back" href="/yonetim">← Yönetici paneli</a><h1>Üye bulunamadı</h1></section>}</div></PublicPage>;
+   const [member,journeys]=await Promise.all([loadMember(db,memberId,now),loadMemberJourneys(db,memberId,now)]);
+   return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="member">{member?<MemberView member={member} journeys={journeys} now={now}/>:<section className="adm-card"><a className="adm-back" href="/yonetim">← Yönetici paneli</a><h1>Üye bulunamadı</h1></section>}</div></PublicPage>;
   }
-  const [overview,areas,members,mistakes,sessions,visits,habits]=await Promise.all([loadOverview(db,now),loadAreas(db),loadMembers(db,now),loadTopMistakes(db,20),loadSessions(db,30),loadVisits(db,now),loadMemberHabits(db,now)]);
+  const [overview,areas,members,mistakes,sessions,visits,habits,journeys]=await Promise.all([loadOverview(db,now),loadAreas(db),loadMembers(db,now),loadTopMistakes(db,20),loadSessions(db,30),loadVisits(db,now),loadMemberHabits(db,now),loadJourneys(db,now)]);
   const accuracy=percent(overview.correct,overview.answers);
   return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="overview">
    <header className="adm-head"><div><span className="eyebrow">{SITE_NAME}</span><h1>Yönetici paneli</h1><p>Üyelerin ne çalıştığı, ne zaman girdiği ve nerede zorlandığı. Saatler Berlin saatiyle.</p></div>
-    <nav className="adm-jump" aria-label="Bölümler"><a href="#ziyaret">Ziyaretçiler</a><a href="#davranis">Üye davranışı</a><a href="#uyeler">Üyeler</a><a href="#yanlislar">Zorlanılan sorular</a><a href="#son">Son çalışmalar</a></nav></header>
+    <nav className="adm-jump" aria-label="Bölümler"><a href="#ziyaret">Ziyaretçiler</a><a href="#davranis">Üye davranışı</a><a href="#kim-ne-yapti">Kim ne yaptı</a><a href="#uyeler">Üyeler</a><a href="#yanlislar">Zorlanılan sorular</a><a href="#son">Son çalışmalar</a></nav></header>
    <Visitors v={visits} now={now}/>
    <Habits h={habits} funnel={visits.funnel} now={now}/>
+   <WhoDidWhat j={journeys} now={now}/>
    <h2 className="adm-part">Çalışma</h2>
    <section className="adm-cards" aria-label="Özet">
     <Stat label="Üye" value={overview.members} note={`Son 7 günde ${overview.new7} yeni · 30 günde ${overview.new30}`}/>
@@ -136,6 +137,28 @@ function Counts({rows,views=false,share=false}:{rows:CountRow[];views?:boolean;s
 }
 
 /** Üye davranışı: şu an çevrimiçi ve son görülen üyeler, yeni üyelerin geri gelişi, misafirden üyeliğe. */
+/** Kim ne yaptı (lib/visit-stats.ts loadJourneys): son 3 günde üyeler ve misafirler; açınca sayfalar ve testler sırayla. */
+function WhoDidWhat({j,now}:{j:Journeys;now:number}){
+ return <section className="adm-card" id="kim-ne-yapti" aria-labelledby="adm-journeys"><h2 id="adm-journeys">Kim ne yaptı <small>son {j.days} gün</small></h2>
+  <div className="adm-habits adm-journeys">
+   <div><h3>Üyeler <small>{j.members.length}</small></h3>{j.members.length?<JourneyList rows={j.members} now={now}/>:<p className="adm-empty">Henüz kayıt yok.</p>}</div>
+   <div><h3>Misafirler <small>{j.guests.length}</small></h3>{j.guests.length?<JourneyList rows={j.guests} now={now}/>:<p className="adm-empty">Henüz kayıt yok.</p>}</div>
+  </div>
+  <p className="adm-note">Bir satıra dokun: o gün açılan sayfalar ve başlatılan testler saatleriyle sırayla görünür. Üyelerin sayfaları hesaplarına bağlı tutulur (4 Kasım 2026'dan beri, 90 gün, hesapla silinir). Misafirler çerezsiz sayılır: aynı kişi her gün yeni bir “Ziyaretçi” olarak görünür ve misafirin cevapları kaydedilmez, yalnızca açtığı sayfalar görünür.</p>
+ </section>;
+}
+const clock=(at:number)=>new Intl.DateTimeFormat('tr-TR',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'}).format(new Date(at));
+function JourneyList({rows,now,openFirst=false}:{rows:Journey[];now:number;openFirst?:boolean}){
+ return <ul className="adm-journey-list">{rows.map((r,index)=><li key={r.key}><details className={'adm-journey '+r.kind} open={openFirst&&index===0}>
+  <summary>
+   <span className="adm-journey-who">{r.kind==='member'&&r.memberId?<a className="adm-member" href={'/yonetim?uye='+encodeURIComponent(r.memberId)+'#gezinti'}><strong>{r.name}</strong></a>:<strong>{r.name}</strong>}{r.meta&&<small>{r.meta}</small>}</span>
+   <span className="adm-journey-when"><strong>{formatTime(r.first,false)}</strong> {clock(r.first)}–{clock(r.last)}<small className="adm-ago">{r.pages} sayfa{r.rounds?` · ${r.rounds} test`:''} · {ago(r.last,now)}</small></span>
+  </summary>
+  <ol className="adm-steps">{r.steps.map((step,i)=><li key={i} className={step.kind}><time>{clock(step.at)}</time><span>{step.text}{step.note&&<small> — {step.note}</small>}</span></li>)}
+   {r.more>0&&<li className="more"><span>+{r.more} adım daha</span></li>}</ol>
+ </details></li>)}</ul>;
+}
+
 function Habits({h,funnel,now}:{h:MemberHabits;funnel:VisitOverview['funnel'];now:number}){
  const online=h.seen.filter(m=>m.online);
  return <section className="adm-card" id="davranis" aria-labelledby="adm-habits"><h2 id="adm-habits">Üye davranışı</h2>
@@ -211,7 +234,7 @@ function Sessions({rows,showMember=false,now}:{rows:SessionRow[];showMember?:boo
   </tr>)}</tbody></table></div>;
 }
 
-function MemberView({member,now}:{member:NonNullable<Awaited<ReturnType<typeof loadMember>>>;now:number}){
+function MemberView({member,journeys,now}:{member:NonNullable<Awaited<ReturnType<typeof loadMember>>>;journeys:Journey[];now:number}){
  const m=member;
  return <>
   <a className="adm-back" href="/yonetim">← Yönetici paneli</a>
@@ -254,5 +277,9 @@ function MemberView({member,now}:{member:NonNullable<Awaited<ReturnType<typeof l
     </tr>)}</tbody></table></div>:<p className="adm-empty">Yanlış cevabı yok.</p>}
   </section>
   <section className="adm-card" aria-labelledby="adm-m-sessions"><h2 id="adm-m-sessions">Testleri</h2><Sessions rows={m.sessions} now={now}/></section>
+  <section className="adm-card" id="gezinti" aria-labelledby="adm-m-journeys"><h2 id="adm-m-journeys">Gezdiği sayfalar ve testleri <small>son 30 gün</small></h2>
+   {journeys.length?<JourneyList rows={journeys} now={now} openFirst/>:<p className="adm-empty">Son 30 günde kayıt yok.</p>}
+   <p className="adm-note">Gün gün: açtığı sayfalar ve başlattığı testler sırayla. Sayfalar 4 Kasım 2026'dan beri hesaba bağlı tutulur (90 gün, hesapla silinir).</p>
+  </section>
  </>;
 }

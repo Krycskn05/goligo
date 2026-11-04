@@ -151,9 +151,12 @@ async function recordVisit(db, input, now = Date.now()) {
             .bind(now, day, visitor, input.memberId ? 1 : 0, path, sourceOf(input.referrer, input.host, input.internal === true), deviceOf(input.device), countryOf(input.country), languageOf(input.language)));
     if (input.memberId)
         writes.push(db.prepare('INSERT INTO member_seen (member_id,at) VALUES (?,?) ON CONFLICT(member_id) DO UPDATE SET at=excluded.at').bind(input.memberId, now));
+    // Üyenin açtığı sayfa hesabına bağlı da tutulur ("Kim ne yaptı"; gizlilik metni whatJourneys).
+    if (input.memberId && !repeat)
+        writes.push(db.prepare('INSERT INTO member_pages (member_id,at,path) VALUES (?,?,?)').bind(input.memberId, now, path));
     // Eski satırlar ara sıra silinir (her istekte değil).
     if (Math.random() < 0.05)
-        writes.push(db.prepare('DELETE FROM site_visits WHERE at<?').bind(now - exports.VISIT_KEEP_MS));
+        writes.push(db.prepare('DELETE FROM site_visits WHERE at<?').bind(now - exports.VISIT_KEEP_MS), db.prepare('DELETE FROM member_pages WHERE at<?').bind(now - exports.VISIT_KEEP_MS));
     if (writes.length)
         await db.batch(writes);
     return !repeat;

@@ -748,5 +748,14 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .site-header:not(.lk-public-header) .site-greeting { justify-self:center; margin-inline:0; }
  .site-header:not(.lk-public-header) .site-header-buttons { justify-self:end; }
 }
+/* The home page (the learner asked, 4 November 2026: "show the site language in the home page's top strip"): on phones
+   its header keeps the language button next to the account button, so the menu does not repeat it there. */
+@media (max-width:760px) {
+ .category-app:has(.ht) .site-header:not(.lk-public-header) .site-language { display:inline-flex; }
+ /* The language and the account button as one item of the right-hand column, side by side: the language right next to
+    the account button, away from the clock (the learner asked). */
+ .category-app:has(.ht) .site-header:not(.lk-public-header) .site-header-tools { display:flex; flex-wrap:nowrap; align-items:center; justify-content:flex-end; gap:6px; width:auto; justify-self:end; margin:0; }
+ .category-app:has(.ht) .site-account-list .site-account-phone[data-account-item=language] { display:none; }
+}
 /* With the two buttons in the menu there is room for the clock face on narrow phones too. */
 @media (max-width:380px) { .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { display:block; width:26px; height:26px; } }

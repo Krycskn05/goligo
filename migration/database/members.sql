@@ -76,3 +76,15 @@ CREATE TABLE IF NOT EXISTS member_seen (
   member_id TEXT PRIMARY KEY,
   at INTEGER NOT NULL
 );
+
+-- Hangi üye hangi sayfayı ne zaman açtı (yönetici panelinde "Kim ne yaptı"; site sahibi istedi, 4 Kasım 2026).
+-- Yalnızca giriş yapmış üyeler; satırlar 90 gün saklanır, hesap silinince silinir. Misafirler burada yoktur: onların
+-- sayfaları site_visits'te yalnızca o güne özel anahtarla görünür.
+CREATE TABLE IF NOT EXISTS member_pages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  member_id TEXT NOT NULL,
+  at INTEGER NOT NULL,
+  path TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS member_pages_member ON member_pages(member_id, at);
+CREATE INDEX IF NOT EXISTS member_pages_at ON member_pages(at);

@@ -35,7 +35,7 @@ export function SiteHeader({language,languages,onLanguage,homeHref,homeLabel,sho
     {/* The text is hidden on the round button (koko-theme.css), so the link carries its name itself (2 November 2026). */}
     {showHome&&<a className="object-back site-home" href={homeHref} aria-label={homeLabel} title={homeLabel}><House size={17} aria-hidden="true"/><span>{homeLabel}</span></a>}
     <EffectsSettingsButton language={language}/>
-    <AccountMenu language={language} guest={guest}/>
+    <AccountMenu language={language} guest={guest} languages={languages} onLanguage={onLanguage} languageLabel={label}/>
    </div>
   </div>
  </header>;

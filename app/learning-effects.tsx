@@ -18,7 +18,8 @@ const NAVIGATION='a[href],.housing-card-open,.housing-card-bottom,.housing-featu
 /** The three speaking speeds of the site voices (also offered in the welcome tour, app/site-tour.tsx). */
 export const VOICE_SPEEDS=[['0.65','speedSlow'],['0.94','speedComfortable'],['1','speedNormal']] as const;
 
-const OPEN_EFFECTS='lernkoko-open-effects';
+/** Opens the sounds and animations window (the header's sound button; on phones the account menu's line). */
+export const OPEN_EFFECTS='lernkoko-open-effects';
 /** Paul Hoca reacts in the answer badge with the learner's animations, a different one each time (app/paul-hoca.tsx):
  * "Harika!" — thumbs up, a wink, fists up or a happy "wow"; "Bir daha deneyelim" — a raised finger, "try again" or
  * "slow down"; end of a round — clapping, "we did it" or the cup, with applause. Right and wrong answers keep only their

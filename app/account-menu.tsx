@@ -5,7 +5,9 @@ import {accountLabel,accountMenuCopy,type AccountMenuKey} from '@/lib/header-cop
 import {guestText} from '@/lib/guest-copy';
 import type {VaultLanguage} from '@/lib/object-vault-copy';
 import {pickText} from '@/lib/site-languages';
+import {effectsText} from '@/lib/effects-copy';
 import {TopIcon} from './top-icons';
+import {OPEN_EFFECTS} from './learning-effects';
 
 type Item={key:string;icon:ReactNode;label:string;href?:string;download?:string;onClick?:()=>void};
 
@@ -13,9 +15,11 @@ type Item={key:string;icon:ReactNode;label:string;href?:string;download?:string;
  * The account button in the header (the learner asked, 22 October 2026: not pink but the colour of the sound button, and
  * a tap opens the parts underneath, one after another). A member gets Hesabım, the password, the site tour, the data
  * download and signing out; a visitor without an account (the guest taste) gets sign in and the free sign-up, both coming
- * back to this page. A tap outside or Escape closes it.
+ * back to this page. A tap outside or Escape closes it. On phones the menu starts with the site language and the sounds
+ * and animations (the learner asked, 4 November 2026: out of the header, so the clock and the day have room in the
+ * middle); on bigger screens those two keep their own header buttons and these lines stay hidden (koko-theme.css).
  */
-export function AccountMenu({language,guest=false}:{language:VaultLanguage;guest?:boolean}){
+export function AccountMenu({language,guest=false,languages,onLanguage,languageLabel=''}:{language:VaultLanguage;guest?:boolean;languages?:readonly {id:string;label:string}[];onLanguage?:(id:string)=>void;languageLabel?:string}){
  const [open,setOpen]=useState(false);const [busy,setBusy]=useState(false);const [back,setBack]=useState('/');
  // The list is placed on the screen under the button (fixed), because the header cuts off what reaches outside it.
  const [place,setPlace]=useState<{top:number;side:number;rtl:boolean}|null>(null);
@@ -55,6 +59,8 @@ export function AccountMenu({language,guest=false}:{language:VaultLanguage;guest
  return <div className={'site-account-menu'+(open?' open':'')} ref={root} data-account-menu>
   <button ref={button} type="button" className="site-home site-account" aria-label={account} title={account} aria-expanded={open} aria-controls={listId} onClick={toggle} data-guest-account={guest||undefined}><TopIcon name="account" size={30}/></button>
   <ul id={listId} className="site-account-list" hidden={!open||!place} style={place?{top:place.top,[place.rtl?'left':'right']:place.side}:undefined} aria-label={account} data-account-list>
+   {languages&&onLanguage&&<li className="site-account-phone" data-account-item="language"><label className="site-account-language"><span className="site-account-icon"><TopIcon name="language" size={24}/></span><span>{languageLabel}: <b>{languages.find(item=>item.id===language)?.label??language.toUpperCase()}</b></span><select value={language} aria-label={languageLabel} onChange={event=>{setOpen(false);onLanguage(event.target.value);}}>{languages.map(item=><option key={item.id} value={item.id} lang={item.id}>{item.label}</option>)}</select></label></li>}
+   <li className="site-account-phone" data-account-item="sounds"><button type="button" onClick={()=>{setOpen(false);window.dispatchEvent(new Event(OPEN_EFFECTS));}}><span className="site-account-icon"><TopIcon name="sounds" size={24}/></span><span>{effectsText(language,'settings')}</span></button></li>
    {items.map((item,index)=><li key={item.key} style={{animationDelay:index*55+'ms'}} data-account-item={item.key}>
     {item.href
      ?<a href={item.href} download={item.download} onClick={()=>setOpen(false)}><span className="site-account-icon">{item.icon}</span><span>{item.label}</span></a>

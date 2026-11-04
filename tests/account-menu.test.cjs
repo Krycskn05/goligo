@@ -7,7 +7,7 @@ const read=file=>fs.readFileSync(file,'utf8');
 
 test('the menu opens under the button with the member parts, or sign in and sign up for a visitor',()=>{
  const menu=read('app/account-menu.tsx'),header=read('app/site-header.tsx');
- assert.ok(header.includes('<AccountMenu language={language} guest={guest}/>')&&!header.includes('<a className="site-home site-account"'));
+ assert.ok(header.includes('<AccountMenu language={language} guest={guest} languages={languages} onLanguage={onLanguage} languageLabel={label}/>')&&!header.includes('<a className="site-home site-account"'));
  assert.ok(menu.includes('className="site-home site-account"')&&menu.includes('aria-expanded={open}')&&menu.includes('aria-controls={listId}'),'a real button the tour can still light (.site-account)');
  for(const part of ["href:'/hesabim'","href:'/hesabim#sifre'","href:'/?tur=1'","href:'/api/auth?export=1',download:'goliqo-verilerim.json'","JSON.stringify({action:'logout'})","href:'/giris?return_to='+encodeURIComponent(back)","href:'/uye-ol?return_to='+encodeURIComponent(back)"])assert.ok(menu.includes(part),part);
  assert.ok(menu.includes("event.key==='Escape'")&&menu.includes("addEventListener('pointerdown',outside)"),'Escape and a tap outside close it');

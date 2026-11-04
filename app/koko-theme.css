@@ -709,17 +709,18 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
    29 October 2026, with the clock moved to the other side): a small calendar leaf first — the German month short on an
    orange strip (OKT), the day of the month under it — then the weekday and the part of the day, the clock at the end.
    The capsule is mirrored to match: a little room before the leaf, the round clock close to the end. */
-.sg-leaf { flex:none; display:grid; grid-template-rows:auto 1fr; width:34px; height:36px; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 0 0 1.5px #f0c9a8,0 2px 0 #f0d9bd; text-align:center; }
-.sg-leaf-month { display:block; background:linear-gradient(180deg,#f28a4b,#e8742c); color:#fff; font-size:9px; font-weight:800; letter-spacing:.06em; line-height:12px; }
-.sg-leaf-day { display:grid; place-items:center; color:var(--ink); font-size:17px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+/* Since 4 November 2026 the learner's own calendar picture (Goliqo-ikonlar.zip); the month and the day on its page. */
+.sg-leaf { flex:none; position:relative; display:block; width:40px; height:40px; background:url(/icons/header/calendar.webp) center / contain no-repeat; text-align:center; }
+.sg-leaf-month { position:absolute; inset-inline:0; top:37%; color:#e8742c; font-size:8.5px; font-weight:900; letter-spacing:.04em; line-height:1; }
+.sg-leaf-day { position:absolute; inset-inline:0; top:51%; color:var(--ink); font-size:15px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
 @media (min-width:761px) {
  .site-header:not(.lk-public-header) .site-greeting { padding-block:3px; padding-inline:8px 3px; }
 }
 @media (max-width:760px) {
  .site-header:not(.lk-public-header) .site-greeting { padding-block:2px; padding-inline:5px 2px; }
- .sg-leaf { width:25px; height:27px; border-radius:6px; }
- .sg-leaf-month { font-size:7px; line-height:9px; }
- .sg-leaf-day { font-size:13px; }
+ .sg-leaf { width:30px; height:30px; }
+ .sg-leaf-month { font-size:6.5px; }
+ .sg-leaf-day { font-size:11.5px; }
 }
 /* Below 381 px the clock face is hidden: the capsule ends with the words. */
 @media (max-width:380px) {
@@ -730,9 +731,9 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
  .site-header:not(.lk-public-header) .site-logo-brand { width:58px; }
  .site-header:not(.lk-public-header) .site-greeting { padding-inline:2px 4px; }
  .site-header:not(.lk-public-header) .site-greeting-button { gap:4px; }
- .sg-leaf { width:21px; height:24px; border-radius:5px; }
- .sg-leaf-month { font-size:6.5px; line-height:8px; }
- .sg-leaf-day { font-size:12px; }
+ .sg-leaf { width:26px; height:26px; }
+ .sg-leaf-month { display:none; }
+ .sg-leaf-day { top:42%; font-size:11px; }
  .site-header:not(.lk-public-header) .site-greeting-day { font-size:11.5px; }
  .site-header:not(.lk-public-header) .site-greeting-part .sg-part-icon { display:none; }
 }

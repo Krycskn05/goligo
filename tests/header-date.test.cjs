@@ -21,11 +21,11 @@ test('the capsule is mirrored and the leaf fits every phone',()=>{
  const at=css.indexOf('/* The date on the header clock');
  assert.ok(at>0,'the leaf styles');
  const part=css.slice(at);
- assert.ok(part.includes('.sg-leaf { flex:none; display:grid; grid-template-rows:auto 1fr; width:34px; height:36px;'));
- assert.ok(part.includes('.sg-leaf-month { display:block; background:linear-gradient(180deg,#f28a4b,#e8742c);'),'the orange strip');
+ assert.ok(part.includes('.sg-leaf { flex:none; position:relative; display:block; width:40px; height:40px; background:url(/icons/header/calendar.webp) center / contain no-repeat;'),'the learner\'s calendar picture (4 November 2026)');
+ assert.ok(part.includes('.sg-leaf-month { position:absolute; inset-inline:0; top:37%; color:#e8742c;'),'the month on the page');
  assert.ok(part.includes('.site-header:not(.lk-public-header) .site-greeting { padding-block:3px; padding-inline:8px 3px; }'),'room before the leaf, the clock near the end');
- assert.ok(part.includes('.sg-leaf { width:25px; height:27px; border-radius:6px; }'),'smaller on phones');
- assert.ok(part.includes('@media (max-width:340px) {')&&part.includes('.sg-leaf { width:21px; height:24px;'),'the narrowest phones');
+ assert.ok(part.includes('.sg-leaf { width:30px; height:30px; }'),'smaller on phones');
+ assert.ok(part.includes('@media (max-width:340px) {')&&part.includes('.sg-leaf { width:26px; height:26px; }')&&part.includes('.sg-leaf-month { display:none; }'),'the narrowest phones: only the day');
  // The leaf styles come after the header row styles, so they win.
  assert.ok(at>css.indexOf('Header "Tek satır şerit"'));
 });

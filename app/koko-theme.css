@@ -425,8 +425,7 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
    481 px (the logo leads to the same page), the clock face below 381 px (the day and the part of the day stay). */
 @media (max-width:480px) {
  .site-header:not(.lk-public-header) .site-header-buttons > .object-back { display:none; }
- /* During a test the clock and the site language are hidden, so there is room for it. */
- .toon-app:has(.object-question) .site-header .site-header-buttons > .object-back { display:inline-flex; }
+ /* During a test too (4 November 2026: the header is the same on every page, with the clock): the ✕ of the test leads back. */
 }
 @media (max-width:440px) {
  .site-header .site-greeting-button { gap:6px; }

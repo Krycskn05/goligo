@@ -36,7 +36,7 @@ test('phones: one row, the select lies over the round language button',()=>{
 test('narrow phones: smaller, the home button and then the clock face step aside',()=>{
  const css=read('app/koko-theme.css');
  assert.ok(block(css,'@media (max-width:480px) {').includes('.site-header:not(.lk-public-header) .site-header-buttons > .object-back { display:none; }'));
- assert.ok(block(css,'@media (max-width:480px) {').includes('.toon-app:has(.object-question) .site-header .site-header-buttons > .object-back { display:inline-flex; }'),'during a test there is room');
+ assert.ok(!css.includes('.toon-app:has(.object-question) .site-header .site-header-buttons > .object-back { display:inline-flex; }'),'during a test the same header as everywhere (4 November 2026)');
  assert.ok(block(css,'@media (max-width:440px) {\n .site-header .site-greeting-button { gap:6px; }').includes('.analog-clock { width:30px; height:30px; }'));
  assert.ok(block(css,'@media (max-width:380px) {\n .site-header .site-greeting-button .analog-clock { display:none; }').includes('.site-greeting-waiting { width:76px; }'));
 });

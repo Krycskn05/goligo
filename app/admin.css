@@ -70,3 +70,35 @@
 }
 .adm-entry { margin:18px 0 0; text-align:center; }
 .adm-detail { display:block; color:var(--ink-3); font-size:13px; }
+
+/* Ziyaretçiler ve üye davranışı (4 Kasım 2026; lib/visit-stats.ts) */
+.adm-part { margin:10px 0 -6px; font-size:22px; }
+.adm-visit-cards { grid-template-columns:repeat(4,minmax(0,1fr)); margin:4px 0 18px; }
+.adm-visit-cards .adm-stat { box-shadow:none; background:#f6f9fc; }
+.adm-visit-chart .adm-bar-fill { background:#9fd3f0; }
+.adm-visit-chart .adm-bar-ok { background:#1f6fc4; }
+.adm-key.guest { background:#9fd3f0; } .adm-key.member { background:#1f6fc4; }
+.adm-two.adm-even { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.adm-two.adm-three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.adm-counts li { grid-template-columns:minmax(120px,190px) minmax(0,1fr); }
+.adm-counts .adm-area-name { font-weight:700; font-size:14px; overflow-wrap:anywhere; }
+.adm-habits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; }
+.adm-habits h3 { margin:0 0 10px; font-size:16px; }
+.adm-habits h3 small { color:var(--ink-3); font-weight:700; }
+.adm-habits h3 + .adm-facts + h3 { margin-top:18px; }
+.adm-seen { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.adm-seen li { display:flex; align-items:center; gap:10px; }
+.adm-seen li .adm-ago { margin-inline-start:auto; }
+.adm-seen-dot { flex:none; width:10px; height:10px; border-radius:50%; background:#cfd8e2; }
+.adm-seen li.online .adm-seen-dot { background:#2fb344; box-shadow:0 0 0 4px rgba(47,179,68,.18); }
+.adm-facts, .adm-funnel { margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+.adm-facts strong, .adm-funnel strong { font-size:20px; margin-inline-end:6px; }
+.adm-facts small, .adm-funnel small { color:var(--ink-3); }
+.adm-funnel li { padding:8px 12px; border-radius:12px; background:#f6f9fc; }
+.adm-funnel li:nth-child(2) { margin-inline-start:14px; } .adm-funnel li:nth-child(3) { margin-inline-start:28px; background:#eaf7ec; }
+@media (max-width:1000px) { .adm-two.adm-three { grid-template-columns:minmax(0,1fr); } .adm-visit-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:640px) {
+ .adm-two.adm-even { grid-template-columns:minmax(0,1fr); }
+ .adm-habits { grid-template-columns:minmax(0,1fr); }
+ .adm-counts li { grid-template-columns:minmax(0,1fr); }
+}

@@ -23,6 +23,7 @@ export function PrivacyView({language,signedIn}:{language:SiteLanguage;signedIn:
     <li>{rich('whatLanguageCookie',{code:()=><code>{LANGUAGE_COOKIE}</code>})}</li>
     <li>{rich('whatDeviceLanguage')}</li>
     <li>{rich('whatLimit')}</li>
+    <li>{rich('whatVisits')}</li>
     <li>{rich('whatBrowser')}</li>
    </ul>
 

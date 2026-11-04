@@ -23,6 +23,7 @@ import { OptionFit } from './option-fit';
 import { LetterBar } from './letter-bar';
 import { LessonSync } from './lesson-sync';
 import { TapToSay } from './tap-to-say';
+import { VisitBeacon } from './visit-beacon';
 import { STORAGE_MOVE_SCRIPT } from "@/lib/storage-move";
 
 export const metadata: Metadata = {
@@ -59,7 +60,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
         <meta name="theme-color" content="#fdf8ec" />
       </head>
-      <body className="antialiased">{children}<LearningEffects/><OptionFit/><LetterBar/><LessonSync/><TapToSay/></body>
+      <body className="antialiased">{children}<LearningEffects/><OptionFit/><LetterBar/><LessonSync/><TapToSay/><VisitBeacon/></body>
     </html>
   );
 }

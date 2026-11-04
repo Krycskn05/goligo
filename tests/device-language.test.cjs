@@ -75,7 +75,7 @@ test('the legal pages: the Turkish original, a translation note elsewhere, the l
  assert.ok(parts.includes("{language!=='tr'&&<p className=\"lk-legal-note\" data-legal-translation>{text('translationNote')}</p>}"));
  assert.ok(privacy.includes("rich('whatLanguageCookie',{code:()=><code>{LANGUAGE_COOKIE}</code>})")&&privacy.includes('<LegalDate language={language}/>')&&terms.includes('<LegalDate language={language}/>'));
  assert.ok(read('lib/legal-copy.ts').includes("'{b}Dil çerezi:{/b} seçilen site dili {code} adlı bir çerezde saklanır"));
- assert.equal(read('app/legal.tsx').match(/LEGAL_UPDATED='([^']+)'/)[1],'2026-10-22');
+ assert.equal(read('app/legal.tsx').match(/LEGAL_UPDATED='([^']+)'/)[1],'2026-11-04','updated for the visit statistics item');
  assert.ok(privacy.includes("<li>{rich('whatDeviceLanguage')}</li>"),'the privacy page says the device language is read and nothing is kept');
  // Every legal key is used on a page.
  const used=privacy+terms+parts+read('app/legal.tsx')+read('app/gizlilik/page.tsx')+read('app/kullanim-kosullari/page.tsx')+read('app/impressum/page.tsx');

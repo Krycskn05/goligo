@@ -5,6 +5,7 @@ import {SITE_NAME} from '@/lib/site-brand';
 import {signInPath} from '@/lib/member-auth';
 import type {Db} from '@/lib/member-store';
 import {isAdminEmail,loadOverview,loadAreas,loadMembers,loadTopMistakes,loadSessions,loadMember,formatTime,ago,percent,modeName,topicName,dayStart,zoneOffsetMs,type DayRow,type AreaRow,type SessionRow} from '@/lib/admin-stats';
+import {loadVisits,loadMemberHabits,type VisitOverview,type VisitDay,type CountRow,type MemberHabits} from '@/lib/visit-stats';
 import {getChatGPTUser} from '../chatgpt-auth';
 import {PublicPage} from '../public-shell';
 /** The admin panel is written in Turkish (the site owner's language), so its header and footer are Turkish too. */
@@ -15,7 +16,8 @@ export const metadata:Metadata={title:`Yönetici paneli · ${SITE_NAME}`,robots:
 type Search=Promise<Record<string,string|string[]|undefined>>;
 
 /**
- * Yönetici paneli: üyeler, giriş zamanları, ne çalıştıkları ve nerede yanlış yaptıkları.
+ * Yönetici paneli: ziyaretçiler (kaç kişi, hangi sayfalar, nereden, hangi cihaz/ülke/dil; 4 Kasım 2026), üyeler, giriş
+ * zamanları, ne çalıştıkları, nerede yanlış yaptıkları, kimin şu an çevrimiçi olduğu ve yeni üyelerin geri gelip gelmediği.
  * Yalnızca lib/admin-access.ts içindeki ADMIN_EMAILS ile giriş yapan hesap görür; başka herkese
  * "Sayfa bulunamadı" görünür ve hiçbir kayıt okunmaz.
  */
@@ -30,11 +32,14 @@ export default async function AdminPage({searchParams}:{searchParams:Search}){
    const member=await loadMember(db,memberId,now);
    return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="member">{member?<MemberView member={member} now={now}/>:<section className="adm-card"><a className="adm-back" href="/yonetim">← Yönetici paneli</a><h1>Üye bulunamadı</h1></section>}</div></PublicPage>;
   }
-  const [overview,areas,members,mistakes,sessions]=await Promise.all([loadOverview(db,now),loadAreas(db),loadMembers(db,now),loadTopMistakes(db,20),loadSessions(db,30)]);
+  const [overview,areas,members,mistakes,sessions,visits,habits]=await Promise.all([loadOverview(db,now),loadAreas(db),loadMembers(db,now),loadTopMistakes(db,20),loadSessions(db,30),loadVisits(db,now),loadMemberHabits(db,now)]);
   const accuracy=percent(overview.correct,overview.answers);
   return <PublicPage language={ADMIN_LANGUAGE} signedIn><div className="adm" data-admin-panel="overview">
    <header className="adm-head"><div><span className="eyebrow">{SITE_NAME}</span><h1>Yönetici paneli</h1><p>Üyelerin ne çalıştığı, ne zaman girdiği ve nerede zorlandığı. Saatler Berlin saatiyle.</p></div>
-    <nav className="adm-jump" aria-label="Bölümler"><a href="#uyeler">Üyeler</a><a href="#yanlislar">Zorlanılan sorular</a><a href="#son">Son çalışmalar</a></nav></header>
+    <nav className="adm-jump" aria-label="Bölümler"><a href="#ziyaret">Ziyaretçiler</a><a href="#davranis">Üye davranışı</a><a href="#uyeler">Üyeler</a><a href="#yanlislar">Zorlanılan sorular</a><a href="#son">Son çalışmalar</a></nav></header>
+   <Visitors v={visits} now={now}/>
+   <Habits h={habits} funnel={visits.funnel} now={now}/>
+   <h2 className="adm-part">Çalışma</h2>
    <section className="adm-cards" aria-label="Özet">
     <Stat label="Üye" value={overview.members} note={`Son 7 günde ${overview.new7} yeni · 30 günde ${overview.new30}`}/>
     <Stat label="Bugün çalışan" value={overview.learnersToday} note={`7 günde ${overview.learners7} · 30 günde ${overview.learners30} kişi`}/>
@@ -76,6 +81,89 @@ export default async function AdminPage({searchParams}:{searchParams:Search}){
   console.error('Yönetici paneli okunamadı',error);
   return <PublicPage language={ADMIN_LANGUAGE} signedIn narrow><section className="lk-auth-card"><h1>Yönetici paneli</h1><p className="lk-form-error" role="alert">Kayıtlara şu anda ulaşılamıyor. Biraz sonra yeniden dene.</p></section></PublicPage>;
  }
+}
+
+/** Ziyaretçiler (lib/visit-stats.ts): şu an, bugün, 7 ve 30 gün; 30 günün grafiği ve sayfa, kaynak, cihaz, ülke, dil dökümü. */
+function Visitors({v,now}:{v:VisitOverview;now:number}){
+ return <>
+  <section className="adm-card" id="ziyaret" aria-labelledby="adm-visits"><h2 id="adm-visits">Ziyaretçiler</h2>
+   <div className="adm-cards adm-visit-cards">
+    <Stat label="Şu an sitede" value={v.online} note={`${v.onlineMembers} üye · ${Math.max(0,v.online-v.onlineMembers)} misafir · son 5 dakika`}/>
+    <Stat label="Bugün" value={v.today.visitors} note={`${v.today.views} sayfa · ${v.today.members} üye · dün ${v.yesterday.visitors} kişi`}/>
+    <Stat label="Son 7 gün" value={v.week.visits} note={`ziyaret · ${v.week.views} sayfa açıldı`}/>
+    <Stat label="Son 30 gün" value={v.month.visits} note={`ziyaret · ${v.month.views} sayfa açıldı`}/>
+   </div>
+   <VisitChart days={v.days} now={now}/>
+   <p className="adm-note">Ziyaretçi: o gün siteye giren farklı kişi (cihaz); aynı kişi iki gün gelirse iki ziyaret sayılır. Çerez ve IP adresi tutulmaz. Senin kendi ziyaretlerin ve arama motoru botları sayılmaz. Dökümler son 30 gün.</p>
+  </section>
+  <div className="adm-two adm-even">
+   <section className="adm-card" aria-labelledby="adm-pages"><h2 id="adm-pages">En çok açılan sayfalar</h2><Counts rows={v.pages} views/></section>
+   <section className="adm-card" aria-labelledby="adm-sources"><h2 id="adm-sources">Nereden geldiler</h2><Counts rows={v.sources}/><p className="adm-note">WhatsApp ve çoğu uygulama nereden gelindiğini söylemez; bu ziyaretler “Doğrudan” sayılır.</p></section>
+  </div>
+  <div className="adm-two adm-even adm-three">
+   <section className="adm-card" aria-labelledby="adm-devices"><h2 id="adm-devices">Cihaz</h2><Counts rows={v.devices} share/></section>
+   <section className="adm-card" aria-labelledby="adm-countries"><h2 id="adm-countries">Ülke</h2><Counts rows={v.countries} share/></section>
+   <section className="adm-card" aria-labelledby="adm-languages"><h2 id="adm-languages">Site dili</h2><Counts rows={v.languages} share/></section>
+  </div>
+ </>;
+}
+
+/** Ziyaretçi grafiği: her gün bir çubuk, koyu kısmı üyeler. */
+function VisitChart({days,now}:{days:VisitDay[];now:number}){
+ const offset=zoneOffsetMs(now);const max=Math.max(1,...days.map(d=>d.visitors));
+ const total=days.reduce((sum,d)=>sum+d.visitors,0);
+ return <figure className="adm-chart adm-visit-chart">
+  <div className="adm-bars" role="img" aria-label={`Son ${days.length} günde ${total} ziyaret`}>
+   {days.map((d,i)=>{const date=formatTime(dayStart(d.day,offset)+12*3600000,false).slice(0,5);
+    return <div className="adm-bar" key={d.day} title={`${date}: ${d.visitors} kişi (${d.members} üye, ${d.visitors-d.members} misafir) · ${d.views} sayfa`}>
+     <span className="adm-bar-fill" style={{height:Math.max(d.visitors?6:0,Math.round(d.visitors/max*100))+'%'}}><span className="adm-bar-ok" style={{height:percent(d.members,d.visitors)+'%'}}/></span>
+     <small>{i%5===0||i===days.length-1?date:''}</small>
+    </div>;})}
+  </div>
+  <figcaption><span className="adm-key guest"/>Misafir <span className="adm-key member"/>Üye · Çubuğun üstüne gelince ayrıntı görünür.</figcaption>
+ </figure>;
+}
+
+/** Sayılar listesi: çubuk kişi sayısına göre; `views` sayfa görüntülemesini, `share` toplam içindeki payı da yazar. */
+function Counts({rows,views=false,share=false}:{rows:CountRow[];views?:boolean;share?:boolean}){
+ if(!rows.length)return <p className="adm-empty">Henüz kayıt yok.</p>;
+ const max=Math.max(1,...rows.map(r=>r.visitors));const total=rows.reduce((sum,r)=>sum+r.visitors,0);
+ return <ul className="adm-areas adm-counts">{rows.map(r=><li key={r.key}>
+  <span className="adm-area-name">{r.name}</span>
+  <span className="adm-area-bar"><span style={{width:Math.round(r.visitors/max*100)+'%'}}/></span>
+  <span className="adm-area-num"><strong>{r.visitors}</strong> kişi{views?` · ${r.views} kez açıldı`:''}{share?` · %${percent(r.visitors,total)}`:''}</span>
+ </li>)}</ul>;
+}
+
+/** Üye davranışı: şu an çevrimiçi ve son görülen üyeler, yeni üyelerin geri gelişi, misafirden üyeliğe. */
+function Habits({h,funnel,now}:{h:MemberHabits;funnel:VisitOverview['funnel'];now:number}){
+ const online=h.seen.filter(m=>m.online);
+ return <section className="adm-card" id="davranis" aria-labelledby="adm-habits"><h2 id="adm-habits">Üye davranışı</h2>
+  <div className="adm-habits">
+   <div>
+    <h3>Şu an çevrimiçi <small>{online.length}</small></h3>
+    {h.seen.length?<ul className="adm-seen">{h.seen.map(m=><li key={m.id} className={m.online?'online':''}>
+     <span className="adm-seen-dot" aria-hidden="true"/><a className="adm-member" href={'/yonetim?uye='+encodeURIComponent(m.id)}><strong>{m.name||'—'}</strong></a>
+     <small className="adm-ago">{m.online?'şu an sitede':ago(m.at,now)}</small>
+    </li>)}</ul>:<p className="adm-empty">Henüz kayıt yok.</p>}
+    <p className="adm-note">Yeşil: son 5 dakikada bir sayfa açtı. Altındakiler en son görülenler.</p>
+   </div>
+   <div>
+    <h3>Yeni üyeler geri geliyor mu?</h3>
+    <ul className="adm-facts">
+     <li><strong>{h.newMembers}</strong> kişi son 30 günde üye oldu.</li>
+     <li><strong>{h.backEligible?'%'+percent(h.cameBack,h.backEligible):'—'}</strong> sonraki bir gün yeniden geldi <small>({h.cameBack} / {h.backEligible})</small></li>
+     <li><strong>{h.weekEligible?'%'+percent(h.weekLater,h.weekEligible):'—'}</strong> bir hafta sonra hâlâ geliyor <small>({h.weekLater} / {h.weekEligible}, 7–60 gün önce üye olanlar)</small></li>
+    </ul>
+    <h3>Misafirden üyeye (son 30 gün)</h3>
+    <ol className="adm-funnel">
+     <li><strong>{funnel.guests}</strong> misafir ziyareti</li>
+     <li><strong>{funnel.signupPage}</strong> “Üye ol” sayfasını açtı</li>
+     <li><strong>{funnel.newMembers}</strong> yeni üye <small>{funnel.guests?'(%'+percent(funnel.newMembers,funnel.guests)+')':''}</small></li>
+    </ol>
+   </div>
+  </div>
+ </section>;
 }
 
 function Stat({label,value,note}:{label:string;value:number|string;note:string}){

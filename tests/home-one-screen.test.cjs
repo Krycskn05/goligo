@@ -29,6 +29,15 @@ test('computers: header, cards and footer share the window height',()=>{
  assert.ok(low.includes('.category-app:has(.ht) .work-sidebar .work-nav { min-height:0; padding:.38rem .8rem; }'));
 });
 
+test('upright tablets: two columns, so the pictures are not tiny (5 November 2026: "düzelmedi")',()=>{
+ const css=read('app/home-tour.css');
+ const three=css.indexOf('@media (max-width:1100px) and (min-width:761px) { .ht-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }');
+ const upright=block(css,'@media (min-width:761px) and (max-width:1100px) and (max-aspect-ratio:5/6) {');
+ assert.ok(three>=0&&css.indexOf(upright)>three,'comes after the three-column rule, so it wins on an upright tablet');
+ assert.ok(upright.includes('.ht-grid { grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(3,minmax(0,auto)); }'),'Üniteler over both columns, then two rows of two, all rows may shrink');
+ assert.ok(upright.includes('.ht-text { min-height:calc(3 * 1.45em); -webkit-line-clamp:3; }'),'the wider cards show three text lines');
+});
+
 test('phones keep the long home page',()=>{
  const css=read('app/home-tour.css');
  const phone=block(css,'@media (max-width:760px) {\n .ht-hero');

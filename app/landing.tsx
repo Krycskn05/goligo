@@ -5,7 +5,7 @@ import {PublicHeader} from './public-shell';
 import {SiteFooter} from './site-footer';
 import AuthForm from './auth-form';
 import {authFormTexts} from '@/lib/auth-texts';
-import {pickPictures,HOME_COVERS,type PicturePart} from '@/lib/site-pictures';
+import {pickPictures,LANDING_COVERS,type PicturePart} from '@/lib/site-pictures';
 import {publicText,type PublicCopyKey} from '@/lib/public-copy';
 import {languageDirection,type SiteLanguage} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
@@ -17,7 +17,7 @@ import {gameIds} from '@/lib/verb-games';
 import {pageLanguage} from './page-language';
 
 // One tile for each part of the site, in the order of the menu, with the names the menu uses and a short German line
-// (as on the home page), each with its own cover, always the same (lib/site-pictures.ts HOME_COVERS, 4 November 2026);
+// (as on the home page), each with its own cover, always the same (lib/site-pictures.ts LANDING_COVERS, 5 November 2026);
 // only the welcome picture above still changes every 30 minutes.
 // `href`: the part a visitor can try without an account (the guest taste); Yanlışlarım needs saved answers, so it leads
 // to the sign-up form below.
@@ -72,7 +72,7 @@ export function LandingView({language}:{language:SiteLanguage}){
     <ul className="lk-parts">
      {features(language).map(item=><li key={item.part}>
       <a className={'lk-part'+(item.href?'':' locked')} href={item.href??'#uye-ol'} data-landing-try={item.href?item.part:undefined} data-landing-locked={item.href?undefined:item.part}>
-       <img src={HOME_COVERS[item.part]} alt="" width={1200} height={600} loading="lazy"/>
+       <img src={LANDING_COVERS[item.part]} alt="" width={960} height={720} loading="lazy"/>
        <strong>{item.title}</strong>
        <small>{item.de}</small>
        {item.href?<span className="lk-part-try">{g('guestTryShort')}</span>:<span className="lk-part-lock"><Lock size={14} aria-hidden="true"/>{g('guestLocked')}</span>}

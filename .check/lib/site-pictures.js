@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.COMPUTER_MEDIA = exports.HOME_COVERS_PC = exports.HOME_COVERS = exports.PICTURE_PERIOD_MS = exports.PART_PICTURES = void 0;
+exports.LANDING_COVERS = exports.WIDE_MEDIA = exports.HOME_COVERS_PC = exports.HOME_COVERS = exports.PICTURE_PERIOD_MS = exports.PART_PICTURES = void 0;
 exports.pickPictures = pickPictures;
 exports.nextPictureChange = nextPictureChange;
 /**
@@ -33,26 +33,27 @@ function pickPictures(now = Date.now()) {
     return pick;
 }
 /**
- * The covers of the parts on the home page and on the introduction page: one picture per part, made for it by the
- * learner (Goliqo-ana-sayfa-kapaklari.zip, 4 November 2026: "the pictures were made for the topics, never change
- * them"). Always the same, no 30-minute change; only the welcome picture of the introduction page still changes.
+ * The covers of the parts on the home page and on the introduction page: one picture per part, always the same, no
+ * 30-minute change (only the welcome picture of the introduction page still changes). Since 5 November 2026 every
+ * screen uses the learner's panoramic pictures (Goliqo-panoramik-kapaklar-1536x1024.zip, "put these on the home page":
+ * everywhere, the earlier covers of Goliqo-ana-sayfa-kapaklari.zip are gone). Each set is cut from them for its frames,
+ * every picture centred on its people and things.
  */
 // Their own file names (public/toon/kapak): phones and browsers keep a picture under the same address for days, so new
 // covers under old names did not show (the learner saw the old ones, 4 November 2026).
+/** Phones (up to 760 px): every card frame is 2:1, so 1200×600, at the same scale as HOME_COVERS_PC. */
 exports.HOME_COVERS = {
-    units: '/toon/kapak/units.webp',
-    vault: '/toon/kapak/vault.webp',
-    verbs: '/toon/kapak/verbs.webp',
-    games: '/toon/kapak/games.webp',
-    mistakes: '/toon/kapak/mistakes.webp',
+    units: '/toon/kapak/units-phone.webp',
+    vault: '/toon/kapak/vault-phone.webp',
+    verbs: '/toon/kapak/verbs-phone.webp',
+    games: '/toon/kapak/games-phone.webp',
+    mistakes: '/toon/kapak/mistakes-phone.webp',
 };
 /**
- * The covers for computers (Goliqo-panoramik-kapaklar-1536x1024.zip, made by the learner for computers only, 5 November
- * 2026: "don't spoil how it looks on the phone and the tablet"). On a computer the home page fits one screen, so the
- * card frames are lower than 2:1 (a 1536×730 laptop gives the small cards 2.5:1 and the wide Üniteler card 4.3 to
- * 5.4:1) and the 2:1 covers lost their top and bottom. These are cut for those frames, every picture centred on its
- * people and things: the four small cards 1200×520, Üniteler 2600×520 (the plain wall and table carried on at its
- * sides), all at the same scale. Phones and tablets keep HOME_COVERS.
+ * Tablets and computers (from 761 px, WIDE_MEDIA). There the home page fits one screen, so the card frames are 2:1 or
+ * lower (a 1536×730 laptop gives the small cards 2.5:1 and the wide Üniteler card 4.3 to 5.4:1): the four small cards
+ * 1200×520, Üniteler 2600×520 (the plain wall and table carried on at its sides), all at the same scale. In a 2:1 frame
+ * a small card still shows all of its people and things (the widest, Fiil Atölyesi, is 903 of the 1040 shown).
  */
 exports.HOME_COVERS_PC = {
     units: '/toon/kapak/units-pc.webp',
@@ -61,8 +62,18 @@ exports.HOME_COVERS_PC = {
     games: '/toon/kapak/games-pc.webp',
     mistakes: '/toon/kapak/mistakes-pc.webp',
 };
-/** The screens that get HOME_COVERS_PC: wider than a phone and used with a mouse or trackpad (a touch tablet is not).
- * app/koko-theme.css uses the same query for the wide card's fit. */
-exports.COMPUTER_MEDIA = '(min-width:761px) and (hover:hover) and (pointer:fine)';
+/** The screens that get HOME_COVERS_PC: wider than a phone (tablets and computers). */
+exports.WIDE_MEDIA = '(min-width:761px)';
+/**
+ * The introduction page's tiles (app/landing.tsx): 4:3 frames (the last tile 3:1 on a phone), so 960×720, cut closer
+ * than the home page covers so the people stay big in the small tiles; Üniteler a little wider to keep its books.
+ */
+exports.LANDING_COVERS = {
+    units: '/toon/kapak/units-intro.webp',
+    vault: '/toon/kapak/vault-intro.webp',
+    verbs: '/toon/kapak/verbs-intro.webp',
+    games: '/toon/kapak/games-intro.webp',
+    mistakes: '/toon/kapak/mistakes-intro.webp',
+};
 /** Milliseconds until the pictures change next. */
 function nextPictureChange(now = Date.now()) { return exports.PICTURE_PERIOD_MS - now % exports.PICTURE_PERIOD_MS; }

@@ -115,28 +115,30 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  }
  for(const name of ['housing','ausbildung'])assert.ok(!icons.includes(name+":'/icons/menu/"),name+' keeps its drawing');
  assert.ok(icons.includes("if(picture)return <span className={'nav-icon has-picture nav-icon-'+name} aria-hidden=\"true\"><img src={picture} alt=\"\" width={128} height={128}"));
- // Since 4 November 2026 every home page card has its own cover, made by the learner for that part, always the same
- // (Goliqo-ana-sayfa-kapaklari.zip: "never change them"); the sets below stay for the welcome picture's turns.
+ // Since 4 November 2026 every home page card has its own cover, always the same; since 5 November 2026 on every screen
+ // the learner's panoramic pictures (Goliqo-panoramik-kapaklar-1536x1024.zip, "put these on the home page": everywhere).
+ // The sets below stay for the welcome picture's turns.
  const tour=read('app/home-tour.tsx');
- assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><picture><source media={COMPUTER_MEDIA} srcSet={HOME_COVERS_PC[id]} width={id==='units'?2600:1200} height={520}/><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/></picture>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
+ assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><picture><source media={WIDE_MEDIA} srcSet={HOME_COVERS_PC[id]} width={id==='units'?2600:1200} height={520}/><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/></picture>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
  const sitePictures=require(path.join(compiled,'site-pictures.js'));
- const covers=sitePictures.HOME_COVERS;
- assert.deepEqual(covers,{units:'/toon/kapak/units.webp',vault:'/toon/kapak/vault.webp',verbs:'/toon/kapak/verbs.webp',games:'/toon/kapak/games.webp',mistakes:'/toon/kapak/mistakes.webp'},'their own names: no old picture kept by a browser shows instead');
- for(const src of Object.values(covers))assert.deepEqual(size('public'+src),[1200,600],src+': 2 : 1 like every card frame on a phone or tablet, so the card shows it whole and even');
- // 5 November 2026: a computer gets the learner's covers made for its lower frames (Goliqo-panoramik-kapaklar-1536x1024.zip,
- // "for the computer, don't spoil the phone and the tablet"); phones and tablets keep the covers above.
- const pc=sitePictures.HOME_COVERS_PC;
- assert.deepEqual(pc,{units:'/toon/kapak/units-pc.webp',vault:'/toon/kapak/vault-pc.webp',verbs:'/toon/kapak/verbs-pc.webp',games:'/toon/kapak/games-pc.webp',mistakes:'/toon/kapak/mistakes-pc.webp'},'new names, so a browser that kept a cover loads the new one');
- for(const [id,src] of Object.entries(pc)){
-  assert.deepEqual(size('public'+src),id==='units'?[2600,520]:[1200,520],src+': the small cards 1200×520, the wide Üniteler card 2600×520 (the same scale)');
-  assert.ok(fs.statSync('public'+src).size<80*1024,src+': small');
+ const ids=['units','vault','verbs','games','mistakes'];
+ const set=end=>Object.fromEntries(ids.map(id=>[id,'/toon/kapak/'+id+end+'.webp']));
+ // Their own names: no old picture kept by a browser shows instead; the earlier covers are gone.
+ assert.deepEqual(sitePictures.HOME_COVERS,set('-phone'),'phones');
+ assert.deepEqual(sitePictures.HOME_COVERS_PC,set('-pc'),'tablets and computers');
+ assert.deepEqual(sitePictures.LANDING_COVERS,set('-intro'),'the introduction page');
+ for(const id of ids)assert.ok(!fs.existsSync('public/toon/kapak/'+id+'.webp'),id+': the earlier cover is gone');
+ for(const id of ids){
+  assert.deepEqual(size('public/toon/kapak/'+id+'-phone.webp'),[1200,600],id+': 2 : 1 like every card frame on a phone');
+  assert.deepEqual(size('public/toon/kapak/'+id+'-pc.webp'),id==='units'?[2600,520]:[1200,520],id+': the small cards 1200×520, the wide Üniteler card 2600×520 (the same scale)');
+  assert.deepEqual(size('public/toon/kapak/'+id+'-intro.webp'),[960,720],id+': 4 : 3 like the introduction page tiles');
+  for(const end of ['-phone','-pc','-intro'])assert.ok(fs.statSync('public/toon/kapak/'+id+end+'.webp').size<80*1024,id+end+': small');
  }
- const media='(min-width:761px) and (hover:hover) and (pointer:fine)';
- assert.equal(sitePictures.COMPUTER_MEDIA,media,'wider than a phone, with a mouse: a touch tablet keeps the 2:1 covers');
+ assert.equal(sitePictures.WIDE_MEDIA,'(min-width:761px)','tablets and computers: their card frames are 2 : 1 or lower');
  const theme=read('app/koko-theme.css');
- const pcRule=theme.indexOf('@media '+media+' {\n .ht .ht-grid>li:first-child .ht-art img { object-fit:cover; -webkit-mask-image:none; mask-image:none; }\n}');
- assert.ok(pcRule>0,'on a computer the wide cover fills its frame, with the same query as the <source>');
- assert.ok(pcRule>theme.indexOf('.ht .ht-grid>li:first-child .ht-art img { object-fit:contain;'),'after the tablet rule, so it wins on a computer');
+ assert.ok(theme.includes('@media (min-width:761px) {\n .ht-grid>li:first-child .ht-art { height:150px; aspect-ratio:auto; background:#fdf1db; }\n}'),'the wide card keeps its lower frame');
+ assert.ok(!theme.includes('.ht .ht-grid>li:first-child .ht-art img { object-fit:contain;')&&!theme.includes('mask-image:linear-gradient(90deg,transparent,#000 9%'),'its cover is cut for it and fills it: no shrunk picture with faded sides');
+ assert.ok(!theme.includes('(hover:hover) and (pointer:fine) {\n .ht'),'tablets get the same covers as computers');
  assert.ok(read('app/home-tour.css').includes('.ht-art img,.ht-art picture,.ht-art .toon-art { display:block; width:100%; height:100%; }'),'the <picture> fills the frame, so the cover does');
  const pictures=read('lib/site-pictures.ts');
  for(const id of ['units','vault','verbs','games','mistakes']){
@@ -146,7 +148,8 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
   for(const src of list)assert.deepEqual(size('public'+src),[1200,600],src);
  }
  const landing=read('app/landing.tsx');
- assert.ok(landing.includes('const pictures=pickPictures();')&&landing.includes('<img src={pictures.welcome}')&&landing.includes('<img src={HOME_COVERS[item.part]}'));
+ assert.ok(landing.includes('const pictures=pickPictures();')&&landing.includes('<img src={pictures.welcome}')&&landing.includes('<img src={LANDING_COVERS[item.part]} alt="" width={960} height={720} loading="lazy"/>'));
+ assert.ok(read('app/members.css').includes('.lk-part img { width:100%; height:auto; aspect-ratio:4 / 3; object-fit:cover;'),'4 : 3 tiles, like the covers');
  for(const src of ['/toon/landing/karsilama.webp','/toon/landing/karsilama-2.webp','/toon/landing/karsilama-3.webp'])assert.deepEqual(size('public'+src),[1400,700],src);
 });
 

@@ -11,17 +11,16 @@ import {verbs} from '@/lib/verb-course';
 import {gameIds} from '@/lib/verb-games';
 import {gameNameList} from '@/lib/game-names';
 import {fillText} from '@/lib/copy-fill';
-import {COMPUTER_MEDIA,HOME_COVERS,HOME_COVERS_PC} from '@/lib/site-pictures';
+import {HOME_COVERS,HOME_COVERS_PC,WIDE_MEDIA} from '@/lib/site-pictures';
 
 type Part={id:string;icon:NavIconName;href:string;title:string;de:string;text:string;art:ReactNode};
 
 /** The main parts of the site, exactly the items of the left menu, in the same order (no lessons inside them). */
 function siteParts(language:StudyLanguage):Part[]{
  const h=(key:HomeCopyKey)=>homeText(language,key);
- // Each card has its own cover, made by the learner for that part, always the same (lib/site-pictures.ts HOME_COVERS;
- // 4 November 2026: "never change them"). A computer gets the learner's covers made for its lower frames
- // (HOME_COVERS_PC, 5 November 2026); phones and tablets keep these.
- const art=(id:keyof typeof HOME_COVERS)=><picture><source media={COMPUTER_MEDIA} srcSet={HOME_COVERS_PC[id]} width={id==='units'?2600:1200} height={520}/><img src={HOME_COVERS[id]} alt="" width={1200} height={600} loading="lazy" decoding="async"/></picture>;
+ // Each card has its own cover, the learner's panoramic picture for that part, always the same (lib/site-pictures.ts,
+ // 5 November 2026): tablets and computers get the cut for their lower frames (HOME_COVERS_PC), phones the 2:1 cut.
+ const art=(id:keyof typeof HOME_COVERS)=><picture><source media={WIDE_MEDIA} srcSet={HOME_COVERS_PC[id]} width={id==='units'?2600:1200} height={520}/><img src={HOME_COVERS[id]} alt="" width={1200} height={600} loading="lazy" decoding="async"/></picture>;
  return [
   {id:'units',icon:'units',href:'/konular',title:c(language,'catalogTitle'),de:'A1.1 · A1.2',text:h('unitsText'),art:art('units')},
   {id:'vault',icon:'vault',href:'/ev-esyalar?learn=de',title:vaultText(language,'vaultTitle'),de:vaultText(language,'objectsCount',{n:objectVocabulary.length}),text:h('vaultText'),art:art('vault')},

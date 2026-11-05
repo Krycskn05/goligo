@@ -285,18 +285,12 @@ img.site-logo-art { aspect-ratio:496/182; object-fit:contain; }
 .verb-hero-badge .nav-icon.has-picture img { width:54px; height:54px; }
 /* The learner's pictures on the home page cards fill their frame (the learner asked, 21 October 2026: no cream strips
    beside the picture): the frame has the pictures' own 2:1 shape. Only the wide first card (two columns) keeps a lower
-   frame; there the picture's sides fade into its cream colour, so no edge shows. */
+   frame; from 761 px its cover is cut for it (lib/site-pictures.ts HOME_COVERS_PC, 5 November 2026: the same query as
+   the <source> in app/home-tour.tsx) and fills it too, on tablets and computers alike. */
 .ht-art { height:auto; aspect-ratio:2 / 1; background:#fef5e2; }
 .ht .ht-art img { object-fit:cover; }
 @media (min-width:761px) {
  .ht-grid>li:first-child .ht-art { height:150px; aspect-ratio:auto; background:#fdf1db; }
- .ht .ht-grid>li:first-child .ht-art img { object-fit:contain; -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent); mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent); }
-}
-/* A computer shows the covers made for its lower frames (lib/site-pictures.ts HOME_COVERS_PC, 5 November 2026; the same
-   query as their <source> in app/home-tour.tsx): the wide Üniteler cover fills its frame too, no faded sides. A tablet
-   keeps the rule above with the 2:1 cover. */
-@media (min-width:761px) and (hover:hover) and (pointer:fine) {
- .ht .ht-grid>li:first-child .ht-art img { object-fit:cover; -webkit-mask-image:none; mask-image:none; }
 }
 @media (max-width:760px) {
  /* On a phone or an upright tablet every card picture is as wide as its card, the same gap on both sides (the learner

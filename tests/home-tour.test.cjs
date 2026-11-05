@@ -119,7 +119,10 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  // the learner's panoramic pictures (Goliqo-panoramik-kapaklar-1536x1024.zip, "put these on the home page": everywhere).
  // The sets below stay for the welcome picture's turns.
  const tour=read('app/home-tour.tsx');
- assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><picture><source media={WIDE_MEDIA} srcSet={HOME_COVERS_PC[id]} width={id==='units'?2600:1200} height={520}/><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/></picture>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
+ assert.ok(tour.includes("<img className=\"ht-cover-phone\" src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>")&&tour.includes("<img className=\"ht-cover-wide\" src={HOME_COVERS_PC[id]} alt=\"\" width={id==='units'?2600:1200} height={520} loading=\"lazy\" decoding=\"async\"/>")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
+ // 5 November 2026 ("Hâlâ görünmüyor"): inside a <picture> the covers did not show on the learner's iPhone, so two plain
+ // pictures, one shown by the style sheet at the same 761 px as WIDE_MEDIA.
+ assert.ok(!tour.includes('<picture')&&!tour.includes('<source'),'plain pictures, no <picture>');
  const sitePictures=require(path.join(compiled,'site-pictures.js'));
  const ids=['units','vault','verbs','games','mistakes'];
  const set=end=>Object.fromEntries(ids.map(id=>[id,'/toon/kapak/'+id+end+'.webp']));
@@ -136,7 +139,7 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  }
  assert.equal(sitePictures.WIDE_MEDIA,'(min-width:761px)','tablets and computers: their card frames are 2 : 1 or lower');
  const theme=read('app/koko-theme.css');
- assert.ok(theme.includes('@media (min-width:761px) {\n .ht-grid>li:first-child .ht-art { height:150px; aspect-ratio:auto; background:#fdf1db; }\n}'),'the wide card keeps its lower frame');
+ assert.ok(theme.includes('.ht-art .ht-cover-wide { display:none; }\n@media (min-width:761px) {\n .ht-grid>li:first-child .ht-art { height:150px; aspect-ratio:auto; background:#fdf1db; }\n .ht-art .ht-cover-phone { display:none; }\n .ht-art .ht-cover-wide { display:block; }\n}'),'phones show the phone cover, from 761 px the wide one; the wide card keeps its lower frame');
  assert.ok(!theme.includes('.ht .ht-grid>li:first-child .ht-art img { object-fit:contain;')&&!theme.includes('mask-image:linear-gradient(90deg,transparent,#000 9%'),'its cover is cut for it and fills it: no shrunk picture with faded sides');
  assert.ok(!theme.includes('(hover:hover) and (pointer:fine) {\n .ht'),'tablets get the same covers as computers');
  assert.ok(read('app/home-tour.css').includes('.ht-art img,.ht-art picture,.ht-art .toon-art { display:block; width:100%; height:100%; }'),'the <picture> fills the frame, so the cover does');

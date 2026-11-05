@@ -62,7 +62,7 @@ exports.HOME_COVERS_PC = {
     games: '/toon/kapak/games-pc.webp',
     mistakes: '/toon/kapak/mistakes-pc.webp',
 };
-/** The screens that get HOME_COVERS_PC: wider than a phone (tablets and computers). */
+/** The screens that get HOME_COVERS_PC: wider than a phone (tablets and computers); app/koko-theme.css uses the same query. */
 exports.WIDE_MEDIA = '(min-width:761px)';
 /**
  * The introduction page's tiles (app/landing.tsx): 4:3 frames (the last tile 3:1 on a phone), so 960×720, cut closer

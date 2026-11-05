@@ -30,6 +30,7 @@ exports.PAGE_NAMES = {
     '/yanlislarim': 'Yanlışlarım',
     '/a1-1/willkommen': 'Lektion 1 · Willkommen',
     '/a1-1/berufe': 'Lektion 2 · Berufe',
+    '/a1-1/orte-und-dinge': 'Lektion 3 · Orte und Dinge',
     '/a1-2/ev-ve-yasam': 'Ev ve Yaşam',
     '/a1-2/ausbildung': 'Lektion 12 · Ausbildung',
     '/a1-2/ausbildung/hoeren': 'Lektion 12 · Hören',

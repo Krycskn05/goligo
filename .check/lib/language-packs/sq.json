@@ -1798,5 +1798,10 @@
     "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.": "{b}Faqet e hapura:{/b} n\u00ebse je an\u00ebtar, faqet q\u00eb hap ruhen gjithashtu me dat\u00eb dhe or\u00eb dhe lidhen me llogarin\u00eb t\u00ebnde, q\u00eb administratori i faqes t\u00eb shoh\u00eb cilat pjes\u00eb t\u00eb faqes ke p\u00ebrdorur dhe kur (bashk\u00eb me rezultatet e ushtrimeve t\u00eb tua). K\u00ebto regjistrime ruhen m\u00eb s\u00eb shumti 90 dit\u00eb dhe fshihen kur fshin llogarin\u00eb. Te vizitor\u00ebt pa llogari shihet vet\u00ebm me \u00e7\u2019radh\u00eb jan\u00eb hapur faqet gjat\u00eb vizit\u00ebs s\u00eb asaj dite, n\u00ebn \u00e7el\u00ebsin e rast\u00ebsish\u00ebm q\u00eb vlen vet\u00ebm at\u00eb dit\u00eb dhe nuk tregon se kush je.",
     "This page could not be found": "Kjo faqe nuk u gjet",
     "The address may be mistyped, or the page may have moved.": "Ndoshta adresa \u00ebsht\u00eb shkruar gabim ose faqja \u00ebsht\u00eb zhvendosur.",
-    "Back to the home page": "Kthehu te faqja kryesore"
+    "Back to the home page": "Kthehu te faqja kryesore",
+    "Now let's go over your mistakes": "Tani le t'i p\u00ebrs\u00ebrisim gabimet e tua",
+    "Questions you got wrong: {n}. They come once more now.": "Pyetje t\u00eb gabuara: {n}. Tani vijn\u00eb edhe nj\u00eb her\u00eb.",
+    "Skip to the results": "Kalo te rezultatet",
+    "In the repeat: {correct} of {total} right": "N\u00eb p\u00ebrs\u00ebritje: {correct} nga {total} t\u00eb sakta",
+    "Mistake repeat": "P\u00ebrs\u00ebritja e gabimeve"
 }

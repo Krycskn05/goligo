@@ -1091,5 +1091,11 @@
 "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Pagine aperte:{/b} se sei membro, le pagine che apri vengono salvate anche con data e ora e collegate al tuo account, cos\u00ec l\u2019amministratore del sito vede quali parti del sito hai usato e quando (insieme ai risultati dei tuoi esercizi). Questi dati sono conservati al massimo 90 giorni e cancellati quando elimini il tuo account. Per i visitatori senza account si vede solo in quale ordine sono state aperte le pagine durante la visita di quel giorno, sotto la chiave casuale valida solo quel giorno, che non rivela chi sei.",
 "This page could not be found":"Pagina non trovata",
 "The address may be mistyped, or the page may have moved.":"Forse l\u2019indirizzo \u00e8 scritto male o la pagina \u00e8 stata spostata.",
-"Back to the home page":"Torna alla pagina iniziale"
+"Back to the home page":"Torna alla pagina iniziale",
+"Now let's go over your mistakes":"Ora ripassiamo i tuoi errori",
+"Questions you got wrong: {n}. They come once more now.":"Domande sbagliate: {n}. Ora tornano ancora una volta.",
+"Start now":"Inizia ora",
+"Skip to the results":"Vai ai risultati",
+"In the repeat: {correct} of {total} right":"Nel ripasso: {correct} su {total} giuste",
+"Mistake repeat":"Ripasso errori"
 }

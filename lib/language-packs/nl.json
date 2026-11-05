@@ -1789,5 +1789,10 @@
 "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Geopende pagina\u2019s:{/b} als je lid bent, worden de pagina\u2019s die je opent ook met datum en tijd aan je account gekoppeld opgeslagen, zodat de beheerder van de site ziet welke delen van de site je wanneer hebt gebruikt (samen met je oefenresultaten). Deze gegevens worden maximaal 90 dagen bewaard en verwijderd als je je account verwijdert. Bij bezoekers zonder account is alleen te zien in welke volgorde de pagina\u2019s tijdens het bezoek van die dag werden geopend, onder de willekeurige sleutel die alleen die dag geldt en niet laat zien wie je bent.",
 "This page could not be found":"Deze pagina is niet gevonden",
 "The address may be mistyped, or the page may have moved.":"Misschien is het adres verkeerd getypt of is de pagina verplaatst.",
-"Back to the home page":"Terug naar de startpagina"
+"Back to the home page":"Terug naar de startpagina",
+"Now let's go over your mistakes":"Laten we nu je fouten herhalen",
+"Questions you got wrong: {n}. They come once more now.":"Fout beantwoorde vragen: {n}. Ze komen nu nog \u00e9\u00e9n keer.",
+"Skip to the results":"Naar de resultaten",
+"In the repeat: {correct} of {total} right":"Bij de herhaling: {correct} van {total} goed",
+"Mistake repeat":"Fouten herhalen"
 }

@@ -1802,5 +1802,10 @@
     "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.": "{b}\u6253\u5f00\u8fc7\u7684\u9875\u9762\uff1a{/b}\u5982\u679c\u4f60\u662f\u4f1a\u5458\uff0c\u4f60\u6253\u5f00\u7684\u9875\u9762\u4e5f\u4f1a\u8fde\u540c\u65e5\u671f\u548c\u65f6\u95f4\u4e0e\u4f60\u7684\u8d26\u6237\u5173\u8054\u4fdd\u5b58\uff0c\u8fd9\u6837\u7f51\u7ad9\u7ba1\u7406\u5458\u53ef\u4ee5\u770b\u5230\u4f60\u5728\u4ec0\u4e48\u65f6\u5019\u4f7f\u7528\u4e86\u7f51\u7ad9\u7684\u54ea\u4e9b\u90e8\u5206\uff08\u4ee5\u53ca\u4f60\u7684\u7ec3\u4e60\u7ed3\u679c\uff09\u3002\u8fd9\u4e9b\u8bb0\u5f55\u6700\u591a\u4fdd\u5b58 90 \u5929\uff0c\u5220\u9664\u8d26\u6237\u65f6\u4e00\u5e76\u5220\u9664\u3002\u5bf9\u4e8e\u6ca1\u6709\u8d26\u6237\u7684\u8bbf\u5ba2\uff0c\u53ea\u80fd\u770b\u5230\u5f53\u5929\u8bbf\u95ee\u4e2d\u9875\u9762\u7684\u6253\u5f00\u987a\u5e8f\uff0c\u5e76\u4e14\u53ea\u5bf9\u5e94\u4e00\u4e2a\u4ec5\u5f53\u5929\u6709\u6548\u3001\u65e0\u6cd5\u663e\u793a\u4f60\u662f\u8c01\u7684\u968f\u673a\u5bc6\u94a5\u3002",
     "This page could not be found": "\u627e\u4e0d\u5230\u6b64\u9875\u9762",
     "The address may be mistyped, or the page may have moved.": "\u5730\u5740\u53ef\u80fd\u8f93\u9519\u4e86\uff0c\u6216\u8005\u9875\u9762\u5df2\u88ab\u79fb\u52a8\u3002",
-    "Back to the home page": "\u8fd4\u56de\u9996\u9875"
+    "Back to the home page": "\u8fd4\u56de\u9996\u9875",
+    "Now let's go over your mistakes": "\u73b0\u5728\u6765\u590d\u4e60\u505a\u9519\u7684\u9898",
+    "Questions you got wrong: {n}. They come once more now.": "\u505a\u9519\u7684\u9898\uff1a{n} \u9053\u3002\u73b0\u5728\u518d\u505a\u4e00\u904d\u3002",
+    "Skip to the results": "\u8df3\u5230\u7ed3\u679c",
+    "In the repeat: {correct} of {total} right": "\u590d\u4e60\u4e2d\uff1a{total} \u9053\u9898\u7b54\u5bf9 {correct} \u9053",
+    "Mistake repeat": "\u9519\u9898\u590d\u4e60"
 }

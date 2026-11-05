@@ -71,7 +71,7 @@ test('pages: the first part opens, the rest carries a lock and the sign-up, ever
   const page=read(file);assert.ok(page.includes('<'+component+' guest={!(await getChatGPTUser())}/>'),file);
  }
  for(const file of ['app/category-study.tsx','app/verb-study.tsx','app/object-study.tsx','app/housing-study.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx']){
-  const code=read(file);assert.ok((code.includes('{guest&&<GuestBanner language={language} back=')||code.includes('{guest&&!(session&&!finished)&&<GuestBanner language={language} back={back} note={part?\'guestNote\':\'guestNoteVerbs\'}/>}'))&&code.includes('guest={guest}/>'),file);
+  const code=read(file);assert.ok((code.includes('{guest&&<GuestBanner language={language} back=')||code.includes('{guest&&!(session&&(!finished||repeatDue))&&<GuestBanner language={language} back={back} note={part?\'guestNote\':\'guestNoteVerbs\'}/>}'))&&code.includes('guest={guest}/>'),file);
  }
  // Fiil Atölyesi: the box says every verb topic is open (in every language, checked with all guest texts below), and it
  // steps aside during a round (4 November 2026).

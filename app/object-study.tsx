@@ -38,6 +38,7 @@ import {ProgressMeter,RoundReward} from './progress-ui';
 import {GUEST_OBJECT_GROUP} from '@/lib/guest-parts';
 import {GuestBanner,GuestLock,GuestMore,guestSignUp} from './guest-taste';
 import {puzzleText} from '@/lib/article-logic';
+import {MistakeRepeatCard,roundMistakeIds} from './mistake-repeat';
 
 const blank:Snapshot={reviews:[],notes:{},sessions:[]};
 /** The next question opens 3 seconds after an answer (the learner asked for 3 instead of 4, 4 November 2026); reading the
@@ -86,6 +87,10 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  // The picture strip (the learner asked, 4 November 2026): questions solved in earlier rounds stay in it as done, and
  // any done question can be opened again to look at (it is not answered again).
  const [earlier,setEarlier]=useState<string[]>([]);const [viewId,setViewId]=useState<string|null>(null);
+ // The end of a round with mistakes (the learner asked, 5 November 2026: the same as in Fiil Atölyesi): the wrong questions
+ // come once more by themselves (app/mistake-repeat.tsx), then the round's results. Only after a normal round (not after
+ // a review of mistakes); `firstRound`: that round while its repeat runs and on the results after it.
+ const [repeatable,setRepeatable]=useState(false);const [firstRound,setFirstRound]=useState<Session|null>(null);const [skipRepeat,setSkipRepeat]=useState(false);
  const [replays,setReplays]=useState(0); // "Tekrar dinle" taps on the answer card: each one gives 3 seconds again
  const [nounArticle,setNounArticle]=useState('');const [articleWarning,setArticleWarning]=useState(false);const [showHint,setShowHint]=useState(false);
  const speech=useGermanSpeech(course);const answerAudio=useAnswerFeedback(speech);const cueBusy=answerAudio.busy;
@@ -102,6 +107,9 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  const articleQuestion=course==='de'&&q&&isArticleChallenge(q)?q:undefined;
  const pronunciation=articleQuestion?articleFullAnswer(articleQuestion):currentWord?(course==='en'?englishObjectName(currentWord.id):currentWord.de):q?.answer??'';
  const finished=!!session&&index>=session.questions.length;
+ const roundMistakes=session?roundMistakeIds(session):[];
+ const repeatDue=!!session&&repeatable&&!firstRound&&!skipRepeat&&roundMistakes.length>0;
+ const resultRound=firstRound??session;
  const scopeFor=(mode:string)=>Array.from(questionMap.values()).filter(item=>modePredicate(mode)(item)&&(group==='all'||item.topic===(course==='en'?'en-':'')+group)&&inObjectSubgroup(item,subgroup));
  const scopedQuestions=scopeFor(practiceMode);
  const availableCount=scopedQuestions.length;
@@ -126,10 +134,10 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
  function clearAnswer(){setViewId(null);setFeedback(null);setSelected('');setHeardQuestionId(null);setNounArticle('');setArticleWarning(false);setShowHint(false);pendingAnswer.current=null;}
- function overview(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('categories');setError(null);void refresh();focus('vault-heading');}
+ function overview(){if(mutation.current)return;stopFeedback();setSession(null);setFirstRound(null);setSkipRepeat(false);clearAnswer();setView('categories');setError(null);void refresh();focus('vault-heading');}
  // The end of a round (the learner asked, 29 October 2026): back to the same category's screen (Gör ve Seç / Yazarak Pekiştir /
  // Dinle ve Bul), not to the list of all categories; the mode just played stays chosen.
- function backToCategory(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('configure');setError(null);pendingStart.current=null;void refresh();focus('vault-config-heading');}
+ function backToCategory(){if(mutation.current)return;stopFeedback();setSession(null);setFirstRound(null);setSkipRepeat(false);clearAnswer();setView('configure');setError(null);pendingStart.current=null;void refresh();focus('vault-config-heading');}
  function chooseCategory(id:string,mode:PracticeMode=practiceMode){if(mutation.current)return;stopFeedback();setGroup(id);setSubgroup('all');setPracticeMode(mode);setView('configure');setError(null);pendingStart.current=null;focus('vault-config-heading');}
  // A mode card starts its round at once (the learner asked, 4 November 2026: no "Teste başla" button), so the mode is passed in.
  async function start(reviewOnly=false,onlyIds?:string[],all=false,mode:PracticeMode=practiceMode){
@@ -150,7 +158,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
   if(!request.ids.length){setError(reviewOnly?'emptyReview':'emptyQuestions');mutation.current=false;setBusy(false);return;}
   try{
    const data=await api<{session:Session}>({action:'start',id:request.id,mode:mode==='write'?'write':mode==='listen'?'listen':'visual',topic:request.topic,count:request.ids.length,onlyIds:request.ids},'',course);
-   if(!mounted.current)return;setEarlier(request.earlier);setSession(data.session);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;focus();
+   if(!mounted.current)return;setEarlier(request.earlier);setSession(data.session);setFirstRound(null);setSkipRepeat(false);setRepeatable(!reviewOnly&&!onlyIds);setIndex(data.session.answers.length);clearAnswer();pendingStart.current=null;focus();
    const first=data.session.mode==='listen'?questionMap.get(data.session.questions[data.session.answers.length]?.id??''):undefined;
    if(first?.audio){setHeardQuestionId(first.id);speech.speak(first.audio);}
   }catch(e){fail(e,'startError');}
@@ -181,7 +189,7 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
  }
  // "Sonraki dinleme" (listening round): the next word is heard at once, as the learner asked; it is started in this tap
  // so phones allow the sound, and the picture choices open after it as with the listen button.
- function next(){if(mutation.current||!session||!feedback)return;stopFeedback();const following=session.mode==='listen'?questionMap.get(session.questions[index+1]?.id??''):undefined;setIndex(i=>i+1);clearAnswer();focus();if(following?.audio){setHeardQuestionId(following.id);speech.speak(following.audio);}if(index+1>=session.questions.length){answerAudio.complete();void refresh();}}
+ function next(){if(mutation.current||!session||!feedback)return;stopFeedback();const following=session.mode==='listen'?questionMap.get(session.questions[index+1]?.id??''):undefined;setIndex(i=>i+1);clearAnswer();focus();if(following?.audio){setHeardQuestionId(following.id);speech.speak(following.audio);}if(index+1>=session.questions.length){if(!repeatDue)answerAudio.complete();void refresh();}}
  // After an answer the next question comes by itself after 3 seconds (the learner asked, 4 November 2026: no "Sonraki"
  // button). It waits while the right answer is still being read (a few seconds at most) and while the page is hidden.
  const nextRef=useRef(next);nextRef.current=next;
@@ -197,6 +205,18 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
   timer=setTimeout(tick,AUTO_NEXT_MS);
   return()=>clearTimeout(timer);
  },[feedback,replays,viewId]);// eslint-disable-line react-hooks/exhaustive-deps
+ /** The round's wrong questions once more, as a round of the same kind; the end sound comes after it. */
+ async function startRepeat(){
+  if(mutation.current||!session||!repeatDue)return;const first=session;const ids=roundMistakes;
+  mutation.current=true;setBusy(true);setError(null);stopFeedback();if(first.mode==='listen')speech.prepare();
+  try{
+   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:first.mode,topic:first.topic,count:ids.length,onlyIds:ids},'',course);
+   if(!mounted.current)return;setEarlier([]);setSession(data.session);setFirstRound(first);setIndex(data.session.answers.length);clearAnswer();focus();
+   const opening=data.session.mode==='listen'?questionMap.get(data.session.questions[data.session.answers.length]?.id??''):undefined;
+   if(opening?.audio){setHeardQuestionId(opening.id);speech.speak(opening.audio);}
+  }catch(e){fail(e,'startError');setSkipRepeat(true);}
+  finally{mutation.current=false;if(mounted.current)setBusy(false);}
+ }
  // Open a done question from the strip, or come back to the current one.
  function showQuestion(id:string|null){if(mutation.current)return;stopFeedback();setViewId(id&&id!==q?.id?id:null);focus();}
  function sayFor(item:Question){const word=item.objectId?objectWordMap.get(item.objectId):undefined;const article=course==='de'&&isArticleChallenge(item)?item:undefined;return article?articleFullAnswer(article):word?(course==='en'?englishObjectName(word.id):word.de):item.answer;}
@@ -230,14 +250,15 @@ export function ObjectWorkshop({language,onLanguage,course='de',onCourse,guest=f
    {guest&&<GuestBanner language={language} back={back}/>}
    {error&&<div className="object-alert" role="alert"><p>{text(error)}</p>{signIn?<a href="/auth/login" className="btn">{text('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{text('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{text('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:text('audioWarning')}</p>}
-   {session?finished?<section className="object-results panel">
-    <h1 id="object-question-heading" tabIndex={-1}>{text(session.mode==='write'?'puzzlesDone':'resultsTitle')}</h1><p className="vault-result-score">{text('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>
-    <RoundReward answers={session.answers} progress={showProgress?objectProgress(group,snapshot.reviews):null} language={language} label={categoryName(group,language)}/>
+   {session?finished?repeatDue?<MistakeRepeatCard title={text('repeatTitle')} lead={text('repeatLead',{n:roundMistakes.length})} startLabel={text('repeatStart')} skipLabel={text('repeatSkip')} busy={busy} onStart={()=>void startRepeat()} onSkip={()=>{stopFeedback();answerAudio.complete();setSkipRepeat(true);focus();}}/>:resultRound&&<section className="object-results panel">
+    <h1 id="object-question-heading" tabIndex={-1}>{text(resultRound.mode==='write'?'puzzlesDone':'resultsTitle')}</h1><p className="vault-result-score">{text('resultScore',{correct:resultRound.answers.filter(a=>a.correct).length,total:resultRound.questions.length})}</p>
+    {firstRound&&<p className="mistake-repeat-score" data-mistake-repeat-score="">{text('repeatScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>}
+    <RoundReward answers={resultRound.answers} progress={showProgress?objectProgress(group,snapshot.reviews):null} language={language} label={categoryName(group,language)}/>
     {guest&&<GuestMore language={language} back={back}/>}
     <div className="object-actions"><button type="button" className="btn" disabled={busy||!ready||!session.answers.some(a=>!a.correct)} onClick={()=>void start(false,session.answers.filter(a=>!a.correct).map(a=>a.question_id))}><RotateCcw size={18}/>{text(session.mode==='write'?'reviewPuzzleMistakes':'reviewRoundMistakes')}</button><button type="button" className="btn secondary" disabled={busy} onClick={backToCategory} data-vault-back-category><ArrowLeft size={18} className="vault-direction-icon"/>{categoryName(group,language)}</button></div>
-    {session.answers.filter(a=>!a.correct).map(a=>{const item=questionMap.get(a.question_id);const word=item?.objectId?objectWordMap.get(item.objectId):undefined;return word?<div className="object-result-row" key={a.id}><ObjectPicture word={word} language={language} small/><div>{item&&answerMeaning(item,word)}<small>{text(session.mode==='write'?'yourAnswer':'yourChoice')}: <span lang={course} dir="ltr">{a.answer}</span></small></div></div>:null;})}
+    {resultRound.answers.filter(a=>!a.correct).map(a=>{const item=questionMap.get(a.question_id);const word=item?.objectId?objectWordMap.get(item.objectId):undefined;return word?<div className="object-result-row" key={a.id}><ObjectPicture word={word} language={language} small/><div>{item&&answerMeaning(item,word)}<small>{text(session.mode==='write'?'yourAnswer':'yourChoice')}: <span lang={course} dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&currentWord?<section className="object-practice picture-quiz-practice">
-    <div className="object-practice-top"><span className="object-pill">{text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span>
+    <div className="object-practice-top"><span className="object-pill">{firstRound?text('repeatPill'):text(session.mode==='write'?'writePractice':session.mode==='listen'?'listenPractice':'testPractice')}</span>
      {/* The picture strip instead of the progress bar (the learner chose "Resimli şerit", 4 November 2026): in the top row
          on wider screens, a row of its own on phones. */}
      <nav className="vault-strip" aria-label={text('navQuestions')}><ol>{strip.map((item,i)=>{const word=item.word;const shown=item.id===shownId;const result=item.result;

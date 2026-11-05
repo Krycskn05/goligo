@@ -689,6 +689,7 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 @media (max-width:760px) {
  .toon-app:has(.object-question) .work-layout>.work-sidebar,
  .toon-app:has(.verb-practice) .work-layout>.work-sidebar,
+ .toon-app:has(.mistake-repeat) .work-layout>.work-sidebar,
  .toon-app:has(.verb-game) .work-layout>.work-sidebar { display:none; }
 }
 
@@ -765,3 +766,12 @@ html[data-lernkoko-motion=reduced] .site-account-list li { animation:none; }
 }
 /* With the two buttons in the menu there is room for the clock face on narrow phones too. */
 @media (max-width:380px) { .site-header:not(.lk-public-header) .site-greeting-button .analog-clock { display:block; width:26px; height:26px; } }
+
+/* The end of a round with mistakes (5 November 2026, app/mistake-repeat.tsx): the card that brings them once more after
+   3 seconds (the bar at its foot), and on the results the line of how the repeat went. */
+.toon-app .mistake-repeat { position:relative; overflow:hidden; }
+.toon-app .mistake-repeat h1 { display:flex; align-items:center; gap:10px; }
+.toon-app .mistake-repeat h1 svg { flex:none; color:#e98d3a; }
+.toon-app .mistake-repeat-lead { margin:0 0 4px; font-size:17px; font-weight:700; color:#3d5a7a; }
+.toon-app .mistake-repeat .vault-auto-next { background:#e98d3a; }
+.toon-app .mistake-repeat-score { margin:-4px 0 6px; font-weight:800; color:#3d5a7a; }

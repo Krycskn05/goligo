@@ -1798,5 +1798,10 @@
 "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Otvorene stranice:{/b} ako si \u010dlan, stranice koje otvara\u0161 spremaju se i s datumom i vremenom i povezuju s tvojim ra\u010dunom, pa administrator stranice vidi koje si dijelove stranice koristio i kada (zajedno s rezultatima vje\u017ebanja). Ti se zapisi \u010duvaju najvi\u0161e 90 dana i bri\u0161u se kad izbri\u0161e\u0161 ra\u010dun. Kod posjetitelja bez ra\u010duna vidi se samo kojim su redoslijedom stranice otvarane tijekom posjeta tog dana, pod nasumi\u010dnim klju\u010dem koji vrijedi samo taj dan i ne pokazuje tko si.",
 "This page could not be found":"Ova stranica nije prona\u0111ena",
 "The address may be mistyped, or the page may have moved.":"Mo\u017eda je adresa pogre\u0161no upisana ili je stranica premje\u0161tena.",
-"Back to the home page":"Natrag na po\u010detnu stranicu"
+"Back to the home page":"Natrag na po\u010detnu stranicu",
+"Now let's go over your mistakes":"Sada ponovimo tvoje gre\u0161ke",
+"Questions you got wrong: {n}. They come once more now.":"Pogre\u0161no odgovorena pitanja: {n}. Sada dolaze jo\u0161 jednom.",
+"Skip to the results":"Idi na rezultate",
+"In the repeat: {correct} of {total} right":"U ponavljanju: {correct} od {total} ta\u010dno",
+"Mistake repeat":"Ponavljanje gre\u0161aka"
 }

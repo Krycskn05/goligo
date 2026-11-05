@@ -1092,5 +1092,11 @@
 "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}P\u00e1ginas abertas:{/b} se \u00e9s membro, as p\u00e1ginas que abres tamb\u00e9m s\u00e3o guardadas com data e hora e ligadas \u00e0 tua conta, para que o administrador do site veja que partes do site usaste e quando (juntamente com os teus resultados de pr\u00e1tica). Estes registos s\u00e3o guardados no m\u00e1ximo 90 dias e apagados quando eliminas a tua conta. Dos visitantes sem conta s\u00f3 se v\u00ea por que ordem as p\u00e1ginas foram abertas durante a visita desse dia, sob a chave aleat\u00f3ria v\u00e1lida apenas nesse dia, que n\u00e3o mostra quem \u00e9s.",
 "This page could not be found":"Esta p\u00e1gina n\u00e3o foi encontrada",
 "The address may be mistyped, or the page may have moved.":"O endere\u00e7o pode estar digitado errado ou a p\u00e1gina pode ter mudado de lugar.",
-"Back to the home page":"Voltar \u00e0 p\u00e1gina inicial"
+"Back to the home page":"Voltar \u00e0 p\u00e1gina inicial",
+"Now let's go over your mistakes":"Agora vamos rever os seus erros",
+"Questions you got wrong: {n}. They come once more now.":"Perguntas erradas: {n}. Agora elas voltam mais uma vez.",
+"Start now":"Come\u00e7ar agora",
+"Skip to the results":"Ir para os resultados",
+"In the repeat: {correct} of {total} right":"Na revis\u00e3o: {correct} de {total} certas",
+"Mistake repeat":"Revis\u00e3o dos erros"
 }

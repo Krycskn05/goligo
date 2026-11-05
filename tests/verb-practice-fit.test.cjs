@@ -6,7 +6,7 @@ const read=file=>fs.readFileSync(file,'utf8');
 
 test('the top: the topic, the picture strip of the verbs, "Fiil n / N", the steps as chips',()=>{
  const page=read('app/verb-study.tsx');const cards=read('app/verb-workshop.tsx');
- assert.ok(page.includes("<span className=\"object-pill\">{place?familyTitle(place.family,language):t('workshopTitle')}</span>"),'the pill names the topic');
+ assert.ok(page.includes("<span className=\"object-pill\">{place?familyTitle(place.family,language):firstRound?v('repeatPill'):t('workshopTitle')}</span>"),'the pill names the topic (or the repeat)');
  assert.ok(page.includes('<nav className="vault-strip verb-strip" aria-label={v(\'navQuestions\')}>'),'the same strip as Nesne Kasası');
  assert.ok(page.includes("const picture=item.done?verbPicture(item.verb):null;"),'only a finished verb shows its picture (a picture would give the meaning away)');
  assert.ok(page.includes("className={'vault-strip-item '+(item.done?(item.wrong?'wrong':'right'):item.current?'current':'later')+(shown&&!item.current?' shown':'')}"),'tick, cross, now, later (and the one opened)');

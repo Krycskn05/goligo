@@ -5,7 +5,7 @@ const read=file=>fs.readFileSync(file,'utf8');
 
 test('the results screen goes back to the category that was just practised',()=>{
  const page=read('app/object-study.tsx');
- assert.ok(page.includes("function backToCategory(){if(mutation.current)return;stopFeedback();setSession(null);clearAnswer();setView('configure');setError(null);pendingStart.current=null;void refresh();focus('vault-config-heading');}"));
+ assert.ok(page.includes("function backToCategory(){if(mutation.current)return;stopFeedback();setSession(null);setFirstRound(null);setSkipRepeat(false);clearAnswer();setView('configure');setError(null);pendingStart.current=null;void refresh();focus('vault-config-heading');}"));
  assert.ok(page.includes('onClick={backToCategory} data-vault-back-category><ArrowLeft size={18} className="vault-direction-icon"/>{categoryName(group,language)}</button>'),'the button names the category');
  const results=page.slice(page.indexOf('<section className="object-results panel">'),page.indexOf('</section>:q&&currentWord?'));
  assert.ok(results.includes('onClick={backToCategory}')&&!results.includes('onClick={overview}'),'no jump to the list of all categories at the end of a round');

@@ -19,6 +19,7 @@ import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox,gameName,gameDetail} from './verb-games';
 import {GameIcon} from './game-icons';
 import {GAME_LEVEL,gameLength} from '@/lib/game-names';
+import {MistakeRepeatCard,roundMistakeIds} from './mistake-repeat';
 import {LearnCard,PathStepper,AnswerResult,OneExample,PartVerbs,VerbDetail,StripVerbCard,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
@@ -104,6 +105,10 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  // stands in the question's place. The round does not move — nothing is answered or skipped — and the next question
  // waits until the learner comes back (the verb now, or the card's button).
  const [viewVerb,setViewVerb]=useState<string|null>(null);
+ // The end of a part with mistakes (the learner asked, 5 November 2026: "let me repeat my mistakes at the end of the part"):
+ // the wrong questions come once more by themselves (app/mistake-repeat.tsx), then the part's results. `firstRound`: the
+ // part's own round while its repeat runs and on the results after it; `skipRepeat`: the learner went to the results.
+ const [firstRound,setFirstRound]=useState<Session|null>(null);const [skipRepeat,setSkipRepeat]=useState(false);
  const [game,setGame]=useState<GameId|null>(null);const [gameTopic,setGameTopic]=useState('verbs-all');
  // A part opened from the map (its verb list), and optionally one verb's card inside it. Both stay in the address
  // (?parca=verbs-w1&fiil=…), so a reload keeps the open card instead of going back to the map (2 November 2026).
@@ -129,7 +134,12 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  // An older round of the whole path ends after part 1; every other round at its last question.
  const end=session?roundEnd(session):0;
  const finished=!!session&&index>=end;
- const workshop=session?.mode===WORKSHOP_MODE;
+ // A repeat is never a part's round (for visitors it is kept in the workshop mode, the only one open to them).
+ const workshop=session?.mode===WORKSHOP_MODE&&!firstRound;
+ const roundMistakes=session?roundMistakeIds(session):[];
+ const repeatDue=!!session&&!firstRound&&!skipRepeat&&session.mode===WORKSHOP_MODE&&roundMistakes.length>0;
+ // The results speak of the part's round; the repeat adds its own line.
+ const resultRound=firstRound??session;
  const place=workshop&&session?pathPlace(session.questions,index,lookup):null;
  // The picture strip of the round's verbs (like the questions of Nesne Kasası): a finished verb shows its picture with a
  // tick (a cross when one of its answers was wrong), the verb now is marked, the ones to come show only their number —
@@ -163,8 +173,8 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const otherMistakes=ready&&section==='mistakes'?partMistakes(snapshot.reviews):null;
  const allMistakes=ready&&section==='mistakes'?allMistakeIds(snapshot.reviews,workshopMistakeIds(snapshot.reviews)):[];
  const mistakeIds=ready?workshopMistakeIds(snapshot.reviews):[];const mistakeVerbList=mistakeVerbs(mistakeIds);
- const mistakesRound=session?.mode===MISTAKES_MODE;
- const roundFamily:VerbFamily=(session&&verbFamilyOf(lookup(session.questions[0]?.id??'')?.verbId??''))||verbFamilies[0];
+ const mistakesRound=resultRound?.mode===MISTAKES_MODE;
+ const roundFamily:VerbFamily=(resultRound&&verbFamilyOf(lookup(resultRound.questions[0]?.id??'')?.verbId??''))||verbFamilies[0];
  function fail(e:unknown,fallback:ErrorKey){if(!mounted.current)return;const auth=!!(e as {signIn?:boolean})?.signIn;setSignIn(auth);setError(auth?'signInError':fallback);}
  async function refresh(){
   try{const next=await api(undefined,'stats=1&tz='+new Date().getTimezoneOffset(),'de');if(mounted.current){setSnapshot(next);setReady(true);setSignIn(false);}return next;}
@@ -183,7 +193,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
  function clearAnswer(){setViewVerb(null);setFeedback(null);setSelected('');setHeardQuestionId(null);setAux('');setAuxWarning(false);setPrefix('');setPrefixWarning(false);pendingAnswer.current=null;}
- function overview(){if(mutation.current)return;stopFeedback();setSession(null);setGame(null);clearAnswer();setError(null);void refresh();focus(view?view.verbId?'verb-detail-heading':'verb-part-heading':section?'verb-section-heading':'vault-heading');}
+ function overview(){if(mutation.current)return;stopFeedback();setSession(null);setFirstRound(null);setSkipRepeat(false);setGame(null);clearAnswer();setError(null);void refresh();focus(view?view.verbId?'verb-detail-heading':'verb-part-heading':section?'verb-section-heading':'vault-heading');}
  /** Opens a part from the map: its verbs with what is done, and the button to start or continue it. */
  function openPart(family:VerbFamily){stopFeedback();setView({family});focus('verb-part-heading');}
  function openVerb(family:VerbFamily,id:string){stopFeedback();setView({family,verbId:id});focus('verb-detail-heading');}
@@ -201,7 +211,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  }
  // Keep the verb now (or the one opened) in sight in the strip.
  useEffect(()=>{document.querySelector('.verb-strip [aria-current]')?.scrollIntoView({block:'nearest',inline:'center'});},[index,viewVerb,session?.id]);
- function openSession(restored:Session){setSession(restored);setIndex(restored.answers.length);setDismissed(new Set());clearAnswer();focusCurrent();}
+ function openSession(restored:Session,first:Session|null=null){setSession(restored);setFirstRound(first);setSkipRepeat(false);setIndex(restored.answers.length);setDismissed(new Set());clearAnswer();focusCurrent();}
  /** Enter a part (none is locked): continue its saved round, or start a new one. A round saved in the older order
   * (all meanings first, or Perfekt with hat/ist) is not continued as it was. A new round of a topic holds only what is
   * still to do — verbs finished anywhere, also in the book parts before 4 November 2026, are not asked again — or the
@@ -219,6 +229,17 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
    const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:WORKSHOP_MODE,topic:PART_ROUND_TOPIC,count:ids.length,onlyIds:ids},'','de');
    if(!mounted.current)return;openSession(data.session);
   }catch(e){fail(e,'startError');}
+  finally{mutation.current=false;if(mounted.current)setBusy(false);}
+ }
+ /** The part's wrong questions once more, as a round of their own (Yanlışlarım's kind, so the part's round stays as it
+  * is). Visitors' rounds are never saved and only the workshop rounds are open to them: theirs keeps that mode. */
+ async function startRepeat(){
+  if(mutation.current||!session||!repeatDue)return;const first=session;const ids=roundMistakes;
+  mutation.current=true;setBusy(true);setError(null);stopFeedback();speech.prepare();
+  try{
+   const data=await api<{session:Session}>({action:'start',id:crypto.randomUUID(),mode:guest?WORKSHOP_MODE:MISTAKES_MODE,topic:WORKSHOP_TOPIC,count:ids.length,onlyIds:ids},'','de');
+   if(!mounted.current)return;openSession(data.session,first);
+  }catch(e){fail(e,'startError');setSkipRepeat(true);}
   finally{mutation.current=false;if(mounted.current)setBusy(false);}
  }
  /** Every open mistake of the site in one round (Fiil Atölyesi, Nesne Kasası, Ev ve Yaşam; the learner asked). */
@@ -264,7 +285,8 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  }
  function next(){
   if(mutation.current||!session||!feedback)return;stopFeedback();speech.prepare();const upcoming=index+1;setIndex(upcoming);clearAnswer();focusCurrent();
-  if(upcoming>=end){answerAudio.complete();void refresh();}
+  // With mistakes the part is not over yet: the end sound comes after the repeat.
+  if(upcoming>=end){if(!repeatDue)answerAudio.complete();void refresh();}
  }
  const nextRef=useRef(next);nextRef.current=next;
  const viewing=!!viewItem;
@@ -393,18 +415,19 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
    {/* The "Ana sayfa › …" breadcrumb was removed at the learner's request (30 October 2026); the menu above leads home. */}
    {/* Not during a round: the question fits one screen for visitors too (4 November 2026). On Fiil Atölyesi it says
        that every topic is open. */}
-   {guest&&!(session&&!finished)&&<GuestBanner language={language} back={back} note={part?'guestNote':'guestNoteVerbs'}/>}
+   {guest&&!(session&&(!finished||repeatDue))&&<GuestBanner language={language} back={back} note={part?'guestNote':'guestNoteVerbs'}/>}
    {error&&<div className="object-alert" role="alert"><p>{errorText(error)}</p>{signIn?<a href="/auth/login" className="btn">{v('signIn')}</a>:pendingAnswer.current?<button type="button" className="btn secondary small" disabled={busy} onClick={()=>void submit(pendingAnswer.current!.answer)}>{v('saveRetry')}</button>:<button type="button" className="btn secondary small" disabled={busy} onClick={()=>{setError(null);void refresh();}}>{v('retry')}</button>}</div>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:v('audioWarning')}</p>}
-   {session?finished?<section className="object-results panel verb-results">
-    <h1 id="object-question-heading" tabIndex={-1}>{workshop?t('partDone',{n:roundFamily.number,total:roundFamily.verbs.length}):mistakesRound?t('mistakesTitle'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:session.answers.filter(a=>a.correct).length,total:end})}</p>
-    <RoundReward answers={session.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
+   {session?finished?repeatDue?<MistakeRepeatCard title={v('repeatTitle')} lead={v('repeatLead',{n:roundMistakes.length})} startLabel={v('repeatStart')} skipLabel={v('repeatSkip')} busy={busy} onStart={()=>void startRepeat()} onSkip={()=>{stopFeedback();answerAudio.complete();setSkipRepeat(true);focusCurrent();}}/>:resultRound&&<section className="object-results panel verb-results">
+    <h1 id="object-question-heading" tabIndex={-1}>{resultRound.mode===WORKSHOP_MODE?t('partDone',{n:roundFamily.number,total:roundFamily.verbs.length}):mistakesRound?t('mistakesTitle'):v('resultsTitle')}</h1><p className="vault-result-score">{v('resultScore',{correct:resultRound.answers.filter(a=>a.correct).length,total:roundEnd(resultRound)})}</p>
+    {firstRound&&<p className="mistake-repeat-score" data-mistake-repeat-score="">{v('repeatScore',{correct:session.answers.filter(a=>a.correct).length,total:session.questions.length})}</p>}
+    <RoundReward answers={resultRound.answers} progress={ready?verbProgress('verbs-all',snapshot.reviews):null} language={language} label={t('workshopTitle')}/>
     {guest&&<GuestMore language={language} back={back}/>}
     {mistakesRound&&!(everyMistake?allMistakes:mistakeIds).length&&<p className="verb-mistakes-done" role="status"><CheckCircle2 size={18}/>{t('mistakesAllDone')}</p>}
     <div className="object-actions">{everyMistake?allMistakes.length>0&&<button type="button" className="btn" disabled={busy} onClick={()=>void startAllMistakes()}><RotateCcw size={18}/>{t('mistakesAllStart',{n:allMistakes.length})}</button>:mistakesRound?mistakeIds.length>0&&<button type="button" className="btn" disabled={busy} onClick={()=>void startMistakes()}><RotateCcw size={18}/>{t('mistakesLeft',{n:mistakeIds.length})}</button>:<button type="button" className="btn" disabled={busy} onClick={()=>void enterPart(roundFamily,true)}><RotateCcw size={18}/>{t('workshopRestart')}</button>}<button type="button" className="btn secondary" disabled={busy} onClick={overview}>{t('backWorkshop')}</button></div>
-    {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:item?<div className="object-result-row verb-result-row" key={a.id}><div><strong lang="de" dir="ltr">{otherAnswer(item)}</strong> <span className="verb-forms-meaning">{otherMeaning(item)}</span><small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: <span lang="de" dir="ltr">{a.answer}</span></small></div></div>:null;})}
+    {resultRound.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:item?<div className="object-result-row verb-result-row" key={a.id}><div><strong lang="de" dir="ltr">{otherAnswer(item)}</strong> <span className="verb-forms-meaning">{otherMeaning(item)}</span><small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: <span lang="de" dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
-    <div className="object-practice-top"><span className="object-pill">{place?familyTitle(place.family,language):t('workshopTitle')}</span>
+    <div className="object-practice-top"><span className="object-pill">{place?familyTitle(place.family,language):firstRound?v('repeatPill'):t('workshopTitle')}</span>
      {strip&&<nav className="vault-strip verb-strip" aria-label={v('navQuestions')}><ol>{strip.map((item,i)=>{const picture=item.done?verbPicture(item.verb):null;const shown=i===shownAt;return <li key={item.verb.id} className={'vault-strip-item '+(item.done?(item.wrong?'wrong':'right'):item.current?'current':'later')+(shown&&!item.current?' shown':'')}><button type="button" disabled={busy} aria-current={shown?'step':undefined} aria-label={(i+1)+' · '+(item.done?item.verb.display:v(item.current?'navCurrent':'navLater'))} onClick={()=>showVerb(item.current?null:item.verb.id)} data-verb-strip={item.verb.id}>{picture?<img src={picture} alt="" width={36} height={36}/>:<span className="vault-strip-number">{i+1}</span>}{item.done&&<span className="vault-strip-badge" aria-hidden="true">{item.wrong?<X size={11} strokeWidth={3.4}/>:<Check size={11} strokeWidth={3.4}/>}</span>}</button></li>;})}</ol></nav>}
      <span>{strip&&shownAt>=0?t('verbOf',{n:shownAt+1,total:strip.length}):v('progress',{n:index+1,total:end})}</span>{!guest&&!viewItem&&<button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     {!strip&&<progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>}

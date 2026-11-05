@@ -1090,5 +1090,11 @@
     "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.": "{b}Otwierane strony:{/b} je\u015bli jeste\u015b cz\u0142onkiem, strony, kt\u00f3re otwierasz, s\u0105 te\u017c zapisywane z dat\u0105 i godzin\u0105 i powi\u0105zane z twoim kontem, wi\u0119c administrator strony widzi, z kt\u00f3rych cz\u0119\u015bci strony korzysta\u0142e\u015b i kiedy (razem z wynikami \u0107wicze\u0144). Te wpisy s\u0105 przechowywane maksymalnie 90 dni i usuwane, gdy usuniesz konto. W przypadku odwiedzaj\u0105cych bez konta wida\u0107 tylko, w jakiej kolejno\u015bci otwierano strony podczas wizyty danego dnia, pod losowym kluczem wa\u017cnym tylko tego dnia, kt\u00f3ry nie pokazuje, kim jeste\u015b.",
     "This page could not be found": "Nie znaleziono tej strony",
     "The address may be mistyped, or the page may have moved.": "Adres m\u00f3g\u0142 zosta\u0107 b\u0142\u0119dnie wpisany albo strona zosta\u0142a przeniesiona.",
-    "Back to the home page": "Wr\u00f3\u0107 na stron\u0119 g\u0142\u00f3wn\u0105"
+    "Back to the home page": "Wr\u00f3\u0107 na stron\u0119 g\u0142\u00f3wn\u0105",
+    "Now let's go over your mistakes": "Teraz powt\u00f3rzmy twoje b\u0142\u0119dy",
+    "Questions you got wrong: {n}. They come once more now.": "Pytania z b\u0142\u0119dem: {n}. Teraz pojawi\u0105 si\u0119 jeszcze raz.",
+    "Start now": "Zacznij teraz",
+    "Skip to the results": "Przejd\u017a do wynik\u00f3w",
+    "In the repeat: {correct} of {total} right": "W powt\u00f3rce: {correct} z {total} dobrze",
+    "Mistake repeat": "Powt\u00f3rka b\u0142\u0119d\u00f3w"
 }

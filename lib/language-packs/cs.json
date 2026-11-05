@@ -1799,5 +1799,10 @@
 "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Otev\u0159en\u00e9 str\u00e1nky:{/b} pokud jsi \u010dlenem, str\u00e1nky, kter\u00e9 otev\u0159e\u0161, se ukl\u00e1daj\u00ed tak\u00e9 s datem a \u010dasem a propojuj\u00ed s tv\u00fdm \u00fa\u010dtem, tak\u017ee spr\u00e1vce webu vid\u00ed, kter\u00e9 \u010d\u00e1sti webu jsi kdy pou\u017e\u00edval (spolu s v\u00fdsledky tv\u00e9ho procvi\u010dov\u00e1n\u00ed). Tyto z\u00e1znamy se uchov\u00e1vaj\u00ed nejv\u00fd\u0161e 90 dn\u00ed a sma\u017eou se, kdy\u017e sv\u016fj \u00fa\u010det sma\u017ee\u0161. U n\u00e1v\u0161t\u011bvn\u00edk\u016f bez \u00fa\u010dtu je vid\u011bt jen po\u0159ad\u00ed, v jak\u00e9m se str\u00e1nky p\u0159i n\u00e1v\u0161t\u011bv\u011b v dan\u00fd den otev\u00edraly, pod n\u00e1hodn\u00fdm kl\u00ed\u010dem platn\u00fdm jen ten den, kter\u00fd neprozrazuje, kdo jsi.",
 "This page could not be found":"Tuto str\u00e1nku se nepoda\u0159ilo naj\u00edt",
 "The address may be mistyped, or the page may have moved.":"Adresa je mo\u017en\u00e1 napsan\u00e1 \u0161patn\u011b, nebo byla str\u00e1nka p\u0159esunuta.",
-"Back to the home page":"Zp\u011bt na \u00favodn\u00ed str\u00e1nku"
+"Back to the home page":"Zp\u011bt na \u00favodn\u00ed str\u00e1nku",
+"Now let's go over your mistakes":"Te\u010f si zopakujeme tvoje chyby",
+"Questions you got wrong: {n}. They come once more now.":"Chybn\u011b zodpov\u011bzen\u00e9 ot\u00e1zky: {n}. Te\u010f p\u0159ijdou je\u0161t\u011b jednou.",
+"Skip to the results":"P\u0159ej\u00edt na v\u00fdsledky",
+"In the repeat: {correct} of {total} right":"P\u0159i opakov\u00e1n\u00ed: {correct} z {total} spr\u00e1vn\u011b",
+"Mistake repeat":"Opakov\u00e1n\u00ed chyb"
 }

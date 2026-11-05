@@ -1794,5 +1794,10 @@
 "{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Pagini deschise:{/b} dac\u0103 e\u0219ti membru, paginile pe care le deschizi sunt salvate \u0219i cu data \u0219i ora \u0219i legate de contul t\u0103u, astfel \u00eenc\u00e2t administratorul site-ului vede ce p\u0103r\u021bi ale site-ului ai folosit \u0219i c\u00e2nd (\u00eempreun\u0103 cu rezultatele exerci\u021biilor tale). Aceste \u00eenregistr\u0103ri se p\u0103streaz\u0103 cel mult 90 de zile \u0219i se \u0219terg c\u00e2nd \u00ee\u021bi \u0219tergi contul. La vizitatorii f\u0103r\u0103 cont se vede doar \u00een ce ordine au fost deschise paginile \u00een timpul vizitei din ziua respectiv\u0103, sub cheia aleatorie valabil\u0103 doar \u00een acea zi, care nu arat\u0103 cine e\u0219ti.",
 "This page could not be found":"Aceast\u0103 pagin\u0103 nu a fost g\u0103sit\u0103",
 "The address may be mistyped, or the page may have moved.":"Poate adresa a fost scris\u0103 gre\u0219it sau pagina a fost mutat\u0103.",
-"Back to the home page":"\u00cenapoi la pagina principal\u0103"
+"Back to the home page":"\u00cenapoi la pagina principal\u0103",
+"Now let's go over your mistakes":"Acum s\u0103 repet\u0103m gre\u0219elile tale",
+"Questions you got wrong: {n}. They come once more now.":"\u00centreb\u0103ri gre\u0219ite: {n}. Acum vin \u00eenc\u0103 o dat\u0103.",
+"Skip to the results":"Mergi la rezultate",
+"In the repeat: {correct} of {total} right":"La repetare: {correct} din {total} corecte",
+"Mistake repeat":"Repetarea gre\u0219elilor"
 }

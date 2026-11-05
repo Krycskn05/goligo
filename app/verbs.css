@@ -676,3 +676,8 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  .verb-practice .verb-slot>.verb-card.with-picture:has(.verb-picture)>:not(.verb-picture) { grid-column:1; }
  .verb-practice .verb-slot>.verb-card.with-picture .verb-card-main { font-size:24px; }
 }
+
+/* A verb opened from the picture strip during a round (5 November 2026): how it went, then its card; the round waits. */
+.verb-view-state { display:inline-flex; align-items:center; gap:6px; justify-self:start; margin:0; padding:4px 12px; border-radius:999px; background:#eef3f9; color:#5a6b80; font-size:13px; font-weight:800; line-height:1.2; }
+.verb-view-state.right { background:#e3f4dc; color:#2e7d22; }
+.verb-view-state.wrong { background:#fff0f4; color:#b23a5b; }

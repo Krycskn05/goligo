@@ -52,6 +52,26 @@ export function useExampleMeanings(language:VaultLanguage){
  useEffect(()=>{let live=true;void loadExampleMeanings(language).then(value=>{if(live)setMeanings({language,value});});return()=>{live=false;};},[language]);
  return meanings?.language===language?meanings.value:null;
 }
+/** A verb opened from the picture strip during a round (the learner asked, 5 November 2026: switch between the verbs
+ * there): how it went (done, with its mistakes, or still to come) and its card as when the verb opens — picture, meaning,
+ * Perfekt, the Präsens table — then the way back to the question. Read aloud only when tapped. */
+export function StripVerbCard({verb,state,status,backLabel,language,speech,onBack}:{verb:Verb;state:'right'|'wrong'|'later';status:string;backLabel:string;language:VaultLanguage;speech:Speech;onBack:()=>void}){
+ const dir=vaultDirection(language);const prefix=verbPrefix(verb);const spoken=learnSpeech(verb,'meaning');
+ return <article className="verb-learn verb-view panel stage-meaning" aria-labelledby="verb-view-heading" data-verb-view={verb.id}>
+  <p className={'verb-view-state '+state}>{state==='right'?<CheckCircle2 size={16} aria-hidden="true"/>:state==='wrong'?<X size={16} aria-hidden="true"/>:null}{status}</p>
+  <div className="verb-learn-body">
+   <VerbPicture verb={verb} language={language}/>
+   <div className="verb-learn-text">
+    <div className="verb-learn-title"><h1 id="verb-view-heading" tabIndex={-1} className={'verb-learn-form '+kindClass(verb)} lang="de" dir="ltr">{verb.display}</h1><button type="button" className="verb-learn-speak" disabled={speech.busy} aria-label={spoken} title={spoken} onClick={()=>speech.speak(spoken)}><Volume2 size={20}/></button></div>
+    <p className="verb-learn-meaning" lang={language} dir={dir}>{verbMeaning(verb,language)}</p>
+    {prefix&&<p className="verb-learn-note">{verbText(language,'separableNote',{p:prefix})}</p>}
+    <p className="verb-learn-perfekt" lang="de" dir="ltr"><small>Perfekt</small> {verb.subject} <VerbForm verb={verb} stage="perfekt"/></p>
+   </div>
+  </div>
+  <ConjugationTable verb={verb} language={language} speech={speech}/>
+  <div className="verb-learn-foot"><button type="button" className="btn verb-learn-next" onClick={onBack}>{backLabel}<ArrowRight size={18} className="vault-direction-icon"/></button></div>
+ </article>;
+}
 /** After an answer: one example sentence for every person (ich … Sie), each one different, Präsens or Perfekt,
  * with its meaning below in the learner's language; tap a sentence to hear it. */
 export function PersonSentences({verb,tense,language,speech}:{verb:Verb;tense:PersonTense;language:VaultLanguage;speech:Speech}){

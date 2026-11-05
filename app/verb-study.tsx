@@ -19,7 +19,7 @@ import {gameIds,type GameId} from '@/lib/verb-games';
 import {VerbGame,VerbPicture,RuleBox,gameName,gameDetail} from './verb-games';
 import {GameIcon} from './game-icons';
 import {GAME_LEVEL,gameLength} from '@/lib/game-names';
-import {LearnCard,PathStepper,AnswerResult,OneExample,PartVerbs,VerbDetail,kindClass} from './verb-workshop';
+import {LearnCard,PathStepper,AnswerResult,OneExample,PartVerbs,VerbDetail,StripVerbCard,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
 import {learnSpeech} from '@/lib/verb-persons';
 import {WORKSHOP_TOPIC,PART_ROUND_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,remainingIds,roundEnd,learnStage,MISTAKES_MODE,workshopMistakeIds,mistakeVerbs} from '@/lib/verb-workshop';
@@ -100,6 +100,10 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const [prefix,setPrefix]=useState('');const [prefixWarning,setPrefixWarning]=useState(false);
  const [dismissed,setDismissed]=useState<Set<string>>(new Set());
  const [replays,setReplays]=useState(0); // a tap on the result's speaker gives 3 seconds again
+ // A verb opened from the picture strip (the learner asked, 5 November 2026: switch between the verbs there): its card
+ // stands in the question's place. The round does not move — nothing is answered or skipped — and the next question
+ // waits until the learner comes back (the verb now, or the card's button).
+ const [viewVerb,setViewVerb]=useState<string|null>(null);
  const [game,setGame]=useState<GameId|null>(null);const [gameTopic,setGameTopic]=useState('verbs-all');
  // A part opened from the map (its verb list), and optionally one verb's card inside it. Both stay in the address
  // (?parca=verbs-w1&fiil=…), so a reload keeps the open card instead of going back to the map (2 November 2026).
@@ -134,9 +138,12 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   const order:string[]=[];const positions=new Map<string,number[]>();
   session.questions.forEach((item,i)=>{const id=lookup(item.id)?.verbId;if(!id||!verbMap.has(id))return;if(!positions.has(id)){positions.set(id,[]);order.push(id);}positions.get(id)!.push(i);});
   const wrong=new Set(session.answers.filter(answer=>!answer.correct).map(answer=>answer.question_id));
-  return order.map(id=>{const at=positions.get(id)!;return {verb:verbMap.get(id)!,done:index>at[at.length-1],current:at.includes(index),wrong:at.some(i=>wrong.has(session.questions[i].id))};});
+  return order.map(id=>{const at=positions.get(id)!;const misses=at.filter(i=>wrong.has(session.questions[i].id)).length;return {verb:verbMap.get(id)!,done:index>at[at.length-1],current:at.includes(index),wrong:misses>0,misses};});
  })():null;
  const stripAt=strip?strip.findIndex(item=>item.current):-1;
+ // Every verb of the strip opens (done, or still to come: its card is the one that opens the verb anyway); the verb now goes back.
+ const viewItem=strip&&viewVerb?strip.find(item=>item.verb.id===viewVerb&&!item.current)??null:null;
+ const shownAt=viewItem&&strip?strip.indexOf(viewItem):stripAt;
  // No part card: a part opens straight on its first verb's card (the learner asked to drop the part introduction).
  const overlay=place&&place.stageStart&&!dismissed.has('l:'+index)?'learn':null;
  // A new verb: its card says the verb aloud once by itself (only the German verb — never the question, the meaning or an explanation).
@@ -175,7 +182,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  useEffect(()=>{void loadExampleMeanings(language);},[language]);
  function stopFeedback(){answerAudio.stop();}
  function focus(id='object-question-heading'){requestAnimationFrame(()=>{document.getElementById(id)?.focus();window.scrollTo({top:0,behavior:'instant'});});}
- function clearAnswer(){setFeedback(null);setSelected('');setHeardQuestionId(null);setAux('');setAuxWarning(false);setPrefix('');setPrefixWarning(false);pendingAnswer.current=null;}
+ function clearAnswer(){setViewVerb(null);setFeedback(null);setSelected('');setHeardQuestionId(null);setAux('');setAuxWarning(false);setPrefix('');setPrefixWarning(false);pendingAnswer.current=null;}
  function overview(){if(mutation.current)return;stopFeedback();setSession(null);setGame(null);clearAnswer();setError(null);void refresh();focus(view?view.verbId?'verb-detail-heading':'verb-part-heading':section?'verb-section-heading':'vault-heading');}
  /** Opens a part from the map: its verbs with what is done, and the button to start or continue it. */
  function openPart(family:VerbFamily){stopFeedback();setView({family});focus('verb-part-heading');}
@@ -187,6 +194,13 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  /** Every step starts at the top of the page: the practice fits one screen on every device (the menu goes away on phones
   * while practising), so the card stays in the same place from step to step and nothing needs scrolling (4 November 2026). */
  function toPractice(){window.scrollTo({top:0,behavior:'instant'});}
+ /** A verb from the picture strip: its card; the verb now (or the card's button) goes back to where the round is. */
+ function showVerb(id:string|null){
+  if(mutation.current)return;stopFeedback();const open=id&&id!==verb?.id?id:null;setViewVerb(open);
+  if(open)requestAnimationFrame(()=>{document.getElementById('verb-view-heading')?.focus({preventScroll:true});toPractice();});else focusCurrent();
+ }
+ // Keep the verb now (or the one opened) in sight in the strip.
+ useEffect(()=>{document.querySelector('.verb-strip [aria-current]')?.scrollIntoView({block:'nearest',inline:'center'});},[index,viewVerb,session?.id]);
  function openSession(restored:Session){setSession(restored);setIndex(restored.answers.length);setDismissed(new Set());clearAnswer();focusCurrent();}
  /** Enter a part (none is locked): continue its saved round, or start a new one. A round saved in the older order
   * (all meanings first, or Perfekt with hat/ist) is not continued as it was. A new round of a topic holds only what is
@@ -253,8 +267,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   if(upcoming>=end){answerAudio.complete();void refresh();}
  }
  const nextRef=useRef(next);nextRef.current=next;
+ const viewing=!!viewItem;
  useEffect(()=>{
-  if(!feedback)return;
+  if(!feedback||viewing)return; // paused while a verb from the strip is open; 3 seconds again after coming back
   let due=Date.now()+AUTO_NEXT_MS;let timer:ReturnType<typeof setTimeout>;
   const tick=()=>{
    const now=Date.now();if(document.hidden)due=Math.max(due,now+AUTO_NEXT_MS);
@@ -264,7 +279,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
   };
   timer=setTimeout(tick,AUTO_NEXT_MS);
   return()=>clearTimeout(timer);
- },[feedback,replays]);// eslint-disable-line react-hooks/exhaustive-deps
+ },[feedback,replays,viewing]);// eslint-disable-line react-hooks/exhaustive-deps
  // Leaving a verb's card stops its voice, so the question can start at once; the part card's button readies the voice for the verb's card.
  function dismiss(kind:'c'|'l'){if(kind==='l')speech.stop();else speech.prepare();setDismissed(previous=>new Set(previous).add(kind+':'+index));focusCurrent();}
  // A saved round keeps the choices it was shown; if the catalogue changed since (the sentence task once offered verbs, now forms), the fresh choices are used in a fixed order.
@@ -390,12 +405,14 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
     {session.answers.filter(a=>!a.correct).map(a=>{const item=lookup(a.question_id);const target=item?.verbId?verbMap.get(item.verbId):undefined;return item&&target?<div className="object-result-row verb-result-row" key={a.id}><div>{verbForms(target,item.verbTask)}<small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: {optionLabel(item,a.answer,'verb-result-answer')}</small></div></div>:item?<div className="object-result-row verb-result-row" key={a.id}><div><strong lang="de" dir="ltr">{otherAnswer(item)}</strong> <span className="verb-forms-meaning">{otherMeaning(item)}</span><small>{v(item.kind==='write'?'yourAnswer':'yourChoice')}: <span lang="de" dir="ltr">{a.answer}</span></small></div></div>:null;})}
    </section>:q&&verb?<section className="object-practice picture-quiz-practice verb-practice">
     <div className="object-practice-top"><span className="object-pill">{place?familyTitle(place.family,language):t('workshopTitle')}</span>
-     {strip&&<nav className="vault-strip verb-strip" aria-label={v('navQuestions')}><ol>{strip.map((item,i)=>{const picture=item.done?verbPicture(item.verb):null;return <li key={item.verb.id} className={'vault-strip-item '+(item.done?(item.wrong?'wrong':'right'):item.current?'current':'later')} aria-current={item.current?'step':undefined}><button type="button" disabled aria-label={(i+1)+' · '+(item.done?item.verb.display:v(item.current?'navCurrent':'navLater'))}>{picture?<img src={picture} alt="" width={36} height={36}/>:<span className="vault-strip-number">{i+1}</span>}{item.done&&<span className="vault-strip-badge" aria-hidden="true">{item.wrong?<X size={11} strokeWidth={3.4}/>:<Check size={11} strokeWidth={3.4}/>}</span>}</button></li>;})}</ol></nav>}
-     <span>{strip&&stripAt>=0?t('verbOf',{n:stripAt+1,total:strip.length}):v('progress',{n:index+1,total:end})}</span>{!guest&&<button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
+     {strip&&<nav className="vault-strip verb-strip" aria-label={v('navQuestions')}><ol>{strip.map((item,i)=>{const picture=item.done?verbPicture(item.verb):null;const shown=i===shownAt;return <li key={item.verb.id} className={'vault-strip-item '+(item.done?(item.wrong?'wrong':'right'):item.current?'current':'later')+(shown&&!item.current?' shown':'')}><button type="button" disabled={busy} aria-current={shown?'step':undefined} aria-label={(i+1)+' · '+(item.done?item.verb.display:v(item.current?'navCurrent':'navLater'))} onClick={()=>showVerb(item.current?null:item.verb.id)} data-verb-strip={item.verb.id}>{picture?<img src={picture} alt="" width={36} height={36}/>:<span className="vault-strip-number">{i+1}</span>}{item.done&&<span className="vault-strip-badge" aria-hidden="true">{item.wrong?<X size={11} strokeWidth={3.4}/>:<Check size={11} strokeWidth={3.4}/>}</span>}</button></li>;})}</ol></nav>}
+     <span>{strip&&shownAt>=0?t('verbOf',{n:shownAt+1,total:strip.length}):v('progress',{n:index+1,total:end})}</span>{!guest&&!viewItem&&<button type="button" className={'housing-star'+(starred.has(q.id)?' active':'')} aria-pressed={starred.has(q.id)} aria-label={v(starred.has(q.id)?'unstar':'star')} title={v(starred.has(q.id)?'unstar':'star')} disabled={starBusy} onClick={()=>void toggleStar(q.id)}><Star size={20} fill={starred.has(q.id)?'currentColor':'none'}/></button>}<button type="button" className="object-exit" disabled={busy} onClick={overview} aria-label={v('exitTest')}><X size={20}/></button></div>
     {!strip&&<progress max={end} value={index} aria-label={v('progress',{n:index+1,total:end})}/>}
-    {place&&<PathStepper place={place} language={language}/>}
-    {overlay==='learn'&&place?<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
-    <article className={'object-question panel verb-question'+(feedback?' answered':'')}>
+    {place&&!viewItem&&<PathStepper place={place} language={language}/>}
+    {viewItem&&<StripVerbCard verb={viewItem.verb} state={viewItem.done?(viewItem.wrong?'wrong':'right'):'later'} status={viewItem.done?v('navDone')+(viewItem.misses?' · '+t('mistakesCount',{n:viewItem.misses}):''):v('navLater')} backLabel={v('backToCurrent')} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onBack={()=>showVerb(null)}/>}
+    {/* The question stays (hidden) while a verb from the strip is open, so the letters typed and the result keep. */}
+    {overlay==='learn'&&place?!viewItem&&<LearnCard verb={verb} stage={place.stage} language={language} speech={{speak:text=>speech.speak(text),busy:speech.busy||cueBusy}} onContinue={()=>dismiss('l')}/>:
+    <article className={'object-question panel verb-question'+(feedback?' answered':'')} style={viewItem?{display:'none'}:undefined}>
      <h1 id="object-question-heading" tabIndex={-1}>{heading(q)}</h1>
      {/* One fixed place for the question card and, after the answer, the result: the choices and the letters below never
          move and nothing scrolls (the learner asked, 4 November 2026: "work like Nesne Kasası, on one page"). */}

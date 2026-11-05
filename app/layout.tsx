@@ -25,6 +25,8 @@ import { LessonSync } from './lesson-sync';
 import { TapToSay } from './tap-to-say';
 import { VisitBeacon } from './visit-beacon';
 import { STORAGE_MOVE_SCRIPT } from "@/lib/storage-move";
+import { languageDirection } from "@/lib/site-languages";
+import { pageLanguage } from "./page-language";
 
 export const metadata: Metadata = {
   // Only the site name in the browser tab (the learner removed the tagline after it).
@@ -41,13 +43,18 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The visitor's language (their choice, else the browser's languages, else German; app/page-language.ts) is written
+  // into the page itself (site check, 5 November 2026: every page said lang="de"): Arabic, Persian, Dari, Pashto and
+  // Urdu are right to left from the first moment, and screen readers and search engines get the right language. The
+  // study pages set it again in the browser when the language saved there differs.
+  const language = await pageLanguage();
   return (
-    <html lang="de">
+    <html lang={language} dir={languageDirection(language)} suppressHydrationWarning>
       <head>
         {/* Moving from the old address: takes this browser's settings along once (lib/storage-move.ts). */}
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MOVE_SCRIPT }} />

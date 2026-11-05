@@ -118,10 +118,26 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  // Since 4 November 2026 every home page card has its own cover, made by the learner for that part, always the same
  // (Goliqo-ana-sayfa-kapaklari.zip: "never change them"); the sets below stay for the welcome picture's turns.
  const tour=read('app/home-tour.tsx');
- assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
- const covers=require(path.join(compiled,'site-pictures.js')).HOME_COVERS;
+ assert.ok(tour.includes("const art=(id:keyof typeof HOME_COVERS)=><picture><source media={COMPUTER_MEDIA} srcSet={HOME_COVERS_PC[id]} width={id==='units'?2600:1200} height={520}/><img src={HOME_COVERS[id]} alt=\"\" width={1200} height={600} loading=\"lazy\" decoding=\"async\"/></picture>;")&&!tour.includes('pickPictures')&&!tour.includes('nextPictureChange'),'no 30-minute change on the home page');
+ const sitePictures=require(path.join(compiled,'site-pictures.js'));
+ const covers=sitePictures.HOME_COVERS;
  assert.deepEqual(covers,{units:'/toon/kapak/units.webp',vault:'/toon/kapak/vault.webp',verbs:'/toon/kapak/verbs.webp',games:'/toon/kapak/games.webp',mistakes:'/toon/kapak/mistakes.webp'},'their own names: no old picture kept by a browser shows instead');
- for(const src of Object.values(covers))assert.deepEqual(size('public'+src),[1200,600],src+': 2 : 1 like every card frame, so the card shows it whole and even');
+ for(const src of Object.values(covers))assert.deepEqual(size('public'+src),[1200,600],src+': 2 : 1 like every card frame on a phone or tablet, so the card shows it whole and even');
+ // 5 November 2026: a computer gets the learner's covers made for its lower frames (Goliqo-panoramik-kapaklar-1536x1024.zip,
+ // "for the computer, don't spoil the phone and the tablet"); phones and tablets keep the covers above.
+ const pc=sitePictures.HOME_COVERS_PC;
+ assert.deepEqual(pc,{units:'/toon/kapak/units-pc.webp',vault:'/toon/kapak/vault-pc.webp',verbs:'/toon/kapak/verbs-pc.webp',games:'/toon/kapak/games-pc.webp',mistakes:'/toon/kapak/mistakes-pc.webp'},'new names, so a browser that kept a cover loads the new one');
+ for(const [id,src] of Object.entries(pc)){
+  assert.deepEqual(size('public'+src),id==='units'?[2600,520]:[1200,520],src+': the small cards 1200×520, the wide Üniteler card 2600×520 (the same scale)');
+  assert.ok(fs.statSync('public'+src).size<80*1024,src+': small');
+ }
+ const media='(min-width:761px) and (hover:hover) and (pointer:fine)';
+ assert.equal(sitePictures.COMPUTER_MEDIA,media,'wider than a phone, with a mouse: a touch tablet keeps the 2:1 covers');
+ const theme=read('app/koko-theme.css');
+ const pcRule=theme.indexOf('@media '+media+' {\n .ht .ht-grid>li:first-child .ht-art img { object-fit:cover; -webkit-mask-image:none; mask-image:none; }\n}');
+ assert.ok(pcRule>0,'on a computer the wide cover fills its frame, with the same query as the <source>');
+ assert.ok(pcRule>theme.indexOf('.ht .ht-grid>li:first-child .ht-art img { object-fit:contain;'),'after the tablet rule, so it wins on a computer');
+ assert.ok(read('app/home-tour.css').includes('.ht-art img,.ht-art picture,.ht-art .toon-art { display:block; width:100%; height:100%; }'),'the <picture> fills the frame, so the cover does');
  const pictures=read('lib/site-pictures.ts');
  for(const id of ['units','vault','verbs','games','mistakes']){
   assert.ok(tour.includes("art:art('"+id+"')"),id);

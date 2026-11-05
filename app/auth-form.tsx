@@ -1,10 +1,11 @@
 'use client';
-import {useRef,useState,type FormEvent} from 'react';
+import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {Eye,EyeOff,Loader2} from 'lucide-react';
 import {TOUR_KEY} from '@/lib/site-tour';
 import {authMessage} from '@/lib/copy-fill';
 import type {AuthFormTexts} from '@/lib/auth-texts';
 import {richText} from './rich-text';
+import {useHydrated} from './use-hydrated';
 
 type Mode='login'|'register';
 type Field='name'|'email'|'password'|'accept';
@@ -14,7 +15,7 @@ type Props={mode:Mode;returnTo:string;texts:AuthFormTexts};
 export default function AuthForm({mode,returnTo,texts}:Props){
  const register=mode==='register';
  const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [field,setField]=useState<Field|null>(null);const [show,setShow]=useState(false);
- const form=useRef<HTMLFormElement>(null);
+ const form=useRef<HTMLFormElement>(null);const ready=useHydrated();
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();if(busy)return;
   const data=new FormData(event.currentTarget);
@@ -33,9 +34,18 @@ export default function AuthForm({mode,returnTo,texts}:Props){
   setBusy(false);
  }
  const invalid=(name:Field)=>({'aria-invalid':field===name||undefined,'aria-describedby':field===name?'auth-error':undefined});
- return <form ref={form} className="lk-auth-form" onSubmit={submit} noValidate data-auth-form={mode}>
+ // The message stands right under the field it is about (site check, 5 November 2026: on a phone it stood at the bottom
+ // of the form, off the screen, while the page scrolled up to the red field); a message about no field stays above the
+ // button. Once it is shown it is scrolled into view if it is not.
+ const fields:Field[]=register?['name','email','password','accept']:['email','password'];
+ const spot=field&&fields.includes(field)?field:null;
+ const message=(at:Field|null)=>error&&spot===at?<p id="auth-error" className={'lk-form-error'+(at?' at-field':'')} role="alert">{error}</p>:null;
+ useEffect(()=>{if(error)document.getElementById('auth-error')?.scrollIntoView({block:'nearest'});},[error,field]);
+ return <form ref={form} className="lk-auth-form" method="post" onSubmit={submit} noValidate data-auth-form={mode}>
   {register&&<label className="lk-field"><span>{texts.nameLabel}</span><input name="name" type="text" autoComplete="name" required maxLength={60} {...invalid('name')}/></label>}
+  {message('name')}
   <label className="lk-field"><span>{texts.emailLabel}</span><input name="email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} required maxLength={254} {...invalid('email')}/></label>
+  {message('email')}
   <div className="lk-field">
    <label htmlFor="auth-password">{texts.passwordLabel}</label>
    <div className="lk-password">
@@ -43,9 +53,11 @@ export default function AuthForm({mode,returnTo,texts}:Props){
     <button type="button" className="lk-password-toggle" onClick={()=>setShow(value=>!value)} aria-label={show?texts.hidePassword:texts.showPassword} aria-pressed={show}>{show?<EyeOff size={19} aria-hidden="true"/>:<Eye size={19} aria-hidden="true"/>}</button>
    </div>
    {register&&<small id="password-help">{texts.passwordHelp}</small>}
+   {message('password')}
   </div>
   {register&&<label className="lk-check"><input name="accept" type="checkbox" required {...invalid('accept')}/><span>{richText(texts.acceptText,{terms:inner=><a href="/kullanim-kosullari" target="_blank" rel="noopener">{inner}</a>,privacy:inner=><a href="/gizlilik" target="_blank" rel="noopener">{inner}</a>})}</span></label>}
-  {error&&<p id="auth-error" className="lk-form-error" role="alert">{error}</p>}
-  <button className="btn lk-submit" type="submit" disabled={busy}>{busy&&<Loader2 className="lk-spin" size={18} aria-hidden="true"/>}{register?texts.register:texts.signIn}</button>
+  {message('accept')}
+  {message(null)}
+  <button className="btn lk-submit" type="submit" disabled={busy||!ready}>{busy&&<Loader2 className="lk-spin" size={18} aria-hidden="true"/>}{register?texts.register:texts.signIn}</button>
  </form>;
 }

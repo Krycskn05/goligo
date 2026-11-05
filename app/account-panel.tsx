@@ -6,6 +6,7 @@ import {BrandMascot} from './site-logo';
 import {authMessage,fillText} from '@/lib/copy-fill';
 import type {AccountTexts} from '@/lib/auth-texts';
 import {isProgressKey} from '@/lib/lesson-sync';
+import {useHydrated} from './use-hydrated';
 
 type Props={name:string;email:string;since:string;texts:AccountTexts};
 type Result={ok?:boolean;error?:string;code?:string;n?:number;field?:string;name?:string};
@@ -38,7 +39,7 @@ function Card({icon,title,id,children}:{icon:ReactNode;title:string;id?:string;c
 
 /** Hesabım: ad, şifre, site turu, verilerimi indir, ilerlemeyi sıfırlama, çıkış ve hesabı silme; sayfanın dilinde (`texts` sunucudan gelir). */
 export default function AccountPanel({name:initialName,email,since,texts}:Props){
- const [name,setName]=useState(initialName);
+ const [name,setName]=useState(initialName);const ready=useHydrated();
  const [busy,setBusy]=useState<string|null>(null);
  const [errors,setErrors]=useState<Record<string,string>>({});const [done,setDone]=useState<Record<string,string>>({});
  async function run(key:string,body:Record<string,unknown>,form:HTMLFormElement|null,success:string,after?:(result:Result)=>void){
@@ -63,20 +64,20 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
   </header>
 
   <Card icon={<TopIcon name="account" size={26}/>} title={texts.nameLabel}>
-   <form className="lk-auth-form" onSubmit={rename}>
+   <form className="lk-auth-form" method="post" onSubmit={rename}>
     <label className="lk-field"><span>{texts.displayName}</span><input name="name" type="text" autoComplete="name" required maxLength={60} defaultValue={name}/></label>
     <Status error={errors.name??''} done={done.name??''}/>
-    <button className="btn secondary small" type="submit" disabled={!!busy}>{spin('name')}{texts.save}</button>
+    <button className="btn secondary small" type="submit" disabled={!!busy||!ready}>{spin('name')}{texts.save}</button>
    </form>
   </Card>
 
   {/* The header's account menu links here (app/account-menu.tsx: /hesabim#sifre). */}
   <Card icon={<KeyRound size={20} aria-hidden="true"/>} title={texts.changePassword} id="sifre">
-   <form className="lk-auth-form" onSubmit={password} data-account-password>
+   <form className="lk-auth-form" method="post" onSubmit={password} data-account-password>
     <label className="lk-field"><span>{texts.currentPassword}</span><input name="current" type="password" autoComplete="current-password" required maxLength={128}/></label>
     <label className="lk-field"><span>{texts.newPassword}</span><input name="next" type="password" autoComplete="new-password" required minLength={8} maxLength={128}/><small>{texts.minChars}</small></label>
     <Status error={errors.password??''} done={done.password??''}/>
-    <button className="btn secondary small" type="submit" disabled={!!busy}>{spin('password')}{texts.changePassword}</button>
+    <button className="btn secondary small" type="submit" disabled={!!busy||!ready}>{spin('password')}{texts.changePassword}</button>
    </form>
   </Card>
 
@@ -96,10 +97,10 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
    <details className="lk-danger">
     <summary>{texts.progressSummary}</summary>
     <p>{texts.progressWarning}</p>
-    <form className="lk-auth-form" onSubmit={reset} data-account-progress>
+    <form className="lk-auth-form" method="post" onSubmit={reset} data-account-progress>
      <label className="lk-check"><input name="confirm" type="checkbox" required/><span>{texts.progressConfirm}</span></label>
      <Status error={errors.progress??''} done={done.progress??''}/>
-     <button className="btn lk-danger-button small" type="submit" disabled={!!busy}>{spin('progress')}{texts.progressButton}</button>
+     <button className="btn lk-danger-button small" type="submit" disabled={!!busy||!ready}>{spin('progress')}{texts.progressButton}</button>
     </form>
    </details>
   </Card>
@@ -108,11 +109,11 @@ export default function AccountPanel({name:initialName,email,since,texts}:Props)
    <details className="lk-danger">
     <summary>{texts.deleteSummary}</summary>
     <p>{texts.deleteWarning}</p>
-    <form className="lk-auth-form" onSubmit={remove} data-account-delete>
+    <form className="lk-auth-form" method="post" onSubmit={remove} data-account-delete>
      <label className="lk-field"><span>{texts.yourPassword}</span><input name="current" type="password" autoComplete="current-password" required maxLength={128}/></label>
      <label className="lk-check"><input name="confirm" type="checkbox" required/><span>{texts.deleteConfirm}</span></label>
      <Status error={errors.delete??''} done={done.delete??''}/>
-     <button className="btn lk-danger-button small" type="submit" disabled={!!busy}>{spin('delete')}{texts.deleteButton}</button>
+     <button className="btn lk-danger-button small" type="submit" disabled={!!busy||!ready}>{spin('delete')}{texts.deleteButton}</button>
     </form>
    </details>
   </Card>

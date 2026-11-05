@@ -70,6 +70,10 @@
 .lk-check input { width:24px; height:24px; flex-shrink:0; margin-top:1px; accent-color:var(--green-2); }
 .lk-check a,.lk-auth-switch a,.lk-legal a,.lk-forgot a,.site-footer-links a { color:var(--blue-2); font-weight:700; }
 .lk-form-error { margin:0; padding:12px 14px; border-radius:14px; background:#fff0f3; color:#8a1f3c; font-weight:700; }
+/* A message under its field sits close to it. */
+.lk-auth-form>.lk-form-error.at-field { margin-top:-8px; padding:9px 12px; font-size:14px; }
+.lk-field>.lk-form-error.at-field { margin-top:2px; padding:9px 12px; font-size:14px; }
+.lk-hero-form .lk-auth-form>.lk-form-error.at-field { margin-top:-4px; }
 .lk-form-done { margin:0; padding:12px 14px; border-radius:14px; background:#e8f7e9; color:#1f6a26; font-weight:700; }
 .lk-submit { width:100%; margin-top:4px; }
 .lk-auth-switch { margin:20px 0 0; text-align:center; color:var(--ink-2); }

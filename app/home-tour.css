@@ -16,7 +16,7 @@
 .ht-card { height:100%; display:grid; gap:6px; align-content:start; padding:12px 14px 16px; color:var(--ink); text-decoration:none; transition:transform .15s,box-shadow .15s; }
 .ht-card:hover { transform:translateY(-3px); box-shadow:var(--soft-3); }
 .ht-art { display:block; height:150px; border-radius:14px; overflow:hidden; background:#fbf7ef; }
-.ht-art img,.ht-art .toon-art { display:block; width:100%; height:100%; }
+.ht-art img,.ht-art picture,.ht-art .toon-art { display:block; width:100%; height:100%; }
 .ht-name { display:flex; align-items:center; gap:10px; margin-top:4px; }
 .ht-name strong { font-size:18px; }
 .ht-name .nav-icon { width:32px; height:32px; }

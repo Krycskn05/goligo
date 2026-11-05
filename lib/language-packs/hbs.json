@@ -830,6 +830,7 @@
 "Study a little every day. Paul will pop in now and then to wave. Enjoy learning!":"U\u010di malo svaki dan. Paul \u0107e povremeno navratiti i mahnuti ti. U\u017eivaj u u\u010denju!",
 "Study a little every day; your mistakes come back for practice.":"U\u010di malo svaki dan; tvoje gre\u0161ke ti se vra\u0107aju za vje\u017ebu.",
 "Study sections A\u2013D":"U\u010di dijelove A\u2013D",
+"Study section A":"U\u010di dio A",
 "Subject ich \u2192 habe. Object: eine Wohnung.":"Subjekt ich \u2192 habe. Objekt: eine Wohnung.",
 "Subject \u00b7 Who / what?":"Subjekt \u00b7 Ko / \u0161ta?",
 "Subtopics":"Podteme",
@@ -1794,5 +1795,8 @@
 "You are trying without an account: every verb topic is open, and your progress is not saved.":"Isprobava\u0161 bez profila: sve teme glagola su otvorene, a tvoj napredak se ne \u010duva.",
 "That letter doesn't go here.":"To slovo ne ide ovdje.",
 "Tries left: {n}":"Preostali poku\u0161aji: {n}",
-"{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Otvorene stranice:{/b} ako si \u010dlan, stranice koje otvara\u0161 spremaju se i s datumom i vremenom i povezuju s tvojim ra\u010dunom, pa administrator stranice vidi koje si dijelove stranice koristio i kada (zajedno s rezultatima vje\u017ebanja). Ti se zapisi \u010duvaju najvi\u0161e 90 dana i bri\u0161u se kad izbri\u0161e\u0161 ra\u010dun. Kod posjetitelja bez ra\u010duna vidi se samo kojim su redoslijedom stranice otvarane tijekom posjeta tog dana, pod nasumi\u010dnim klju\u010dem koji vrijedi samo taj dan i ne pokazuje tko si."
+"{b}Which pages were opened:{/b} if you are a member, the pages you open are also saved with their date and time and linked to your account, so the site administrator can see which parts of the site you used and when (together with your practice results). These entries are kept for at most 90 days and deleted when you delete your account. For visitors without an account, only the order in which pages were opened during that day's visit is visible, under the random key that is valid for that day only and does not show who you are.":"{b}Otvorene stranice:{/b} ako si \u010dlan, stranice koje otvara\u0161 spremaju se i s datumom i vremenom i povezuju s tvojim ra\u010dunom, pa administrator stranice vidi koje si dijelove stranice koristio i kada (zajedno s rezultatima vje\u017ebanja). Ti se zapisi \u010duvaju najvi\u0161e 90 dana i bri\u0161u se kad izbri\u0161e\u0161 ra\u010dun. Kod posjetitelja bez ra\u010duna vidi se samo kojim su redoslijedom stranice otvarane tijekom posjeta tog dana, pod nasumi\u010dnim klju\u010dem koji vrijedi samo taj dan i ne pokazuje tko si.",
+"This page could not be found":"Ova stranica nije prona\u0111ena",
+"The address may be mistyped, or the page may have moved.":"Mo\u017eda je adresa pogre\u0161no upisana ili je stranica premje\u0161tena.",
+"Back to the home page":"Natrag na po\u010detnu stranicu"
 }

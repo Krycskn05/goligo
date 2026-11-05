@@ -3,10 +3,11 @@ import {useState,type FormEvent} from 'react';
 import {Eye,EyeOff,Loader2} from 'lucide-react';
 import {authMessage} from '@/lib/copy-fill';
 import type {ResetFormTexts} from '@/lib/auth-texts';
+import {useHydrated} from './use-hydrated';
 
 /** The new password, on the page of the emailed link (app/sifre-yenile). After saving the learner is signed in. */
 export default function ResetForm({token,texts}:{token:string;texts:ResetFormTexts}){
- const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [show,setShow]=useState(false);const [dead,setDead]=useState(false);
+ const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [show,setShow]=useState(false);const [dead,setDead]=useState(false);const ready=useHydrated();
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();if(busy)return;
   const password=String(new FormData(event.currentTarget).get('password')??'');
@@ -19,7 +20,7 @@ export default function ResetForm({token,texts}:{token:string;texts:ResetFormTex
   }catch{setError(texts.offline);}
   setBusy(false);
  }
- return <form className="lk-auth-form" onSubmit={submit} noValidate data-reset-form>
+ return <form className="lk-auth-form" method="post" onSubmit={submit} noValidate data-reset-form>
   <div className="lk-field">
    <label htmlFor="reset-password">{texts.newPassword}</label>
    <div className="lk-password">
@@ -29,6 +30,6 @@ export default function ResetForm({token,texts}:{token:string;texts:ResetFormTex
    <small id="reset-help">{texts.passwordHelp}</small>
   </div>
   {error&&<p id="reset-error" className="lk-form-error" role="alert">{error}</p>}
-  <button className="btn lk-submit" type="submit" disabled={busy||dead}>{busy&&<Loader2 className="lk-spin" size={18} aria-hidden="true"/>}{texts.resetSave}</button>
+  <button className="btn lk-submit" type="submit" disabled={busy||dead||!ready}>{busy&&<Loader2 className="lk-spin" size={18} aria-hidden="true"/>}{texts.resetSave}</button>
  </form>;
 }

@@ -124,6 +124,11 @@ const copy={
  privacyLink:['Gizlilik','Datenschutz','Privacy','الخصوصية','Конфіденційність','Confidentialité'],
  termsLink:['Kullanım koşulları','Nutzungsbedingungen','Terms of use','شروط الاستخدام','Умови користування','Conditions d’utilisation'],
  legalNav:['Yasal bilgiler','Rechtliches','Legal information','معلومات قانونية','Правова інформація','Informations légales'],
+ // A page that does not exist (app/not-found.tsx; site check, 5 November 2026: it said "This page could not be found."
+ // in English, in every language).
+ notFoundTitle:['Bu sayfa bulunamadı','Diese Seite gibt es nicht','This page could not be found','لم يتم العثور على هذه الصفحة','Цю сторінку не знайдено','Cette page est introuvable'],
+ notFoundText:['Adres yanlış yazılmış ya da sayfa taşınmış olabilir.','Vielleicht ist die Adresse falsch geschrieben oder die Seite wurde verschoben.','The address may be mistyped, or the page may have moved.','ربما كُتب العنوان بشكل خاطئ أو نُقلت الصفحة.','Можливо, адресу введено з помилкою або сторінку перенесено.','L’adresse est peut-être mal écrite, ou la page a été déplacée.'],
+ notFoundHome:['Ana sayfaya dön','Zur Startseite','Back to the home page','العودة إلى الصفحة الرئيسية','На головну','Retour à l’accueil'],
 } as const satisfies Record<string,Six>;
 export type PublicCopyKey=keyof typeof copy;
 export const publicCopy=copy;

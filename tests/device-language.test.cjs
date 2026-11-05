@@ -40,7 +40,9 @@ test('every page starts in the saved language (German otherwise) and keeps a new
   const page=read(file);assert.ok(page.includes('let saved:VaultLanguage=browserLanguage();try{saved=readVaultLanguage(localStorage,saved);'),file);
  }
  assert.ok(read('lib/vault-language-preference.ts').includes('rememberSiteLanguage(language);'),'a choice in Nesne Kasası or Fiil Atölyesi is kept too');
- assert.ok(read('app/layout.tsx').includes('<html lang="de">'));
+ // The page is written in the visitor's language and direction from the start (site check, 5 November 2026).
+ const layout=read('app/layout.tsx');
+ assert.ok(layout.includes('const language = await pageLanguage();')&&layout.includes('<html lang={language} dir={languageDirection(language)} suppressHydrationWarning>')&&!layout.includes('<html lang="de">'));
  // The server pages: language from app/page-language.ts, the header lets the visitor change it.
  for(const file of ['app/landing.tsx','app/giris/page.tsx','app/uye-ol/page.tsx','app/hesabim/page.tsx','app/gizlilik/page.tsx','app/kullanim-kosullari/page.tsx'])assert.ok(read(file).includes('await pageLanguage()'),file);
  const shell=read('app/public-shell.tsx');assert.ok(shell.includes('<PublicLanguage language={language} label={pickText(siteLanguageLabel,language)}/>')&&shell.includes('lang={language} dir={languageDirection(language)}'));

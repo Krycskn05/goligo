@@ -921,3 +921,19 @@ body::after{content:"";display:block;height:var(--letter-bar-space,0px)}
 @media(max-width:1100px) { .vault-section .vault-category-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media(max-width:900px) { .vault-section .vault-category-art { height:130px; } }
 @media(max-width:620px) { .vault-section .vault-category-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .vault-section .vault-category-art { height:104px; } .vault-section-emoji { width:36px; height:36px; font-size:18px; } }
+
+/* German inside a right-to-left page (Arabic, Persian, Dari, Pashto, Urdu; site check, 5 November 2026): every German
+   piece keeps its own left-to-right order, so "Wie heißen Sie?" no longer shows as "?Wie heißen Sie" and "Tschüss!" as
+   "!Tschüss". The direction comes from the text itself (plaintext, like <bdi>), so a bold Arabic word stays right to
+   left. A German line on its own (a subtitle, a title in the contents, a verb in the list) stays on the right like the
+   text around it. */
+[dir=rtl] :is(b,strong,i,em,mark,cite,q),
+[dir=rtl] [lang=de]:not([dir]):not(:has([lang]:not([lang=de]))) { unicode-bidi:plaintext; }
+:where([dir=rtl] :is(p,h1,h2,h3,h4,h5,h6,dd,dt,figcaption,blockquote)[lang=de]:not([dir]):not([dir=ltr] *)),
+:where([dir=rtl] :is(b,strong):not([dir=ltr] *)) { text-align:right; }
+
+/* One very long word (Dutch "Werkwoordwerkplaats", long compounds in other languages) breaks inside its box, with a
+   hyphen where the browser knows the language, instead of running out of the menu button or off the phone screen
+   (site check, 5 November 2026). */
+.work-nav { overflow-wrap:anywhere; -webkit-hyphens:auto; hyphens:auto; }
+.verb-hero-title { overflow-wrap:break-word; -webkit-hyphens:auto; hyphens:auto; }

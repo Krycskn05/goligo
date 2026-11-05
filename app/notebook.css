@@ -56,8 +56,8 @@
  .nb-tabs button { flex:1; justify-content:center; transform:translateY(6px); padding:12px 10px 16px; }
  .nb-tabs button.active { transform:none; }
  .nb-tabs button:hover:not(.active) { transform:translateY(6px); }
- .nb-tabs strong { font-size:21px; }
- .nb-tabs span { font-size:14px; }
+ .nb-tabs strong { font-size:21px; white-space:nowrap; }
+ .nb-tabs span { font-size:14px; min-width:0; overflow-wrap:break-word; }
  /* Phone: the two tabs fill the width, so the spiral rings would sit on them; the tabs alone top the notebook. */
  .nb-tabs { position:relative; top:auto; inset-inline-end:auto; z-index:3; }
  .nb-spiral { display:none; }
@@ -66,6 +66,14 @@
  .nb-title { font-size:24px; margin-bottom:22px; }
  .nb-grid { grid-template-columns:minmax(0,1fr); gap:28px; }
  .nb-photo { height:200px; }
+}
+/* A small phone: "A1.1" stays on one line beside its tick and "Themen" (site check, 5 November 2026: German broke it
+   into "A1." and "1" at 360 px). */
+@media (max-width:400px) {
+ .nb-tabs button { gap:5px; padding-inline:6px; }
+ .nb-tabs button.active::before { width:18px; height:18px; background-size:12px; }
+ .nb-tabs strong { font-size:19px; }
+ .nb-tabs span { font-size:13px; }
 }
 @media (prefers-reduced-motion:reduce) {
  .nb-card,.nb-card:nth-child(even),.nb-card:hover { transform:none; animation:none; }

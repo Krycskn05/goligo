@@ -41,5 +41,23 @@ export const HOME_COVERS:Record<Exclude<PicturePart,'welcome'>,string>={
  games:'/toon/kapak/games.webp',
  mistakes:'/toon/kapak/mistakes.webp',
 };
+/**
+ * The covers for computers (Goliqo-panoramik-kapaklar-1536x1024.zip, made by the learner for computers only, 5 November
+ * 2026: "don't spoil how it looks on the phone and the tablet"). On a computer the home page fits one screen, so the
+ * card frames are lower than 2:1 (a 1536×730 laptop gives the small cards 2.5:1 and the wide Üniteler card 4.3 to
+ * 5.4:1) and the 2:1 covers lost their top and bottom. These are cut for those frames, every picture centred on its
+ * people and things: the four small cards 1200×520, Üniteler 2600×520 (the plain wall and table carried on at its
+ * sides), all at the same scale. Phones and tablets keep HOME_COVERS.
+ */
+export const HOME_COVERS_PC:Record<Exclude<PicturePart,'welcome'>,string>={
+ units:'/toon/kapak/units-pc.webp',
+ vault:'/toon/kapak/vault-pc.webp',
+ verbs:'/toon/kapak/verbs-pc.webp',
+ games:'/toon/kapak/games-pc.webp',
+ mistakes:'/toon/kapak/mistakes-pc.webp',
+};
+/** The screens that get HOME_COVERS_PC: wider than a phone and used with a mouse or trackpad (a touch tablet is not).
+ * app/koko-theme.css uses the same query for the wide card's fit. */
+export const COMPUTER_MEDIA='(min-width:761px) and (hover:hover) and (pointer:fine)';
 /** Milliseconds until the pictures change next. */
 export function nextPictureChange(now:number=Date.now()){return PICTURE_PERIOD_MS-now%PICTURE_PERIOD_MS;}

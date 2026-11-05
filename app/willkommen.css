@@ -338,6 +338,9 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
  .l1a-contents .lb-toc-photo { width:60px; height:46px; }
  .l1a-contents .lb-toc-row>.progress-meter { margin-inline-start:112px; }
  .l1a-contents .lb-toc-text strong { font-size:15px; }
+ /* "20 Wörter · 12 Übungen · Test mit 12 Fragen" was cut to "Test mit 12 Fr…" here (site check, 5 November 2026): the
+    line may wrap; a taller page is drawn a little smaller anyway. */
+ .l1a-contents .lb-toc-meta { white-space:normal; overflow:visible; text-overflow:clip; }
 }
 @media (min-width:1180px) and (max-height:740px) {
  .l1a-contents .lb-title { font-size:26px; }

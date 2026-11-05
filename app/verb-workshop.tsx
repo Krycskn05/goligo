@@ -55,7 +55,7 @@ export function useExampleMeanings(language:VaultLanguage){
 /** A verb opened from the picture strip during a round (the learner asked, 5 November 2026: switch between the verbs
  * there): how it went (done, with its mistakes, or still to come) and its card as when the verb opens — picture, meaning,
  * Perfekt, the Präsens table — then the way back to the question. Read aloud only when tapped. */
-export function StripVerbCard({verb,state,status,backLabel,language,speech,onBack}:{verb:Verb;state:'right'|'wrong'|'later';status:string;backLabel:string;language:VaultLanguage;speech:Speech;onBack:()=>void}){
+export function StripVerbCard({verb,state,status,returnLabel,language,speech,onBack}:{verb:Verb;state:'right'|'wrong'|'later';status:string;returnLabel:string;language:VaultLanguage;speech:Speech;onBack:()=>void}){
  const dir=vaultDirection(language);const prefix=verbPrefix(verb);const spoken=learnSpeech(verb,'meaning');
  return <article className="verb-learn verb-view panel stage-meaning" aria-labelledby="verb-view-heading" data-verb-view={verb.id}>
   <p className={'verb-view-state '+state}>{state==='right'?<CheckCircle2 size={16} aria-hidden="true"/>:state==='wrong'?<X size={16} aria-hidden="true"/>:null}{status}</p>
@@ -69,7 +69,7 @@ export function StripVerbCard({verb,state,status,backLabel,language,speech,onBac
    </div>
   </div>
   <ConjugationTable verb={verb} language={language} speech={speech}/>
-  <div className="verb-learn-foot"><button type="button" className="btn verb-learn-next" onClick={onBack}>{backLabel}<ArrowRight size={18} className="vault-direction-icon"/></button></div>
+  <div className="verb-learn-foot"><button type="button" className="btn verb-learn-next" onClick={onBack}>{returnLabel}<ArrowRight size={18} className="vault-direction-icon"/></button></div>
  </article>;
 }
 /** After an answer: one example sentence for every person (ich … Sie), each one different, Präsens or Perfekt,

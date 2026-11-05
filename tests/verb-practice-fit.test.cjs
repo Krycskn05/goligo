@@ -44,7 +44,7 @@ test('every verb of the strip opens its card; the round waits and comes back whe
  assert.ok(page.includes("<article className={'object-question panel verb-question'+(feedback?' answered':'')} style={viewItem?{display:'none'}:undefined}>"),'the question stays, hidden, so the letters and the result keep');
  assert.ok(page.includes('{place&&!viewItem&&<PathStepper')&&page.includes('{!guest&&!viewItem&&<button'),'the steps and the star belong to the question');
  assert.ok(page.includes("function clearAnswer(){setViewVerb(null);"),'the next question starts on the question');
- assert.ok(page.includes("status={viewItem.done?v('navDone')+(viewItem.misses?' · '+t('mistakesCount',{n:viewItem.misses}):''):v('navLater')} backLabel={v('backToCurrent')}"),'how it went, in the learner\'s language');
+ assert.ok(page.includes("status={viewItem.done?v('navDone')+(viewItem.misses?' · '+t('mistakesCount',{n:viewItem.misses}):''):v('navLater')} returnLabel={v('backToCurrent')}"),'how it went, in the learner\'s language');
  assert.ok(cards.includes('export function StripVerbCard(')&&cards.includes('<h1 id="verb-view-heading" tabIndex={-1}')&&cards.includes('<ConjugationTable verb={verb} language={language} speech={speech}/>'));
  // Never read aloud by itself: no speak call outside the buttons.
  const card=cards.slice(cards.indexOf('export function StripVerbCard('),cards.indexOf('/** After an answer: one example sentence for every person'));

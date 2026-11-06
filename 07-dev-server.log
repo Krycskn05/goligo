@@ -1,0 +1,217 @@
+$ node scripts/sounds/make-sounds.mjs && node scripts/run-framework.mjs dev
+Goliqo sesleri hazır: tap 0.24s, tap2 0.24s, tap3 0.24s, whoosh 0.55s, correct 0.95s, complete 1.65s, soft 0.8s, beep 0.7s, retro 0.55s, low 0.95s, cartoon 0.85s, tapWood 0.22s, tapPop 0.22s, tapDrop 0.26s, tapBell 0.4s, tapChip 0.12s, pageFlip 0.177s, pageSlide 0.48s, pageHarp 0.75s, pageBubbles 0.42s, pageChip 0.17s, correctMarimba 0.95s, correctCoin 0.62s, correctDing 1.2s, correctFanfare 0.95s, correctBubbles 0.95s, completeFanfare 1.6s, completeLevel 0.89s, completeChimes 1.65s, completeHarp 1.6s, paulHello 0.85s, paulTip 0.75s, paulHmm 0.95s, paulClap 1.55s, paulDrum 1.05s, completeMarimba 1.6s
+
+  vinext dev  (Vite 8.0.13)
+
+Sites local sign-in: seedy@sites.test
+[2m9:34:03 AM[22m [36m[1m[vite][22m[39m [34m[2m(rsc)[22m[39m [optimizer] scanning dependencies...
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+ GET / 200 in 2.1s (compile: 1793957641.5s, render: 1.5s)
+ GET / 200 in 106ms (compile: 1793957640.9s, render: 74ms)
+ POST /api/ilerleme 401 in 452ms
+ POST /api/ziyaret 204 in 203ms
+ GET /ev-esyalar 200 in 1.4s (compile: 1793957641.0s, render: 1.2s)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 161ms
+ POST /api/ziyaret 204 in 11ms
+ GET /fiiller 200 in 594ms (compile: 1793957640.9s, render: 515ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 103ms
+ POST /api/ziyaret 204 in 10ms
+ GET /a1-1/willkommen 200 in 660ms (compile: 1793957640.9s, render: 599ms)
+ GET /a1-1/berufe 302 in 7ms
+ GET /giris?return_to=%2Fa1-1%2Fberufe 200 in 106ms (compile: 1793957640.9s, render: 75ms)
+ GET /a1-2/ev-ve-yasam 302 in 8ms
+ GET /giris?return_to=%2Fa1-2%2Fev-ve-yasam 200 in 57ms (compile: 1793957640.9s, render: 44ms)
+ GET /a1-2/ausbildung 302 in 7ms
+ GET /giris?return_to=%2Fa1-2%2Fausbildung 200 in 53ms (compile: 1793957640.9s, render: 42ms)
+ GET /a1-2/wege-in-der-stadt 302 in 7ms
+ GET /giris?return_to=%2Fa1-2%2Fwege-in-der-stadt 200 in 98ms (compile: 1793957640.9s, render: 53ms)
+ GET /hesabim 302 in 8ms
+ GET /giris?return_to=%2Fhesabim 200 in 57ms (compile: 1793957640.9s, render: 46ms)
+ GET /giris 200 in 62ms (compile: 1793957640.9s, render: 50ms)
+ POST /api/ziyaret 204 in 10ms
+ GET /uye-ol 200 in 95ms (compile: 1793957640.9s, render: 56ms)
+ POST /api/ziyaret 204 in 26ms
+ GET /gizlilik 200 in 156ms (compile: 1793957640.9s, render: 61ms)
+ POST /api/ziyaret 204 in 10ms
+ GET /kullanim-kosullari 200 in 82ms (compile: 1793957640.9s, render: 49ms)
+ POST /api/ziyaret 204 in 10ms
+ GET /impressum 200 in 78ms (compile: 1793957640.9s, render: 52ms)
+ POST /api/ziyaret 204 in 28ms
+ GET /api/study 200 in 9ms
+ POST /api/study 401 in 9ms
+ GET /api/study 200 in 8ms
+ GET /uye-ol?return_to=%2Ffiiller 200 in 79ms (compile: 1793957640.9s, render: 64ms)
+ POST /api/ziyaret 204 in 28ms
+ POST /api/auth 400 in 108ms
+ POST /api/auth 201 in 34ms
+ GET /fiiller 200 in 53ms (compile: 1793957640.9s, render: 38ms)
+ POST /api/ilerleme 200 in 29ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 78ms
+ POST /api/ziyaret 204 in 20ms
+ GET /api/study 200 in 17ms
+ GET /hesabim 200 in 203ms (compile: 1793957640.9s, render: 140ms)
+ POST /api/ilerleme 200 in 46ms
+ POST /api/ziyaret 204 in 26ms
+ POST /api/auth 200 in 32ms
+ GET / 200 in 98ms (compile: 1793957640.9s, render: 78ms)
+ POST /api/ilerleme 401 in 45ms
+ POST /api/ziyaret 204 in 17ms
+ GET /api/study 200 in 11ms
+ GET /giris?return_to=%2Fhesabim 200 in 62ms (compile: 1793957640.9s, render: 51ms)
+ POST /api/auth 401 in 60ms
+ POST /api/ziyaret 204 in 20ms
+ POST /api/auth 200 in 34ms
+ GET /hesabim 200 in 79ms (compile: 1793957640.9s, render: 54ms)
+ POST /api/ilerleme 200 in 32ms
+ POST /api/study 201 in 42ms
+ GET /api/study 200 in 17ms
+ POST /api/ziyaret 204 in 21ms
+ POST /api/auth 200 in 19ms
+ GET /api/study 200 in 17ms
+ GET /api/auth 200 in 11ms
+ POST /api/auth 200 in 35ms
+ GET / 200 in 75ms (compile: 1793957640.9s, render: 59ms)
+ POST /api/ilerleme 401 in 22ms
+ POST /api/auth 401 in 65ms
+ GET / 200 in 78ms (compile: 1793957640.9s, render: 55ms)
+ POST /api/ilerleme 401 in 36ms
+ POST /api/ziyaret 204 in 54ms
+ GET /giris 200 in 68ms (compile: 1793957640.9s, render: 54ms)
+ GET /uye-ol 200 in 62ms (compile: 1793957640.9s, render: 50ms)
+ GET /uye-ol 200 in 76ms (compile: 1793957640.9s, render: 62ms)
+ POST /api/ziyaret 204 in 65ms
+ GET /uye-ol 200 in 135ms (compile: 1793957640.9s, render: 41ms)
+ GET /uye-ol 200 in 58ms (compile: 1793957640.9s, render: 44ms)
+ GET /gizlilik 200 in 63ms (compile: 1793957640.9s, render: 51ms)
+ GET /gizlilik 200 in 63ms (compile: 1793957640.9s, render: 51ms)
+ GET /giris 200 in 53ms (compile: 1793957640.9s, render: 41ms)
+ POST /api/auth 200 in 28ms
+ POST /api/ziyaret 204 in 18ms
+ GET /sifre-yenile?anahtar=bozuk 200 in 94ms (compile: 1793957640.9s, render: 42ms)
+ GET /fiiller 200 in 62ms (compile: 1793957640.9s, render: 51ms)
+ POST /api/ilerleme 401 in 40ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 77ms
+ POST /api/ziyaret 204 in 16ms
+ GET /ev-esyalar 200 in 63ms (compile: 1793957640.9s, render: 48ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 32ms
+ POST /api/ziyaret 204 in 29ms
+ POST /api/study 401 in 10ms
+ GET /api/study?stats=1&tz=0 200 in 9ms
+ GET /ev-esyalar 200 in 63ms (compile: 1793957640.9s, render: 49ms)
+ POST /api/ilerleme 200 in 35ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 83ms
+ POST /api/ziyaret 204 in 11ms
+ GET /ev-esyalar 200 in 45ms (compile: 1793957640.9s, render: 34ms)
+ POST /api/ilerleme 200 in 30ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 78ms
+ POST /api/ziyaret 204 in 18ms
+ GET /a1-2/ev-ve-yasam 200 in 290ms (compile: 1793957640.9s, render: 209ms)
+ POST /api/ilerleme 200 in 33ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 28ms
+ POST /api/ziyaret 204 in 10ms
+ GET /a1-1/willkommen 200 in 55ms (compile: 1793957640.9s, render: 44ms)
+ POST /api/ilerleme 200 in 32ms
+ POST /api/ziyaret 204 in 9ms
+ GET /a1-1/willkommen?teil=b&adim=alfabe 200 in 56ms (compile: 1793957640.9s, render: 44ms)
+ POST /api/ilerleme 200 in 29ms
+ POST /api/ilerleme 200 in 41ms
+ GET /a1-1/willkommen?teil=c&adim=befinden 200 in 93ms (compile: 1793957640.9s, render: 81ms)
+ POST /api/ilerleme 200 in 32ms
+ GET /a1-1/willkommen?teil=d&adim=cizgi-roman 200 in 50ms (compile: 1793957640.9s, render: 37ms)
+ POST /api/ilerleme 200 in 27ms
+ POST /api/ziyaret 204 in 9ms
+ GET /a1-1/willkommen?adim=diyalog 200 in 46ms (compile: 1793957640.9s, render: 35ms)
+ POST /api/ilerleme 200 in 28ms
+ POST /api/ziyaret 204 in 75ms
+ GET /a1-2/wege-in-der-stadt 200 in 323ms (compile: 1793957640.9s, render: 281ms)
+ POST /api/ilerleme 200 in 29ms
+ POST /api/ziyaret 204 in 17ms
+ GET /a1-2/wege-in-der-stadt?adim=diyalog-amt 200 in 47ms (compile: 1793957640.9s, render: 34ms)
+ POST /api/ilerleme 200 in 30ms
+ POST /api/ilerleme 200 in 52ms
+ POST /api/ziyaret 204 in 8ms
+ GET /a1-2/wege-in-der-stadt?adim=test 200 in 53ms (compile: 1793957640.9s, render: 42ms)
+ POST /api/ilerleme 200 in 33ms
+ POST /api/ziyaret 204 in 9ms
+ GET /a1-2/wege-in-der-stadt?adim=katlar-yaz 200 in 54ms (compile: 1793957640.9s, render: 43ms)
+ POST /api/ilerleme 200 in 23ms
+ POST /api/ilerleme 200 in 32ms
+ POST /api/ziyaret 204 in 9ms
+ GET /a1-2/wege-in-der-stadt?adim=katlar 200 in 66ms (compile: 1793957640.9s, render: 46ms)
+ POST /api/ilerleme 200 in 30ms
+ GET /a1-2/wege-in-der-stadt?adim=wohin 200 in 63ms (compile: 1793957640.9s, render: 39ms)
+ POST /api/ilerleme 200 in 28ms
+ POST /api/ziyaret 204 in 14ms
+ GET /a1-2/wege-in-der-stadt?adim=rami 302 in 8ms
+ GET /giris?return_to=%2Fa1-2%2Fwege-in-der-stadt%3Fadim%3Drami 200 in 55ms (compile: 1793957640.9s, render: 40ms)
+ POST /api/ziyaret 204 in 15ms
+ GET /a1-1/berufe 200 in 586ms (compile: 1793957640.9s, render: 540ms)
+ POST /api/ilerleme 200 in 29ms
+ POST /api/ziyaret 204 in 9ms
+ GET /a1-1/berufe?adim=meslekler 200 in 75ms (compile: 1793957640.9s, render: 61ms)
+ POST /api/ilerleme 200 in 35ms
+ POST /api/ilerleme 200 in 36ms
+ POST /api/ziyaret 204 in 10ms
+ GET /a1-1/berufe?teil=b&adim=ne-yapiyor 200 in 46ms (compile: 1793957640.9s, render: 34ms)
+ POST /api/ilerleme 200 in 30ms
+ POST /api/ziyaret 204 in 9ms
+ GET /a1-1/berufe?teil=c&adim=sayilar 200 in 50ms (compile: 1793957640.9s, render: 36ms)
+ POST /api/ilerleme 200 in 29ms
+ POST /api/ziyaret 204 in 10ms
+ GET /a1-1/berufe?teil=d&adim=personalformular 200 in 53ms (compile: 1793957640.9s, render: 41ms)
+ POST /api/ilerleme 200 in 35ms
+ POST /api/ziyaret 204 in 10ms
+ POST /api/ilerleme 200 in 27ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 40ms
+ POST /api/ziyaret 204 in 9ms
+ POST /api/ilerleme 200 in 28ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 26ms
+ POST /api/ziyaret 204 in 10ms
+ GET / 200 in 52ms (compile: 1793957640.9s, render: 39ms)
+ POST /api/ilerleme 200 in 28ms
+ GET /api/study?note=tour 200 in 13ms
+ POST /api/study?learn=de 200 in 35ms
+ POST /api/ziyaret 204 in 10ms
+ GET /api/study 200 in 17ms
+ POST /api/study 201 in 39ms
+ POST /api/study 200 in 18ms
+ GET /api/study 200 in 14ms
+ GET /fiiller 200 in 65ms (compile: 1793957640.9s, render: 55ms)
+ POST /api/ilerleme 200 in 29ms
+ GET /api/study?stats=1&tz=0&learn=de 200 in 72ms
+ POST /api/ziyaret 204 in 9ms
+ GET / 200 in 68ms (compile: 1793957640.9s, render: 51ms)
+ POST /api/ilerleme 401 in 30ms
+ POST /api/ziyaret 204 in 15ms
+ GET /fiiller 200 in 57ms (compile: 1793957640.9s, render: 46ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 64ms
+ POST /api/ziyaret 204 in 19ms
+ GET /fiiller 200 in 62ms (compile: 1793957640.9s, render: 39ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 72ms
+ POST /api/ziyaret 204 in 15ms
+ POST /api/study?learn=de 201 in 27ms
+ POST /api/study?learn=de 200 in 29ms
+ GET /fiiller?bolum=oyunlar 200 in 47ms (compile: 1793957640.9s, render: 36ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 91ms
+ GET /oyunlar 200 in 178ms (compile: 1793957641.0s, render: 53ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 38ms
+ GET /oyunlar 200 in 47ms (compile: 1793957640.9s, render: 36ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 42ms
+ POST /api/ziyaret 204 in 19ms
+ GET /oyunlar 200 in 60ms (compile: 1793957640.9s, render: 48ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 51ms
+ POST /api/ziyaret 204 in 20ms
+ GET /oyunlar 200 in 110ms (compile: 1793957640.9s, render: 95ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 34ms
+ POST /api/ziyaret 204 in 22ms
+ GET /oyunlar 200 in 51ms (compile: 1793957640.9s, render: 37ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 47ms
+ POST /api/ziyaret 204 in 23ms
+ GET /oyunlar 200 in 44ms (compile: 1793957640.9s, render: 34ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 32ms
+ POST /api/ziyaret 204 in 47ms
+ GET /oyunlar 200 in 50ms (compile: 1793957640.9s, render: 37ms)
+ GET /api/study?stats=1&tz=0&learn=de 200 in 28ms
+ POST /api/ziyaret 204 in 62ms
+[2m9:38:58 AM[22m [36m[1m[vite][22m[39m [34m[2m(rsc)[22m[39m [32mhmr update [39m[2m/app/globals.css[22m
+[2m9:38:58 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/app/globals.css?direct[22m

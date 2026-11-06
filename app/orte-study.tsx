@@ -30,6 +30,7 @@ import {hasUnitPack,loadUnitPack,setUnitLanguage,ut} from '@/lib/unit-i18n';
 import {StepViewL3} from './orte-steps';
 import {useSyncVersion} from './lesson-sync';
 import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
+import {OneScreenStep,oneScreenDesign} from './paged-step';
 
 /**
  * Lektion 3 „Orte und Dinge“ (A1.1): the contents page is an open notebook like Lektion 1, 2 and 15 (Teil A – Ich lerne
@@ -92,6 +93,8 @@ function OrteLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangua
   saveLastPlace(localStorage,{id:'orte',href:lessonStepHref('orte',place.part,step.id),detail:'Lektion 3 · Teil '+parts[place.part].badge+' · '+step.title});}catch{}},[place]);
  // An exercise that shows one item at a time takes the page's İleri for its next item first (app/willkommen-ui.tsx `useInnerNext`).
  const innerNext=useRef<(()=>boolean)|null>(null);
+ // The one-screen design proposal (app/paged-step.tsx, ?tasarim=tek): the whole step on one screen.
+ const [design]=useState(oneScreenDesign);
  const setInnerNext=useCallback((next:(()=>boolean)|null)=>{innerNext.current=next;},[]);
  const [lockNote,setLockNote]=useState<string|null>(null);
  const forward=(next:number)=>{
@@ -112,10 +115,10 @@ function OrteLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangua
  const openLabel=lock.open?(config.short[lock.open]??config.steps[lock.openIndex]?.title??''):'';
  const progress=partProgressL3(place.part,scores[place.part]);
  const dir=languageDirection(language);
- return <div className="category-app toon-app housing-app l12-app l1a-app l15-app l2-app l3-app" lang={language} dir={dir}>
+ return <div className={"category-app toon-app housing-app l12-app l1a-app l15-app l2-app l3-app"+(design&&step?" l3-onescreen":"")} lang={language} dir={dir}>
   <a className="skip-link" href="#l3-main">{vaultText(language,'skipContent')}</a>
   <SiteHeader language={language} languages={studyLanguages} onLanguage={value=>{if(isStudyLanguage(value)){speech.stop();onLanguage(value);}}} homeHref="/konular?level=A1.1" homeLabel={c(language,'catalogTitle')} guest={guest}/>
-  <div className="work-layout site-layout"><SiteMenuAside language={language} current="units"/>
+  <div className="work-layout site-layout">{!(design&&step)&&<SiteMenuAside language={language} current="units"/>}
   <main id="l3-main" className="object-page housing-page l1a-page l15-page l2-page l3-page" lang={language} dir={dir}>
    {guest&&<GuestBanner language={language} back={ORTE_PATH}/>}
    {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
@@ -127,7 +130,8 @@ function OrteLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangua
       {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:config.short[id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
       :<div className="l1a-bar" role="progressbar" aria-valuemin={0} aria-valuemax={config.steps.length} aria-valuenow={index+1} aria-label={ut(step.title)}><i style={{width:((index+1)/config.steps.length*100)+'%'}}/></div>}
      </header>
-     {stepLocked?<LockedStep openLabel={openLabel} onOpen={()=>go(lock.openIndex)}/>:<StepViewL3 key={config.id+':'+step.id} orteStep={step} part={config.id} badge={config.badge} partTitle={config.title} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l3'+place.part+'-run'}/>}
+     {(()=>{const view=stepLocked?<LockedStep openLabel={openLabel} onOpen={()=>go(lock.openIndex)}/>:<StepViewL3 key={config.id+':'+step.id} orteStep={step} part={config.id} badge={config.badge} partTitle={config.title} step={step} speech={speech} sound={sound} scores={scores[place.part]} progress={progress} onScore={score} onGo={go} onPart={toPart} language={language} setInnerNext={setInnerNext} runKey={'lernkoko-l3'+place.part+'-run'}/>;
+      return design?<OneScreenStep key={config.id+':'+step.id}>{view}</OneScreenStep>:view;})()}
      <nav className="l1a-pager" aria-label={ut('Adımlar')}>
       <button type="button" className="btn secondary" onClick={()=>go(index-1)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{ut(index===0?'İçindekiler':'Geri')}</button>
       <button type="button" className={'btn'+(mustFinish?' l1a-next-locked':'')} aria-describedby={mustFinish&&lockNote===step.id?'l1a-lock-note':undefined} onClick={()=>forward(index===config.steps.length-1?-1:index+1)}>{index===config.steps.length-1?<><BookOpen size={18} aria-hidden="true"/>{ut('İçindekiler')}</>:<>{ut('İleri')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></>}</button>

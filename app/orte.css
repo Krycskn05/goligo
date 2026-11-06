@@ -18,3 +18,51 @@ span.l3-write-pic { display:grid; place-items:center; aspect-ratio:auto; font-si
 /* The small ads of Teil C: a card each, the price in a tag. */
 .l3-price { display:inline-block; margin-inline-start:6px; padding:1px 8px; border-radius:999px; background:#fff1d6; color:#9a5a00; font-size:15px; font-weight:800; }
 @media (max-width:640px) { .l3-ads { grid-template-columns:minmax(0,1fr); } }
+/* Design proposal (app/paged-step.tsx, ?tasarim=tek): the whole step on one screen of a tablet or computer. The left menu
+   steps aside while a step is open, the tabs are one line, the content is spread over side-by-side columns (all
+   visible) and everything is a little denser; a step still too high is drawn smaller. */
+@media (min-width:761px) {
+ .l3-onescreen .work-layout { grid-template-columns:minmax(0,1fr); }
+ .l3-onescreen .l12-steps .l12-step-text small { display:none; }
+ .l3-onescreen .l12-steps .l12-step { min-height:0; padding-top:5px; padding-bottom:5px; }
+ .l3-onescreen .l1a-card .l1a-top-row { display:none; }
+ .l3-onescreen .l1a-card .l1a-top { margin-bottom:6px; }
+ .l3-onescreen .l1a-mini-head { display:none; }
+ .l3-onescreen .l1a-card .l1a-pager { margin-top:6px; padding-top:6px; }
+ .l3-onescreen .l1a-folded .lb.l1a-book .lb-spread { grid-template-columns:minmax(0,0fr) 0px minmax(0,1fr); transition:none; padding:6px; }
+ .l3-onescreen .l1a-folded .lb.l1a-book .lb-left { transition:none; transform:none; opacity:0; visibility:hidden; max-height:0; padding:0; overflow:hidden; display:block; }
+ .l3-onescreen .l1a-folded .lb.l1a-book .lb-rings { overflow:hidden; opacity:0; }
+ .l3-onescreen .l1a-folded .lb-right.lb-page, .l3-onescreen .l1a-folded .lb-right.lb-page:dir(rtl) { padding:14px 18px 12px 52px; }
+ .l3-onescreen .l1a-folded .lb-right.lb-page:dir(rtl) { padding:14px 52px 12px 18px; }
+ .l3-onescreen .lb-tabbed { margin-top:50px; }
+ .l3-onescreen .lb .lb-right>.l12-steps { margin:-62px -8px 10px; }
+ .l3-onescreen .object-page { padding-top:8px; }
+ .l3-onescreen .l1a-card { padding:10px 14px; }
+ .l3-one-flow { column-gap:28px; column-fill:balance; }
+ .l3-one-flow .l1a-phrase, .l3-one-flow .l1a-line, .l3-one-flow .l2-job, .l3-one-flow .l1a-arow, .l3-one-flow .l1a-note,
+ .l3-one-flow tr, .l3-one-flow img, .l3-one-flow .l1a-opts, .l3-one-flow .l15-warn, .l3-one-flow .l1a-actions { break-inside:avoid; }
+ .l3-one-flow h2, .l3-one-flow .kicker { break-after:avoid; }
+ .l3-one-flow .l2-jobs, .l3-one-flow .l15-word-grid { display:block; margin:4px 0; }
+ .l3-one-flow .l2-job, .l3-one-flow .l15-word-grid .l1a-phrase { margin:0 0 6px; padding:4px 8px; gap:10px; }
+ .l3-one-flow .l2-job-pic { width:76px; }
+ .l3-one-flow .l1a-heading { font-size:24px; margin:0 0 4px; }
+ .l3-one-flow .l1a-h2 { margin:8px 0 4px; font-size:16px; }
+ .l3-one-flow p { margin:0 0 6px; line-height:1.45; }
+ .l3-one-flow .l1a-phrase { padding:6px 10px; margin:0 0 6px; }
+ .l3-one-flow .l1a-dialogue { gap:6px; }
+ .l3-one-flow .l1a-line { margin:0 0 6px; }
+ .l3-one-flow .l1a-bubble { padding:6px 10px; }
+ .l3-one-flow .l1a-table td, .l3-one-flow .l1a-table th { padding:4px 8px; }
+ .l3-one-flow .l2-checks { margin:6px 0 0; }
+ /* Word rows on two lines: the word and its meaning, then the example and its meaning. */
+ .l3-one-flow .l15-word-grid .l1a-phrase-text { display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:10px; row-gap:1px; align-items:baseline; }
+ .l3-one-flow .l15-word-grid .l1a-de { font-size:16px; }
+ .l3-one-flow .l15-word-grid .l1a-tr { order:0; font-size:13.5px; }
+ .l3-one-flow .l15-word-grid .l15-example { font-size:13.5px; }
+ .l3-one-flow .l15-word-grid .l1a-mini { font-size:12.5px; }
+ /* Dialogues: smaller portraits and bubbles. */
+ .l3-one-flow .l1a-portrait { width:38px; height:38px; }
+ .l3-one-flow .l1a-bubble .l1a-de { font-size:15px; line-height:1.35; }
+ .l3-one-flow .l1a-bubble .l1a-tr { font-size:13px; line-height:1.35; }
+ .l3-one-flow .l2-job-text .l3-word { font-size:16px; }
+}

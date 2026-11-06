@@ -1,0 +1,1 @@
+durum=basarili-degisiklik-yok calisma=42195845485 commit=9ae64e973f87801330fa4b2426b2578e9b899ea9 tarih=2026-11-06 09:33

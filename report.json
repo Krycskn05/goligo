@@ -1,0 +1,102 @@
+{
+ "started": "2026-11-06 01:01 UTC",
+ "settings": "supertonic3-de-speed0.92-steps10-v1",
+ "texts": 4773,
+ "voices": {
+  "M4": {
+   "rate": 44100,
+   "rendered": 322,
+   "seconds": 507.7,
+   "median_pitch_hz": 117.3,
+   "asr": [
+    {
+     "text": "Was findest du schön?",
+     "heard": "Was findest du schön?",
+     "score": 1.0
+    },
+    {
+     "text": "Ich bin jetzt Näherin. Ich arbeite in Hamburg.",
+     "heard": "Ich bin jetzt näherin, ich arbeite in Hamburg.",
+     "score": 1.0
+    },
+    {
+     "text": "Wo lernst du Deutsch?",
+     "heard": "Wo lernst du Deutsch?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 4773
+  },
+  "M5": {
+   "rate": 44100,
+   "rendered": 406,
+   "seconds": 668.0,
+   "median_pitch_hz": 93.2,
+   "asr": [
+    {
+     "text": "die Kasse, sie.",
+     "heard": "die Kasse sie.",
+     "score": 1.0
+    },
+    {
+     "text": "Das ist ein Sofa.",
+     "heard": "Das ist ein Sofa.",
+     "score": 1.0
+    },
+    {
+     "text": "Das ist wichtig für mich.",
+     "heard": "Das ist wichtig für mich.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 4773
+  },
+  "F1": {
+   "available": 4773
+  },
+  "F2": {
+   "available": 4773
+  },
+  "F3": {
+   "available": 4773
+  },
+  "F4": {
+   "available": 4773
+  },
+  "F5": {
+   "available": 4773
+  },
+  "M1": {
+   "available": 4773
+  },
+  "M2": {
+   "available": 4773
+  },
+  "M3": {
+   "available": 4773
+  }
+ },
+ "errors": [],
+ "package": "1.3.1",
+ "init_signature": "(self, model: 'str' = 'supertonic-3', model_dir: 'Optional[Union[Path, str]]' = None, auto_download: 'bool' = True, intra_op_num_threads: 'Optional[int]' = None, inter_op_num_threads: 'Optional[int]' = None)",
+ "init_used": {
+  "model": "supertonic-3",
+  "auto_download": true
+ },
+ "synthesize_signature": "(text: 'str', voice_style: 'Style', total_steps: 'int' = 8, speed: 'float' = 1.05, max_chunk_length: 'Optional[int]' = None, silence_duration: 'float' = 0.3, lang: 'Optional[str]' = None, verbose: 'bool' = False) -> 'tuple[np.ndarray, np.ndarray]'",
+ "ready_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "finished": "2026-11-06 01:21 UTC"
+}

@@ -80,10 +80,10 @@ test('"İlerlememi sıfırla" (3 November 2026): removals newer than every chang
 
 test('every lesson page reads progress from another device again; the sync and the letter row run on every page',()=>{
  const layout=read('app/layout.tsx');assert(layout.includes('<LetterBar/><LessonSync/>'));
- for(const [file,lesson,component] of [['app/willkommen-study.tsx','l1','WillkommenLesson'],['app/stadt-study.tsx','l15','StadtLesson'],['app/berufe-study.tsx','l2','BerufeLesson'],['app/ausbildung-study.tsx','l12','AusbildungLesson'],['app/ausbildung-hoeren.tsx','l12','HoerenPage']]){
+ for(const [file,lesson,component] of [['app/willkommen-study.tsx','l1','WillkommenLesson'],['app/stadt-study.tsx','l15','StadtLesson'],['app/berufe-study.tsx','l2','BerufeLesson'],['app/ausbildung-study.tsx','l12','AusbildungLesson'],['app/ausbildung-hoeren.tsx','l12','HoerenPage'],['app/orte-study.tsx','l3','OrteLesson']]){
   const code=read(file);assert(code.includes(`useSyncVersion('${lesson}')`),file);assert(code.includes(`<${component} key={synced}`),file);
  }
- const units=read('app/category-study.tsx');assert.equal((units.match(/\},\[course,home,seen\]\);/g)||[]).length,4,'the unit cards (Lektion 1, 2, 12, 15) read again (the continue card is gone, 3 November 2026)');
+ const units=read('app/category-study.tsx');assert.equal((units.match(/\},\[course,home,seen\]\);/g)||[]).length,5,'the unit cards (Lektion 1, 2, 3, 12, 15) read again (the continue card is gone, 3 November 2026)');
  assert(units.includes('const seen=synced*1000+back;')&&units.includes("document.addEventListener('visibilitychange',visible)"),'after a sync and when the learner comes back');
  const client=read('app/lesson-sync.tsx');
  for(const piece of ["fetch('/api/ilerleme'",'15000',"'visibilitychange'","'pagehide'",'response.status===401','SYNC_EVENT'])assert(client.includes(piece),piece);

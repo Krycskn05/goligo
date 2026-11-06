@@ -20,15 +20,15 @@ exports.wordsA = [
     { de: 'das Heft', plural: 'Hefte', tr: (0, orte_types_1.T)('defter'), emoji: '📒', pic: orte_pictures_1.objectPic.heft },
     { de: 'der Stift', plural: 'Stifte', tr: (0, orte_types_1.T)('kalem'), emoji: '🖊️', pic: orte_pictures_1.objectPic.stift },
     { de: 'der Bleistift', plural: 'Bleistifte', tr: (0, orte_types_1.T)('kurşun kalem'), emoji: '✏️', pic: orte_pictures_1.objectPic.bleistift },
-    { de: 'das Plakat', plural: 'Plakate', tr: (0, orte_types_1.T)('afiş, poster'), emoji: '🖼️' },
-    { de: 'das Handy', plural: 'Handys', tr: (0, orte_types_1.T)('cep telefonu'), emoji: '📱' },
+    { de: 'das Plakat', plural: 'Plakate', tr: (0, orte_types_1.T)('afiş, poster'), emoji: '🖼️', pic: orte_pictures_1.objectPic.plakat },
+    { de: 'das Handy', plural: 'Handys', tr: (0, orte_types_1.T)('cep telefonu'), emoji: '📱', pic: orte_pictures_1.objectPic.handy },
     { de: 'das Foto', plural: 'Fotos', tr: (0, orte_types_1.T)('fotoğraf'), emoji: '📷', pic: orte_pictures_1.objectPic.foto },
 ];
 const wordA = (de) => exports.wordsA.find(word => word.de === de);
 exports.partA = {
     id: 'a', badge: 'A', title: 'Ich lerne hier Deutsch.',
     lead: (0, orte_types_1.T)('Eşyaların adı, **Was ist das? Wie heißt das auf Deutsch?**, **ein / eine**, **kein / keine** ve öğrendiğin yeri anlatmak.'),
-    cover: orte_pictures_1.orteCovers.a, coverAlt: (0, orte_types_1.T)('Mei odasında masada çalışıyor; parkta Sabine ve Tomasz bir bankta defterleriyle oturuyor'),
+    cover: orte_pictures_1.orteCovers.a, coverAlt: (0, orte_types_1.T)('Mei odasında yatağın kenarında kitap okuyor; parkta Sabine ve Tomasz bir bankta defterlerine yazıyor, arkada çocuklar oynuyor'),
     short: { 'resim-sec': (0, orte_types_1.T)('Resim – kelime'), 'ein-eine': (0, orte_types_1.T)('ein / eine'), 'kein-keine': (0, orte_types_1.T)('kein / keine'), 'sesliler': (0, orte_types_1.T)('a e i o u'), 'kim': (0, orte_types_1.T)('Kim ne diyor?'), 'var-yok': (0, orte_types_1.T)('Var mı, yok mu?'), 'und-du': (0, orte_types_1.T)('Şimdi sen') },
     steps: [
         { id: 'kapak', title: (0, orte_types_1.T)('Kapak'), kind: 'cover', cover: {
@@ -72,7 +72,7 @@ exports.partA = {
                         (0, orte_types_1.check)((0, orte_types_1.T)('cep telefonu'), ['das Handy', 'das Heft', 'das Foto']),
                         (0, orte_types_1.check)((0, orte_types_1.T)('oynamak'), ['spielen', 'sitzen', 'stehen']),
                     ] }] },
-        { id: 'was-ist-das', title: (0, orte_types_1.T)('Was ist das?'), kind: 'teach', kicker: (0, orte_types_1.T)('Konu 1 · Wie heißt das auf Deutsch?'), heading: (0, orte_types_1.T)('Bir eşyanın adını sormak'),
+        { id: 'was-ist-das', title: 'Was ist das?', kind: 'teach', kicker: (0, orte_types_1.T)('Konu 1 · Wie heißt das auf Deutsch?'), heading: (0, orte_types_1.T)('Bir eşyanın adını sormak'),
             blocks: [
                 { t: 'p', text: (0, orte_types_1.T)('Bir eşyanın Almancasını bilmiyorsan iki soru sorabilirsin:') },
                 { t: 'rows', rows: [(0, orte_types_1.row)('Was ist das?', 'Bu ne?'), (0, orte_types_1.row)('Wie heißt das auf Deutsch?', 'Bunun Almancası ne? (kelimesi kelimesine: „Bu Almancada nasıl adlandırılır?“)')] },
@@ -199,7 +199,7 @@ exports.partA = {
                     { given: '❌ Sofa', pic: orte_pictures_1.objectPic.sofa, emoji: '🛋️', answers: ['kein Sofa'], say: 'Hier ist kein Sofa.' },
                     { given: '✅ Regal', pic: orte_pictures_1.objectPic.regal, emoji: '🗄️', answers: ['ein Regal'], say: 'Hier ist ein Regal.' },
                     { given: '❌ Tasche', pic: orte_pictures_1.objectPic.tasche, emoji: '👜', answers: ['keine Tasche'], say: 'Hier ist keine Tasche.' },
-                    { given: '❌ Handy', emoji: wordA('das Handy').emoji, answers: ['kein Handy'], say: 'Hier ist kein Handy.' },
+                    { given: '❌ Handy', pic: wordA('das Handy').pic, emoji: wordA('das Handy').emoji, answers: ['kein Handy'], say: 'Hier ist kein Handy.' },
                 ] } },
         { id: 'und-du', title: (0, orte_types_1.T)('Alıştırma 7'), kind: 'exercise', kicker: 'Alıştırma 7 · Und du?', heading: (0, orte_types_1.T)('Şimdi sen: senin yerin'), lead: (0, orte_types_1.T)('Kendi cevaplarını yaz. Kalıba uyan cümle yeşil olur. İlk üç cümle bitince alıştırma tamam; sonra dinle, gizle ve ezberden söyle.'),
             exercise: { type: 'own', key: 'lernkoko-l3a-own', prompts: [

@@ -6,7 +6,7 @@ const orte_pictures_1 = require("./orte-pictures");
 const gap = (options, answer) => ({ options, answer });
 exports.wordsC = [
     { de: 'die Waschmaschine', plural: 'Waschmaschinen', tr: (0, orte_types_1.T)('çamaşır makinesi'), emoji: '🧺', pic: orte_pictures_1.objectPic.waschmaschine },
-    { de: 'die Spülmaschine', plural: 'Spülmaschinen', tr: (0, orte_types_1.T)('bulaşık makinesi'), emoji: '🍽️' },
+    { de: 'die Spülmaschine', plural: 'Spülmaschinen', tr: (0, orte_types_1.T)('bulaşık makinesi'), emoji: '🍽️', pic: orte_pictures_1.objectPic.spuelmaschine },
     { de: 'der Kühlschrank', plural: 'Kühlschränke', tr: (0, orte_types_1.T)('buzdolabı'), emoji: '🧊', pic: orte_pictures_1.objectPic.kuehlschrank },
     { de: 'der Herd', plural: 'Herde', tr: (0, orte_types_1.T)('ocak (fırınlı)'), emoji: '🍳', pic: orte_pictures_1.objectPic.herd },
     { de: 'der Schrank', plural: 'Schränke', tr: (0, orte_types_1.T)('dolap'), emoji: '🚪', pic: orte_pictures_1.objectPic.schrank },

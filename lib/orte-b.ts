@@ -11,22 +11,22 @@ const gap=(options:readonly string[],answer:string):ChoiceGap=>({options,answer}
 const art=['Der','Das','Die'] as const,pron=['Er','Es','Sie'] as const;
 
 export const wordsB:Word[]=[
- {de:'der Computer',plural:'Computer',tr:T('bilgisayar'),emoji:'🖥️'},
- {de:'der Laptop',plural:'Laptops',tr:T('dizüstü bilgisayar'),emoji:'💻'},
+ {de:'der Computer',plural:'Computer',tr:T('bilgisayar'),emoji:'🖥️',pic:objectPic.computer},
+ {de:'der Laptop',plural:'Laptops',tr:T('dizüstü bilgisayar'),emoji:'💻',pic:objectPic.laptop},
  {de:'die Kaffeemaschine',plural:'Kaffeemaschinen',tr:T('kahve makinesi'),emoji:'☕',pic:objectPic.kaffeemaschine},
- {de:'die Kasse',plural:'Kassen',tr:T('kasa'),emoji:'🧾'},
+ {de:'die Kasse',plural:'Kassen',tr:T('kasa'),emoji:'🧾',pic:objectPic.kasse},
  {de:'die Tafel',plural:'Tafeln',tr:T('yazı tahtası'),emoji:'🧑‍🏫',pic:objectPic.tafel},
  {de:'die Tür',plural:'Türen',tr:T('kapı'),emoji:'🚪',pic:objectPic.tuer},
  {de:'das Fenster',plural:'Fenster',tr:T('pencere'),emoji:'🪟',pic:objectPic.fenster},
- {de:'der Schlüssel',plural:'Schlüssel',tr:T('anahtar'),emoji:'🔑'},
+ {de:'der Schlüssel',plural:'Schlüssel',tr:T('anahtar'),emoji:'🔑',pic:objectPic.schluessel},
  {de:'der Kühlschrank',plural:'Kühlschränke',tr:T('buzdolabı'),emoji:'🧊',pic:objectPic.kuehlschrank},
- {de:'der Kiosk',plural:'Kioske',tr:T('büfe'),emoji:'🏪'},
+ {de:'der Kiosk',plural:'Kioske',tr:T('büfe'),emoji:'🏪',pic:objectPic.kiosk},
 ];
 
 export const partB:OrtePart={
  id:'b',badge:'B',title:'Ich finde, das Regal ist schön.',
  lead:T('İş yerindeki eşyalar ve nasıl oldukları: **groß, klein, neu, alt** …, **ein → der**, **er / es / sie** ve **Ich finde, …**'),
- cover:orteCovers.b,coverAlt:T('Omar büfesinde tezgâhın arkasında; yanında büyük bir buzdolabı, eski bir kasa ve kahve makinesi'),
+ cover:orteCovers.b,coverAlt:T('Omar büfesinde tezgâhın arkasında elinde bir anahtar tutuyor; yanında büyük bir buzdolabı, eski bir kasa ve kahve makinesi'),
  short:{'resim-sec':T('Resim – artikel'),'der-ex':T('ein → der'),'zamir':T('er / es / sie'),'zit':T('Zıt kelimeler'),'dialog':T('Diyalog'),'bufe':T('Omar’ın büfesi'),'und-du':T('Şimdi sen')},
  steps:[
   {id:'kapak',title:T('Kapak'),kind:'cover',cover:{
@@ -148,9 +148,9 @@ export const partB:OrtePart={
     {pic:objectPic.tuer,emoji:'🚪',options:['die Tür','der Tür','das Tür']},
     {pic:objectPic.kuehlschrank,emoji:'🧊',options:['der Kühlschrank','die Kühlschrank','das Kühlschrank']},
     {pic:objectPic.tafel,emoji:'🧑‍🏫',options:['die Tafel','der Tafel','das Tafel']},
-    {emoji:'🔑',prompt:T('anahtar'),options:['der Schlüssel','die Schlüssel','das Schlüssel']},
-    {emoji:'💻',prompt:T('dizüstü bilgisayar'),options:['der Laptop','die Laptop','das Laptop']},
-    {emoji:'🧾',prompt:T('kasa'),options:['die Kasse','der Kasse','das Kasse']},
+    {pic:objectPic.schluessel,emoji:'🔑',options:['der Schlüssel','die Schlüssel','das Schlüssel']},
+    {pic:objectPic.laptop,emoji:'💻',options:['der Laptop','die Laptop','das Laptop']},
+    {pic:objectPic.kasse,emoji:'🧾',options:['die Kasse','der Kasse','das Kasse']},
    ]}},
   {id:'der-ex',title:T('Alıştırma 2'),kind:'exercise',kicker:'Alıştırma 2 · ein → der',heading:T('Önce ein, sonra der / das / die'),lead:T('İkinci cümlede doğru artikeli seç.'),
    exercise:{type:'choice',lines:[

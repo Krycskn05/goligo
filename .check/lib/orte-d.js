@@ -7,12 +7,12 @@ const gap = (options, answer) => ({ options, answer });
 const ein = ['ein', 'eine'];
 exports.wordsD = [
     { de: 'das Kleid', plural: 'Kleider', tr: (0, orte_types_1.T)('elbise'), emoji: '👗', pic: orte_pictures_1.objectPic.kleid },
-    { de: 'die Nähmaschine', plural: 'Nähmaschinen', tr: (0, orte_types_1.T)('dikiş makinesi'), emoji: '🧵' },
+    { de: 'die Nähmaschine', plural: 'Nähmaschinen', tr: (0, orte_types_1.T)('dikiş makinesi'), emoji: '🧵', pic: orte_pictures_1.objectPic.naehmaschine },
     { de: 'die Schere', plural: 'Scheren', tr: (0, orte_types_1.T)('makas'), emoji: '✂️', pic: orte_pictures_1.objectPic.schere },
     { de: 'der Topf', plural: 'Töpfe', tr: (0, orte_types_1.T)('tencere'), emoji: '🍲', pic: orte_pictures_1.objectPic.topf },
-    { de: 'das Wörterbuch', plural: 'Wörterbücher', tr: (0, orte_types_1.T)('sözlük'), emoji: '📖' },
-    { de: 'die Wortkarte', plural: 'Wortkarten', tr: (0, orte_types_1.T)('kelime kartı'), emoji: '🗂️' },
-    { de: 'der Arbeitsplatz', plural: 'Arbeitsplätze', tr: (0, orte_types_1.T)('iş yeri, çalışma yeri'), emoji: '🧑‍🏭' },
+    { de: 'das Wörterbuch', plural: 'Wörterbücher', tr: (0, orte_types_1.T)('sözlük'), emoji: '📖', pic: orte_pictures_1.objectPic.woerterbuch },
+    { de: 'die Wortkarte', plural: 'Wortkarten', tr: (0, orte_types_1.T)('kelime kartı'), emoji: '🗂️', pic: orte_pictures_1.objectPic.wortkarte },
+    { de: 'der Arbeitsplatz', plural: 'Arbeitsplätze', tr: (0, orte_types_1.T)('iş yeri, çalışma yeri'), emoji: '🧑‍🏭', pic: orte_pictures_1.objectPic.arbeitsplatz },
 ];
 /** Aisha's chat with Yasemin (Konu 1 and Alıştırma 3). */
 const chat = [
@@ -114,17 +114,17 @@ exports.partD = {
         { id: 'sozluk', title: (0, orte_types_1.T)('Alıştırma 1'), kind: 'exercise', kicker: 'Alıştırma 1 · m, n oder f?', heading: (0, orte_types_1.T)('Sözlükteki harften artikeli bul'), lead: (0, orte_types_1.T)('*m* → der, *n* → das, *f* → die. Doğrusunu seç.'),
             exercise: { type: 'quiz', items: [
                     ['Kleid, n', 'das Kleid', orte_pictures_1.objectPic.kleid, '👗'], ['Schere, f', 'die Schere', orte_pictures_1.objectPic.schere, '✂️'], ['Topf, m', 'der Topf', orte_pictures_1.objectPic.topf, '🍲'],
-                    ['Nähmaschine, f', 'die Nähmaschine', undefined, '🧵'], ['Arbeitsplatz, m', 'der Arbeitsplatz', undefined, '🧑‍🏭'], ['Wörterbuch, n', 'das Wörterbuch', undefined, '📖'],
-                    ['Fenster, n', 'das Fenster', orte_pictures_1.objectPic.fenster, '🪟'], ['Kasse, f', 'die Kasse', undefined, '🧾'],
+                    ['Nähmaschine, f', 'die Nähmaschine', orte_pictures_1.objectPic.naehmaschine, '🧵'], ['Arbeitsplatz, m', 'der Arbeitsplatz', orte_pictures_1.objectPic.arbeitsplatz, '🧑‍🏭'], ['Wörterbuch, n', 'das Wörterbuch', orte_pictures_1.objectPic.woerterbuch, '📖'],
+                    ['Fenster, n', 'das Fenster', orte_pictures_1.objectPic.fenster, '🪟'], ['Kasse, f', 'die Kasse', orte_pictures_1.objectPic.kasse, '🧾'],
                 ].map(([prompt, answer, pic, emoji]) => { const noun = answer.split(' ')[1]; return { prompt: prompt, pic: pic, emoji: emoji, options: [answer, ...['der', 'das', 'die'].filter(a => !answer.startsWith(a + ' ')).map(a => a + ' ' + noun)] }; }) } },
         { id: 'kartlar', title: (0, orte_types_1.T)('Alıştırma 2'), kind: 'exercise', kicker: 'Alıştırma 2 · Wortkarten', heading: (0, orte_types_1.T)('Kartın öbür yüzü: Almancası'), lead: (0, orte_types_1.T)('Türkçe kelimenin Almancasını **artikeliyle** yaz: ~das Kleid~. Doğru yazınca kutu yeşil olur ve okunur.'),
             exercise: { type: 'write', rows: [
                     { given: (0, orte_types_1.T)('elbise'), pic: orte_pictures_1.objectPic.kleid, emoji: '👗', answers: ['das Kleid'], say: 'das Kleid' },
                     { given: (0, orte_types_1.T)('makas'), pic: orte_pictures_1.objectPic.schere, emoji: '✂️', answers: ['die Schere'], say: 'die Schere' },
                     { given: (0, orte_types_1.T)('tencere'), pic: orte_pictures_1.objectPic.topf, emoji: '🍲', answers: ['der Topf'], say: 'der Topf' },
-                    { given: (0, orte_types_1.T)('dikiş makinesi'), emoji: '🧵', answers: ['die Nähmaschine'], say: 'die Nähmaschine' },
-                    { given: (0, orte_types_1.T)('sözlük'), emoji: '📖', answers: ['das Wörterbuch'], say: 'das Wörterbuch' },
-                    { given: (0, orte_types_1.T)('iş yeri, çalışma yeri'), emoji: '🧑‍🏭', answers: ['der Arbeitsplatz'], say: 'der Arbeitsplatz' },
+                    { given: (0, orte_types_1.T)('dikiş makinesi'), pic: orte_pictures_1.objectPic.naehmaschine, emoji: '🧵', answers: ['die Nähmaschine'], say: 'die Nähmaschine' },
+                    { given: (0, orte_types_1.T)('sözlük'), pic: orte_pictures_1.objectPic.woerterbuch, emoji: '📖', answers: ['das Wörterbuch'], say: 'das Wörterbuch' },
+                    { given: (0, orte_types_1.T)('iş yeri, çalışma yeri'), pic: orte_pictures_1.objectPic.arbeitsplatz, emoji: '🧑‍🏭', answers: ['der Arbeitsplatz'], say: 'der Arbeitsplatz' },
                 ] } },
         { id: 'chat-ex', title: (0, orte_types_1.T)('Alıştırma 3'), kind: 'exercise', kicker: 'Alıştırma 3 · Hallo, Aisha!', heading: (0, orte_types_1.T)('Aisha’nın mesajını tamamla'), lead: (0, orte_types_1.T)('Boşluğa dokun ve seç. Cümle doğru olunca kişi onu okur.'),
             exercise: { type: 'choice', dialogue: true, lines: [

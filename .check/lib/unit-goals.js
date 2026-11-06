@@ -5,7 +5,7 @@ exports.unitGoalsFor = exports.unitGoalsById = void 0;
  * "Bu ünitede": what a unit teaches, for the left page of a unit's notebook (the learner asked, 25 October 2026).
  * Written in our own words from the topics of the learner's textbook contents page — no sentences, names or titles
  * of the book are copied; the German examples are everyday phrases. Bold with **…**.
- * Units without a lesson page yet (2, 3) are ready for when their pages come.
+ * Lektion 3's list follows its pages (5 November 2026).
  */
 exports.unitGoalsById = {
     // Lektion 1 „Willkommen!“
@@ -35,11 +35,11 @@ exports.unitGoalsById = {
     // Lektion 3 „Orte und Dinge“
     'book-03': [
         'Eşyaların adını söyle, Almancasını sor: **Wie heißt das auf Deutsch?**',
-        'Bir yeri anlat: **Das Zimmer ist groß und hell.**',
+        'Bir yeri anlat: **Hier ist ein Tisch, aber kein Stuhl.**',
         'Küçük ilanları anla, telefonda kendini tanıt ve bilgi iste',
         'Sayılar 21–1000, fiyat sor: **Was kostet …?**',
         'Neyi önemli bulduğunu söyle: **Ich finde … wichtig.**',
-        'Sayıları farklı dillerde karşılaştır, sözlükle bir yeri anlat',
+        'Sözlükte artikeli bul, bir iş yerini anlat: **Die Schere ist alt, aber gut.**',
         'Gramer: artikeller **der / das / die**, **er / es / sie**',
         'Telaffuz: **a, e, i, o, u** · İpucu: kelime kartlarıyla ve sözlükle çalış',
     ],

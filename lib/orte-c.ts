@@ -11,7 +11,7 @@ const gap=(options:readonly string[],answer:string):ChoiceGap=>({options,answer}
 
 export const wordsC:Word[]=[
  {de:'die Waschmaschine',plural:'Waschmaschinen',tr:T('çamaşır makinesi'),emoji:'🧺',pic:objectPic.waschmaschine},
- {de:'die Spülmaschine',plural:'Spülmaschinen',tr:T('bulaşık makinesi'),emoji:'🍽️'},
+ {de:'die Spülmaschine',plural:'Spülmaschinen',tr:T('bulaşık makinesi'),emoji:'🍽️',pic:objectPic.spuelmaschine},
  {de:'der Kühlschrank',plural:'Kühlschränke',tr:T('buzdolabı'),emoji:'🧊',pic:objectPic.kuehlschrank},
  {de:'der Herd',plural:'Herde',tr:T('ocak (fırınlı)'),emoji:'🍳',pic:objectPic.herd},
  {de:'der Schrank',plural:'Schränke',tr:T('dolap'),emoji:'🚪',pic:objectPic.schrank},

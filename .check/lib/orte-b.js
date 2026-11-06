@@ -6,21 +6,21 @@ const orte_pictures_1 = require("./orte-pictures");
 const gap = (options, answer) => ({ options, answer });
 const art = ['Der', 'Das', 'Die'], pron = ['Er', 'Es', 'Sie'];
 exports.wordsB = [
-    { de: 'der Computer', plural: 'Computer', tr: (0, orte_types_1.T)('bilgisayar'), emoji: '🖥️' },
-    { de: 'der Laptop', plural: 'Laptops', tr: (0, orte_types_1.T)('dizüstü bilgisayar'), emoji: '💻' },
+    { de: 'der Computer', plural: 'Computer', tr: (0, orte_types_1.T)('bilgisayar'), emoji: '🖥️', pic: orte_pictures_1.objectPic.computer },
+    { de: 'der Laptop', plural: 'Laptops', tr: (0, orte_types_1.T)('dizüstü bilgisayar'), emoji: '💻', pic: orte_pictures_1.objectPic.laptop },
     { de: 'die Kaffeemaschine', plural: 'Kaffeemaschinen', tr: (0, orte_types_1.T)('kahve makinesi'), emoji: '☕', pic: orte_pictures_1.objectPic.kaffeemaschine },
-    { de: 'die Kasse', plural: 'Kassen', tr: (0, orte_types_1.T)('kasa'), emoji: '🧾' },
+    { de: 'die Kasse', plural: 'Kassen', tr: (0, orte_types_1.T)('kasa'), emoji: '🧾', pic: orte_pictures_1.objectPic.kasse },
     { de: 'die Tafel', plural: 'Tafeln', tr: (0, orte_types_1.T)('yazı tahtası'), emoji: '🧑‍🏫', pic: orte_pictures_1.objectPic.tafel },
     { de: 'die Tür', plural: 'Türen', tr: (0, orte_types_1.T)('kapı'), emoji: '🚪', pic: orte_pictures_1.objectPic.tuer },
     { de: 'das Fenster', plural: 'Fenster', tr: (0, orte_types_1.T)('pencere'), emoji: '🪟', pic: orte_pictures_1.objectPic.fenster },
-    { de: 'der Schlüssel', plural: 'Schlüssel', tr: (0, orte_types_1.T)('anahtar'), emoji: '🔑' },
+    { de: 'der Schlüssel', plural: 'Schlüssel', tr: (0, orte_types_1.T)('anahtar'), emoji: '🔑', pic: orte_pictures_1.objectPic.schluessel },
     { de: 'der Kühlschrank', plural: 'Kühlschränke', tr: (0, orte_types_1.T)('buzdolabı'), emoji: '🧊', pic: orte_pictures_1.objectPic.kuehlschrank },
-    { de: 'der Kiosk', plural: 'Kioske', tr: (0, orte_types_1.T)('büfe'), emoji: '🏪' },
+    { de: 'der Kiosk', plural: 'Kioske', tr: (0, orte_types_1.T)('büfe'), emoji: '🏪', pic: orte_pictures_1.objectPic.kiosk },
 ];
 exports.partB = {
     id: 'b', badge: 'B', title: 'Ich finde, das Regal ist schön.',
     lead: (0, orte_types_1.T)('İş yerindeki eşyalar ve nasıl oldukları: **groß, klein, neu, alt** …, **ein → der**, **er / es / sie** ve **Ich finde, …**'),
-    cover: orte_pictures_1.orteCovers.b, coverAlt: (0, orte_types_1.T)('Omar büfesinde tezgâhın arkasında; yanında büyük bir buzdolabı, eski bir kasa ve kahve makinesi'),
+    cover: orte_pictures_1.orteCovers.b, coverAlt: (0, orte_types_1.T)('Omar büfesinde tezgâhın arkasında elinde bir anahtar tutuyor; yanında büyük bir buzdolabı, eski bir kasa ve kahve makinesi'),
     short: { 'resim-sec': (0, orte_types_1.T)('Resim – artikel'), 'der-ex': (0, orte_types_1.T)('ein → der'), 'zamir': (0, orte_types_1.T)('er / es / sie'), 'zit': (0, orte_types_1.T)('Zıt kelimeler'), 'dialog': (0, orte_types_1.T)('Diyalog'), 'bufe': (0, orte_types_1.T)('Omar’ın büfesi'), 'und-du': (0, orte_types_1.T)('Şimdi sen') },
     steps: [
         { id: 'kapak', title: (0, orte_types_1.T)('Kapak'), kind: 'cover', cover: {
@@ -142,9 +142,9 @@ exports.partB = {
                     { pic: orte_pictures_1.objectPic.tuer, emoji: '🚪', options: ['die Tür', 'der Tür', 'das Tür'] },
                     { pic: orte_pictures_1.objectPic.kuehlschrank, emoji: '🧊', options: ['der Kühlschrank', 'die Kühlschrank', 'das Kühlschrank'] },
                     { pic: orte_pictures_1.objectPic.tafel, emoji: '🧑‍🏫', options: ['die Tafel', 'der Tafel', 'das Tafel'] },
-                    { emoji: '🔑', prompt: (0, orte_types_1.T)('anahtar'), options: ['der Schlüssel', 'die Schlüssel', 'das Schlüssel'] },
-                    { emoji: '💻', prompt: (0, orte_types_1.T)('dizüstü bilgisayar'), options: ['der Laptop', 'die Laptop', 'das Laptop'] },
-                    { emoji: '🧾', prompt: (0, orte_types_1.T)('kasa'), options: ['die Kasse', 'der Kasse', 'das Kasse'] },
+                    { pic: orte_pictures_1.objectPic.schluessel, emoji: '🔑', options: ['der Schlüssel', 'die Schlüssel', 'das Schlüssel'] },
+                    { pic: orte_pictures_1.objectPic.laptop, emoji: '💻', options: ['der Laptop', 'die Laptop', 'das Laptop'] },
+                    { pic: orte_pictures_1.objectPic.kasse, emoji: '🧾', options: ['die Kasse', 'der Kasse', 'das Kasse'] },
                 ] } },
         { id: 'der-ex', title: (0, orte_types_1.T)('Alıştırma 2'), kind: 'exercise', kicker: 'Alıştırma 2 · ein → der', heading: (0, orte_types_1.T)('Önce ein, sonra der / das / die'), lead: (0, orte_types_1.T)('İkinci cümlede doğru artikeli seç.'),
             exercise: { type: 'choice', lines: [

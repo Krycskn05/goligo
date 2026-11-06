@@ -25,8 +25,8 @@ export const wordsA:Word[]=[
  {de:'das Heft',plural:'Hefte',tr:T('defter'),emoji:'📒',pic:objectPic.heft},
  {de:'der Stift',plural:'Stifte',tr:T('kalem'),emoji:'🖊️',pic:objectPic.stift},
  {de:'der Bleistift',plural:'Bleistifte',tr:T('kurşun kalem'),emoji:'✏️',pic:objectPic.bleistift},
- {de:'das Plakat',plural:'Plakate',tr:T('afiş, poster'),emoji:'🖼️'},
- {de:'das Handy',plural:'Handys',tr:T('cep telefonu'),emoji:'📱'},
+ {de:'das Plakat',plural:'Plakate',tr:T('afiş, poster'),emoji:'🖼️',pic:objectPic.plakat},
+ {de:'das Handy',plural:'Handys',tr:T('cep telefonu'),emoji:'📱',pic:objectPic.handy},
  {de:'das Foto',plural:'Fotos',tr:T('fotoğraf'),emoji:'📷',pic:objectPic.foto},
 ];
 const wordA=(de:string)=>wordsA.find(word=>word.de===de)!;
@@ -34,7 +34,7 @@ const wordA=(de:string)=>wordsA.find(word=>word.de===de)!;
 export const partA:OrtePart={
  id:'a',badge:'A',title:'Ich lerne hier Deutsch.',
  lead:T('Eşyaların adı, **Was ist das? Wie heißt das auf Deutsch?**, **ein / eine**, **kein / keine** ve öğrendiğin yeri anlatmak.'),
- cover:orteCovers.a,coverAlt:T('Mei odasında masada çalışıyor; parkta Sabine ve Tomasz bir bankta defterleriyle oturuyor'),
+ cover:orteCovers.a,coverAlt:T('Mei odasında yatağın kenarında kitap okuyor; parkta Sabine ve Tomasz bir bankta defterlerine yazıyor, arkada çocuklar oynuyor'),
  short:{'resim-sec':T('Resim – kelime'),'ein-eine':T('ein / eine'),'kein-keine':T('kein / keine'),'sesliler':T('a e i o u'),'kim':T('Kim ne diyor?'),'var-yok':T('Var mı, yok mu?'),'und-du':T('Şimdi sen')},
  steps:[
   {id:'kapak',title:T('Kapak'),kind:'cover',cover:{
@@ -78,7 +78,7 @@ export const partA:OrtePart={
     check(T('cep telefonu'),['das Handy','das Heft','das Foto']),
     check(T('oynamak'),['spielen','sitzen','stehen']),
    ]}]},
-  {id:'was-ist-das',title:T('Was ist das?'),kind:'teach',kicker:T('Konu 1 · Wie heißt das auf Deutsch?'),heading:T('Bir eşyanın adını sormak'),
+  {id:'was-ist-das',title:'Was ist das?',kind:'teach',kicker:T('Konu 1 · Wie heißt das auf Deutsch?'),heading:T('Bir eşyanın adını sormak'),
    blocks:[
     {t:'p',text:T('Bir eşyanın Almancasını bilmiyorsan iki soru sorabilirsin:')},
     {t:'rows',rows:[row('Was ist das?','Bu ne?'),row('Wie heißt das auf Deutsch?','Bunun Almancası ne? (kelimesi kelimesine: „Bu Almancada nasıl adlandırılır?“)')]},
@@ -205,7 +205,7 @@ export const partA:OrtePart={
     {given:'❌ Sofa',pic:objectPic.sofa,emoji:'🛋️',answers:['kein Sofa'],say:'Hier ist kein Sofa.'},
     {given:'✅ Regal',pic:objectPic.regal,emoji:'🗄️',answers:['ein Regal'],say:'Hier ist ein Regal.'},
     {given:'❌ Tasche',pic:objectPic.tasche,emoji:'👜',answers:['keine Tasche'],say:'Hier ist keine Tasche.'},
-    {given:'❌ Handy',emoji:wordA('das Handy').emoji,answers:['kein Handy'],say:'Hier ist kein Handy.'},
+    {given:'❌ Handy',pic:wordA('das Handy').pic,emoji:wordA('das Handy').emoji,answers:['kein Handy'],say:'Hier ist kein Handy.'},
    ]}},
   {id:'und-du',title:T('Alıştırma 7'),kind:'exercise',kicker:'Alıştırma 7 · Und du?',heading:T('Şimdi sen: senin yerin'),lead:T('Kendi cevaplarını yaz. Kalıba uyan cümle yeşil olur. İlk üç cümle bitince alıştırma tamam; sonra dinle, gizle ve ezberden söyle.'),
    exercise:{type:'own',key:'lernkoko-l3a-own',prompts:[

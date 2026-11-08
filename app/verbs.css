@@ -611,11 +611,11 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-slot>.verb-card.with-picture:has(.verb-picture)>:not(.verb-picture) { grid-column:2; }
 /* hat mı, ist mi? (9 November 2026, the learner chose design 1 of three: the sentence with a gap for the helping verb):
    the verb, its meaning and the sentence stay together in the middle of the fixed question place, nothing is cut. */
-.verb-slot>.verb-card.verb-aux-card { grid-template-rows:1fr auto auto auto 1fr; }
-.verb-slot>.verb-card.verb-aux-card.with-picture>.verb-picture { grid-row:1 / -1; }
+.verb-slot>.verb-card.verb-aux-card { grid-template-rows:1fr auto auto 1fr auto; row-gap:2px; }
+.verb-practice .verb-slot>.verb-card.verb-aux-card.with-picture>.verb-picture { grid-row:1 / span 4; width:calc(var(--qslot) - 110px); }
 .verb-slot>.verb-card.verb-aux-card>.verb-card-main { grid-row:2; }
 .verb-slot>.verb-card.verb-aux-card>.verb-card-meaning { grid-row:3; }
-.verb-slot>.verb-card.verb-aux-card>.verb-sentence { grid-row:4; margin:8px 0 0; padding:6px 14px; font-size:19px; line-height:1.6; }
+.verb-slot>.verb-card.verb-aux-card.with-picture:has(.verb-picture)>.verb-sentence,.verb-slot>.verb-card.verb-aux-card>.verb-sentence { grid-row:5; grid-column:1 / -1; justify-self:stretch; margin:8px 0 0; padding:5px 12px; text-align:center; font-size:19px; line-height:1.5; }
 .verb-aux-card .verb-chunk.gap.aux { min-width:2.6em; }
 .verb-slot>.vault-listen-player { box-sizing:border-box; height:100%; margin:0; }
 .verb-slot>.verb-result { box-sizing:border-box; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:16px; height:100%; padding:10px calc(var(--paul) + 8px) 13px 14px; border-radius:18px; background:#eafbe4; overflow:hidden; }

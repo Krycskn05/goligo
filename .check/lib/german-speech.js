@@ -11,6 +11,7 @@ exports.splitSpeechText = splitSpeechText;
 exports.createGermanSpeechPlayer = createGermanSpeechPlayer;
 const audio_session_1 = require("./audio-session");
 const site_voices_1 = require("./site-voices");
+const read_along_1 = require("./read-along");
 exports.idlePlayback = { status: 'idle', text: '', warning: '' };
 exports.germanSpeechPreview = 'Hallo! Schön, dass du da bist. Wir lernen zusammen Deutsch. Ganz in Ruhe, Schritt für Schritt.';
 const defaultSpeechRate = (language) => language === 'de' ? 0.94 : 0.85;
@@ -105,23 +106,42 @@ function splitSpeechText(text, limit = 180) {
     }
     return chunks;
 }
-function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language = 'de', engineOptions = {}, clips) {
+function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language = 'de', 
+/** `onWord`: read-along by word (lib/read-along.ts) — the index of the word being read in the spoken text (as
+ * `wordSpans` counts), -1 when none; told once per change, with the text. */
+engineOptions = {}, clips) {
     let generation = 0;
     let playback = exports.idlePlayback;
     let current = null;
     let timer;
+    let estimate; // a device voice without word events is followed by the clock
+    let lastWord = -1;
     let prepared = false;
     let cancelledAt = null;
     let unlockRequest = null;
     const cancelDelay = Math.max(0, Math.min(250, engineOptions.cancelDelayMs ?? 0));
     function cancelEngine() { synthesis.cancel(); cancelledAt = Date.now(); }
+    function word(k) {
+        if (k === lastWord)
+            return;
+        lastWord = k;
+        engineOptions.onWord?.(k, k >= 0 ? playback.text : '');
+    }
+    function stopEstimate() {
+        if (estimate !== undefined)
+            clearInterval(estimate);
+        estimate = undefined;
+    }
     function clearTimer() {
         if (timer !== undefined)
             clearTimeout(timer);
         timer = undefined;
+        stopEstimate();
     }
     function update(next) {
         playback = next;
+        if (next.status !== 'speaking')
+            word(-1);
         onChange(next);
     }
     function stop(warning = '') {
@@ -189,6 +209,7 @@ function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language
         let started = false;
         let attempt = 0;
         let waited = 0;
+        let timeline = (0, read_along_1.wordTimeline)(text); // read-along by word: each word's share of the clip's playing time
         update({ status: 'loading', text, warning: '' });
         const fallback = () => {
             if (token !== generation || started)
@@ -213,7 +234,27 @@ function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language
             fallback();
         };
         const tryClip = () => {
-            clips.player.play(urls[attempt], rate, {
+            const url = urls[attempt];
+            const mine = attempt;
+            // Read-along by word: the clip's measured word times (lib/site-voices.ts `clipWordTimes`) when its voice has them;
+            // the letter estimate until they arrive, or when there are none. Another voice's clip brings its own times.
+            timeline = (0, read_along_1.wordTimeline)(text);
+            const useTimes = (starts) => {
+                if (token !== generation || attempt !== mine)
+                    return;
+                const measured = (0, read_along_1.measuredTimeline)(text, starts);
+                if (measured)
+                    timeline = measured;
+            };
+            try {
+                const got = clips.times?.(url) ?? null;
+                if (got && typeof got.then === 'function')
+                    void got.then(useTimes, () => { });
+                else
+                    useTimes(got);
+            }
+            catch { }
+            clips.player.play(url, rate, {
                 onStart: () => {
                     if (token !== generation)
                         return;
@@ -239,6 +280,11 @@ function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language
                     clearTimer();
                     update({ ...exports.idlePlayback });
                 },
+                onProgress: ratio => {
+                    if (token !== generation || !started)
+                        return;
+                    word((0, read_along_1.wordAtRatio)(timeline, ratio));
+                },
             }, speed);
             if (token === generation && !started) {
                 waited = 0;
@@ -253,6 +299,8 @@ function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language
             update({ ...exports.idlePlayback });
             return;
         }
+        const spans = (0, read_along_1.wordSpans)(parts.join(' '));
+        const offsets = (0, read_along_1.partOffsets)(parts); // read-along by word
         const token = generation;
         let index = 0;
         let retried = false;
@@ -296,11 +344,37 @@ function createGermanSpeechPlayer(synthesis, createUtterance, onChange, language
             utterance.pitch = standIn.pitch;
             utterance.volume = 1;
             const isCurrent = () => token === generation && current === utterance;
+            // Read-along by word: the browser's boundary events mark each word; a voice that sends none (some online voices)
+            // is followed by the clock instead, from the estimated time of every word (lib/read-along.ts).
+            let heard = false;
+            utterance.onboundary = event => {
+                if (!isCurrent() || (event.name && event.name !== 'word'))
+                    return;
+                heard = true;
+                word((0, read_along_1.wordAtChar)(spans, offsets[index] + event.charIndex));
+            };
             utterance.onstart = () => {
                 if (!isCurrent())
                     return;
                 clearTimer();
                 update({ status: 'speaking', text, warning: '' });
+                word((0, read_along_1.wordAtChar)(spans, offsets[index]));
+                const began = Date.now();
+                const partTimeline = (0, read_along_1.wordTimeline)(parts[index]);
+                const length = (0, read_along_1.estimatedDurationMs)(partTimeline, rate);
+                estimate = setInterval(() => {
+                    if (!isCurrent()) {
+                        stopEstimate();
+                        return;
+                    }
+                    const passed = Date.now() - began;
+                    if (heard || passed < 450)
+                        return;
+                    const k = (0, read_along_1.wordAtRatio)(partTimeline, passed / length);
+                    if (k >= 0)
+                        word((0, read_along_1.wordAtChar)(spans, offsets[index] + partTimeline.spans[k].start));
+                }, 80);
+                estimate.unref?.();
                 timer = setTimeout(() => {
                     if (isCurrent())
                         stop('Dinleme kesildi. Dinle düğmesine yeniden dokun.');

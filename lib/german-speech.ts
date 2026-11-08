@@ -1,7 +1,10 @@
 import {configureAudioSession} from './audio-session';
 import {isSiteVoice,SITE_VOICE_PREFIX,type ClipPlayer} from './site-voices';
-/** Pre-rendered natural clips (site voices); resolve gives the clip URLs to try in order (none: no clip). */
-export type SpeechClips={player:ClipPlayer;resolve:(text:string,voiceName:string)=>string|readonly string[]|null};
+import {estimatedDurationMs,measuredTimeline,partOffsets,wordAtChar,wordAtRatio,wordSpans,wordTimeline} from './read-along';
+/** Pre-rendered natural clips (site voices); resolve gives the clip URLs to try in order (none: no clip).
+ * `times`: the measured word starts of a clip (lib/site-voices.ts `clipWordTimes`) for the read-along by word — at once,
+ * or as a promise while the voice's table loads; null (or no `times`) keeps the letter estimate. */
+export type SpeechClips={player:ClipPlayer;resolve:(text:string,voiceName:string)=>string|readonly string[]|null;times?:(url:string)=>readonly number[]|null|Promise<readonly number[]|null>};
 export type SpeechPlayback = {
   status: 'idle' | 'loading' | 'speaking';
   text: string;
@@ -101,25 +104,40 @@ export function createGermanSpeechPlayer(
   createUtterance: (text: string) => SpeechSynthesisUtterance,
   onChange: (playback: SpeechPlayback) => void,
   language:'de'|'en'='de',
-  engineOptions:{cancelDelayMs?:number}={},
+  /** `onWord`: read-along by word (lib/read-along.ts) — the index of the word being read in the spoken text (as
+   * `wordSpans` counts), -1 when none; told once per change, with the text. */
+  engineOptions:{cancelDelayMs?:number;onWord?:(word:number,text:string)=>void}={},
   clips?:SpeechClips,
 ) {
   let generation = 0;
   let playback = idlePlayback;
   let current: SpeechSynthesisUtterance | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let estimate: ReturnType<typeof setInterval> | undefined; // a device voice without word events is followed by the clock
+  let lastWord = -1;
   let prepared = false;
   let cancelledAt:number|null=null;let unlockRequest:SpeechSynthesisUtterance|null=null;
   const cancelDelay=Math.max(0,Math.min(250,engineOptions.cancelDelayMs??0));
   function cancelEngine(){synthesis.cancel();cancelledAt=Date.now();}
 
+  function word(k: number) {
+    if (k === lastWord) return;
+    lastWord = k;
+    engineOptions.onWord?.(k, k >= 0 ? playback.text : '');
+  }
+  function stopEstimate() {
+    if (estimate !== undefined) clearInterval(estimate);
+    estimate = undefined;
+  }
   function clearTimer() {
     if (timer !== undefined) clearTimeout(timer);
     timer = undefined;
+    stopEstimate();
   }
 
   function update(next: SpeechPlayback) {
     playback = next;
+    if (next.status !== 'speaking') word(-1);
     onChange(next);
   }
 
@@ -179,6 +197,7 @@ export function createGermanSpeechPlayer(
     let started = false;
     let attempt = 0;
     let waited = 0;
+    let timeline = wordTimeline(text); // read-along by word: each word's share of the clip's playing time
     update({status: 'loading', text, warning: ''});
     const fallback = () => {
       if (token !== generation || started) return;
@@ -194,7 +213,21 @@ export function createGermanSpeechPlayer(
       fallback();
     };
     const tryClip = () => {
-    clips!.player.play(urls[attempt], rate, {
+    const url = urls[attempt]; const mine = attempt;
+    // Read-along by word: the clip's measured word times (lib/site-voices.ts `clipWordTimes`) when its voice has them;
+    // the letter estimate until they arrive, or when there are none. Another voice's clip brings its own times.
+    timeline = wordTimeline(text);
+    const useTimes = (starts: readonly number[] | null) => {
+      if (token !== generation || attempt !== mine) return;
+      const measured = measuredTimeline(text, starts);
+      if (measured) timeline = measured;
+    };
+    try {
+      const got = clips!.times?.(url) ?? null;
+      if (got && typeof (got as PromiseLike<unknown>).then === 'function') void (got as Promise<readonly number[] | null>).then(useTimes, () => {});
+      else useTimes(got as readonly number[] | null);
+    } catch {}
+    clips!.player.play(url, rate, {
       onStart: () => {
         if (token !== generation) return;
         started = true;
@@ -213,6 +246,10 @@ export function createGermanSpeechPlayer(
         clearTimer();
         update({...idlePlayback});
       },
+      onProgress: ratio => {
+        if (token !== generation || !started) return;
+        word(wordAtRatio(timeline, ratio));
+      },
     }, speed);
     if (token === generation && !started) { waited = 0; timer = setTimeout(slow, CLIP_WAIT_MS); }
     };
@@ -222,6 +259,7 @@ export function createGermanSpeechPlayer(
   function speakWithEngine(text: string, rate: number, voiceName?: string) {
     const parts = splitSpeechText(text);
     if (!parts.length) { update({...idlePlayback}); return; }
+    const spans = wordSpans(parts.join(' ')); const offsets = partOffsets(parts); // read-along by word
     const token = generation;
     let index = 0;
     let retried = false;
@@ -260,10 +298,28 @@ export function createGermanSpeechPlayer(
       utterance.pitch = standIn.pitch;
       utterance.volume = 1;
       const isCurrent = () => token === generation && current === utterance;
+      // Read-along by word: the browser's boundary events mark each word; a voice that sends none (some online voices)
+      // is followed by the clock instead, from the estimated time of every word (lib/read-along.ts).
+      let heard = false;
+      utterance.onboundary = event => {
+        if (!isCurrent() || (event.name && event.name !== 'word')) return;
+        heard = true;
+        word(wordAtChar(spans, offsets[index] + event.charIndex));
+      };
       utterance.onstart = () => {
         if (!isCurrent()) return;
         clearTimer();
         update({status: 'speaking', text, warning: ''});
+        word(wordAtChar(spans, offsets[index]));
+        const began = Date.now(); const partTimeline = wordTimeline(parts[index]); const length = estimatedDurationMs(partTimeline, rate);
+        estimate = setInterval(() => {
+          if (!isCurrent()) { stopEstimate(); return; }
+          const passed = Date.now() - began;
+          if (heard || passed < 450) return;
+          const k = wordAtRatio(partTimeline, passed / length);
+          if (k >= 0) word(wordAtChar(spans, offsets[index] + partTimeline.spans[k].start));
+        }, 80);
+        (estimate as unknown as {unref?: () => void}).unref?.();
         timer = setTimeout(() => {
           if (isCurrent()) stop('Dinleme kesildi. Dinle düğmesine yeniden dokun.');
         }, Math.max(30000, parts[index].length * 220 / rate));

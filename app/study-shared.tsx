@@ -4,7 +4,7 @@ import {Mic,Square} from 'lucide-react';
 import {t,type StudyLanguage} from '@/lib/study-languages';
 import type {Snapshot} from '@/lib/study';
 import {createGermanSpeechPlayer,studyVoices,idlePlayback,defaultSpeechRate,type SpeechPlayback} from '@/lib/german-speech';
-import {availableSiteVoices,createClipPlayer,loadVoiceManifest,onVoiceManifest,savedVoiceName,siteClipUrls,VOICE_PREFERENCE_VERSION,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
+import {availableSiteVoices,clipWordTimes,createClipPlayer,loadVoiceManifest,onVoiceManifest,savedVoiceName,siteClipUrls,VOICE_PREFERENCE_VERSION,type SiteVoice,type VoiceManifest} from '@/lib/site-voices';
 import {createAnswerFeedbackPlayer} from '@/lib/answer-feedback';
 import type {LearningLanguage} from '@/lib/learning-language';
 import {prepareEffects,readEffects,playLearningSound,learningReaction} from '@/lib/learning-effects';
@@ -82,11 +82,14 @@ export function useGermanSpeech(course:LearningLanguage='de'){
  },[course]);
  const changeVoice=useCallback((value:string)=>{player.current?.stop();setVoiceName(value);saveSpeechPreference(course,{voiceName:value,rate});},[course,rate]);
  const changeRate=useCallback((value:string)=>{const number=Number(value);if(!Number.isFinite(number)||number<0.5||number>1.2)return;player.current?.stop();setRate(value);saveSpeechPreference(course,{voiceName,rate:value});},[course,voiceName]);
+ // Read-along by word (lib/read-along.ts): whoever listens hears which word the player is at, outside React's state.
+ const wordListeners=useRef(new Set<(word:number,text:string)=>void>());
+ const onWord=useCallback((listener:(word:number,text:string)=>void)=>{wordListeners.current.add(listener);return()=>{wordListeners.current.delete(listener);};},[]);
  useEffect(()=>{
   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){setPlayback({...idlePlayback,warning:'Bu tarayıcı sesli okumayı desteklemiyor. Safari, Chrome veya Edge ile açabilirsin.'});return;}
   const synth=window.speechSynthesis;let mounted=true;
-  const clips=course==='de'&&typeof window.Audio==='function'?{player:createClipPlayer(),resolve:(text:string,name:string)=>siteClipUrls(name,text)}:undefined;
-  const controller=createGermanSpeechPlayer(synth,text=>new SpeechSynthesisUtterance(text),next=>{if(mounted)setPlayback(next);},course,{cancelDelayMs:100},clips);player.current=controller;
+  const clips=course==='de'&&typeof window.Audio==='function'?{player:createClipPlayer(),resolve:(text:string,name:string)=>siteClipUrls(name,text),times:clipWordTimes}:undefined;
+  const controller=createGermanSpeechPlayer(synth,text=>new SpeechSynthesisUtterance(text),next=>{if(mounted)setPlayback(next);},course,{cancelDelayMs:100,onWord:(word,text)=>{if(mounted)wordListeners.current.forEach(listener=>listener(word,text));}},clips);player.current=controller;
   const update=()=>setVoices(studyVoices(synth.getVoices(),course));const visibility=()=>{if(document.hidden){controller.stop();controller.resetPreparation();}};
   update();synth.addEventListener('voiceschanged',update);document.addEventListener('visibilitychange',visibility);
   return()=>{mounted=false;synth.removeEventListener('voiceschanged',update);document.removeEventListener('visibilitychange',visibility);controller.stop();player.current=null;};
@@ -95,7 +98,7 @@ export function useGermanSpeech(course:LearningLanguage='de'){
  const prepare=useCallback(()=>player.current?.prepare(),[]);
  const isActive=useCallback(()=>player.current?.isActive()??false,[]);
  const speak=useCallback((text:string,slow=false,voiceOverride?:string,speed?:number)=>{if(!player.current){setPlayback({...idlePlayback,warning:'Ses desteği bulunamadı. Güncel Safari veya Chrome ile aç.'});return;}player.current.speak(text,{voiceName:voiceOverride??(preferenceCourse.current===course?voiceName:''),rate:slow?0.65:preferenceCourse.current===course?Number(rate):defaultSpeechRate(course),speed});},[voiceName,rate,course]);
- return {speaking:playback.status==='speaking',loading:playback.status==='loading',busy:playback.status!=='idle',activeText:playback.text,warning:playback.warning,voices,siteVoices,siteVoicesState,voiceName,setVoiceName:changeVoice,rate,setRate:changeRate,prepare,speak,stop,isActive};
+ return {speaking:playback.status==='speaking',loading:playback.status==='loading',busy:playback.status!=='idle',activeText:playback.text,warning:playback.warning,voices,siteVoices,siteVoicesState,voiceName,setVoiceName:changeVoice,rate,setRate:changeRate,prepare,speak,stop,isActive,onWord};
 }export function Recorder({language="tr"}:{language?:StudyLanguage}){
  const [recording,setRecording]=useState(false);const [starting,setStarting]=useState(false);const [url,setUrl]=useState('');const [error,setError]=useState('');
  const recorder=useRef<MediaRecorder|null>(null);const stream=useRef<MediaStream|null>(null);const blobUrl=useRef('');const timer=useRef<ReturnType<typeof setTimeout>|null>(null);const mounted=useRef(true);const requesting=useRef(false);

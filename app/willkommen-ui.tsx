@@ -4,6 +4,7 @@ import {ArrowRight,Check,Lightbulb,Lock,RotateCcw,Trash2,Volume2} from 'lucide-r
 import type {StudyLanguage} from '@/lib/study-languages';
 import type {TopicProgress} from '@/lib/progress';
 import {siteClipUrls,warmClip} from '@/lib/site-voices';
+import {wordSpans} from '@/lib/read-along';
 import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,voiceOwner,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
 import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
@@ -50,7 +51,51 @@ export function findReadLine(text:string,after?:Element|null):HTMLElement|null{
  const later=after?loose.find(line=>after.compareDocumentPosition(line)&Node.DOCUMENT_POSITION_FOLLOWING):undefined;
  return later??loose[0];
 }
-function clearReading(){document.querySelectorAll('.'+READING).forEach(line=>line.classList.remove(READING));}
+function clearReading(){document.querySelectorAll('.'+READING).forEach(line=>line.classList.remove(READING));clearWord();}
+/** Read-along by word (lib/read-along.ts; the learner chose "Vurgu" among six styles, 8 November 2026): the word being
+ * spoken is marked in the line with the CSS highlight API (`::highlight(l1a-word)`, app/willkommen.css), so the line's
+ * markup stays as React drew it. The k-th spoken word is the k-th word of the line when both have as many words,
+ * otherwise the next line word (after the one marked before) that reads the same. A line with a typed box, or a
+ * browser without the API, shows the line alone. */
+const WORD='l1a-word';
+type Marks={set(name:string,mark:unknown):void;delete(name:string):void};
+const marks=()=>typeof CSS!=='undefined'?(CSS as unknown as {highlights?:Marks}).highlights:undefined;
+const markType=()=>typeof window!=='undefined'?(window as unknown as {Highlight?:new(range:Range)=>unknown}).Highlight:undefined;
+let markedLine:HTMLElement|null=null;let markedWord=-1;
+function clearWord(){try{marks()?.delete(WORD);}catch{}markedLine=null;markedWord=-1;}
+type Piece={node:Text;start:number};
+/** The line's text, node by node, as `spokenText` reads it; false when a part of it is typed (a box cannot be marked). */
+function textPieces(node:Node,pieces:Piece[],at:{length:number}):boolean{
+ if(node.nodeType===Node.TEXT_NODE){pieces.push({node:node as Text,start:at.length});at.length+=node.nodeValue?.length??0;return true;}
+ if(!(node instanceof HTMLElement))return true;
+ if(node instanceof HTMLInputElement||node instanceof HTMLTextAreaElement)return false;
+ if(node.getAttribute('aria-hidden')==='true'||node.classList.contains('l1a-hint')||node.classList.contains('l1a-choice-menu'))return true;
+ for(const child of node.childNodes)if(!textPieces(child,pieces,at))return false;
+ return true;
+}
+const plainWord=(word:string)=>word.toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+export function showWord(line:HTMLElement,spoken:string,word:number){
+ const registry=marks();const Highlight=markType();const de=line.querySelector('.l1a-de');
+ if(!registry||!Highlight||word<0||!de){clearWord();return;}
+ const pieces:Piece[]=[];const at={length:0};
+ if(!textPieces(de,pieces,at)){clearWord();return;}
+ const lineWords=wordSpans(pieces.map(piece=>piece.node.nodeValue??'').join(''));const spokenWords=wordSpans(spoken);
+ if(line!==markedLine){markedLine=line;markedWord=-1;}
+ let k=-1;
+ if(lineWords.length===spokenWords.length)k=word;
+ else{const want=plainWord(spokenWords[word]?.text??'');if(want)k=lineWords.findIndex((item,i)=>i>markedWord&&plainWord(item.text)===want);}
+ const span=lineWords[k];
+ if(!span){try{registry.delete(WORD);}catch{}return;}
+ markedWord=k;
+ const range=document.createRange();
+ const place=(offset:number,end:boolean)=>{
+  for(let i=pieces.length-1;i>=0;i--){const piece=pieces[i];if(piece.start>offset)continue;
+   const inside=Math.min(offset-piece.start,piece.node.nodeValue?.length??0);if(end)range.setEnd(piece.node,inside);else range.setStart(piece.node,inside);return true;}
+  return false;
+ };
+ if(!place(span.start,false)||!place(span.end,true)){clearWord();return;}
+ try{registry.set(WORD,new Highlight(range));}catch{clearWord();}
+}
 function showReading(line:HTMLElement,scroll:boolean){
  clearReading();line.classList.add(READING);
  if(!scroll)return;
@@ -69,6 +114,15 @@ export function useLessonSpeech():Speech&{warning?:string}{
  const say=useCallback((item:SayItem)=>{const who=voiceOwner(item);const slow=typeof item!=='string'&&!!item.slow;speak(sayText(item),slow,speakerVoice(who,voices.current));},[speak]);
  const queue=useRef<SayItem[]>([]);const waiting=useRef<ReturnType<typeof setTimeout>|null>(null);
  const following=useRef(false);const lastLine=useRef<HTMLElement|null>(null);const handScroll=useRef(false);
+ // Read-along by word: the player tells which word it is at; it is marked in the line being read (`showWord`) — at once
+ // when that line is known for this text, otherwise as soon as the effect below finds the line.
+ const lastText=useRef('');const lastWord=useRef(-1);const subscribe=german.onWord;
+ useEffect(()=>subscribe((word,text)=>{
+  lastWord.current=word;
+  if(!following.current)return;
+  if(word<0){clearWord();return;}
+  if(lastLine.current&&lastText.current===text)showWord(lastLine.current,text,word);
+ }),[subscribe]);
  const busyRef=useRef(busy);
  const next=useCallback(()=>{
   const item=queue.current.shift();if(!item)return;
@@ -83,7 +137,7 @@ export function useLessonSpeech():Speech&{warning?:string}{
  // Read-along: mark the line being read and keep it on the screen; the mark goes when the reading ends.
  useEffect(()=>{
   if(!following.current)return;
-  if(busy&&activeText){const line=findReadLine(activeText,lastLine.current);if(line){lastLine.current=line;showReading(line,!handScroll.current);}return;}
+  if(busy&&activeText){const line=findReadLine(activeText,lastLine.current);if(line){lastLine.current=line;lastText.current=activeText;showReading(line,!handScroll.current);if(lastWord.current>=0)showWord(line,activeText,lastWord.current);}return;}
   if(!busy&&!queue.current.length&&!waiting.current){following.current=false;clearReading();}
  },[busy,activeText]);
  useEffect(()=>{
@@ -105,6 +159,27 @@ export function useInnerNext(setInnerNext:StepProps['setInnerNext'],next:()=>boo
  const latest=useRef(next);latest.current=next;
  useEffect(()=>{if(!setInnerNext)return;setInnerNext(()=>latest.current());return()=>setInnerNext(null);},[setInnerNext]);
 }
+/** A choice exercise that shows one question at a time goes on by itself (the learner asked, 8 November 2026, as the Kelime
+ * Kasası does): AUTO_NEXT_MS after the answer. While the right answer is still being read then, it waits for the reading
+ * (AUTO_NEXT_GRACE_MS at most), and while the page is hidden it waits too. `armed`: an answer is shown and the exercise is
+ * not over. The page's İleri still goes on at once; `AutoNextBar` shows the wait. */
+export const AUTO_NEXT_MS=3000;const AUTO_NEXT_GRACE_MS=6000;
+export function useAutoNext(armed:boolean,speech:Pick<Speech,'busy'>,next:()=>void){
+ const latest=useRef(next);latest.current=next;const busy=useRef(speech.busy);busy.current=speech.busy;
+ useEffect(()=>{
+  if(!armed)return;
+  let due=Date.now()+AUTO_NEXT_MS;let timer:ReturnType<typeof setTimeout>;
+  const tick=()=>{
+   const now=Date.now();if(document.hidden)due=Math.max(due,now+AUTO_NEXT_MS);
+   if(now<due||(busy.current&&now<due+AUTO_NEXT_GRACE_MS)){timer=setTimeout(tick,Math.max(100,Math.min(250,due-now)));return;}
+   latest.current();
+  };
+  timer=setTimeout(tick,AUTO_NEXT_MS);
+  return()=>clearTimeout(timer);
+ },[armed]);
+}
+/** The thin line that fills while the next question is on its way (app/willkommen.css `.l1a-auto`). */
+export function AutoNextBar(){return <span className="l1a-auto" aria-hidden="true"/>;}
 /** An exercise or a test that was left in the middle goes on where it was (the learner asked, 30 October 2026): its state
  * stays in the browser under the page's `runKey` (lernkoko-l1a-run, lernkoko-l15a-run …) and the step id, and is
  * dropped once it is finished. `fix` checks a saved state against the lesson (and may move it on); null = start anew. */
@@ -426,18 +501,18 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
  const [i,setI]=useState(saved?.i??0);const [score,setScore]=useState(saved?.score??0);const [picked,setPicked]=useState<string|null>(null);const [options,setOptions]=useState(()=>saved?.options??shuffle(questions[0][1]));const [over,setOver]=useState(false);
  const [wait,setWait]=useState(false);
  useRunSave(runKey,step.id,!over&&(i>0||picked!==null)?{i,score,picked,options}:null);
- const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
  // Leaving right after the last answer still saves the result.
  const pending=useRef<(()=>void)|null>(null);
- useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);pending.current?.();},[]);
+ useEffect(()=>()=>{pending.current?.();},[]);
  const question=questions[i];
  const answer=(option:string)=>{if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);setWait(false);const ok=option===question[2];const total=score+(ok?1:0);setScore(total);
   const say=sayFor(i);const after=()=>{if(say)speech.speak(say);};if(ok)sound.correct(after);else sound.wrong(after);
-  if(i+1>=questions.length)pending.current=()=>onScore(step.id,total,questions.length);
-  timer.current=setTimeout(()=>advance(i,total),1600);};
+  if(i+1>=questions.length)pending.current=()=>onScore(step.id,total,questions.length);};
  /** The next question (or the result after the last one). */
- const advance=(from:number,total:number)=>{if(timer.current){clearTimeout(timer.current);timer.current=null;}pending.current=null;
+ const advance=(from:number,total:number)=>{pending.current=null;
   if(from+1<questions.length){setI(from+1);setPicked(null);setOptions(shuffle(questions[from+1][1]));}else{setOver(true);onScore(step.id,total,questions.length);if(total===questions.length)sound.complete();}};
+ // The next question comes by itself (useAutoNext): 3 seconds after the answer, once the right answer has been read.
+ useAutoNext(picked!==null&&!over,speech,()=>advance(i,score));
  // İleri at the bottom (the learner asked, 30 October 2026): the next question once this one is answered; a tap by
  // mistake before answering loses nothing. On the result page İleri opens the next step.
  useInnerNext(props.setInnerNext,()=>{if(over)return false;if(picked===null){setWait(true);return true;}advance(i,score);return true;});
@@ -457,6 +532,7 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
   <div className="l1a-opts column" role="group" aria-label={ut('Soru {n}',{n:i+1})}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===question[2]?' ok':picked===option?' bad':'')} disabled={picked!==null} lang={langFor(option,langOf?langOf(option):/^[A-Za-zÄÖÜäöüß–]/.test(option)&&!/^(Hoş|İyi|Teşekkürler|Efendim|Nasıl|biraz|çok|hiç|yot|ce|ji)\b/.test(option)?'de':'tr')} onClick={()=>answer(option)}>{ut(option)}</button>)}</div>
   <p className="l1a-mini">{ut('Puan: {n}',{n:score})}</p>
   {wait&&<p className="l1a-feedback bad" role="status">{ut('Önce bir cevap seç.')}</p>}
+  {picked!==null&&<AutoNextBar/>}
  </>;
 }
 

@@ -8,6 +8,7 @@ exports.siteVoiceById = siteVoiceById;
 exports.savedVoiceName = savedVoiceName;
 exports.normalizeSpeechText = normalizeSpeechText;
 exports.parseVoiceManifest = parseVoiceManifest;
+exports.parseWordTimes = parseWordTimes;
 exports.currentVoiceManifest = currentVoiceManifest;
 exports.setVoiceManifest = setVoiceManifest;
 exports.onVoiceManifest = onVoiceManifest;
@@ -18,6 +19,7 @@ exports.siteClipUrl = siteClipUrl;
 exports.siteClipUrls = siteClipUrls;
 exports.voiceSample = voiceSample;
 exports.clipPlaybackRate = clipPlaybackRate;
+exports.clipWordTimes = clipWordTimes;
 exports.warmClip = warmClip;
 exports.clipSource = clipSource;
 exports.createClipPlayer = createClipPlayer;
@@ -81,13 +83,28 @@ function parseVoiceManifest(value) {
     for (const [text, id] of Object.entries(data.clips))
         if (typeof id === 'string' && /^[a-f0-9]{8,40}$/.test(id))
             clips[normalizeSpeechText(text)] = id;
-    return { version: Number(data.version) || 0, settings: typeof data.settings === 'string' ? data.settings : undefined, voices, clips };
+    const times = Array.isArray(data.times) ? data.times.filter((style) => typeof style === 'string' && /^[A-Z][0-9]$/.test(style)) : [];
+    return { version: Number(data.version) || 0, settings: typeof data.settings === 'string' ? data.settings : undefined, voices, clips, times };
 }
+function parseWordTimes(value) {
+    const table = {};
+    if (!value || typeof value !== 'object')
+        return table;
+    for (const [id, starts] of Object.entries(value)) {
+        if (!/^[a-f0-9]{8,40}$/.test(id) || !Array.isArray(starts) || !starts.length)
+            continue;
+        if (starts.every(start => typeof start === 'number' && Number.isFinite(start) && start >= 0 && start <= 1))
+            table[id] = starts;
+    }
+    return table;
+}
+const timesTables = new Map();
+const timesLoading = new Map();
 let manifest = null;
 let loading = null;
 const listeners = new Set();
 function currentVoiceManifest() { return manifest; }
-function setVoiceManifest(value) { manifest = value; listeners.forEach(listener => listener(value)); }
+function setVoiceManifest(value) { manifest = value; timesTables.clear(); timesLoading.clear(); listeners.forEach(listener => listener(value)); }
 function onVoiceManifest(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; }
 function loadVoiceManifest(fetcher = fetch) {
     if (manifest)
@@ -138,6 +155,27 @@ function clipPlaybackRate(rate) {
     const value = rate / exports.SITE_CLIP_BASE_RATE;
     return Number.isFinite(value) ? Math.max(0.5, Math.min(1.3, value)) : 1;
 }
+const clipAddress = /^\/voices\/([A-Z][0-9])\/([a-f0-9]{8,40})\.mp3$/;
+/** Read-along by word (lib/read-along.ts `measuredTimeline`): the measured word starts of a clip, when its voice is in the
+ * manifest's `times`. A voice's times.json is fetched once, when its first clip is asked for, and kept for the page (the
+ * manifest's version in the address, so a new deploy is not read from the cache); a voice without one costs no request.
+ * A known table answers at once (the starts, or null), a table still loading answers with a promise. */
+function clipWordTimes(url, value = manifest, fetcher = fetch) {
+    const found = clipAddress.exec(url);
+    if (!found || !value || !value.times?.includes(found[1]) || typeof fetcher !== 'function')
+        return null;
+    const [, style, id] = found;
+    const table = timesTables.get(style);
+    if (table)
+        return table[id] ?? null;
+    let pending = timesLoading.get(style);
+    if (!pending) {
+        pending = fetcher(`/voices/${style}/times.json?v=${value.version}`).then(response => response.ok ? response.json() : null).then(parseWordTimes).catch(() => ({}))
+            .then(parsed => { timesTables.set(style, parsed); timesLoading.delete(style); return parsed; });
+        timesLoading.set(style, pending);
+    }
+    return pending.then(parsed => parsed[id] ?? null);
+}
 /** Clips that are on the page are loaded before the tap (the learner heard late voices, 30 October 2026): a few at a
  * time, each once, kept in memory; the player then plays the loaded copy instead of downloading first. */
 const loadedClips = new Map();
@@ -150,6 +188,7 @@ function warmClip(url) {
     wantedClips.add(url);
     clipQueue.push(url);
     pumpClips();
+    void clipWordTimes(url); // the voice's word times come along with its first clip, before the tap
 }
 function pumpClips() {
     while (clipsLoading < 3 && clipQueue.length) {
@@ -189,7 +228,12 @@ function createClipPlayer(createAudio = () => new Audio()) {
         }
         return element;
     };
-    const detach = (audio) => { audio.onplaying = null; audio.onended = null; audio.onerror = null; };
+    let ticker = null;
+    const stopTicking = () => { if (ticker !== null) {
+        clearInterval(ticker);
+        ticker = null;
+    } };
+    const detach = (audio) => { stopTicking(); audio.onplaying = null; audio.onended = null; audio.onerror = null; };
     return {
         unlock() {
             const audio = media();
@@ -230,8 +274,22 @@ function createClipPlayer(createAudio = () => new Audio()) {
             // speed: a listening player's 0.5×–2× on top of the reading rate.
             audio.playbackRate = clipPlaybackRate(rate) * (Number.isFinite(speed) ? Math.max(0.5, Math.min(2, speed)) : 1);
             audio.defaultPlaybackRate = audio.playbackRate;
-            audio.onplaying = () => { if (mine === token)
-                events.onStart(); };
+            audio.onplaying = () => {
+                if (mine !== token)
+                    return;
+                events.onStart();
+                // Read-along by word: how far the clip is, a few times a second, while it plays.
+                const progress = events.onProgress;
+                if (!progress)
+                    return;
+                stopTicking();
+                ticker = setInterval(() => { if (mine !== token) {
+                    stopTicking();
+                    return;
+                } const { currentTime, duration } = audio; if (Number.isFinite(duration) && duration > 0)
+                    progress(currentTime / duration); }, 70);
+                ticker.unref?.();
+            };
             audio.onended = () => { if (mine === token) {
                 detach(audio);
                 events.onEnd();

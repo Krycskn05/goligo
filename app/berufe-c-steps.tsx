@@ -15,7 +15,7 @@ import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,Conversation,SpeakStep} from './berufe-a-steps';
 import {Marked} from './berufe-b-steps';
-import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,ChoiceRows,TestStep,shuffle,useFinish,useInnerNext,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,ChoiceRows,TestStep,shuffle,useFinish,useInnerNext,useAutoNext,AutoNextBar,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside} from '@/lib/unit-i18n';
 
 /**
@@ -194,20 +194,18 @@ function NumberListen(props:StepProps){
  const {speech,sound}=props;const finish=useFinish(props);
  const [round,setRound]=useState(0);const [options,setOptions]=useState(()=>shuffle(listenNumbers[0][1]));
  const [picked,setPicked]=useState<string|null>(null);const [right,setRight]=useState(0);const [feedback,setFeedback]=useState<Feedback>(null);
- const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const item=listenNumbers[round];const heard=numberWords[item[0]];const last=round===listenNumbers.length-1;const ended=last&&picked!==null;
  const latest=useRef(speech);latest.current=speech;
  useEffect(()=>{latest.current.speak(heard);},[heard,round]);
- useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
- const next=()=>{if(timer.current){clearTimeout(timer.current);timer.current=null;}if(last)return;const r=round+1;setRound(r);setOptions(shuffle(listenNumbers[r][1]));setPicked(null);setFeedback(null);};
+ const next=()=>{if(last)return;const r=round+1;setRound(r);setOptions(shuffle(listenNumbers[r][1]));setPicked(null);setFeedback(null);};
  const answer=(option:string)=>{
   if(picked!==null)return;sound.prepare();speech.prepare();setPicked(option);
   const ok=option===String(item[0]);const total=right+(ok?1:0);setRight(total);
   if(last){setFeedback(scoreFeedback(total,listenNumbers.length));finish(total,listenNumbers.length,[heard],ok);return;}
   setFeedback(ok?{ok:true,text:'Doğru!'}:{ok:false,text:'Doğrusu yeşil olan.'});
   if(ok)sound.correct(()=>speech.speak(heard));else sound.wrong(()=>speech.speak(heard));
-  timer.current=setTimeout(next,1800);
  };
+ useAutoNext(picked!==null&&!ended,speech,next); // the next number comes by itself, 3 seconds after the answer
  const again=()=>{setRound(0);setOptions(shuffle(listenNumbers[0][1]));setPicked(null);setRight(0);setFeedback(null);};
  useInnerNext(props.setInnerNext,()=>{if(ended)return false;if(picked===null){setFeedback({ok:false,text:'Önce dinle ve bir sayı seç.'});return true;}next();return true;});
  return <>
@@ -217,6 +215,7 @@ function NumberListen(props:StepProps){
   <div className="l1a-opts l2-num-opts" role="group" aria-label={ut('Sayı {n}',{n:round+1})}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===String(item[0])?' ok':picked===option?' bad':'')} disabled={picked!==null} onClick={()=>answer(option)}>{option}</button>)}</div>
   <p className="l1a-mini">{ut('Puan: {n}',{n:right})}</p>
   <FeedbackLine feedback={feedback}/>
+  {picked!==null&&!ended&&<AutoNextBar/>}
   {ended&&<div className="l1a-actions"><button type="button" className="btn secondary small" onClick={again}><RotateCcw size={16} aria-hidden="true"/>{ut('Baştan')}</button></div>}
  </>;
 }

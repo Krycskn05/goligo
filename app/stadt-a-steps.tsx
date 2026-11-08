@@ -15,7 +15,7 @@ import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
 import {PaulHoca} from './paul-hoca';
-import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,useAutoNext,AutoNextBar,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
 /**
@@ -456,6 +456,7 @@ function RoleExercise(props:StepProps){
   if(picked!==null){next();return true;}
   setWait(true);return true;
  });
+ useAutoNext(picked!==null&&!over,speech,next); // Mei's next question comes by itself, 3 seconds after the answer
  const feedback:Feedback=over?(right===roleQuestions.length?{ok:true,text:'Harika, Mei yolunu buldu! {right} / {total}',params:{right,total:roleQuestions.length}}:scoreFeedback(right,roleQuestions.length)):picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Panoya bir daha bak. Doğrusu yeşil olan.'};
  return <>
   <p className="kicker">{ut('Alıştırma 11 · Rollenspiel')}</p><Heading>{ut('Sabine sensin!')}</Heading>
@@ -470,7 +471,7 @@ function RoleExercise(props:StepProps){
   <div className="l1a-opts column" role="group" aria-label={ut('Soru {n}',{n:round+1})}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null||over} lang="de" dir="ltr" onClick={()=>choose(option)}>{option}</button>)}</div>
   <FeedbackLine feedback={feedback}/>
   <div className="l1a-actions">
-   {picked!==null&&!over&&<button type="button" className="btn small" onClick={next}>{ut('Sonraki')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
+   {picked!==null&&!over&&<AutoNextBar/>}
    {over&&<button type="button" className="btn secondary small" onClick={again}><RotateCcw size={16} aria-hidden="true"/>{ut('Baştan')}</button>}
   </div>
  </>;

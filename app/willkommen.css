@@ -88,6 +88,9 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 .l1a-hint { display:inline-block; margin-inline-start:6px; color:#2f7a31; font-weight:700; font-size:14px; }
 .l1a-glued { margin:8px 0 12px; padding:12px 14px; border-radius:14px; background:#eaf4ff; font-weight:800; color:var(--ink); word-break:break-all; letter-spacing:.3px; line-height:1.5; }
 .l1a-feedback { min-height:1.5em; margin:10px 0 0; font-weight:800; }
+/* The next question comes by itself (app/willkommen-ui.tsx useAutoNext): a thin line fills during the 3-second wait. */
+.l1a-auto { display:block; flex-basis:100%; height:3px; width:100%; margin-top:10px; border-radius:2px; background:linear-gradient(90deg,var(--blue-2,#2f7fd6),var(--blue-2,#2f7fd6)) no-repeat; background-size:0 100%; animation:l1a-auto 3s linear forwards; }
+@keyframes l1a-auto { to { background-size:100% 100%; } }
 .l1a-feedback.ok { color:#2f7a31; }
 .l1a-feedback.bad { color:#a63d2a; }
 .l1a-feedback.info { color:var(--ink,#1f3b5c); }
@@ -449,6 +452,8 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 /* Read-along (app/willkommen-ui.tsx `showReading`, 2 November 2026): the dialogue line being read is ringed in blue. */
 .l1a-line .l1a-bubble { transition:box-shadow .2s ease; }
 .l1a-line.l1a-reading .l1a-bubble { box-shadow:0 0 0 3px var(--blue-2,#2f7fd6), 0 6px 18px rgba(47,127,214,.18); }
+/* Read-along by word ("Vurgu", 8 November 2026; app/willkommen-ui.tsx showWord): a soft blue strip behind the word being spoken. */
+::highlight(l1a-word) { background-color:#cfe6ff; }
 @media (prefers-reduced-motion:reduce) { .l1a-line .l1a-bubble { transition:none; } }
 
 /* Sentence building: what the sentence means, so the learner knows what to build (2 November 2026). */

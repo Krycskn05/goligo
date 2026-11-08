@@ -31,7 +31,9 @@ export function voiceGreeting(voice:Pick<SiteVoice,'name'>){return `Hallo, ich b
 /** Clips are rendered at a calm pace; the "comfortable" speed plays them unchanged. */
 export const SITE_CLIP_BASE_RATE=0.94;
 
-export type VoiceManifest={version:number;settings?:string;voices:string[];clips:Record<string,string>};
+/** `times`: the voices whose folder has a times.json with measured word starts (read-along by word, `clipWordTimes`);
+ * an older manifest has none. */
+export type VoiceManifest={version:number;settings?:string;voices:string[];clips:Record<string,string>;times?:string[]};
 
 export function isSiteVoice(name:string|undefined|null):boolean{return typeof name==='string'&&name.startsWith(SITE_VOICE_PREFIX);}
 export function siteVoiceById(id:string){return siteVoices.find(voice=>voice.id===id);}
@@ -57,14 +59,29 @@ export function parseVoiceManifest(value:unknown):VoiceManifest|null{
  const voices=data.voices.filter((style):style is string=>typeof style==='string'&&/^[A-Z][0-9]$/.test(style));
  const clips:Record<string,string>={};
  for(const [text,id] of Object.entries(data.clips))if(typeof id==='string'&&/^[a-f0-9]{8,40}$/.test(id))clips[normalizeSpeechText(text)]=id;
- return {version:Number(data.version)||0,settings:typeof data.settings==='string'?data.settings:undefined,voices,clips};
+ const times=Array.isArray(data.times)?data.times.filter((style):style is string=>typeof style==='string'&&/^[A-Z][0-9]$/.test(style)):[];
+ return {version:Number(data.version)||0,settings:typeof data.settings==='string'?data.settings:undefined,voices,clips,times};
 }
+
+/** Word times of a voice's clips (scripts/voices/word_times.py; <voice>/times.json): clip id → each word's start as a share
+ * (0–1) of the clip, one per word of the text. Only well-formed entries are kept. */
+export type WordTimes=Record<string,number[]>;
+export function parseWordTimes(value:unknown):WordTimes{
+ const table:WordTimes={};
+ if(!value||typeof value!=='object')return table;
+ for(const [id,starts] of Object.entries(value as Record<string,unknown>)){
+  if(!/^[a-f0-9]{8,40}$/.test(id)||!Array.isArray(starts)||!starts.length)continue;
+  if(starts.every(start=>typeof start==='number'&&Number.isFinite(start)&&start>=0&&start<=1))table[id]=starts as number[];
+ }
+ return table;
+}
+const timesTables=new Map<string,WordTimes>();const timesLoading=new Map<string,Promise<WordTimes>>();
 
 let manifest:VoiceManifest|null=null;
 let loading:Promise<VoiceManifest|null>|null=null;
 const listeners=new Set<(value:VoiceManifest|null)=>void>();
 export function currentVoiceManifest(){return manifest;}
-export function setVoiceManifest(value:VoiceManifest|null){manifest=value;listeners.forEach(listener=>listener(value));}
+export function setVoiceManifest(value:VoiceManifest|null){manifest=value;timesTables.clear();timesLoading.clear();listeners.forEach(listener=>listener(value));}
 export function onVoiceManifest(listener:(value:VoiceManifest|null)=>void){listeners.add(listener);return()=>{listeners.delete(listener);};}
 export function loadVoiceManifest(fetcher:typeof fetch=fetch):Promise<VoiceManifest|null>{
  if(manifest)return Promise.resolve(manifest);
@@ -109,12 +126,33 @@ export function clipPlaybackRate(rate:number){
  return Number.isFinite(value)?Math.max(0.5,Math.min(1.3,value)):1;
 }
 
+const clipAddress=/^\/voices\/([A-Z][0-9])\/([a-f0-9]{8,40})\.mp3$/;
+/** Read-along by word (lib/read-along.ts `measuredTimeline`): the measured word starts of a clip, when its voice is in the
+ * manifest's `times`. A voice's times.json is fetched once, when its first clip is asked for, and kept for the page (the
+ * manifest's version in the address, so a new deploy is not read from the cache); a voice without one costs no request.
+ * A known table answers at once (the starts, or null), a table still loading answers with a promise. */
+export function clipWordTimes(url:string,value:VoiceManifest|null=manifest,fetcher:typeof fetch=fetch):readonly number[]|null|Promise<readonly number[]|null>{
+ const found=clipAddress.exec(url);
+ if(!found||!value||!value.times?.includes(found[1])||typeof fetcher!=='function')return null;
+ const [,style,id]=found;
+ const table=timesTables.get(style);
+ if(table)return table[id]??null;
+ let pending=timesLoading.get(style);
+ if(!pending){
+  pending=fetcher(`/voices/${style}/times.json?v=${value.version}`).then(response=>response.ok?response.json():null).then(parseWordTimes).catch(()=>({}))
+   .then(parsed=>{timesTables.set(style,parsed);timesLoading.delete(style);return parsed;});
+  timesLoading.set(style,pending);
+ }
+ return pending.then(parsed=>parsed[id]??null);
+}
+
 /** Clips that are on the page are loaded before the tap (the learner heard late voices, 30 October 2026): a few at a
  * time, each once, kept in memory; the player then plays the loaded copy instead of downloading first. */
 const loadedClips=new Map<string,string>();const wantedClips=new Set<string>();const clipQueue:string[]=[];let clipsLoading=0;
 export function warmClip(url:string){
  if(!url||wantedClips.has(url)||typeof fetch!=='function'||typeof URL==='undefined'||typeof URL.createObjectURL!=='function')return;
  wantedClips.add(url);clipQueue.push(url);pumpClips();
+ void clipWordTimes(url); // the voice's word times come along with its first clip, before the tap
 }
 function pumpClips(){
  while(clipsLoading<3&&clipQueue.length){
@@ -129,7 +167,8 @@ function pumpClips(){
 /** The loaded copy of a clip, or the clip's own address. */
 export function clipSource(url:string){return loadedClips.get(url)??url;}
 
-type ClipEvents={onStart:()=>void;onEnd:()=>void;onError:()=>void};
+/** `onProgress`: how far the clip is (0–1), a few times a second while it plays — the read-along by word (lib/read-along.ts). */
+type ClipEvents={onStart:()=>void;onEnd:()=>void;onError:()=>void;onProgress?:(ratio:number)=>void};
 /** `loading` says whether the current clip is still being downloaded (a slow connection), so the chosen voice is kept a little longer. */
 export type ClipPlayer={unlock:()=>void;play:(url:string,rate:number,events:ClipEvents,speed?:number)=>void;stop:()=>void;loading?:()=>boolean};
 // 50 ms of silence: playing it inside a tap lets the same element play the
@@ -141,7 +180,9 @@ export function createClipPlayer(createAudio:()=>HTMLAudioElement=()=>new Audio(
   if(!element){element=createAudio();element.preload='auto';try{element.setAttribute('playsinline','');}catch{}}
   return element;
  };
- const detach=(audio:HTMLAudioElement)=>{audio.onplaying=null;audio.onended=null;audio.onerror=null;};
+ let ticker:ReturnType<typeof setInterval>|null=null;
+ const stopTicking=()=>{if(ticker!==null){clearInterval(ticker);ticker=null;}};
+ const detach=(audio:HTMLAudioElement)=>{stopTicking();audio.onplaying=null;audio.onended=null;audio.onerror=null;};
  return {
   unlock(){
    const audio=media();if(!audio.paused)return;
@@ -155,7 +196,13 @@ export function createClipPlayer(createAudio:()=>HTMLAudioElement=()=>new Audio(
    try{pitch.preservesPitch=true;pitch.webkitPreservesPitch=true;pitch.mozPreservesPitch=true;}catch{}
    // speed: a listening player's 0.5×–2× on top of the reading rate.
    audio.playbackRate=clipPlaybackRate(rate)*(Number.isFinite(speed)?Math.max(0.5,Math.min(2,speed)):1);audio.defaultPlaybackRate=audio.playbackRate;
-   audio.onplaying=()=>{if(mine===token)events.onStart();};
+   audio.onplaying=()=>{
+    if(mine!==token)return;events.onStart();
+    // Read-along by word: how far the clip is, a few times a second, while it plays.
+    const progress=events.onProgress;if(!progress)return;stopTicking();
+    ticker=setInterval(()=>{if(mine!==token){stopTicking();return;}const {currentTime,duration}=audio;if(Number.isFinite(duration)&&duration>0)progress(currentTime/duration);},70);
+    (ticker as unknown as {unref?:()=>void}).unref?.();
+   };
    audio.onended=()=>{if(mine===token){detach(audio);events.onEnd();}};
    audio.onerror=()=>{if(mine===token){detach(audio);events.onError();}};
    try{const started=audio.play();if(started)void started.catch(()=>{if(mine===token){detach(audio);events.onError();}});}

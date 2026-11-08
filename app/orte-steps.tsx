@@ -9,7 +9,7 @@ import {ProgressMeter} from './progress-meter';
 import {PaulHoca} from './paul-hoca';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,Conversation,QuickChecks,SpeakStep} from './berufe-a-steps';
-import {Say,Note,Heading,Portrait,Tx,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
+import {Say,Note,Heading,Portrait,Tx,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,useAutoNext,AutoNextBar,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
 /**
@@ -146,6 +146,7 @@ function Quiz(props:StepProps&Head&{items:readonly QuizItem[]}){
  const next=()=>{const r=round+1;setRound(r);setOptions(shuffle(items[r].options));setPicked(null);setWait(false);};
  const again=()=>{setRound(0);setOptions(shuffle(items[0].options));setPicked(null);setRight(0);setOver(false);};
  useInnerNext(props.setInnerNext,()=>{if(over)return false;if(picked!==null){next();return true;}setWait(true);return true;});
+ useAutoNext(picked!==null&&!over,speech,next); // the next item comes by itself, 3 seconds after the answer
  const feedback:Feedback=over?(right===total?{ok:true,text:'Harika! {right} / {total}',params:{right,total}}:scoreFeedback(right,total)):picked===null?(wait?{ok:false,text:'Önce bir cevap seç.'}:null):picked===answer?{ok:true,text:'Doğru!'}:{ok:false,text:'Doğrusu yeşil olan.'};
  const listen=item.listen;
  return <>
@@ -157,7 +158,7 @@ function Quiz(props:StepProps&Head&{items:readonly QuizItem[]}){
   <div className="l1a-opts column" role="group" aria-label={ut('Soru {n}',{n:round+1})}>{options.map(option=><button type="button" key={option} className={'l1a-opt'+(picked!==null&&option===answer?' ok':picked===option?' bad':'')} disabled={picked!==null||over} lang={isOrteTurkish(option)?utLang(option):'de'} onClick={()=>choose(option)}><Cell text={option}/></button>)}</div>
   <FeedbackLine feedback={feedback}/>
   <div className="l1a-actions">
-   {picked!==null&&!over&&<button type="button" className="btn small" onClick={next}>{ut('Sonraki')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></button>}
+   {picked!==null&&!over&&<AutoNextBar/>}
    {over&&<button type="button" className="btn secondary small" onClick={again}><RotateCcw size={16} aria-hidden="true"/>{ut('Baştan')}</button>}
   </div>
  </>;

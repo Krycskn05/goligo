@@ -5,7 +5,7 @@ import {objectQuestions,objectWordMap} from './object-course';
 import {isObjectPictureQuestion,isObjectWritingQuestion,isObjectListeningQuestion,isObjectMistake} from './object-practice';
 import {verbQuestions,inVerbTopic} from './verb-course';
 import {isVerbExercise} from './verb-practice';
-import {verbSteps} from './verb-workshop';
+import {countedSteps} from './verb-workshop';
 import {starsFor,stageFor,type ProgressStage,type TopicProgress} from './progress-core';
 export * from './progress-core';
 
@@ -54,9 +54,9 @@ export function objectProgressIds(group:string){
  return objectQuestions.filter(q=>(group==='all'||q.topic===group)&&isVaultExercise(q)).map(q=>q.id);
 }
 /** The Fiiller exercises that can be practised (the learner asked, 2 November 2026: the percentage stopped near 31%):
- * the four steps of every verb in Fiil Atölyesi (meaning, writing, the past form, writing it), not the older exercises
- * that no page asks any more. */
-const workshopTasks=new Set<string>(verbSteps);
+ * the four counted steps of every verb in Fiil Atölyesi (meaning, writing, the past form, writing it; the hat/ist step
+ * added on 9 November 2026 is asked but not counted), not the older exercises that no page asks any more. */
+const workshopTasks=new Set<string>(countedSteps);
 export function verbProgressIds(topic:string){
  return verbQuestions.filter(q=>inVerbTopic(q.topic,topic)&&isVerbExercise(q)&&!!q.verbTask&&workshopTasks.has(q.verbTask)).map(q=>q.id);
 }

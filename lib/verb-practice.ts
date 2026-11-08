@@ -19,7 +19,11 @@ export function isVerbWritingQuestion(q:Question|undefined):q is Question{
 export function isVerbListeningQuestion(q:Question|undefined):q is Question{
  return !!q&&q.id.startsWith('verb-')&&!!q.verbId&&q.kind==='listen'&&!!q.verbTask&&listenTasks.includes(q.verbTask)&&!!q.audio&&fourChoices(q);
 }
-export function isVerbExercise(q:Question|undefined):q is Question{return isVerbTestQuestion(q)||isVerbWritingQuestion(q)||isVerbListeningQuestion(q);}
+/** Fiil Atölyesi's last step of a verb: the Perfekt's helping verb, hat or ist (two choices, 9 November 2026). */
+export function isVerbAuxQuestion(q:Question|undefined):q is Question{
+ return !!q&&q.id.startsWith('verb-')&&!!q.verbId&&q.kind==='choice'&&q.verbTask==='aux'&&!q.audio&&q.options?.length===2&&q.options.includes('hat')&&q.options.includes('ist')&&q.options.includes(q.answer);
+}
+export function isVerbExercise(q:Question|undefined):q is Question{return isVerbTestQuestion(q)||isVerbWritingQuestion(q)||isVerbListeningQuestion(q)||isVerbAuxQuestion(q);}
 /** Fiil Atölyesi (workshop), its mistakes round (review) and Karma sınav (mixed) use every kind of exercise. */
 export function verbModePredicate(mode:string){return mode==='write'?isVerbWritingQuestion:mode==='listen'?isVerbListeningQuestion:mode==='workshop'||mode==='mixed'||mode==='review'?isVerbExercise:isVerbTestQuestion;}
 /** Session mode stored on the server for each practice mode. */

@@ -90,21 +90,21 @@ test('progress by topic: what was done in the book parts, in topic rounds and by
  // The next topic round asks only the verbs not done yet, each with all its steps.
  const left=workshop.remainingIds(unterwegs,status);
  assert.ok(!left.some(id=>/-(abfahren|ankommen|aussteigen)$/.test(id)),'nothing done is asked again');
- assert.equal(left.length,(unterwegs.verbs.length-3)*4);
+ assert.equal(left.length,(unterwegs.verbs.length-3)*workshop.verbSteps.length);
  // Answers count: a verb whose meaning was answered goes on with its past form only.
  const row=id=>({question_id:id,seen:1});
  const reviews=[row('verb-meaning-fahren'),row('verb-write-fahren')];
  assert.equal(workshop.partsStatus([old],reviews)[0].marks[unterwegs.verbs.indexOf('fahren')].meaning,true);
  const next=workshop.remainingIds(unterwegs,workshop.verbStatus([old],reviews),reviews);
- assert.deepEqual(next.filter(id=>id.endsWith('-fahren')),['verb-partizip-fahren','verb-write-partizip-fahren']);
+ assert.deepEqual(next.filter(id=>id.endsWith('-fahren')),['verb-partizip-fahren','verb-write-partizip-fahren','verb-aux-fahren']);
  // The past form done but not the meaning (older Perfekt rows): the verb is asked whole, so the round keeps its order.
  const pastOnly=[row('verb-perfekt-gehen'),row('verb-write-perfekt-gehen')];
  assert.deepEqual(workshop.verbStatus([],pastOnly).get('gehen'),{meaning:false,perfekt:true});
- assert.deepEqual(workshop.remainingIds(unterwegs,workshop.verbStatus([],pastOnly),pastOnly).filter(id=>id.endsWith('-gehen')),['meaning','write','partizip','write-partizip'].map(step=>'verb-'+step+'-gehen'));
+ assert.deepEqual(workshop.remainingIds(unterwegs,workshop.verbStatus([],pastOnly),pastOnly).filter(id=>id.endsWith('-gehen')),['meaning','write','partizip','write-partizip','aux'].map(step=>'verb-'+step+'-gehen'));
  for(const list of [left,next])assert.ok(!workshop.isOlderRound(list.map(id=>({id}))),'a new topic round is in the current order');
  // A topic round is read by its topic, never as a book part, even when it starts with the same verb (abfahren).
  const topicIds=workshop.partIds(unterwegs);
- const topicRound={id:'t',mode:'workshop',topic:workshop.PART_ROUND_TOPIC,first:topicIds[0],total:topicIds.length,answered:4,finished_at:null,ids:topicIds};
+ const topicRound={id:'t',mode:'workshop',topic:workshop.PART_ROUND_TOPIC,first:topicIds[0],total:topicIds.length,answered:5,finished_at:null,ids:topicIds};
  assert.equal(workshop.sessionPart(topicRound).id,unterwegs.id);assert.equal(workshop.sessionPart(old).id,'verbs-w1');
  assert.equal(workshop.bookPartsStatus([topicRound])[0].done,0,'book part 1 does not take the topic round');
  const fresh=workshop.partsStatus([topicRound])[0];assert.equal(fresh.done,4);assert.equal(fresh.verbsDone,1);assert.equal(fresh.nextVerbId,'ankommen');assert.equal(fresh.session.id,'t');

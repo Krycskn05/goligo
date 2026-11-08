@@ -60,7 +60,7 @@ export const partB:AlltagPart={
    cast:['sabine','nikos','mei','omar','yasemin','rami','paul'],
   }},
   {id:'freizeit',title:T('Kelimeler: boş zaman'),kind:'teach',kicker:'Wortschatz · Freizeit',heading:T('Boş zamanda ne yapıyoruz?'),
-   lead:T('Karta dokun, dinle ve tekrar et. Resmi henüz gelmeyen kelimede emojisi görünür.'),
+   lead:T('Karta dokun, dinle ve tekrar et.'),
    blocks:[{t:'cards',words:wordsB}]},
   {id:'orte-kelimeler',title:T('Kelimeler: şehir'),kind:'teach',kicker:'Wortschatz · Orte',heading:T('Şehirdeki yerler'),
    lead:T('Her kelime artikeliyle: [der] mavi, [das] yeşil, [die] kırmızı. Karta dokun: tekili ve çoğulu okunur.'),

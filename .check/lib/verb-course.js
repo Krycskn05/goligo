@@ -218,6 +218,9 @@ for (const verb of exports.verbs) {
     add('verb-partizip-' + verb.id, 'partizip', { kind: 'choice', prompt: verb.display + ' · geçmiş hali (Partizip II) hangisi?', answer: verb.participle, options: [verb.participle, ...partizipDistractors(verb)] });
     // The past form spelled with letters: the infinitive is shown, the Partizip II is written (no hat/ist).
     add('verb-write-partizip-' + verb.id, 'write-partizip', { kind: 'write', writingTask: 'word', prompt: verb.display + ' · geçmiş halini (Partizip II) yaz.', answer: verb.participle });
+    // The helping verb of the Perfekt (the learner asked, 9 November 2026): after the past form is spelled, hat or ist is
+    // chosen — two choices. liegen, sitzen and stehen: the book writes hat/ist, so ist counts as right too.
+    add('verb-aux-' + verb.id, 'aux', { kind: 'choice', prompt: verb.display + ' · Perfekt: ' + subject + ' ___ ' + verb.participle + ' — hat mı, ist mi?', answer: verb.aux, options: ['hat', 'ist'], ...(verb.alsoIst ? { accepted: ['ist'] } : {}) });
     add('verb-write-' + verb.id, 'write', { kind: 'write', writingTask: 'word', prompt: '“' + meaning + '” anlamındaki fiili yaz.', answer: verb.infinitive });
     add('verb-write-praesens-' + verb.id, 'write-praesens', { kind: 'write', writingTask: 'gap', prompt: verb.display + ' · Präsens yaz.', gap: subject + ' ___', answer: verb.praesens });
     add('verb-write-perfekt-' + verb.id, 'write-perfekt', { kind: 'write', writingTask: 'gap', prompt: verb.display + ' · Perfekt yaz.', gap: subject + ' ___ ___', answer: verb.perfekt, ...(verb.alsoIst ? { accepted: ['ist ' + verb.participle] } : {}) });

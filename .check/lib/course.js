@@ -26,8 +26,9 @@ function normalizeAnswer(value, strictCase = false) {
 }
 function gradeAnswer(q, answer) {
     // Single punctuation choices must stay exact; stripping punctuation would merge ? and . .
+    // A choice may name other options that count too, exactly as written (hat/ist: liegen, sitzen, stehen also take ist).
     if (q.options)
-        return answer === q.answer;
+        return answer === q.answer || !!q.accepted?.includes(answer);
     return [q.answer, ...(q.accepted ?? [])].some(a => normalizeAnswer(a, !!q.strictCase) === normalizeAnswer(answer, !!q.strictCase));
 }
 function shuffle(items) { const result = [...items]; for (let i = result.length - 1; i > 0; i--) {

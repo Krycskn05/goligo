@@ -13,7 +13,7 @@ import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling',partizip:'stepPartizip','write-partizip':'stepWritePartizip'};
+const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling',partizip:'stepPartizip','write-partizip':'stepWritePartizip',aux:'stepAux'};
 
 /** One example sentence with the verb parts highlighted and a speaker button (kept for the later sentence practice). */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
@@ -154,7 +154,7 @@ export function AnswerResult({verb,stage,language,speech,correct,status,chosen,s
   <span key={replays} className="vault-auto-next" aria-hidden="true"/>
  </div>;
 }
-/** The card that opens a part: its verbs and what each verb brings, one verb after the other (card, meaning test, spelling, past form). */
+/** The card that opens a part: its verbs and what each verb brings, one verb after the other (card, meaning test, spelling, past form, hat/ist). */
 export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamily;verbs:readonly Verb[];language:VaultLanguage;onContinue:()=>void}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
  return <article className={'verb-chapter panel tone-'+family.tone} aria-labelledby="verb-chapter-heading" data-verb-chapter={family.id}>

@@ -58,7 +58,7 @@ export const partA:AlltagPart={
    cast:['mei','omar','nikos','yasemin','rami','paul'],
   }},
   {id:'gunluk',title:T('Kelimeler: günlük işler'),kind:'teach',kicker:'Wortschatz · Alltag',heading:T('Her gün ne yapıyoruz?'),
-   lead:T('Bunlar fiil: artikelleri yok. Karta dokun, dinle ve tekrar et. Resmi henüz gelmeyen kelimede emojisi görünür.'),
+   lead:T('Bunlar fiil: artikelleri yok. Karta dokun, dinle ve tekrar et.'),
    blocks:[{t:'cards',words:wordsA}]},
   {id:'tageszeiten',title:T('Kelimeler: günün bölümleri'),kind:'teach',kicker:'Wortschatz · Tageszeiten',heading:T('Sabah, öğle, akşam'),
    lead:T('Günün bölümleri artikeliyle: hepsi [der], yalnız *die Nacht* [die]. Karta dokun: tekili ve çoğulu okunur.'),

@@ -115,18 +115,21 @@ test('our own names, places and texts: the site\'s people, nothing of the book',
  for(const who of cast)assert.ok(fs.existsSync(`public/toon/lektion1/${who}.webp`),who+' has a portrait and a voice');
 });
 
-test('pictures: the temporary covers and the site\'s pictures exist; every card and quiz item has a picture or its emoji; the list for ChatGPT names every picture to come',()=>{
+test('pictures: the learner\'s 3D pictures (9 November 2026) and the site\'s verb pictures exist; every card and picture quiz has one',()=>{
  const pictures=load('alltag-pictures');
  const size=file=>{const b=fs.readFileSync(file);assert.equal(b.toString('ascii',0,4),'RIFF',file);assert.equal(b.toString('ascii',12,16),'VP8 ',file);return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];};
- for(const src of Object.values(pictures.alltagPic)){if(!src)continue;assert.ok(fs.existsSync('public'+src),src);if(src.startsWith('/toon/lektion5/'))assert.deepEqual(size('public'+src),[640,480],src);}
- for(const part of course.alltagPartList){assert.match(part.cover.src,/^\/toon\/lektion5\/(gecici-)?kapak-[a-d]\.webp$/);assert.deepEqual(size('public'+part.cover.src),[960,540],part.cover.src);}
+ for(const [key,src] of Object.entries(pictures.alltagPic)){assert.ok(typeof src==='string'&&fs.existsSync('public'+src),key+' '+src);if(src.startsWith('/toon/lektion5/'))assert.deepEqual(size('public'+src),[640,480],src);}
+ for(const part of course.alltagPartList){assert.match(part.cover.src,/^\/toon\/lektion5\/kapak-[a-d]\.webp$/);assert.deepEqual(size('public'+part.cover.src),[960,540],part.cover.src);}
+ const files=fs.readdirSync('public/toon/lektion5');
+ assert.ok(!files.some(file=>file.startsWith('gecici')),'the temporary covers are gone');
+ assert.equal(files.filter(file=>file.endsWith('.webp')).length,66,'the 62 things and 4 covers');
+ // every picture of the list for ChatGPT arrived and is used
+ const list=read('Claude outputs/lektion5-resim-listesi.txt');const used=new Set(Object.values(pictures.alltagPic));
+ for(const file of files.filter(file=>!file.startsWith('kapak-'))){assert.ok(list.includes(file.replace('.webp','')),file+' is in the list');assert.ok(used.has('/toon/lektion5/'+file),file+' is used');}
  for(const part of course.alltagPartList)for(const step of part.steps){
-  for(const block of step.blocks??[])if(block.t==='cards')for(const word of block.words)assert.ok(word.pic||word.emoji,part.id+': '+word.de);
-  if(step.exercise?.type==='quiz')for(const item of step.exercise.items)assert.ok(item.pic||item.emoji||item.listen||item.prompt,part.id+':'+step.id);
+  for(const block of step.blocks??[])if(block.t==='cards')for(const word of block.words)assert.ok(word.pic,part.id+': '+word.de);
+  if(step.exercise?.type==='quiz')for(const item of step.exercise.items)assert.ok(item.pic||item.listen||!item.emoji,part.id+':'+step.id);
  }
- const waiting=pictures.alltagWaiting();assert.equal(new Set(waiting).size,waiting.length);
- const list=read('Claude outputs/lektion5-resim-listesi.txt');
- for(const name of waiting)assert.ok(list.includes(name.startsWith('kapak-')?name+'.png':name),'the list names '+name);
 });
 
 test('progress: kept in the browser, travels with the account as lesson l5; the own sentences stay on the device',()=>{

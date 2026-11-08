@@ -21,7 +21,8 @@ export function normalizeAnswer(value:string,strictCase=false){
 }
 export function gradeAnswer(q:Question,answer:string){
  // Single punctuation choices must stay exact; stripping punctuation would merge ? and . .
- if(q.options)return answer===q.answer;
+ // A choice may name other options that count too, exactly as written (hat/ist: liegen, sitzen, stehen also take ist).
+ if(q.options)return answer===q.answer||!!q.accepted?.includes(answer);
  return [q.answer,...(q.accepted??[])].some(a=>normalizeAnswer(a,!!q.strictCase)===normalizeAnswer(answer,!!q.strictCase));
 }
 export function shuffle<T>(items:T[]):T[]{const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}

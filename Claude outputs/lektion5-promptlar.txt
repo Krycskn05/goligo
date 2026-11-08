@@ -1,0 +1,127 @@
+LEKTION 5 – CHATGPT PROMPTLARI
+Sırayla gönder: önce 0, "OK" gelince 1, 2, 3 … Her bölüm ayrı bir mesaj. Gelen resmi başlıktaki adla kaydet (kapak-a.png, lektion5-1.png …).
+
+==== 0) İlk mesaj (bir kez gönder) ====
+For this chat: every image I ask for is for a German-learning website. Style: polished original 3D animated-film illustration (Pixar-like look), rounded forms, expressive friendly faces, tactile clay-like materials, soft warm studio light, lively colours. Palette: teal, amber, terracotta and warm ivory; plain pale ivory background (#fff9ec) unless a scene needs a room or a place. Original characters only. No visible text, no letters, no numbers, no logos, no brands, no watermark. Simple symbols (heart, tick, cross, question mark, musical note) only where I ask.
+Two layouts: (A) COVER = one single wide image, 16:9. (B) SHEET = a tall portrait image (2:3) with 6 separate pictures in a grid of 2 columns and 3 rows, every picture 4:3, all on the same plain ivory background with wide empty gaps, no frames, no borders, no lines, no picture touching another or the edge.
+Recurring people (keep them the same in every image):
+- RAMI: man in his 30s from Lebanon, dark curly hair, short dark beard, warm smile, red shirt over a white tee.
+- LINA (Rami's daughter, 8): girl with dark curly hair in two bunches, yellow dress.
+- SAMI (Rami's son, 5): small boy with dark curls, striped blue tee.
+- NIKOS: man in his 30s from Greece, curly brown hair, light stubble, blue shirt.
+- OMAR: man in his 30s from Sudan, short black curly hair, dark beard, yellow shirt.
+- TOMASZ: man in his 30s from Poland, light brown hair, round glasses, green sweater over a white collar.
+- PAUL: the teacher, older man, short grey hair, big friendly smile, navy blue zip jacket.
+- SABINE: woman in her 20s, wavy blonde hair, small earrings, salmon-pink polo shirt.
+- YASEMIN: woman in her 30s from Turkey, long wavy light-brown hair, lilac cardigan over a white top.
+- AISHA: woman in her 30s from Kenya, black braided hair in a high bun, gold hoop earrings, green sweater.
+- NORA: woman in her 20s, red wavy bob, round glasses, yellow sweater.
+- MEI: woman in her 20s from Thailand, straight black shoulder-length hair with a small hair clip, teal top under an orange cardigan.
+Reply "OK" now; I will send the first image next.
+
+==== kapak-a.png · Kapak A · Hast du Zeit? (COVER, 16:9) ====
+COVER: A sunny morning at a small café terrace. MEI and NIKOS sit at a round table with two coffee cups. Mei types a message on her smartphone and smiles; Nikos holds a table-tennis bat and points across the street. Behind them, in a green park, a concrete outdoor table-tennis table. Warm morning light, no text anywhere.
+
+==== kapak-b.png · Kapak B · Das sind meine Tipps. (COVER, 16:9) ====
+COVER: SABINE sits on a park bench with an open laptop on her knees, smiling and typing. Around her a lively city park: a cyclist, a jogger, a family having a picnic on a blanket, and in the background a modern cinema building and a library with big windows (no signs, no letters). Bright afternoon.
+
+==== kapak-c.png · Kapak C · Boxen macht Spaß! (COVER, 16:9) ====
+COVER: A bright, friendly boxing club hall. YASEMIN wears red boxing gloves and laughs, ready to punch a hanging punching bag. MEI stands next to her, curious, trying on blue gloves; NIKOS stands at the side with crossed arms and a doubtful, funny face. On the wall a blank weekly planner board with coloured squares (no letters).
+
+==== kapak-d.png · Kapak D · Mein Hobby ist auch mein Beruf. (COVER, 16:9) ====
+COVER: A cosy cooking-course kitchen. MEI in an apron stands at a stove with a wok and fresh vegetables, teaching and smiling. NORA sits at the counter with a notebook and a pen, interviewing her, a small voice recorder on the counter. Three course participants chop vegetables in the background.
+
+==== lektion5-1.png · Alltag 1 (SHEET 2×3) → duschen, fruehstuecken, kaffee-trinken, zur-arbeit-gehen, arbeiten, deutsch-lernen ====
+SHEET: six pictures.
+Row 1, left (duschen): MEI under a shower, eyes closed, happy, foam in her hair, a bright bathroom tile wall (only head and shoulders visible, decent).
+Row 1, right (frühstücken): MEI at a small kitchen table with bread rolls, jam, a boiled egg and a glass of orange juice, cheerful morning light.
+Row 2, left (Kaffee trinken): NIKOS holding a big steaming coffee cup with both hands, enjoying the smell.
+Row 2, right (zur Arbeit gehen): OMAR walking on a pavement with a backpack, waving, a small kiosk in the background (no sign).
+Row 3, left (arbeiten): OMAR behind the counter of his kiosk, handing a newspaper (blank pages) to a customer.
+Row 3, right (Deutsch lernen): YASEMIN at a desk with an open textbook (no readable text), a notebook and headphones around her neck, writing.
+
+==== lektion5-2.png · Alltag 2 (SHEET 2×3) → lebensmittel-kaufen, kochen, putzen, telefonieren, im-internet-surfen, musik-hoeren ====
+SHEET: six pictures.
+Row 1, left (Lebensmittel kaufen): OMAR pushing a supermarket trolley full of vegetables, bread, milk and fruit.
+Row 1, right (kochen): YASEMIN stirring a big pot on a stove, steam rising, a happy face.
+Row 2, left (putzen): YASEMIN cleaning a window with a cloth and a spray bottle, rolling her eyes a little (she does not like it).
+Row 2, right (telefonieren): OMAR on the phone, laughing, sitting on a sofa (he talks with his son).
+Row 3, left (im Internet surfen): RAMI on a sofa with a laptop on his knees, scrolling, a cup of tea beside him.
+Row 3, right (Musik hören): YASEMIN with big headphones, eyes closed, swaying, little musical notes in the air.
+
+==== lektion5-3.png · Alltag 3 (SHEET 2×3) → sport-machen, tischtennis-spielen, ins-bett-gehen, lange-schlafen, hobby, beruf ====
+SHEET: six pictures.
+Row 1, left (Sport machen): RAMI doing push-ups on a yoga mat in his living room, determined smile.
+Row 1, right (Tischtennis spielen): NIKOS and MEI playing table tennis on an outdoor concrete table in a park, the ball in the air.
+Row 2, left (ins Bett gehen): MEI in pyjamas climbing into bed, yawning, a bedside lamp on.
+Row 2, right (lange schlafen): MEI asleep in bed on a Sunday, the sun already high in the window, an alarm clock showing no numbers, a cat sleeping on the blanket.
+Row 3, left (das Hobby): NIKOS painting a small colourful picture on an easel in his free time, a joyful face.
+Row 3, right (der Beruf): NORA in a light-blue nurse uniform with a stethoscope, standing proudly in a hospital corridor.
+
+==== lektion5-4.png · Tageszeiten (SHEET 2×3) → morgen, vormittag, mittag, nachmittag, abend, nacht ====
+SHEET: six pictures, the same small house with a garden and a tree in every picture, only the time of day changes.
+Row 1, left (der Morgen): sunrise, pink-orange sky, the sun just above the hills, dew on the grass.
+Row 1, right (der Vormittag): bright morning sun higher in a clear blue sky, a bicycle in front of the house.
+Row 2, left (der Mittag): the sun at its highest point, short shadows, a hot summer midday.
+Row 2, right (der Nachmittag): warm afternoon sun lower in the sky, long soft shadows, children's ball on the lawn.
+Row 3, left (der Abend): sunset, purple and orange sky, warm light in the windows of the house.
+Row 3, right (die Nacht): dark blue night, a crescent moon and stars, all windows dark except one small lamp.
+
+==== lektion5-5.png · Freizeit (SHEET 2×3) → film-sehen, fahrrad-fahren, spaziergang, picknick, fussball-spielen, grillen ====
+SHEET: six pictures.
+Row 1, left (einen Film sehen): MEI in a cinema seat with a bucket of popcorn, glowing light from the screen on her face, delighted.
+Row 1, right (Fahrrad fahren): TOMASZ riding a teal bicycle along a tree-lined path, smiling, wearing a helmet.
+Row 2, left (einen Spaziergang machen): PAUL walking slowly through a park with his hands behind his back, autumn leaves.
+Row 2, right (ein Picknick machen): RAMI with LINA and SAMI on a checked blanket in the grass, a basket, sandwiches and fruit.
+Row 3, left (Fußball spielen): OMAR kicking a football on a green field, the ball flying.
+Row 3, right (grillen): NIKOS at a small barbecue grill in a park, turning sausages and vegetable skewers, smoke rising.
+
+==== lektion5-6.png · Orte 1 (SHEET 2×3) → stadt, park, zoo, kino, schwimmbad, bibliothek ====
+SHEET: six pictures, places only (people small or none), no signs, no letters.
+Row 1, left (die Stadt): a colourful city skyline with a river, a TV tower-like tower, old and modern houses, a tram.
+Row 1, right (der Park): a big green park with old trees, a pond, benches and a path.
+Row 2, left (der Zoo): a friendly zoo scene with a giraffe and an elephant behind a low fence, children watching.
+Row 2, right (das Kino): a modern cinema building at evening with big glowing windows and an empty blank poster frame.
+Row 3, left (das Schwimmbad): a beautiful old indoor swimming pool with arches and big windows, light on the water.
+Row 3, right (die Bibliothek): a bright library with tall shelves full of books and reading tables.
+
+==== lektion5-7.png · Orte 2 + Verein (SHEET 2×3) → restaurant, sprachcafe, boxen, trainieren, verein, kinderkurs ====
+SHEET: six pictures.
+Row 1, left (das Restaurant): YASEMIN at a restaurant table with colourful dishes from many countries (noodles, pizza, falafel, rice), eating happily.
+Row 1, right (das Sprachcafé): NIKOS at a big table in a library café talking with three people of different origins, coffee cups, small flags as table decoration (plain colours, no real national flags).
+Row 2, left (boxen): YASEMIN in red boxing gloves punching a punching bag, focused and happy.
+Row 2, right (trainieren): a group of adults doing jumping jacks in a sports hall, a coach clapping.
+Row 3, left (der Verein): the outside of a small sports club house with a door, a bench and a bicycle stand, a few people going in (no sign).
+Row 3, right (der Kurs / Kinderkurs): a boxing coach showing four children (8–12 years) how to hold their gloves, everyone smiling.
+
+==== lektion5-8.png · Verein 2 (SHEET 2×3) → jugendliche, hausaufgaben, anmeldung, preis, woche, wochenende ====
+SHEET: six pictures.
+Row 1, left (die Jugendlichen): three teenagers (about 15) laughing together with sports bags.
+Row 1, right (die Hausaufgaben): LINA at a table doing homework with a pencil, a helper (SABINE) sitting next to her and pointing at the notebook.
+Row 2, left (die Anmeldung): AISHA at a club counter filling in a paper form with a pen (the form has only blank lines).
+Row 2, right (der Preis): a small price tag hanging on a pair of boxing gloves, a few coins and a banknote next to it (no numbers, no letters).
+Row 3, left (die Woche): a wall calendar page with seven coloured columns and small drawings (sun, ball, book) instead of words or numbers.
+Row 3, right (das Wochenende): RAMI, LINA and SAMI relaxing on a sunny Saturday morning in pyjamas, pancakes on the table.
+
+==== lektion5-9.png · Reaktionen (SHEET 2×3) → spass, interessant, langweilig, weiss-nicht, nicht-so-gern, ich-komme-auch ====
+SHEET: six pictures, the same three friends in a row of portraits, big clear facial expressions and gestures.
+Row 1, left (Das macht Spaß!): MEI laughing with a thumbs-up, eyes shining.
+Row 1, right (Das ist interessant.): MEI leaning forward with her hand on her chin, curious, eyebrows raised.
+Row 2, left (Das ist langweilig.): NIKOS slumped, head on his hand, half-closed eyes, a little cloud of boredom.
+Row 2, right (Ich weiß nicht.): NIKOS shrugging his shoulders with open palms up, unsure face.
+Row 3, left (Ach nein, nicht so gern.): RAMI shaking his head with a polite smile, one hand raised gently.
+Row 3, right (Ich komme auch!): YASEMIN jumping up with her arm raised high, very happy.
+
+==== lektion5-10.png · Hobby und Beruf (SHEET 2×3) → unterrichten, kochkurs, kellnerin, interview, basketball-trainer, schwimmkurs ====
+SHEET: six pictures.
+Row 1, left (unterrichten): PAUL at a blank whiteboard explaining something to a small group, a marker in his hand.
+Row 1, right (der Kochkurs): MEI in an apron showing two course participants how to cut vegetables, a wok on the stove.
+Row 2, left (die Kellnerin): MEI as a waitress in a restaurant carrying two plates of food, smiling.
+Row 2, right (das Interview): NORA with a notebook and a small voice recorder interviewing MEI at a table.
+Row 3, left (der Trainer): TOMASZ as a basketball coach with a whistle, teenagers with a basketball in a sports hall.
+Row 3, right (der Schwimmkurs): AISHA in a swimming pool teaching three small children with swim floats.
+
+==== lektion5-11.png · Pantomime und Plakate (SHEET, 2 pictures side by side) → pantomime, plakate ====
+SHEET: two separate 4:3 pictures side by side on the same plain ivory background, wide gap between them.
+Left (die Pantomime): RAMI miming reading a book without a book (hands open like a book), NIKOS and MEI watching and guessing with raised hands.
+Right (die Plakate): four colourful posters on a classroom wall, each with arrows and small drawings (a car, an eye, a book, a running shoe), no letters.

@@ -867,6 +867,8 @@ body{color:#17243b;line-height:1.5}.workspace,.international-main{background-ima
 .puzzle-empty { position:relative; }
 .puzzle-empty.filled { color:#1f6b4a; background:#effaf3; border-color:#8fcca8; animation:puzzle-pop .32s cubic-bezier(.3,1.6,.5,1) both; }
 .puzzle-empty.filled.hinted { color:#8a5a00; background:#fff7dc; border-color:#f0c75a; }
+/* The tries used up: the right letters the site filled in, one after the other, in blue on a dashed box. */
+.puzzle-empty.revealed { color:#1f5a8a; background:#eef5ff; border-color:#8fb8e3; border-style:dashed; box-shadow:none; animation:puzzle-pop .32s cubic-bezier(.3,1.6,.5,1) both; }
 .puzzle-empty.shake { color:#b3261e; background:#fff1ef; border-color:#e88b80; animation:puzzle-shake .45s ease both; }
 .puzzle-empty.missed::after { content:''; position:absolute; top:-4px; inset-inline-end:-4px; width:9px; height:9px; border-radius:50%; background:#f08a3c; border:2px solid #fff; }
 .letter-bank-puzzle.complete .puzzle-empty.filled { animation:puzzle-wave .55s ease both; }
@@ -894,8 +896,8 @@ html[data-lernkoko-motion="reduced"] .puzzle-tries.last svg { animation:none; }
 @keyframes puzzle-pop { 0% { transform:scale(.55); } 70% { transform:scale(1.14); } 100% { transform:scale(1); } }
 @keyframes puzzle-shake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px) rotate(-5deg); } 40% { transform:translateX(5px) rotate(5deg); } 60% { transform:translateX(-4px); } 80% { transform:translateX(3px); } }
 @keyframes puzzle-wave { 0%,100% { transform:translateY(0); } 45% { transform:translateY(-8px) scale(1.08); } }
-html[data-lernkoko-motion="reduced"] .puzzle-empty.filled,html[data-lernkoko-motion="reduced"] .puzzle-empty.shake,html[data-lernkoko-motion="reduced"] .letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; }
-@media (prefers-reduced-motion:reduce) { .puzzle-empty.filled,.puzzle-empty.shake,.letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; } }
+html[data-lernkoko-motion="reduced"] .puzzle-empty.revealed,html[data-lernkoko-motion="reduced"] .puzzle-empty.filled,html[data-lernkoko-motion="reduced"] .puzzle-empty.shake,html[data-lernkoko-motion="reduced"] .letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; }
+@media (prefers-reduced-motion:reduce) { .puzzle-empty.revealed,.puzzle-empty.filled,.puzzle-empty.shake,.letter-bank-puzzle.complete .puzzle-empty.filled { animation:none; } }
 /* Nesne Kasası: "Tüm nesneler" is the only big card; on wide screens it spans the page with the picture on the left. */
 .vault-feature-grid:has(> :only-child) { grid-template-columns:minmax(0,1fr); }
 @media (min-width:761px) {

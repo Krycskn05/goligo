@@ -2,7 +2,7 @@
  * "Bu ünitede": what a unit teaches, for the left page of a unit's notebook (the learner asked, 25 October 2026).
  * Written in our own words from the topics of the learner's textbook contents page — no sentences, names or titles
  * of the book are copied; the German examples are everyday phrases. Bold with **…**.
- * Lektion 3's list follows its pages (5 November 2026), Lektion 4's too (8 November 2026).
+ * Lektion 3's list follows its pages (5 November 2026), Lektion 4's and 5's too (8 November 2026).
  */
 export const unitGoalsById:Record<string,string[]>={
  // Lektion 1 „Willkommen!“
@@ -51,6 +51,20 @@ export const unitGoalsById:Record<string,string[]>={
   'Bir Elfchen (on bir kelimelik şiir) yaz, kelimeleri alanlara göre öğren',
   'Gramer: çoğul, **haben**, Akkusativ **einen / keinen**, iyelik **mein, dein, sein, ihr, unser, euer, Ihr**',
   'Telaffuz: sondaki **-er**, **-e / -en** · Yazım: **ie / ei** · Fiil ekleri: **arbeiten, sprechen, heißen**',
+ ],
+ // Lektion 5 „Alltag und Freizeit“
+ 'book-05':[
+  'Gününü anlat: **Am Morgen dusche ich und frühstücke. Am Abend koche ich.**',
+  'Günün bölümleri: **am Morgen, am Vormittag, am Mittag, am Nachmittag, am Abend, in der Nacht** · **morgen** = yarın',
+  'Neyi sevip neyi sevmediğini söyle: **Ich spiele gern Tischtennis. Ich putze nicht gern.**',
+  'Ja-/Nein-soruları sor ve cevapla: **Hast du heute Zeit? – Ja. / Nein, leider nicht.**',
+  'Davet et, kabul et ya da nazikçe reddet: **Kommst du auch? – Ja, ich komme gern! · Oh, schade.**',
+  'Şehirde boş zaman: öneri iste ve ver: **Hast du einen Tipp für mich? – Das Kino ist interessant für dich.**',
+  'Haftanın günleri ve zaman: **am Montag, am Wochenende, am Dienstagabend**',
+  'Bir şey hakkında fikrini söyle: **Das macht Spaß! · Das ist langweilig. · Ich weiß nicht.**',
+  'Bir röportajı anla: **Was machen Sie beruflich? Was machen Sie in Ihrer Freizeit?**',
+  'Gramer: düzensiz fiiller **e → i, e → ie, a → ä, au → äu** (**du fährst, er liest, sie läuft**) · Ja-/Nein-sorusunda fiil başta',
+  'Telaffuz: **a – ä, e – ie, e – i** · Yazım: **ll, tt, mm, ff**',
  ],
  // Lektion 15 „Wege in der Stadt“ (Teil A since 30 October 2026, from the learner's lesson page)
  'book-15':[

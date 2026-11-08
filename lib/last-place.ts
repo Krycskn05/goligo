@@ -4,14 +4,14 @@
  * a lesson page (Lektion 1, 2, 12, 15) with its part and step. The key travels with the account (lib/lesson-sync.ts,
  * `site`). Only known site paths are accepted when it is read back.
  */
-export type PlaceId='housing'|'ausbildung'|'hoeren'|'vault'|'verbs'|'willkommen'|'berufe'|'orte'|'familie'|'stadt';
+export type PlaceId='housing'|'ausbildung'|'hoeren'|'vault'|'verbs'|'willkommen'|'berufe'|'orte'|'familie'|'alltag'|'stadt';
 export type LastPlace={id:PlaceId;href:string;detail?:string;at:number};
 export const LAST_PLACE_KEY='lernkoko-last-place';
-const paths:Record<PlaceId,string>={housing:'/a1-2/ev-ve-yasam',ausbildung:'/a1-2/ausbildung',hoeren:'/a1-2/ausbildung/hoeren',vault:'/ev-esyalar',verbs:'/fiiller',willkommen:'/a1-1/willkommen',berufe:'/a1-1/berufe',orte:'/a1-1/orte-und-dinge',familie:'/a1-1/familie',stadt:'/a1-2/wege-in-der-stadt'};
+const paths:Record<PlaceId,string>={housing:'/a1-2/ev-ve-yasam',ausbildung:'/a1-2/ausbildung',hoeren:'/a1-2/ausbildung/hoeren',vault:'/ev-esyalar',verbs:'/fiiller',willkommen:'/a1-1/willkommen',berufe:'/a1-1/berufe',orte:'/a1-1/orte-und-dinge',familie:'/a1-1/familie',alltag:'/a1-1/alltag-und-freizeit',stadt:'/a1-2/wege-in-der-stadt'};
 /** The textbook unit of a lesson place (its name on the units page); the other places have their own titles. */
-export const placeUnit:Partial<Record<PlaceId,string>>={ausbildung:'book-12',hoeren:'book-12',willkommen:'book-01',berufe:'book-02',orte:'book-03',familie:'book-04',stadt:'book-15'};
+export const placeUnit:Partial<Record<PlaceId,string>>={ausbildung:'book-12',hoeren:'book-12',willkommen:'book-01',berufe:'book-02',orte:'book-03',familie:'book-04',alltag:'book-05',stadt:'book-15'};
 /** A lesson step's address: Teil A without `teil`, the other parts with it. */
-export const lessonStepHref=(id:'willkommen'|'berufe'|'orte'|'familie'|'stadt',part:string,step:string)=>paths[id]+'?'+(part==='a'?'':'teil='+part+'&')+'adim='+step;
+export const lessonStepHref=(id:'willkommen'|'berufe'|'orte'|'familie'|'alltag'|'stadt',part:string,step:string)=>paths[id]+'?'+(part==='a'?'':'teil='+part+'&')+'adim='+step;
 const isPlaceId=(value:unknown):value is PlaceId=>typeof value==='string'&&Object.hasOwn(paths,value);
 /** The page path itself, optionally with a plain query (letters, digits, = & . _ -). */
 export function isPlaceHref(id:PlaceId,href:unknown):href is string{

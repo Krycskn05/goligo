@@ -75,11 +75,14 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
  const [orte,setOrte]=useState<TopicProgress|null>(null);
  // Lektion 4 (Teil A–D since 8 November 2026) keeps its scores in the browser, too (lib/familie-progress.ts).
  const [familie,setFamilie]=useState<TopicProgress|null>(null);
+ // Lektion 5 (Teil A–D since 8 November 2026) keeps its scores in the browser, too (lib/alltag-progress.ts).
+ const [alltag,setAlltag]=useState<TopicProgress|null>(null);
  const synced=useSyncVersion(); // lesson progress from another device (app/lesson-sync.tsx)
  const seen=synced*1000+back; // read the browser's lesson progress again after a sync or when the learner comes back
  useEffect(()=>{if(course!=='de'||home){setStadt(null);return;}let alive=true;import('@/lib/stadt-progress').then(({readLessonFifteenProgress})=>{if(alive)setStadt(readLessonFifteenProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setOrte(null);return;}let alive=true;import('@/lib/orte-progress').then(({readLessonThreeProgress})=>{if(alive)setOrte(readLessonThreeProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setFamilie(null);return;}let alive=true;import('@/lib/familie-progress').then(({readLessonFourProgress})=>{if(alive)setFamilie(readLessonFourProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
+ useEffect(()=>{if(course!=='de'||home){setAlltag(null);return;}let alive=true;import('@/lib/alltag-progress').then(({readLessonFiveProgress})=>{if(alive)setAlltag(readLessonFiveProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setBerufe(null);return;}let alive=true;import('@/lib/berufe-progress').then(({readLessonTwoProgress})=>{if(alive)setBerufe(readLessonTwoProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setWillkommen(null);return;}let alive=true;import('@/lib/willkommen-progress').then(({readLessonOneProgress})=>{if(alive)setWillkommen(readLessonOneProgress());}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
  useEffect(()=>{if(course!=='de'||home){setAusbildung(null);return;}let alive=true;import('@/lib/ausbildung-progress').then(({lessonProgress})=>{let scores={};try{scores=JSON.parse(localStorage.getItem('lernkoko-l12-scores')??'{}')??{};}catch{}if(alive)setAusbildung(lessonProgress(scores));}).catch(()=>{});return()=>{alive=false;};},[course,home,seen]);
@@ -103,7 +106,7 @@ export function Workshop({page='units',language,onLanguage,course='de',onCourse,
       <div className="nb-spiral" aria-hidden="true">{Array.from({length:30},(_,i)=><span key={i}/>)}</div>
       <div className="nb-page">
        <h2 id="curriculum-heading" className="nb-title">{level} · {c(language,'categories')}</h2>
-       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-01'?'/a1-1/willkommen':unit.id==='book-02'?'/a1-1/berufe':unit.id==='book-03'?'/a1-1/orte-und-dinge':unit.id==='book-04'?'/a1-1/familie':unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':unit.id==='book-15'?'/a1-2/wege-in-der-stadt':null:null;const progress=course!=='de'?null:unit.id==='book-01'?willkommen:unit.id==='book-02'?berufe:unit.id==='book-03'?orte:unit.id==='book-04'?familie:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:unit.id==='book-15'?stadt:null;
+       <ul className="nb-grid">{units.map((unit,i)=>{const title=translate(unit.names,language);const lesson=course==='de'?unit.id==='book-01'?'/a1-1/willkommen':unit.id==='book-02'?'/a1-1/berufe':unit.id==='book-03'?'/a1-1/orte-und-dinge':unit.id==='book-04'?'/a1-1/familie':unit.id==='book-05'?'/a1-1/alltag-und-freizeit':unit.id==='book-11'?'/a1-2/ev-ve-yasam':unit.id==='book-12'?'/a1-2/ausbildung':unit.id==='book-15'?'/a1-2/wege-in-der-stadt':null:null;const progress=course!=='de'?null:unit.id==='book-01'?willkommen:unit.id==='book-02'?berufe:unit.id==='book-03'?orte:unit.id==='book-04'?familie:unit.id==='book-05'?alltag:unit.id==='book-11'&&snapshot?housingProgress('all',snapshot.reviews):unit.id==='book-12'?ausbildung:unit.id==='book-15'?stadt:null;
         return <li className={'nb-card tape-'+(i%4)+(lesson?' has-lesson':'')} key={unit.id} data-unit={unit.id}>
          <span className="nb-tape" aria-hidden="true"/>
          <div className="nb-photo"><TopicArt id={unit.id.replace(/^en-/,'')} title={title}/></div>

@@ -53,6 +53,8 @@ for(const text of load('berufe-d-course').berufeDSpeechTexts())add(text);
 for(const text of load('orte-course').orteSpeechTexts())add(text);
 // Lektion 4 „Familie“ (Teil A–D): the family, Familienstand, haben, the possessive articles, the interview, the Elfchen, the course room.
 for(const text of load('familie-course').familieSpeechTexts())add(text);
+// Lektion 5 „Alltag und Freizeit“ (Teil A–D): the day, gern, Ja-/Nein-Fragen, free time in the city, irregular verbs, the week, the boxing club, the interview.
+for(const text of load('alltag-course').alltagSpeechTexts())add(text);
 // "Konuş" (the AI role plays): the partners' opening lines and the phrases to try.
 for(const text of load('talk-scenarios').talkSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

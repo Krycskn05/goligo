@@ -112,7 +112,7 @@ function ExerciseStep(props:StepProps&{familieStep:FamilieStep}){
  switch(exercise.type){
   case 'choice':return <ChoiceExercise kicker={kicker} title={title} lead={step.lead?<Tx text={step.lead}/>:undefined} bankLead={exercise.bankLead} before={before} lines={exercise.lines} dialogue={exercise.dialogue}
    after={done=><>{exercise.dialogue&&<div className="l1a-actions"><button type="button" className="btn secondary small" disabled={!done||speech.busy} onClick={()=>speech.speakAll(exercise.lines.map(line=>line.say??''))}><Play size={16} aria-hidden="true"/>{ut('Tamamlanan diyaloğu dinle')}</button></div>}{after}</>} {...props}/>;
-  case 'gaps':return <><GapExercise kicker={kicker} title={title} lead={step.lead} before={before} lines={exercise.lines} say={exercise.say} cells={exercise.cells} wide={exercise.wide} exact={exercise.exact} choices={exercise.choices} bank={exercise.bank} {...props}/>{after}</>;
+  case 'gaps':return <><GapExercise kicker={kicker} title={title} before={<>{step.lead&&!exercise.bank&&<p className="l1a-tr"><Tx text={step.lead}/></p>}{before}</>} lines={exercise.lines} say={exercise.say} cells={exercise.cells} wide={exercise.wide} exact={exercise.exact} choices={exercise.choices} bank={exercise.bank} {...props}/>{after}</>;
   case 'quiz':return <><Quiz items={exercise.items} kicker={kicker} title={title} lead={step.lead} before={before} {...props}/>{after}</>;
   case 'write':return <><Write rows={exercise.rows} kicker={kicker} title={title} lead={step.lead} before={before} {...props}/>{after}</>;
   case 'own':return <><Own storeKey={exercise.key} prompts={exercise.prompts} kicker={kicker} title={title} lead={step.lead} before={before} {...props}/>{after}</>;

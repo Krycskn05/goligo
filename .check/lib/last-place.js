@@ -8,9 +8,9 @@ exports.readLastPlace = readLastPlace;
 exports.dayNumber = dayNumber;
 exports.dailyIndex = dailyIndex;
 exports.LAST_PLACE_KEY = 'lernkoko-last-place';
-const paths = { housing: '/a1-2/ev-ve-yasam', ausbildung: '/a1-2/ausbildung', hoeren: '/a1-2/ausbildung/hoeren', vault: '/ev-esyalar', verbs: '/fiiller', willkommen: '/a1-1/willkommen', berufe: '/a1-1/berufe', orte: '/a1-1/orte-und-dinge', familie: '/a1-1/familie', stadt: '/a1-2/wege-in-der-stadt' };
+const paths = { housing: '/a1-2/ev-ve-yasam', ausbildung: '/a1-2/ausbildung', hoeren: '/a1-2/ausbildung/hoeren', vault: '/ev-esyalar', verbs: '/fiiller', willkommen: '/a1-1/willkommen', berufe: '/a1-1/berufe', orte: '/a1-1/orte-und-dinge', familie: '/a1-1/familie', alltag: '/a1-1/alltag-und-freizeit', stadt: '/a1-2/wege-in-der-stadt' };
 /** The textbook unit of a lesson place (its name on the units page); the other places have their own titles. */
-exports.placeUnit = { ausbildung: 'book-12', hoeren: 'book-12', willkommen: 'book-01', berufe: 'book-02', orte: 'book-03', familie: 'book-04', stadt: 'book-15' };
+exports.placeUnit = { ausbildung: 'book-12', hoeren: 'book-12', willkommen: 'book-01', berufe: 'book-02', orte: 'book-03', familie: 'book-04', alltag: 'book-05', stadt: 'book-15' };
 /** A lesson step's address: Teil A without `teil`, the other parts with it. */
 const lessonStepHref = (id, part, step) => paths[id] + '?' + (part === 'a' ? '' : 'teil=' + part + '&') + 'adim=' + step;
 exports.lessonStepHref = lessonStepHref;

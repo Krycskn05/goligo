@@ -1,0 +1,272 @@
+/**
+ * Lektion 5 „Alltag und Freizeit“, Teil D – Mein Hobby ist auch mein Beruf. Nora's interview with Mei for the course
+ * newspaper (Mei teaches cooking courses and works as a waitress), notes „beruflich / in der Freizeit“, the questions
+ * of an interview with Sie and du (Ihr / Ihre, a reminder of Lektion 4: mein, dein, sein, ihr …), two more people whose
+ * hobby is a job (Tomasz trains young basketball players, Aisha teaches children to swim), regular or irregular verbs
+ * (the four posters e → i, e → ie, a → ä, au → äu), the pantomime game, the summary and „Alles klar?“ over the whole
+ * unit. Our own texts after the topics of the learner's books (8 November 2026); the people are the site's.
+ */
+import {T,check,row,listWord,line,choiceLine,gap,type AlltagPart,type Word} from './alltag-types';
+import {alltagCovers,alltagPic} from './alltag-pictures';
+
+/** A hobby and a job. */
+export const wordsD:Word[]=[
+ {de:'der Beruf',plural:'Berufe',tr:T('meslek'),emoji:'💼',pic:alltagPic.beruf},
+ {de:'das Hobby',plural:'Hobbys',tr:T('hobi'),emoji:'🎨',pic:alltagPic.hobby},
+ {de:'unterrichten',tr:T('ders vermek, öğretmek'),emoji:'🧑‍🏫',pic:alltagPic.unterrichten},
+ {de:'der Kochkurs',plural:'Kochkurse',tr:T('yemek kursu'),emoji:'🍲',pic:alltagPic.kochkurs},
+ {de:'die Kellnerin',plural:'Kellnerinnen',tr:T('garson (kadın); der Kellner: garson (erkek)'),emoji:'🍽️',pic:alltagPic.kellnerin},
+ {de:'das Interview',plural:'Interviews',tr:T('röportaj'),emoji:'🎤',pic:alltagPic.interview},
+ {de:'der Trainer',plural:'Trainer',tr:T('antrenör'),emoji:'🏀',pic:alltagPic.trainer},
+ {de:'der Schwimmkurs',plural:'Schwimmkurse',tr:T('yüzme kursu'),emoji:'🏊‍♂️',pic:alltagPic.schwimmkurs},
+ {de:'die Pantomime',plural:'Pantomimen',tr:T('pandomim (sessiz oyun)'),emoji:'🤐',pic:alltagPic.pantomime},
+ {de:'das Plakat',plural:'Plakate',tr:T('afiş, poster'),emoji:'🪧',pic:alltagPic.plakate},
+ {de:'lange schlafen',tr:T('uzun uyumak, geç kalkmak'),emoji:'😴',pic:alltagPic.langeSchlafen},
+];
+/** Nora's interview with Mei (Konu 1). */
+const interview=[
+ line('nora','Hallo, Frau Suwan! Kochen ist für Sie ein Hobby, oder?','Merhaba Bayan Suwan! Yemek pişirmek sizin için bir hobi, değil mi?'),
+ line('mei','Ja, aber nicht nur. Kochen ist auch mein Beruf. Ich unterrichte Kochkurse.','Evet ama sadece hobi değil. Yemek pişirmek aynı zamanda mesleğim. Yemek kursları veriyorum.'),
+ line('nora','Was unterrichten Sie?','Ne öğretiyorsunuz?'),
+ line('mei','Ich unterrichte Thai-Küche: Essen aus Thailand. Ich komme aus Bangkok. Meine Mutter und mein Bruder kochen auch sehr gern.','Tay mutfağını öğretiyorum: Tayland yemeklerini. Bangkok’tanım. Annem ve erkek kardeşim de yemek yapmayı çok sever.'),
+ line('nora','Wann sind Ihre Kurse?','Kurslarınız ne zaman?'),
+ line('mei','Am Dienstagabend und am Samstagvormittag.','Salı akşamı ve cumartesi öğleden önce.'),
+ line('nora','Haben Sie noch einen Beruf?','Başka bir mesleğiniz de var mı?'),
+ line('mei','Ja, ich arbeite auch als Kellnerin. Das macht Spaß, aber ich arbeite viel. Im Restaurant treffe ich jeden Tag Leute.','Evet, garson olarak da çalışıyorum. Eğlenceli ama çok çalışıyorum. Restoranda her gün insanlarla karşılaşıyorum.'),
+ line('nora','Was machen Sie in Ihrer Freizeit?','Boş zamanınızda ne yapıyorsunuz?'),
+ line('mei','Ich habe viele Hobbys: Ich schwimme gern und ich lese viel. Ich spiele auch gern Tischtennis mit Nikos. Am Sonntag schlafe ich lange. Und ich koche natürlich gern!','Birçok hobim var: yüzmeyi severim, çok okurum. Nikos’la masa tenisi oynamayı da severim. Pazar günü uzun uyurum. Ve tabii ki yemek yapmayı severim!'),
+ line('nora','Vielen Dank, Frau Suwan!','Çok teşekkürler, Bayan Suwan!'),
+];
+/** Tomasz and Aisha tell about themselves (Konu 4; Alıştırma 3 tells it again with er / sie). */
+const tomasz=[
+ row('Ich bin Tomasz. Ich trainiere Basketball mit Jugendlichen, am Montagabend und am Mittwochabend.','Ben Tomasz. Gençlerle basketbol antrenmanı yapıyorum, pazartesi ve çarşamba akşamları.'),
+ row('Basketball ist mein Hobby. Von Beruf bin ich Kellner.','Basketbol benim hobim. Mesleğim garsonluk.'),
+ row('In meiner Freizeit fahre ich gern Fahrrad und ich spiele mit Jan und Zofia.','Boş zamanımda bisiklete binmeyi severim ve Jan’la Zofia ile oynarım.'),
+];
+const aisha=[
+ row('Ich bin Aisha. Am Samstagvormittag unterrichte ich Schwimmen für Kinder.','Ben Aisha. Cumartesi öğleden önce çocuklara yüzme öğretiyorum.'),
+ row('Das ist nicht mein Beruf. Ich bin Lehrerin, aber ich arbeite als Taxifahrerin.','Bu benim mesleğim değil. Öğretmenim ama taksi şoförü olarak çalışıyorum.'),
+ row('In meiner Freizeit schwimme ich, ich lese und ich tanze gern mit Amani.','Boş zamanımda yüzerim, okurum ve Amani ile dans etmeyi severim.'),
+];
+const groups=['e → i','e → ie','a → ä','au → äu'];
+const group=(verb:string,right:string)=>({prompt:verb,options:[right,...groups.filter(item=>item!==right)]});
+
+export const partD:AlltagPart={
+ id:'d',badge:'D',title:'Mein Hobby ist auch mein Beruf.',
+ lead:T('Bir röportaj: **Was unterrichten Sie? Wann sind Ihre Kurse?** · iş ve boş zaman · düzenli mi düzensiz mi? · pandomim · **Alles klar?**'),
+ cover:alltagCovers.d,coverAlt:T('Nora bir defterle Mei ile röportaj yapıyor; Mei bir yemek kursunda önlüğüyle tencerenin başında gülümsüyor'),
+ short:{'interview-fragen':T('Hangi soru?'),'notizen':T('İş mi boş zaman mı?'),'profile':T('Tomasz ve Aisha'),'plakate':T('Fiil afişleri'),'regelmaessig':T('Düzenli mi?'),'pantomime':T('Pandomim'),'antwort':T('Hangi cevap?'),'und-du':T('Şimdi sen')},
+ steps:[
+  {id:'kapak',title:T('Kapak'),kind:'cover',cover:{
+   intro:T('Nora kurs gazetesi için Mei ile konuşuyor. Mei’nin hobisi yemek pişirmek ama bu aynı zamanda onun işi: yemek kursları veriyor! Tomasz ve Aisha’nın da böyle hobileri var. Bu bölümde bir röportajı anlayacak, düzensiz fiilleri toplayacak ve bütün üniteyi „Alles klar?“ ile bitireceksin.'),
+   learn:[T('Bir röportaj: *Was unterrichten Sie? Wann sind Ihre Kurse?*'),T('İş ve boş zaman: *beruflich · in der Freizeit*'),T('*Sie* ve *du* ile soru: *Haben Sie …? / Hast du …?*'),T('Düzenli mi düzensiz mi? Fiil afişleri: *e → i, e → ie, a → ä, au → äu*'),T('Pandomim oyunu: *Du liest ein Buch! – Ja, richtig!*'),T('**Alles klar?** Bütün ünitenin testi')],
+   cast:['nora','mei','tomasz','aisha','rami','nikos','paul'],
+  }},
+  {id:'beruf-hobby',title:T('Kelimeler: iş ve hobi'),kind:'teach',kicker:'Wortschatz · Hobby und Beruf',heading:T('Hobi ve meslek'),
+   lead:T('Her kelime artikeliyle. Karta dokun: tekili ve çoğulu okunur.'),
+   blocks:[{t:'cards',words:wordsD}]},
+  {id:'kelimeler',title:T('Kelimeler: diğerleri'),kind:'teach',kicker:'Wortschatz · Wörter',heading:T('Röportaj ve fiil kelimeleri'),
+   lead:T('Her satırda kelime, anlamı ve bir örnek cümle var. Satıra dokununca örnek cümle okunur.'),
+   blocks:[{t:'list',words:[
+    listWord('beruflich','iş olarak, meslek olarak','Was machen Sie beruflich?','Ne iş yapıyorsunuz?'),
+    listWord('in der Freizeit','boş zamanda','In der Freizeit lese ich.','Boş zamanımda okurum.'),
+    listWord('noch','daha, başka; hâlâ','Haben Sie noch einen Beruf?','Başka bir mesleğiniz de var mı?'),
+    listWord('viel','çok','Ich arbeite viel.','Çok çalışıyorum.'),
+    listWord('jeden Tag','her gün','Ich laufe jeden Tag.','Her gün koşarım.'),
+    listWord('lange','uzun süre','Am Sonntag schlafe ich lange.','Pazar günü uzun uyurum.'),
+    listWord('natürlich','tabii ki','Ich koche natürlich gern!','Tabii ki yemek yapmayı severim!'),
+    listWord('regelmäßig','düzenli','„kochen“ ist regelmäßig: du kochst.','„kochen“ düzenlidir: du kochst.'),
+    listWord('unregelmäßig','düzensiz','„fahren“ ist unregelmäßig: du fährst.','„fahren“ düzensizdir: du fährst.'),
+    listWord('die Verbliste, die Verblisten','fiil listesi','Die Verbliste hilft.','Fiil listesi yardımcı olur.'),
+    listWord('raten','tahmin etmek','Was mache ich? Rate mal!','Ne yapıyorum? Tahmin et!'),
+    listWord('richtig','doğru','Ja, richtig!','Evet, doğru!'),
+    listWord('falsch','yanlış','Nein, leider falsch.','Hayır, maalesef yanlış.'),
+    listWord('Vielen Dank!','Çok teşekkürler!','Vielen Dank, Frau Suwan!','Çok teşekkürler, Bayan Suwan!'),
+   ]}]},
+  {id:'kontrol',title:T('Kelime kontrolü'),kind:'teach',kicker:'Wortschatz · Kontrolle',heading:T('Kelimeleri hatırlıyor musun?'),
+   lead:T('Hızlı bir kontrol, puanı yok. Yanlış olursa doğrusu yeşil görünür.'),
+   blocks:[{t:'checks',title:T('6 kısa soru'),items:[
+    check(T('ders vermek, öğretmek'),['unterrichten','trainieren','lernen']),
+    check(T('yaptığın iş, meslek'),['der Beruf','das Hobby','der Kurs']),
+    check('„beruflich“',[T('iş olarak'),T('boş zamanda'),T('her gün')],''),
+    check('„Rate mal!“',[T('Tahmin et!'),T('Oku!'),T('Çalış!')],''),
+    check('„unregelmäßig“',[T('düzensiz'),T('düzenli'),T('her gün')],''),
+    check('„Haben Sie noch einen Beruf?“',[T('Başka bir mesleğiniz de var mı?'),T('Mesleğiniz ne?'),T('Hâlâ çalışıyor musunuz?')],''),
+   ]}]},
+  {id:'interview-konu',title:T('Röportaj'),kind:'teach',kicker:T('Konu 1 · Ein Interview mit Mei'),heading:T('Hobim aynı zamanda mesleğim'),
+   blocks:[
+    {t:'p',text:T('Nora kurs gazetesi için Mei ile konuşuyor. Röportajda *Sie* kullanılıyor. Dinle: her kişi kendi sesiyle.')},
+    {t:'talk',lines:interview},
+    {t:'checks',items:[
+     check(T('Mei ne öğretiyor?'),['Thai-Küche','Tischtennis','Deutsch'],'Sie unterrichtet Thai-Küche.'),
+     check(T('Kursları ne zaman?'),['am Dienstagabend und am Samstagvormittag','am Montagabend','am Sonntag'],'Ihre Kurse sind am Dienstagabend und am Samstagvormittag.'),
+     check(T('Mei’nin başka işi ne?'),['Sie ist Kellnerin.','Sie ist Lehrerin.','Sie ist Ärztin.'],'Sie arbeitet auch als Kellnerin.'),
+     check(T('Pazar günü ne yapıyor?'),['Sie schläft lange.','Sie arbeitet.','Sie boxt.'],'Am Sonntag schläft sie lange.'),
+    ]},
+   ]},
+  {id:'notizen-konu',title:T('İş ve boş zaman'),kind:'teach',kicker:T('Konu 2 · beruflich – in der Freizeit'),heading:T('Mei: iş ve boş zaman'),
+   blocks:[
+    {t:'p',text:T('Nora notlarını iki sütuna yazıyor: işle ilgili olanlar (*beruflich*) ve boş zaman (*in der Freizeit*). Şimdi Mei’yi anlatıyoruz: fiil *-t* alır.')},
+    {t:'table',head:['beruflich','in der Freizeit'],rows:[['Sie unterrichtet Kochkurse.','Sie schwimmt gern.'],['Ihre Kurse sind am Dienstagabend und am Samstagvormittag.','Sie liest viel.'],['Sie arbeitet auch als Kellnerin.','Sie spielt Tischtennis mit Nikos.'],['Sie trifft jeden Tag Leute.','Am Sonntag schläft sie lange.']],
+     say:['Sie unterrichtet Kochkurse. Sie schwimmt gern.','Ihre Kurse sind am Dienstagabend und am Samstagvormittag. Sie liest viel.','Sie arbeitet auch als Kellnerin. Sie spielt Tischtennis mit Nikos.','Sie trifft jeden Tag Leute. Am Sonntag schläft sie lange.']},
+    {t:'warn',text:T('Düzensiz fiillere dikkat: ~sie liest~, ~sie trifft~, ~sie schläft~ (Teil B).')},
+    {t:'rows',rows:[row('Was macht Mei beruflich? – Sie unterrichtet Kochkurse.','Mei ne iş yapıyor? – Yemek kursları veriyor.'),row('Was macht Mei gern? – Sie kocht gern und sie schwimmt gern.','Mei neyi sever? – Yemek pişirmeyi ve yüzmeyi sever.')]},
+   ]},
+  {id:'fragen-konu',title:T('Röportaj soruları'),kind:'teach',kicker:T('Konu 3 · Fragen: Sie und du'),heading:T('Siz mi, sen mi? Röportaj soruları'),
+   blocks:[
+    {t:'p',text:T('Bir röportajda tanımadığın biriyle *Sie* ile konuşursun; bir arkadaşınla *du* ile. Fiil ve iyelik (*Ihr / dein*) de değişir. Satıra dokun ve dinle.')},
+    {t:'table',head:['Sie','du'],rows:[['Was unterrichten Sie?','Was unterrichtest du?'],['Wann sind Ihre Kurse?','Wann sind deine Kurse?'],['Haben Sie noch einen Beruf?','Hast du noch einen Beruf?'],['Was machen Sie beruflich?','Was machst du beruflich?'],['Was machen Sie in Ihrer Freizeit?','Was machst du in deiner Freizeit?']],
+     say:['Was unterrichten Sie? Was unterrichtest du?','Wann sind Ihre Kurse? Wann sind deine Kurse?','Haben Sie noch einen Beruf? Hast du noch einen Beruf?','Was machen Sie beruflich? Was machst du beruflich?','Was machen Sie in Ihrer Freizeit? Was machst du in deiner Freizeit?']},
+    {t:'h',text:T('Hatırla: iyelik (Lektion 4)')},
+    {t:'table',head:['','',T('örnek')],rows:[['ich','mein / meine','Mein Hobby ist Kochen.'],['du','dein / deine','Wann sind deine Kurse?'],['er','sein / seine','Sein Beruf ist Kellner.'],['sie','ihr / ihre','Ihre Kurse sind am Dienstag.'],['wir','unser / unsere','Unser Kurs ist am Montag.'],['ihr','euer / eure','Wann ist euer Kurs?'],['Sie','Ihr / Ihre','Wann sind Ihre Kurse, Frau Suwan?']],
+     say:['ich, mein, meine. Mein Hobby ist Kochen.','du, dein, deine. Wann sind deine Kurse?','er, sein, seine. Sein Beruf ist Kellner.','sie, ihr, ihre. Ihre Kurse sind am Dienstag.','wir, unser, unsere. Unser Kurs ist am Montag.','ihr, euer, eure. Wann ist euer Kurs?','Sie, Ihr, Ihre. Wann sind Ihre Kurse, Frau Suwan?']},
+    {t:'note',text:T('*in Ihrer Freizeit / in deiner Freizeit / in meiner Freizeit* hazır bir kalıp: olduğu gibi öğren. (*-er* eki sonraki ünitelerde.)')},
+    {t:'checks',items:[
+     check('Frau Suwan, wann sind ___ Kurse?',['Ihre','deine','eure'],'Frau Suwan, wann sind Ihre Kurse?'),
+     check('Mei, ___ du noch einen Beruf?',['hast','haben','hat'],'Mei, hast du noch einen Beruf?'),
+     check('Was machen Sie in ___ Freizeit?',['Ihrer','deiner','meiner'],'Was machen Sie in Ihrer Freizeit?'),
+    ]},
+   ]},
+  {id:'zwei-konu',title:T('Tomasz ve Aisha'),kind:'teach',kicker:T('Konu 4 · Wer unterrichtet was?'),heading:T('İki kişi daha: hobi mi meslek mi?'),
+   blocks:[
+    {t:'p',text:T('Tomasz ve Aisha da bir şey öğretiyor. Ama bu onların mesleği mi? Satıra dokun: kendi sesleriyle okurlar.')},
+    {t:'rows',who:'tomasz',rows:tomasz},
+    {t:'rows',who:'aisha',rows:aisha},
+    {t:'table',head:['','Tomasz','Aisha'],rows:[['Was?','Basketball','Schwimmen'],['Wann?','am Montagabend und am Mittwochabend','am Samstagvormittag'],['Beruf?','Kellner','Lehrerin; sie arbeitet als Taxifahrerin'],['Freizeit?','Fahrrad fahren, mit Jan und Zofia spielen','schwimmen, lesen, mit Amani tanzen']],
+     say:['Tomasz trainiert Basketball. Aisha unterrichtet Schwimmen.','Tomasz: am Montagabend und am Mittwochabend. Aisha: am Samstagvormittag.','Tomasz ist Kellner. Aisha ist Lehrerin, aber sie arbeitet als Taxifahrerin.','Tomasz fährt gern Fahrrad. Aisha schwimmt, liest und tanzt gern.']},
+    {t:'rows',rows:[row('Was unterrichtet Aisha? – Sie unterrichtet Schwimmen.','Aisha ne öğretiyor? – Yüzme öğretiyor.'),row('Ist das ihr Beruf? – Nein, sie ist Taxifahrerin.','Bu onun mesleği mi? – Hayır, taksi şoförü.'),row('Was macht Tomasz in der Freizeit? – Er fährt gern Fahrrad.','Tomasz boş zamanında ne yapıyor? – Bisiklete binmeyi seviyor.')]},
+    {t:'checks',items:[
+     check(T('Tomasz’ın mesleği ne?'),['Kellner','Trainer','Taxifahrer'],'Von Beruf ist Tomasz Kellner.'),
+     check(T('Aisha ne zaman yüzme öğretiyor?'),['am Samstagvormittag','am Montagabend','am Sonntag'],'Am Samstagvormittag unterrichtet Aisha Schwimmen.'),
+     check('Tomasz ___ gern Fahrrad.',['fährt','fahrt','fährst'],'Tomasz fährt gern Fahrrad.'),
+    ]},
+   ]},
+  {id:'verben-konu',title:T('Düzenli mi düzensiz mi?'),kind:'teach',kicker:T('Konu 5 · regelmäßig oder unregelmäßig?'),heading:T('Dört fiil afişi'),
+   blocks:[
+    {t:'p',text:T('Çoğu fiil düzenlidir: *kochen → du kochst, er kocht*. Düzensiz fiillerde *du* ve *er / es / sie* değişir. Sınıfta dört afiş yaptık: her afişte bir değişim türü.')},
+    {t:'table',head:['e → i','e → ie','a → ä','au → äu'],rows:[['sprechen: du sprichst','sehen: du siehst','fahren: du fährst','laufen: du läufst'],['treffen: du triffst','lesen: du liest','schlafen: du schläfst','–'],['essen: du isst','–','–','–'],['helfen: du hilfst','–','–','–']],
+     say:['sprechen, du sprichst. sehen, du siehst. fahren, du fährst. laufen, du läufst.','treffen, du triffst. lesen, du liest. schlafen, du schläfst.','essen, du isst.','helfen, du hilfst.']},
+    {t:'table',head:['regelmäßig','unregelmäßig'],rows:[['kochen, spielen, wohnen, lernen','fahren, schlafen, laufen'],['tanzen, schwimmen, hören, kaufen','sehen, lesen'],['arbeiten, unterrichten, trainieren','sprechen, treffen, essen, helfen']],
+     say:['kochen, spielen, wohnen, lernen. fahren, schlafen, laufen.','tanzen, schwimmen, hören, kaufen. sehen, lesen.','arbeiten, unterrichten, trainieren. sprechen, treffen, essen, helfen.']},
+    {t:'note',text:T('Strateji: yeni bir fiili sözlükte ya da fiil listesinde (Verbliste) üç biçimiyle bul ve öyle öğren: ~lesen – du liest – er liest~. Sitedeki Fiil Atölyesi’nde de çalışabilirsin.')},
+    {t:'warn',text:T('*haben* ve *sein* de özeldir: ~du hast, er hat~ · ~du bist, er ist~.')},
+   ]},
+  {id:'pantomime-konu',title:T('Pandomim'),kind:'teach',kicker:T('Konu 6 · Pantomime'),heading:T('Ne yapıyorum? Tahmin et!'),
+   blocks:[
+    {t:'p',text:T('Pandomimde konuşmadan bir şey yaparsın, öteki tahmin eder. Rami oynuyor, Nikos ve Mei tahmin ediyor. Tahminlerde *du* biçimine dikkat: *du liest, du siehst*.')},
+    {t:'talk',lines:[
+     line('rami','Was mache ich? Rate mal!','Ne yapıyorum? Tahmin et!'),
+     line('nikos','Du liest ein Buch!','Kitap okuyorsun!'),
+     line('rami','Nein, leider falsch.','Hayır, maalesef yanlış.'),
+     line('mei','Du siehst einen Film.','Film izliyorsun.'),
+     line('rami','Ja, richtig! Und jetzt? Was mache ich?','Evet, doğru! Peki şimdi? Ne yapıyorum?'),
+     line('mei','Du fährst Fahrrad!','Bisiklete biniyorsun!'),
+     line('rami','Nein! Ich laufe!','Hayır! Koşuyorum!'),
+    ]},
+    {t:'rows',rows:[row('Was mache ich? Rate mal!','Ne yapıyorum? Tahmin et!'),row('Du liest ein Buch!','Kitap okuyorsun!'),row('Ja, richtig!','Evet, doğru!'),row('Nein, leider falsch.','Hayır, maalesef yanlış.')]},
+    {t:'note',text:T('Oyun: bir arkadaşınla oyna. Afişlerdeki fiilleri kullan: ~Du schläfst! Du isst! Du sprichst!~')},
+   ]},
+  {id:'ozet-konu',title:T('Özet'),kind:'teach',kicker:T('Konu 7 · Zusammenfassung'),heading:T('Bütün ünite bir bakışta'),
+   blocks:[
+    {t:'p',text:T('„Alles klar?“ testinden önce bütün üniteyi tekrar et. Satıra dokun ve dinle.')},
+    {t:'table',head:[T('konu'),T('örnek')],rows:[[T('günün bölümleri'),'am Morgen, am Mittag, am Abend, in der Nacht'],[T('morgen = yarın'),'Morgen habe ich frei.'],['gern / nicht gern','Ich koche gern. Ich putze nicht gern.'],[T('Ja-/Nein-sorusu'),'Hast du heute Zeit?'],[T('davet'),'Kommst du auch? – Ja, gern! / Oh, schade.'],[T('düzensiz fiiller'),'du fährst, er liest, sie isst, er läuft'],[T('günler'),'am Montag, am Wochenende, am Dienstagabend'],['ihr','Habt ihr Zeit? Kommt ihr?'],[T('fikir'),'Das macht Spaß! Das ist langweilig.'],[T('röportaj'),'Was machen Sie in Ihrer Freizeit?']],
+     say:['am Morgen, am Mittag, am Abend, in der Nacht','Morgen habe ich frei.','Ich koche gern. Ich putze nicht gern.','Hast du heute Zeit?','Kommst du auch? Ja, gern! Oh, schade.','du fährst, er liest, sie isst, er läuft','am Montag, am Wochenende, am Dienstagabend','Habt ihr Zeit? Kommt ihr?','Das macht Spaß! Das ist langweilig.','Was machen Sie in Ihrer Freizeit?']},
+    {t:'rows',all:true,rows:[row('Was machen Sie beruflich?','Ne iş yapıyorsunuz?'),row('Was machen Sie in Ihrer Freizeit?','Boş zamanınızda ne yapıyorsunuz?'),row('Mein Hobby ist auch mein Beruf.','Hobim aynı zamanda mesleğim.'),row('Was mache ich? Rate mal!','Ne yapıyorum? Tahmin et!'),row('Ja, richtig! / Nein, leider falsch.','Evet, doğru! / Hayır, maalesef yanlış.')]},
+    {t:'p',text:T('Şimdi alıştırmalar. Sırayla yapılır; bir alıştırma bitmeden sonraki açılmaz.')},
+   ]},
+  {id:'interview-fragen',title:T('Alıştırma 1'),kind:'exercise',kicker:'Alıştırma 1 · Welche Frage passt?',heading:T('Cevaba uyan soruyu seç'),lead:T('Mei’nin cevabını oku. Nora ne sormuştu?'),
+   exercise:{type:'quiz',items:[
+    {prompt:'Kochen! Ich unterrichte Kochkurse.',options:['Was unterrichten Sie?','Wann sind Ihre Kurse?','Haben Sie noch einen Beruf?']},
+    {prompt:'Am Dienstagabend und am Samstagvormittag.',options:['Wann sind Ihre Kurse?','Was unterrichten Sie?','Woher kommen Sie?']},
+    {prompt:'Ja, ich arbeite auch als Kellnerin.',options:['Haben Sie noch einen Beruf?','Was machen Sie in Ihrer Freizeit?','Wann sind Ihre Kurse?']},
+    {prompt:'Ich schwimme gern und ich lese viel.',options:['Was machen Sie in Ihrer Freizeit?','Was unterrichten Sie?','Haben Sie noch einen Beruf?']},
+    {prompt:'Ich komme aus Bangkok.',options:['Woher kommen Sie?','Wann sind Ihre Kurse?','Was machen Sie beruflich?']},
+    {prompt:'Ja, sehr gern!',options:['Kochen Sie gern?','Wann kochen Sie?','Was kochen Sie?']},
+   ].map(item=>({...item,say:item.options[0]}))}},
+  {id:'notizen',title:T('Alıştırma 2'),kind:'exercise',kicker:'Alıştırma 2 · beruflich oder in der Freizeit?',heading:T('İş mi, boş zaman mı?'),lead:T('Mei hakkındaki cümle işle mi ilgili, boş zamanla mı?'),
+   exercise:{type:'quiz',items:[
+    ['Sie unterrichtet Kochkurse.','beruflich'],['Sie schwimmt gern.','in der Freizeit'],['Sie arbeitet als Kellnerin.','beruflich'],['Sie liest viel.','in der Freizeit'],
+    ['Am Sonntag schläft sie lange.','in der Freizeit'],['Ihre Kurse sind am Dienstagabend.','beruflich'],['Sie spielt Tischtennis mit Nikos.','in der Freizeit'],['Im Restaurant trifft sie jeden Tag Leute.','beruflich'],
+   ].map(([prompt,answer])=>({prompt,options:[answer,answer==='beruflich'?'in der Freizeit':'beruflich'],say:prompt}))}},
+  {id:'profile',title:T('Alıştırma 3'),kind:'exercise',kicker:'Alıştırma 3 · Tomasz und Aisha',heading:T('Tomasz ve Aisha’yı anlat'),lead:T('Konu 4’ü hatırla. Boşluğa dokun ve seç: *er / sie* biçimi ve *sein / ihr*.'),
+   exercise:{type:'choice',lines:[
+    choiceLine('p1',['Tomasz ',gap(['trainiert','trainierst','trainiere'],'trainiert'),' Basketball mit Jugendlichen.']),
+    choiceLine('p2',['Seine Kurse ',gap(['sind','ist','seid'],'sind'),' am Montagabend und am Mittwochabend.']),
+    choiceLine('p3',['Basketball ist ',gap(['sein','ihr','mein'],'sein'),' Hobby. Er ist Kellner von Beruf.']),
+    choiceLine('p4',['In der Freizeit ',gap(['fährt','fahrt','fährst'],'fährt'),' er gern Fahrrad.']),
+    choiceLine('p5',['Aisha ',gap(['unterrichtet','unterrichtest','unterrichten'],'unterrichtet'),' Schwimmen für Kinder.']),
+    choiceLine('p6',['Das ist nicht ',gap(['ihr','sein','dein'],'ihr'),' Beruf: Sie ',gap(['arbeitet','arbeitest','arbeiten'],'arbeitet'),' als Taxifahrerin.']),
+    choiceLine('p7',['In der Freizeit ',gap(['liest','lest','lesen'],'liest'),' sie und sie ',gap(['tanzt','tanzen','tanzest'],'tanzt'),' mit Amani.']),
+   ]}},
+  {id:'plakate',title:T('Alıştırma 4'),kind:'exercise',kicker:'Alıştırma 4 · Vier Plakate',heading:T('Fiil hangi afişe gider?'),lead:T('Fiil *du* ile nasıl değişiyor? Doğru afişi seç. Doğrusu okunur.'),
+   exercise:{type:'quiz',items:[
+    {...group('fahren','a → ä'),say:'fahren, du fährst, er fährt'},
+    {...group('helfen','e → i'),say:'helfen, du hilfst, er hilft'},
+    {...group('sehen','e → ie'),say:'sehen, du siehst, er sieht'},
+    {...group('laufen','au → äu'),say:'laufen, du läufst, er läuft'},
+    {...group('sprechen','e → i'),say:'sprechen, du sprichst, er spricht'},
+    {...group('lesen','e → ie'),say:'lesen, du liest, er liest'},
+    {...group('schlafen','a → ä'),say:'schlafen, du schläfst, er schläft'},
+    {...group('treffen','e → i'),say:'treffen, du triffst, er trifft'},
+   ]}},
+  {id:'regelmaessig',title:T('Alıştırma 5'),kind:'exercise',kicker:'Alıştırma 5 · regelmäßig oder unregelmäßig?',heading:T('Düzenli mi düzensiz mi?'),lead:T('*du* biçimini düşün: fiil değişiyor mu?'),
+   exercise:{type:'quiz',items:[
+    ['kochen','regelmäßig','kochen, du kochst'],['essen','unregelmäßig','essen, du isst'],['wohnen','regelmäßig','wohnen, du wohnst'],['fahren','unregelmäßig','fahren, du fährst'],
+    ['spielen','regelmäßig','spielen, du spielst'],['lesen','unregelmäßig','lesen, du liest'],['tanzen','regelmäßig','tanzen, du tanzt'],['laufen','unregelmäßig','laufen, du läufst'],
+   ].map(([prompt,answer,say])=>({prompt,options:[answer,answer==='regelmäßig'?'unregelmäßig':'regelmäßig'],say}))}},
+  {id:'pantomime',title:T('Alıştırma 6'),kind:'exercise',kicker:'Alıştırma 6 · Pantomime',heading:T('Tahmin doğru mu?'),lead:T('Resimde Rami’nin gerçekten ne yaptığını gör. Tahmini dinle: doğru mu, yanlış mı?'),
+   exercise:{type:'quiz',items:[
+    {pic:alltagPic.lesen,emoji:'📖',listen:{text:'Du liest ein Buch!',who:'nikos'},options:['Ja, richtig!','Nein, leider falsch.'],say:'Ja, richtig! Du liest ein Buch.'},
+    {pic:alltagPic.schwimmen,emoji:'🏊',listen:{text:'Du fährst Fahrrad!',who:'mei'},options:['Nein, leider falsch.','Ja, richtig!'],say:'Nein, leider falsch. Du schwimmst.'},
+    {pic:alltagPic.schlafen,emoji:'😴',listen:{text:'Du schläfst!',who:'nikos'},options:['Ja, richtig!','Nein, leider falsch.'],say:'Ja, richtig! Du schläfst.'},
+    {pic:alltagPic.essen,emoji:'🍝',listen:{text:'Du siehst einen Film.',who:'mei'},options:['Nein, leider falsch.','Ja, richtig!'],say:'Nein, leider falsch. Du isst.'},
+    {pic:alltagPic.laufen,emoji:'🏃',listen:{text:'Du läufst!',who:'nikos'},options:['Ja, richtig!','Nein, leider falsch.'],say:'Ja, richtig! Du läufst.'},
+    {pic:alltagPic.sprechen,emoji:'💬',listen:{text:'Du isst!',who:'mei'},options:['Nein, leider falsch.','Ja, richtig!'],say:'Nein, leider falsch. Du sprichst mit Freunden.'},
+   ].map(item=>({...item,prompt:T('Rami ne yapıyor? Tahmini dinle: doğru mu?')}))}},
+  {id:'antwort',title:T('Alıştırma 7'),kind:'exercise',kicker:'Alıştırma 7 · Welche Antwort passt?',heading:T('Dinle: hangi cevap uyuyor?'),lead:T('Dinle düğmesine dokun ve uyan cevabı seç. Bütün ünitenin kalıpları burada.'),
+   exercise:{type:'quiz',items:[
+    {listen:{text:'Schwimmst du gern?',who:'mei'},options:['Ja, ich schwimme gern.','Ach, schade!','Am Mittwoch.']},
+    {listen:{text:'Ich spiele heute Fußball. Kommst du auch?',who:'omar'},options:['Ja, ich komme auch!','Ja, ich schwimme gern.','Ach, schade!']},
+    {listen:{text:'Ich habe heute leider keine Zeit.',who:'nikos'},options:['Oh, schade!','Das macht Spaß!','Ja, ich habe Zeit.']},
+    {listen:{text:'Findest du Boxen interessant?',who:'yasemin'},options:['Nein, ich finde Boxen langweilig.','Ja, ich habe Zeit.','Am Samstag.']},
+    {listen:{text:'Hast du am Sonntag Zeit?',who:'sabine'},options:['Ja, am Sonntag habe ich frei.','Nein, nicht so gern.','Das ist interessant!']},
+    {listen:{text:'Wann sind deine Kurse?',who:'nora'},options:['Am Dienstagabend.','Ja, gern.','Ich unterrichte Kochkurse.']},
+   ].map(item=>({...item,prompt:T('Dinle. Hangi cevap uyuyor?')}))}},
+  {id:'und-du',title:T('Alıştırma 8'),kind:'exercise',kicker:'Alıştırma 8 · Und Sie?',heading:T('Şimdi sen: röportaj senle'),lead:T('Nora seninle konuşuyor (*Sie*). Kendi cevaplarını yaz. Kalıba uyan cümle yeşil olur. Üç cümle bitince alıştırma tamam.'),
+   exercise:{type:'own',key:'lernkoko-l5d-own',prompts:[
+    {question:'Was machen Sie beruflich?',pattern:/^(ich bin [a-z]+( von beruf)?|ich arbeite als [a-z]+|ich arbeite( jetzt)? nicht|ich lerne deutsch)( [a-z]+)*$/,placeholder:'Ich arbeite als Verkäuferin.'},
+    {question:'Was machen Sie in Ihrer Freizeit?',pattern:/^(in meiner freizeit [a-z]+ ich|ich [a-z]+ gern)( [a-z]+)*$/,placeholder:'In meiner Freizeit lese ich gern.'},
+    {question:'Wann haben Sie Zeit?',pattern:/^(am [a-z]+|heute [a-z]+|morgen( [a-z]+)?) (habe ich (zeit|frei)|[a-z]+ ich)( [a-z]+)*$/,placeholder:'Am Samstagnachmittag habe ich Zeit.'},
+    {question:'Ist Ihr Hobby auch Ihr Beruf?',pattern:/^(ja|nein)( [a-z]+)*$/,placeholder:'Nein, mein Hobby ist Fußball.',optional:true},
+   ]},
+   after:[{t:'note',text:T('Hatırla: *Sie* ile soruda fiil *-en*: ~Was machen Sie?~ Cevapta *ich*: ~Ich mache …~')}]},
+  {id:'test',title:'Alles klar?',kind:'test',test:[
+   ['Am ___ frühstücke ich.',['Morgen','morgen','Nacht'],'Morgen','Am Morgen frühstücke ich.'],
+   ['Hast du ___ Zeit? – Ja, morgen habe ich frei.',['morgen','Morgen','am morgen'],'morgen','Hast du morgen Zeit? Ja, morgen habe ich frei.'],
+   ['Ich ___ gern Tischtennis.',['spiele','spielt','spielst'],'spiele','Ich spiele gern Tischtennis.'],
+   ['___ Sie gern Sport, Herr Nowak?',['Machen','Machst','Macht'],'Machen','Machen Sie gern Sport, Herr Nowak?'],
+   [T('Hangisi W-sorusu?'),['Wann hast du Zeit?','Hast du Zeit?','Kommst du auch?'],'Wann hast du Zeit?','Wann hast du Zeit?'],
+   ['Rami ___ gern libanesisch.',['isst','esst','ist'],'isst','Rami isst gern libanesisch.'],
+   ['___ du gern Fahrrad?',['Fährst','Fahrst','Fährt'],'Fährst','Fährst du gern Fahrrad?'],
+   ['Tomasz ___ gern Bücher.',['liest','lest','lesst'],'liest','Tomasz liest gern Bücher.'],
+   ['Aisha ___ jeden Morgen im Park.',['läuft','lauft','läufst'],'läuft','Aisha läuft jeden Morgen im Park.'],
+   [T('„cumartesi“'),['der Samstag','der Sonntag','der Freitag'],'der Samstag','der Samstag'],
+   ['am Freitag + am Abend = ___',['am Freitagabend','am Abendfreitag','im Freitagabend'],'am Freitagabend','am Freitagabend'],
+   ['___ ihr am Wochenende Zeit?',['Habt','Hast','Hat'],'Habt','Habt ihr am Wochenende Zeit?'],
+   [T('Arkadaşın gelemiyor. Ne dersin?'),['Oh, schade!','Super!','Viel Spaß!'],'Oh, schade!','Oh, schade!'],
+   ['Was machen Sie in ___ Freizeit, Frau Suwan?',['Ihrer','deiner','ihr'],'Ihrer','Was machen Sie in Ihrer Freizeit, Frau Suwan?'],
+   [T('Hangi fiil düzensiz?'),['sehen','spielen','kochen'],'sehen','sehen, du siehst, er sieht'],
+  ]},
+  {id:'konus',title:T('Konuş'),kind:'speak',lead:T('Nora seninle röportaj yapıyor. Soruyu dinle, cevabı dinle, sonra sen yüksek sesle söyle. Üç cevapta senin cümlelerin var (Alıştırma 8).'),speak:[
+   {who:'nora',question:'Was machen Sie beruflich?',answer:'Ich arbeite als Verkäuferin.',own:{key:'lernkoko-l5d-own',index:0,pattern:/^(ich bin [a-z]+( von beruf)?|ich arbeite als [a-z]+|ich arbeite( jetzt)? nicht|ich lerne deutsch)( [a-z]+)*$/}},
+   {who:'nora',question:'Was machen Sie in Ihrer Freizeit?',answer:'In meiner Freizeit lese ich gern.',own:{key:'lernkoko-l5d-own',index:1,pattern:/^(in meiner freizeit [a-z]+ ich|ich [a-z]+ gern)( [a-z]+)*$/}},
+   {who:'nora',question:'Wann haben Sie Zeit?',answer:'Am Samstagnachmittag habe ich Zeit.',own:{key:'lernkoko-l5d-own',index:2,pattern:/^(am [a-z]+|heute [a-z]+|morgen( [a-z]+)?) (habe ich (zeit|frei)|[a-z]+ ich)( [a-z]+)*$/}},
+   {who:'rami',question:'Was mache ich? Rate mal!',answer:'Du liest ein Buch!'},
+   {who:'mei',question:'Am Samstag koche ich. Kommst du auch?',answer:'Ja, ich komme gern! Das macht Spaß!'},
+  ]},
+  {id:'ozet',title:T('Bitti'),kind:'end',end:{
+   can:[T('Bir röportajı anlamak ve soru sormak: *Was unterrichten Sie? Wann sind Ihre Kurse?*'),T('İş ve boş zamanı ayırmak: *beruflich · in der Freizeit*'),T('Düzenli ve düzensiz fiilleri ayırmak: *du kochst · du fährst*'),T('Bütün ünite: günün bölümleri, *gern*, Ja-/Nein-soruları, günler, davetler')],
+   summary:T('**Lektion 5 bitti!** _Was machen Sie beruflich?_ · _in der Freizeit_ · _e → i, e → ie, a → ä, au → äu_ · _Rate mal! – Ja, richtig! / Nein, leider falsch._'),
+  }},
+ ],
+};

@@ -34,6 +34,7 @@ export const PAGE_NAMES: Record<string, string> = {
   '/a1-1/berufe': 'Lektion 2 · Berufe',
   '/a1-1/orte-und-dinge': 'Lektion 3 · Orte und Dinge',
   '/a1-1/familie': 'Lektion 4 · Familie',
+  '/a1-1/alltag-und-freizeit': 'Lektion 5 · Alltag und Freizeit',
   '/a1-2/ev-ve-yasam': 'Ev ve Yaşam',
   '/a1-2/ausbildung': 'Lektion 12 · Ausbildung',
   '/a1-2/ausbildung/hoeren': 'Lektion 12 · Hören',

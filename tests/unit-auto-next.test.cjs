@@ -18,6 +18,7 @@ const quizzes={
  'app/willkommen-ui.tsx':'useAutoNext(picked!==null&&!over,speech,()=>advance(i,score));', // every lesson's test
  'app/orte-steps.tsx':'useAutoNext(picked!==null&&!over,speech,next);', // Lektion 3 quizzes
  'app/familie-steps.tsx':'useAutoNext(picked!==null&&!over,speech,next);', // Lektion 4 quizzes
+ 'app/alltag-steps.tsx':'useAutoNext(picked!==null&&!over,speech,next);', // Lektion 5 quizzes
  'app/berufe-a-steps.tsx':'useAutoNext(picked!==null&&!over,speech,next);', // Lektion 2A pictures
  'app/berufe-c-steps.tsx':'useAutoNext(picked!==null&&!ended,speech,next);', // Lektion 2C numbers heard
  'app/stadt-a-steps.tsx':'useAutoNext(picked!==null&&!over,speech,next);', // Lektion 15A Mei's questions

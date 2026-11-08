@@ -683,6 +683,14 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  .verb-practice .verb-slot>.verb-card.with-picture>.verb-picture { grid-column:1; grid-row:auto; width:auto; height:calc(var(--qslot) - 92px); aspect-ratio:1; }
  .verb-practice .verb-slot>.verb-card.with-picture:has(.verb-picture)>:not(.verb-picture) { grid-column:1; }
  .verb-practice .verb-slot>.verb-card.with-picture .verb-card-main { font-size:24px; }
+ /* hat mı, ist mi?: the sentence needs the room, so the picture stays small beside the verb and the sentence goes under both. */
+ .verb-practice .verb-slot>.verb-card.verb-aux-card.with-picture:has(.verb-picture) { grid-template-columns:96px minmax(0,1fr); grid-template-rows:auto auto auto; justify-items:start; text-align:start; column-gap:12px; }
+ .verb-practice .verb-slot>.verb-card.verb-aux-card.with-picture>.verb-picture { grid-column:1; grid-row:1 / span 2; width:96px; height:auto; }
+ .verb-practice .verb-slot>.verb-card.verb-aux-card.with-picture:has(.verb-picture)>.verb-card-main { grid-column:2; grid-row:1; align-self:end; }
+ .verb-practice .verb-slot>.verb-card.verb-aux-card.with-picture:has(.verb-picture)>.verb-card-meaning { grid-column:2; grid-row:2; align-self:start; }
+ .verb-practice .verb-slot>.verb-card.verb-aux-card.with-picture:has(.verb-picture)>.verb-sentence { grid-column:1 / -1; grid-row:3; font-size:17px; }
+ /* Its result ("sie/er ist angekommen") breaks a long word at a German syllable, not anywhere. */
+ .verb-practice .verb-slot>.verb-result[data-verb-result="perfekt"] .verb-result-title strong { font-size:16px; overflow-wrap:normal; -webkit-hyphens:auto; hyphens:auto; }
 }
 
 /* A verb opened from the picture strip during a round (5 November 2026): how it went, then its card; the round waits. */

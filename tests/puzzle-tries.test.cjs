@@ -17,6 +17,9 @@ test('the puzzle shows three hearts, keeps the word right while a try is left an
  const styles=read('app/globals.css');assert.ok(styles.includes('.puzzle-hint-slot>* { grid-area:1 / 1; }')&&styles.includes('.puzzle-hint-slot .puzzle-hint.covered { visibility:hidden; }'));
  assert.ok(ui.includes('hintLimit(puzzle,hintCount)')&&ui.includes('readPuzzleExtras(puzzle,storageKey,hintCount)'));
  const css=read('app/globals.css');assert.ok(css.includes('.puzzle-tries { display:inline-flex;')&&css.includes('.puzzle-tries .lost {'));
+ // The tries used up (the learner asked, 9 November 2026): the empty boxes show their right letter, filled in by the site.
+ assert.ok(ui.includes("const revealed=out&&!value?part.character:'';")&&ui.includes("const state=revealed?'revealed':")&&ui.includes("value||revealed||<span aria-hidden=\"true\">_</span>"),'the right letters fill the empty boxes');
+ assert.ok(css.includes('.puzzle-empty.revealed {'),'in their own colour');
 });
 
 test('Nesne Kasası and Fiil Atölyesi use the rule, Ev ve Yaşam does not',()=>{

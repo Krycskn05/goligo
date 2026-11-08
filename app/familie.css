@@ -1,0 +1,38 @@
+/* Lektion 4 „Familie“ (app/familie-study.tsx, app/familie-steps.tsx): the same few pieces as Lektion 3 (app/orte.css). */
+/* A word card's picture: the 3D pictures fill the card's 4:3 frame (a word without a picture yet shows its emoji). */
+.l4-card-pic img { object-fit:cover; }
+.l4-emoji { display:grid; place-items:center; width:100%; aspect-ratio:4/3; font-size:44px; line-height:1; background:#f4f8fc; }
+.l4-word { font-size:18px; font-weight:700; line-height:1.3; }
+.l4-plural { font-weight:500; font-size:15px; color:var(--ink-2,#3d5a7a); }
+.l4-cards .l2-job { align-items:center; }
+.l4-cards .l2-job > button.l1a-say,.l4-cards .l2-job > .l1a-say { flex:none; }
+/* The quiz picture: the drawn things are small, the emoji gets a tile of its own. */
+.l4-quiz-pic { max-height:220px; margin-inline:auto; }
+span.l4-quiz-pic { display:grid; place-items:center; width:min(260px,70%); aspect-ratio:4/3; margin:6px auto 4px; font-size:84px; border-radius:18px; background:#f4f8fc; }
+/* A row to write with its picture. */
+.l4-write-row { align-items:center; justify-content:flex-start; gap:8px 12px; }
+.l4-write-row .l2-form-given { flex:1 1 auto; text-align:start; }
+.l4-write-pic { flex:none; width:56px; height:42px; object-fit:contain; border-radius:10px; background:#fff; }
+span.l4-write-pic { display:grid; place-items:center; aspect-ratio:auto; font-size:28px; background:#f4f8fc; }
+.l4-table td:first-child { font-weight:700; }
+.l4-price { display:inline-block; margin-inline-start:6px; padding:1px 8px; border-radius:999px; background:#fff1d6; color:#9a5a00; font-size:15px; font-weight:800; }
+@media (max-width:640px) { .l4-ads { grid-template-columns:minmax(0,1fr); } }
+/* The one-screen design (app/paged-step.tsx, ?tasarim=tek), the same as Lektion 3's. */
+@media (min-width:761px) {
+ .l4-onescreen .work-layout { grid-template-columns:minmax(0,1fr); }
+ .l4-onescreen .l12-steps .l12-step-text small { display:none; }
+ .l4-onescreen .l12-steps .l12-step { min-height:0; padding-top:5px; padding-bottom:5px; }
+ .l4-onescreen .l1a-card .l1a-top-row { display:none; }
+ .l4-onescreen .l1a-card .l1a-top { margin-bottom:6px; }
+ .l4-onescreen .l1a-mini-head { display:none; }
+ .l4-onescreen .l1a-card .l1a-pager { margin-top:6px; padding-top:6px; }
+ .l4-onescreen .l1a-folded .lb.l1a-book .lb-spread { grid-template-columns:minmax(0,0fr) 0px minmax(0,1fr); transition:none; padding:6px; }
+ .l4-onescreen .l1a-folded .lb.l1a-book .lb-left { transition:none; transform:none; opacity:0; visibility:hidden; max-height:0; padding:0; overflow:hidden; display:block; }
+ .l4-onescreen .l1a-folded .lb.l1a-book .lb-rings { overflow:hidden; opacity:0; }
+ .l4-onescreen .l1a-folded .lb-right.lb-page, .l4-onescreen .l1a-folded .lb-right.lb-page:dir(rtl) { padding:14px 18px 12px 52px; }
+ .l4-onescreen .l1a-folded .lb-right.lb-page:dir(rtl) { padding:14px 52px 12px 18px; }
+ .l4-onescreen .lb-tabbed { margin-top:50px; }
+ .l4-onescreen .lb .lb-right>.l12-steps { margin:-62px -8px 10px; }
+ .l4-onescreen .object-page { padding-top:8px; }
+ .l4-onescreen .l1a-card { padding:10px 14px; }
+}

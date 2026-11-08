@@ -5,7 +5,7 @@ exports.unitGoalsFor = exports.unitGoalsById = void 0;
  * "Bu ünitede": what a unit teaches, for the left page of a unit's notebook (the learner asked, 25 October 2026).
  * Written in our own words from the topics of the learner's textbook contents page — no sentences, names or titles
  * of the book are copied; the German examples are everyday phrases. Bold with **…**.
- * Lektion 3's list follows its pages (5 November 2026).
+ * Lektion 3's list follows its pages (5 November 2026), Lektion 4's too (8 November 2026).
  */
 exports.unitGoalsById = {
     // Lektion 1 „Willkommen!“
@@ -42,6 +42,18 @@ exports.unitGoalsById = {
         'Sözlükte artikeli bul, bir iş yerini anlat: **Die Schere ist alt, aber gut.**',
         'Gramer: artikeller **der / das / die**, **er / es / sie**',
         'Telaffuz: **a, e, i, o, u** · İpucu: kelime kartlarıyla ve sözlükle çalış',
+    ],
+    // Lektion 4 „Familie“
+    'book-04': [
+        'Aileni tanıt, kim kimin nesi: **Das ist meine Mutter. · der Vater von Rami**',
+        'Kaç kardeş, kaç çocuk: **Wie viele Geschwister hast du? · Ich habe zwei Brüder.**',
+        'Medeni durumunu söyle: **Ich bin ledig / verheiratet / geschieden.**',
+        'Neyin var, neyin yok, neye ihtiyacın var: **Ich habe ein Handy, aber kein Auto. · Ich brauche …**',
+        'Gelecek planları: **In 15 Jahren habe ich vielleicht ein Haus.**',
+        'Özel sorulara nazikçe hayır de: **Entschuldigung, das ist meine Privatsache.**',
+        'Bir Elfchen (on bir kelimelik şiir) yaz, kelimeleri alanlara göre öğren',
+        'Gramer: çoğul, **haben**, Akkusativ **einen / keinen**, iyelik **mein, dein, sein, ihr, unser, euer, Ihr**',
+        'Telaffuz: sondaki **-er**, **-e / -en** · Yazım: **ie / ei** · Fiil ekleri: **arbeiten, sprechen, heißen**',
     ],
     // Lektion 15 „Wege in der Stadt“ (Teil A since 30 October 2026, from the learner's lesson page)
     'book-15': [

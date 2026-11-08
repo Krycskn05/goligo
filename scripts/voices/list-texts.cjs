@@ -51,6 +51,8 @@ for(const text of load('berufe-c-course').berufeCSpeechTexts())add(text);
 for(const text of load('berufe-d-course').berufeDSpeechTexts())add(text);
 // Lektion 3 „Orte und Dinge“ (Teil A–D): word cards, lists, tables, dialogues, quick checks, exercises, tests and Konuş.
 for(const text of load('orte-course').orteSpeechTexts())add(text);
+// Lektion 4 „Familie“ (Teil A–D): the family, Familienstand, haben, the possessive articles, the interview, the Elfchen, the course room.
+for(const text of load('familie-course').familieSpeechTexts())add(text);
 // "Konuş" (the AI role plays): the partners' opening lines and the phrases to try.
 for(const text of load('talk-scenarios').talkSpeechTexts())add(text);
 process.stdout.write(JSON.stringify([...texts].sort(),null,1)+'\n');

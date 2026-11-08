@@ -254,7 +254,7 @@ async function languageFlow(browser) {
     record(`Girissiz ${target} tadimlik olarak aciliyor`, at.pathname === target && banner === 1, `${page.url()} · not ${banner}`);
   }
   // Unitelerden yalnizca Lektion 1 acik (ogrenci istedi, 3 Kasim 2026); digerleri giris ister.
-  for (const target of ["/a1-1/berufe", "/a1-2/ev-ve-yasam", "/a1-2/ausbildung", "/a1-2/wege-in-der-stadt"]) {
+  for (const target of ["/a1-1/berufe", "/a1-1/familie", "/a1-2/ev-ve-yasam", "/a1-2/ausbildung", "/a1-2/wege-in-der-stadt"]) {
     await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
     const at = new URL(page.url());
     record(`Girissiz ${target} giris sayfasina yonleniyor`, at.pathname === "/giris" && at.searchParams.get("return_to") === target, page.url());
@@ -389,6 +389,13 @@ async function languageFlow(browser) {
   await page.goto(BASE + "/konular?level=A1.1", { waitUntil: "networkidle", timeout: 90000 });
   record("Uniteler: Lektion 1 karti Lektion 1A'ya acliyor", (await page.locator("[data-unit='book-01'] a.housing-open[href='/a1-1/willkommen']").count()) === 1, "");
   record("Uniteler: Lektion 2 karti Lektion 2'ye aciliyor", (await page.locator("[data-unit='book-02'] a.housing-open[href='/a1-1/berufe']").count()) === 1, "");
+  record("Uniteler: Lektion 4 karti Lektion 4'e aciliyor", (await page.locator("[data-unit='book-04'] a.housing-open[href='/a1-1/familie']").count()) === 1, "");
+  // Lektion 4 „Familie“ (8 Kasim 2026): Lektion 3 gibi veriden cizilen bir defter, Teil A-D acik.
+  await visit(page, "/a1-1/familie", "03j-lektion-4.png", errors);
+  record("Lektion 4: defter girisi (Teil A-D acik)", (await page.locator(".l4-book .lb-toc-row button.lb-toc-open").count()) === 4, "");
+  await page.goto(BASE + "/a1-1/familie?adim=aile", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  record("Lektion 4A: aile kartlari (18 kart) ve dort sekme", (await page.locator("[data-l4-step='aile'] .l2-job").count()) === 18 && (await page.locator("#l1a-tabs .l12-step").count()) === 4, "");
   await visit(page, "/", "01-ana-sayfa.png", errors);
   record("Giris yapinca ana sayfada dersler var (tanitim yok)", (await page.locator("[data-landing]").count()) === 0, "");
 

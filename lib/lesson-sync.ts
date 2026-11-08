@@ -11,7 +11,7 @@
  * beats a known change, and two score lists of unknown age are joined (exercises done on one device and others done on
  * the other device both stay).
  */
-export const SYNC_LESSONS=['l1','l2','l3','l12','l15','site'] as const;
+export const SYNC_LESSONS=['l1','l2','l3','l4','l12','l15','site'] as const;
 export type SyncLesson=typeof SYNC_LESSONS[number];
 export type SyncItem={v:string|null;t:number};
 export type SyncItems=Record<string,SyncItem>;
@@ -26,9 +26,9 @@ export const SYNC_LESSON_MAX=150000;
 export const SYNC_REQUEST_MAX=480000;
 /** Settings of one device, not progress. */
 const DEVICE_ONLY=new Set(['lernkoko-l12-speed']);
-/** The learner's own data — their sentences and their form in Lektion 2 (`lernkoko-l2a-own`, `lernkoko-l2d-form` …) —
- * stays on this device only (the learner asked, 2 November 2026); it is never sent to the account. */
-const OWN_DATA=/^lernkoko-l[23][a-d]-(own|form)$/;
+/** The learner's own data — their sentences and their form in Lektion 2, 3 and 4 (`lernkoko-l2a-own`, `lernkoko-l2d-form`,
+ * `lernkoko-l4d-own` …) — stays on this device only (the learner asked, 2 November 2026); it is never sent to the account. */
+const OWN_DATA=/^lernkoko-l[234][a-d]-(own|form)$/;
 
 /** Progress of the site that is no lesson (`site`, 2 November 2026): "Kaldığın yerden devam et" (lib/last-place.ts) and
  * the best scores of the games (Oyunlar). */
@@ -38,9 +38,9 @@ const SITE_KEY=/^lernkoko-(last-place$|verb-game:)/;
 export function syncLessonOf(key:string):SyncLesson|null{
  if(DEVICE_ONLY.has(key)||OWN_DATA.test(key))return null;
  if(SITE_KEY.test(key))return 'site';
- const match=/^lernkoko-l(1[a-d]?|12|15[a-d]?|2[a-d]?|3[a-d]?)[-:]/.exec(key);
+ const match=/^lernkoko-l(1[a-d]?|12|15[a-d]?|2[a-d]?|3[a-d]?|4[a-d]?)[-:]/.exec(key);
  if(!match)return null;
- return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':match[1].startsWith('2')?'l2':match[1].startsWith('3')?'l3':'l1';
+ return match[1].startsWith('12')?'l12':match[1].startsWith('15')?'l15':match[1].startsWith('2')?'l2':match[1].startsWith('3')?'l3':match[1].startsWith('4')?'l4':'l1';
 }
 /** Half-done answers of word and verb rounds (`lernkoko-puzzle:<round>:<question>` …): they belong to a round of the account. */
 const ROUND_DRAFT=/^lernkoko-(puzzle|housing-puzzle|housing-free):/;

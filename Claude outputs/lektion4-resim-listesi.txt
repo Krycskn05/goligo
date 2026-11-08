@@ -1,0 +1,137 @@
+GOLIQO · LEKTION 4 „FAMILIE“ · RESİM LİSTESİ — ChatGPT için (8 Kasım 2026)
+
+Nasıl:
+1) Önce 0) numaralı mesajı bir kez gönder (stil + kişiler). ChatGPT "OK" desin.
+2) Sonra her paftayı ayrı bir mesaj olarak gönder. Kapaklar tek resimdir (16:9); kelime paftaları 2 sütun × 3 satır, altı ayrı resimdir.
+3) Gelen resmi başlıktaki adla kaydet (örneğin kapak-a.png, lektion4-1.png) ve goligo/yeni-resimler/lektion4 klasörüne koy.
+   Kesme, 640×480 / 960×540 boyutlama ve WebP'ye çevirme bende: dosyalar gelince ben keserim ve lib/familie-pictures.ts'teki `arrived` listesine eklerim.
+Telif notu: Bütün sahneler bizim kendi kişilerimiz ve kendi metinlerimizdir; ders kitabının fotoğrafları, kişileri, adları ve metinleri kullanılmaz. Resimlerde yazı, logo, marka ve filigran yoktur.
+
+==== 0) İlk mesaj (bir kez gönder) ====
+For this chat: every image I ask for is for a German-learning website. Style: polished original 3D animated-film illustration (Pixar-like look), rounded forms, expressive friendly faces, tactile clay-like materials, soft warm studio light, lively colours. Palette: teal, amber, terracotta and warm ivory; plain pale ivory background (#fff9ec) unless a scene needs a room. Original characters only. No visible text, no letters, no numbers, no logos, no brands, no watermark. Simple symbols (heart, tick, cross, question mark) only where I ask.
+Two layouts: (A) COVER = one single wide image, 16:9. (B) SHEET = a tall portrait image (2:3) with 6 separate pictures in a grid of 2 columns and 3 rows, every picture 4:3, all on the same plain ivory background with wide empty gaps, no frames, no borders, no lines, no picture touching another or the edge.
+Recurring people (keep them the same in every image):
+- RAMI: man in his 30s from Lebanon, dark curly hair, short dark beard, warm smile, red shirt over a white tee.
+- HANAN (Rami's wife): woman in her 30s, long dark hair, olive-green blouse.
+- LINA (their daughter, 8): girl with dark curly hair in two bunches, yellow dress.
+- SAMI (their son, 5): small boy with dark curls, striped blue tee.
+- FADI and RIMA (Rami's parents): an elderly couple, grey hair, he with a short white beard and a beige cardigan, she with a dark headscarf and a plum cardigan.
+- NIKOS: man in his 30s from Greece, curly brown hair, light stubble, blue shirt.
+- OMAR: man in his 30s from Sudan, short black curly hair, dark beard, yellow shirt.
+- ADAM (Omar's son, 10): boy with short black curls, green hoodie.
+- TOMASZ: man in his 30s from Poland, light brown hair, round glasses, green sweater over a white collar.
+- AGATA (Tomasz's wife): woman in her 30s, blonde braid, rust-coloured sweater.
+- PAUL: the teacher, older man, short grey hair, big friendly smile, navy blue zip jacket.
+- SABINE: woman in her 20s, wavy blonde hair, small earrings, salmon-pink polo shirt.
+- YASEMIN: woman in her 30s from Turkey, long wavy light-brown hair, lilac cardigan over a white top.
+- AISHA: woman in her 30s from Kenya, black braided hair in a high bun, gold hoop earrings, green sweater.
+- NORA: woman in her 20s, red wavy bob, round glasses, yellow sweater.
+- MEI: woman in her 20s from Thailand, straight black shoulder-length hair with a small hair clip, teal top under an orange cardigan.
+Reply "OK" now; I will send the first image next.
+
+==== kapak-a.png · Kapak A · Das ist meine Familie. (COVER, 16:9) ====
+COVER: RAMI and NIKOS sit on a wooden park bench under a tree on a sunny day. Rami holds up his smartphone and shows Nikos photos; on the phone screen we see tiny portraits of Hanan, Lina, Sami, Fadi and Rima (no text). Nikos leans in, smiling and pointing at the screen. Warm afternoon light, green park behind them.
+
+==== kapak-b.png · Kapak B · Ich habe später ein Haus und zwei Kinder. (COVER, 16:9) ====
+COVER: MEI sits at a tidy desk with a laptop, a smartphone and a mug, chin on her hand, smiling and dreaming. A big soft thought bubble above her shows a small house with a garden and a tree, two happy children and a bicycle. Bright office corner with a plant.
+
+==== kapak-c.png · Kapak C · Das ist meine Privatsache. (COVER, 16:9) ====
+COVER: A cosy café table. NORA sits with an open notebook and a pen, interviewing OMAR across the table. Omar smiles kindly and raises one open palm politely, as if saying "that is private". On the table two coffee cups and a small framed photo of a boy (Adam). Warm café interior behind them, no text anywhere.
+
+==== kapak-d.png · Kapak D · Das Elfchen ist schön! (COVER, 16:9) ====
+COVER: A bright course room. PAUL stands at a large blank smartboard. In front of him RAMI, MEI, TOMASZ and AISHA proudly hold up colourful posters covered with abstract coloured word blocks (no readable letters). Chairs, a window, a wall clock and a coat rack in the room.
+
+==== lektion4-1.png · Familie 1 (SHEET 2×3) → familie, eltern, mutter, vater, kind, baby ====
+SHEET: six pictures.
+Row 1, left (die Familie): Rami's whole family on a sofa — RAMI, HANAN, LINA and SAMI, all smiling, a framed photo of FADI and RIMA on the wall behind.
+Row 1, right (die Eltern): RAMI and HANAN standing side by side, his arm around her shoulder.
+Row 2, left (die Mutter): HANAN hugging LINA, both laughing.
+Row 2, right (der Vater): RAMI carrying SAMI on his shoulders in the park.
+Row 3, left (das Kind): LINA alone, with a small school backpack, waving.
+Row 3, right (das Baby): a baby in a soft cot with a teddy bear.
+
+==== lektion4-2.png · Familie 2 (SHEET 2×3) → sohn, tochter, geschwister, bruder, schwester, grosseltern ====
+SHEET: six pictures.
+Row 1, left (der Sohn): SAMI playing with a toy car on the floor.
+Row 1, right (die Tochter): LINA holding up a colourful drawing (abstract shapes, no letters).
+Row 2, left (die Geschwister): LINA and SAMI building a tower of wooden blocks together.
+Row 2, right (der Bruder): NIKOS with his younger brother (curly hair like him, orange tee), arms around each other's shoulders, both grinning.
+Row 3, left (die Schwester): YASEMIN with her younger sister (same light-brown hair, denim jacket), taking a selfie together.
+Row 3, right (die Großeltern): FADI and RIMA sitting close together on a garden bench, holding hands.
+
+==== lektion4-3.png · Familie 3 (SHEET 2×3) → oma, opa, tante, onkel, cousine, cousin ====
+SHEET: six pictures.
+Row 1, left (die Oma): RIMA in an armchair knitting a teal scarf, smiling.
+Row 1, right (der Opa): FADI with a walking stick and a folded newspaper (no readable text), tipping his flat cap.
+Row 2, left (die Tante): a friendly woman in her 40s with a gift bag, opening her arms for a hug.
+Row 2, right (der Onkel): a cheerful man in his 40s holding a football under his arm.
+Row 3, left (die Cousine): a young woman with big headphones around her neck, waving.
+Row 3, right (der Cousin): a young man with a skateboard under his arm, giving a thumbs up.
+
+==== lektion4-4.png · Teil B 1 (SHEET 2×3) → ehemann, ehefrau, enkel, enkelin, garten, auto ====
+SHEET: six pictures.
+Row 1, left (der Ehemann): TOMASZ in a smart jacket, a wedding ring on his hand, holding a small bouquet.
+Row 1, right (die Ehefrau): AGATA in a light dress, a wedding ring on her hand, holding the same bouquet, smiling.
+Row 2, left (der Enkel): a small boy sitting on FADI's lap, both laughing.
+Row 2, right (die Enkelin): a small girl baking cookies with RIMA at a kitchen table.
+Row 3, left (der Garten): a small cosy garden behind a house — flower beds, a tree, a watering can, a little fence.
+Row 3, right (das Auto): a cream-coloured compact family car on a plain background, three-quarter view.
+
+==== lektion4-5.png · Teil B 2 (SHEET 2×3) → chef, chefin, job, ledig, verheiratet, geschieden ====
+SHEET: six pictures.
+Row 1, left (der Chef): a friendly man in a suit standing at an office door, holding a folder.
+Row 1, right (die Chefin): a friendly woman in a blazer pointing at a whiteboard with a simple abstract chart (bars only, no text).
+Row 2, left (der Job): MEI typing on a laptop at an office desk with two monitors showing colourful abstract blocks.
+Row 2, right (ledig): MEI alone on a balcony with a mug of tea, relaxed and happy.
+Row 3, left (verheiratet): two gold wedding rings resting together on a small velvet cushion.
+Row 3, right (geschieden): two gold rings lying apart on the same cushion with a clear gap between them.
+
+==== lektion4-6.png · Teil C 1 (SHEET 2×3) → nachbar, nachbarin, cafe, ex-frau, ex-mann, gespraech ====
+SHEET: six pictures.
+Row 1, left (der Nachbar): a friendly man waving over a low garden fence, a lawnmower beside him.
+Row 1, right (die Nachbarin): a friendly woman watering flowers on the neighbouring balcony, waving.
+Row 2, left (das Café): a small café counter with cups and cakes; an elderly Sudanese couple (Omar's parents, grey hair, warm smiles) behind the counter.
+Row 2, right (die Ex-Frau): a woman at the open front door of her flat handing a school backpack to ADAM, who is about to leave.
+Row 3, left (der Ex-Mann): a man at a front door waving goodbye to a boy and his mother who walk away with a suitcase; calm, friendly mood.
+Row 3, right (das Gespräch): NORA and OMAR talking at a café table, Nora with a notebook, Omar gesturing with his hands.
+
+==== lektion4-7.png · Teil C 2 (SHEET 2×3) → besuchen, privat, million, wanduhr, kennen, leben ====
+SHEET: six pictures.
+Row 1, left (besuchen): OMAR at a front door with a small wrapped gift; ADAM runs toward him with open arms to hug him.
+Row 1, right (privat): a smiling person politely raising one open palm toward the viewer, the other hand over the heart, as if saying "that is private".
+Row 2, left (die Million): an enormous mountain of shiny gold coins with a few coins rolling off, a small amazed person next to it (no numbers).
+Row 2, right (die Wanduhr): a round wall clock on a classroom wall, simple hands, no digits.
+Row 3, left (kennen): two neighbours meeting in a stairwell and shaking hands warmly, both clearly recognising each other.
+Row 3, right (leben): TOMASZ, AGATA and their two small children in front of their house with a little garden.
+
+==== lektion4-8.png · Kursraum (SHEET 2×3) → klimaanlage, lautsprecher, leinwand, garderobe, smartboard, gedicht ====
+SHEET: six pictures.
+Row 1, left (die Klimaanlage): a white air-conditioning unit mounted high on a wall with a gentle cool breeze shown as soft lines.
+Row 1, right (der Lautsprecher): a wall-mounted loudspeaker in a corner near the ceiling, a few soft sound waves.
+Row 2, left (die Leinwand): a white projection screen pulled down in front of a classroom wall, a projector light on it, nothing written.
+Row 2, right (die Garderobe): a wooden coat rack with three jackets and a scarf hanging on it.
+Row 3, left (das Smartboard): a large blank interactive screen on a classroom wall with a small pen tray, no content.
+Row 3, right (das Gedicht): an open notebook on a desk with a pencil; on the page five lines of soft scribbles getting longer then short again (one short, two, three, four words, one short) — no real letters.
+
+==== lektion4-9.png · Formen (SHEET 2×3, isteğe bağlı) → rund, oval, quadratisch, rechteckig, dreieckig, gemustert ====
+SHEET: six pictures.
+Row 1, left (rund): a round teal wall clock.
+Row 1, right (oval): an oval mirror with a wooden frame.
+Row 2, left (quadratisch): a perfectly square window with four panes and a plant on the sill.
+Row 2, right (rechteckig): a rectangular whiteboard on a wall with a marker on its tray, nothing written.
+Row 3, left (dreieckig): a plain triangular wooden sign on a post, no symbol on it.
+Row 3, right (gemustert): three cushions side by side on a sofa — one striped, one checked, one with a flower pattern.
+
+==== lektion4-10.png · Gegensätze (SHEET 2×3, isteğe bağlı) → gross-klein, jung-alt, neu-alt, lang-kurz, dick-duenn, schlank-dick ====
+SHEET: six pictures.
+Row 1, left (groß – klein): a very big fluffy dog next to a tiny puppy.
+Row 1, right (jung – alt): a small child and an elderly man sitting together on a bench, both laughing.
+Row 2, left (neu – alt): a shiny new teal car next to an old dusty car with a dent.
+Row 2, right (lang – kurz): a long yellow pencil next to a very short stub of the same pencil.
+Row 3, left (dick – dünn): a thick fat book next to a thin slim booklet, standing side by side.
+Row 3, right (schlank – dick): a slim elegant cat next to a round plump cat, both content.
+
+==== Dosya adları (kesildikten sonra, public/toon/lektion4/) ====
+Kapaklar (960×540): kapak-a.webp, kapak-b.webp, kapak-c.webp, kapak-d.webp
+Kelimeler (640×480): familie, eltern, mutter, vater, kind, baby, sohn, tochter, geschwister, bruder, schwester, grosseltern, oma, opa, tante, onkel, cousine, cousin, ehemann, ehefrau, enkel, enkelin, garten, auto, chef, chefin, job, ledig, verheiratet, geschieden, nachbar, nachbarin, cafe, ex-frau, ex-mann, gespraech, besuchen, privat, million, wanduhr, kennen, leben, klimaanlage, lautsprecher, leinwand, garderobe, smartboard, gedicht
+İsteğe bağlı (şekiller ve zıtlar, sonra konu anlatımına resim olarak eklenir): rund, oval, quadratisch, rechteckig, dreieckig, gemustert, gross-klein, jung-alt, neu-alt, lang-kurz, dick-duenn, schlank-dick

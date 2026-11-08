@@ -5,11 +5,11 @@ const sync=require(path.join(compiled,'lesson-sync.js'));
 const read=file=>fs.readFileSync(file,'utf8');
 
 test('which browser keys travel with the account',()=>{
- const cases={'lernkoko-l1-part':'l1','lernkoko-l1a-scores':'l1','lernkoko-l1d-step':'l1','lernkoko-l1c-run':'l1','lernkoko-l12-scores':'l12','lernkoko-l12:a3':'l12','lernkoko-l12-ex:b':'l12','lernkoko-l12-hoeren:t4':'l12','lernkoko-l12-known:a':'l12','lernkoko-l15a-scores':'l15','lernkoko-l15-part':'l15','lernkoko-l15a-run':'l15','lernkoko-l2a-scores':'l2','lernkoko-l2-part':'l2','lernkoko-l2a-run':'l2','lernkoko-l2c-scores':'l2','lernkoko-l2d-run':'l2'};
+ const cases={'lernkoko-l1-part':'l1','lernkoko-l1a-scores':'l1','lernkoko-l1d-step':'l1','lernkoko-l1c-run':'l1','lernkoko-l12-scores':'l12','lernkoko-l12:a3':'l12','lernkoko-l12-ex:b':'l12','lernkoko-l12-hoeren:t4':'l12','lernkoko-l12-known:a':'l12','lernkoko-l15a-scores':'l15','lernkoko-l15-part':'l15','lernkoko-l15a-run':'l15','lernkoko-l2a-scores':'l2','lernkoko-l2-part':'l2','lernkoko-l2a-run':'l2','lernkoko-l2c-scores':'l2','lernkoko-l2d-run':'l2','lernkoko-l4a-scores':'l4','lernkoko-l4-part':'l4','lernkoko-l4d-run':'l4'};
  for(const [key,lesson] of Object.entries(cases))assert.equal(sync.syncLessonOf(key),lesson,key);
  for(const key of ['lernkoko-l12-speed','lernkoko-effects-v1','lernkoko-tour-v1','lernkoko-sync-meta','lernkoko-l13-x','lernkoko-l1x-step','lernkoko-l2x-step','lernkoko-l22-x','goligo-dil'])assert.equal(sync.syncLessonOf(key),null,key);
  // The learner's own sentences and form stay on this device (2 November 2026): never sent, never written back from the account.
- for(const key of ['lernkoko-l2a-own','lernkoko-l2b-own','lernkoko-l2d-form','lernkoko-l2c-form'])assert.equal(sync.syncLessonOf(key),null,key);
+ for(const key of ['lernkoko-l2a-own','lernkoko-l2b-own','lernkoko-l2d-form','lernkoko-l2c-form','lernkoko-l4a-own','lernkoko-l4d-own'])assert.equal(sync.syncLessonOf(key),null,key);
  assert.deepEqual(sync.cleanItems('l2',{'lernkoko-l2a-own':{v:'["Ich bin Koch."]',t:5},'lernkoko-l2a-scores':{v:'{}',t:5}}),{'lernkoko-l2a-scores':{v:'{}',t:5}},'an own key kept by the account is dropped');
 });
 
@@ -80,10 +80,10 @@ test('"İlerlememi sıfırla" (3 November 2026): removals newer than every chang
 
 test('every lesson page reads progress from another device again; the sync and the letter row run on every page',()=>{
  const layout=read('app/layout.tsx');assert(layout.includes('<LetterBar/><LessonSync/>'));
- for(const [file,lesson,component] of [['app/willkommen-study.tsx','l1','WillkommenLesson'],['app/stadt-study.tsx','l15','StadtLesson'],['app/berufe-study.tsx','l2','BerufeLesson'],['app/ausbildung-study.tsx','l12','AusbildungLesson'],['app/ausbildung-hoeren.tsx','l12','HoerenPage'],['app/orte-study.tsx','l3','OrteLesson']]){
+ for(const [file,lesson,component] of [['app/willkommen-study.tsx','l1','WillkommenLesson'],['app/stadt-study.tsx','l15','StadtLesson'],['app/berufe-study.tsx','l2','BerufeLesson'],['app/ausbildung-study.tsx','l12','AusbildungLesson'],['app/ausbildung-hoeren.tsx','l12','HoerenPage'],['app/orte-study.tsx','l3','OrteLesson'],['app/familie-study.tsx','l4','FamilieLesson']]){
   const code=read(file);assert(code.includes(`useSyncVersion('${lesson}')`),file);assert(code.includes(`<${component} key={synced}`),file);
  }
- const units=read('app/category-study.tsx');assert.equal((units.match(/\},\[course,home,seen\]\);/g)||[]).length,5,'the unit cards (Lektion 1, 2, 3, 12, 15) read again (the continue card is gone, 3 November 2026)');
+ const units=read('app/category-study.tsx');assert.equal((units.match(/\},\[course,home,seen\]\);/g)||[]).length,6,'the unit cards (Lektion 1, 2, 3, 4, 12, 15) read again (the continue card is gone, 3 November 2026)');
  assert(units.includes('const seen=synced*1000+back;')&&units.includes("document.addEventListener('visibilitychange',visible)"),'after a sync and when the learner comes back');
  const client=read('app/lesson-sync.tsx');
  for(const piece of ["fetch('/api/ilerleme'",'15000',"'visibilitychange'","'pagehide'",'response.status===401','SYNC_EVENT'])assert(client.includes(piece),piece);

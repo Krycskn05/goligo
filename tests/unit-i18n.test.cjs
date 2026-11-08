@@ -10,7 +10,7 @@ const languages=['en','ar','uk','de'];
 const packs=Object.fromEntries(languages.map(id=>[id,JSON.parse(fs.readFileSync(`lib/unit-packs/${id}.json`,'utf8'))]));
 const pages=['app/willkommen-ui.tsx','app/willkommen-study.tsx','app/willkommen-b-steps.tsx','app/willkommen-c-steps.tsx','app/willkommen-d-steps.tsx',
  'app/berufe-study.tsx','app/berufe-a-steps.tsx','app/berufe-b-steps.tsx','app/berufe-c-steps.tsx','app/berufe-d-steps.tsx',
- 'app/stadt-study.tsx','app/stadt-a-steps.tsx','app/talk-step.tsx','app/orte-study.tsx','app/orte-steps.tsx'];
+ 'app/stadt-study.tsx','app/stadt-a-steps.tsx','app/talk-step.tsx','app/orte-study.tsx','app/orte-steps.tsx','app/familie-study.tsx','app/familie-steps.tsx'];
 /** The Turkish texts a page shows: ut('…') and <Tx text="…"/>. */
 function pageTexts(){
  const out=new Set();

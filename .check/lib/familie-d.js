@@ -32,6 +32,24 @@ const aishaMail = [
 ];
 const oneWord = /^[a-z0-9]+$/, twoWords = /^[a-z0-9]+ [a-z0-9]+$/, threeWords = /^[a-z0-9]+ [a-z0-9]+ [a-z0-9]+$/, fourWords = /^[a-z0-9]+ [a-z0-9]+ [a-z0-9]+ [a-z0-9]+$/;
 const article = ['die', 'der', 'das'];
+/** The shapes and patterns of the board (Konu 3), each with its picture. */
+const shapeWords = [
+    { de: 'rund', tr: (0, familie_types_1.T)('yuvarlak'), emoji: '⚪', pic: familie_pictures_1.familiePic.rund },
+    { de: 'oval', tr: (0, familie_types_1.T)('oval, yumurta biçimli'), emoji: '🥚', pic: familie_pictures_1.familiePic.oval },
+    { de: 'quadratisch', tr: (0, familie_types_1.T)('kare'), emoji: '🟦', pic: familie_pictures_1.familiePic.quadratisch },
+    { de: 'rechteckig', tr: (0, familie_types_1.T)('dikdörtgen'), emoji: '▭', pic: familie_pictures_1.familiePic.rechteckig },
+    { de: 'dreieckig', tr: (0, familie_types_1.T)('üçgen'), emoji: '🔺', pic: familie_pictures_1.familiePic.dreieckig },
+    { de: 'gestreift · kariert · gemustert', tr: (0, familie_types_1.T)('çizgili · kareli · desenli'), emoji: '🧶', pic: familie_pictures_1.familiePic.gemustert, say: 'gestreift, kariert, gemustert' },
+];
+/** The opposites of the board (Konu 3). */
+const oppositeWords = [
+    { de: 'groß ≠ klein', tr: (0, familie_types_1.T)('büyük ≠ küçük'), emoji: '🐕', pic: familie_pictures_1.familiePic.grossKlein, say: 'groß, klein' },
+    { de: 'jung ≠ alt', tr: (0, familie_types_1.T)('genç ≠ yaşlı'), emoji: '👴', pic: familie_pictures_1.familiePic.jungAlt, say: 'jung, alt' },
+    { de: 'neu ≠ alt', tr: (0, familie_types_1.T)('yeni ≠ eski'), emoji: '🚗', pic: familie_pictures_1.familiePic.neuAlt, say: 'neu, alt' },
+    { de: 'lang ≠ kurz', tr: (0, familie_types_1.T)('uzun ≠ kısa'), emoji: '✏️', pic: familie_pictures_1.familiePic.langKurz, say: 'lang, kurz' },
+    { de: 'dick ≠ dünn', tr: (0, familie_types_1.T)('kalın ≠ ince'), emoji: '📚', pic: familie_pictures_1.familiePic.dickDuenn, say: 'dick, dünn' },
+    { de: 'schlank ≠ dick', tr: (0, familie_types_1.T)('zayıf ≠ şişman'), emoji: '🐈', pic: familie_pictures_1.familiePic.schlankDick, say: 'schlank, dick' },
+];
 exports.partD = {
     id: 'd', badge: 'D', title: 'Das Elfchen ist schön!',
     lead: (0, familie_types_1.T)('Kelime alanları, on bir kelimelik şiir **Elfchen**, sınıf eşyaları, şekiller ve zıt kelimeler, fiil ekleri, **ie / ei** ve bütün ünitenin **Alles klar?** testi.'),
@@ -119,9 +137,11 @@ exports.partD = {
                 { t: 'p', text: (0, familie_types_1.T)('Sınıfta ne var, nerede, nasıl? Önce şekiller ve desenler:') },
                 { t: 'table', head: [(0, familie_types_1.T)('şekil'), (0, familie_types_1.T)('örnek')], rows: [['rund', 'Die Wanduhr ist rund.'], ['oval', 'Der Spiegel ist oval.'], ['quadratisch', 'Das Fenster ist quadratisch.'], ['rechteckig', 'Die Tafel ist rechteckig.'], ['dreieckig', 'Das Schild ist dreieckig.'], ['gestreift', 'Das Hemd ist gestreift.'], ['kariert', 'Die Tischdecke ist kariert.'], ['gemustert', 'Der Teppich ist gemustert.']],
                     say: ['rund: Die Wanduhr ist rund.', 'oval: Der Spiegel ist oval.', 'quadratisch: Das Fenster ist quadratisch.', 'rechteckig: Die Tafel ist rechteckig.', 'dreieckig: Das Schild ist dreieckig.', 'gestreift: Das Hemd ist gestreift.', 'kariert: Die Tischdecke ist kariert.', 'gemustert: Der Teppich ist gemustert.'] },
+                { t: 'cards', words: shapeWords },
                 { t: 'h', text: (0, familie_types_1.T)('Zıt kelimeler') },
                 { t: 'table', head: ['', '≠'], rows: [['groß', 'klein'], ['jung', 'alt'], ['neu', 'alt'], ['lang', 'kurz'], ['dick', 'dünn'], ['schlank', 'dick']],
                     say: ['groß, klein.', 'jung, alt.', 'neu, alt.', 'lang, kurz.', 'dick, dünn.', 'schlank, dick.'] },
+                { t: 'cards', words: oppositeWords },
                 { t: 'note', text: (0, familie_types_1.T)('*alt* iki zıttı var: *jung* (insan için: genç ≠ yaşlı) ve *neu* (eşya için: yeni ≠ eski). *dick* de: *dünn* (ince, eşya) ve *schlank* (zayıf, insan).') },
                 { t: 'h', text: (0, familie_types_1.T)('Wo ist …?') },
                 { t: 'rows', rows: [(0, familie_types_1.row)('Wo ist die Klimaanlage? – Da oben, an der Wand.', 'Klima nerede? – Yukarıda, duvarda.'), (0, familie_types_1.row)('Wo ist der Papierkorb? – In der Ecke.', 'Çöp kutusu nerede? – Köşede.'), (0, familie_types_1.row)('Wo ist die Lampe? – An der Decke.', 'Lamba nerede? – Tavanda.'), (0, familie_types_1.row)('Wo ist die Steckdose? – Da unten.', 'Priz nerede? – Aşağıda.')] },

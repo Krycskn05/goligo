@@ -81,17 +81,21 @@ test('our own names and texts: the site\'s people, no names of the book',()=>{
  for(const who of cast)assert.ok(fs.existsSync(`public/toon/lektion1/${who}.webp`),who+' has a portrait and a voice');
 });
 
-test('pictures: the covers, the pictures that arrived and the Kelime Kasası ones exist; every card has a picture or its emoji',()=>{
+test('pictures: the learner\'s 3D pictures (8 November 2026) and the Kelime Kasası ones exist; every card, quiz picture and write row has one',()=>{
  const pictures=load('familie-pictures');
  const size=file=>{const b=fs.readFileSync(file);assert.equal(b.toString('ascii',0,4),'RIFF',file);assert.equal(b.toString('ascii',12,16),'VP8 ',file);return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];};
- for(const src of Object.values(pictures.familiePic)){if(!src)continue;assert.ok(fs.existsSync('public'+src),src);if(src.startsWith('/toon/lektion4/'))assert.deepEqual(size('public'+src),[640,480],src);}
- for(const part of course.familiePartList){assert.match(part.cover.src,/^\/toon\/lektion4\/(gecici-)?kapak-[a-d]\.webp$/);assert.deepEqual(size('public'+part.cover.src),[960,540],part.cover.src);}
+ for(const src of Object.values(pictures.familiePic)){assert.ok(typeof src==='string'&&fs.existsSync('public'+src),src);if(src.startsWith('/toon/lektion4/'))assert.deepEqual(size('public'+src),[640,480],src);}
+ for(const part of course.familiePartList){assert.match(part.cover.src,/^\/toon\/lektion4\/kapak-[a-d]\.webp$/);assert.deepEqual(size('public'+part.cover.src),[960,540],part.cover.src);}
+ assert.ok(!fs.readdirSync('public/toon/lektion4').some(file=>file.startsWith('gecici')),'the temporary covers are gone');
+ assert.ok(fs.readdirSync('public/toon/lektion4').filter(file=>file.endsWith('.webp')).length>=64,'the 60 things and 4 covers');
  for(const part of course.familiePartList)for(const step of part.steps){
-  for(const block of step.blocks??[])if(block.t==='cards')for(const word of block.words)assert.ok(word.pic||word.emoji,part.id+': '+word.de);
-  if(step.exercise?.type==='quiz')for(const item of step.exercise.items)assert.ok(item.pic||item.emoji||item.listen||item.prompt,part.id+':'+step.id);
+  for(const block of step.blocks??[])if(block.t==='cards')for(const word of block.words)assert.ok(word.pic,part.id+': '+word.de);
+  if(step.exercise?.type==='quiz')for(const item of step.exercise.items)assert.ok(item.pic||item.listen||!item.emoji,part.id+':'+step.id);
+  if(step.exercise?.type==='write')for(const row of step.exercise.rows)assert.ok(row.pic||!row.emoji,part.id+':'+step.id+' '+row.given);
  }
- // The course-room words of Teil D come from the Kelime Kasası already.
- for(const word of course.familieParts.d.steps[1].blocks[0].words)assert.ok(word.pic,'Teil D: '+word.de);
+ // The shapes and the opposites of the board are picture cards in Teil D, Thema 3.
+ const cards=course.familieParts.d.steps.find(step=>step.id==='kursraum-konu').blocks.filter(block=>block.t==='cards');
+ assert.equal(cards.length,2);assert.deepEqual(cards.map(block=>block.words.length),[6,6]);
 });
 
 test('progress: kept in the browser, travels with the account as lesson l4; the own sentences stay on the device',()=>{

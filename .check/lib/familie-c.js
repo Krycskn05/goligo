@@ -9,7 +9,6 @@ exports.partC = exports.wordsC = void 0;
  */
 const familie_types_1 = require("./familie-types");
 const familie_pictures_1 = require("./familie-pictures");
-const sein = ['sein', 'seine', 'ihr', 'ihre'];
 exports.wordsC = [
     { de: 'der Nachbar', plural: 'Nachbarn', tr: (0, familie_types_1.T)('komşu (erkek)'), emoji: '🧑‍🤝‍🧑', pic: familie_pictures_1.familiePic.nachbar },
     { de: 'die Nachbarin', plural: 'Nachbarinnen', tr: (0, familie_types_1.T)('komşu (kadın)'), emoji: '👩‍🤝‍👩', pic: familie_pictures_1.familiePic.nachbarin },

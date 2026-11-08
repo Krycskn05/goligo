@@ -30,6 +30,24 @@ const aishaMail=[
 ];
 const oneWord=/^[a-z0-9]+$/,twoWords=/^[a-z0-9]+ [a-z0-9]+$/,threeWords=/^[a-z0-9]+ [a-z0-9]+ [a-z0-9]+$/,fourWords=/^[a-z0-9]+ [a-z0-9]+ [a-z0-9]+ [a-z0-9]+$/;
 const article=['die','der','das'] as const;
+/** The shapes and patterns of the board (Konu 3), each with its picture. */
+const shapeWords:Word[]=[
+ {de:'rund',tr:T('yuvarlak'),emoji:'⚪',pic:familiePic.rund},
+ {de:'oval',tr:T('oval, yumurta biçimli'),emoji:'🥚',pic:familiePic.oval},
+ {de:'quadratisch',tr:T('kare'),emoji:'🟦',pic:familiePic.quadratisch},
+ {de:'rechteckig',tr:T('dikdörtgen'),emoji:'▭',pic:familiePic.rechteckig},
+ {de:'dreieckig',tr:T('üçgen'),emoji:'🔺',pic:familiePic.dreieckig},
+ {de:'gestreift · kariert · gemustert',tr:T('çizgili · kareli · desenli'),emoji:'🧶',pic:familiePic.gemustert,say:'gestreift, kariert, gemustert'},
+];
+/** The opposites of the board (Konu 3). */
+const oppositeWords:Word[]=[
+ {de:'groß ≠ klein',tr:T('büyük ≠ küçük'),emoji:'🐕',pic:familiePic.grossKlein,say:'groß, klein'},
+ {de:'jung ≠ alt',tr:T('genç ≠ yaşlı'),emoji:'👴',pic:familiePic.jungAlt,say:'jung, alt'},
+ {de:'neu ≠ alt',tr:T('yeni ≠ eski'),emoji:'🚗',pic:familiePic.neuAlt,say:'neu, alt'},
+ {de:'lang ≠ kurz',tr:T('uzun ≠ kısa'),emoji:'✏️',pic:familiePic.langKurz,say:'lang, kurz'},
+ {de:'dick ≠ dünn',tr:T('kalın ≠ ince'),emoji:'📚',pic:familiePic.dickDuenn,say:'dick, dünn'},
+ {de:'schlank ≠ dick',tr:T('zayıf ≠ şişman'),emoji:'🐈',pic:familiePic.schlankDick,say:'schlank, dick'},
+];
 
 export const partD:FamiliePart={
  id:'d',badge:'D',title:'Das Elfchen ist schön!',
@@ -118,9 +136,11 @@ export const partD:FamiliePart={
     {t:'p',text:T('Sınıfta ne var, nerede, nasıl? Önce şekiller ve desenler:')},
     {t:'table',head:[T('şekil'),T('örnek')],rows:[['rund','Die Wanduhr ist rund.'],['oval','Der Spiegel ist oval.'],['quadratisch','Das Fenster ist quadratisch.'],['rechteckig','Die Tafel ist rechteckig.'],['dreieckig','Das Schild ist dreieckig.'],['gestreift','Das Hemd ist gestreift.'],['kariert','Die Tischdecke ist kariert.'],['gemustert','Der Teppich ist gemustert.']],
      say:['rund: Die Wanduhr ist rund.','oval: Der Spiegel ist oval.','quadratisch: Das Fenster ist quadratisch.','rechteckig: Die Tafel ist rechteckig.','dreieckig: Das Schild ist dreieckig.','gestreift: Das Hemd ist gestreift.','kariert: Die Tischdecke ist kariert.','gemustert: Der Teppich ist gemustert.']},
+    {t:'cards',words:shapeWords},
     {t:'h',text:T('Zıt kelimeler')},
     {t:'table',head:['','≠'],rows:[['groß','klein'],['jung','alt'],['neu','alt'],['lang','kurz'],['dick','dünn'],['schlank','dick']],
      say:['groß, klein.','jung, alt.','neu, alt.','lang, kurz.','dick, dünn.','schlank, dick.']},
+    {t:'cards',words:oppositeWords},
     {t:'note',text:T('*alt* iki zıttı var: *jung* (insan için: genç ≠ yaşlı) ve *neu* (eşya için: yeni ≠ eski). *dick* de: *dünn* (ince, eşya) ve *schlank* (zayıf, insan).')},
     {t:'h',text:T('Wo ist …?')},
     {t:'rows',rows:[row('Wo ist die Klimaanlage? – Da oben, an der Wand.','Klima nerede? – Yukarıda, duvarda.'),row('Wo ist der Papierkorb? – In der Ecke.','Çöp kutusu nerede? – Köşede.'),row('Wo ist die Lampe? – An der Decke.','Lamba nerede? – Tavanda.'),row('Wo ist die Steckdose? – Da unten.','Priz nerede? – Aşağıda.')]},

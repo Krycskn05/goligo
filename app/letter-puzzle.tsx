@@ -102,14 +102,17 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
    {words.map((word,number)=><span className="puzzle-word" key={number}>{word.map(part=>{
     if(!part.editable)return <span key={part.index} className={'puzzle-letter '+(/[\p{L}\p{N}]/u.test(part.character)?'puzzle-given':'puzzle-punctuation')} aria-label={/[\p{L}\p{N}]/u.test(part.character)?text('puzzleGiven',{letter:part.character}):undefined}>{part.character}</span>;
     const value=letters[part.index];const shaking=shake?.index===part.index;const order=puzzle.editable.indexOf(part.index);
-    const state=result!==undefined?(value&&letterFits(puzzle,part.index,value,strictCase,course)?'right':'wrong'):value?'filled':'';
+    // The tries used up: the boxes still empty show their right letter, filled in by the site in its own colour (the
+    // learner asked, 9 November 2026). Only what is shown changes; the word was already sent as a mistake.
+    const revealed=out&&!value?part.character:'';
+    const state=revealed?'revealed':result!==undefined?(value&&letterFits(puzzle,part.index,value,strictCase,course)?'right':'wrong'):value?'filled':'';
     return <button key={part.index} ref={node=>{if(node)fields.current.set(part.index,node);else fields.current.delete(part.index);}} type="button"
      className={'puzzle-letter puzzle-empty '+state+(active===part.index&&!locked&&!value?' active':'')+(shaking?' shake':'')+(mistakes.boxes.includes(part.index)?' missed':'')+(hints.boxes.includes(part.index)&&value?' hinted':'')}
-     style={done?{animationDelay:order*45+'ms'}:undefined} disabled={unavailable} aria-pressed={active===part.index}
-     aria-label={text('puzzleLetter',{n:order+1,total:puzzle.editable.length})+(value?': '+value:'')} data-puzzle-index={part.index}
+     style={done||revealed?{animationDelay:order*45+'ms'}:undefined} disabled={unavailable} aria-pressed={active===part.index}
+     aria-label={text('puzzleLetter',{n:order+1,total:puzzle.editable.length})+(value||revealed?': '+(value||revealed):'')} data-puzzle-index={part.index}
      onClick={()=>giveBack(part.index)}
      onKeyDown={event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();const next=puzzle.editable[order+(event.key==='ArrowRight'?1:-1)];if(next!==undefined){setActive(next);focus(next);}}else if(event.key==='Backspace'||event.key==='Delete'){event.preventDefault();event.stopPropagation();giveBack(part.index);}}}>
-     {shaking&&!value?<span className="puzzle-wrong-letter" aria-hidden="true">{shake.letter}</span>:value||<span aria-hidden="true">_</span>}
+     {shaking&&!value?<span className="puzzle-wrong-letter" aria-hidden="true">{shake.letter}</span>:value||revealed||<span aria-hidden="true">_</span>}
     </button>;
    })}</span>)}
   </fieldset>

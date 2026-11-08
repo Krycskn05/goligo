@@ -617,6 +617,10 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-slot>.verb-card.verb-aux-card>.verb-card-meaning { grid-row:3; }
 .verb-slot>.verb-card.verb-aux-card.with-picture:has(.verb-picture)>.verb-sentence,.verb-slot>.verb-card.verb-aux-card>.verb-sentence { grid-row:5; grid-column:1 / -1; justify-self:stretch; margin:8px 0 0; padding:5px 12px; text-align:center; font-size:19px; line-height:1.5; }
 .verb-aux-card .verb-chunk.gap.aux { min-width:2.6em; }
+/* Its result shows the same sentence filled in (no other example sentence; the learner asked) — the voice reads it. */
+.verb-slot>.verb-result .verb-sentence { justify-self:start; margin:4px 0 0; padding:4px 10px; font-size:16px; line-height:1.5; }
+.verb-slot>.verb-result .verb-sentence .verb-chunk.gap { min-width:0; }
+@media (max-width:760px) { .verb-practice .verb-slot>.verb-result .verb-sentence { grid-column:1 / 3; font-size:14.5px; } }
 .verb-slot>.vault-listen-player { box-sizing:border-box; height:100%; margin:0; }
 .verb-slot>.verb-result { box-sizing:border-box; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:16px; height:100%; padding:10px calc(var(--paul) + 8px) 13px 14px; border-radius:18px; background:#eafbe4; overflow:hidden; }
 .verb-slot>.verb-result.retry { background:#fff0f4; }

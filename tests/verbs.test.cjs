@@ -253,7 +253,7 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  assert.match(fs.readFileSync('app/progress-ui.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/layout.tsx','utf8'),/verbs\.css/);
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(page.includes("const pronunciation=task==='fit'&&verb?verb.praesens:task==='aux'&&verb?verb.perfekt:q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';"),'only the correct answer (in the round of every mistake an article puzzle says the whole word)');
+ assert.ok(page.includes("const pronunciation=task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';"),'only the correct answer (in the round of every mistake an article puzzle says the whole word)');
  assert.ok(page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'));
  // The question audio is played only from the listen buttons.
  assert.equal((page.match(/speech\.speak\(q\.audio/g)||[]).length,1);
@@ -575,7 +575,8 @@ test('after an answer every person gets an example sentence: Präsens after mean
  const result=cards.slice(cards.indexOf('export function AnswerResult'),cards.indexOf('export function ChapterCard'));
  assert.ok(result.includes('{example}')&&result.includes('<VerbPicture verb={verb}')&&!result.includes('<PersonSentences'),'picture, verb and one example sentence');
  assert.ok(page.includes('<div className="verb-slot" data-paul-slot="">{feedback?<AnswerResult verb={verb} stage={q.verbTask===\'aux\'?\'perfekt\':learnStage(q.verbTask)}'),'an answer opens the result in the place of the question card');
- assert.ok(page.includes("tense={q.verbTask==='partizip'||q.verbTask==='write-partizip'||q.verbTask==='aux'||learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'} pick={index}"),'the past-form questions show a Perfekt sentence');
+ assert.ok(page.includes("tense={q.verbTask==='partizip'||q.verbTask==='write-partizip'||learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'} pick={index}"),'the past-form questions show a Perfekt sentence');
+ assert.ok(page.includes("example={q.verbTask==='aux'?sentenceLine(q,verb):<OneExample"),'hat/ist: its own sentence filled in, no other example (the learner asked)');
  assert.ok(page.includes('spoken={pronunciation}')&&page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'),'after the effect only the correct answer is spoken');
  assert.ok(!page.includes('<PersonSentences'),'no example sentences after spelling');
  // Every step starts at the top of the page: the card fits one screen and stays in the same place from step to step.

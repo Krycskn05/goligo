@@ -2,7 +2,8 @@
 // gibi 2-3-4-5 ünitelerini de böyle yap"), one card per lesson like Lektion 1 (lib/object-word-additions.ts). The words
 // are each unit's picture cards (Lektion 2: the 15 jobs of Teil A as man/woman pairs, Teil B's people and doings, Teil C's
 // form; Lektion 3–5: every word card once; das Haus of Lektion 4 is left out, its picture shows housework). The pictures
-// are the units' own, set on a 512 × 512 square (public/objects/toon/<id>.webp). Cards without der/die/das (verbs,
+// (public/objects/toon/<id>.webp, 512 × 512 on the vault cream) were made for the vault by the learner in ChatGPT from
+// Claude outputs/kasa-ders-kelimeleri-promptlar.txt, one clear subject each (9 November 2026). Cards without der/die/das (verbs,
 // phrases, adjectives, the job pairs) have no article questions and stay out of the article games.
 type Meanings=readonly [en:string,ar:string,uk:string,fr:string,es:string,ru:string,fa:string,pl:string,it:string,pt:string];
 export type Spec=readonly [id:string,de:string,tr:string,description:string,descriptionTr:string,meanings:Meanings,note?:string];

@@ -17,7 +17,7 @@ exports.exam = (0, a1_exam_build_1.buildExam)(8, 'Kind ist krank · Brief von de
             items: [
                 ['Die Bücher kann man nur am Tag zurückbringen.', 'f', 'Kapının önündeki kutu *Tag und Nacht offen*: gece de bırakılabilir.'],
                 ['Für drei Bücher bezahlt Frau Arslan 1 Euro pro Woche.', 'f', '*1 Euro pro Buch*: üç kitap için haftada 3 Euro.'],
-                ['Frau Arslan kann die Bücher noch länger haben.', 'r', '*Sie können die Zeit einmal online verlängern*: süre bir kez uzatılabiliyor.'],
+                ['Frau Arslan kann die Bücher noch länger haben.', 'r', '*können Sie die Zeit einmal online verlängern*: süre bir kez uzatılabiliyor.'],
             ] },
     ],
     teil2: { mode: 'ad',

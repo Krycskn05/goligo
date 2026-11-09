@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.examsSolved = exports.a1ExamRunKey = exports.A1_EXAM_SCORES_KEY = void 0;
+exports.examsSolved = exports.examPapers = exports.a1ExamRunKey = exports.A1_EXAM_SCORES_KEY = void 0;
 exports.readExamScores = readExamScores;
 exports.saveExamScore = saveExamScore;
 exports.readExamRun = readExamRun;
@@ -19,7 +19,7 @@ const a1_exam_course_1 = require("./a1-exam-course");
 exports.A1_EXAM_SCORES_KEY = 'lernkoko-a1-exam-scores';
 const a1ExamRunKey = (examId) => 'lernkoko-a1-exam-run:' + examId;
 exports.a1ExamRunKey = a1ExamRunKey;
-const isAnswer = (value) => value === 'r' || value === 'f' || value === 'a' || value === 'b';
+const isAnswer = (value) => value === 'r' || value === 'f' || value === 'a' || value === 'b' || value === 'c';
 const whole = (value, max) => typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.min(max, Math.floor(value))) : 0;
 function readExamScores(storage) {
     let data = null;
@@ -73,7 +73,12 @@ function readExamRun(storage, examId) {
             if (id.startsWith(examId + '-') && isAnswer(value))
                 answers[id] = value;
     const teil = run.teil === 2 || run.teil === 3 ? run.teil : 1;
-    return { answers, seconds: whole(run.seconds, 86400), teil, timed: run.timed !== false, done: run.done === true };
+    const plays = {};
+    if (run.plays && typeof run.plays === 'object')
+        for (const [id, value] of Object.entries(run.plays))
+            if (id.startsWith(examId + '-') && typeof value === 'number' && value > 0)
+                plays[id] = whole(value, 99);
+    return { answers, seconds: whole(run.seconds, 86400), teil, timed: run.timed !== false, done: run.done === true, ...(Object.keys(plays).length ? { plays } : {}) };
 }
 function saveExamRun(storage, examId, run) { try {
     storage.setItem((0, exports.a1ExamRunKey)(examId), JSON.stringify(run));
@@ -84,22 +89,24 @@ function clearExamRun(storage, examId) { try {
 }
 catch { } }
 const ratio = (part, total) => total ? Math.round(part / total * 100) : 0;
-/** The section as a whole: every exam's 15 points; an exam counts as tried once it was handed in. */
+/** Every exam paper of the section (Hören 1–10, Lesen 1–10) with its points. */
+exports.examPapers = [...a1_exam_course_1.hoerenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.HOEREN_TOTAL })), ...a1_exam_course_1.lesenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.LESEN_TOTAL }))];
+/** The section as a whole: every paper's 15 points; a paper counts as tried once it was handed in. */
 function examSectionProgress(scores) {
     let total = 0, tried = 0, learned = 0;
-    for (const exam of a1_exam_course_1.lesenExamList) {
-        total += a1_exam_course_1.LESEN_TOTAL;
+    for (const exam of exports.examPapers) {
+        total += exam.total;
         const score = scores[exam.id];
         if (!score)
             continue;
-        tried += a1_exam_course_1.LESEN_TOTAL;
-        learned += Math.max(0, Math.min(a1_exam_course_1.LESEN_TOTAL, score.right));
+        tried += exam.total;
+        learned += Math.max(0, Math.min(exam.total, score.right));
     }
     const percent = ratio(learned, total);
     return { total, tried, learned, percent, triedPercent: Math.max(percent, ratio(tried, total)), stars: (0, progress_core_1.starsFor)(percent), stage: (0, progress_core_1.stageFor)(percent, tried) };
 }
-/** How many exams were handed in. */
-const examsSolved = (scores) => a1_exam_course_1.lesenExamList.filter(exam => scores[exam.id]).length;
+/** How many papers were handed in. */
+const examsSolved = (scores) => exports.examPapers.filter(exam => scores[exam.id]).length;
 exports.examsSolved = examsSolved;
 /** 754 seconds → "12:34". */
 function clock(seconds) { const s = Math.max(0, Math.floor(seconds)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }

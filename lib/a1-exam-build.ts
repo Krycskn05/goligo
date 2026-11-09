@@ -1,4 +1,4 @@
-import type {A1Exam,Ad,AdChoice,AdMode,Face,Frame,Notice,ReadingText,TrueFalse} from './a1-exam-types';
+import type {A1Exam,A1HoerenExam,AbcChoice,Ad,AdChoice,AdMode,AudioLine,Face,Frame,ListenOption,Notice,ReadingText,TrueFalse} from './a1-exam-types';
 
 /**
  * The short way an exam is written down (lib/a1-exam-lesen-NN.ts): statements, ads and notices as small tuples in the
@@ -37,5 +37,43 @@ export function buildExam(number:number,topics:string,spec:ExamSpec):A1Exam{
  const teil3={
   example:{place:spec.teil3.example[0],notice:notice(spec.teil3.example[1]),text:spec.teil3.example[2],answer:spec.teil3.example[3]},
   items:spec.teil3.items.map(item=>({id:id(),n,place:item[0],notice:notice(item[1]),text:item[2],answer:item[3],why:item[4]}))};
- return {id:lesenExamId(number),number,topics,lesen:{teil1,teil2,teil3},hoeren:null,schreiben:null};
+ return {id:lesenExamId(number),number,topics,lesen:{teil1,teil2,teil3},schreiben:null};
+}
+
+/* ---------- Hören (lib/a1-exam-hoeren-NN.ts) ---------- */
+/**
+ * The people of the site keep their own voice in every exam (lib/site-voices.ts: the voice called Sabine reads Sabine).
+ * Anyone else is written as "Name:Voice" ("Verkäuferin:F4") — a voice of the right kind that is not the other speaker's.
+ */
+export const CAST_VOICES:Record<string,string>={Sabine:'F1',Yasemin:'F2',Aisha:'F3',Nora:'F4',Mei:'F5',Rami:'M1',Omar:'M2',Paul:'M3',Nikos:'M4',Tomasz:'M5'};
+/** [speaker or "speaker:voice", text] */
+export type LineSpec=readonly [who:string,text:string];
+/** An answer: its words, or [emoji, words]. */
+export type OptionSpec=string|readonly [icon:string,text:string];
+export type ChoiceSpec={q:string;o:readonly [OptionSpec,OptionSpec,OptionSpec];a:AbcChoice;lines:readonly LineSpec[];why:string};
+export type TrueFalseSpec={t:string;a:TrueFalse;lines:readonly LineSpec[];why:string};
+export type HoerenSpec={
+ teil1:{example:Omit<ChoiceSpec,'why'>;items:readonly ChoiceSpec[]};
+ teil2:{example:Omit<TrueFalseSpec,'why'>;items:readonly TrueFalseSpec[]};
+ teil3:{items:readonly ChoiceSpec[]};
+};
+export const hoerenExamId=(number:number)=>'a1-hoeren-'+two(number);
+export const hoerenItemId=(exam:number,n:number)=>hoerenExamId(exam)+'-'+two(n);
+function audioLine(spec:LineSpec):AudioLine{
+ const [name,given]=spec[0].split(':');const voice=given??CAST_VOICES[name];
+ if(!voice||!/^[FM][1-5]$/.test(voice))throw new Error('No voice for '+spec[0]);
+ return {who:name,voice,text:spec[1]};
+}
+const option=(spec:OptionSpec):ListenOption=>typeof spec==='string'?{text:spec}:{icon:spec[0],text:spec[1]};
+const options=(o:ChoiceSpec['o'])=>[option(o[0]),option(o[1]),option(o[2])] as const;
+
+/** Numbers a Hören exam like the paper: Teil 1: 1–6, Teil 2: 7–10, Teil 3: 11–15; ids `a1-hoeren-<exam>-<number>`. */
+export function buildHoeren(number:number,topics:string,spec:HoerenSpec):A1HoerenExam{
+ let n=0;const id=()=>hoerenItemId(number,++n);
+ const choice=(item:ChoiceSpec)=>({id:id(),n,question:item.q,options:options(item.o),answer:item.a,lines:item.lines.map(audioLine),why:item.why});
+ const teil1={example:{question:spec.teil1.example.q,options:options(spec.teil1.example.o),answer:spec.teil1.example.a,lines:spec.teil1.example.lines.map(audioLine)},items:spec.teil1.items.map(choice)};
+ const teil2={example:{text:spec.teil2.example.t,answer:spec.teil2.example.a,lines:spec.teil2.example.lines.map(audioLine)},
+  items:spec.teil2.items.map(item=>({id:id(),n,text:item.t,answer:item.a,lines:item.lines.map(audioLine),why:item.why}))};
+ const teil3={items:spec.teil3.items.map(choice)};
+ return {id:hoerenExamId(number),number,topics,hoeren:{teil1,teil2,teil3}};
 }

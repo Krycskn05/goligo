@@ -33,26 +33,34 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.lesenKey = exports.isExamNumber = exports.GUEST_EXAM = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
+exports.gradeLesen = exports.gradeHoeren = exports.hoerenKey = exports.lesenKey = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleMinutes = exports.isReadyModule = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
 exports.loadLesenExam = loadLesenExam;
+exports.loadHoerenExam = loadHoerenExam;
 exports.lesenItems = lesenItems;
-exports.gradeLesen = gradeLesen;
+exports.hoerenItems = hoerenItems;
+exports.gradeItems = gradeItems;
 const a1_exam_build_1 = require("./a1-exam-build");
 /**
  * A1 sınavı (/a1-sinavi): the list of practice exams and how an exam is marked. The exam texts themselves are one file
- * per exam (lib/a1-exam-lesen-01.ts … -10.ts), loaded when the learner opens it. Marking follows the real exam: one
- * point per answer, 15 points in Lesen, each part's points × 1,66 for the certificate (so Lesen gives up to 25 of 100),
- * and 60 % to pass (there the 60 % counts over all parts together; here it is shown for the part the learner solved).
+ * per exam and part (lib/a1-exam-lesen-01.ts … -10.ts, lib/a1-exam-hoeren-01.ts … -10.ts), loaded when the learner
+ * opens it. Marking follows the real exam: one point per answer, 15 points in Hören and 15 in Lesen, each part's points
+ * × 1,66 for the certificate (so a part gives up to 25 of 100), and 60 % to pass (there the 60 % counts over all parts
+ * together; here it is shown for the part the learner solved).
  */
 exports.A1_EXAM_PATH = '/a1-sinavi';
 /** The parts of the written exam in the order of the exam paper; `ready` parts have exams. */
 exports.examModules = [
-    { id: 'hoeren', number: 1, name: 'Hören', minutes: 20, ready: false },
+    { id: 'hoeren', number: 1, name: 'Hören', minutes: 20, ready: true },
     { id: 'lesen', number: 2, name: 'Lesen', minutes: 25, ready: true },
     { id: 'schreiben', number: 3, name: 'Schreiben', minutes: 20, ready: false },
 ];
 exports.LESEN_MINUTES = 25;
 exports.LESEN_TOTAL = 15;
+exports.HOEREN_MINUTES = 20;
+exports.HOEREN_TOTAL = 15;
+const isReadyModule = (value) => value === 'hoeren' || value === 'lesen';
+exports.isReadyModule = isReadyModule;
+exports.moduleMinutes = { hoeren: exports.HOEREN_MINUTES, lesen: exports.LESEN_MINUTES };
 exports.PASS_PERCENT = 60;
 /** The exam's factor: points of a part × 1,66 (four parts of 15 points make 100). */
 exports.POINT_FACTOR = 1.66;
@@ -76,6 +84,22 @@ exports.lesenExamList = [
     { number: 10, id: (0, a1_exam_build_1.lesenExamId)(10), topics: 'Praktikum · Regeln im Haus · Internetseiten · Anmelden und Warten' },
 ];
 exports.LESEN_EXAM_COUNT = exports.lesenExamList.length;
+/** The ten Hören exams (9 November 2026): the same numbers as the Lesen exams — exam 3 is Hören 3 and Lesen 3. */
+exports.hoerenExamList = [
+    { number: 1, id: (0, a1_exam_build_1.hoerenExamId)(1), topics: 'Einkaufen · Kino · Durchsagen im Bahnhof · Nachrichten am Telefon' },
+    { number: 2, id: (0, a1_exam_build_1.hoerenExamId)(2), topics: 'Im Café · Unterwegs in der Stadt · Durchsagen · Termine am Telefon' },
+    { number: 3, id: (0, a1_exam_build_1.hoerenExamId)(3), topics: 'Wohnung und Arbeit · Geburtstag · Durchsagen · Kino und Bibliothek' },
+    { number: 4, id: (0, a1_exam_build_1.hoerenExamId)(4), topics: 'Auf dem Markt · Am Bahnhof · Durchsagen · Adressen und Preise am Telefon' },
+    { number: 5, id: (0, a1_exam_build_1.hoerenExamId)(5), topics: 'Im Restaurant · Im Hotel · Durchsagen · Apotheke, Schule und Kochkurs' },
+    { number: 6, id: (0, a1_exam_build_1.hoerenExamId)(6), topics: 'Im Taxi · Familie und Geschenke · Durchsagen · Kita, Sport und Arbeit' },
+    { number: 7, id: (0, a1_exam_build_1.hoerenExamId)(7), topics: 'Am Kiosk · Beruf und Freizeit · Durchsagen · Fahrschule, Lieferung, Arbeit' },
+    { number: 8, id: (0, a1_exam_build_1.hoerenExamId)(8), topics: 'Öffnungszeiten · Wohnen · Beim Arzt · Durchsagen · Arbeit, Training, Amt' },
+    { number: 9, id: (0, a1_exam_build_1.hoerenExamId)(9), topics: 'Eintritt und Bus · Besuch und Pakete · Durchsagen · Einladung, Umzug, Kurs' },
+    { number: 10, id: (0, a1_exam_build_1.hoerenExamId)(10), topics: 'Zimmer und Auto · Schule · Durchsagen · Geburtstag, Arbeit, Bahnhof' },
+];
+/** The exams of a part. */
+const examList = (module) => module === 'hoeren' ? exports.hoerenExamList : exports.lesenExamList;
+exports.examList = examList;
 /** The exam a visitor without an account may open (the guest taste: the first part of every section). */
 exports.GUEST_EXAM = 1;
 const isExamNumber = (value) => Number.isInteger(value) && value >= 1 && value <= exports.LESEN_EXAM_COUNT;
@@ -91,6 +115,17 @@ function loadLesenExam(number) {
         return Promise.reject(new Error('No exam ' + number));
     return load().then(module => module.exam);
 }
+const hoerenLoaders = {
+    1: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-01'))), 2: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-02'))), 3: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-03'))), 4: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-04'))), 5: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-05'))),
+    6: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-06'))), 7: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-07'))), 8: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-08'))), 9: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-09'))), 10: () => Promise.resolve().then(() => __importStar(require('./a1-exam-hoeren-10'))),
+};
+/** Loads one Hören exam's questions and spoken texts. */
+function loadHoerenExam(number) {
+    const load = hoerenLoaders[number];
+    if (!load)
+        return Promise.reject(new Error('No exam ' + number));
+    return load().then(module => module.exam);
+}
 /** The 15 scored items of a Lesen exam in the order of the paper, with the Teil they belong to. */
 function lesenItems(lesen) {
     return [
@@ -102,10 +137,25 @@ function lesenItems(lesen) {
 /** The right answers as one string in the order of the paper ("frfrfabaab…"). */
 const lesenKey = (lesen) => lesenItems(lesen).map(entry => entry.item.answer).join('');
 exports.lesenKey = lesenKey;
+/** The 15 scored items of a Hören exam in the order of the paper (Teil 1: 1–6, Teil 2: 7–10, Teil 3: 11–15). */
+function hoerenItems(hoeren) {
+    return [
+        ...hoeren.teil1.items.map(item => ({ teil: 1, item })),
+        ...hoeren.teil2.items.map(item => ({ teil: 2, item })),
+        ...hoeren.teil3.items.map(item => ({ teil: 3, item })),
+    ];
+}
+const hoerenKey = (hoeren) => hoerenItems(hoeren).map(entry => entry.item.answer).join('');
+exports.hoerenKey = hoerenKey;
+/** Marks a Hören exam like a Lesen exam. */
+const gradeHoeren = (hoeren, answers) => gradeItems(hoerenItems(hoeren), answers);
+exports.gradeHoeren = gradeHoeren;
 /** Marks a Lesen exam: one point per right answer; an item left open counts as wrong. */
-function gradeLesen(lesen, answers) {
+const gradeLesen = (lesen, answers) => gradeItems(lesenItems(lesen), answers);
+exports.gradeLesen = gradeLesen;
+function gradeItems(items, answers) {
     const result = { right: 0, total: 0, answered: 0, byTeil: { 1: { right: 0, total: 0 }, 2: { right: 0, total: 0 }, 3: { right: 0, total: 0 } }, wrong: [], open: [] };
-    for (const { teil, item } of lesenItems(lesen)) {
+    for (const { teil, item } of items) {
         result.total++;
         result.byTeil[teil].total++;
         const given = answers[item.id];

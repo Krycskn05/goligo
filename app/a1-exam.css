@@ -20,28 +20,37 @@
 .x1-module-words { display:grid; min-width:0; }
 .x1-module-words strong { font-size:17px; line-height:1.2; }
 .x1-module-words small { display:inline-flex; align-items:center; gap:4px; font-size:13.5px; color:inherit; opacity:.9; }
-.x1-info { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:22px; }
-.x1-info .panel { padding:18px 20px; margin:0; }
-.x1-info h2 { margin:0 0 8px; font-size:19px; }
-.x1-info p { margin:0 0 8px; line-height:1.55; }
-.x1-info ol { margin:0; padding-inline-start:22px; display:grid; gap:8px; line-height:1.5; list-style:decimal; }
+.x1-about { padding:18px 20px; margin:0 0 22px; }
+.x1-about h2 { margin:0 0 8px; font-size:19px; }
+.x1-about p { margin:0 0 8px; line-height:1.55; }
+.x1-about p:last-child { margin-bottom:0; }
+.x1-module-link { display:flex; align-items:center; gap:10px; min-width:0; flex:1 1 auto; margin:-12px -14px; padding:12px 14px; border-radius:16px; color:inherit; text-decoration:none; }
+.x1-module-link:hover { background:#f2f6ff; }
+.x1-tips { margin:0 0 16px; padding:10px 14px; border-radius:14px; background:#f5f8fc; }
+.x1-tips summary { font-weight:800; cursor:pointer; }
+.x1-tips ol { margin:10px 0 2px; padding-inline-start:22px; display:grid; gap:8px; line-height:1.5; list-style:decimal; }
 .x1-soon-line { display:flex; align-items:center; gap:8px; color:#6b7a8c; font-weight:600; font-size:15px; }
 .x1-soon-line svg { flex:none; }
 .x1-exams-head { display:flex; flex-wrap:wrap; align-items:end; justify-content:space-between; gap:10px 24px; margin-bottom:12px; }
 .x1-exams-head h2 { margin:0; font-size:24px; }
 .x1-exams-progress { display:grid; gap:2px; min-width:min(280px,100%); }
 .x1-exams-progress small { color:var(--ink-2); font-weight:600; }
-.x1-grid { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+.x1-grid { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
 .x1-card { display:flex; flex-direction:column; gap:6px; margin:0; padding:16px 16px 18px; border-radius:20px; }
 .x1-card.passed { border-color:#bfe3c1; }
 .x1-card-top { display:flex; align-items:center; gap:10px; }
 .x1-card-top h3 { margin:0; font-size:19px; flex:1 1 auto; }
 .x1-card-num { flex:none; display:grid; place-items:center; width:38px; height:38px; border-radius:10px; background:#e9eef7; color:#2b4a86; font-weight:900; font-size:20px; }
 .x1-card.passed .x1-card-num { background:#dcf3dd; color:#2c7a31; }
-.x1-card-topics { margin:2px 0 0; font-size:15px; line-height:1.4; color:var(--ink-2); min-height:4.2em; }
-.x1-card-meta { margin:0; font-size:13.5px; color:var(--ink-3); font-weight:600; }
-.x1-card-state { margin:0 0 6px; font-weight:700; font-size:15px; }
-.x1-card .btn,.x1-card .guest-lock { margin-top:auto; align-self:flex-start; }
+.x1-papers { list-style:none; margin:6px 0 0; padding:0; display:grid; gap:8px; }
+.x1-paper-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 10px; align-items:center; padding:10px 12px; border-radius:14px; background:#f5f8fc; border:1px solid #e3ebf5; }
+.x1-paper-row.passed { background:#f1faf1; border-color:#cfe9d0; }
+.x1-paper-row.soon { background:#f6f7f9; border-style:dashed; color:#6b7a8c; grid-template-columns:auto auto; justify-content:space-between; }
+.x1-paper-name { display:flex; align-items:center; gap:8px; font-size:17px; }
+.x1-paper-name svg { flex:none; }
+.x1-card-topics { grid-column:1; font-size:14px; line-height:1.35; color:var(--ink-2); }
+.x1-card-state { grid-column:1; display:inline-flex; align-items:center; gap:5px; font-weight:700; font-size:14px; }
+.x1-paper-row .btn,.x1-paper-row .guest-lock { grid-column:2; grid-row:1 / span 3; align-self:center; }
 .x1-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:999px; font-size:13px; font-weight:800; white-space:nowrap; }
 .x1-badge.ok { background:#dcf3dd; color:#22692a; }
 .x1-badge.no { background:#fde7d6; color:#8f4a10; }
@@ -183,6 +192,37 @@
 .x1-row-claim { margin-inline-start:54px; }
 .x1-sign-item + .x1-sign-item { margin-top:26px; }
 .x1-example { opacity:.92; }
+/* Hören: the play button with the hearings left, three answers to cross, the spoken text after the exam. */
+.x1-listen { display:flex; align-items:center; gap:10px; margin:8px 0 0 54px; font-family:var(--koko-font); }
+.x1-row > .x1-listen { margin:0; }
+.x1-play { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 18px; border:2px solid #1f3f86; border-radius:999px; background:#fff; color:#1f3f86; font:inherit; font-weight:800; font-size:16px; }
+.x1-play:enabled:hover { background:#edf3ff; }
+.x1-play.on { background:#1f3f86; color:#fff; }
+.x1-play:disabled { border-color:#aab3c2; color:#7b8798; background:#eef0f4; opacity:1; }
+.x1-wave { display:inline-flex; align-items:flex-end; gap:2px; height:14px; }
+.x1-wave b { width:3px; height:100%; border-radius:2px; background:currentColor; transform-origin:bottom; animation:x1-wave .9s ease-in-out infinite; }
+.x1-wave b:nth-child(2) { animation-delay:.15s; }
+.x1-wave b:nth-child(3) { animation-delay:.3s; }
+@keyframes x1-wave { 0%,100% { transform:scaleY(.35); } 50% { transform:scaleY(1); } }
+.x1-plays { display:inline-flex; gap:5px; }
+.x1-plays i { width:12px; height:12px; border-radius:50%; border:2px solid #1f3f86; background:#1f3f86; }
+.x1-plays i.used { background:transparent; border-color:#9aa5b8; }
+.x1-abc { display:grid; gap:10px; margin:10px 0 0 54px; }
+.x1-abc.tiles { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.x1-opt { align-items:center; gap:10px; padding:10px 12px; border:1.5px solid #222; border-radius:8px; background:#f4f5f7; min-height:52px; }
+.x1-abc.tiles .x1-opt { flex-direction:column; justify-content:flex-start; gap:6px; padding:12px 8px 12px; text-align:center; }
+.x1-abc.tiles .x1-pick-label { font-size:16px; line-height:1.25; overflow-wrap:break-word; }
+.x1-opt:enabled:hover { background:#fff; box-shadow:0 0 0 3px rgba(53,103,201,.2); }
+.x1-opt.on { background:#fff; box-shadow:0 0 0 2px #222; }
+.x1-opt-icon { font-size:34px; line-height:1.1; }
+.x1-script { margin:10px 0 0 54px; padding:10px 14px; border-radius:10px; background:#fff; border:1px dashed #9aa0aa; font-size:16px; line-height:1.5; }
+.x1-script p { margin:0 0 4px; }
+.x1-script p:last-child { margin-bottom:0; }
+.x1-script-title { font-family:var(--koko-font); font-size:13px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:#5d6b7e; text-align:start; }
+.x1-hear + .x1-hear { margin-top:26px; }
+.x1-voice-note { margin:0 0 12px; padding:8px 12px; border-radius:12px; background:#f1f3f7; color:#4b5b70; font-size:14.5px; }
+.x1-opt.is-right { border-color:#1f7a2a; background:#eef9ee; box-shadow:0 0 0 3px #bfe3c1; }
+.x1-opt.is-wrong { border-color:#b3261e; background:#fdf0ee; box-shadow:none; }
 /* After handing in: the right box is green, a wrong cross is red, and the answer is explained. */
 .x1-box.is-right .x1-box-word,.x1-pick.is-right .x1-letter { border-color:#1f7a2a; background:#dff3e0; box-shadow:0 0 0 3px #bfe3c1; }
 .x1-box.is-wrong .x1-box-word,.x1-pick.is-wrong .x1-letter { border-color:#b3261e; background:#fde2de; }
@@ -198,7 +238,6 @@
 @media (max-width:760px) {
  .x1-app.x1-running .work-layout>.work-sidebar { display:none; }
  .x1-modules { grid-template-columns:1fr; gap:8px; }
- .x1-info { grid-template-columns:1fr; }
  .x1-hero-badge { width:58px; height:58px; }
  .x1-hero-badge .nav-icon { width:42px; height:42px; }
  .x1-cover,.x1-result { padding:18px 16px 20px; }
@@ -211,7 +250,7 @@
  .x1-paper-side { display:none; }
  .x1-num { width:30px; font-size:28px; }
  .x1-beispiel { margin-inline-start:0; }
- .x1-mail,.x1-text-letter,.x1-text-note,.x1-ads,.x1-why { margin-left:0; }
+ .x1-mail,.x1-text-letter,.x1-text-note,.x1-ads,.x1-why,.x1-listen,.x1-abc,.x1-script { margin-left:0; }
  .x1-row-claim { margin-inline-start:0; }
  .x1-notice { max-width:100%; padding:14px 16px; }
  /* A statement, then its two boxes under it. */
@@ -222,8 +261,12 @@
  .x1-pager .btn { padding-inline:18px; }
 }
 @media (max-width:560px) {
+ .x1-abc.tiles .x1-opt-icon { font-size:28px; }
+ .x1-abc.tiles .x1-pick-label { font-size:14.5px; }
+ .x1-abc.tiles { gap:6px; }
  .x1-ads { grid-template-columns:1fr; gap:10px; }
  .x1-ad-col + .x1-ad-col { margin-top:6px; }
  .x1-mail-menu { display:none; }
 }
+@media (prefers-reduced-motion:reduce) { .x1-wave b { animation:none; } }
 @media print { .x1-bar,.x1-pager,.x1-ask,.work-sidebar { display:none !important; } }

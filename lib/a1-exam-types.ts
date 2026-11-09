@@ -1,18 +1,20 @@
 /**
  * A1 sınavı (the learner asked, 9 November 2026): practice exams built like the written part of the Start Deutsch 1
- * exam (Goethe / telc) from the learner's photos — 1 Hören, 2 Lesen, 3 Schreiben. Lesen is written (10 exams,
- * lib/a1-exam-lesen-01.ts … -10.ts); Hören and Schreiben come later from new photos, so an exam has a place for them
- * (`hoeren`, `schreiben`) that stays empty for now.
+ * exam (Goethe / telc) from the learner's photos — 1 Hören, 2 Lesen, 3 Schreiben. Lesen (10 exams,
+ * lib/a1-exam-lesen-01.ts … -10.ts) and Hören (10 exams, lib/a1-exam-hoeren-01.ts … -10.ts, added on 9 November 2026 after
+ * the telc and Goethe practice sets) are written; Schreiben comes later, so an exam has a place for it (`schreiben`).
  *
  * Every text of an exam is German and our own (the site's people, invented places, phone numbers from the ranges kept
- * free for films, invented web addresses). Every answer is a tap: Richtig / Falsch (`r` / `f`) or one of two ads
- * (`a` / `b`). `why` is the short Turkish explanation shown in the review; its translations are
+ * free for films, invented web addresses). Every answer is a tap: Richtig / Falsch (`r` / `f`), one of two ads
+ * (`a` / `b`) or, in Hören, one of three answers (`a` / `b` / `c`). `why` is the short Turkish explanation shown in the review; its translations are
  * lib/a1-exam-packs/<language>.json by item id. Markup: `**bold**` in German texts; `*German words*` in `why`
  * (kept as they are in every language).
  */
 export type TrueFalse='r'|'f';
 export type AdChoice='a'|'b';
-export type ExamAnswer=TrueFalse|AdChoice;
+/** Hören Teil 1 and Teil 3: one of three answers. */
+export type AbcChoice='a'|'b'|'c';
+export type ExamAnswer=TrueFalse|AdChoice|AbcChoice;
 
 /** The frame of an ad or a notice, like the boxes on the exam paper. */
 export type Frame='solid'|'dashed'|'dotted'|'double'|'shaded'|'round'|'bold';
@@ -60,6 +62,26 @@ export type A1Exam={
  /** A few German words that say what the texts are about (on the exam card). */
  topics:string;
  lesen:LesenExam;
- /** Not written yet: the learner sends the Hören photos later; Schreiben comes later too. */
- hoeren?:null;schreiben?:null;
+ /** Not written yet: Schreiben comes later. (Hören is its own file per exam: `A1HoerenExam`.) */
+ schreiben?:null;
 };
+
+/* ---------- Hören (the site's voices read the texts; nothing is recorded) ---------- */
+/** One spoken line: who speaks (shown with the text after the exam) and the site voice that reads it (F1 … M5). */
+export type AudioLine={who:string;voice:string;text:string};
+/** An answer of a three-way question: its words and, in Teil 1, a small picture (an emoji) like the pictures of the paper. */
+export type ListenOption={text:string;icon?:string};
+/** Teil 1 (short talks) and Teil 3 (phone messages): a question and three answers; heard twice. */
+export type ListenChoiceItem={id:string;n:number;question:string;options:readonly [ListenOption,ListenOption,ListenOption];answer:AbcChoice;lines:readonly AudioLine[];why:string};
+export type ListenChoiceExample=Omit<ListenChoiceItem,'id'|'n'|'why'>;
+/** Teil 2 (announcements): a statement to mark Richtig or Falsch; heard once. */
+export type ListenTrueFalseItem={id:string;n:number;text:string;answer:TrueFalse;lines:readonly AudioLine[];why:string};
+export type ListenTrueFalseExample=Omit<ListenTrueFalseItem,'id'|'n'|'why'>;
+export type HoerenExam={
+ teil1:{example:ListenChoiceExample;items:readonly ListenChoiceItem[]};
+ teil2:{example:ListenTrueFalseExample;items:readonly ListenTrueFalseItem[]};
+ teil3:{items:readonly ListenChoiceItem[]};
+};
+/** How often a text of a Teil is heard in the exam. */
+export const HOEREN_PLAYS:Record<1|2|3,number>={1:2,2:1,3:2};
+export type A1HoerenExam={id:string;number:number;topics:string;hoeren:HoerenExam};

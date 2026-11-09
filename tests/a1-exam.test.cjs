@@ -1,12 +1,18 @@
-// A1 sınavı (/a1-sinavi, the learner asked, 9 November 2026): ten Lesen practice exams built like the written
-// Start Deutsch 1 exam from the learner's photos (Teil 1 Richtig / Falsch on two texts, Teil 2 two ads a / b, Teil 3
-// notices Richtig / Falsch); every answer is a tap. Hören and Schreiben come later and already have their place.
+// A1 sınavı (/a1-sinavi, the learner asked, 9 November 2026): ten practice exams built like the written Start Deutsch 1
+// exam. Lesen from the learner's photos (Teil 1 Richtig / Falsch on two texts, Teil 2 two ads a / b, Teil 3 notices
+// Richtig / Falsch); Hören after the telc and Goethe practice sets (Teil 1 short talks a / b / c, Teil 2 announcements
+// Richtig / Falsch, Teil 3 phone messages a / b / c; the site's voices read the texts). Every answer is a tap.
+// Schreiben comes later and already has its place.
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const compiled=process.env.STUDY_CHECK_DIR;if(!compiled)throw Error('Set STUDY_CHECK_DIR.');
 const load=name=>require(path.join(compiled,name+'.js'));
 const course=load('a1-exam-course'),progress=load('a1-exam-progress'),copy=load('a1-exam-copy'),build=load('a1-exam-build'),sync=load('lesson-sync'),auth=load('member-auth'),visits=load('visits');
+const listening=load('a1-exam-hoeren'),types=load('a1-exam-types');const hoerenExams=listening.hoerenExams;
+const heard=exam=>course.hoerenItems(exam.hoeren);
 const read=file=>fs.readFileSync(file,'utf8');
 const two=n=>String(n).padStart(2,'0');
+/** A text without case and punctuation, to find a quote in it. */
+const plain=text=>text.toLowerCase().replace(/\*\*/g,'').replace(/[.,!?:;–—-]/g,' ').replace(/\s+/g,' ').trim();
 const exams=Array.from({length:10},(_,i)=>load('a1-exam-lesen-'+two(i+1)).exam);
 const languages=['en','ar','uk','de'];
 const packs=Object.fromEntries(languages.map(id=>[id,JSON.parse(read(`lib/a1-exam-packs/${id}.json`))]));
@@ -21,16 +27,21 @@ function allText(exam){
  return out.join('\n');
 }
 
-test('ten Lesen exams; Hören and Schreiben have their place and are not ready yet',()=>{
+test('ten exams with a Hören and a Lesen paper each; Schreiben has its place and is not ready yet',()=>{
  assert.equal(course.A1_EXAM_PATH,'/a1-sinavi');assert.equal(course.LESEN_EXAM_COUNT,10);assert.equal(exams.length,10);
- assert.deepEqual(course.examModules.map(module=>[module.number,module.id,module.name,module.ready]),[[1,'hoeren','Hören',false],[2,'lesen','Lesen',true],[3,'schreiben','Schreiben',false]]);
+ assert.deepEqual(course.examModules.map(module=>[module.number,module.id,module.name,module.ready]),[[1,'hoeren','Hören',true],[2,'lesen','Lesen',true],[3,'schreiben','Schreiben',false]]);
+ assert.equal(hoerenExams.length,10);assert.equal(course.hoerenExamList.length,10);assert.equal(course.HOEREN_TOTAL,15);assert.equal(course.HOEREN_MINUTES,20);
+ hoerenExams.forEach((exam,i)=>{const meta=course.hoerenExamList[i];assert.deepEqual([meta.number,meta.id,meta.topics],[i+1,'a1-hoeren-'+two(i+1),exam.topics]);assert.equal(exam.id,meta.id);assert.equal(exam.number,i+1);});
+ assert.equal(new Set(course.hoerenExamList.map(exam=>exam.topics)).size,10);
+ assert.equal(course.examList('hoeren'),course.hoerenExamList);assert.equal(course.examList('lesen'),course.lesenExamList);
+ assert.ok(course.isReadyModule('hoeren')&&course.isReadyModule('lesen')&&!course.isReadyModule('schreiben'));
  assert.deepEqual(course.examModules.map(module=>module.minutes),[20,25,20]);
  exams.forEach((exam,i)=>{
   const meta=course.lesenExamList[i];
   assert.equal(exam.number,i+1);assert.equal(exam.id,'a1-lesen-'+two(i+1));assert.equal(exam.id,build.lesenExamId(i+1));
   assert.deepEqual([meta.number,meta.id,meta.topics],[exam.number,exam.id,exam.topics],'the list page shows the exam\'s own topics');
   assert.ok(exam.topics.split(' · ').length>=4,exam.id+': topics');
-  assert.equal(exam.hoeren,null,'room for Hören');assert.equal(exam.schreiben,null,'room for Schreiben');
+  assert.equal(exam.schreiben,null,'room for Schreiben');
  });
  assert.equal(new Set(course.lesenExamList.map(exam=>exam.topics)).size,10,'ten different sets of topics');
 });
@@ -66,6 +77,9 @@ test('every exam: Teil 1–3 with 15 scored items and the examples, ids that nev
    assert.ok((teil===2?['a','b']:['r','f']).includes(item.answer),item.id+': one right answer');
    assert.ok(item.why.trim().length>=20,item.id+': explained');assert.equal((item.why.match(/\*/g)??[]).length%2,0,item.id+': quotes closed');
   }
+  // What an explanation quotes really stands in the exam's texts.
+  const whole=plain(allText(exam));
+  for(const {item} of list)for(const quote of item.why.match(/\*[^*]+\*/g)??[])for(const piece of quote.slice(1,-1).split('…').map(plain).filter(Boolean))assert.ok(whole.includes(piece),item.id+': '+quote+' is in the text');
  }
 });
 
@@ -102,6 +116,65 @@ test('our own texts: the site\'s people, nothing from the book, phone numbers fr
  assert.equal(new Set(statements).size,150);
 });
 
+test('every Hören exam: Teil 1–3 with 15 scored items, the examples, a spoken text for each, ids that never change',()=>{
+ assert.deepEqual(types.HOEREN_PLAYS,{1:2,2:1,3:2},'Teil 1 and 3 are heard twice, Teil 2 once');
+ for(const exam of hoerenExams){
+  const {teil1,teil2,teil3}=exam.hoeren;const list=heard(exam);
+  assert.deepEqual([teil1.items.length,teil2.items.length,teil3.items.length],[6,4,5],exam.id);
+  assert.deepEqual(list.map(entry=>entry.item.n),Array.from({length:15},(_,i)=>i+1));
+  assert.deepEqual(list.map(entry=>entry.item.id),Array.from({length:15},(_,i)=>exam.id+'-'+two(i+1)));
+  assert.equal(list.map(entry=>entry.teil).join(''),'111111222233333');
+  const choices=[teil1.example,...teil1.items,...teil3.items];
+  for(const item of choices){
+   assert.ok(item.question.trim().endsWith('?'),exam.id+': a question');assert.ok(['a','b','c'].includes(item.answer));
+   assert.equal(item.options.length,3);assert.equal(new Set(item.options.map(option=>option.text)).size,3,exam.id+': three different answers');
+   for(const option of item.options)assert.ok(option.text.trim()&&option.text.length<=30,option.text);
+  }
+  for(const item of [teil2.example,...teil2.items]){assert.ok(item.text.trim().endsWith('.'));assert.ok(['r','f'].includes(item.answer));}
+  // The spoken texts: every line has a site voice; two people of a text never share a voice; the site's people keep their own.
+  for(const block of listening.hoerenBlocks(exam.hoeren)){
+   assert.ok(block.lines.length>=1&&block.lines.length<=6);
+   const voices=new Map();
+   for(const line of block.lines){
+    assert.match(line.voice,/^[FM][1-5]$/,line.who);assert.ok(line.text.trim().length>=3);
+    if(voices.has(line.who))assert.equal(voices.get(line.who),line.voice,line.who+' keeps one voice');voices.set(line.who,line.voice);
+    if(build.CAST_VOICES[line.who])assert.equal(line.voice,build.CAST_VOICES[line.who],line.who+' has their own voice');
+    // Written for the voices: no signs or decimals a voice would read wrongly.
+    assert.ok(!/[€%&/()]|\d[.,]\d|\bz\. B\.|\busw\b/.test(line.text),'voice-safe: '+line.text);
+   }
+   assert.equal(new Set(voices.values()).size,voices.size,exam.id+': different voices in one text');
+  }
+  for(const item of teil1.items)assert.ok(new Set(item.lines.map(line=>line.who)).size===2,item.id+': a talk of two');
+  for(const item of [...teil2.items,...teil3.items])assert.equal(new Set(item.lines.map(line=>line.who)).size,1,item.id+': one speaker');
+  for(const {item} of list){assert.ok(item.why.trim().length>=20,item.id+': explained');assert.equal((item.why.match(/\*/g)??[]).length%2,0);
+   // What an explanation quotes was really said (or is a word of the question).
+   const said=plain([...item.lines.map(line=>line.text),item.question??item.text].join(' '));
+   for(const quote of item.why.match(/\*[^*]+\*/g)??[])for(const piece of quote.slice(1,-1).split('…').map(plain).filter(Boolean))assert.ok(said.includes(piece),item.id+': '+quote+' is in the text');}
+ }
+});
+
+test('Hören: the answers are balanced, no two exams have the same key, every statement and question once',()=>{
+ const keys=hoerenExams.map(exam=>course.hoerenKey(exam.hoeren));
+ assert.equal(new Set(keys).size,10);let right=0;const letters={a:0,b:0,c:0};
+ for(const [i,key] of keys.entries()){
+  assert.match(key,/^[abc]{6}[rf]{4}[abc]{5}$/,'exam '+(i+1));
+  const abc=key.slice(0,6)+key.slice(10),tf=key.slice(6,10);
+  for(const letter of ['a','b','c']){const n=[...abc].filter(x=>x===letter).length;letters[letter]+=n;assert.ok(n>=3&&n<=5,'exam '+(i+1)+': '+n+' × '+letter+' of 11');}
+  const r=[...tf].filter(x=>x==='r').length;right+=r;assert.ok(r>=1&&r<=3,'exam '+(i+1)+': '+r+' Richtig of 4');
+  for(const part of [key.slice(0,6),key.slice(10)])assert.ok(!/(.)\1\1/.test(part),'exam '+(i+1)+': no three equal answers in a row');
+ }
+ assert.equal(right,20,'Richtig and Falsch half and half over the ten exams');
+ for(const letter of ['a','b','c'])assert.ok(letters[letter]>=33&&letters[letter]<=40,letter+': '+letters[letter]+' of 110');
+ assert.equal(new Set(keys.map(key=>key.slice(6,10))).size,10,'ten different Teil 2 keys');
+ const asked=hoerenExams.flatMap(exam=>heard(exam).map(entry=>entry.item.question??entry.item.text));assert.equal(new Set(asked).size,150);
+ // The voices get every spoken line (scripts/voices/list-texts.cjs).
+ const spoken=listening.a1ExamSpeechTexts();assert.equal(new Set(spoken).size,spoken.length);assert.ok(spoken.length>=280,String(spoken.length));
+ assert.ok(read('scripts/voices/list-texts.cjs').includes("load('a1-exam-hoeren').a1ExamSpeechTexts()"));
+ // Nothing from the practice sets the format was taken from.
+ const whole=hoerenExams.map(exam=>listening.hoerenBlocks(exam.hoeren).map(block=>block.lines.map(line=>line.text).join(' ')).join(' ')).join(' ');
+ for(const word of ['Schneider','Gundlach','Heinze','Solms','Hegers','Albers','Betriebsrat','Budapest','Metropolis','Aladin','11833'])assert.ok(!whole.includes(word),'from a practice set: '+word);
+});
+
 test('marking like the exam: a point per answer, 15 points, 60 % to pass, × 1,66 for the certificate',()=>{
  assert.equal(course.LESEN_MINUTES,25);assert.equal(course.PASS_PERCENT,60);assert.equal(course.passMark(15),9);
  assert.equal(course.hasPassed(9,15),true);assert.equal(course.hasPassed(8,15),false);
@@ -114,6 +187,10 @@ test('marking like the exam: a point per answer, 15 points, 60 % to pass, × 1,6
  assert.deepEqual([mixed.right,mixed.answered,mixed.wrong,mixed.open],[11,14,[exam.id+'-01',exam.id+'-06',exam.id+'-15'],[exam.id+'-11']]);
  assert.deepEqual(mixed.byTeil,{1:{right:4,total:5},2:{right:4,total:5},3:{right:3,total:5}});
  assert.equal(course.isExamNumber(10),true);for(const value of [0,11,1.5,NaN])assert.equal(course.isExamNumber(value),false);
+ // Hören is marked the same way.
+ const hoeren=hoerenExams[0];const heardAll=Object.fromEntries(heard(hoeren).map(entry=>[entry.item.id,entry.item.answer]));
+ assert.deepEqual(course.gradeHoeren(hoeren.hoeren,heardAll).byTeil,{1:{right:6,total:6},2:{right:4,total:4},3:{right:5,total:5}});
+ assert.equal(course.gradeHoeren(hoeren.hoeren,{...heardAll,[hoeren.id+'-07']:heardAll[hoeren.id+'-07']==='r'?'f':'r'}).right,14);
 });
 
 test('results stay in the browser, travel with the account and go with a progress reset',()=>{
@@ -131,6 +208,10 @@ test('results stay in the browser, travel with the account and go with a progres
  assert.deepEqual(progress.readExamRun(box,id),{answers:{[id+'-01']:'r',[id+'-06']:'b'},seconds:61,teil:2,timed:false,done:false});
  box.setItem(progress.a1ExamRunKey(id),JSON.stringify({answers:{[id+'-01']:'x','a1-lesen-04-01':'r',[id+'-02']:'f'},seconds:-4,teil:9}));
  assert.deepEqual(progress.readExamRun(box,id),{answers:{[id+'-02']:'f'},seconds:0,teil:1,timed:true,done:false});
+ // A Hören run also keeps the answer c and how often each text was heard.
+ const heardId='a1-hoeren-02';progress.saveExamRun(box,heardId,{answers:{[heardId+'-01']:'c'},seconds:9,teil:3,timed:true,done:false,plays:{[heardId+'-01']:2,[heardId+'-b1']:1,'a1-hoeren-03-01':5,[heardId+'-02']:0}});
+ assert.deepEqual(progress.readExamRun(box,heardId),{answers:{[heardId+'-01']:'c'},seconds:9,teil:3,timed:true,done:false,plays:{[heardId+'-01']:2,[heardId+'-b1']:1}});
+ assert.equal(sync.syncLessonOf(progress.a1ExamRunKey(heardId)),'site');
  progress.clearExamRun(box,id);assert.equal(progress.readExamRun(box,id),null);
  // The keys are part of the account's `site` progress; two score lists are joined, the better result stays.
  for(const key of [progress.A1_EXAM_SCORES_KEY,progress.a1ExamRunKey(id)]){assert.equal(sync.syncLessonOf(key),'site',key);assert.equal(sync.isProgressKey(key),true,key);}
@@ -138,9 +219,9 @@ test('results stay in the browser, travel with the account and go with a progres
  const merged=sync.mergeItems({[progress.A1_EXAM_SCORES_KEY]:{v:'{"a":{"right":9,"total":15}}',t:5}},{[progress.A1_EXAM_SCORES_KEY]:{v:'{"a":{"right":12,"total":15},"b":{"right":7,"total":15}}',t:3}},9);
  assert.deepEqual(JSON.parse(merged[progress.A1_EXAM_SCORES_KEY].v),{a:{right:12,total:15},b:{right:7,total:15}});
  // The section's progress: every exam's 15 points.
- const whole=progress.examSectionProgress({'a1-lesen-01':{right:15,total:15},'a1-lesen-02':{right:9,total:15},'other':{right:15,total:15}});
- assert.deepEqual([whole.total,whole.tried,whole.learned,whole.percent],[150,30,24,16]);
- assert.equal(progress.examsSolved({'a1-lesen-01':{right:1,total:15}}),1);assert.equal(progress.examSectionProgress({}).stage,'new');
+ const whole=progress.examSectionProgress({'a1-lesen-01':{right:15,total:15},'a1-hoeren-02':{right:9,total:15},'other':{right:15,total:15}});
+ assert.deepEqual([whole.total,whole.tried,whole.learned,whole.percent],[300,30,24,8],'twenty papers of 15 points');
+ assert.equal(progress.examPapers.length,20);assert.equal(progress.examsSolved({'a1-lesen-01':{right:1,total:15},'a1-hoeren-01':{right:1,total:15}}),2);assert.equal(progress.examSectionProgress({}).stage,'new');
  assert.equal(progress.clock(754),'12:34');assert.equal(progress.clock(5),'0:05');assert.equal(progress.clock(-3),'0:00');
 });
 
@@ -162,8 +243,8 @@ test('the labels come in Turkish, German, English, Arabic and Ukrainian',()=>{
 
 test('every answer is explained in all five languages, the German quotes kept as they are',()=>{
  const stars=text=>[...text.matchAll(/\*([^*]+)\*/g)].map(m=>m[1]);
- const turkish=Object.fromEntries(exams.flatMap(exam=>items(exam).map(entry=>[entry.item.id,entry.item.why])));
- assert.equal(Object.keys(turkish).length,150);
+ const turkish=Object.fromEntries([...exams.flatMap(exam=>items(exam).map(entry=>[entry.item.id,entry.item.why])),...hoerenExams.flatMap(exam=>heard(exam).map(entry=>[entry.item.id,entry.item.why]))]);
+ assert.equal(Object.keys(turkish).length,300,'150 Lesen and 150 Hören answers');
  assert.deepEqual([...copy.examPackLanguages].sort(),[...languages].sort());
  const script={ar:/[؀-ۿ]/,uk:/[Ѐ-ӿ]/,en:/[a-z]{3}/,de:/[a-zäöüß]{3}/};
  for(const [id,pack] of Object.entries(packs)){
@@ -193,8 +274,16 @@ test('the section is on the site: menu, page, guest taste, visits, styles',()=>{
  assert.ok(read('app/layout.tsx').includes('import "./a1-exam.css";'));
  const ui=read('app/a1-exam-study.tsx'),paper=read('app/a1-exam-paper.tsx');
  assert.ok(ui.includes('<div className="work-layout site-layout"><SiteMenuAside language={language} current={\'exam\'}/>')&&ui.includes('</main></div>'),'the site menu');
- // Hören and Schreiben are shown as coming later.
- assert.ok(ui.includes("data-ready={module.ready?'1':'0'}")&&ui.includes("examText(language,'soon')")&&ui.includes("examText(language,'hoerenSoon')")&&ui.includes("examText(language,'schreibenSoon')"));
+ // Schreiben is shown as coming later; every exam has a Hören and a Lesen paper (`?sinav=3&bolum=hoeren`, no `bolum` = Lesen).
+ assert.ok(ui.includes("data-ready={module.ready?'1':'0'}")&&ui.includes("examText(language,'soon')")&&ui.includes("examText(language,'schreibenSoon')")&&!ui.includes('hoerenSoon'));
+ assert.ok(ui.includes("A1_EXAM_PATH+'?sinav='+number+'&bolum='+module")&&ui.includes("module:isReadyModule(part)?part:'lesen'")&&ui.includes('data-x1-paper={exam.id}'));
+ // After Hören the same exam's Lesen; after Lesen the next exam's Hören.
+ assert.ok(ui.includes("hoeren?{number,module:'lesen'}:number<LESEN_EXAM_COUNT?{number:number+1,module:'hoeren'}:null"));
+ // Hören: a text is played with its button, in the exam-like mode only as often as in the exam; the spoken text shows after handing in.
+ const heardPaper=read('app/a1-exam-hoeren-paper.tsx'),player=read('app/a1-exam-audio.tsx');
+ assert.ok(heardPaper.includes('const max=HOEREN_PLAYS[teil];')&&heardPaper.includes('disabled={!on&&left<=0}')&&heardPaper.includes('{review&&<Script lines={lines} language={language}/>}')&&heardPaper.includes('{review&&id&&why&&<Why '));
+ assert.ok(player.includes('item.style===line.voice')&&player.includes('latest.current.speak(line.text,false,voice?.id,1)'),'each line with its speaker\'s site voice');
+ assert.ok(ui.includes('limit={!!run?.timed}')&&ui.includes("onPlay={review?()=>{}:played}")&&ui.includes('latest.current.audio.stop()'));
  // A visitor opens exam 1; nothing of a visitor is saved.
  assert.equal(course.GUEST_EXAM,1);assert.ok(auth.GUEST_PAGES.has('/a1-sinavi')&&auth.isPublicPath('/a1-sinavi'));
  assert.ok(ui.includes('const locked=guest&&number!==GUEST_EXAM;')&&ui.includes('if(!guest)saveExamRun(')&&ui.includes('if(!guest)try{saveExamScore('));
@@ -206,5 +295,5 @@ test('the section is on the site: menu, page, guest taste, visits, styles',()=>{
  // Paul stays away while a paper is on the screen.
  assert.ok(read('app/paul-hoca.tsx').includes("if(document.querySelector('.x1-running'))return true;")&&ui.includes("(running?' x1-running':'')"));
  // The 25 minutes can be ignored: the clock only shows, it never hands in.
- assert.ok(ui.includes("examText(language,'timeUp')")&&ui.includes("examText(language,'untimed')")&&!/over\)\s*finish\(/.test(ui));
+ assert.ok(ui.includes("examText(language,'timeUp')")&&ui.includes("off:'untimed'")&&ui.includes("off:'listenFree'")&&!/over\)\s*finish\(/.test(ui));
 });

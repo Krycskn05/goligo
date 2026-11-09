@@ -1,6 +1,6 @@
 'use client';
 import type {ReactNode} from 'react';
-import {BookOpen,Check,Mail,X} from 'lucide-react';
+import {BookOpen,Check,Headphones,Mail,X} from 'lucide-react';
 import type {Ad,AdChoice,AdMode,ExamAnswer,LesenExam,Notice,ReadingText,TrueFalse} from '@/lib/a1-exam-types';
 import type {ExamAnswers} from '@/lib/a1-exam-course';
 import {examText,examWhy} from '@/lib/a1-exam-copy';
@@ -13,7 +13,7 @@ import {languageDirection,isSiteLanguage} from '@/lib/site-languages';
  * left-to-right in every site language. `review`: after handing in — the right answer is marked and explained, nothing
  * can be changed.
  */
-type MarkProps={answers:ExamAnswers;onMark?:(id:string,value:ExamAnswer)=>void;review?:boolean;language:string};
+export type MarkProps={answers:ExamAnswers;onMark?:(id:string,value:ExamAnswer)=>void;review?:boolean;language:string};
 
 /** German with `**bold**`. */
 export function Bold({text}:{text:string}){const parts=text.split(/(\*\*[^*]+\*\*)/g);return <>{parts.map((part,i)=>part.length>4&&part.startsWith('**')&&part.endsWith('**')?<b key={i}>{part.slice(2,-2)}</b>:part)}</>;}
@@ -23,10 +23,10 @@ function Quoted({text}:{text:string}){const parts=text.split(/(\*[^*]+\*)/g);ret
 const TF_WORD:Record<TrueFalse,string>={r:'Richtig',f:'Falsch'};
 const TF_SIGN:Record<TrueFalse,string>={r:'+',f:'–'};
 /** How a box looks: crossed by the learner; after handing in also right (green) or wrong (red). */
-function boxClass(base:string,mine:boolean,right:boolean,review:boolean){return base+(mine?' on':'')+(review&&right?' is-right':'')+(review&&mine&&!right?' is-wrong':'');}
+export function boxClass(base:string,mine:boolean,right:boolean,review:boolean){return base+(mine?' on':'')+(review&&right?' is-right':'')+(review&&mine&&!right?' is-wrong':'');}
 
 /** Richtig / Falsch with + and − under the boxes, like the paper; the marked box is crossed. */
-function TrueFalseBoxes({id,value,answer,onMark,review=false,example=false,label}:{id?:string;value:ExamAnswer|undefined;answer:TrueFalse;onMark?:(id:string,value:ExamAnswer)=>void;review?:boolean;example?:boolean;label:string}){
+export function TrueFalseBoxes({id,value,answer,onMark,review=false,example=false,label}:{id?:string;value:ExamAnswer|undefined;answer:TrueFalse;onMark?:(id:string,value:ExamAnswer)=>void;review?:boolean;example?:boolean;label:string}){
  const fixed=review||example||!onMark||!id;
  return <div className="x1-tf" role="radiogroup" aria-label={label}>
   {(['r','f'] as const).map(choice=><button type="button" key={choice} role="radio" aria-checked={value===choice} disabled={fixed} data-choice={choice}
@@ -36,7 +36,7 @@ function TrueFalseBoxes({id,value,answer,onMark,review=false,example=false,label
  </div>;
 }
 /** The line under an item after handing in: right or wrong, the right answer and why. */
-function Why({id,given,answer,why,language}:{id:string;given:ExamAnswer|undefined;answer:ExamAnswer;why:string;language:string}){
+export function Why({id,given,answer,why,language}:{id:string;given:ExamAnswer|undefined;answer:ExamAnswer;why:string;language:string}){
  const right=given===answer;const name=(value:ExamAnswer)=>value==='r'||value==='f'?TF_WORD[value]:value;
  const shown=examWhy(language,id,why);const dir=isSiteLanguage(shown.lang)?languageDirection(shown.lang):'ltr';
  return <div className={'x1-why '+(right?'ok':'no')} lang={language} dir={languageDirection(isSiteLanguage(language)?language:'en')} data-x1-why={right?'right':'wrong'}>
@@ -47,7 +47,7 @@ function Why({id,given,answer,why,language}:{id:string;given:ExamAnswer|undefine
  </div>;
 }
 /** The big number of an item (0 = Beispiel). */
-const Num=({n}:{n:number})=><span className={'x1-num'+(n===0?' zero':'')} aria-hidden="true">{n}</span>;
+export const Num=({n}:{n:number})=><span className={'x1-num'+(n===0?' zero':'')} aria-hidden="true">{n}</span>;
 
 /** A statement with its boxes. */
 function Statement({n,id,text,answer,why,example=false,answers,onMark,review,language}:{n:number;id?:string;text:string;answer:TrueFalse;why?:string;example?:boolean}&MarkProps){
@@ -71,8 +71,8 @@ function Reading({text}:{text:ReadingText}){
  </div>;
  return <div className={'x1-text-'+text.kind} data-x1-text={text.kind}><Lines lines={text.lines}/></div>;
 }
-const HEAD=(module:number,title:string)=><h2 className="x1-teil" id="x1-teil-heading" tabIndex={-1}><span className="x1-teil-num" aria-hidden="true">{module}</span>{title}</h2>;
-function Hint({language,text}:{language:string;text:string}){
+export const HEAD=(module:number,title:string)=><h2 className="x1-teil" id="x1-teil-heading" tabIndex={-1}><span className="x1-teil-num" aria-hidden="true">{module}</span>{title}</h2>;
+export function Hint({language,text}:{language:string;text:string}){
  if(language==='de')return null; // the German instruction says it already
  return <p className="x1-hint" lang={language} dir={languageDirection(isSiteLanguage(language)?language:'en')}>{text}</p>;
 }
@@ -151,10 +151,10 @@ function TeilThree({lesen,...marks}:{lesen:LesenExam}&MarkProps){
 export function LesenTeil({lesen,teil,...marks}:{lesen:LesenExam;teil:1|2|3}&MarkProps){
  return teil===1?<TeilOne lesen={lesen} {...marks}/>:teil===2?<TeilTwo lesen={lesen} {...marks}/>:<TeilThree lesen={lesen} {...marks}/>;
 }
-/** The sheet itself: the head line of the exam paper and the side label. */
-export function Paper({children,minutes}:{children:ReactNode;minutes:number}){
- return <div className="x1-paper" lang="de" dir="ltr">
-  <div className="x1-paper-head"><span className="x1-paper-icon" aria-hidden="true"><BookOpen size={20}/></span><strong>Lesen</strong><span>(circa {minutes} Minuten)</span></div>
+/** The sheet itself: the head line of the exam paper (Hören or Lesen) and the side label. */
+export function Paper({children,minutes,module='lesen'}:{children:ReactNode;minutes:number;module?:'hoeren'|'lesen'}){
+ return <div className={'x1-paper x1-paper-'+module} lang="de" dir="ltr">
+  <div className="x1-paper-head"><span className="x1-paper-icon" aria-hidden="true">{module==='hoeren'?<Headphones size={20}/>:<BookOpen size={20}/>}</span><strong>{module==='hoeren'?'Hören':'Lesen'}</strong><span>(circa {minutes} Minuten)</span></div>
   <span className="x1-paper-side" aria-hidden="true">Schriftliche Prüfung</span>
   {children}
  </div>;

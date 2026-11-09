@@ -32,7 +32,7 @@ exports.exam = (0, a1_exam_build_1.buildExam)(4, 'Zettel zu Hause · Geburtstag 
             ['Sie suchen ein Hotel in Hamburg. Ihr Hund kommt mit.',
                 ['solid', ['**Pension Elbe**', 'Kleine Pension, 10 Minuten zum Hafen.', 'Hunde willkommen (€ 5 pro Nacht).'], 'www.pension-elbe-hamburg.de'],
                 ['solid', ['**Hotel Hafenblick**', 'Zimmer mit Blick auf den Hafen, Frühstück inklusive.', 'Haustiere leider nicht erlaubt.'], 'www.hotel-hafenblick-hh.de'],
-                'a', '*Hunde willkommen*: köpek kabul ediliyor. Öbür otelde *Haustiere nicht erlaubt*.'],
+                'a', '*Hunde willkommen*: köpek kabul ediliyor. Öbür otelde *Haustiere leider nicht erlaubt*.'],
             ['Sie möchten wissen: Wie lange hat das Bürgeramt heute geöffnet?',
                 ['solid', ['**Ämter in Ihrer Stadt**', 'Adressen, Öffnungszeiten, Formulare'], 'www.stadt-service.de/aemter'],
                 ['solid', ['**Freizeit in Ihrer Stadt**', 'Parks, Schwimmbäder, Kinos:', 'Tipps und Öffnungszeiten'], 'www.stadt-service.de/freizeit'],

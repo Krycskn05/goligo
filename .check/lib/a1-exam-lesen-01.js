@@ -58,7 +58,7 @@ exports.exam = (0, a1_exam_build_1.buildExam)(1, 'Umzug · Ausflug in den Zoo ·
             ['An einer **Tankstelle**.', ['double', ['Frische Brötchen!', 'Täglich ab 7 Uhr.', 'Sonntags ab 8 Uhr.'], undefined, 'serif'],
                 'Am Sonntag um halb neun gibt es hier schon frische Brötchen.', 'r', 'Pazar günü *ab 8 Uhr* var; *halb neun* = 8.30, yani o saatte taze ekmek var.'],
             ['Am **Aufzug** im Bahnhof.', ['shaded', ['Aufzug kaputt! Reparatur bis Freitag.', 'Bitte benutzen Sie die Treppe', 'oder den Aufzug an Gleis 5.']],
-                'Im Bahnhof gibt es bis Freitag keinen Aufzug.', 'f', 'Yalnızca bu asansör bozuk; *der Aufzug an Gleis 5* çalışıyor.'],
+                'Im Bahnhof gibt es bis Freitag keinen Aufzug.', 'f', 'Yalnızca bu asansör bozuk; 5. perondaki çalışıyor: *Aufzug an Gleis 5*.'],
         ]
     },
 });

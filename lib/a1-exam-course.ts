@@ -1,21 +1,28 @@
-import type {A1Exam,AdItem,ExamAnswer,ExamModule,LesenExam,NoticeItem,TrueFalseItem} from './a1-exam-types';
-import {lesenExamId} from './a1-exam-build';
+import type {A1Exam,A1HoerenExam,AdItem,ExamAnswer,ExamModule,HoerenExam,LesenExam,ListenChoiceItem,ListenTrueFalseItem,NoticeItem,TrueFalseItem} from './a1-exam-types';
+import {hoerenExamId,lesenExamId} from './a1-exam-build';
 
 /**
  * A1 sınavı (/a1-sinavi): the list of practice exams and how an exam is marked. The exam texts themselves are one file
- * per exam (lib/a1-exam-lesen-01.ts … -10.ts), loaded when the learner opens it. Marking follows the real exam: one
- * point per answer, 15 points in Lesen, each part's points × 1,66 for the certificate (so Lesen gives up to 25 of 100),
- * and 60 % to pass (there the 60 % counts over all parts together; here it is shown for the part the learner solved).
+ * per exam and part (lib/a1-exam-lesen-01.ts … -10.ts, lib/a1-exam-hoeren-01.ts … -10.ts), loaded when the learner
+ * opens it. Marking follows the real exam: one point per answer, 15 points in Hören and 15 in Lesen, each part's points
+ * × 1,66 for the certificate (so a part gives up to 25 of 100), and 60 % to pass (there the 60 % counts over all parts
+ * together; here it is shown for the part the learner solved).
  */
 export const A1_EXAM_PATH='/a1-sinavi';
 /** The parts of the written exam in the order of the exam paper; `ready` parts have exams. */
 export const examModules:readonly {id:ExamModule;number:number;name:string;minutes:number;ready:boolean}[]=[
- {id:'hoeren',number:1,name:'Hören',minutes:20,ready:false},
+ {id:'hoeren',number:1,name:'Hören',minutes:20,ready:true},
  {id:'lesen',number:2,name:'Lesen',minutes:25,ready:true},
  {id:'schreiben',number:3,name:'Schreiben',minutes:20,ready:false},
 ];
 export const LESEN_MINUTES=25;
 export const LESEN_TOTAL=15;
+export const HOEREN_MINUTES=20;
+export const HOEREN_TOTAL=15;
+/** The parts that have exams (a part of the address: `?sinav=3&bolum=hoeren`); Lesen is the part of an address without one. */
+export type ReadyModule='hoeren'|'lesen';
+export const isReadyModule=(value:unknown):value is ReadyModule=>value==='hoeren'||value==='lesen';
+export const moduleMinutes:Record<ReadyModule,number>={hoeren:HOEREN_MINUTES,lesen:LESEN_MINUTES};
 export const PASS_PERCENT=60;
 /** The exam's factor: points of a part × 1,66 (four parts of 15 points make 100). */
 export const POINT_FACTOR=1.66;
@@ -37,6 +44,21 @@ export const lesenExamList:readonly {number:number;id:string;topics:string}[]=[
  {number:10,id:lesenExamId(10),topics:'Praktikum · Regeln im Haus · Internetseiten · Anmelden und Warten'},
 ];
 export const LESEN_EXAM_COUNT=lesenExamList.length;
+/** The ten Hören exams (9 November 2026): the same numbers as the Lesen exams — exam 3 is Hören 3 and Lesen 3. */
+export const hoerenExamList:readonly {number:number;id:string;topics:string}[]=[
+ {number:1,id:hoerenExamId(1),topics:'Einkaufen · Kino · Durchsagen im Bahnhof · Nachrichten am Telefon'},
+ {number:2,id:hoerenExamId(2),topics:'Im Café · Unterwegs in der Stadt · Durchsagen · Termine am Telefon'},
+ {number:3,id:hoerenExamId(3),topics:'Wohnung und Arbeit · Geburtstag · Durchsagen · Kino und Bibliothek'},
+ {number:4,id:hoerenExamId(4),topics:'Auf dem Markt · Am Bahnhof · Durchsagen · Adressen und Preise am Telefon'},
+ {number:5,id:hoerenExamId(5),topics:'Im Restaurant · Im Hotel · Durchsagen · Apotheke, Schule und Kochkurs'},
+ {number:6,id:hoerenExamId(6),topics:'Im Taxi · Familie und Geschenke · Durchsagen · Kita, Sport und Arbeit'},
+ {number:7,id:hoerenExamId(7),topics:'Am Kiosk · Beruf und Freizeit · Durchsagen · Fahrschule, Lieferung, Arbeit'},
+ {number:8,id:hoerenExamId(8),topics:'Öffnungszeiten · Wohnen · Beim Arzt · Durchsagen · Arbeit, Training, Amt'},
+ {number:9,id:hoerenExamId(9),topics:'Eintritt und Bus · Besuch und Pakete · Durchsagen · Einladung, Umzug, Kurs'},
+ {number:10,id:hoerenExamId(10),topics:'Zimmer und Auto · Schule · Durchsagen · Geburtstag, Arbeit, Bahnhof'},
+];
+/** The exams of a part. */
+export const examList=(module:ReadyModule)=>module==='hoeren'?hoerenExamList:lesenExamList;
 /** The exam a visitor without an account may open (the guest taste: the first part of every section). */
 export const GUEST_EXAM=1;
 export const isExamNumber=(value:number)=>Number.isInteger(value)&&value>=1&&value<=LESEN_EXAM_COUNT;
@@ -48,6 +70,15 @@ const loaders:Record<number,()=>Promise<{exam:A1Exam}>>={
 /** Loads one exam's texts. */
 export function loadLesenExam(number:number):Promise<A1Exam>{
  const load=loaders[number];if(!load)return Promise.reject(new Error('No exam '+number));
+ return load().then(module=>module.exam);
+}
+const hoerenLoaders:Record<number,()=>Promise<{exam:A1HoerenExam}>>={
+ 1:()=>import('./a1-exam-hoeren-01'),2:()=>import('./a1-exam-hoeren-02'),3:()=>import('./a1-exam-hoeren-03'),4:()=>import('./a1-exam-hoeren-04'),5:()=>import('./a1-exam-hoeren-05'),
+ 6:()=>import('./a1-exam-hoeren-06'),7:()=>import('./a1-exam-hoeren-07'),8:()=>import('./a1-exam-hoeren-08'),9:()=>import('./a1-exam-hoeren-09'),10:()=>import('./a1-exam-hoeren-10'),
+};
+/** Loads one Hören exam's questions and spoken texts. */
+export function loadHoerenExam(number:number):Promise<A1HoerenExam>{
+ const load=hoerenLoaders[number];if(!load)return Promise.reject(new Error('No exam '+number));
  return load().then(module=>module.exam);
 }
 
@@ -63,12 +94,27 @@ export function lesenItems(lesen:LesenExam):{teil:1|2|3;item:LesenItem}[]{
 /** The right answers as one string in the order of the paper ("frfrfabaab…"). */
 export const lesenKey=(lesen:LesenExam)=>lesenItems(lesen).map(entry=>entry.item.answer).join('');
 
+export type HoerenItem=ListenChoiceItem|ListenTrueFalseItem;
+/** The 15 scored items of a Hören exam in the order of the paper (Teil 1: 1–6, Teil 2: 7–10, Teil 3: 11–15). */
+export function hoerenItems(hoeren:HoerenExam):{teil:1|2|3;item:HoerenItem}[]{
+ return [
+  ...hoeren.teil1.items.map(item=>({teil:1 as const,item})),
+  ...hoeren.teil2.items.map(item=>({teil:2 as const,item})),
+  ...hoeren.teil3.items.map(item=>({teil:3 as const,item})),
+ ];
+}
+export const hoerenKey=(hoeren:HoerenExam)=>hoerenItems(hoeren).map(entry=>entry.item.answer).join('');
+
 export type ExamAnswers=Record<string,ExamAnswer>;
-export type LesenResult={right:number;total:number;answered:number;byTeil:Record<1|2|3,{right:number;total:number}>;wrong:string[];open:string[]};
+export type ExamResult={right:number;total:number;answered:number;byTeil:Record<1|2|3,{right:number;total:number}>;wrong:string[];open:string[]};
+export type LesenResult=ExamResult;
+/** Marks a Hören exam like a Lesen exam. */
+export const gradeHoeren=(hoeren:HoerenExam,answers:ExamAnswers)=>gradeItems(hoerenItems(hoeren),answers);
 /** Marks a Lesen exam: one point per right answer; an item left open counts as wrong. */
-export function gradeLesen(lesen:LesenExam,answers:ExamAnswers):LesenResult{
- const result:LesenResult={right:0,total:0,answered:0,byTeil:{1:{right:0,total:0},2:{right:0,total:0},3:{right:0,total:0}},wrong:[],open:[]};
- for(const {teil,item} of lesenItems(lesen)){
+export const gradeLesen=(lesen:LesenExam,answers:ExamAnswers)=>gradeItems(lesenItems(lesen),answers);
+export function gradeItems(items:readonly {teil:1|2|3;item:{id:string;answer:ExamAnswer}}[],answers:ExamAnswers):ExamResult{
+ const result:ExamResult={right:0,total:0,answered:0,byTeil:{1:{right:0,total:0},2:{right:0,total:0},3:{right:0,total:0}},wrong:[],open:[]};
+ for(const {teil,item} of items){
   result.total++;result.byTeil[teil].total++;
   const given=answers[item.id];
   if(given===undefined){result.open.push(item.id);continue;}

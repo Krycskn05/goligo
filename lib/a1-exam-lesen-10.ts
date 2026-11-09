@@ -34,7 +34,7 @@ export const exam=buildExam(10,'Praktikum · Regeln im Haus · Internetseiten ·
    ['Sie möchten Ihre alten Möbel verschenken.',
     ['solid',['**Möbel-Palast**','Neue Sofas, Betten und Schränke –','jetzt 30 % billiger'],'www.moebel-palast-shop.de'],
     ['solid',['**Zu verschenken**','Geben und nehmen: Möbel,','Kleidung, Spielzeug – alles gratis'],'www.zu-verschenken-hier.de'],
-    'b','Hediye etmek (*verschenken*): *Geben und nehmen – alles gratis*. Öbür sayfa yeni mobilya satıyor.'],
+    'b','Hediye etmek (*verschenken*): *Geben und nehmen … alles gratis*. Öbür sayfa yeni mobilya satıyor.'],
    ['Sie möchten am Wochenende mit Ihren Kindern etwas machen. Es regnet.',
     ['solid',['**Abenteuer-Spielplatz**','Klettern, laufen, grillen im Wald.','Nur bei gutem Wetter geöffnet'],'www.abenteuer-spielplatz-wald.de'],
     ['solid',['**Kindermuseum**','Sehen, hören, selbst machen: für Kinder','von 4 bis 12, auch am Sonntag'],'www.kindermuseum-stadt.de'],

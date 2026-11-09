@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.lesenItemId = exports.lesenExamId = void 0;
+exports.hoerenItemId = exports.hoerenExamId = exports.CAST_VOICES = exports.lesenItemId = exports.lesenExamId = void 0;
 exports.buildExam = buildExam;
+exports.buildHoeren = buildHoeren;
 const two = (n) => String(n).padStart(2, '0');
 const lesenExamId = (number) => 'a1-lesen-' + two(number);
 exports.lesenExamId = lesenExamId;
@@ -24,5 +25,35 @@ function buildExam(number, topics, spec) {
         example: { place: spec.teil3.example[0], notice: notice(spec.teil3.example[1]), text: spec.teil3.example[2], answer: spec.teil3.example[3] },
         items: spec.teil3.items.map(item => ({ id: id(), n, place: item[0], notice: notice(item[1]), text: item[2], answer: item[3], why: item[4] }))
     };
-    return { id: (0, exports.lesenExamId)(number), number, topics, lesen: { teil1, teil2, teil3 }, hoeren: null, schreiben: null };
+    return { id: (0, exports.lesenExamId)(number), number, topics, lesen: { teil1, teil2, teil3 }, schreiben: null };
+}
+/* ---------- Hören (lib/a1-exam-hoeren-NN.ts) ---------- */
+/**
+ * The people of the site keep their own voice in every exam (lib/site-voices.ts: the voice called Sabine reads Sabine).
+ * Anyone else is written as "Name:Voice" ("Verkäuferin:F4") — a voice of the right kind that is not the other speaker's.
+ */
+exports.CAST_VOICES = { Sabine: 'F1', Yasemin: 'F2', Aisha: 'F3', Nora: 'F4', Mei: 'F5', Rami: 'M1', Omar: 'M2', Paul: 'M3', Nikos: 'M4', Tomasz: 'M5' };
+const hoerenExamId = (number) => 'a1-hoeren-' + two(number);
+exports.hoerenExamId = hoerenExamId;
+const hoerenItemId = (exam, n) => (0, exports.hoerenExamId)(exam) + '-' + two(n);
+exports.hoerenItemId = hoerenItemId;
+function audioLine(spec) {
+    const [name, given] = spec[0].split(':');
+    const voice = given ?? exports.CAST_VOICES[name];
+    if (!voice || !/^[FM][1-5]$/.test(voice))
+        throw new Error('No voice for ' + spec[0]);
+    return { who: name, voice, text: spec[1] };
+}
+const option = (spec) => typeof spec === 'string' ? { text: spec } : { icon: spec[0], text: spec[1] };
+const options = (o) => [option(o[0]), option(o[1]), option(o[2])];
+/** Numbers a Hören exam like the paper: Teil 1: 1–6, Teil 2: 7–10, Teil 3: 11–15; ids `a1-hoeren-<exam>-<number>`. */
+function buildHoeren(number, topics, spec) {
+    let n = 0;
+    const id = () => (0, exports.hoerenItemId)(number, ++n);
+    const choice = (item) => ({ id: id(), n, question: item.q, options: options(item.o), answer: item.a, lines: item.lines.map(audioLine), why: item.why });
+    const teil1 = { example: { question: spec.teil1.example.q, options: options(spec.teil1.example.o), answer: spec.teil1.example.a, lines: spec.teil1.example.lines.map(audioLine) }, items: spec.teil1.items.map(choice) };
+    const teil2 = { example: { text: spec.teil2.example.t, answer: spec.teil2.example.a, lines: spec.teil2.example.lines.map(audioLine) },
+        items: spec.teil2.items.map(item => ({ id: id(), n, text: item.t, answer: item.a, lines: item.lines.map(audioLine), why: item.why })) };
+    const teil3 = { items: spec.teil3.items.map(choice) };
+    return { id: (0, exports.hoerenExamId)(number), number, topics, hoeren: { teil1, teil2, teil3 } };
 }

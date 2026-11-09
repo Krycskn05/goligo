@@ -1,0 +1,61 @@
+import {buildExam} from './a1-exam-build';
+
+/** A1 sınavı · Lesen 9: the course visits a museum, a parcel at the neighbour's, ads, notices. */
+export const exam=buildExam(9,'Mit dem Kurs ins Museum · Paket bei der Nachbarin · Wohnen und Feiern · Regeln',{
+ teil1:[
+  {kind:'mail',from:'Paul',to:'Kurs A1',subject:'Freitag: Museum',
+   lines:['Liebe Kursteilnehmer,','am Freitag haben wir keinen Unterricht in der Schule: Wir besuchen zusammen das Technikmuseum! Treffpunkt ist um 9.45 Uhr am Eingang vom Museum. Die Führung beginnt um 10 Uhr und ist auf Deutsch – aber langsam und einfach. Um 12 Uhr sind wir fertig.','Für Kursteilnehmer kostet der Eintritt nichts, alle anderen Besucher bezahlen 8 Euro. Bitte bringt euren Kursausweis mit.','Bis Freitag!','Paul'],
+   example:['Am Freitag geht der Kurs ins Museum.','r'],
+   items:[
+    ['Die Führung im Museum dauert zwei Stunden.','r','Rehberli gezi 10’da başlıyor, 12’de bitiyor: iki saat.'],
+    ['Der Eintritt ist für alle Besucher frei.','f','Yalnızca kursiyerler ücretsiz; *alle anderen Besucher bezahlen 8 Euro*.'],
+   ]},
+  {kind:'note',
+   lines:['Hallo Herr Papadakis,','der Postbote war heute um 11 Uhr da, aber Sie waren nicht zu Hause. Ich habe Ihr Paket genommen. Es ist ziemlich groß und schwer!','Sie können es heute ab 18 Uhr bei mir abholen, vorher bin ich beim Sport. Morgen bin ich den ganzen Tag im Büro. Ich wohne im zweiten Stock links.','Viele Grüße','Ihre Nachbarin Mira Sommer'],
+   items:[
+    ['Das Paket ist jetzt bei der Post.','f','*Ich habe Ihr Paket genommen*: paket komşuda, postanede değil.'],
+    ['Herr Papadakis kann das Paket heute um 17 Uhr holen.','f','*Ab 18 Uhr*: ondan önce komşu sporda, saat 17’de evde yok.'],
+    ['Morgen Mittag ist die Nachbarin nicht zu Hause.','r','*Morgen bin ich den ganzen Tag im Büro*: yarın gün boyu işte.'],
+   ]},
+ ],
+ teil2:{mode:'ad',
+  example:['Sie suchen eine Lampe für Ihren Schreibtisch.',
+   ['dotted',['**Schreibtischlampe**,','schwarz, LED, € 12.','Tel.: 0176 / 040690 11'],'0176 / 040690 11'],
+   ['solid',['**Schreibtisch mit Stuhl**,','Holz, 1,40 m breit, € 95.','Tel.: 0176 / 040690 74'],'0176 / 040690 74','serif'],'a'],
+  items:[
+   ['Sie möchten in einer Wohngemeinschaft wohnen. Sie rauchen nicht.',
+    ['solid',['**Zimmer in 2er-WG** frei,','15 m², Nichtraucher,','€ 370 warm.','Tel.: 030 / 23125 146'],'030 / 23125 146'],
+    ['dashed',['**WG sucht Mitbewohner/in:**','großes Zimmer, € 400.','Wir rauchen alle – du auch?','Tel.: 030 / 23125 583'],'030 / 23125 583','serif'],
+    'a','Sigara içmiyorsunuz: *Nichtraucher* evi uyar. Öbür evde herkes sigara içiyor.'],
+   ['Sie möchten den Führerschein machen. Sie haben nur am Wochenende Zeit.',
+    ['shaded',['**Fahrschule Ziel**','Kurs am Samstag und Sonntag,','Theorie in 4 Wochenenden.','Tel.: 030 / 23125 662'],'030 / 23125 662'],
+    ['solid',['**Fahrschule Start**','Unterricht Montag bis Freitag','am Abend, 18–19.30 Uhr.','Tel.: 030 / 23125 217'],'030 / 23125 217','serif'],
+    'a','Yalnızca hafta sonu: *am Samstag und Sonntag*. Öbür okulda dersler hafta içi akşamları.'],
+   ['Sie möchten mit 40 Personen Ihren Geburtstag feiern.',
+    ['dotted',['**Bistro Klein**','Gemütlich essen zu zweit,','8 Tische. Bitte reservieren!','Tel.: 030 / 23125 794'],'030 / 23125 794','serif'],
+    ['solid',['**Restaurant Sonne**','Raum für Feste bis 60 Personen,','mit Musik und Buffet.','Tel.: 030 / 23125 350'],'030 / 23125 350'],
+    'b','40 kişi için *Raum für Feste bis 60 Personen*. Bistroda yalnızca sekiz masa var.'],
+   ['Sie suchen eine Winterjacke für Ihren Sohn. Er trägt Größe 128.',
+    ['solid',['**Winterjacke** für Jungen,','Größe 152, rot, wie neu,','€ 12.','Tel.: 0176 / 040690 53'],'0176 / 040690 53','serif'],
+    ['dashed',['**Kinder-Winterjacke**,','Größe 128, blau, sehr warm,','€ 15.','Tel.: 0176 / 040690 88'],'0176 / 040690 88'],
+    'b','Beden önemli: *Größe 128*. Öbür mont 152 beden, çok büyük.'],
+   ['Sie möchten nach der Arbeit Sport machen. Sie arbeiten bis 20 Uhr.',
+    ['bold',['**Fit 24**','Tag und Nacht geöffnet,','7 Tage die Woche.','Tel.: 030 / 23125 905'],'030 / 23125 905'],
+    ['solid',['**Sportstudio Aktiv**','Montag bis Freitag 8–20 Uhr,','Samstag 9–14 Uhr.','Tel.: 030 / 23125 422'],'030 / 23125 422','serif'],
+    'a','Saat 20’den sonra açık olan yer: *Tag und Nacht geöffnet*. Öbür salon 20’de kapanıyor.'],
+  ]},
+ teil3:{
+  example:['An der Tür einer **Reinigung**.',['solid',['Hemden waschen und bügeln: nur 2 Euro!','Heute bringen – morgen abholen.']],'Ihr Hemd ist am nächsten Tag fertig.','r'],
+  items:[
+   ['In einer **Kantine**.',['solid',['Mittagessen: 11.30–14 Uhr','Heute: Suppe € 2,50 · Nudeln mit Gemüse € 4,20'],'Kantine','serif'],
+    'Um 14.30 Uhr bekommen Sie hier noch ein Mittagessen.','f','Öğle yemeği 14’e kadar; 14.30’da artık yok.'],
+   ['An der Tür einer **Sporthalle**.',['bold',['Bitte nur mit sauberen Sportschuhen in die Halle!','Straßenschuhe bleiben im Flur.']],
+    'In der Halle dürfen Sie keine Straßenschuhe tragen.','r','*Straßenschuhe bleiben im Flur*: salona yalnızca spor ayakkabısıyla girilir.'],
+   ['An einem **Taxistand**.',['shaded',['Taxi zum Flughafen:','fester Preis 35 Euro –','am Tag und in der Nacht.']],
+    'In der Nacht kostet das Taxi zum Flughafen auch 35 Euro.','r','*Fester Preis 35 Euro – am Tag und in der Nacht*: gece de aynı fiyat.'],
+   ['An der Tür einer **Tierarztpraxis**.',['dashed',['Bitte Hunde an der Leine führen!','Ohne Termin müssen Sie leider länger warten.']],
+    'Ohne Termin können Sie nicht zum Tierarzt kommen.','f','Randevusuz da gelinebilir, ama daha uzun beklenir (*länger warten*).'],
+   ['Am **Rathaus**.',['double',['Das Rathaus ist am Freitag, dem 3. Oktober, geschlossen (Feiertag).','Am Donnerstag haben wir länger geöffnet: bis 19 Uhr.']],
+    'Am Tag vor dem Feiertag ist das Rathaus bis zum Abend geöffnet.','r','Tatilden önceki gün perşembe: *länger geöffnet: bis 19 Uhr*.'],
+  ]},
+});

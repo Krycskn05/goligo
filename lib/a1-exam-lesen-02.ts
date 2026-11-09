@@ -1,0 +1,61 @@
+import {buildExam} from './a1-exam-build';
+
+/** A1 sınavı · Lesen 2: Omar visits his son in Köln, no water in the house, jobs and courses, notices. */
+export const exam=buildExam(2,'Besuch in Köln · Kein Wasser im Haus · Arbeit und Kurse · Hinweise',{
+ teil1:[
+  {kind:'mail',from:'Omar Nasser',to:'Adam',subject:'Wochenende',
+   lines:['Hallo Adam,','am Freitag komme ich nach Köln. Mein Zug ist um 17.40 Uhr am Hauptbahnhof. Du musst mich nicht abholen, ich nehme die Straßenbahn.','Am Samstag gehen wir zusammen ins Stadion: Ich habe zwei Karten für das Spiel um 15.30 Uhr. Am Sonntagmittag fahre ich wieder zurück nach Berlin – am Montag ist der Kiosk ja wieder geöffnet.','Bis Freitag!','Papa'],
+   example:['Omar ist am Wochenende in Köln.','r'],
+   items:[
+    ['Adam wartet am Freitag am Bahnhof auf Omar.','f','*Du musst mich nicht abholen*: Omar tramvayla gidiyor, Adam garda beklemiyor.'],
+    ['Am Samstagnachmittag sind Omar und Adam im Stadion.','r','Maç cumartesi *um 15.30 Uhr*; bu saat öğleden sonradır (*Nachmittag*).'],
+   ]},
+  {kind:'letter',
+   lines:['Liebe Mieterinnen und Mieter,','am Dienstag, dem 4. März, reparieren wir die Wasserleitung im Haus Kastanienallee 25. Von 8 bis 12 Uhr gibt es in allen Wohnungen kein Wasser. Ab Mittag ist alles wieder normal.','Die Handwerker arbeiten nur im Keller. Sie müssen nicht zu Hause sein.','Haben Sie Fragen? Rufen Sie uns an: Montag bis Donnerstag von 9 bis 16 Uhr.','Mit freundlichen Grüßen','Ihre Hausverwaltung Berger'],
+   items:[
+    ['Am Dienstagnachmittag kann man im Haus wieder duschen.','r','Su yalnızca 8–12 arası yok; *ab Mittag ist alles wieder normal*.'],
+    ['Die Mieter müssen am Dienstagvormittag in der Wohnung bleiben.','f','*Sie müssen nicht zu Hause sein*: ustalar yalnızca bodrumda çalışıyor.'],
+    ['Die Hausverwaltung kann man auch am Freitag anrufen.','f','Telefon saatleri *Montag bis Donnerstag*; cuma yok.'],
+   ]},
+ ],
+ teil2:{mode:'ad',
+  example:['Sie suchen einen Babysitter für Samstagabend.',
+   ['dotted',['**Studentin (22)** passt auf Ihre Kinder auf –','abends und am Wochenende.','Tel.: 0176 / 040690 14'],'0176 / 040690 14'],
+   ['solid',['**Familie sucht Babysitter**','für zwei Kinder,','Montag bis Freitag nachmittags.','Tel.: 030 / 23125 702'],'030 / 23125 702','serif'],'a'],
+  items:[
+   ['Sie möchten in einem Restaurant arbeiten. Sie haben nur am Abend Zeit.',
+    ['solid',['**Restaurant Olive** sucht','Koch/Köchin für das Mittagessen,','10–15 Uhr.','Tel.: 030 / 23125 151'],'030 / 23125 151','serif'],
+    ['dashed',['**Pizzeria Roma** sucht','Hilfe in der Küche,','Dienstag bis Samstag ab 18 Uhr.','Tel.: 030 / 23125 648'],'030 / 23125 648'],
+    'b','Akşam işi: *ab 18 Uhr*. Öbür ilan öğle yemeği için, 10–15 arası.'],
+   ['Sie haben keine Waschmaschine und möchten eine kaufen. Sie haben wenig Geld.',
+    ['shaded',['**Elektro Krause**','Neue Waschmaschinen ab € 399,','Lieferung gratis.','Tel.: 030 / 23125 280'],'030 / 23125 280'],
+    ['dotted',['**Waschmaschine**, 3 Jahre alt,','funktioniert gut, nur € 90.','Bitte selbst abholen!','Tel.: 0176 / 040690 77'],'0176 / 040690 77','serif'],
+    'b','Az para: 90 Euro’luk ikinci el makine uyar. Yenisi en az 399 Euro; *gratis* olan yalnızca teslimat.'],
+   ['Sie möchten schwimmen lernen. Sie sind 30 Jahre alt.',
+    ['solid',['**Schwimmen lernen – nie zu spät!**','Kurs für Erwachsene,','mittwochs um 19 Uhr.','Tel.: 030 / 23125 934'],'030 / 23125 934'],
+    ['dashed',['**Schwimmkurse** für Kinder','von 5 bis 10 Jahren,','samstags im Stadtbad.','Tel.: 030 / 23125 407'],'030 / 23125 407','serif'],
+    'a','30 yaşında biri yetişkindir: *Kurs für Erwachsene*. Öbür kurs 5–10 yaş arası çocuklar için.'],
+   ['Sie suchen ein Zimmer. Sie bleiben nur von Juni bis August in Berlin.',
+    ['dotted',['**Möbliertes Zimmer** frei','vom 1.6. bis 31.8.,','€ 380 warm, Nähe Volkspark.','Tel.: 030 / 23125 566'],'030 / 23125 566'],
+    ['solid',['**Zimmer in 3er-WG**, 18 m²,','ab 1. Juni, mindestens ein Jahr,','€ 350.','Tel.: 0176 / 040690 42'],'0176 / 040690 42','serif'],
+    'a','Üç ay için: *vom 1.6. bis 31.8.* Öbür oda *mindestens ein Jahr* isteniyor.'],
+   ['Ihre Katze ist krank. Es ist Samstag.',
+    ['solid',['**Tierarztpraxis Dr. Vogel**','Sprechzeiten:','Montag bis Freitag 9–18 Uhr.','Tel.: 030 / 23125 819'],'030 / 23125 819'],
+    ['shaded',['**Tierklinik am Zoo**','Jeden Tag geöffnet,','auch am Wochenende.','Tel.: 030 / 23125 223'],'030 / 23125 223'],
+    'b','Cumartesi günü Dr. Vogel kapalı (pazartesi–cuma). *Tierklinik am Zoo* hafta sonu da açık.'],
+  ]},
+ teil3:{
+  example:['An der Tür eines **Friseurs**.',['round',['Heute geschlossen –','wir sind auf einer Hochzeit!','Morgen sind wir wieder für Sie da.']],'Morgen ist der Friseur wieder geöffnet.','r'],
+  items:[
+   ['Am Eingang einer **Arztpraxis**.',['solid',['Sprechzeiten:','Mo, Di, Do 8–12 und 15–18 Uhr','Mi und Fr 8–13 Uhr'],'Dr. Yıldız'],
+    'Sie haben am Donnerstag um 14 Uhr Zeit. Dann können Sie zum Arzt gehen.','f','Perşembe günü 12 ile 15 arası ara var: saat 14’te muayenehane kapalı.'],
+   ['In der **Bibliothek**.',['dashed',['Bitte leise sein!','Telefonieren nur im Erdgeschoss.','Essen und Trinken bitte nur im Café.']],
+    'Im Erdgeschoss darf man telefonieren.','r','*Telefonieren nur im Erdgeschoss*: zemin katta telefon serbest, başka yerde değil.'],
+   ['Im **Bahnhof**.',['bold',['Der Zug nach Hamburg, Abfahrt 14.20 Uhr,','fährt heute von Gleis 7,','nicht von Gleis 3.'],'Achtung!'],
+    'Der Zug nach Hamburg fährt heute später.','f','Saat aynı (14.20); değişen yalnızca peron: *Gleis 7*.'],
+   ['An einer **Kasse** im Supermarkt.',['shaded',['Diese Kasse: nur Kartenzahlung.','Bar bezahlen Sie bitte','an Kasse 1 und 2.']],
+    'An Kasse 2 können Sie mit Bargeld bezahlen.','r','Nakit için *Kasse 1 und 2*; bu kasada ise yalnızca kartla ödeniyor.'],
+   ['An einer **Haustür**.',['double',['Liebe Nachbarn,','am Samstag feiere ich meinen 30. Geburtstag. Vielleicht wird es ein bisschen laut. Kommen Sie gern auf ein Glas vorbei!','Ihre Mei Suwan, 2. Stock'],undefined,'serif'],
+    'Die Nachbarn sind auch eingeladen.','r','*Kommen Sie gern auf ein Glas vorbei*: Mei komşularını da davet ediyor.'],
+  ]},
+});

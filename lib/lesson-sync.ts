@@ -30,9 +30,9 @@ const DEVICE_ONLY=new Set(['lernkoko-l12-speed']);
  * `lernkoko-l4d-own` …) — stays on this device only (the learner asked, 2 November 2026); it is never sent to the account. */
 const OWN_DATA=/^lernkoko-l[2345][a-d]-(own|form)$/;
 
-/** Progress of the site that is no lesson (`site`, 2 November 2026): "Kaldığın yerden devam et" (lib/last-place.ts) and
- * the best scores of the games (Oyunlar). */
-const SITE_KEY=/^lernkoko-(last-place$|verb-game:)/;
+/** Progress of the site that is no lesson (`site`, 2 November 2026): "Kaldığın yerden devam et" (lib/last-place.ts),
+ * the best scores of the games (Oyunlar) and the results and half-done papers of A1 sınavı (lib/a1-exam-progress.ts). */
+const SITE_KEY=/^lernkoko-(last-place$|verb-game:|a1-exam-(scores$|run:))/;
 
 /** The lesson a browser key belongs to, or null for keys that are not synced. */
 export function syncLessonOf(key:string):SyncLesson|null{

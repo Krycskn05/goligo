@@ -30,6 +30,7 @@ export const PAGE_NAMES: Record<string, string> = {
   '/fiiller': 'Fiil Atölyesi',
   '/oyunlar': 'Oyunlar',
   '/yanlislarim': 'Yanlışlarım',
+  '/a1-sinavi': 'A1 sınavı',
   '/a1-1/willkommen': 'Lektion 1 · Willkommen',
   '/a1-1/berufe': 'Lektion 2 · Berufe',
   '/a1-1/orte-und-dinge': 'Lektion 3 · Orte und Dinge',

@@ -1,9 +1,9 @@
 import type {ReactNode} from 'react';
 
-export type NavIconName='app'|'home'|'units'|'housing'|'ausbildung'|'vault'|'verbs'|'games'|'mistakes';
+export type NavIconName='app'|'home'|'units'|'exam'|'housing'|'ausbildung'|'vault'|'verbs'|'games'|'mistakes';
 
 /** Line drawings (24 × 24): a phone (Uygulama olarak indir), a house (home page), an open book, a block of flats (Ev ve Yaşam), a briefcase
- * (Ausbildung), an armchair, a pencil, a game pad, a sheet with a cross. */
+ * (Ausbildung), an armchair, a pencil, a game pad, a sheet with a cross; a clipboard with a tick (A1 sınavı). */
 const SHAPES:Record<NavIconName,ReactNode>={
  app:<><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></>,
  home:<><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></>,
@@ -13,13 +13,14 @@ const SHAPES:Record<NavIconName,ReactNode>={
  vault:<><path d="M5.5 11V8.5a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3V11"/><path d="M3 13.2a2 2 0 0 1 4 0V15h10v-1.8a2 2 0 0 1 4 0V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M6 19v2M18 19v2"/></>,
  verbs:<><path d="M16.6 3.6a2.2 2.2 0 0 1 3.1 3.1L7.3 19.1 3 20.5l1.4-4.3z"/><path d="m14.6 5.6 3.1 3.1"/></>,
  games:<><path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.3l-.6 3.4a2.6 2.6 0 0 1-4.6 1.1L15 15.5H9l-1.2 1.8a2.6 2.6 0 0 1-4.6-1.1l-.6-3.4A4.5 4.5 0 0 1 7 7.5z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11" r=".7" fill="currentColor"/><circle cx="17.3" cy="12.9" r=".7" fill="currentColor"/></>,
+ exam:<><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V4a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4v.5"/><path d="m8.8 13.2 2.3 2.3 4.2-4.6"/></>,
  mistakes:<><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5"/><path d="m9.5 11.5 4 4m0-4-4 4"/></>,
 };
 
 /**
  * The learner's own menu icons (soft 3D, made in ChatGPT; 128 × 128 WebP with a clear background, public/icons/menu):
  * Ana sayfa, Üniteler ve konular, Nesne Kasası, Fiil Atölyesi, Oyunlar, Yanlışlarım, Uygulama olarak indir. Ev ve Yaşam
- * and Ausbildung have no picture yet and keep their two-tone drawing on a round white sticker.
+ * Ausbildung and A1 sınavı have no picture yet and keep their two-tone drawing on a round white sticker.
  */
 export const NAV_PICTURES:Partial<Record<NavIconName,string>>={home:'/icons/menu/home.webp',units:'/icons/menu/units.webp',vault:'/icons/menu/kelime-kasasi.webp',verbs:'/icons/menu/verbs.webp',games:'/icons/menu/games.webp',mistakes:'/icons/menu/mistakes.webp',app:'/icons/menu/app.webp'};
 

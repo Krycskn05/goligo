@@ -175,7 +175,7 @@ export function isAssetPath(pathname: string): boolean {
  * the rest asks to sign up. Of the units only Lektion 1 (GUEST_UNIT, 3 November 2026); Hesabım and the admin page stay
  * for members.
  */
-export const GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/oyunlar', '/yanlislarim', '/a1-1/willkommen']);
+export const GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/oyunlar', '/yanlislarim', '/a1-1/willkommen', '/a1-sinavi']);
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PAGES.has(pathname) || GUEST_PAGES.has(pathname) || pathname === '/api' || pathname.startsWith('/api/') || isAssetPath(pathname);

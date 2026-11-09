@@ -164,6 +164,7 @@ strong { font-weight:700; }
 .nav-icon-app { --nav-c:#0f6b78; --nav-duo:#cdeff3; }
 .nav-icon-home { --nav-c:#2f7a31; --nav-duo:#c9efbf; }
 .nav-icon-units { --nav-c:#b06d00; --nav-duo:#ffe08a; }
+.nav-icon-exam { --nav-c:#2f58b8; --nav-duo:#d3e0ff; }
 .nav-icon-housing { --nav-c:#2c6c64; --nav-duo:#cdeee6; }
 .nav-icon-ausbildung { --nav-c:#b25f12; --nav-duo:#ffe0bf; }
 .nav-icon-vault { --nav-c:#1f6fc4; --nav-duo:#bfe0ff; }

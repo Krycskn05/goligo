@@ -21,6 +21,7 @@ import "./admin.css";
 import "./paul-hoca.css";
 import "./site-tour.css";
 import "./games.css";
+import "./a1-exam.css";
 import LearningEffects from './learning-effects';
 import { OptionFit } from './option-fit';
 import { LetterBar } from './letter-bar';

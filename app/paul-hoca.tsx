@@ -119,6 +119,8 @@ export function peekSpot(last:number|null,random:()=>number=Math.random):number{
 /** Something is going on (Paul's answer badge, a speaking voice, an open window): Paul waits for a quieter moment. */
 function busyScreen(){
  if(document.hidden||document.querySelector('.lk-reaction-layer,dialog[open],.ig-backdrop,.sg-backdrop,.st-layer'))return true;
+ // An exam paper of A1 sınavı is on the screen (app/a1-exam-study.tsx): he does not walk over the text while the clock runs.
+ if(document.querySelector('.x1-running'))return true;
  try{if(window.speechSynthesis?.speaking||window.speechSynthesis?.pending)return true;}catch{}
  return [...document.querySelectorAll('audio')].some(audio=>!audio.paused);
 }

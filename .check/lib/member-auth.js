@@ -187,7 +187,7 @@ function isAssetPath(pathname) {
  * the rest asks to sign up. Of the units only Lektion 1 (GUEST_UNIT, 3 November 2026); Hesabım and the admin page stay
  * for members.
  */
-exports.GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/oyunlar', '/yanlislarim', '/a1-1/willkommen']);
+exports.GUEST_PAGES = new Set(['/konular', '/ev-esyalar', '/fiiller', '/oyunlar', '/yanlislarim', '/a1-1/willkommen', '/a1-sinavi']);
 function isPublicPath(pathname) {
     return exports.PUBLIC_PAGES.has(pathname) || exports.GUEST_PAGES.has(pathname) || pathname === '/api' || pathname.startsWith('/api/') || isAssetPath(pathname);
 }

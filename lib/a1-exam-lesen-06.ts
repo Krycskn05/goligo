@@ -1,0 +1,61 @@
+import {buildExam} from './a1-exam-build';
+
+/** A1 sınavı · Lesen 6: Aisha's taxi to the airport, the doctor's holiday, ads, notices. */
+export const exam=buildExam(6,'Taxi zum Flughafen · Praxis im Urlaub · Reisen und Kochen · Hinweise',{
+ teil1:[
+  {kind:'mail',from:'Aisha Kamau',to:'Herr Lang',subject:'Ihr Taxi am Donnerstag',
+   lines:['Guten Tag Herr Lang,','danke für Ihre Bestellung. Ich hole Sie am Donnerstag um 5.30 Uhr vor Ihrem Haus ab. Die Fahrt zum Flughafen dauert am Morgen etwa 40 Minuten. Ihr Flug geht um 7.45 Uhr, wir haben also genug Zeit.','Sie haben zwei große Koffer – kein Problem, mein Auto ist groß. Bezahlen können Sie bar oder mit Karte.','Mit freundlichen Grüßen','Aisha Kamau, Taxi Kamau'],
+   example:['Herr Lang fährt mit dem Taxi zum Flughafen.','r'],
+   items:[
+    ['Herr Lang nimmt viel Gepäck mit.','r','*Zwei große Koffer*: bu çok bagaj (*Gepäck*) demek.'],
+    ['Herr Lang ist vor halb sieben am Flughafen.','r','5.30 + yaklaşık 40 dakika = 6.10; *halb sieben* (6.30) olmadan oradalar.'],
+   ]},
+  {kind:'letter',
+   lines:['Liebe Patientinnen und Patienten,','unsere Praxis ist vom 4. bis zum 15. August im Urlaub. In dieser Zeit hilft Ihnen Frau Dr. Seidel in der Gartenstraße 8. Brauchen Sie ein Rezept? Dann kommen Sie bitte noch vor dem 4. August zu uns.','Ab Montag, dem 18. August, sind wir wieder da – mit neuen Sprechzeiten: jetzt auch am Mittwochnachmittag.','Ihr Praxisteam Dr. Hoffmann'],
+   items:[
+    ['Im Urlaub können die Patienten zu einer anderen Ärztin gehen.','r','*In dieser Zeit hilft Ihnen Frau Dr. Seidel*: tatilde başka bir doktor bakıyor.'],
+    ['Am 15. August ist die Praxis wieder geöffnet.','f','15 Ağustos tatilin son günü; muayenehane *ab Montag, dem 18. August* açılıyor.'],
+    ['Nach dem Urlaub ist die Praxis am Mittwochnachmittag geschlossen.','f','Yeni saatler: *jetzt auch am Mittwochnachmittag* — çarşamba öğleden sonra da açık.'],
+   ]},
+ ],
+ teil2:{mode:'ad',
+  example:['Sie suchen einen Parkplatz für Ihr Auto.',
+   ['solid',['**Garage zu vermieten**,','Uferweg, € 60 im Monat.','Tel.: 030 / 23125 087'],'030 / 23125 087','serif'],
+   ['dotted',['**Suche Garage** oder Parkplatz','in der Nähe vom Volkspark.','Tel.: 0176 / 040690 36'],'0176 / 040690 36'],'a'],
+  items:[
+   ['Sie möchten im August eine Woche am Meer wohnen.',
+    ['shaded',['**Ferienwohnung an der Ostsee**,','200 m zum Strand. Im Juli und August','leider schon voll. Frei ab September.','Tel.: 040 / 66969 211'],'040 / 66969 211'],
+    ['solid',['**Kleines Ferienhaus an der Nordsee**,','4 Betten, im August','noch eine Woche frei.','Tel.: 040 / 66969 866'],'040 / 66969 866','serif'],
+    'b','Ağustosta boş olan Kuzey Denizi’ndeki ev. Öbürü temmuz–ağustos *schon voll*, ancak eylülden sonra boş.'],
+   ['Sie möchten als Fahrer arbeiten. Sie haben einen Führerschein, aber kein Auto.',
+    ['dashed',['**Pizza-Blitz** sucht Fahrer/innen','mit eigenem Auto,','abends ab 17 Uhr.','Tel.: 030 / 23125 395'],'030 / 23125 395'],
+    ['solid',['**Bäckerei** sucht Fahrer/in,','Führerschein Klasse B,','Auto von der Firma, 4–9 Uhr.','Tel.: 030 / 23125 730'],'030 / 23125 730','serif'],
+    'b','Arabanız yok: fırında *Auto von der Firma*. Pizzacı *mit eigenem Auto* (kendi arabasıyla) şoför arıyor.'],
+   ['Sie möchten kochen lernen. Sie essen kein Fleisch.',
+    ['solid',['**Kochkurs „Thai-Küche vegetarisch“**','mit Mei Suwan,','samstags um 10 Uhr.','Tel.: 030 / 23125 468'],'030 / 23125 468'],
+    ['dotted',['**Grillkurs:** Steaks, Würste','und Burger wie die Profis.','Freitags um 18 Uhr.','Tel.: 030 / 23125 912'],'030 / 23125 912','serif'],
+    'a','Et yemiyorsunuz: *vegetarisch* kurs uyar. Izgara kursunda yalnızca et var.'],
+   ['Sie brauchen einen Kühlschrank. Ihre Küche ist sehr klein.',
+    ['solid',['**Kühlschrank** mit Gefrierfach,','1,85 m hoch, 70 cm breit,','€ 150.','Tel.: 0176 / 040690 81'],'0176 / 040690 81','serif'],
+    ['shaded',['**Kleiner Kühlschrank**,','85 cm hoch, 50 cm breit,','ideal für 1 Person, € 60.','Tel.: 0176 / 040690 20'],'0176 / 040690 20'],
+    'b','Küçük mutfağa küçük dolap: 85 cm yüksek, 50 cm geniş. Öbürü 1,85 m.'],
+   ['Sie möchten am Sonntag auf einem Flohmarkt alte Sachen verkaufen.',
+    ['dotted',['**Flohmarkt im Volkspark**,','jeden Sonntag 9–16 Uhr.','Plätze für Verkäufer:','Tel.: 030 / 23125 654'],'030 / 23125 654'],
+    ['dashed',['**Kaufe alte Möbel**,','Lampen und Bücher. Ich komme','zu Ihnen und bezahle bar.','Tel.: 030 / 23125 129'],'030 / 23125 129','serif'],
+    'a','Bit pazarında satmak için yer: *Plätze für Verkäufer*. Öbür ilan eşyayı evinizden alıyor, pazar yok.'],
+  ]},
+ teil3:{
+  example:['In einem **Kaufhaus**.',['solid',['Kinderkleidung jetzt im 2. Stock.','Im Erdgeschoss finden Sie','Schuhe und Taschen.']],'Eine Jacke für Ihr Kind finden Sie im zweiten Stock.','r'],
+  items:[
+   ['An der Tür einer **Kita**.',['round',['Am Freitag ist die Kita geschlossen:','Alle Erzieherinnen machen einen Kurs.','Am Montag sind wir wieder da.']],
+    'Am Freitag können die Kinder nicht in die Kita kommen.','r','*Am Freitag ist die Kita geschlossen*: o gün çocuklar gelemiyor.'],
+   ['Am Eingang von einem **Fitnessstudio**.',['bold',['Das erste Training ist kostenlos!','Bitte bringen Sie Sportschuhe','und ein Handtuch mit.'],'Neu hier?'],
+    'Das erste Training kostet nichts.','r','*Kostenlos* = ücretsiz = *kostet nichts*.'],
+   ['Im **Krankenhaus**.',['solid',['Besuchszeit: täglich 14–19 Uhr.','Bitte nicht mehr als zwei Besucher','pro Patient.']],
+    'Sie möchten Ihre Freundin am Vormittag besuchen. Das geht.','f','Ziyaret saati 14–19; öğleden önce ziyaret yok.'],
+   ['In einem **Blumenladen**.',['double',['Am 14. Februar (Valentinstag)','haben wir schon ab 6 Uhr geöffnet!'],undefined,'serif'],
+    'Am Valentinstag öffnet der Laden später.','f','*Schon ab 6 Uhr*: o gün dükkân daha erken açılıyor, geç değil.'],
+   ['An einer **Baustelle**.',['shaded',['Die Gartenstraße ist bis 30. September','für Autos geschlossen.','Zu Fuß und mit dem Fahrrad kommen Sie durch.']],
+    'Im September kann man mit dem Auto durch die Gartenstraße fahren.','f','30 Eylül’e kadar yol *für Autos geschlossen*; yalnızca yayalar ve bisikletler geçebiliyor.'],
+  ]},
+});

@@ -247,7 +247,7 @@ async function languageFlow(browser) {
   await visit(page, "/", "01-tanitim.png", errors);
   record("Girissiz ana sayfada tanitim ve uye ol dugmesi var",
     (await page.locator("[data-landing]").count()) === 1 && (await page.locator("[data-landing-register]").count()) === 1, "");
-  for (const target of ["/ev-esyalar", "/fiiller", "/a1-1/willkommen"]) {
+  for (const target of ["/ev-esyalar", "/fiiller", "/a1-1/willkommen", "/a1-sinavi"]) {
     await page.goto(BASE + target, { waitUntil: "networkidle", timeout: 90000 });
     const at = new URL(page.url());
     const banner = await page.locator("[data-guest-banner]").count();
@@ -408,6 +408,16 @@ async function languageFlow(browser) {
   await page.goto(BASE + "/a1-1/alltag-und-freizeit?adim=gunluk", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   record("Lektion 5A: gunluk isler kartlari (16 kart) ve dort sekme", (await page.locator("[data-l5-step='gunluk'] .l2-job").count()) === 16 && (await page.locator("#l1a-tabs .l12-step").count()) === 4, "");
+  // A1 sinavi (9 Kasim 2026): 10 Lesen denemesi; Hören ve Schreiben "yakinda"; sinav kagidi Teil 1 ile aciliyor.
+  await visit(page, "/a1-sinavi", "03l-a1-sinavi.png", errors);
+  record("A1 sinavi: 10 Lesen sinavi acik, Hören ve Schreiben yakinda",
+    (await page.locator("[data-x1-exam]").count()) === 10 && (await page.locator("a.x1-open").count()) === 10 && (await page.locator("[data-x1-module][data-ready='0']").count()) === 2 && (await page.locator("[data-menu-exam][aria-current='page']").count()) === 1, "");
+  await page.goto(BASE + "/a1-sinavi?sinav=1", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.locator("[data-x1-start]").click();
+  await page.waitForTimeout(800);
+  record("A1 sinavi 1: kagit aciliyor (Teil 1: ornek + 5 soru, e-posta penceresi, isaretlenebilir kutular)",
+    (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 6 && (await page.locator(".x1-mail").count()) === 1 && (await page.locator(".x1-box:not([disabled])").count()) === 10, "");
   await visit(page, "/", "01-ana-sayfa.png", errors);
   record("Giris yapinca ana sayfada dersler var (tanitim yok)", (await page.locator("[data-landing]").count()) === 0, "");
 

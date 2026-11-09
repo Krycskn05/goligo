@@ -1,0 +1,61 @@
+import {buildExam} from './a1-exam-build';
+
+/** A1 sınavı · Lesen 7: Mei's holiday mail, the team meeting, web pages, notices. */
+export const exam=buildExam(7,'Grüße aus dem Urlaub · Teamsitzung · Internetseiten · Unterwegs',{
+ teil1:[
+  {kind:'mail',from:'Mei Suwan',to:'Sabine Krüger',subject:'Grüße von der Ostsee',
+   lines:['Liebe Sabine,','viele Grüße von der Ostsee! Das Hotel ist klein, aber sehr schön, und das Meer ist nur fünf Minuten weg. Leider regnet es seit drei Tagen, also war ich noch nicht schwimmen. Gestern war ich im Museum und heute fahre ich mit dem Schiff.','Am Sonntag komme ich zurück, und am Montag muss ich wieder im Restaurant arbeiten. Gehen wir am Dienstag zusammen ins Kino?','Deine Mei'],
+   example:['Mei macht Urlaub am Meer.','r'],
+   items:[
+    ['Mei schwimmt jeden Tag im Meer.','f','Üç gündür yağmur yağıyor: *also war ich noch nicht schwimmen* (henüz hiç yüzmedi).'],
+    ['Am Tag nach der Reise geht Mei wieder zur Arbeit.','r','Pazar dönüyor, pazartesi çalışıyor: dönüşten bir gün sonra.'],
+   ]},
+  {kind:'mail',from:'Carla Engel',to:'Team',subject:'Teamsitzung diese Woche',
+   lines:['Liebes Team,','unsere Teamsitzung ist diese Woche nicht am Montag, sondern am Mittwoch um 15 Uhr – am Montag kommt der neue Herd für die Küche.','Wir sprechen über den Sommerplan: Wer möchte wann Urlaub machen? Bitte schreibt eure Wünsche vorher auf einen Zettel. Die Sitzung dauert eine Stunde. Um 17 Uhr öffnen wir wie immer.','Viele Grüße','Carla Engel'],
+   items:[
+    ['Am Montag gibt es keine Teamsitzung.','r','*Nicht am Montag, sondern am Mittwoch*: toplantı çarşambaya alındı.'],
+    ['Die Mitarbeiter sollen ihre Urlaubswünsche schon vor der Sitzung aufschreiben.','r','*Bitte schreibt eure Wünsche vorher auf einen Zettel*: toplantıdan önce yazılacak.'],
+    ['Am Mittwoch ist das Restaurant geschlossen.','f','*Um 17 Uhr öffnen wir wie immer*: restoran çarşamba da açılıyor.'],
+   ]},
+ ],
+ teil2:{mode:'web',
+  example:['Sie möchten wissen: Welche Filme laufen heute Abend?',
+   ['solid',['**Kino am Kanal**','Programm · Karten · Preise'],'www.kino-am-kanal.de'],
+   ['solid',['**Filmgeschichte**','Alles über Filme von 1920 bis heute'],'www.film-geschichte-lexikon.de'],'a'],
+  items:[
+   ['Sie suchen ein Rezept für einen Apfelkuchen.',
+    ['solid',['**Backen leicht gemacht**','Kuchen, Torten, Brot:','über 500 Rezepte mit Fotos'],'www.backen-leicht-gemacht.de'],
+    ['solid',['**Café Apfelbaum**','Kuchen und Torten, täglich frisch.','Tisch online reservieren'],'www.cafe-apfelbaum-berlin.de'],
+    'a','Tarif (*Rezept*) arıyorsunuz: *über 500 Rezepte*. Kafenin sayfasında yalnızca masa ayırtılıyor.'],
+   ['Sie möchten wissen: Wie viel kostet ein Brief nach Thailand?',
+    ['solid',['**Post und Paket**','Preise für Briefe und Pakete','in alle Länder'],'www.post-und-paket-preise.de'],
+    ['solid',['**Thai-Reisen**','Flüge, Hotels und Reisen','nach Thailand'],'www.thai-reisen-buchen.de'],
+    'a','Mektup ücreti: *Preise für Briefe und Pakete in alle Länder*. Öbür sayfa Tayland’a seyahat satıyor.'],
+   ['Ihr Kind hat Fieber. Sie suchen heute einen Arzt in der Nähe.',
+    ['solid',['**Kinderarzt finden**','Kinderärzte in Ihrer Stadt:','Adressen und Sprechzeiten'],'www.kinderarzt-finden.de'],
+    ['solid',['**Kinder-Apotheke online**','Medikamente für Kinder bestellen,','Lieferung in 3 Tagen'],'www.kinder-apotheke-online.de'],
+    'a','Bugün doktor arıyorsunuz: adres ve muayene saatleri. Öbür sayfa ilacı üç günde gönderiyor, doktor yok.'],
+   ['Sie möchten ein Fußballspiel im Stadion sehen und brauchen Karten.',
+    ['solid',['**Fußball heute**','Ergebnisse, Tabellen, Nachrichten'],'www.fussball-heute-news.de'],
+    ['solid',['**Ticket-Ecke**','Karten für Konzerte,','Theater und Sport'],'www.ticket-ecke.de'],
+    'b','Bilet (*Karten*) için *Ticket-Ecke*: spor biletleri de var. Öbür sayfada yalnızca sonuçlar ve haberler.'],
+   ['Sie sind Krankenpfleger und suchen eine neue Arbeit.',
+    ['solid',['**Pflegeschule Nord**','Ausbildung in 3 Jahren:','Werden Sie Krankenpfleger/in!'],'www.pflegeschule-nord.de'],
+    ['solid',['**Jobs im Krankenhaus**','Freie Stellen für Pfleger,','Ärzte und Köche'],'www.jobs-im-krankenhaus.de'],
+    'b','Mesleğiniz zaten var, iş arıyorsunuz: *freie Stellen*. Öbür sayfa üç yıllık meslek eğitimi veriyor.'],
+  ]},
+ teil3:{
+  example:['Am Eingang einer **Bank**.',['solid',['Unsere Bank ist am 24. und 31. Dezember geschlossen.','Die Geldautomaten funktionieren normal.']],'Am 24. Dezember können Sie hier Geld vom Automaten holen.','r'],
+  items:[
+   ['In der **Sprachschule**.',['dashed',['Die Bücher für den Kurs A1','können Sie im Büro kaufen:','Montag bis Donnerstag, 12–14 Uhr.']],
+    'Am Freitag können Sie das Buch im Büro kaufen.','f','Büro pazartesiden perşembeye satış yapıyor; cuma yok.'],
+   ['An einer **Bushaltestelle**.',['bold',['Am Samstag ist in der Marktstraße ein Fest.','Der Bus 12 hält dann nicht hier.','Nächste Haltestelle: Volkspark.']],
+    'Am Samstag können Sie am Volkspark in den Bus 12 einsteigen.','r','Otobüs cumartesi yalnızca bu durakta durmuyor; *nächste Haltestelle: Volkspark*.'],
+   ['An der Tür einer **Autowerkstatt**.',['solid',['Ihr Auto ist fertig?','Abholen: Mo–Fr bis 18 Uhr,','samstags nur bis 12 Uhr.']],
+    'Am Samstagnachmittag können Sie Ihr Auto abholen.','f','Cumartesi *nur bis 12 Uhr*: öğleden sonra kapalı.'],
+   ['In einem **Wohnhaus**.',['double',['Liebe Nachbarn,','ich suche meine Katze Mimi (schwarz, 2 Jahre). Sie ist seit Montag weg.','Bitte klingeln Sie bei Arslan, 1. Stock.'],undefined,'serif'],
+    'Familie Arslan möchte eine Katze kaufen.','f','*Ich suche meine Katze*: kendi kedisi kayıp, onu arıyor; kedi satın almak istemiyor.'],
+   ['In einem **Park**.',['shaded',['Grillen ist nur auf dem Grillplatz am See erlaubt.','Bitte nehmen Sie Ihren Müll mit nach Hause.']],
+    'Am See dürfen Sie im Park grillen.','r','Izgara *nur auf dem Grillplatz am See* serbest: göl kenarında olur.'],
+  ]},
+});

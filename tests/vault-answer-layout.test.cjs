@@ -49,7 +49,7 @@ test('a mode card in Nesne Kasası starts its round at once; no "Teste başla" b
  // The learner asked, 4 November 2026.
  const page=read('app/object-study.tsx');
  assert.ok(page.includes('async function start(reviewOnly=false,onlyIds?:string[],all=false,mode:PracticeMode=practiceMode){'));
- assert.ok(page.includes('<PracticeModes labels={modeLabels} topicLabel={categoryName(group,language)} active={practiceMode} starts disabled={busy||!ready} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;void start(false,undefined,false,mode);}}/>'));
+ assert.ok(page.includes('<PracticeModes labels={modeLabels} topicLabel={categoryName(group,language)} active={practiceMode} starts noWrite={isLessonTopic(group)} disabled={busy||!ready} onChoose={mode=>{stopFeedback();setPracticeMode(mode);pendingStart.current=null;void start(false,undefined,false,mode);}}/>'));
  // The chosen mode, not the one shown before the tap, decides the questions, their history and the sound preparation.
  assert.ok(page.includes("if(mode==='listen')speech.prepare();"));
  assert.ok(page.includes("const history=mode===practiceMode?reviews:snapshot.reviews.filter(r=>modePredicate(mode)(questionMap.get(r.question_id)));"));

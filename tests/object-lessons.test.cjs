@@ -52,7 +52,7 @@ test('every lesson card has its own 512 px picture, meanings in all 31 languages
 
 test('words without der/die/das have no article questions; the games and the English course keep their own words',()=>{
  for(const word of fresh){
-  const noun=/^(der|die|das) /.test(word.de);assert.equal(!word.phrase,noun,word.id);
+  const noun=/^(der|die|das) [^ ]+$/.test(word.de);assert.equal(!word.phrase,noun,word.id); // „der Koch / die Köchin“ is a pair card
   if(word.phrase)assert(!course.questionMap.get('obj-article-'+word.id)&&!course.questionMap.get('obj-gap-'+word.id),word.id);
   assert(!games.gameObject(word.id),word.id+' not in the games (der Tisch is already there)');
  }

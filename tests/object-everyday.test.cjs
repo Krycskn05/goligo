@@ -58,8 +58,9 @@ test('every new object has its own 512 px picture, meanings in all 31 site langu
   const pack=JSON.parse(fs.readFileSync(`lib/language-packs/${id}.json`,'utf8'));
   for(const text of texts)assert(typeof pack[text]==='string'&&pack[text].trim(),id+': '+text);
  }
- // English names are all different, so four English choices never repeat a word.
- const names=objects.objectVocabulary.map(word=>english.englishObjectName(word.id));assert.equal(new Set(names).size,names.length);
+ // English names are all different, so four English choices never repeat a word. (The lesson cards of Lektion 2–5,
+ // 9 November 2026, repeat vault words such as der Tisch and are German only: they are not in the English course.)
+ const names=objects.objectVocabulary.filter(word=>!/^objects-lektion[2-5]$/.test(word.topic)).map(word=>english.englishObjectName(word.id));assert.equal(new Set(names).size,names.length);
 });
 
 test('the new objects work in Gör ve Seç, Yazarak Pekiştir and Dinle ve Bul, with choices from their own category',()=>{

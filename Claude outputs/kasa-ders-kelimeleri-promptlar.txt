@@ -1,0 +1,345 @@
+KELİME KASASI · DERS KELİMELERİ (LEKTION 2–5) – CHATGPT PROMPTLARI
+Sırayla gönder: önce 0, "OK" gelince 1, 2, 3 … Her bölüm ayrı bir mesaj. Gelen resmi başlıktaki adla kaydet (kasa-l2-1.png …).
+Her resimde TEK bir şey var ve kelimeyi açıkça gösteriyor; birbirine benzeyen kelimelerde (günün saatleri, aile, zıt sıfatlar)
+farkı gösteren işaret yazıldı: saat, gökyüzü, sarı ok, yan yana iki şey. Resimler gelince ben kesip kartlara koyarım; o zamana
+kadar kartlarda ünitelerin kendi resimleri duruyor.
+
+==== 0) İlk mesaj (bir kez gönder) ====
+For this chat: every image I ask for is for a German-learning website's picture quiz: the learner sees ONE picture and must
+name the word, so every picture must show its word unmistakably, with one clear main subject, big and centred, and nothing
+that could suggest another word. Style: polished original 3D animated-film illustration (Pixar-like look), rounded forms,
+expressive friendly faces, tactile clay-like materials, soft warm studio light, lively colours. Palette: teal, amber,
+terracotta and warm ivory. Background: plain warm cream (#fcfaed) everywhere; places and scenes are drawn as a small
+rounded diorama standing on that cream background. Original characters only. No visible text, no letters, no numbers, no
+logos, no brands, no watermark. Simple symbols (arrow, heart, tick, cross, musical note, moon, euro sign, speech bubble) only
+where I ask; "a yellow arrow" means one bold simple yellow arrow pointing at that person.
+Layout: SHEET = one landscape image (3:2) with separate SQUARE pictures in a grid (3 columns × 2 rows unless I say
+otherwise), all on the same plain cream background with wide empty gaps; no frames, no borders, no lines, no picture
+touching another or the edge. Keep every picture inside its own square.
+Recurring people (keep them the same in every image):
+- RAMI: man in his 30s from Lebanon, dark curly hair, short dark beard, warm smile, red shirt over a white tee.
+- LINA (Rami's daughter, 8): girl with dark curly hair in two bunches, yellow dress.
+- SAMI (Rami's son, 5): small boy with dark curls, striped blue tee.
+- NIKOS: man in his 30s from Greece, curly brown hair, light stubble, blue shirt.
+- OMAR: man in his 30s from Sudan, short black curly hair, dark beard, yellow shirt.
+- TOMASZ: man in his 30s from Poland, light brown hair, round glasses, green sweater over a white collar.
+- PAUL: the teacher, older man, short grey hair, big friendly smile, navy blue zip jacket.
+- SABINE: woman in her 20s, wavy blonde hair, small earrings, salmon-pink polo shirt.
+- YASEMIN: woman in her 30s from Turkey, long wavy light-brown hair, lilac cardigan over a white top.
+- AISHA: woman in her 30s from Kenya, black braided hair in a high bun, gold hoop earrings, green sweater.
+- NORA: woman in her 20s, red wavy bob, round glasses, yellow sweater.
+- MEI: woman in her 20s from Thailand, straight black shoulder-length hair with a small hair clip, teal top under an orange cardigan.
+Reply "OK" now; I will send the first sheet next.
+
+==== kasa-l2-1.png · Lektion 2, sayfa 1 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. NIKOS and SABINE as cooks in white chef jackets and tall white chef hats, side by side at a stove, Nikos stirs a big steaming pot, Sabine holds a ladle.
+2. PAUL and NORA as teachers in front of a green chalkboard with simple drawings (a sun, a house), Paul holds a book, Nora points at the board with chalk.
+3. RAMI and NORA as doctors in white coats with stethoscopes around their necks, standing next to an examination couch with a medical bag.
+4. OMAR and AISHA as hairdressers in black aprons, Omar holds scissors and a comb, Aisha a hair dryer, an empty salon chair and a round mirror between them.
+5. OMAR and SABINE as shop assistants in blue aprons behind a shop counter with fruit, bread and a small card terminal.
+6. TOMASZ and AISHA as taxi drivers: a cream-coloured taxi with a blank roof light, Tomasz behind the wheel, Aisha holding the back door open with a welcoming gesture.
+Kelimeler: 1) der Koch / die Köchin · 2) der Lehrer / die Lehrerin · 3) der Arzt / die Ärztin · 4) der Friseur / die Friseurin · 5) der Verkäufer / die Verkäuferin · 6) der Taxifahrer / die Taxifahrerin
+
+==== kasa-l2-2.png · Lektion 2, sayfa 2 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. NIKOS and MEI as car mechanics in blue overalls, leaning over the open bonnet of a car, holding a wrench and a small diagnostic tablet.
+2. RAMI and MEI as elderly-care workers in light blue care tunics, helping a smiling white-haired old lady in a wheelchair; Rami hands her a glass of water.
+3. OMAR and NORA as police officers in dark blue uniforms and caps, standing in front of a police car with a blue light (no text on the car).
+4. TOMASZ and MEI as engineers with yellow hard hats and orange safety vests, holding a big blueprint plan open between them.
+5. NIKOS and AISHA as singers on a small stage with coloured spotlights, both singing into microphones side by side.
+6. TOMASZ and SABINE as waiters in white shirts and black aprons, each carrying a tray with coffee cups, a small café table beside them.
+Kelimeler: 1) der Mechatroniker / die Mechatronikerin · 2) der Altenpfleger / die Altenpflegerin · 3) der Polizist / die Polizistin · 4) der Ingenieur / die Ingenieurin · 5) der Sänger / die Sängerin · 6) der Kellner / die Kellnerin
+
+==== kasa-l2-3.png · Lektion 2, sayfa 3 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. PAUL and YASEMIN as bus drivers in navy uniforms in front of a yellow city bus; Paul sits at the big steering wheel, Yasemin stands at the open front door.
+2. At home: RAMI in an apron cooks at the stove (house-husband) and YASEMIN folds laundry from a basket (house-wife); a cosy kitchen corner, clearly a home, not an office.
+3. NIKOS and YASEMIN as vets in green scrubs examining a happy little dog on a metal examination table; Nikos listens with a stethoscope.
+4. NORA as a writer alone at a desk with a laptop, a tall stack of her own books with blank colourful covers next to her, thinking with a pen at her chin.
+5. TOMASZ as a basketball player in a green jersey and shorts, jumping to throw an orange basketball into a basket on a stand.
+6. RAMI as a film director: holding a black-and-white clapperboard and a megaphone, next to a big film camera on a tripod and a director’s chair.
+Kelimeler: 1) der Busfahrer / die Busfahrerin · 2) der Hausmann / die Hausfrau · 3) der Tierarzt / die Tierärztin · 4) die Autorin · 5) der Basketballer · 6) der Regisseur
+
+==== kasa-l2-4.png · Lektion 2, sayfa 4 (4 resim) ====
+SHEET (4 pictures: 2 columns × 2 rows). From left to right, top to bottom:
+1. AISHA alone as a singer on stage in a bright orange dress, singing into a microphone, eyes closed, a spotlight from above (only ONE person).
+2. MEI sits in an armchair and drinks tea from a cup, a small teapot and a tea glass on a side table, steam rising.
+3. RAMI dances happily in the middle of an empty floor, arms up, one leg lifted, small musical notes floating around him.
+4. Close-up of a paper form on a desk: empty lines and small tick boxes (no letters), a hand with a pen filling in one box.
+Kelimeler: 1) die Sängerin · 2) Tee trinken · 3) tanzen · 4) das Formular
+
+==== kasa-l3-1.png · Lektion 3, sayfa 1 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A simple wooden dining table, seen from the side, nothing on it.
+2. A single wooden chair with a teal seat cushion.
+3. A teal two-seater sofa with one amber cushion.
+4. A single bed with a white pillow and a folded teal blanket, wooden frame.
+5. A tall closed wooden wardrobe with two doors and small teal handles.
+6. An open wooden bookshelf with books, a small plant and a box on its shelves.
+Kelimeler: 1) der Tisch · 2) der Stuhl · 3) das Sofa · 4) das Bett · 5) der Schrank · 6) das Regal
+
+==== kasa-l3-2.png · Lektion 3, sayfa 2 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A white kitchen stove with four black hot plates on top and an oven door below.
+2. A wooden park bench with black iron legs.
+3. A brown leather shoulder bag with a buckle.
+4. A closed hardcover book with a plain teal cover, lying slightly turned.
+5. A thin orange school exercise book (soft cover), slightly open, with empty lines.
+6. A blue ballpoint pen with its click button on top.
+Kelimeler: 1) der Herd · 2) die Bank · 3) die Tasche · 4) das Buch · 5) das Heft · 6) der Stift
+
+==== kasa-l3-3.png · Lektion 3, sayfa 3 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A yellow wooden pencil with a sharpened grey tip and a pink rubber at the end.
+2. A big poster with colourful abstract shapes, fixed to a wall with tape at the corners.
+3. A modern smartphone standing upright, screen on with a few colourful app squares.
+4. A printed instant photo with a white frame, showing a smiling woman’s face.
+5. A desktop computer: a big monitor on a stand, a separate keyboard and a mouse.
+6. An open silver laptop seen from the front, teal screen.
+Kelimeler: 1) der Bleistift · 2) das Plakat · 3) das Handy · 4) das Foto · 5) der Computer · 6) der Laptop
+
+==== kasa-l3-4.png · Lektion 3, sayfa 4 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A filter coffee machine with a glass jug full of coffee.
+2. A shop cash register on a counter with an open drawer of coins and notes (no numbers).
+3. A green school chalkboard on a wall with a chalk tray, empty.
+4. A closed white front door with a round window and a door handle, in its frame.
+5. An open window with a white frame, blue sky and a tree outside.
+6. One big silver key, seen from the side.
+Kelimeler: 1) die Kaffeemaschine · 2) die Kasse · 3) die Tafel · 4) die Tür · 5) das Fenster · 6) der Schlüssel
+
+==== kasa-l3-5.png · Lektion 3, sayfa 5 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A tall white fridge, one door slightly open showing milk, vegetables and cheese inside.
+2. A small street kiosk with a striped awning, newspapers, drinks and sweets in its window (no text).
+3. A white front-loading washing machine with colourful clothes and soap foam behind the round glass door.
+4. An open dishwasher with clean plates, glasses and cutlery in its racks, a few soap bubbles.
+5. A red summer dress on a clothes hanger.
+6. A cream-coloured sewing machine with a teal piece of fabric under the needle and a red thread reel on top.
+Kelimeler: 1) der Kühlschrank · 2) der Kiosk · 3) die Waschmaschine · 4) die Spülmaschine · 5) das Kleid · 6) die Nähmaschine
+
+==== kasa-l3-6.png · Lektion 3, sayfa 6 (5 resim) ====
+SHEET (5 pictures: 3 on top, 2 centred below). From left to right, top to bottom:
+1. A pair of open scissors with teal handles.
+2. A cooking pot with a lid and two handles.
+3. A very thick dictionary, opened, with many thin pages and colourful index tabs on the side (no letters).
+4. A small fan of three word cards; the top one shows a simple picture of an apple (no letters).
+5. OMAR at his workplace in a small tailor’s workshop: his own work table with fabric, a measuring tape and tools; he stands proudly beside it (a place to work, not only a table).
+Kelimeler: 1) die Schere · 2) der Topf · 3) das Wörterbuch · 4) die Wortkarte · 5) der Arbeitsplatz
+
+==== kasa-l4-1.png · Lektion 4, sayfa 1 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A whole family standing close together for a photo: RAMI, his wife, their daughter LINA and son SAMI, and a grandmother and grandfather — everyone smiling.
+2. RAMI and his wife (woman in her 30s, long dark hair, olive-green dress) stand together; between and in front of them their two small children LINA and SAMI; a yellow arrow points at the two adults.
+3. Rami’s wife (woman in her 30s, long dark hair, olive-green dress) hugs her small daughter LINA; a yellow arrow points at the woman.
+4. RAMI carries his little son SAMI on his shoulders; a yellow arrow points at Rami.
+5. One small child alone: LINA in her yellow dress with a school backpack, waving (no adults).
+6. RAMI with his arm around his small son SAMI; a yellow arrow points at the boy.
+Kelimeler: 1) die Familie · 2) die Eltern · 3) die Mutter · 4) der Vater · 5) das Kind · 6) der Sohn
+
+==== kasa-l4-2.png · Lektion 4, sayfa 2 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. RAMI holds hands with his daughter LINA; a yellow arrow points at the girl.
+2. Brother and sister play together on the floor with building blocks: LINA and SAMI, clearly two children of the same family.
+3. LINA stands next to her little brother SAMI with her hand on his shoulder; a yellow arrow points at the boy.
+4. SAMI stands next to his big sister LINA and looks up at her; a yellow arrow points at the girl.
+5. An old couple on a sofa, white-haired grandmother in a purple cardigan and grey-haired grandfather with glasses, holding hands.
+6. The white-haired grandmother in a purple cardigan, alone, knitting in an armchair, smiling.
+Kelimeler: 1) die Tochter · 2) die Geschwister · 3) der Bruder · 4) die Schwester · 5) die Großeltern · 6) die Oma
+
+==== kasa-l4-3.png · Lektion 4, sayfa 3 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. The grey-haired grandfather with glasses, alone, with a walking stick and a newspaper (no letters), smiling.
+2. A woman in her 40s (NIKOS’s sister: curly brown hair, scarf) arrives with a present and opens her arms to her niece LINA; a yellow arrow points at the woman.
+3. NIKOS gives his nephew SAMI a football; a yellow arrow points at Nikos.
+4. A girl of about 12 with headphones around her neck (Lina’s cousin) high-fives LINA; a yellow arrow points at the older girl.
+5. A boy of about 12 with a skateboard (Sami’s cousin) next to SAMI, both grinning; a yellow arrow points at the older boy.
+6. A baby in a onesie sitting up and laughing, holding a rattle.
+Kelimeler: 1) der Opa · 2) die Tante · 3) der Onkel · 4) die Cousine · 5) der Cousin · 6) das Baby
+
+==== kasa-l4-4.png · Lektion 4, sayfa 4 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A wedding couple: the bride in white and the groom in a dark suit with a flower; a yellow arrow points at the groom.
+2. The same wedding couple; a yellow arrow points at the bride.
+3. A small garden behind a house: green lawn, flower beds, an apple tree and a wooden fence.
+4. A small family car, cream-coloured, seen from the front side.
+5. The grey-haired grandfather with glasses reads a picture book to his grandson SAMI on his lap; a yellow arrow points at the boy.
+6. The white-haired grandmother bakes biscuits with her granddaughter LINA; a yellow arrow points at the girl.
+Kelimeler: 1) der Ehemann · 2) die Ehefrau · 3) der Garten · 4) das Auto · 5) der Enkel · 6) die Enkelin
+
+==== kasa-l4-5.png · Lektion 4, sayfa 5 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. TOMASZ as the boss: in a suit behind a big desk in an office, two employees stand in front of him listening.
+2. SABINE as the boss: in a smart blazer at the head of a meeting table, explaining a chart on a board to her team.
+3. AISHA at her job in a bakery: in a work apron and cap, putting fresh bread on a shelf behind the counter.
+4. A small street kiosk with a striped awning, newspapers, drinks and sweets in its window (no text).
+5. An open silver laptop seen from the front, teal screen.
+6. A block of flats with two balconies side by side: on the left balcony YASEMIN waters plants; on the right balcony an older man (her neighbour, bald, grey moustache) waves to her; a yellow arrow points at the man.
+Kelimeler: 1) der Chef · 2) die Chefin · 3) der Job · 4) der Kiosk · 5) der Laptop · 6) der Nachbar
+
+==== kasa-l4-6.png · Lektion 4, sayfa 6 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. Two front doors side by side in a stairwell: NIKOS stands at his door and a woman from the door next to his (neighbour: short grey hair, blue cardigan) hands him a parcel; a yellow arrow points at the woman.
+2. A small café from outside: round tables with cups on the terrace, a striped awning, a cake in the window (no text).
+3. A man and a woman stand back to back with crossed arms, a broken red heart between them; a yellow arrow points at the woman.
+4. The same man and woman back to back, a broken red heart between them; a yellow arrow points at the man.
+5. Two people sit face to face at a little table and talk: NORA and RAMI, with two speech bubbles (no letters) above them.
+6. A very thick dictionary, opened, with many thin pages and colourful index tabs on the side (no letters).
+Kelimeler: 1) die Nachbarin · 2) das Café · 3) die Ex-Frau · 4) der Ex-Mann · 5) das Gespräch · 6) das Wörterbuch
+
+==== kasa-l4-7.png · Lektion 4, sayfa 7 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. An enormous mountain of gold coins and banknote bundles (no numbers), a tiny happy person on top for scale.
+2. A green school chalkboard on a wall with a chalk tray, empty.
+3. A teal desk lamp, switched on.
+4. A white radiator on a wall with a round thermostat knob, warm air shown as soft wavy lines.
+5. A white wall socket (European type, two round holes), front view.
+6. A white light switch on a wall, front view.
+Kelimeler: 1) die Million · 2) die Tafel · 3) die Lampe · 4) die Heizung · 5) die Steckdose · 6) der Lichtschalter
+
+==== kasa-l4-8.png · Lektion 4, sayfa 8 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A colourful wall map of Europe on a wooden roller (no names).
+2. Three white sticks of chalk.
+3. A yellow ruler with marks (no numbers).
+4. A pink-and-white eraser.
+5. A metal-mesh waste-paper basket with crumpled paper in it.
+6. A black cable rolled up with a plug at one end.
+Kelimeler: 1) die Landkarte · 2) die Kreide · 3) das Lineal · 4) der Radiergummi · 5) der Papierkorb · 6) das Kabel
+
+==== kasa-l4-9.png · Lektion 4, sayfa 9 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A silver door handle on a white door, close-up.
+2. Three round things together: a ball, a round wall clock without numbers and an orange — all perfectly round.
+3. Three oval things together: an egg, an oval mirror and an oval serving plate — all clearly oval.
+4. Three square things together: a square gift box seen from the front, a square floor tile and a square sticky note — all with four equal sides.
+5. Three rectangular things together: a closed door, a book seen from the front and a smartphone — all clearly long rectangles.
+6. Three triangular things together: a slice of pizza, a triangle sandwich and a small triangular flag.
+Kelimeler: 1) die Türklinke · 2) rund · 3) oval · 4) quadratisch · 5) rechteckig · 6) dreieckig
+
+==== kasa-l4-10.png · Lektion 4, sayfa 10 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. Three T-shirts hanging side by side: one with stripes, one with a check pattern, one with a flower pattern.
+2. A very big elephant and a tiny mouse standing side by side, looking at each other.
+3. A young woman of about 20 and a very old woman of about 85 with white hair and a walking stick, standing side by side in the same pose.
+4. Two sneakers side by side: one shiny new and clean, one old, worn out, dirty and torn.
+5. Two pencils side by side: one very long and one very short.
+6. Two candles side by side: one very thick and one very thin.
+Kelimeler: 1) gestreift · kariert · gemustert · 2) groß ≠ klein · 3) jung ≠ alt · 4) neu ≠ alt · 5) lang ≠ kurz · 6) dick ≠ dünn
+
+==== kasa-l4-11.png · Lektion 4, sayfa 11 (1 resim) ====
+Make ONE square image (1:1), plain cream background:
+Two cats side by side: one slim and sporty, one very fat and round.
+Kelimeler: schlank ≠ dick
+
+==== kasa-l5-1.png · Lektion 5, sayfa 1 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. YASEMIN stands under a shower with water drops, shampoo foam in her hair, eyes closed, happy (shoulders up only).
+2. NIKOS at a breakfast table in the morning sun: a croissant, a boiled egg in a cup, orange juice and bread rolls; he bites into a roll.
+3. RAMI holds a big cup of hot coffee with both hands and smells it happily, steam rising; nothing else on the table.
+4. OMAR with a backpack and a lunch box walks out of his front door towards the street in the early morning, waving goodbye.
+5. TOMASZ concentrates at his office desk: typing on a computer, papers and a coffee mug next to him.
+6. MEI studies at a desk with an open textbook that has a small black-red-gold flag on the cover, flash cards and a pen.
+Kelimeler: 1) duschen · 2) frühstücken · 3) Kaffee trinken · 4) zur Arbeit gehen · 5) arbeiten · 6) Deutsch lernen
+
+==== kasa-l5-2.png · Lektion 5, sayfa 2 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. OMAR pushes a shopping trolley full of fruit, vegetables, bread and milk along a supermarket shelf.
+2. YASEMIN stirs a big pot of soup on the stove, vegetables on a chopping board next to her.
+3. YASEMIN in yellow rubber gloves cleans a window with a spray bottle and a cloth, the glass sparkles.
+4. OMAR talks on his smartphone held to his ear, laughing, sitting on a sofa.
+5. NIKOS on a sofa with a laptop; small floating icons around the screen: a Wi-Fi symbol, a play button, a heart, a globe.
+6. SABINE sits in an armchair with big headphones on and eyes closed, enjoying music, musical notes floating up.
+Kelimeler: 1) Lebensmittel kaufen · 2) kochen · 3) putzen · 4) telefonieren · 5) im Internet surfen · 6) Musik hören
+
+==== kasa-l5-3.png · Lektion 5, sayfa 3 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. NIKOS in sports clothes does push-ups on a yoga mat at home, a water bottle and dumbbells beside him.
+2. TOMASZ and MEI play table tennis at a green table with a net, the small white ball in the air.
+3. MEI in pyjamas climbs into her bed in the evening and switches off the bedside lamp; a dark blue window.
+4. TOMASZ sleeps deeply in bed, tucked in, mouth slightly open, a small moon symbol above him.
+5. MORNING: a small house on a hill at sunrise, the sun just above the horizon, pink-orange sky, a rooster crowing on the fence; a round clock without numbers on the house wall shows 7 o’clock.
+6. LATE MORNING: the same small house, the sun halfway up in a clear blue sky, laundry drying on a line; the wall clock shows 10 o’clock.
+Kelimeler: 1) Sport machen · 2) Tischtennis spielen · 3) ins Bett gehen · 4) schlafen · 5) der Morgen · 6) der Vormittag
+
+==== kasa-l5-4.png · Lektion 5, sayfa 4 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. NOON: the same small house, the sun high exactly above it, short shadows, a table with a lunch plate in the garden; the wall clock shows 12 o’clock.
+2. AFTERNOON: the same small house, the sun lower on the right, long shadows, coffee and cake on the garden table; the wall clock shows 4 o’clock.
+3. EVENING: the same small house at sunset, orange-purple sky, the windows lit up, a lantern switched on; the wall clock shows 7 o’clock.
+4. NIGHT: the same small house in the dark, a big moon and stars, all windows dark; the wall clock shows 12 o’clock.
+5. NORA sits in a red cinema seat with a box of popcorn, watching a bright screen (only the light of the screen visible), fascinated.
+6. TOMASZ rides a bicycle with a helmet along a park path.
+Kelimeler: 1) der Mittag · 2) der Nachmittag · 3) der Abend · 4) die Nacht · 5) einen Film sehen · 6) Fahrrad fahren
+
+==== kasa-l5-5.png · Lektion 5, sayfa 5 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. OMAR jogs in running clothes and trainers, both feet in the air, a sweatband on his head.
+2. NORA eats a plate of spaghetti with a fork at a kitchen table, happy.
+3. MEI meets two friends on a street corner: they wave and smile as they come towards each other.
+4. SABINE reads a thick book on a sofa with a blanket, a cup of tea next to her.
+5. Three friends (AISHA, NIKOS, MEI) at a café table talk and laugh, speech bubbles (no letters) above them.
+6. RAMI swims crawl in blue water, splashes, swimming goggles.
+Kelimeler: 1) laufen · 2) essen · 3) Leute treffen · 4) ein Buch lesen · 5) mit Freunden sprechen · 6) schwimmen
+
+==== kasa-l5-6.png · Lektion 5, sayfa 6 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. An old man and NORA walk slowly along a park path with a dog on a lead, autumn trees.
+2. A family picnic on a checked blanket in a meadow: a basket, sandwiches, fruit and lemonade.
+3. OMAR kicks a football on a green football pitch, a goal behind him.
+4. NIKOS turns sausages and vegetables on a barbecue grill in the garden, smoke rising.
+5. MEI and RAMI dance together on a dance floor, small musical notes and coloured lights around them.
+6. A city: a river with a bridge, tall and old buildings, a TV tower and a tram (no text).
+Kelimeler: 1) einen Spaziergang machen · 2) ein Picknick machen · 3) Fußball spielen · 4) grillen · 5) tanzen · 6) die Stadt
+
+==== kasa-l5-7.png · Lektion 5, sayfa 7 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A green city park: lawns, big trees, a path, a pond with ducks and an empty bench.
+2. A zoo: a giraffe and an elephant behind a low fence, a child (LINA) watching them.
+3. A cinema building from outside at night: a big entrance with red carpet, posters with film reels and a popcorn symbol (no text).
+4. An indoor swimming pool hall: a big blue pool with lane ropes, a diving board and big windows, nobody swimming.
+5. A library: tall shelves full of books, reading tables with green lamps, a person reading quietly.
+6. A small café from outside: round tables with cups on the terrace, a striped awning, a cake in the window (no text).
+Kelimeler: 1) der Park · 2) der Zoo · 3) das Kino · 4) das Schwimmbad · 5) die Bibliothek · 6) das Café
+
+==== kasa-l5-8.png · Lektion 5, sayfa 8 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. A restaurant inside: tables with white tablecloths, candles, wine glasses and plates of food, a waiter in the back (no menu text).
+2. A language café: people of different origins around a café table, small paper flags of different countries on the table, speech bubbles (no letters).
+3. YASEMIN in red boxing gloves punches a hanging punching bag in a boxing club.
+4. A training session in a sports hall: three people do squats in a row in front of a coach with a whistle.
+5. A small club house with a flag (a simple football symbol, no letters) in front; club members in matching team shirts pose together.
+6. An adult course in a classroom: six learners at tables and PAUL as the teacher at the board.
+Kelimeler: 1) das Restaurant · 2) das Sprachcafé · 3) boxen · 4) trainieren · 5) der Verein · 6) der Kurs
+
+==== kasa-l5-9.png · Lektion 5, sayfa 9 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. Three teenagers (about 15) with a skateboard, a smartphone and a basketball hang out together and laugh.
+2. LINA does her homework at the kitchen table: exercise book, pencil case, she thinks with a pencil at her lips.
+3. A reception desk: AISHA fills in a registration form on a clipboard, the receptionist hands her a pen.
+4. A big brown price tag with a euro sign (no numbers) hanging on a pair of red boxing gloves.
+5. A big weekly planner on a wall with seven coloured columns in a row (no letters), the first five yellow, the last two green.
+6. A big weekly planner with seven columns, only the last two columns glow green; in front, a family relaxes in pyjamas with pancakes.
+Kelimeler: 1) der Jugendliche · 2) die Hausaufgabe · 3) die Anmeldung · 4) der Preis · 5) die Woche · 6) das Wochenende
+
+==== kasa-l5-10.png · Lektion 5, sayfa 10 (6 resim) ====
+SHEET (3 columns × 2 rows). From left to right, top to bottom:
+1. Three people side by side in different work clothes: a cook with a chef hat, a doctor with a stethoscope and a mechanic with a wrench.
+2. NIKOS paints a landscape on a canvas on an easel in his free time, a palette in his hand.
+3. PAUL teaches: he explains something at a whiteboard to a few adult learners who raise their hands.
+4. A cooking course: four people in aprons cook at a kitchen island, a cook in a white hat shows them how to cut vegetables.
+5. AISHA as a waitress in a black apron carries two plates of food through a restaurant (only ONE woman).
+6. A journalist holds a microphone towards SABINE, who answers; a small camera on a tripod behind them.
+Kelimeler: 1) der Beruf · 2) das Hobby · 3) unterrichten · 4) der Kochkurs · 5) die Kellnerin · 6) das Interview
+
+==== kasa-l5-11.png · Lektion 5, sayfa 11 (5 resim) ====
+SHEET (5 pictures: 3 on top, 2 centred below). From left to right, top to bottom:
+1. A coach with a whistle, a cap and a clipboard gives instructions to a youth basketball team.
+2. A swimming course for children: three kids with arm bands in a shallow pool, a swimming teacher in the water shows the arm movement.
+3. A mime artist with a white face, black-and-white striped shirt and braces pretends to touch an invisible wall with both hands.
+4. Several colourful posters on a round advertising pillar in the street (pictures only, no text).
+5. RAMI is still asleep in bed although bright sunshine fills the room; the alarm clock on the night table shows 11 o’clock (hands only).
+Kelimeler: 1) der Trainer · 2) der Schwimmkurs · 3) die Pantomime · 4) das Plakat · 5) lange schlafen
+
+Toplam: 183 resim, 32 mesaj (+ ilk mesaj).

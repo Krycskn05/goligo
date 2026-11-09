@@ -4,8 +4,8 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -16,7 +16,7 @@
         "height": 793,
         "crop": {
             "x": 396.6,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -27,7 +27,7 @@
         "height": 793,
         "crop": {
             "x": 793.2,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -38,7 +38,7 @@
         "height": 793,
         "crop": {
             "x": 1189.8,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -49,7 +49,7 @@
         "height": 793,
         "crop": {
             "x": 1586.4,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -59,7 +59,7 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
+            "x": 0,
             "y": 396.5,
             "width": 396.6,
             "height": 396.5
@@ -114,8 +114,8 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -126,7 +126,7 @@
         "height": 793,
         "crop": {
             "x": 396.6,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -137,7 +137,7 @@
         "height": 793,
         "crop": {
             "x": 793.2,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -148,7 +148,7 @@
         "height": 793,
         "crop": {
             "x": 1189.8,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -159,7 +159,7 @@
         "height": 793,
         "crop": {
             "x": 1586.4,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -169,7 +169,7 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
+            "x": 0,
             "y": 396.5,
             "width": 396.6,
             "height": 396.5
@@ -224,8 +224,8 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -236,7 +236,7 @@
         "height": 793,
         "crop": {
             "x": 396.6,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -247,7 +247,7 @@
         "height": 793,
         "crop": {
             "x": 793.2,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -258,7 +258,7 @@
         "height": 793,
         "crop": {
             "x": 1189.8,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -269,7 +269,7 @@
         "height": 793,
         "crop": {
             "x": 1586.4,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -279,7 +279,7 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
+            "x": 0,
             "y": 396.5,
             "width": 396.6,
             "height": 396.5
@@ -334,8 +334,8 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -346,7 +346,7 @@
         "height": 793,
         "crop": {
             "x": 396.6,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -357,7 +357,7 @@
         "height": 793,
         "crop": {
             "x": 793.2,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -368,7 +368,7 @@
         "height": 793,
         "crop": {
             "x": 1189.8,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -379,7 +379,7 @@
         "height": 793,
         "crop": {
             "x": 1586.4,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -389,7 +389,7 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
+            "x": 0,
             "y": 396.5,
             "width": 396.6,
             "height": 396.5
@@ -444,8 +444,8 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -456,7 +456,7 @@
         "height": 793,
         "crop": {
             "x": 396.6,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -467,7 +467,7 @@
         "height": 793,
         "crop": {
             "x": 793.2,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -478,7 +478,7 @@
         "height": 793,
         "crop": {
             "x": 1189.8,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -489,7 +489,7 @@
         "height": 793,
         "crop": {
             "x": 1586.4,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -499,7 +499,7 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
+            "x": 0,
             "y": 396.5,
             "width": 396.6,
             "height": 396.5
@@ -554,8 +554,8 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -566,7 +566,7 @@
         "height": 793,
         "crop": {
             "x": 396.6,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -577,7 +577,7 @@
         "height": 793,
         "crop": {
             "x": 793.2,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -588,7 +588,7 @@
         "height": 793,
         "crop": {
             "x": 1189.8,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -599,7 +599,7 @@
         "height": 793,
         "crop": {
             "x": 1586.4,
-            "y": 0.0,
+            "y": 0,
             "width": 396.6,
             "height": 396.5
         }
@@ -609,7 +609,7 @@
         "width": 1983,
         "height": 793,
         "crop": {
-            "x": 0.0,
+            "x": 0,
             "y": 396.5,
             "width": 396.6,
             "height": 396.5
@@ -5028,6 +5028,2019 @@
     },
     "kleidung-winterjacke": {
         "src": "/objects/toon/kleidung-winterjacke.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-koch": {
+        "src": "/objects/toon/l2-koch.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-lehrer": {
+        "src": "/objects/toon/l2-lehrer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-arzt": {
+        "src": "/objects/toon/l2-arzt.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-friseur": {
+        "src": "/objects/toon/l2-friseur.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-verkaeufer": {
+        "src": "/objects/toon/l2-verkaeufer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-taxifahrer": {
+        "src": "/objects/toon/l2-taxifahrer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-mechatroniker": {
+        "src": "/objects/toon/l2-mechatroniker.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-altenpfleger": {
+        "src": "/objects/toon/l2-altenpfleger.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-polizist": {
+        "src": "/objects/toon/l2-polizist.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-ingenieur": {
+        "src": "/objects/toon/l2-ingenieur.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-saenger": {
+        "src": "/objects/toon/l2-saenger.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-kellner": {
+        "src": "/objects/toon/l2-kellner.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-busfahrer": {
+        "src": "/objects/toon/l2-busfahrer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-haus": {
+        "src": "/objects/toon/l2-haus.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-tierarzt": {
+        "src": "/objects/toon/l2-tierarzt.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-autorin": {
+        "src": "/objects/toon/l2-autorin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-basketballer": {
+        "src": "/objects/toon/l2-basketballer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-regisseur": {
+        "src": "/objects/toon/l2-regisseur.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-saengerin": {
+        "src": "/objects/toon/l2-saengerin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-tee-trinken": {
+        "src": "/objects/toon/l2-tee-trinken.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-tanzen": {
+        "src": "/objects/toon/l2-tanzen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l2-formular": {
+        "src": "/objects/toon/l2-formular.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-tisch": {
+        "src": "/objects/toon/l3-tisch.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-stuhl": {
+        "src": "/objects/toon/l3-stuhl.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-sofa": {
+        "src": "/objects/toon/l3-sofa.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-bett": {
+        "src": "/objects/toon/l3-bett.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-schrank": {
+        "src": "/objects/toon/l3-schrank.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-regal": {
+        "src": "/objects/toon/l3-regal.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-herd": {
+        "src": "/objects/toon/l3-herd.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-bank": {
+        "src": "/objects/toon/l3-bank.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-tasche": {
+        "src": "/objects/toon/l3-tasche.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-buch": {
+        "src": "/objects/toon/l3-buch.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-heft": {
+        "src": "/objects/toon/l3-heft.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-stift": {
+        "src": "/objects/toon/l3-stift.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-bleistift": {
+        "src": "/objects/toon/l3-bleistift.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-plakat": {
+        "src": "/objects/toon/l3-plakat.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-handy": {
+        "src": "/objects/toon/l3-handy.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-foto": {
+        "src": "/objects/toon/l3-foto.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-computer": {
+        "src": "/objects/toon/l3-computer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-laptop": {
+        "src": "/objects/toon/l3-laptop.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-kaffeemaschine": {
+        "src": "/objects/toon/l3-kaffeemaschine.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-kasse": {
+        "src": "/objects/toon/l3-kasse.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-tafel": {
+        "src": "/objects/toon/l3-tafel.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-tuer": {
+        "src": "/objects/toon/l3-tuer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-fenster": {
+        "src": "/objects/toon/l3-fenster.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-schluessel": {
+        "src": "/objects/toon/l3-schluessel.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-kuehlschrank": {
+        "src": "/objects/toon/l3-kuehlschrank.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-kiosk": {
+        "src": "/objects/toon/l3-kiosk.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-waschmaschine": {
+        "src": "/objects/toon/l3-waschmaschine.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-spuelmaschine": {
+        "src": "/objects/toon/l3-spuelmaschine.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-kleid": {
+        "src": "/objects/toon/l3-kleid.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-naehmaschine": {
+        "src": "/objects/toon/l3-naehmaschine.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-schere": {
+        "src": "/objects/toon/l3-schere.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-topf": {
+        "src": "/objects/toon/l3-topf.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-woerterbuch": {
+        "src": "/objects/toon/l3-woerterbuch.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-wortkarte": {
+        "src": "/objects/toon/l3-wortkarte.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l3-arbeitsplatz": {
+        "src": "/objects/toon/l3-arbeitsplatz.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-familie": {
+        "src": "/objects/toon/l4-familie.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-eltern": {
+        "src": "/objects/toon/l4-eltern.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-mutter": {
+        "src": "/objects/toon/l4-mutter.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-vater": {
+        "src": "/objects/toon/l4-vater.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-kind": {
+        "src": "/objects/toon/l4-kind.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-sohn": {
+        "src": "/objects/toon/l4-sohn.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-tochter": {
+        "src": "/objects/toon/l4-tochter.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-geschwister": {
+        "src": "/objects/toon/l4-geschwister.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-bruder": {
+        "src": "/objects/toon/l4-bruder.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-schwester": {
+        "src": "/objects/toon/l4-schwester.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-grosseltern": {
+        "src": "/objects/toon/l4-grosseltern.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-oma": {
+        "src": "/objects/toon/l4-oma.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-opa": {
+        "src": "/objects/toon/l4-opa.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-tante": {
+        "src": "/objects/toon/l4-tante.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-onkel": {
+        "src": "/objects/toon/l4-onkel.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-cousine": {
+        "src": "/objects/toon/l4-cousine.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-cousin": {
+        "src": "/objects/toon/l4-cousin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-baby": {
+        "src": "/objects/toon/l4-baby.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-ehemann": {
+        "src": "/objects/toon/l4-ehemann.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-ehefrau": {
+        "src": "/objects/toon/l4-ehefrau.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-garten": {
+        "src": "/objects/toon/l4-garten.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-auto": {
+        "src": "/objects/toon/l4-auto.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-enkel": {
+        "src": "/objects/toon/l4-enkel.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-enkelin": {
+        "src": "/objects/toon/l4-enkelin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-chef": {
+        "src": "/objects/toon/l4-chef.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-chefin": {
+        "src": "/objects/toon/l4-chefin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-job": {
+        "src": "/objects/toon/l4-job.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-kiosk": {
+        "src": "/objects/toon/l4-kiosk.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-laptop": {
+        "src": "/objects/toon/l4-laptop.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-nachbar": {
+        "src": "/objects/toon/l4-nachbar.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-nachbarin": {
+        "src": "/objects/toon/l4-nachbarin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-cafe": {
+        "src": "/objects/toon/l4-cafe.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-ex-frau": {
+        "src": "/objects/toon/l4-ex-frau.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-ex-mann": {
+        "src": "/objects/toon/l4-ex-mann.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-gespraech": {
+        "src": "/objects/toon/l4-gespraech.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-woerterbuch": {
+        "src": "/objects/toon/l4-woerterbuch.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-million": {
+        "src": "/objects/toon/l4-million.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-tafel": {
+        "src": "/objects/toon/l4-tafel.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-lampe": {
+        "src": "/objects/toon/l4-lampe.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-heizung": {
+        "src": "/objects/toon/l4-heizung.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-steckdose": {
+        "src": "/objects/toon/l4-steckdose.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-lichtschalter": {
+        "src": "/objects/toon/l4-lichtschalter.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-landkarte": {
+        "src": "/objects/toon/l4-landkarte.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-kreide": {
+        "src": "/objects/toon/l4-kreide.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-lineal": {
+        "src": "/objects/toon/l4-lineal.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-radiergummi": {
+        "src": "/objects/toon/l4-radiergummi.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-papierkorb": {
+        "src": "/objects/toon/l4-papierkorb.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-kabel": {
+        "src": "/objects/toon/l4-kabel.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-tuerklinke": {
+        "src": "/objects/toon/l4-tuerklinke.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-rund": {
+        "src": "/objects/toon/l4-rund.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-oval": {
+        "src": "/objects/toon/l4-oval.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-quadratisch": {
+        "src": "/objects/toon/l4-quadratisch.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-rechteckig": {
+        "src": "/objects/toon/l4-rechteckig.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-dreieckig": {
+        "src": "/objects/toon/l4-dreieckig.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-gemustert": {
+        "src": "/objects/toon/l4-gemustert.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-gross-klein": {
+        "src": "/objects/toon/l4-gross-klein.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-jung-alt": {
+        "src": "/objects/toon/l4-jung-alt.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-neu-alt": {
+        "src": "/objects/toon/l4-neu-alt.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-lang-kurz": {
+        "src": "/objects/toon/l4-lang-kurz.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-dick-duenn": {
+        "src": "/objects/toon/l4-dick-duenn.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l4-schlank-dick": {
+        "src": "/objects/toon/l4-schlank-dick.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-duschen": {
+        "src": "/objects/toon/l5-duschen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-fruehstuecken": {
+        "src": "/objects/toon/l5-fruehstuecken.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-kaffee-trinken": {
+        "src": "/objects/toon/l5-kaffee-trinken.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-zur-arbeit-gehen": {
+        "src": "/objects/toon/l5-zur-arbeit-gehen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-arbeiten": {
+        "src": "/objects/toon/l5-arbeiten.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-deutsch-lernen": {
+        "src": "/objects/toon/l5-deutsch-lernen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-lebensmittel-kaufen": {
+        "src": "/objects/toon/l5-lebensmittel-kaufen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-kochen": {
+        "src": "/objects/toon/l5-kochen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-putzen": {
+        "src": "/objects/toon/l5-putzen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-telefonieren": {
+        "src": "/objects/toon/l5-telefonieren.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-im-internet-surfen": {
+        "src": "/objects/toon/l5-im-internet-surfen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-musik-hoeren": {
+        "src": "/objects/toon/l5-musik-hoeren.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-sport-machen": {
+        "src": "/objects/toon/l5-sport-machen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-tischtennis-spielen": {
+        "src": "/objects/toon/l5-tischtennis-spielen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-ins-bett-gehen": {
+        "src": "/objects/toon/l5-ins-bett-gehen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-schlafen": {
+        "src": "/objects/toon/l5-schlafen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-morgen": {
+        "src": "/objects/toon/l5-morgen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-vormittag": {
+        "src": "/objects/toon/l5-vormittag.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-mittag": {
+        "src": "/objects/toon/l5-mittag.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-nachmittag": {
+        "src": "/objects/toon/l5-nachmittag.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-abend": {
+        "src": "/objects/toon/l5-abend.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-nacht": {
+        "src": "/objects/toon/l5-nacht.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-film-sehen": {
+        "src": "/objects/toon/l5-film-sehen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-fahrrad-fahren": {
+        "src": "/objects/toon/l5-fahrrad-fahren.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-laufen": {
+        "src": "/objects/toon/l5-laufen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-essen": {
+        "src": "/objects/toon/l5-essen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-leute-treffen": {
+        "src": "/objects/toon/l5-leute-treffen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-buch-lesen": {
+        "src": "/objects/toon/l5-buch-lesen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-mit-freunden-sprechen": {
+        "src": "/objects/toon/l5-mit-freunden-sprechen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-schwimmen": {
+        "src": "/objects/toon/l5-schwimmen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-spaziergang": {
+        "src": "/objects/toon/l5-spaziergang.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-picknick": {
+        "src": "/objects/toon/l5-picknick.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-fussball-spielen": {
+        "src": "/objects/toon/l5-fussball-spielen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-grillen": {
+        "src": "/objects/toon/l5-grillen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-tanzen": {
+        "src": "/objects/toon/l5-tanzen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-stadt": {
+        "src": "/objects/toon/l5-stadt.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-park": {
+        "src": "/objects/toon/l5-park.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-zoo": {
+        "src": "/objects/toon/l5-zoo.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-kino": {
+        "src": "/objects/toon/l5-kino.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-schwimmbad": {
+        "src": "/objects/toon/l5-schwimmbad.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-bibliothek": {
+        "src": "/objects/toon/l5-bibliothek.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-cafe": {
+        "src": "/objects/toon/l5-cafe.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-restaurant": {
+        "src": "/objects/toon/l5-restaurant.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-sprachcafe": {
+        "src": "/objects/toon/l5-sprachcafe.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-boxen": {
+        "src": "/objects/toon/l5-boxen.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-trainieren": {
+        "src": "/objects/toon/l5-trainieren.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-verein": {
+        "src": "/objects/toon/l5-verein.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-kurs": {
+        "src": "/objects/toon/l5-kurs.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-jugendliche": {
+        "src": "/objects/toon/l5-jugendliche.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-hausaufgabe": {
+        "src": "/objects/toon/l5-hausaufgabe.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-anmeldung": {
+        "src": "/objects/toon/l5-anmeldung.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-preis": {
+        "src": "/objects/toon/l5-preis.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-woche": {
+        "src": "/objects/toon/l5-woche.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-wochenende": {
+        "src": "/objects/toon/l5-wochenende.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-beruf": {
+        "src": "/objects/toon/l5-beruf.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-hobby": {
+        "src": "/objects/toon/l5-hobby.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-unterrichten": {
+        "src": "/objects/toon/l5-unterrichten.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-kochkurs": {
+        "src": "/objects/toon/l5-kochkurs.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-kellnerin": {
+        "src": "/objects/toon/l5-kellnerin.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-interview": {
+        "src": "/objects/toon/l5-interview.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-trainer": {
+        "src": "/objects/toon/l5-trainer.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-schwimmkurs": {
+        "src": "/objects/toon/l5-schwimmkurs.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-pantomime": {
+        "src": "/objects/toon/l5-pantomime.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-plakat": {
+        "src": "/objects/toon/l5-plakat.webp",
+        "width": 512,
+        "height": 512,
+        "crop": {
+            "x": 0,
+            "y": 0,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "l5-lange-schlafen": {
+        "src": "/objects/toon/l5-lange-schlafen.webp",
         "width": 512,
         "height": 512,
         "crop": {

@@ -28,6 +28,7 @@ test('the server keeps every chosen question of a full Ev ve Yaşam round',()=>{
 test('the server keeps every chosen question of a full Nesne Kasası round',()=>{
  const modes=[['test',practice.pickPictureQuiz,'visual'],['write',practice.pickObjectWritingQuiz,'write'],['listen',practice.pickObjectListeningQuiz,'listen']];
  for(const group of ['all',...objects.objectGroups.map(item=>item.id)])for(const [mode,pick,server] of modes){
+  if(mode==='write'&&/^objects-lektion\d$/.test(group))continue; // the lesson cards have no writing round (9 November 2026)
   const everything=pick(group,'all',[],false,undefined,{fresh:true});const solved=everything.slice(0,3).map(q=>row(q.id,0,2));
   const ids=pick(group,'all',solved,false,undefined,{fresh:true}).map(q=>q.id);
   assert.equal(ids.length,everything.length-3,group+' '+mode+' all unsolved questions, none solved');

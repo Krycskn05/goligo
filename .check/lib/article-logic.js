@@ -20,14 +20,16 @@ const moreHeads = { regenschirm: 'der Schirm', vogelkaefig: 'der Käfig', umzugs
 // Short nouns made from a verb stem (they take der): the verb is shown with the rule.
 const verbNouns = { verband: 'verbinden', vorhang: 'vorhängen' };
 // Words that are only used in the plural (die Nudeln, die Pommes): the plural rule, die.
-const pluralOnly = new Set(['nudeln', 'spaghetti', 'pommes', 'kleidung-leggings']);
+const pluralOnly = new Set(['nudeln', 'spaghetti', 'pommes', 'kleidung-leggings', 'l4-eltern', 'l4-geschwister', 'l4-grosseltern']);
 /** Vowel groups (au, ei, ie, aa … count once) = syllables of a German noun. */
 function syllables(noun) { return (noun.toLowerCase().match(/[aeiouäöüy]+/g) ?? []).length; }
 /** Up to three other vault nouns with the same article, from the same category first: a group to learn together. */
 function articleGroup(id, full, count = 3) {
     const article = full.split(' ')[0];
     const self = object_course_1.objectVocabulary.find(word => word.id === id);
-    const peers = object_course_1.objectVocabulary.filter(word => word.id !== id && word.de.split(' ')[0] === article && !word.de.includes('-'));
+    // Never a card without an article (tanzen, „der Koch / die Köchin“) and never the same word from another card (der Tisch
+    // is in Möbel and in Lektion 3).
+    const peers = object_course_1.objectVocabulary.filter(word => word.id !== id && !word.phrase && word.de !== full && word.de.split(' ')[0] === article && !word.de.includes('-'));
     const score = (word) => (word.topic === self?.topic ? 2 : 0) + (article_challenges_1.compoundHeads[word.id] ?? moreHeads[word.id] ? 0 : 1);
     return [...peers].sort((a, b) => score(b) - score(a)).slice(0, count).map(word => word.de);
 }

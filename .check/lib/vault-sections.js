@@ -15,7 +15,7 @@ exports.vaultSections = [
         title: ['İş ve meslekler', 'Arbeit und Berufe', 'Work and jobs', 'العمل والمهن', 'Робота і професії', 'Travail et métiers', 'Trabajo y profesiones', 'Работа и профессии', 'کار و شغل‌ها', 'Praca i zawody', 'Lavoro e professioni', 'Trabalho e profissões'] },
     { id: 'outside', emoji: '🌳', groups: ['objects-school', 'objects-nature', 'objects-outdoors'],
         title: ['Okul, doğa ve şehir', 'Schule, Natur und Stadt', 'School, nature and town', 'المدرسة والطبيعة والمدينة', 'Школа, природа і місто', 'École, nature et ville', 'Escuela, naturaleza y ciudad', 'Школа, природа и город', 'مدرسه، طبیعت و شهر', 'Szkoła, przyroda i miasto', 'Scuola, natura e città', 'Escola, natureza e cidade'] },
-    { id: 'lessons', emoji: '📘', groups: ['objects-lektion1'],
+    { id: 'lessons', emoji: '📘', groups: ['objects-lektion1', 'objects-lektion2', 'objects-lektion3', 'objects-lektion4', 'objects-lektion5'],
         title: ['Ders kelimeleri', 'Wörter aus den Lektionen', 'Words from the lessons', 'كلمات من الدروس', 'Слова з уроків', 'Mots des leçons', 'Palabras de las lecciones', 'Слова из уроков', 'واژه‌های درس‌ها', 'Słowa z lekcji', 'Parole delle lezioni', 'Palavras das lições'] },
 ];
 function sectionTitle(section, language) { return (0, site_languages_1.pickText)(section.title, language); }

@@ -21,7 +21,9 @@ export function syllables(noun:string){return (noun.toLowerCase().match(/[aeiou�
 /** Up to three other vault nouns with the same article, from the same category first: a group to learn together. */
 export function articleGroup(id:string,full:string,count=3){
  const article=full.split(' ')[0];const self=objectVocabulary.find(word=>word.id===id);
- const peers=objectVocabulary.filter(word=>word.id!==id&&word.de.split(' ')[0]===article&&!word.de.includes('-'));
+ // Never a card without an article (tanzen, „der Koch / die Köchin“) and never the same word from another card (der Tisch
+ // is in Möbel and in Lektion 3).
+ const peers=objectVocabulary.filter(word=>word.id!==id&&!word.phrase&&word.de!==full&&word.de.split(' ')[0]===article&&!word.de.includes('-'));
  const score=(word:typeof peers[number])=>(word.topic===self?.topic?2:0)+(compoundHeads[word.id]??moreHeads[word.id]?0:1);
  return [...peers].sort((a,b)=>score(b)-score(a)).slice(0,count).map(word=>word.de);
 }

@@ -14,6 +14,7 @@ exports.objectWritingPool = objectWritingPool;
 exports.pickObjectWritingQuiz = pickObjectWritingQuiz;
 const object_course_1 = require("./object-course");
 const course_1 = require("./course");
+const object_word_additions_1 = require("./object-word-additions");
 /** A round asks about each object once; incorrect answers get another retrieval opportunity. */
 function pickObjectQuestions(mode, group, count, reviews, scene) {
     const byId = new Map(reviews.map(r => [r.question_id, r]));
@@ -112,9 +113,10 @@ function pickPictureQuiz(group, count, reviews, reviewOnly = false, onlyIds, opt
     const pool = roundPool(object_course_1.objectQuestions.filter(q => isObjectPictureQuestion(q) && (group === 'all' || q.topic === group) && (!only || only.has(q.id))), pictureQuizReviews(reviews), reviewOnly, options);
     return mix(pool, options.random).slice(0, count === 'all' ? pool.length : count);
 }
-/** Written retrieval has its own pool and does not change picture tests. */
+/** Written retrieval has its own pool and does not change picture tests. The lesson cards (Ders kelimeleri) have no
+ * "Yazarak Pekiştir" (the learner asked, 9 November 2026): their written questions are not offered and not counted. */
 function isObjectWritingQuestion(q) {
-    return !!q && !!q.objectId && q.kind === 'write' && !q.audio && !q.sceneFind;
+    return !!q && !!q.objectId && q.kind === 'write' && !q.audio && !q.sceneFind && !(0, object_word_additions_1.isLessonTopic)(q.topic);
 }
 function objectWritingPool(group = 'all') {
     return object_course_1.objectQuestions.filter(q => isObjectWritingQuestion(q) && (group === 'all' || q.topic === group));

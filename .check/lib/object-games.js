@@ -33,8 +33,11 @@ function splitNoun(de) {
     return match ? { article: match[1], noun: match[2] } : null;
 }
 const hasArt = (word) => Object.prototype.hasOwnProperty.call(object_toon_art_json_1.default, word.id);
+/** The lesson cards of Lektion 2–5 (9 November 2026) repeat many vault nouns (der Tisch, die Lampe …): they stay out of
+ * the games, so a round never shows the same word twice. */
+const lessonCopies = new Set(['objects-lektion2', 'objects-lektion3', 'objects-lektion4', 'objects-lektion5']);
 /** The vault words a game can show: with a picture and "article + one word". */
-exports.gameObjects = object_course_1.objectVocabulary.filter(word => hasArt(word) && !!splitNoun(word.de));
+exports.gameObjects = object_course_1.objectVocabulary.filter(word => hasArt(word) && !!splitNoun(word.de) && !lessonCopies.has(word.topic));
 const gameObject = (id) => exports.gameObjects.find(word => word.id === id);
 exports.gameObject = gameObject;
 /** The pictures that fall, each word once, in a new order every time. */

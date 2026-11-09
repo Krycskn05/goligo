@@ -101,7 +101,7 @@ test('Fiiller keeps the 72 verbs of the two pages with Präsens, Perfekt and a m
 test('every verb has choice, writing and listening exercises with new IDs only',()=>{
  const kinds=['meaning','word','fit','praesens','perfekt','partizip','write','write-praesens','write-perfekt','write-partizip','aux','hear','hear-praesens','hear-perfekt'];
  // meaning-perfekt (the Perfekt among other verbs' forms) stays in the bank for old rounds but is no exercise any more.
- assert.equal(verbs.verbQuestions.length,72*(kinds.length+1)+verbs.verbs.reduce((sum,v)=>sum+verbs.personChanges(v).length,0));
+ assert.equal(verbs.verbQuestions.length,72*(kinds.length+1)+verbs.verbs.reduce((sum,v)=>sum+verbs.personQuestions(v).length,0));
  assert.equal(new Set(verbs.verbQuestions.map(q=>q.id)).size,verbs.verbQuestions.length);
  for(const verb of verbs.verbs){const old=course.questionMap.get('verb-meaning-perfekt-'+verb.id);assert.ok(old,verb.id);assert.ok(!practice.isVerbExercise(old),old.id);}
  for(const verb of verbs.verbs)for(const task of kinds){
@@ -253,7 +253,7 @@ test('the page is linked from home, only the correct answer is spoken, and verb 
  assert.match(fs.readFileSync('app/progress-ui.tsx','utf8'),/href="\/fiiller"/);
  assert.match(fs.readFileSync('app/layout.tsx','utf8'),/verbs\.css/);
  const page=fs.readFileSync('app/verb-study.tsx','utf8');
- assert.ok(page.includes("const pronunciation=askedPerson&&verb?personSpoken(verb,askedPerson):task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';"),'only the correct answer (in the round of every mistake an article puzzle says the whole word)');
+ assert.ok(page.includes("const pronunciation=askedPerson&&verb?(personRow(verb,askedPerson)?.text??personSpoken(verb,askedPerson)):task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';"),'only the correct answer (in the round of every mistake an article puzzle says the whole word)');
  assert.ok(page.includes('answerAudio.answer(gradeAnswer(q,answer),pronunciation)'));
  // The question audio is played only from the listen buttons.
  assert.equal((page.match(/speech\.speak\(q\.audio/g)||[]).length,1);
@@ -346,7 +346,7 @@ test('Fiil Atölyesi: six topics on the map (the four book parts only read older
  assert.equal(families.bookParts[2].verbs[0],'mitnehmen');assert.equal(families.bookParts[2].verbs[16],'treffen');assert.equal(families.bookParts[3].verbs[0],'trinken');assert.equal(families.bookParts[3].verbs[16],'zurückkommen');
  // Each verb in turn: the meaning test, spelling, the persons whose form changes (only those verbs), the past form, spelling
  // the past form, hat or ist; only then the next verb.
- const personCount=verbs.verbs.reduce((sum,v)=>sum+verbs.personChanges(v).length,0);assert.equal(personCount,57);
+ const personCount=verbs.verbs.reduce((sum,v)=>sum+verbs.personQuestions(v).length,0);assert.equal(personCount,55);
  const ids=workshop.workshopIds();assert.equal(ids.length,72*5+personCount);assert.equal(new Set(ids).size,ids.length);
  for(const id of ids)assert.ok(practice.isVerbExercise(course.questionMap.get(id)),id);
  assert.deepEqual(workshop.verbSteps,['meaning','write','person-ich','person-du','person-er','partizip','write-partizip','aux']);assert.deepEqual(workshop.countedSteps,['meaning','write','partizip','write-partizip']);
@@ -355,9 +355,12 @@ test('Fiil Atölyesi: six topics on the map (the four book parts only read older
  // Kişiler: exactly the persons whose form changes (as verbKindInfo), each the right form against the regular-looking one.
  const kindLib=load('verb-kind'),personLib=load('verb-persons');const voiced=new Set(personLib.workshopSpeechTexts());
  for(const verb of verbs.verbs){const changes=verbs.personChanges(verb);assert.deepEqual(changes.map(c=>c.person),kindLib.verbKindInfo(verb).changedPersons,verb.id);
-  for(const change of changes){const q=course.questionMap.get('verb-person-'+change.person+'-'+verb.id);assert.equal(q.verbTask,'person-'+change.person);assert.deepEqual(q.options,[change.form,change.regular]);assert.equal(q.answer,change.form);assert.notEqual(change.form,change.regular);
-   assert.ok(practice.isVerbPersonQuestion(q)&&practice.isVerbExercise(q)&&!practice.isVerbTestQuestion(q),q.id);assert.ok(course.gradeAnswer(q,change.form)&&!course.gradeAnswer(q,change.regular),q.id);assert.ok(voiced.has(verbs.personSpoken(verb,change.person)),'natural voice for '+q.id);}}
- assert.deepEqual(verbs.personChanges(verbs.verbMap.get('abfahren')).map(c=>c.form+'/'+c.regular),['fährst/fahrst','fährt/fahrt']);assert.equal(verbs.personSpoken(verbs.verbMap.get('abfahren'),'du'),'du fährst ab');
+  const asked=verbs.personQuestions(verb);assert.deepEqual(asked.map(c=>c.person),personLib.personMode(verb)==='subject'?changes.map(c=>c.person):changes.filter(c=>c.person==='er').map(c=>c.person),'only the persons whose A1 sentence keeps the form '+verb.id);
+  for(const change of changes)if(!asked.includes(change))assert.equal(course.questionMap.get('verb-person-'+change.person+'-'+verb.id),undefined);
+  for(const change of asked){const q=course.questionMap.get('verb-person-'+change.person+'-'+verb.id);const row=personLib.personSentences(verb,'praesens').find(item=>item.person===change.person);const finite=row.parts.filter(part=>part.role==='verb');assert.equal(finite.length,1,q.id);assert.equal(finite[0].text.toLocaleLowerCase('de'),change.form.toLocaleLowerCase('de'),'the A1 sentence holds the asked form: '+row.text);assert.ok(voiced.has(row.text),'natural voice for '+row.text);assert.equal(q.verbTask,'person-'+change.person);assert.deepEqual(q.options,[change.form,change.regular]);assert.equal(q.answer,change.form);assert.notEqual(change.form,change.regular);
+   assert.ok(practice.isVerbPersonQuestion(q)&&practice.isVerbExercise(q)&&!practice.isVerbTestQuestion(q),q.id);assert.ok(course.gradeAnswer(q,change.form)&&!course.gradeAnswer(q,change.regular),q.id);}}
+ assert.deepEqual(verbs.personChanges(verbs.verbMap.get('abfahren')).map(c=>c.form+'/'+c.regular),['fährst/fahrst','fährt/fahrt']);assert.equal(personLib.personSentences(verbs.verbMap.get('abfahren'),'praesens').find(row=>row.person==='du').text,'Wann fährst du morgen ab?');assert.equal(course.questionMap.get('verb-person-du-gefallen'),undefined);assert.ok(course.questionMap.get('verb-person-er-gefallen'));
+ const pageSrc=fs.readFileSync('app/verb-study.tsx','utf8');assert.ok(pageSrc.includes("const pronunciation=askedPerson&&verb?(personRow(verb,askedPerson)?.text??personSpoken(verb,askedPerson)):")&&pageSrc.includes("part.role==='verb'?<span key={i} className={'verb-chunk gap verb'+(feedback?' filled':'')}>"),'the A1 sentence with its gap, read after the answer');
  assert.ok(!ids.some(id=>/^verb-(perfekt|write-perfekt|meaning-perfekt|word|hear)/.test(id)),'no hat/ist questions, no second choice, no listening on the path');
  const topicStarts=families.verbFamilies.map((f,i)=>families.verbFamilies.slice(0,i).reduce((sum,g)=>sum+workshop.partTotal(g),0));
  assert.equal(course.questionMap.get(ids[topicStarts[1]]).verbId,'essen','topic 2 after the 13 verbs of topic 1');

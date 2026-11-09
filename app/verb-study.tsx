@@ -24,7 +24,9 @@ import {GAME_LEVEL,gameLength} from '@/lib/game-names';
 import {MistakeRepeatCard,roundMistakeIds} from './mistake-repeat';
 import {LearnCard,PathStepper,AnswerResult,OneExample,PartVerbs,VerbDetail,StripVerbCard,kindClass} from './verb-workshop';
 import {loadExampleMeanings} from '@/lib/verb-example-meanings';
-import {learnSpeech} from '@/lib/verb-persons';
+import {learnSpeech,personSentences} from '@/lib/verb-persons';
+/** Kişiler: the A1 sentence of the asked person (lib/verb-examples.json); its finite verb is the gap. */
+const personRow=(verb:Verb,person:ChangedPerson)=>personSentences(verb,'praesens').find(row=>row.person===person&&row.parts.some(part=>part.role==='verb'));
 import {WORKSHOP_TOPIC,PART_ROUND_TOPIC,WORKSHOP_MODE,workshopVerbs,pathPlace,partIds,partsStatus,currentPart,verbStatus,findPartSession,isPartRound,isOlderRound,remainingIds,roundEnd,learnStage,MISTAKES_MODE,workshopMistakeIds,mistakeVerbs} from '@/lib/verb-workshop';
 import {starNoteKey,starredQuestionIds,type Answer,type Session,type Snapshot} from '@/lib/study';
 import {api,useGermanSpeech,useAnswerFeedback} from './study-shared';
@@ -133,9 +135,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const task=q?.verbTask;
  // Only the correct answer is spoken after the effect, never the question. The sentence task answers with the Präsens form.
  // hat/ist: the question's own sentence is read, filled in ("Der Zug ist pünktlich abgefahren."; the learner asked).
- // Kişiler: the person with the whole form is read ("du fährst ab").
+ // Kişiler: its A1 sentence is read, filled in ("Wann fährst du morgen ab?"; without one, the person with the form).
  const askedPerson=personOf(task);
- const pronunciation=askedPerson&&verb?personSpoken(verb,askedPerson):task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';
+ const pronunciation=askedPerson&&verb?(personRow(verb,askedPerson)?.text??personSpoken(verb,askedPerson)):task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';
  // An older round of the whole path ends after part 1; every other round at its last question.
  const end=session?roundEnd(session):0;
  const finished=!!session&&index>=end;
@@ -324,6 +326,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  /** How an answer option is shown: a meaning in the chosen language, a verb, or a German form. */
  function optionText(question:Question,option:string):{text:string;german:boolean}{
   const target=verbMap.get(option);const kind=question.verbTask??'';
+  // Kişiler: when the sentence starts with the verb ("___ du morgen nach Berlin?"), the forms are shown with a capital.
+  const asked=personOf(kind);
+  if(asked){const item=question.verbId?verbMap.get(question.verbId):undefined;const row=item?personRow(item,asked):undefined;return {text:row?.parts[0]?.role==='verb'?option.charAt(0).toLocaleUpperCase('de')+option.slice(1):option,german:true};}
   if(target&&meaningOptionTasks.has(kind))return {text:verbMeaning(target,language),german:false};
   // The sentence task offers forms of the verb ("fährt", "fährst", "fahre" …); a prefix is shown where it goes, at the end.
   if(kind==='fit')return {text:formWithGap(option,question),german:true};
@@ -391,10 +396,12 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  }
  /** The whole Präsens form of a person, with the separable prefix ("fährst ab"). */
  function personForm(item:Verb,person:ChangedPerson){return praesensPersons(item)[person];}
- /** Kişiler: "du ___ ab" — the person, the gap for the form, the prefix after it; filled in after the answer. */
+ /** Kişiler: the person's A1 sentence with a gap for the verb ("Wann ___ du morgen ab?"), filled in after the answer; the
+  * prefix at the end in its colour. Without a sentence: "du ___ ab". */
  function personLine(question:Question,item:Verb){
-  const person=personOf(question.verbTask)!;const prefix=verbPrefix(item);
-  return <p className="verb-sentence verb-person-line" lang="de" dir="ltr"><span className="verb-chunk">{personLabel(person)}</span><span className={'verb-chunk gap verb'+(feedback?' filled':'')}>{feedback?question.answer:'___'}</span>{prefix&&<span className="verb-chunk prefix">{prefix}</span>}</p>;
+  const person=personOf(question.verbTask)!;const row=personRow(item,person);
+  if(!row){const prefix=verbPrefix(item);return <p className="verb-sentence verb-person-line" lang="de" dir="ltr"><span className="verb-chunk">{personLabel(person)}</span><span className={'verb-chunk gap verb'+(feedback?' filled':'')}>{feedback?question.answer:'___'}</span>{prefix&&<span className="verb-chunk prefix">{prefix}</span>}</p>;}
+  return <p className="verb-sentence verb-person-line" lang="de" dir="ltr">{row.parts.map((part,i)=>part.role==='verb'?<span key={i} className={'verb-chunk gap verb'+(feedback?' filled':'')}>{feedback?part.text:'___'}</span>:<span key={i} className={'verb-chunk'+(part.role==='end'?' prefix':'')}>{part.text}</span>)}{row.mark}</p>;
  }
  function promptCard(question:Question,item:Verb){
   const kind=question.verbTask;

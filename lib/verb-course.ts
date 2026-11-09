@@ -186,6 +186,13 @@ export function personChanges(verb:Verb):{person:ChangedPerson;form:string;regul
  const regular:Record<ChangedPerson,string>={ich:stem+'e',du:stem+(dt?'est':/[sßxz]$/.test(stem)?'t':'st'),er:stem+(dt?'et':'t')};
  return (['ich','du','er'] as const).map(person=>({person,form:strip(forms[person]),regular:regular[person]})).filter(item=>item.form!==item.regular);
 }
+/** Verbs said with the person as an object (gefallen, leid|tun, weh|tun, scheinen: dative; gelten: für + accusative; the
+ * same list as objectModes in lib/verb-persons.ts): their A1 sentences agree with the thing ("Gefällt dir die Wohnung?"). */
+const personAsObject:ReadonlySet<string>=new Set(['gefallen','leidtun','wehtun','scheinen','gelten']);
+/** The Kişiler questions of a verb: each changed person asked in its A1 sentence (lib/verb-examples.json) with a gap for
+ * the form (the learner asked: "build an A1 sentence, not just du fährst ab"). Where the person is an object, only
+ * er/sie/es is asked: its sentence keeps the changed form (Der Film gefällt ihm nicht.). */
+export function personQuestions(verb:Verb){return personChanges(verb).filter(change=>!personAsObject.has(verb.id)||change.person==='er');}
 /** The person as the page writes it: ich, du, er/sie/es. */
 export function personLabel(person:ChangedPerson){return person==='er'?'er/sie/es':person;}
 /** What is read after a Kişiler answer: the person with the whole form, the prefix too ("du fährst ab"; er/sie/es is read as
@@ -216,7 +223,7 @@ for(const verb of verbs){
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});
  // Kişiler: one two-choice question for each person whose form changes (du fährst / fahrst), only in those verbs.
  const tail=verb.display.includes('|')?' '+verb.display.split('|')[0]:'';
- for(const change of personChanges(verb))add('verb-person-'+change.person+'-'+verb.id,('person-'+change.person) as VerbTask,{kind:'choice',prompt:verb.display+' · '+personLabel(change.person)+' ___'+tail+' — doğru biçim hangisi?',answer:change.form,options:[change.form,change.regular]});
+ for(const change of personQuestions(verb))add('verb-person-'+change.person+'-'+verb.id,('person-'+change.person) as VerbTask,{kind:'choice',prompt:verb.display+' · '+personLabel(change.person)+' ___'+tail+' — doğru biçim hangisi?',answer:change.form,options:[change.form,change.regular]});
  add('verb-write-praesens-'+verb.id,'write-praesens',{kind:'write',writingTask:'gap',prompt:verb.display+' · Präsens yaz.',gap:subject+' ___',answer:verb.praesens});
  add('verb-write-perfekt-'+verb.id,'write-perfekt',{kind:'write',writingTask:'gap',prompt:verb.display+' · Perfekt yaz.',gap:subject+' ___ ___',answer:verb.perfekt,...(verb.alsoIst?{accepted:['ist '+verb.participle]}:{})});
  add('verb-hear-'+verb.id,'hear',{kind:'listen',prompt:'Dinle ve anlamını seç.',audio:verb.infinitive,answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'hear-'+verb.id)]});

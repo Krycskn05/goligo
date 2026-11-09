@@ -19,8 +19,11 @@ export function splitNoun(de:string):{article:Article;noun:string}|null{
  const match=/^(der|die|das) (\S+)$/.exec(de);return match?{article:match[1] as Article,noun:match[2]}:null;
 }
 const hasArt=(word:ObjectWord)=>Object.prototype.hasOwnProperty.call(objectArt,word.id);
+/** The lesson cards of Lektion 2–5 (9 November 2026) repeat many vault nouns (der Tisch, die Lampe …): they stay out of
+ * the games, so a round never shows the same word twice. */
+const lessonCopies=new Set(['objects-lektion2','objects-lektion3','objects-lektion4','objects-lektion5']);
 /** The vault words a game can show: with a picture and "article + one word". */
-export const gameObjects:readonly ObjectWord[]=objectVocabulary.filter(word=>hasArt(word)&&!!splitNoun(word.de));
+export const gameObjects:readonly ObjectWord[]=objectVocabulary.filter(word=>hasArt(word)&&!!splitNoun(word.de)&&!lessonCopies.has(word.topic));
 export const gameObject=(id:string)=>gameObjects.find(word=>word.id===id);
 
 // ---- Artikel yağmuru ----

@@ -61,7 +61,7 @@ exports.partB = {
                 cast: ['sabine', 'nikos', 'mei', 'omar', 'yasemin', 'rami', 'paul'],
             } },
         { id: 'freizeit', title: (0, alltag_types_1.T)('Kelimeler: boş zaman'), kind: 'teach', kicker: 'Wortschatz · Freizeit', heading: (0, alltag_types_1.T)('Boş zamanda ne yapıyoruz?'),
-            lead: (0, alltag_types_1.T)('Karta dokun, dinle ve tekrar et. Resmi henüz gelmeyen kelimede emojisi görünür.'),
+            lead: (0, alltag_types_1.T)('Karta dokun, dinle ve tekrar et.'),
             blocks: [{ t: 'cards', words: exports.wordsB }] },
         { id: 'orte-kelimeler', title: (0, alltag_types_1.T)('Kelimeler: şehir'), kind: 'teach', kicker: 'Wortschatz · Orte', heading: (0, alltag_types_1.T)('Şehirdeki yerler'),
             lead: (0, alltag_types_1.T)('Her kelime artikeliyle: [der] mavi, [das] yeşil, [die] kırmızı. Karta dokun: tekili ve çoğulu okunur.'),

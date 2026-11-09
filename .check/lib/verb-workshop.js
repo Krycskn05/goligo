@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verbs = exports.MISTAKES_MODE = exports.LEGACY_WORKSHOP_TOTAL = exports.legacyWorkshopIds = exports.WORKSHOP_TOTAL = exports.questionId = exports.workshopVerbs = exports.AUX_STEP = exports.verbSteps = exports.meaningSteps = exports.WORKSHOP_MODE = exports.PART_ROUND_TOPIC = exports.WORKSHOP_TOPIC = void 0;
+exports.verbs = exports.MISTAKES_MODE = exports.LEGACY_WORKSHOP_TOTAL = exports.legacyWorkshopIds = exports.WORKSHOP_TOTAL = exports.questionId = exports.workshopVerbs = exports.countedSteps = exports.personSteps = exports.verbSteps = exports.meaningSteps = exports.WORKSHOP_MODE = exports.PART_ROUND_TOPIC = exports.WORKSHOP_TOPIC = void 0;
+exports.stepsOf = stepsOf;
 exports.partIds = partIds;
 exports.partTotal = partTotal;
 exports.workshopIds = workshopIds;
@@ -34,9 +35,11 @@ const verb_practice_1 = require("./verb-practice");
 /**
  * Fiil Atölyesi: one path through all 72 verbs in six topics (lib/verb-themes.ts; until 4 November 2026 four book parts,
  * see lib/verb-families.ts). Each verb is finished in one go before the next one: its card with the
- * meaning, then the meaning test, then spelling it with letters, then its past form: the infinitive
+ * meaning, then the meaning test, then spelling it with letters, then (only where the Präsens stem changes) the persons
+ * whose form changes, one two-choice question each (Kişiler: du fährst / fahrst; 9 November 2026), then its past form: the infinitive
  * is shown and the Partizip II is chosen (abfahren → abgefahren; no hat/ist, no other verbs), then spelled, and last
- * the Perfekt's helping verb is chosen, hat or ist (two choices; the learner asked, 9 November 2026).
+ * the Perfekt's helping verb is chosen, hat or ist (two choices; the learner asked, 9 November 2026 — it is asked only:
+ * ticks, rings and percentages count the four steps before it, see `countedSteps`).
  * No part is locked: each part is its own saved round (mode `workshop`), so the learner can start
  * or continue any part; leaving and coming back continues it.
  * Rounds saved in an earlier order (all meanings first, Perfekt steps with hat/ist, or before a step was added) still count
@@ -49,13 +52,17 @@ exports.WORKSHOP_TOPIC = 'verbs-all';
 exports.PART_ROUND_TOPIC = verb_course_1.VERB_TOPIC_ROUND;
 exports.WORKSHOP_MODE = 'workshop';
 exports.meaningSteps = ['meaning', 'write'];
-/** All steps of one verb: the meaning test, spelling, the past form, spelling the past form, hat or ist. */
-exports.verbSteps = ['meaning', 'write', 'partizip', 'write-partizip', 'aux'];
-/** The hat/ist step (added 9 November 2026). It never takes a tick away: a verb's past tick still comes from the past form
- * and its spelling, so what was done before the step came stays done; the step is asked until it was answered once. */
-exports.AUX_STEP = 'aux';
+/** All steps a verb can have: the meaning test, spelling, the persons whose form changes (Kişiler, only in the verbs whose
+ * Präsens stem changes, 9 November 2026), the past form, spelling the past form, hat or ist. `stepsOf` gives a verb's own. */
+exports.verbSteps = ['meaning', 'write', 'person-ich', 'person-du', 'person-er', 'partizip', 'write-partizip', 'aux'];
+/** The Kişiler steps: shown as one step ("Kişiler") with its questions counted in it. */
+exports.personSteps = ['person-ich', 'person-du', 'person-er'];
+/** The steps the ticks, rings and percentages count: the four steps before hat/ist. The hat/ist step (added 9 November 2026)
+ * is asked on the path after the past form is spelled, and nothing else changes (the learner asked: "do not change the
+ * verbs' system"): it gives no tick and takes none away, and the counts stay as they were. */
+exports.countedSteps = ['meaning', 'write', 'partizip', 'write-partizip'];
 /** Tasks that asked the past form, in this path or in older rounds. */
-const pastTasks = ['partizip', 'write-partizip', 'aux', 'perfekt', 'write-perfekt', 'meaning-perfekt'];
+const pastTasks = ['partizip', 'write-partizip', 'perfekt', 'write-perfekt', 'meaning-perfekt'];
 /** Every task a workshop round has ever held. */
 const workshopTasks = new Set([...exports.verbSteps, ...pastTasks]);
 /** The verbs in path order: topic 1 first, then topic 2 … 6. */
@@ -63,8 +70,10 @@ exports.workshopVerbs = verb_families_1.verbFamilies.flatMap(family => family.ve
 const questionId = (step, verbId) => 'verb-' + step + '-' + verbId;
 exports.questionId = questionId;
 const questionById = new Map(verb_course_1.verbQuestions.map(q => [q.id, q]));
-/** One part's questions in order: verb by verb, each with its four steps. */
-function partIds(family) { return family.verbs.flatMap(id => exports.verbSteps.map(step => (0, exports.questionId)(step, id))); }
+/** The steps of one verb: every step it has a question for (the Kişiler steps only where its persons change). */
+function stepsOf(verbId) { return exports.verbSteps.filter(step => questionById.has((0, exports.questionId)(step, verbId))); }
+/** One part's questions in order: verb by verb, each with its own steps. */
+function partIds(family) { return family.verbs.flatMap(id => stepsOf(id).map(step => (0, exports.questionId)(step, id))); }
 function partTotal(family) { return partIds(family).length; }
 /** Every question of the path in order: topic 1, then topic 2 … 6. */
 function workshopIds() { return verb_families_1.verbFamilies.flatMap(family => partIds(family)); }
@@ -213,13 +222,11 @@ const pastSteps = ['partizip', 'write-partizip'];
  * book part round saved before 4 November 2026, in a topic round, or by its answers — so nothing done before the topics
  * came is lost, and a verb is never counted twice. `session`: the topic's newest round; `completed`: every verb of the
  * topic has both ticks, which stays so when the topic is practised again (its tick, full ring and stickers);
- * `finished`: completed with no open round left and the hat/ist step answered for every verb (a topic done before that
- * step came goes on with only its hat/ist questions; its tick, ring and stickers stay).
+ * `finished`: completed with no open round left. The counts are of the four counted steps (`countedSteps`).
  */
 function partsStatus(sessions, reviews = []) {
     const book = bookVerbStatus(sessions);
     const answered = answeredIds(reviews);
-    const auxDone = (verbId) => answered.has((0, exports.questionId)(exports.AUX_STEP, verbId));
     return verb_families_1.verbFamilies.map(family => {
         const session = findPartSession(sessions, family);
         const rounds = sessions.filter(item => item.topic === exports.PART_ROUND_TOPIC && sessionPart(item)?.id === family.id).map(item => partProgress(family, summaryIds(item), summaryAnswered(item)).marks);
@@ -228,19 +235,18 @@ function partsStatus(sessions, reviews = []) {
             const old = book.get(id);
             return { meaning: own.meaning || !!old?.meaning || rounds.some(list => list[i].meaning), perfekt: own.perfekt || !!old?.perfekt || rounds.some(list => list[i].perfekt) };
         });
-        const done = family.verbs.reduce((sum, id, i) => sum + (marks[i].meaning ? exports.meaningSteps.length : exports.meaningSteps.filter(step => answered.has((0, exports.questionId)(step, id))).length) + (marks[i].perfekt ? pastSteps.length : pastSteps.filter(step => answered.has((0, exports.questionId)(step, id))).length) + (auxDone(id) ? 1 : 0), 0);
-        const count = family.verbs.length * exports.verbSteps.length;
+        const done = family.verbs.reduce((sum, id, i) => sum + (marks[i].meaning ? exports.meaningSteps.length : exports.meaningSteps.filter(step => answered.has((0, exports.questionId)(step, id))).length) + (marks[i].perfekt ? pastSteps.length : pastSteps.filter(step => answered.has((0, exports.questionId)(step, id))).length), 0);
+        const count = family.verbs.length * exports.countedSteps.length;
         const meaningDone = marks.filter(mark => mark.meaning).length;
         const perfektDone = marks.filter(mark => mark.perfekt).length;
         const verbsDone = marks.filter(mark => mark.meaning && mark.perfekt).length;
         const completed = verbsDone === family.verbs.length;
-        const auxLeft = family.verbs.some(id => !auxDone(id));
         // An open round of the topic (also one practising a done topic again) is continued, never thrown away: the topic counts
         // as finished only when every verb is done and no round of it is open.
         const openRound = !!session && !session.finished_at && session.answered < (session.ids?.length || session.total);
         const open = openRound && session?.ids?.length ? questionById.get(session.ids[session.answered]) : undefined;
-        const nextVerbId = open?.verbId && family.verbs.includes(open.verbId) ? open.verbId : family.verbs[Math.max(0, marks.findIndex((mark, i) => !(mark.meaning && mark.perfekt) || !auxDone(family.verbs[i])))];
-        return { family, session, done, count, percent: Math.round(done / count * 100), finished: completed && !openRound && !auxLeft, completed, started: done > 0 || openRound, verbsDone, verbCount: family.verbs.length, nextVerbId, meaningDone, perfektDone, marks };
+        const nextVerbId = open?.verbId && family.verbs.includes(open.verbId) ? open.verbId : family.verbs[Math.max(0, marks.findIndex(mark => !(mark.meaning && mark.perfekt)))];
+        return { family, session, done, count, percent: Math.round(done / count * 100), finished: completed && !openRound, completed, started: done > 0 || openRound, verbsDone, verbCount: family.verbs.length, nextVerbId, meaningDone, perfektDone, marks };
     });
 }
 /** The topic to continue: the open topic practised last, else the first topic not finished, else topic 1. */
@@ -262,18 +268,19 @@ function verbStatus(sessions, reviews = []) {
 }
 /**
  * The questions of a new topic round: the verbs not done yet, each with the steps still to do (the steps answered before
- * are not asked again). A verb always ends with its last step; when its steps would not, it is asked whole. A verb done
- * before the hat/ist step came is asked only that step. Nothing left (or `restart`): the whole topic.
+ * are not asked again). A verb always ends with its last step; when its steps would not, it is asked whole. Nothing left
+ * (or `restart`): the whole topic. The hat/ist step goes with the past form: a verb whose past tick is done skips it.
  */
 function remainingIds(family, marks, reviews = []) {
     const answered = answeredIds(reviews);
     const last = exports.verbSteps[exports.verbSteps.length - 1];
     const ids = family.verbs.flatMap(verbId => {
         const mark = marks.get(verbId);
-        if (mark?.meaning && mark.perfekt && answered.has((0, exports.questionId)(exports.AUX_STEP, verbId)))
+        if (mark?.meaning && mark.perfekt)
             return [];
-        const steps = exports.verbSteps.filter(step => !(step !== exports.AUX_STEP && (exports.meaningSteps.includes(step) ? mark?.meaning : mark?.perfekt)) && !answered.has((0, exports.questionId)(step, verbId)));
-        return (steps.includes(last) ? steps : exports.verbSteps).map(step => (0, exports.questionId)(step, verbId));
+        const own = stepsOf(verbId);
+        const steps = own.filter(step => !(exports.meaningSteps.includes(step) ? mark?.meaning : mark?.perfekt) && !answered.has((0, exports.questionId)(step, verbId)));
+        return (steps.includes(last) ? steps : own).map(step => (0, exports.questionId)(step, verbId));
     });
     return ids.length ? ids : partIds(family);
 }

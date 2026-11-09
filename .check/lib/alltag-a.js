@@ -59,7 +59,7 @@ exports.partA = {
                 cast: ['mei', 'omar', 'nikos', 'yasemin', 'rami', 'paul'],
             } },
         { id: 'gunluk', title: (0, alltag_types_1.T)('Kelimeler: günlük işler'), kind: 'teach', kicker: 'Wortschatz · Alltag', heading: (0, alltag_types_1.T)('Her gün ne yapıyoruz?'),
-            lead: (0, alltag_types_1.T)('Bunlar fiil: artikelleri yok. Karta dokun, dinle ve tekrar et. Resmi henüz gelmeyen kelimede emojisi görünür.'),
+            lead: (0, alltag_types_1.T)('Bunlar fiil: artikelleri yok. Karta dokun, dinle ve tekrar et.'),
             blocks: [{ t: 'cards', words: exports.wordsA }] },
         { id: 'tageszeiten', title: (0, alltag_types_1.T)('Kelimeler: günün bölümleri'), kind: 'teach', kicker: 'Wortschatz · Tageszeiten', heading: (0, alltag_types_1.T)('Sabah, öğle, akşam'),
             lead: (0, alltag_types_1.T)('Günün bölümleri artikeliyle: hepsi [der], yalnız *die Nacht* [die]. Karta dokun: tekili ve çoğulu okunur.'),

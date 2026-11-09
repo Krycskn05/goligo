@@ -1,5 +1,6 @@
 import {objectQuestions,objectQuestionPool,type ObjectMode,type SceneKey} from './object-course';
 import {shuffle,type Question} from './course';
+import {isLessonTopic} from './object-word-additions';
 import type {Review} from './study';
 
 /** A round asks about each object once; incorrect answers get another retrieval opportunity. */
@@ -73,9 +74,10 @@ export function pickPictureQuiz(group:string,count:number|'all',reviews:Review[]
  return mix(pool,options.random).slice(0,count==='all'?pool.length:count);
 }
 
-/** Written retrieval has its own pool and does not change picture tests. */
+/** Written retrieval has its own pool and does not change picture tests. The lesson cards (Ders kelimeleri) have no
+ * "Yazarak Pekiştir" (the learner asked, 9 November 2026): their written questions are not offered and not counted. */
 export function isObjectWritingQuestion(q:Question|undefined):q is Question{
- return !!q&&!!q.objectId&&q.kind==='write'&&!q.audio&&!q.sceneFind;
+ return !!q&&!!q.objectId&&q.kind==='write'&&!q.audio&&!q.sceneFind&&!isLessonTopic(q.topic);
 }
 export function objectWritingPool(group='all'){
  return objectQuestions.filter(q=>isObjectWritingQuestion(q)&&(group==='all'||q.topic===group));

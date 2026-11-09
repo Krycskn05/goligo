@@ -88,9 +88,9 @@ function objectProgressIds(group) {
     return object_course_1.objectQuestions.filter(q => (group === 'all' || q.topic === group) && isVaultExercise(q)).map(q => q.id);
 }
 /** The Fiiller exercises that can be practised (the learner asked, 2 November 2026: the percentage stopped near 31%):
- * the steps of every verb in Fiil Atölyesi (meaning, writing, the past form, writing it, and since 9 November 2026 hat or
- * ist), not the older exercises that no page asks any more. */
-const workshopTasks = new Set(verb_workshop_1.verbSteps);
+ * the four counted steps of every verb in Fiil Atölyesi (meaning, writing, the past form, writing it; the hat/ist step
+ * added on 9 November 2026 is asked but not counted), not the older exercises that no page asks any more. */
+const workshopTasks = new Set(verb_workshop_1.countedSteps);
 function verbProgressIds(topic) {
     return verb_course_1.verbQuestions.filter(q => (0, verb_course_1.inVerbTopic)(q.topic, topic) && (0, verb_practice_1.isVerbExercise)(q) && !!q.verbTask && workshopTasks.has(q.verbTask)).map(q => q.id);
 }

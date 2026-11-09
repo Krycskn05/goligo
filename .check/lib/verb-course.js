@@ -9,6 +9,10 @@ exports.perfektLabel = perfektLabel;
 exports.verbRowSpeech = verbRowSpeech;
 exports.partizipDistractors = partizipDistractors;
 exports.praesensPersons = praesensPersons;
+exports.personChanges = personChanges;
+exports.personQuestions = personQuestions;
+exports.personLabel = personLabel;
+exports.personSpoken = personSpoken;
 exports.seededOptions = seededOptions;
 exports.spreadVerbRound = spreadVerbRound;
 const site_languages_1 = require("./site-languages");
@@ -198,6 +202,28 @@ function personDistractors(verb) {
     }
     return result;
 }
+function personChanges(verb) {
+    const prefix = verb.display.includes('|') ? verb.display.split('|')[0] : '';
+    const base = verb.infinitive.slice(prefix.length);
+    const stem = base.replace(/e?n$/, '');
+    const forms = praesensPersons(verb);
+    const strip = (form) => prefix ? form.slice(0, -(prefix.length + 1)) : form;
+    const dt = /[dt]$/.test(stem) || /[^aeiouäöülrhmn][mn]$/.test(stem);
+    const regular = { ich: stem + 'e', du: stem + (dt ? 'est' : /[sßxz]$/.test(stem) ? 't' : 'st'), er: stem + (dt ? 'et' : 't') };
+    return ['ich', 'du', 'er'].map(person => ({ person, form: strip(forms[person]), regular: regular[person] })).filter(item => item.form !== item.regular);
+}
+/** Verbs said with the person as an object (gefallen, leid|tun, weh|tun, scheinen: dative; gelten: für + accusative; the
+ * same list as objectModes in lib/verb-persons.ts): their A1 sentences agree with the thing ("Gefällt dir die Wohnung?"). */
+const personAsObject = new Set(['gefallen', 'leidtun', 'wehtun', 'scheinen', 'gelten']);
+/** The Kişiler questions of a verb: each changed person asked in its A1 sentence (lib/verb-examples.json) with a gap for
+ * the form (the learner asked: "build an A1 sentence, not just du fährst ab"). Where the person is an object, only
+ * er/sie/es is asked: its sentence keeps the changed form (Der Film gefällt ihm nicht.). */
+function personQuestions(verb) { return personChanges(verb).filter(change => !personAsObject.has(verb.id) || change.person === 'er'); }
+/** The person as the page writes it: ich, du, er/sie/es. */
+function personLabel(person) { return person === 'er' ? 'er/sie/es' : person; }
+/** What is read after a Kişiler answer: the person with the whole form, the prefix too ("du fährst ab"; er/sie/es is read as
+ * the verb's own pronoun, as everywhere). */
+function personSpoken(verb, person) { return (person === 'er' ? spokenSubject(verb) : person) + ' ' + praesensPersons(verb)[person]; }
 /** Shuffle a question's options the same way for one round, so a saved round keeps its order without the server. */
 function seededOptions(options, seed) { return seeded(options, seed); }
 const verbBank = [];
@@ -222,6 +248,10 @@ for (const verb of exports.verbs) {
     // chosen — two choices. liegen, sitzen and stehen: the book writes hat/ist, so ist counts as right too.
     add('verb-aux-' + verb.id, 'aux', { kind: 'choice', prompt: verb.display + ' · Perfekt: ' + subject + ' ___ ' + verb.participle + ' — hat mı, ist mi?', answer: verb.aux, options: ['hat', 'ist'], ...(verb.alsoIst ? { accepted: ['ist'] } : {}) });
     add('verb-write-' + verb.id, 'write', { kind: 'write', writingTask: 'word', prompt: '“' + meaning + '” anlamındaki fiili yaz.', answer: verb.infinitive });
+    // Kişiler: one two-choice question for each person whose form changes (du fährst / fahrst), only in those verbs.
+    const tail = verb.display.includes('|') ? ' ' + verb.display.split('|')[0] : '';
+    for (const change of personQuestions(verb))
+        add('verb-person-' + change.person + '-' + verb.id, ('person-' + change.person), { kind: 'choice', prompt: verb.display + ' · ' + personLabel(change.person) + ' ___' + tail + ' — doğru biçim hangisi?', answer: change.form, options: [change.form, change.regular] });
     add('verb-write-praesens-' + verb.id, 'write-praesens', { kind: 'write', writingTask: 'gap', prompt: verb.display + ' · Präsens yaz.', gap: subject + ' ___', answer: verb.praesens });
     add('verb-write-perfekt-' + verb.id, 'write-perfekt', { kind: 'write', writingTask: 'gap', prompt: verb.display + ' · Perfekt yaz.', gap: subject + ' ___ ___', answer: verb.perfekt, ...(verb.alsoIst ? { accepted: ['ist ' + verb.participle] } : {}) });
     add('verb-hear-' + verb.id, 'hear', { kind: 'listen', prompt: 'Dinle ve anlamını seç.', audio: verb.infinitive, answer: verb.infinitive, options: [verb.infinitive, ...meaningDistractors(verb, 'hear-' + verb.id)] });

@@ -34,6 +34,10 @@ export const objectGroups=[
  {id:'objects-clothes',title:'Kıyafetler',de:'Kleidung',subtitle:'Giysiler, ayakkabılar ve aksesuarlar'},
  {id:'objects-jobs',title:'Meslekler',de:'Berufe',subtitle:'Kadın ve erkek meslek adları'},
  {id:'objects-lektion1',title:'Lektion 1 kelimeleri',de:'Wörter aus Lektion 1',subtitle:'Selamlaşma, tanışma ve ilk kalıplar'},
+ {id:'objects-lektion2',title:'Lektion 2 kelimeleri',de:'Wörter aus Lektion 2',subtitle:'Meslekler, insanlar ve form'},
+ {id:'objects-lektion3',title:'Lektion 3 kelimeleri',de:'Wörter aus Lektion 3',subtitle:'Evde, kursta ve iş yerinde eşyalar'},
+ {id:'objects-lektion4',title:'Lektion 4 kelimeleri',de:'Wörter aus Lektion 4',subtitle:'Aile, komşular, biçimler ve sıfatlar'},
+ {id:'objects-lektion5',title:'Lektion 5 kelimeleri',de:'Wörter aus Lektion 5',subtitle:'Günlük işler, boş zaman ve günün saatleri'},
 ];
 type Spec=[string,string,string,string,string,string?];
 const house:Spec[]=[
@@ -134,16 +138,46 @@ const nearPairs:[string,string[]][]=[['daumen',['finger','hand']],['finger',['da
  ['socke',['strumpf','strumpfhose']],['strumpf',['strumpfhose']],['schuh',['turnschuh','hausschuh','stiefel','sandale']],['turnschuh',['hausschuh']],['hausschuh',['sandale']],
  ['damenhut',['herrenhut','muetze','kappe']],['herrenhut',['muetze','kappe']],['muetze',['kappe']]] as [string,string[]][])
   .map(([id,others]):[string,string[]]=>['kleidung-'+id,others.map(other=>'kleidung-'+other)]),
- ['rock',['kleidung-kleid','kleidung-kurze-hose','kleidung-strumpfhose']]];
+ ['rock',['kleidung-kleid','kleidung-kurze-hose','kleidung-strumpfhose']],
+ // Ders kelimeleri, Lektion 2–5 (9 November 2026): pictures that tell nearly the same thing (two pictures of the same
+ // family, the times of day, sports, courses) are never offered together.
+ ...([
+  ['saenger',['saengerin']],['arzt',['tierarzt']],['basketballer',['tanzen']]] as [string,string[]][]).map(([id,others]):[string,string[]]=>['l2-'+id,others.map(other=>'l2-'+other)]),
+ ...([
+  ['computer',['laptop']],['stift',['bleistift']],['buch',['woerterbuch','heft']],['heft',['woerterbuch']],['naehmaschine',['arbeitsplatz']],
+  ['arbeitsplatz',['tisch']],['tafel',['plakat']]] as [string,string[]][]).map(([id,others]):[string,string[]]=>['l3-'+id,others.map(other=>'l3-'+other)]),
+ ...([
+  ['familie',['eltern','kind','geschwister','grosseltern','sohn','tochter','mutter','vater']],['eltern',['mutter','vater','ehemann','ehefrau']],
+  ['geschwister',['bruder','schwester','kind']],['grosseltern',['oma','opa','enkel','enkelin']],
+  ['kind',['sohn','tochter','baby','enkelin','cousine','cousin','enkel']],['sohn',['enkel','cousin','bruder']],
+  ['tochter',['enkelin','cousine','schwester']],['mutter',['tante','oma','ehefrau','chefin','nachbarin']],
+  ['vater',['onkel','opa','ehemann','chef','nachbar']],['ehemann',['ex-mann','onkel']],['ehefrau',['ex-frau','tante']],['chef',['chefin']],
+  ['enkel',['enkelin']],['nachbar',['nachbarin']],['cousin',['cousine']],['ex-frau',['ex-mann']],['job',['laptop']],['neu-alt',['jung-alt']],
+  ['dick-duenn',['schlank-dick']],['rund',['oval']],['quadratisch',['rechteckig']],['tafel',['rechteckig']],['oma',['opa']],['bruder',['schwester']]] as [string,string[]][]).map(([id,others]):[string,string[]]=>['l4-'+id,others.map(other=>'l4-'+other)]),
+ ...([
+  ['kaffee-trinken',['fruehstuecken','cafe','sprachcafe']],['fruehstuecken',['essen','morgen']],['schlafen',['ins-bett-gehen','lange-schlafen','nacht']],
+  ['ins-bett-gehen',['lange-schlafen','nacht']],['sport-machen',['trainieren','boxen','laufen','fussball-spielen','tischtennis-spielen']],
+  ['trainieren',['boxen','trainer']],['arbeiten',['zur-arbeit-gehen','beruf','kellnerin']],
+  ['deutsch-lernen',['hausaufgabe','kurs','unterrichten','buch-lesen','anmeldung']],['kochen',['kochkurs']],
+  ['essen',['restaurant','picknick','grillen']],['schwimmen',['schwimmbad','schwimmkurs']],['schwimmbad',['schwimmkurs']],['cafe',['sprachcafe']],
+  ['buch-lesen',['bibliothek']],['spaziergang',['park','laufen']],['leute-treffen',['mit-freunden-sprechen','jugendliche']],
+  ['kurs',['kochkurs','schwimmkurs','unterrichten']],['woche',['wochenende']],['morgen',['vormittag','abend']],['vormittag',['mittag']],
+  ['mittag',['nachmittag']],['nachmittag',['abend']],['abend',['nacht']],['trainer',['unterrichten']],['musik-hoeren',['tanzen']],
+  ['anmeldung',['hausaufgabe']],['interview',['mit-freunden-sprechen']],['plakat',['preis']],['hobby',['wochenende']]] as [string,string[]][]).map(([id,others]):[string,string[]]=>['l5-'+id,others.map(other=>'l5-'+other)])];
 // Categories whose wrong choices come from the same category (an eye among other body parts, a fork among tableware).
-const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors','objects-jobs','objects-lektion1','objects-clothes']);
+const ownChoices=new Set(['objects-body','objects-health','objects-food','objects-drinks','objects-cooking','objects-school','objects-outdoors','objects-jobs','objects-lektion1','objects-clothes',
+ 'objects-lektion2','objects-lektion3','objects-lektion4','objects-lektion5']);
+// The lesson cards added on 9 November 2026 take their choices only from their own lesson, and the older categories never
+// take theirs from them, so every older question keeps exactly the choices it had (the same German word, der Tisch, is
+// in Möbel and in Lektion 3).
+const laterLessons=new Set(['objects-lektion2','objects-lektion3','objects-lektion4','objects-lektion5']);
 const nearObjects:Record<string,string[]>={};
 for(const [id,others] of nearPairs)for(const other of others){(nearObjects[id]??=[]).push(other);(nearObjects[other]??=[]).push(id);}
 function distractors(w:ObjectWord){
  // A removal van is also a truck: never offer both names for the same picture.
  const excluded=new Set([w.id,...(w.id==='lastwagen'?['umzugswagen']:w.id==='umzugswagen'?['lastwagen']:[])]);
  const same=objectVocabulary.filter(x=>x.topic===w.topic&&!excluded.has(x.id));
- const all=[...same,...objectVocabulary.filter(x=>x.topic!==w.topic&&!excluded.has(x.id))];
+ const all=[...same,...objectVocabulary.filter(x=>x.topic!==w.topic&&!excluded.has(x.id)&&!laterLessons.has(x.topic))];
  // Body parts, health things and the 3D-sheet categories take their wrong choices from their own category (an eye
  // among other body parts, not among building tools); the older categories keep the choices they always had.
  if(ownChoices.has(w.topic)){

@@ -14,7 +14,7 @@ const moreHeads:Record<string,string>={regenschirm:'der Schirm',vogelkaefig:'der
 // Short nouns made from a verb stem (they take der): the verb is shown with the rule.
 const verbNouns:Record<string,string>={verband:'verbinden',vorhang:'vorhängen'};
 // Words that are only used in the plural (die Nudeln, die Pommes): the plural rule, die.
-const pluralOnly=new Set(['nudeln','spaghetti','pommes','kleidung-leggings']);
+const pluralOnly=new Set(['nudeln','spaghetti','pommes','kleidung-leggings','l4-eltern','l4-geschwister','l4-grosseltern']);
 export type ArticleRule={key:'personIn'|'personMale'|'compound'|'ending'|'endingException'|'suffix'|'plural'|'diminutive'|'neuterEnding'|'gePrefix'|'masculineEnding'|'verbNoun'|'derEnding'|'derEndingException'|'oneSyllable'|'oneSyllableGroup'|'group'|'memorize';x:string;a?:string;e?:string;v?:string;list?:string};
 /** Vowel groups (au, ei, ie, aa … count once) = syllables of a German noun. */
 export function syllables(noun:string){return (noun.toLowerCase().match(/[aeiouäöüy]+/g)??[]).length;}

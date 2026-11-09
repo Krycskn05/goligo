@@ -5,6 +5,7 @@ exports.isVerbTestQuestion = isVerbTestQuestion;
 exports.isVerbWritingQuestion = isVerbWritingQuestion;
 exports.isVerbListeningQuestion = isVerbListeningQuestion;
 exports.isVerbAuxQuestion = isVerbAuxQuestion;
+exports.isVerbPersonQuestion = isVerbPersonQuestion;
 exports.isVerbExercise = isVerbExercise;
 exports.verbModePredicate = verbModePredicate;
 exports.verbSessionMode = verbSessionMode;
@@ -31,7 +32,11 @@ function isVerbListeningQuestion(q) {
 function isVerbAuxQuestion(q) {
     return !!q && q.id.startsWith('verb-') && !!q.verbId && q.kind === 'choice' && q.verbTask === 'aux' && !q.audio && q.options?.length === 2 && q.options.includes('hat') && q.options.includes('ist') && q.options.includes(q.answer);
 }
-function isVerbExercise(q) { return isVerbTestQuestion(q) || isVerbWritingQuestion(q) || isVerbListeningQuestion(q) || isVerbAuxQuestion(q); }
+/** Fiil Atölyesi's Kişiler step: the form of one person whose stem changes, against the regular-looking form (two choices, 9 November 2026). */
+function isVerbPersonQuestion(q) {
+    return !!q && q.id.startsWith('verb-person-') && !!q.verbId && q.kind === 'choice' && (q.verbTask === 'person-ich' || q.verbTask === 'person-du' || q.verbTask === 'person-er') && !q.audio && q.options?.length === 2 && new Set(q.options).size === 2 && q.options.includes(q.answer);
+}
+function isVerbExercise(q) { return isVerbTestQuestion(q) || isVerbWritingQuestion(q) || isVerbListeningQuestion(q) || isVerbAuxQuestion(q) || isVerbPersonQuestion(q); }
 /** Fiil Atölyesi (workshop), its mistakes round (review) and Karma sınav (mixed) use every kind of exercise. */
 function verbModePredicate(mode) { return mode === 'write' ? isVerbWritingQuestion : mode === 'listen' ? isVerbListeningQuestion : mode === 'workshop' || mode === 'mixed' || mode === 'review' ? isVerbExercise : isVerbTestQuestion; }
 /** Session mode stored on the server for each practice mode. */

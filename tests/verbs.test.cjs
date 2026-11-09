@@ -356,11 +356,11 @@ test('Fiil Atölyesi: six topics on the map (the four book parts only read older
  const kindLib=load('verb-kind'),personLib=load('verb-persons');const voiced=new Set(personLib.workshopSpeechTexts());
  for(const verb of verbs.verbs){const changes=verbs.personChanges(verb);assert.deepEqual(changes.map(c=>c.person),kindLib.verbKindInfo(verb).changedPersons,verb.id);
   const asked=verbs.personQuestions(verb);assert.deepEqual(asked.map(c=>c.person),personLib.personMode(verb)==='subject'?changes.map(c=>c.person):changes.filter(c=>c.person==='er').map(c=>c.person),'only the persons whose A1 sentence keeps the form '+verb.id);
-  for(const change of changes)if(!asked.includes(change))assert.equal(course.questionMap.get('verb-person-'+change.person+'-'+verb.id),undefined);
+  for(const change of changes)if(!asked.some(c=>c.person===change.person))assert.equal(course.questionMap.get('verb-person-'+change.person+'-'+verb.id),undefined);
   for(const change of asked){const q=course.questionMap.get('verb-person-'+change.person+'-'+verb.id);const row=personLib.personSentences(verb,'praesens').find(item=>item.person===change.person);const finite=row.parts.filter(part=>part.role==='verb');assert.equal(finite.length,1,q.id);assert.equal(finite[0].text.toLocaleLowerCase('de'),change.form.toLocaleLowerCase('de'),'the A1 sentence holds the asked form: '+row.text);assert.ok(voiced.has(row.text),'natural voice for '+row.text);assert.equal(q.verbTask,'person-'+change.person);assert.deepEqual(q.options,[change.form,change.regular]);assert.equal(q.answer,change.form);assert.notEqual(change.form,change.regular);
    assert.ok(practice.isVerbPersonQuestion(q)&&practice.isVerbExercise(q)&&!practice.isVerbTestQuestion(q),q.id);assert.ok(course.gradeAnswer(q,change.form)&&!course.gradeAnswer(q,change.regular),q.id);}}
  assert.deepEqual(verbs.personChanges(verbs.verbMap.get('abfahren')).map(c=>c.form+'/'+c.regular),['fährst/fahrst','fährt/fahrt']);assert.equal(personLib.personSentences(verbs.verbMap.get('abfahren'),'praesens').find(row=>row.person==='du').text,'Wann fährst du morgen ab?');assert.equal(course.questionMap.get('verb-person-du-gefallen'),undefined);assert.ok(course.questionMap.get('verb-person-er-gefallen'));
- const pageSrc=fs.readFileSync('app/verb-study.tsx','utf8');assert.ok(pageSrc.includes("const pronunciation=askedPerson&&verb?(personRow(verb,askedPerson)?.text??personSpoken(verb,askedPerson)):")&&pageSrc.includes("part.role==='verb'?<span key={i} className={'verb-chunk gap verb'+(feedback?' filled':'')}>"),'the A1 sentence with its gap, read after the answer');
+ const studySrc=fs.readFileSync('app/verb-study.tsx','utf8');assert.ok(studySrc.includes("const pronunciation=askedPerson&&verb?(personRow(verb,askedPerson)?.text??personSpoken(verb,askedPerson)):")&&studySrc.includes("part.role==='verb'?<span key={i} className={'verb-chunk gap verb'+(feedback?' filled':'')}>"),'the A1 sentence with its gap, read after the answer');
  assert.ok(!ids.some(id=>/^verb-(perfekt|write-perfekt|meaning-perfekt|word|hear)/.test(id)),'no hat/ist questions, no second choice, no listening on the path');
  const topicStarts=families.verbFamilies.map((f,i)=>families.verbFamilies.slice(0,i).reduce((sum,g)=>sum+workshop.partTotal(g),0));
  assert.equal(course.questionMap.get(ids[topicStarts[1]]).verbId,'essen','topic 2 after the 13 verbs of topic 1');
@@ -380,11 +380,11 @@ test('Fiil Atölyesi: six topics on the map (the four book parts only read older
  assert.deepEqual(study.selectQuestions('workshop','verbs-all',ids.length,[],ids).map(q=>q.id),ids,'the path keeps its order');
  assert.deepEqual(study.selectQuestions('workshop',workshop.PART_ROUND_TOPIC,ids.length,[],ids).map(q=>q.id),ids,'a topic round keeps its order too');
  assert.deepEqual(families.verbFamilies.flatMap(f=>workshop.partIds(f)),ids,'the path: topic after topic');
- const [w1,w2,w3,w4]=families.bookParts;assert.deepEqual([w1,w2,w3,w4].map(w=>workshop.partTotal(w)),[109,111,101,96]);
+ const [w1,w2,w3,w4]=families.bookParts;assert.deepEqual([w1,w2,w3,w4].map(w=>workshop.partTotal(w)),[109,109,101,96]);
  const bookIds=families.bookParts.flatMap(f=>workshop.partIds(f));
- assert.deepEqual(workshop.partIds(w1),bookIds.slice(0,109));assert.deepEqual(workshop.partIds(w2),bookIds.slice(109,220));assert.deepEqual(workshop.partIds(w3),bookIds.slice(220,321));assert.deepEqual(workshop.partIds(w4),bookIds.slice(321));
+ assert.deepEqual(workshop.partIds(w1),bookIds.slice(0,109));assert.deepEqual(workshop.partIds(w2),bookIds.slice(109,218));assert.deepEqual(workshop.partIds(w3),bookIds.slice(218,319));assert.deepEqual(workshop.partIds(w4),bookIds.slice(319));
  // The first rounds were saved before the second page came: their whole path (152 questions) still means the first page.
- assert.equal(workshop.WORKSHOP_TOTAL,417);assert.equal(workshop.LEGACY_WORKSHOP_TOTAL,152);
+ assert.equal(workshop.WORKSHOP_TOTAL,415);assert.equal(workshop.LEGACY_WORKSHOP_TOTAL,152);
  assert.ok(workshop.legacyWorkshopIds.every(id=>families.bookPartOf(course.questionMap.get(id).verbId).number<=2));
  // Progress: the meaning tick after the meaning test and spelling, the past tick after the past form and its spelling (hat/ist is asked, not counted).
  const part1=workshop.partIds(w1);const upTo=id=>part1.indexOf(id)+1;

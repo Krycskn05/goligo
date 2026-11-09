@@ -9,11 +9,11 @@ export const exam=buildHoeren(5,'Im Restaurant · Im Hotel · Durchsagen · Apot
    ['Tomasz','Sehr gut, aber heute haben wir keine mehr. Pizza und Salat gibt es noch.'],
    ['Gast:M4','Dann eine Pizza, bitte.']]},
   items:[
-   {q:'Wie viel bezahlt die Frau?',o:['13,50 Euro','15 Euro','20 Euro'],a:'b',lines:[
-     ['Tomasz','Das macht 13 Euro 50, bitte.'],
-     ['Gast:F4','Hier sind 20 Euro. Machen Sie 15.'],
-     ['Tomasz','Vielen Dank! Dann bekommen Sie 5 Euro zurück.']],
-    why:'Hesap 13,50 Euro, 20 Euro veriyor ama *Machen Sie 15* diyor: bahşişle 15 Euro ödüyor.'},
+   {q:'Wie viel kostet das Essen?',o:['6,50 Euro','13,50 Euro','20 Euro'],a:'b',lines:[
+     ['Tomasz','So, ein Salat und ein Wasser: Das macht 13 Euro 50, bitte.'],
+     ['Gast:F4','Hier sind 20 Euro.'],
+     ['Tomasz','Danke schön. Und 6 Euro 50 zurück.']],
+    why:'Yemek *13 Euro 50* tutuyor; 20 Euro verilen para, 6,50 Euro ise para üstü.'},
    {q:'Für wann reserviert der Mann einen Tisch?',o:['Für 18 Uhr','Für 19 Uhr','Für 20 Uhr'],a:'c',lines:[
      ['Gast:M2','Guten Tag, ich möchte für heute Abend einen Tisch reservieren, für 19 Uhr.'],
      ['Mei','Um 19 Uhr ist leider alles voll. Um 18 Uhr oder um 20 Uhr geht es.'],

@@ -6,7 +6,7 @@ const a1_exam_build_1 = require("./a1-exam-build");
 exports.exam = (0, a1_exam_build_1.buildExam)(4, 'Zettel zu Hause · Geburtstag im Garten · Internetseiten · Schilder', {
     teil1: [
         { kind: 'note',
-            lines: ['Lieber Can,', 'ich bin bis 13 Uhr im Deutschkurs und gehe dann noch mit Aisha einkaufen. Das Mittagessen steht im Kühlschrank – du musst es nur warm machen.', 'Kannst du bitte die Wäsche aufhängen? Die Maschine ist um elf fertig. Heute Abend kommen Elif und Mert zum Essen, ich koche. Wir brauchen noch Brot, das kaufe ich.', 'Bis später!', 'Yasemin'],
+            lines: ['Lieber Can,', 'ich bin bis 13 Uhr im Deutschkurs und gehe dann noch mit Aisha einkaufen. Das Mittagessen steht im Kühlschrank – du musst es nur warm machen.', 'Kannst du bitte die Wäsche aus der Maschine holen? Sie ist um elf fertig. Heute Abend kommen Elif und Mert zum Essen, ich koche. Wir brauchen noch Brot, das kaufe ich.', 'Bis später!', 'Yasemin'],
             example: ['Yasemin ist am Vormittag nicht zu Hause.', 'r'],
             items: [
                 ['Can muss heute Mittag kochen.', 'f', 'Yemek hazır, buzdolabında: *du musst es nur warm machen* (yalnızca ısıtacak).'],
@@ -23,10 +23,10 @@ exports.exam = (0, a1_exam_build_1.buildExam)(4, 'Zettel zu Hause · Geburtstag 
     teil2: { mode: 'web',
         example: ['Sie möchten wissen: Wann fährt morgen früh ein Zug nach Leipzig?',
             ['solid', ['Fahrplan · Tickets · Verspätungen', 'Alle Züge in Deutschland'], 'www.zugzeiten-online.de'],
-            ['solid', ['Leipzig entdecken:', 'Hotels, Museen, Restaurants'], 'www.leipzig-erleben.de'], 'a'],
+            ['solid', ['Leipzig für Touristen:', 'Hotels, Museen, Restaurants'], 'www.leipzig-erleben.de'], 'a'],
         items: [
             ['Sie möchten ein gebrauchtes Handy kaufen.',
-                ['solid', ['**Handy-Doktor**', 'Display kaputt? Akku leer?', 'Wir reparieren alle Handys in einer Stunde.'], 'www.handy-doktor-berlin.de'],
+                ['solid', ['**Handy-Doktor**', 'Ihr Handy ist kaputt?', 'Wir reparieren alle Handys in einer Stunde.'], 'www.handy-doktor-berlin.de'],
                 ['solid', ['**Zweite Hand**', 'Gebraucht kaufen und verkaufen:', 'Handys, Computer, Fernseher'], 'www.zweite-hand-markt.de'],
                 'b', '*Gebraucht kaufen* = ikinci el almak. Öbür sayfa telefon tamir ediyor, satmıyor.'],
             ['Sie suchen ein Hotel in Hamburg. Ihr Hund kommt mit.',
@@ -39,8 +39,8 @@ exports.exam = (0, a1_exam_build_1.buildExam)(4, 'Zettel zu Hause · Geburtstag 
                 'a', '*Bürgeramt* bir resmî dairedir (*Amt*): açılış saatleri *Ämter* sayfasında.'],
             ['Sie möchten Ihrer Freundin Blumen nach Hause schicken.',
                 ['solid', ['**Blumen-Express**', 'Wir bringen Blumen in 2 Stunden:', 'bestellen, bezahlen, fertig!'], 'www.blumen-express-24.de'],
-                ['solid', ['**Gartenfreunde**', 'Alles für Ihren Garten: Blumen, Bäume, Erde.', 'Nur im Geschäft, kein Versand.'], 'www.gartenfreunde-markt.de'],
-                'a', 'Eve çiçek gönderen sayfa: *Wir bringen Blumen*. Öbüründe *kein Versand*: göndermiyorlar.'],
+                ['solid', ['**Gartenfreunde**', 'Alles für Ihren Garten: Blumen und Bäume.', 'Nur im Geschäft, wir schicken nichts.'], 'www.gartenfreunde-markt.de'],
+                'a', 'Eve çiçek gönderen sayfa: *Wir bringen Blumen*. Öbüründe *wir schicken nichts*: göndermiyorlar.'],
             ['Sie möchten in einer Gruppe Volleyball spielen.',
                 ['solid', ['**Sport live**', 'Fußball, Volleyball, Tennis:', 'alle Spiele live sehen'], 'www.sport-live-sehen.de'],
                 ['solid', ['**TSV Kanal**', 'Volleyball für Erwachsene, dienstags 19 Uhr.', 'Neue Spieler willkommen!'], 'www.tsv-kanal.de'],

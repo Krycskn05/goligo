@@ -38,7 +38,7 @@ export const lesenExamList:readonly {number:number;id:string;topics:string}[]=[
  {number:4,id:lesenExamId(4),topics:'Zettel zu Hause · Geburtstag im Garten · Internetseiten · Schilder'},
  {number:5,id:lesenExamId(5),topics:'Heizung kaputt · Basketball-Training · Wohnen und Service · Zeiten lesen'},
  {number:6,id:lesenExamId(6),topics:'Taxi zum Flughafen · Praxis im Urlaub · Reisen und Kochen · Hinweise'},
- {number:7,id:lesenExamId(7),topics:'Grüße aus dem Urlaub · Teamsitzung · Internetseiten · Unterwegs'},
+ {number:7,id:lesenExamId(7),topics:'Grüße aus dem Urlaub · Team-Treffen · Internetseiten · Unterwegs'},
  {number:8,id:lesenExamId(8),topics:'Kind ist krank · Brief von der Bibliothek · Anzeigen · Zeiten und Orte'},
  {number:9,id:lesenExamId(9),topics:'Mit dem Kurs ins Museum · Paket bei der Nachbarin · Wohnen und Feiern · Regeln'},
  {number:10,id:lesenExamId(10),topics:'Praktikum · Regeln im Haus · Internetseiten · Anmelden und Warten'},

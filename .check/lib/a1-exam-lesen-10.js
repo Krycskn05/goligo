@@ -6,17 +6,17 @@ const a1_exam_build_1 = require("./a1-exam-build");
 exports.exam = (0, a1_exam_build_1.buildExam)(10, 'Praktikum · Regeln im Haus · Internetseiten · Anmelden und Warten', {
     teil1: [
         { kind: 'mail', from: 'Dr. Karin Vogel', to: 'Yasemin Arslan', subject: 'Ihr Praktikum',
-            lines: ['Sehr geehrte Frau Arslan,', 'vielen Dank für Ihre E-Mail. Wir möchten Sie gern kennenlernen. Können Sie am Dienstag, dem 9. Februar, um 10 Uhr in unsere Praxis kommen? Bitte bringen Sie Ihre Zeugnisse mit.', 'Das Praktikum beginnt am 1. März und dauert drei Monate. Sie arbeiten von Montag bis Donnerstag, am Freitag haben Sie frei für Ihren Deutschkurs.', 'Mit freundlichen Grüßen', 'Dr. Karin Vogel, Tierarztpraxis'],
+            lines: ['Sehr geehrte Frau Arslan,', 'vielen Dank für Ihre E-Mail. Wir möchten Sie gern kennenlernen. Können Sie am Dienstag, dem 9. Februar, um 10 Uhr in unsere Praxis kommen? Bitte bringen Sie Ihre Papiere mit.', 'Das Praktikum beginnt am 1. März und dauert drei Monate. Sie arbeiten von Montag bis Donnerstag, am Freitag haben Sie frei für Ihren Deutschkurs.', 'Mit freundlichen Grüßen', 'Dr. Karin Vogel, Tierarztpraxis'],
             example: ['Frau Dr. Vogel möchte Yasemin treffen.', 'r'],
             items: [
                 ['Yasemin soll im Februar in die Praxis kommen.', 'r', 'Tanışma görüşmesi *am Dienstag, dem 9. Februar*; staj ise martta başlıyor.'],
                 ['Im Praktikum arbeitet Yasemin auch am Freitag.', 'f', '*Am Freitag haben Sie frei für Ihren Deutschkurs*: cuma çalışmıyor.'],
             ] },
         { kind: 'letter',
-            lines: ['Liebe Hausbewohner,', 'im Hof stehen zu viele Fahrräder. Bitte stellen Sie Ihre Räder ab sofort in den Fahrradkeller, er ist jetzt Tag und Nacht offen. Kinderwagen dürfen im Hausflur bleiben.', 'Und noch eine Bitte: Der Müll kommt in die Tonnen im Hof, nicht vor die Wohnungstür. Diese Woche putzt Familie Nowak das Treppenhaus, nächste Woche ist Familie Kamau dran.', 'Vielen Dank!', 'Ihr Hausmeister Tarek Haddad'],
+            lines: ['Liebe Hausbewohner,', 'vor dem Haus stehen zu viele Fahrräder. Bitte stellen Sie Ihre Räder ab sofort in den Fahrradkeller, er ist jetzt Tag und Nacht offen. Kinderwagen dürfen im Erdgeschoss bleiben.', 'Und noch eine Bitte: Der Müll darf nicht vor der Wohnungstür stehen. Diese Woche putzt Familie Nowak das Treppenhaus, nächste Woche Familie Kamau.', 'Vielen Dank!', 'Ihr Hausmeister Tarek Haddad'],
             items: [
                 ['Fahrräder sollen jetzt im Keller stehen.', 'r', '*Bitte stellen Sie Ihre Räder ab sofort in den Fahrradkeller*: bisikletler artık bodruma konacak.'],
-                ['Kinderwagen müssen auch in den Keller.', 'f', '*Kinderwagen dürfen im Hausflur bleiben*: bebek arabaları koridorda kalabilir.'],
+                ['Kinderwagen müssen auch in den Keller.', 'f', '*Kinderwagen dürfen im Erdgeschoss bleiben*: bebek arabaları zemin katta kalabilir.'],
                 ['Familie Kamau putzt diese Woche das Treppenhaus.', 'f', 'Bu hafta Nowak ailesi; Kamau ailesinin sırası *nächste Woche*.'],
             ] },
     ],
@@ -38,7 +38,7 @@ exports.exam = (0, a1_exam_build_1.buildExam)(10, 'Praktikum · Regeln im Haus �
                 ['solid', ['**Zu verschenken**', 'Geben und nehmen: Möbel,', 'Kleidung, Spielzeug – alles gratis'], 'www.zu-verschenken-hier.de'],
                 'b', 'Hediye etmek (*verschenken*): *Geben und nehmen … alles gratis*. Öbür sayfa yeni mobilya satıyor.'],
             ['Sie möchten am Wochenende mit Ihren Kindern etwas machen. Es regnet.',
-                ['solid', ['**Abenteuer-Spielplatz**', 'Klettern, laufen, grillen im Wald.', 'Nur bei gutem Wetter geöffnet'], 'www.abenteuer-spielplatz-wald.de'],
+                ['solid', ['**Spielplatz am See**', 'Spielen, laufen, grillen.', 'Nur bei gutem Wetter geöffnet'], 'www.spielplatz-am-see.de'],
                 ['solid', ['**Kindermuseum**', 'Sehen, hören, selbst machen: für Kinder', 'von 4 bis 12, auch am Sonntag'], 'www.kindermuseum-stadt.de'],
                 'b', 'Yağmurda müze olur ve pazar da açık. Oyun alanı *nur bei gutem Wetter* açık.'],
             ['Sie haben einen Führerschein aus Kenia und möchten in Deutschland Auto fahren. Sie suchen Informationen.',
@@ -53,12 +53,12 @@ exports.exam = (0, a1_exam_build_1.buildExam)(10, 'Praktikum · Regeln im Haus �
                 'Für den Kurs im April können Sie sich jetzt schon anmelden.', 'r', '*Anmeldung ab sofort*: nisan kursuna kayıt şimdiden açık.'],
             ['Vor einem **Supermarkt**.', ['bold', ['Wir suchen Verkäufer/innen', 'und Fahrer/innen.', 'Fragen Sie bitte an der Information!']],
                 'Im Supermarkt gibt es freie Arbeitsplätze.', 'r', '*Wir suchen Verkäufer/innen und Fahrer/innen*: market eleman arıyor.'],
-            ['In einer **Jugendherberge**.', ['dashed', ['Die Rezeption ist von 7 bis 22 Uhr geöffnet.', 'Kommen Sie später? Dann rufen Sie bitte vorher an:', 'Wir legen Ihren Schlüssel in die Box.']],
+            ['In einer **Pension**.', ['dashed', ['Die Rezeption ist von 7 bis 22 Uhr geöffnet.', 'Kommen Sie später? Dann rufen Sie bitte vorher an:', 'Wir legen Ihren Schlüssel in die Box.']],
                 'Nach 22 Uhr können Sie kein Zimmer mehr bekommen.', 'f', 'Geç gelen önceden arar; anahtar kutuya bırakılır: 22’den sonra da odaya girilir.'],
             ['Im **Wartezimmer**.', ['shaded', ['Bitte machen Sie Ihr Handy aus.', 'Wir rufen Sie mit Ihrer Nummer,', 'nicht mit Ihrem Namen.']],
                 'Sie müssen hier auf Ihre Nummer warten.', 'r', '*Wir rufen Sie mit Ihrer Nummer*: adınız değil, numaranız söyleniyor.'],
-            ['An einem **Tennisplatz**.', ['double', ['Plätze 1–3: nur für Mitglieder.', 'Platz 4 können Gäste mieten:', '12 Euro pro Stunde.'], undefined, 'serif'],
-                'Nur Mitglieder können hier Tennis spielen.', 'f', 'Misafirler de oynayabilir: *Platz 4 können Gäste mieten*.'],
+            ['An einem **Tennisplatz**.', ['double', ['Plätze 1–3: nur für den Tennisclub.', 'Platz 4 können Gäste mieten:', '12 Euro pro Stunde.'], undefined, 'serif'],
+                'Hier können nur Leute vom Tennisclub spielen.', 'f', 'Misafirler de oynayabilir: *Platz 4 können Gäste mieten*.'],
         ]
     },
 });

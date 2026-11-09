@@ -293,6 +293,11 @@ async function languageFlow(browser) {
   await page.screenshot({ path: path.join(OUT, "04-yerel-giris-sonrasi.png") });
   record("Yerel giris taklidi", new URL(page.url()).pathname === "/ev-esyalar", `son adres ${page.url()}`);
   await visit(page, "/ev-esyalar", "02-nesne-kasasi.png", errors);
+  // Ders kelimeleri (9 Kasim 2026): Lektion 1-5 kartlari, hicbirinde Yazarak Pekistir yok; diger kategorilerde uc mod duruyor.
+  {
+    const lessons = { cards: await page.locator("[data-vault-section='lessons'] [data-vault-category]").count(), modes: await page.locator("[data-vault-section='lessons'] .practice-mode-button").count(), write: await page.locator("[data-vault-section='lessons'] .practice-mode-button.write").count(), houseWrite: await page.locator("[data-vault-category='objects-house'] .practice-mode-button.write").count() };
+    record("Nesne Kasasi: Ders kelimeleri 5 kart, Yazarak Pekistir yok", lessons.cards === 5 && lessons.modes === 10 && lessons.write === 0 && lessons.houseWrite === 1, JSON.stringify(lessons));
+  }
   await visit(page, "/a1-2/ev-ve-yasam", "03-ev-ve-yasam.png", errors);
   // Lektion 1 (25 October 2026): the entry is a notebook like Lektion 11/12 (Teil A–D); Teil A opens on its cover, a step opens from its address.
   await visit(page, "/a1-1/willkommen", "03b-lektion-1.png", errors);

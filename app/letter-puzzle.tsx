@@ -76,7 +76,10 @@ export function LetterPuzzle({answer,storageKey,language,onChange,onSubmit,busy=
   const needed=puzzle.parts[index].character;
   const right=letterFits(puzzle,index,key,strictCase,course)?tileForLetter(choices,strictCase?key:needed,course):undefined;
   if(right){pick(right.id);return;}
-  if(tileForLetter(choices,key,course))miss(index,key);else{turn.current++;setShake({index,letter:key,turn:turn.current});}
+  // With hearts (Nesne Kasası, Fiil Atölyesi) every wrong letter typed takes one, also a letter the bank does not offer
+  // (the learner asked, 9 November 2026: "a wrong letter typed on the keyboard takes no heart"); without hearts
+  // (Ev ve Yaşam) a letter the bank does not offer only shakes, as before.
+  if(tries||tileForLetter(choices,key,course))miss(index,key);else{turn.current++;setShake({index,letter:key,turn:turn.current});}
  }
  function removeLast(){
   if(unavailable)return;

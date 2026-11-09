@@ -9,7 +9,7 @@ import {pickText} from './site-languages';
  * questions `verb-*`. Answer options stay German; meanings follow the interface language.
  */
 export type VerbAux='hat'|'ist';
-export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'partizip'|'write'|'write-praesens'|'write-perfekt'|'write-partizip'|'aux'|'hear'|'hear-praesens'|'hear-perfekt';
+export type VerbTask='meaning'|'word'|'fit'|'praesens'|'perfekt'|'meaning-perfekt'|'partizip'|'write'|'write-praesens'|'write-perfekt'|'write-partizip'|'aux'|'person-ich'|'person-du'|'person-er'|'hear'|'hear-praesens'|'hear-perfekt';
 export type Verb={id:string;display:string;infinitive:string;subject:'sie/er'|'es'|'sie';praesens:string;perfekt:string;aux:VerbAux;participle:string;alsoIst:boolean;group:string;number:number;praesensWrong:readonly string[];perfektWrong:readonly string[];meanings:VaultTranslations};
 
 type Spec=readonly [display:string,praesens:string,perfekt:string,praesensWrong:readonly [string,string,string],perfektWrong:readonly [string,string,string],meanings:VaultTranslations];
@@ -172,6 +172,25 @@ function personDistractors(verb:Verb){
  for(const form of [forms.du,forms.ich,forms.wir,forms.ihr,...verb.praesensWrong]){if(seen.has(form))continue;seen.add(form);result.push(form);if(result.length===3)break;}
  return result;
 }
+/**
+ * Kişiler (the learner asked, 9 November 2026, and chose design 3 of three, "kişi kişi seç"): the persons whose Präsens
+ * form changes its stem — du and er/sie/es in the strong verbs (fahren → du fährst, er fährt), ich too in wissen (ich weiß).
+ * Each comes with the form a regular verb would have (fahrst, fahrt), the wrong choice of its two-choice question. Forms are
+ * without the separable prefix, which stands after the gap ("du ___ ab"). The same rule as verbKindInfo in lib/verb-kind.ts.
+ */
+export type ChangedPerson='ich'|'du'|'er';
+export function personChanges(verb:Verb):{person:ChangedPerson;form:string;regular:string}[]{
+ const prefix=verb.display.includes('|')?verb.display.split('|')[0]:'';const base=verb.infinitive.slice(prefix.length);const stem=base.replace(/e?n$/,'');
+ const forms=praesensPersons(verb);const strip=(form:string)=>prefix?form.slice(0,-(prefix.length+1)):form;
+ const dt=/[dt]$/.test(stem)||/[^aeiouäöülrhmn][mn]$/.test(stem);
+ const regular:Record<ChangedPerson,string>={ich:stem+'e',du:stem+(dt?'est':/[sßxz]$/.test(stem)?'t':'st'),er:stem+(dt?'et':'t')};
+ return (['ich','du','er'] as const).map(person=>({person,form:strip(forms[person]),regular:regular[person]})).filter(item=>item.form!==item.regular);
+}
+/** The person as the page writes it: ich, du, er/sie/es. */
+export function personLabel(person:ChangedPerson){return person==='er'?'er/sie/es':person;}
+/** What is read after a Kişiler answer: the person with the whole form, the prefix too ("du fährst ab"; er/sie/es is read as
+ * the verb's own pronoun, as everywhere). */
+export function personSpoken(verb:Verb,person:ChangedPerson){return (person==='er'?spokenSubject(verb):person)+' '+praesensPersons(verb)[person];}
 /** Shuffle a question's options the same way for one round, so a saved round keeps its order without the server. */
 export function seededOptions(options:readonly string[],seed:string){return seeded(options,seed);}
 const verbBank:Question[]=[];
@@ -195,6 +214,9 @@ for(const verb of verbs){
  // chosen — two choices. liegen, sitzen and stehen: the book writes hat/ist, so ist counts as right too.
  add('verb-aux-'+verb.id,'aux',{kind:'choice',prompt:verb.display+' · Perfekt: '+subject+' ___ '+verb.participle+' — hat mı, ist mi?',answer:verb.aux,options:['hat','ist'],...(verb.alsoIst?{accepted:['ist']}:{})});
  add('verb-write-'+verb.id,'write',{kind:'write',writingTask:'word',prompt:'“'+meaning+'” anlamındaki fiili yaz.',answer:verb.infinitive});
+ // Kişiler: one two-choice question for each person whose form changes (du fährst / fahrst), only in those verbs.
+ const tail=verb.display.includes('|')?' '+verb.display.split('|')[0]:'';
+ for(const change of personChanges(verb))add('verb-person-'+change.person+'-'+verb.id,('person-'+change.person) as VerbTask,{kind:'choice',prompt:verb.display+' · '+personLabel(change.person)+' ___'+tail+' — doğru biçim hangisi?',answer:change.form,options:[change.form,change.regular]});
  add('verb-write-praesens-'+verb.id,'write-praesens',{kind:'write',writingTask:'gap',prompt:verb.display+' · Präsens yaz.',gap:subject+' ___',answer:verb.praesens});
  add('verb-write-perfekt-'+verb.id,'write-perfekt',{kind:'write',writingTask:'gap',prompt:verb.display+' · Perfekt yaz.',gap:subject+' ___ ___',answer:verb.perfekt,...(verb.alsoIst?{accepted:['ist '+verb.participle]}:{})});
  add('verb-hear-'+verb.id,'hear',{kind:'listen',prompt:'Dinle ve anlamını seç.',audio:verb.infinitive,answer:verb.infinitive,options:[verb.infinitive,...meaningDistractors(verb,'hear-'+verb.id)]});

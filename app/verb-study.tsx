@@ -10,7 +10,9 @@ import {housingMeaning,type HousingExercise} from '@/lib/housing-course';
 import {housingIllustration} from '@/lib/housing-illustrations';
 import {objectMeaning} from '@/lib/object-translations';
 import {ObjectArt,RasterArt} from './toon-art';
-import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,type Verb,type VerbTask} from '@/lib/verb-course';
+import {verbs,verbMap,verbMeaning,perfektLabel,verbRowSpeech,seededOptions,personLabel,personSpoken,praesensPersons,type Verb,type VerbTask,type ChangedPerson} from '@/lib/verb-course';
+/** The person of a Kişiler question (verbTask person-ich / person-du / person-er), else none. */
+const personOf=(task:string|undefined):ChangedPerson|null=>task==='person-ich'?'ich':task==='person-du'?'du':task==='person-er'?'er':null;
 import {verbFamilies,verbFamilyOf,verbFamilyMap,familyTitle,type VerbFamily} from '@/lib/verb-families';
 import {verbModePredicate} from '@/lib/verb-practice';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
@@ -131,7 +133,9 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  const task=q?.verbTask;
  // Only the correct answer is spoken after the effect, never the question. The sentence task answers with the Präsens form.
  // hat/ist: the question's own sentence is read, filled in ("Der Zug ist pünktlich abgefahren."; the learner asked).
- const pronunciation=task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';
+ // Kişiler: the person with the whole form is read ("du fährst ab").
+ const askedPerson=personOf(task);
+ const pronunciation=askedPerson&&verb?personSpoken(verb,askedPerson):task==='fit'&&verb?verb.praesens:task==='aux'&&verb?sentenceText(verb,'perfekt'):q?.articlePuzzle?q.articlePuzzle.fullAnswer:q?.answer??'';
  // An older round of the whole path ends after part 1; every other round at its last question.
  const end=session?roundEnd(session):0;
  const finished=!!session&&index>=end;
@@ -368,11 +372,11 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
  /** The forms shown after an answer: only what the stage teaches (meaning: the verb; Perfekt: sie/er hat/ist …). */
  function verbForms(item:Verb,task?:VerbTask){
   const stage=learnStage(task);
-  return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong>{(task==='partizip'||task==='write-partizip')&&<> → {item.participle}</>}{(stage==='perfekt'||task==='aux')&&<> — {item.subject} {perfektLabel(item)}</>}{stage==='praesens'&&<> — {item.subject} {item.praesens}</>}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;
+  return <span className="verb-forms"><span className="verb-forms-german" lang="de" dir="ltr"><strong>{item.display}</strong>{(task==='partizip'||task==='write-partizip')&&<> → {item.participle}</>}{(stage==='perfekt'||task==='aux')&&<> — {item.subject} {perfektLabel(item)}</>}{personOf(task)&&<> — {personLabel(personOf(task)!)} {personForm(item,personOf(task)!)}</>}{stage==='praesens'&&<> — {item.subject} {item.praesens}</>}</span><span className="verb-forms-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</span></span>;
  }
  function heading(question:Question){
   const kind=question.verbTask;
-  return kind==='meaning'?t('promptMeaning'):kind==='word'?t('promptWord'):kind==='partizip'?t('promptPartizip'):kind==='aux'?t('promptAux'):kind==='fit'?t('promptFit'):kind==='praesens'?t('promptPraesens'):kind==='perfekt'?t('promptPerfekt'):kind==='write-partizip'?t('writePartizip'):kind==='write'?t('writeInfinitive'):kind==='write-praesens'?t('gapPraesens'):kind==='write-perfekt'?t('gapPerfekt'):kind==='hear'?t('listenMeaning'):t('listenVerb');
+  return kind==='meaning'?t('promptMeaning'):kind==='word'?t('promptWord'):kind==='partizip'?t('promptPartizip'):kind==='aux'?t('promptAux'):personOf(kind)?t('promptPerson'):kind==='fit'?t('promptFit'):kind==='praesens'?t('promptPraesens'):kind==='perfekt'?t('promptPerfekt'):kind==='write-partizip'?t('writePartizip'):kind==='write'?t('writeInfinitive'):kind==='write-praesens'?t('gapPraesens'):kind==='write-perfekt'?t('gapPerfekt'):kind==='hear'?t('listenMeaning'):t('listenVerb');
  }
  /** The example sentence with gaps where the verb goes; filled in after the answer. */
  function sentenceLine(question:Question,item:Verb){
@@ -385,8 +389,16 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
    return <span key={i} className={'verb-chunk gap '+chunk.role+(value?' filled':'')}>{value||'___'}</span>;
   })}.</p>;
  }
+ /** The whole Präsens form of a person, with the separable prefix ("fährst ab"). */
+ function personForm(item:Verb,person:ChangedPerson){return praesensPersons(item)[person];}
+ /** Kişiler: "du ___ ab" — the person, the gap for the form, the prefix after it; filled in after the answer. */
+ function personLine(question:Question,item:Verb){
+  const person=personOf(question.verbTask)!;const prefix=verbPrefix(item);
+  return <p className="verb-sentence verb-person-line" lang="de" dir="ltr"><span className="verb-chunk">{personLabel(person)}</span><span className={'verb-chunk gap verb'+(feedback?' filled':'')}>{feedback?question.answer:'___'}</span>{prefix&&<span className="verb-chunk prefix">{prefix}</span>}</p>;
+ }
  function promptCard(question:Question,item:Verb){
   const kind=question.verbTask;
+  if(personOf(kind))return <div className="verb-card with-picture verb-aux-card verb-person-card"><VerbPicture verb={item} language={language}/><p className="verb-card-main" lang="de" dir="ltr">{item.display}</p><p className="verb-card-meaning" lang={language} dir={dir}>{verbMeaning(item,language)}</p>{personLine(question,item)}</div>;
   // Pictures give the answer away: hidden until the answer for the meaning and listening questions.
   const showPicture=(kind!=='meaning'&&kind!=='hear'&&kind!=='hear-perfekt')||!!feedback;
   if(kind==='word'||kind==='write')return <div className="verb-card with-picture">{showPicture&&<VerbPicture verb={item} language={language}/>}<p className="verb-card-main verb-card-meaning-main" lang={language} dir={dir}>{verbMeaning(item,language)}</p></div>;
@@ -441,7 +453,7 @@ export function VerbWorkshop({language,onLanguage,guest=false,part}:{language:Va
      <h1 id="object-question-heading" tabIndex={-1}>{heading(q)}</h1>
      {/* One fixed place for the question card and, after the answer, the result: the choices and the letters below never
          move and nothing scrolls (the learner asked, 4 November 2026: "work like Nesne Kasası, on one page"). */}
-     <div className="verb-slot" data-paul-slot="">{feedback?<AnswerResult verb={verb} stage={q.verbTask==='aux'?'perfekt':learnStage(q.verbTask)} language={language} speech={resultSpeech} correct={!!feedback.correct} status={v(feedback.correct?'correct':writing?'wrongAnswer':'wrong')} chosen={feedback.correct?undefined:<>{v(writing?'yourAnswer':'yourChoice')}: {writing?<span lang="de" dir="ltr">{feedback.answer}</span>:optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} past={q.verbTask==='partizip'||q.verbTask==='write-partizip'} example={q.verbTask==='aux'?sentenceLine(q,verb):<OneExample verb={verb} tense={q.verbTask==='partizip'||q.verbTask==='write-partizip'||learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'} pick={index} language={language} speech={resultSpeech}/>} replays={replays}/>:listening?<div className="vault-listen-player"><Headphones size={32} aria-hidden="true"/><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===q.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div><p role="status">{speech.busy?v('listenPlaying'):heardQuestionId===q.id?t('listenChoose'):t('listenFirst')}</p></div>:promptCard(q,verb)}</div>
+     <div className="verb-slot" data-paul-slot="">{feedback?<AnswerResult verb={verb} stage={q.verbTask==='aux'?'perfekt':learnStage(q.verbTask)} language={language} speech={resultSpeech} correct={!!feedback.correct} status={v(feedback.correct?'correct':writing?'wrongAnswer':'wrong')} chosen={feedback.correct?undefined:<>{v(writing?'yourAnswer':'yourChoice')}: {writing?<span lang="de" dir="ltr">{feedback.answer}</span>:optionLabel(q,feedback.answer,'verb-result-answer')}</>} spoken={pronunciation} past={q.verbTask==='partizip'||q.verbTask==='write-partizip'} example={q.verbTask==='aux'?sentenceLine(q,verb):askedPerson?personLine(q,verb):<OneExample verb={verb} tense={q.verbTask==='partizip'||q.verbTask==='write-partizip'||learnStage(q.verbTask)==='perfekt'?'perfekt':'praesens'} pick={index} language={language} speech={resultSpeech}/>} replays={replays}/>:listening?<div className="vault-listen-player"><Headphones size={32} aria-hidden="true"/><div className="vault-listen-buttons"><button type="button" className="btn" disabled={actionDisabled} onClick={()=>hearQuestion()}><Volume2 size={20}/>{heardQuestionId===q.id?v('repeatAudio'):t('listenButton')}</button><button type="button" className="btn secondary" disabled={actionDisabled} onClick={()=>hearQuestion(true)}>{v('speechSlow')}</button></div><p role="status">{speech.busy?v('listenPlaying'):heardQuestionId===q.id?t('listenChoose'):t('listenFirst')}</p></div>:promptCard(q,verb)}</div>
      {writing?<>
       {task==='write-perfekt'&&<div className="verb-aux"><span className="verb-aux-label">{t('helperVerb')}</span><div className="article-bank" role="group" aria-label={t('helperVerb')} dir="ltr" lang="de">{(['hat','ist'] as const).map(value=>{const right=value===verb.aux||(verb.alsoIst&&value==='ist');return <button type="button" key={value} className={'article-choice verb-aux-choice '+(aux===value?'selected ':'')+(feedback?(right&&(aux===value||!feedback.correct)?'right':aux===value?'wrong':''):'')} aria-pressed={aux===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setAux(value);setAuxWarning(false);if(selected&&!feedback)void submit(value+' '+selected);}}>{value}</button>;})}</div>{auxWarning&&!aux&&<p className="verb-aux-warning" role="alert">{t('helperMissing')}</p>}</div>}
       {task==='write-praesens'&&verbPrefix(verb)&&<div className="verb-aux"><span className="verb-aux-label">{t('prefixChoice')}</span><div className="article-bank" role="group" aria-label={t('prefixChoice')} dir="ltr" lang="de">{prefixOptions(verb).map(value=>{const right=value===verbPrefix(verb);return <button type="button" key={value} className={'article-choice verb-aux-choice '+(prefix===value?'selected ':'')+(feedback?(right&&(prefix===value||!feedback.correct)?'right':prefix===value?'wrong':''):'')} aria-pressed={prefix===value} disabled={!!feedback||actionDisabled||!!pendingAnswer.current} onClick={()=>{setPrefix(value);setPrefixWarning(false);if(selected&&!feedback)void submit(selected+' '+value);}}>{value}</button>;})}</div>{prefixWarning&&!prefix&&<p className="verb-aux-warning" role="alert">{t('prefixMissing')}</p>}</div>}

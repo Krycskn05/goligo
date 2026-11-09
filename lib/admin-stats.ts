@@ -19,7 +19,7 @@ export function areaOf(questionId:string):AreaId{
 const AREA_SQL="CASE WHEN question_id LIKE 'housing-%' THEN 'housing' WHEN question_id LIKE 'en-obj-%' THEN 'vaultEn' WHEN question_id LIKE 'obj-%' THEN 'vault' WHEN question_id LIKE 'verb-%' THEN 'verbs' ELSE 'other' END";
 const TASKS:readonly [string,string][]=[
  ['obj-hear','Dinle ve bul'],['obj-picture','Resim testi'],['obj-write','Yazma'],['obj-article','Artikel'],['obj-gap','Boşluk doldurma'],['obj-read','Okuma'],['obj-dictation','Dikte'],['obj-scene','Resimde bul'],['obj-puzzle','Harf bulmacası'],['en-obj-','İngilizce nesne'],
- ['verb-meaning','Anlam'],['verb-word','Kelime'],['verb-fit','Uygun fiil'],['verb-praesens','Präsens'],['verb-perfekt','Perfekt'],['verb-partizip','Partizip II'],['verb-aux','hat/ist'],['verb-write','Yazma'],['verb-hear','Dinleme'],
+ ['verb-meaning','Anlam'],['verb-word','Kelime'],['verb-fit','Uygun fiil'],['verb-praesens','Präsens'],['verb-perfekt','Perfekt'],['verb-partizip','Partizip II'],['verb-aux','hat/ist'],['verb-person','Kişi biçimi'],['verb-write','Yazma'],['verb-hear','Dinleme'],
 ];
 const KINDS:Record<string,string>={choice:'Test',write:'Yazma',listen:'Dinleme',read:'Okuma'};
 export type QuestionInfo={id:string;area:AreaId;areaName:string;task:string;prompt:string;detail:string;answer:string};

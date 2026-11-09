@@ -7,7 +7,8 @@ import {isVerbExercise} from './verb-practice';
 /**
  * Fiil Atölyesi: one path through all 72 verbs in six topics (lib/verb-themes.ts; until 4 November 2026 four book parts,
  * see lib/verb-families.ts). Each verb is finished in one go before the next one: its card with the
- * meaning, then the meaning test, then spelling it with letters, then its past form: the infinitive
+ * meaning, then the meaning test, then spelling it with letters, then (only where the Präsens stem changes) the persons
+ * whose form changes, one two-choice question each (Kişiler: du fährst / fahrst; 9 November 2026), then its past form: the infinitive
  * is shown and the Partizip II is chosen (abfahren → abgefahren; no hat/ist, no other verbs), then spelled, and last
  * the Perfekt's helping verb is chosen, hat or ist (two choices; the learner asked, 9 November 2026 — it is asked only:
  * ticks, rings and percentages count the four steps before it, see `countedSteps`).
@@ -23,10 +24,13 @@ export const WORKSHOP_TOPIC='verbs-all';
 export const PART_ROUND_TOPIC=VERB_TOPIC_ROUND;
 export const WORKSHOP_MODE='workshop';
 export type LearnStage='meaning'|'praesens'|'perfekt';
-export type WorkshopStep='meaning'|'write'|'partizip'|'write-partizip'|'aux';
+export type WorkshopStep='meaning'|'write'|'person-ich'|'person-du'|'person-er'|'partizip'|'write-partizip'|'aux';
 export const meaningSteps:readonly WorkshopStep[]=['meaning','write'];
-/** All steps of one verb: the meaning test, spelling, the past form, spelling the past form, hat or ist. */
-export const verbSteps:readonly WorkshopStep[]=['meaning','write','partizip','write-partizip','aux'];
+/** All steps a verb can have: the meaning test, spelling, the persons whose form changes (Kişiler, only in the verbs whose
+ * Präsens stem changes, 9 November 2026), the past form, spelling the past form, hat or ist. `stepsOf` gives a verb's own. */
+export const verbSteps:readonly WorkshopStep[]=['meaning','write','person-ich','person-du','person-er','partizip','write-partizip','aux'];
+/** The Kişiler steps: shown as one step ("Kişiler") with its questions counted in it. */
+export const personSteps:readonly WorkshopStep[]=['person-ich','person-du','person-er'];
 /** The steps the ticks, rings and percentages count: the four steps before hat/ist. The hat/ist step (added 9 November 2026)
  * is asked on the path after the past form is spelled, and nothing else changes (the learner asked: "do not change the
  * verbs' system"): it gives no tick and takes none away, and the counts stay as they were. */
@@ -39,8 +43,10 @@ const workshopTasks=new Set<string>([...verbSteps,...pastTasks]);
 export const workshopVerbs:Verb[]=verbFamilies.flatMap(family=>family.verbs.map(id=>verbMap.get(id)!));
 export const questionId=(step:string,verbId:string)=>'verb-'+step+'-'+verbId;
 const questionById=new Map(verbQuestions.map(q=>[q.id,q]));
-/** One part's questions in order: verb by verb, each with its four steps. */
-export function partIds(family:VerbFamily){return family.verbs.flatMap(id=>verbSteps.map(step=>questionId(step,id)));}
+/** The steps of one verb: every step it has a question for (the Kişiler steps only where its persons change). */
+export function stepsOf(verbId:string){return verbSteps.filter(step=>questionById.has(questionId(step,verbId)));}
+/** One part's questions in order: verb by verb, each with its own steps. */
+export function partIds(family:VerbFamily){return family.verbs.flatMap(id=>stepsOf(id).map(step=>questionId(step,id)));}
 export function partTotal(family:VerbFamily){return partIds(family).length;}
 /** Every question of the path in order: topic 1, then topic 2 … 6. */
 export function workshopIds(){return verbFamilies.flatMap(family=>partIds(family));}
@@ -217,8 +223,9 @@ export function remainingIds(family:VerbFamily,marks:ReadonlyMap<string,VerbMark
  const answered=answeredIds(reviews);const last=verbSteps[verbSteps.length-1];
  const ids=family.verbs.flatMap(verbId=>{
   const mark=marks.get(verbId);if(mark?.meaning&&mark.perfekt)return [];
-  const steps=verbSteps.filter(step=>!(meaningSteps.includes(step)?mark?.meaning:mark?.perfekt)&&!answered.has(questionId(step,verbId)));
-  return (steps.includes(last)?steps:verbSteps).map(step=>questionId(step,verbId));
+  const own=stepsOf(verbId);
+  const steps=own.filter(step=>!(meaningSteps.includes(step)?mark?.meaning:mark?.perfekt)&&!answered.has(questionId(step,verbId)));
+  return (steps.includes(last)?steps:own).map(step=>questionId(step,verbId));
  });
  return ids.length?ids:partIds(family);
 }

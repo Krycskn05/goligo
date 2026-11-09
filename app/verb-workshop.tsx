@@ -13,7 +13,7 @@ import {vaultDirection,type VaultLanguage} from '@/lib/object-vault-copy';
 import {VerbPicture,RuleBox} from './verb-games';
 
 type Speech={speak:(text:string)=>void;busy:boolean};
-const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling',partizip:'stepPartizip','write-partizip':'stepWritePartizip',aux:'stepAux'};
+const stepLabels:Record<WorkshopStep,VerbCopyKey>={meaning:'stepMeaning',write:'stepSpelling','person-ich':'stepPersons','person-du':'stepPersons','person-er':'stepPersons',partizip:'stepPartizip','write-partizip':'stepWritePartizip',aux:'stepAux'};
 
 /** One example sentence with the verb parts highlighted and a speaker button (kept for the later sentence practice). */
 export function ExampleSentence({verb,tense,speech,label}:{verb:Verb;tense:VerbTense;speech:Speech;label?:string}){
@@ -170,7 +170,10 @@ export function ChapterCard({family,verbs,language,onContinue}:{family:VerbFamil
  * number are in the picture strip above (4 November 2026: the practice fits one screen, like Nesne Kasası). */
 export function PathStepper({place,language}:{place:PathPlace;language:VaultLanguage}){
  const t=(key:VerbCopyKey,params?:Record<string,string|number>)=>verbText(language,key,params);
- return <ol className="verb-stepper verb-step-chips" data-verb-step={place.step} data-verb-stage={place.stage} aria-label={place.verb.display+' · '+t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})} style={{gridTemplateColumns:'repeat('+place.steps.length+',minmax(0,1fr))'}}>{place.steps.map((step,i)=><li key={step} className={i<place.step?'done':i===place.step?'current':''} aria-current={i===place.step?'step':undefined}>{i<place.step&&<Check size={13} aria-hidden="true"/>}<span>{t(stepLabels[step])}</span></li>)}</ol>;
+ // Steps with the same label are one chip: the Kişiler questions (du, er/sie/es) show as "Kişiler 1/2", "Kişiler 2/2".
+ const chips:{key:string;label:VerbCopyKey;from:number;to:number}[]=[];
+ place.steps.forEach((step,i)=>{const label=stepLabels[step];const last=chips[chips.length-1];if(last&&last.label===label)last.to=i;else chips.push({key:step,label,from:i,to:i});});
+ return <ol className="verb-stepper verb-step-chips" data-verb-step={place.step} data-verb-stage={place.stage} aria-label={place.verb.display+' · '+t('verbOf',{n:place.verbNumber,total:place.family.verbs.length})} style={{gridTemplateColumns:'repeat('+chips.length+',minmax(0,1fr))'}}>{chips.map(chip=>{const done=chip.to<place.step;const current=chip.from<=place.step&&place.step<=chip.to;return <li key={chip.key} className={done?'done':current?'current':''} aria-current={current?'step':undefined}>{done&&<Check size={13} aria-hidden="true"/>}<span>{t(chip.label)}{current&&chip.to>chip.from?' '+(place.step-chip.from+1)+'/'+(chip.to-chip.from+1):''}</span></li>;})}</ol>;
 }
 type PartState={done:number;count:number;percent:number;finished:boolean;started:boolean;meaningDone:number;perfektDone:number};
 /** Done or not, for one verb: the meaning and the Perfekt, each with a tick. */

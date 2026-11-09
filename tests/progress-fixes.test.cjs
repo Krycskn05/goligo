@@ -20,9 +20,9 @@ test('an exercise answered right once stays learned; a written exercise and its 
 });
 
 test('Fiiller counts the steps Fiil Atölyesi asks, and a finished part keeps its tick when it is practised again',()=>{
- // The hat/ist step (9 November 2026) is asked on the path but not counted: the four counted steps of every verb.
+ // The hat/ist and Kişiler steps (9 November 2026) are asked on the path but not counted: the four counted steps of every verb.
  assert.equal(progress.verbProgressIds('verbs-all').length,72*workshop.countedSteps.length);
- assert.deepEqual(new Set(progress.verbProgressIds('verbs-all')),new Set(workshop.workshopIds().filter(id=>!id.startsWith('verb-aux-'))));
+ assert.deepEqual(new Set(progress.verbProgressIds('verbs-all')),new Set(workshop.workshopIds().filter(id=>!/^verb-(aux|person)-/.test(id))));
  // Since 4 November 2026 the parts are the topics; their rounds are saved with the topic round name.
  const w1=families.verbFamilies[0];const ids=workshop.partIds(w1);
  const round=(id,answered,finished_at=null)=>({id,mode:'workshop',topic:workshop.PART_ROUND_TOPIC,first:ids[0],total:ids.length,answered,finished_at,ids:finished_at?null:ids});

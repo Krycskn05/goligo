@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.examsSolved = exports.examPapers = exports.a1ExamRunKey = exports.A1_EXAM_SCORES_KEY = void 0;
+exports.examsSolved = exports.spellPapers = exports.examPapers = exports.a1ExamRunKey = exports.A1_EXAM_SCORES_KEY = void 0;
 exports.readExamScores = readExamScores;
 exports.saveExamScore = saveExamScore;
 exports.readExamRun = readExamRun;
@@ -91,6 +91,9 @@ catch { } }
 const ratio = (part, total) => total ? Math.round(part / total * 100) : 0;
 /** Every exam paper of the section (Hören 1–10, Lesen 1–10) with its points. */
 exports.examPapers = [...a1_exam_course_1.hoerenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.HOEREN_TOTAL })), ...a1_exam_course_1.lesenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.LESEN_TOTAL }))];
+/** The sheets of the spelling practice (Buchstabieren 1–3): their results are kept like a paper's, but they are a practice
+ * and do not count in the section's progress. */
+exports.spellPapers = a1_exam_course_1.spellSheetList.map(sheet => ({ id: sheet.id, total: a1_exam_course_1.SPELL_TOTAL }));
 /** The section as a whole: every paper's 15 points; a paper counts as tried once it was handed in. */
 function examSectionProgress(scores) {
     let total = 0, tried = 0, learned = 0;

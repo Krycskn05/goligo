@@ -67,8 +67,11 @@ export type A1Exam={
 };
 
 /* ---------- Hören (the site's voices read the texts; nothing is recorded) ---------- */
-/** One spoken line: who speaks (shown with the text after the exam) and the site voice that reads it (F1 … M5). */
-export type AudioLine={who:string;voice:string;text:string};
+/** One spoken line: who speaks (shown with the text after the exam) and the site voice that reads it (F1 … M5). A name
+ * letter by letter is not read as it is written (text "K – R – Ü – G – E – R"): `say` is what the natural site voices
+ * read ("Kah, Err, Üh, …"), `device` what the device voice reads when the natural voices have no clip of the line
+ * ("K, R, Ü, …"). */
+export type AudioLine={who:string;voice:string;text:string;say?:string;device?:string};
 /** An answer of a three-way question: its words and, in Teil 1, a small picture (an emoji) like the pictures of the paper. */
 export type ListenOption={text:string;icon?:string};
 /** Teil 1 (short talks) and Teil 3 (phone messages): a question and three answers; heard twice. */
@@ -85,3 +88,14 @@ export type HoerenExam={
 /** How often a text of a Teil is heard in the exam. */
 export const HOEREN_PLAYS:Record<1|2|3,number>={1:2,2:1,3:2};
 export type A1HoerenExam={id:string;number:number;topics:string;hoeren:HoerenExam};
+
+/* ---------- Buchstabieren (a listening practice beside the ten exams, 10 November 2026) ---------- */
+/** One name of the spelling practice: a short talk in which the name is said letter by letter, and three spellings that
+ * differ in one spot (the item "Wie buchstabiert man den Namen?" of Hören Teil 1). `spelled`: the right name as it is
+ * shown after the practice ("K – R – Ü – G – E – R"); `focus`: the letters to listen for with their German names
+ * ("Ö = Öh"), shown with the answer; `tip`: a hint in the site language for this kind of trap. */
+export type SpellTip='double'|'count'|'umlaut';
+export type SpellItem={id:string;n:number;names:readonly [string,string,string];answer:AbcChoice;lines:readonly AudioLine[];spelled:string;focus:readonly string[];tip?:SpellTip};
+export type SpellExample=Omit<SpellItem,'id'|'n'>;
+/** A sheet of the practice: one example and ten names. */
+export type SpellSheet={id:string;number:number;topics:string;example:SpellExample;items:readonly SpellItem[]};

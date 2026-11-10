@@ -269,4 +269,19 @@
  .x1-mail-menu { display:none; }
 }
 @media (prefers-reduced-motion:reduce) { .x1-wave b { animation:none; } }
+/* ---------- Buchstabieren: the spelling practice beside the exams (app/a1-exam-spell.tsx) ---------- */
+.x1-spell { padding:18px 20px; margin:0 0 22px; }
+.x1-spell-head { display:flex; gap:14px; align-items:flex-start; margin:0 0 12px; }
+.x1-spell-head h2 { margin:0 0 6px; font-size:19px; }
+.x1-spell-head p { margin:0; line-height:1.55; }
+.x1-spell-icon { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:12px; background:#e9eef7; color:#2b4a86; }
+.x1-spell-list { margin:0; }
+.x1-pager-one { justify-content:flex-end; }
+/* The three spellings as name cards, like the cards of the exam paper. */
+.x1-names .x1-opt { padding:14px 8px 12px; border-radius:12px; background:#fbfbfc; box-shadow:2px 2px 0 #222; }
+.x1-names .x1-opt.on { background:#fff; box-shadow:0 0 0 2px #222,2px 2px 0 #222; }
+.x1-names .x1-opt.is-right { box-shadow:0 0 0 3px #bfe3c1; }
+.x1-names .x1-opt.is-wrong { box-shadow:none; }
+.x1-names .x1-pick-label { font-family:Georgia,"Times New Roman",serif; font-size:19px; font-weight:700; letter-spacing:.03em; }
+@media (max-width:560px) { .x1-names .x1-pick-label { font-size:15.5px; letter-spacing:0; } }
 @media print { .x1-bar,.x1-pager,.x1-ask,.work-sidebar { display:none !important; } }

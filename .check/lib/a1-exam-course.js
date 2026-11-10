@@ -33,9 +33,10 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gradeLesen = exports.gradeHoeren = exports.hoerenKey = exports.lesenKey = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleMinutes = exports.isReadyModule = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
+exports.gradeLesen = exports.gradeHoeren = exports.hoerenKey = exports.lesenKey = exports.isSpellNumber = exports.SPELL_SHEET_COUNT = exports.spellSheetList = exports.SPELL_TOTAL = exports.SPELL_MODULE = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleMinutes = exports.isReadyModule = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
 exports.loadLesenExam = loadLesenExam;
 exports.loadHoerenExam = loadHoerenExam;
+exports.loadSpellSheet = loadSpellSheet;
 exports.lesenItems = lesenItems;
 exports.hoerenItems = hoerenItems;
 exports.gradeItems = gradeItems;
@@ -125,6 +126,26 @@ function loadHoerenExam(number) {
     if (!load)
         return Promise.reject(new Error('No exam ' + number));
     return load().then(module => module.exam);
+}
+/* ---------- Buchstabieren: a listening practice beside the exams (lib/a1-exam-spell.ts) ---------- */
+/** Its part of the address: `?sinav=2&bolum=buchstabieren` (sheet 2). */
+exports.SPELL_MODULE = 'buchstabieren';
+exports.SPELL_TOTAL = 10;
+/** The three sheets: number, id and the letters they train (kept here so the list page loads no sheet). The ids are
+ * kept in the learner's saved answers, never change them. */
+exports.spellSheetList = [
+    { number: 1, id: 'a1-spell-01', topics: 'Vokale und Umlaute: a · o · ä · ö · ü · ai · au · eu' },
+    { number: 2, id: 'a1-spell-02', topics: 'Konsonanten: b · p · d · t · v · w · f · s · z · ß · j · y' },
+    { number: 3, id: 'a1-spell-03', topics: 'Doppelte und stumme Buchstaben · lange Namen' },
+];
+exports.SPELL_SHEET_COUNT = exports.spellSheetList.length;
+const isSpellNumber = (value) => Number.isInteger(value) && value >= 1 && value <= exports.SPELL_SHEET_COUNT;
+exports.isSpellNumber = isSpellNumber;
+/** Loads one sheet of the spelling practice. */
+function loadSpellSheet(number) {
+    if (!(0, exports.isSpellNumber)(number))
+        return Promise.reject(new Error('No sheet ' + number));
+    return Promise.resolve().then(() => __importStar(require('./a1-exam-spell'))).then(module => module.spellSheets[number - 1]);
 }
 /** The 15 scored items of a Lesen exam in the order of the paper, with the Teil they belong to. */
 function lesenItems(lesen) {

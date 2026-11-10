@@ -9,6 +9,7 @@ import {exam as h07} from './a1-exam-hoeren-07';
 import {exam as h08} from './a1-exam-hoeren-08';
 import {exam as h09} from './a1-exam-hoeren-09';
 import {exam as h10} from './a1-exam-hoeren-10';
+import {spellSpeechTexts} from './a1-exam-spell';
 
 /**
  * All ten Hören exams of A1 sınavı at once — for the voices (scripts/voices/list-texts.cjs renders every spoken line
@@ -20,9 +21,11 @@ export const hoerenExams:readonly A1HoerenExam[]=[h01,h02,h03,h04,h05,h06,h07,h0
 export function hoerenBlocks(hoeren:HoerenExam):readonly {lines:readonly AudioLine[]}[]{
  return [hoeren.teil1.example,...hoeren.teil1.items,hoeren.teil2.example,...hoeren.teil2.items,...hoeren.teil3.items];
 }
-/** Every German line the Hören exams read aloud (for the natural site voices). */
+/** Every German line the Hören exams and the spelling practice (lib/a1-exam-spell.ts) read aloud, as the voice reads
+ * it (for the natural site voices). */
 export function a1ExamSpeechTexts():string[]{
  const texts=new Set<string>();
- for(const exam of hoerenExams)for(const block of hoerenBlocks(exam.hoeren))for(const line of block.lines)texts.add(line.text);
+ for(const exam of hoerenExams)for(const block of hoerenBlocks(exam.hoeren))for(const line of block.lines)texts.add(line.say??line.text);
+ for(const text of spellSpeechTexts())texts.add(text);
  return [...texts];
 }

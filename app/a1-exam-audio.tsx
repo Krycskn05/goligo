@@ -1,12 +1,14 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {AudioLine} from '@/lib/a1-exam-types';
+import {siteClipUrls} from '@/lib/site-voices';
 import {useGermanSpeech} from './study-shared';
 
 /**
  * Plays the texts of a Hören exam (A1 sınavı): the lines of one text in order, each with its speaker's own site voice
  * (lib/site-voices.ts; women and men differ, a person keeps one voice). Until the natural voices of a new text are
- * rendered — or when they cannot be loaded — the device's German voice reads every line. One text plays at a time;
+ * rendered — or when they cannot be loaded — the device's German voice reads every line (a spelled name with the text
+ * written for it, lib/a1-exam-spell.ts). One text plays at a time;
  * `playing` is its key. Modelled on the Lektion 12 player (app/ausbildung-listen.tsx): the next line starts when the
  * speech goes from busy to idle.
  */
@@ -20,7 +22,10 @@ export function useExamAudio(){
   if(index>=current.lines.length){queue.current=null;setPlaying(null);return;}
   current.index=index;started.current=true;
   const line=current.lines[index];const voice=latest.current.siteVoices.find(item=>item.style===line.voice);
-  latest.current.speak(line.text,false,voice?.id,1);
+  // A name letter by letter: the natural voices read the letters' names (`say`); a line they have no clip of is read by
+  // the device voice, which reads plain capitals best (`device`).
+  const natural=line.say??line.text;const clip=!!voice&&siteClipUrls(voice.id,natural).length>0;
+  latest.current.speak(line.device&&!clip?line.device:natural,false,voice?.id,1);
  },[]);
  // A line has ended (busy → idle): read the next one.
  useEffect(()=>{if(speech.busy){started.current=true;return;}if(started.current&&queue.current){started.current=false;speakAt(queue.current.index+1);}},[speech.busy,speakAt]);

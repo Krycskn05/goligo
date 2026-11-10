@@ -424,6 +424,13 @@ async function languageFlow(browser) {
   await page.waitForTimeout(800);
   record("A1 sinavi 1 Lesen: kagit aciliyor (Teil 1: ornek + 5 soru, e-posta penceresi, isaretlenebilir kutular)",
     (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 6 && (await page.locator(".x1-mail").count()) === 1 && (await page.locator(".x1-box:not([disabled])").count()) === 10, "");
+  // A1 sinavi – Buchstabieren (10 Kasim 2026): sinavlarin yaninda ayri bir dinleme alistirmasi; 1. kagit aciliyor.
+  await page.goto(BASE + "/a1-sinavi?sinav=1&bolum=buchstabieren", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.locator("[data-x1-start]").click();
+  await page.waitForTimeout(800);
+  record("A1 sinavi Buchstabieren 1: kagit aciliyor (ornek + 10 ad, 11 dinle dugmesi, isaretlenebilir ad kartlari)",
+    (await page.locator("[data-x1-spell='1'] [data-x1-item]").count()) === 11 && (await page.locator("[data-x1-play]").count()) === 11 && (await page.locator(".x1-names .x1-opt:not([disabled])").count()) === 30, "");
   await visit(page, "/", "01-ana-sayfa.png", errors);
   record("Giris yapinca ana sayfada dersler var (tanitim yok)", (await page.locator("[data-landing]").count()) === 0, "");
 

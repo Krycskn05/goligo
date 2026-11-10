@@ -1,4 +1,4 @@
-import type {A1Exam,A1HoerenExam,AdItem,ExamAnswer,ExamModule,HoerenExam,LesenExam,ListenChoiceItem,ListenTrueFalseItem,NoticeItem,TrueFalseItem} from './a1-exam-types';
+import type {A1Exam,A1HoerenExam,AdItem,ExamAnswer,ExamModule,HoerenExam,LesenExam,ListenChoiceItem,ListenTrueFalseItem,NoticeItem,SpellSheet,TrueFalseItem} from './a1-exam-types';
 import {hoerenExamId,lesenExamId} from './a1-exam-build';
 
 /**
@@ -80,6 +80,25 @@ const hoerenLoaders:Record<number,()=>Promise<{exam:A1HoerenExam}>>={
 export function loadHoerenExam(number:number):Promise<A1HoerenExam>{
  const load=hoerenLoaders[number];if(!load)return Promise.reject(new Error('No exam '+number));
  return load().then(module=>module.exam);
+}
+
+/* ---------- Buchstabieren: a listening practice beside the exams (lib/a1-exam-spell.ts) ---------- */
+/** Its part of the address: `?sinav=2&bolum=buchstabieren` (sheet 2). */
+export const SPELL_MODULE='buchstabieren';
+export const SPELL_TOTAL=10;
+/** The three sheets: number, id and the letters they train (kept here so the list page loads no sheet). The ids are
+ * kept in the learner's saved answers, never change them. */
+export const spellSheetList:readonly {number:number;id:string;topics:string}[]=[
+ {number:1,id:'a1-spell-01',topics:'Vokale und Umlaute: a · o · ä · ö · ü · ai · au · eu'},
+ {number:2,id:'a1-spell-02',topics:'Konsonanten: b · p · d · t · v · w · f · s · z · ß · j · y'},
+ {number:3,id:'a1-spell-03',topics:'Doppelte und stumme Buchstaben · lange Namen'},
+];
+export const SPELL_SHEET_COUNT=spellSheetList.length;
+export const isSpellNumber=(value:number)=>Number.isInteger(value)&&value>=1&&value<=SPELL_SHEET_COUNT;
+/** Loads one sheet of the spelling practice. */
+export function loadSpellSheet(number:number):Promise<SpellSheet>{
+ if(!isSpellNumber(number))return Promise.reject(new Error('No sheet '+number));
+ return import('./a1-exam-spell').then(module=>module.spellSheets[number-1]);
 }
 
 export type LesenItem=TrueFalseItem|AdItem|NoticeItem;

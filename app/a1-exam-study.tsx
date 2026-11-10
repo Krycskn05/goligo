@@ -8,8 +8,8 @@ import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {vaultText} from '@/lib/object-vault-copy';
 import type {A1Exam,A1HoerenExam,ExamAnswer,ExamModule} from '@/lib/a1-exam-types';
-import {A1_EXAM_PATH,GUEST_EXAM,HOEREN_TOTAL,LESEN_EXAM_COUNT,LESEN_MINUTES,LESEN_TOTAL,examList,examModules,examPoints,gradeItems,hasPassed,hoerenItems,isExamNumber,isReadyModule,lesenItems,loadHoerenExam,loadLesenExam,moduleMinutes,passMark,type ExamAnswers,type ExamResult,type ReadyModule} from '@/lib/a1-exam-course';
-import {clearExamRun,clock,examPapers,examSectionProgress,examsSolved,readExamRun,readExamScores,saveExamRun,saveExamScore,type ExamRun,type ExamScoreMap} from '@/lib/a1-exam-progress';
+import {A1_EXAM_PATH,GUEST_EXAM,HOEREN_TOTAL,LESEN_EXAM_COUNT,LESEN_MINUTES,LESEN_TOTAL,SPELL_MODULE,examList,examModules,examPoints,gradeItems,hasPassed,hoerenItems,isExamNumber,isReadyModule,isSpellNumber,lesenItems,loadHoerenExam,loadLesenExam,moduleMinutes,passMark,type ExamAnswers,type ExamResult,type ReadyModule} from '@/lib/a1-exam-course';
+import {clearExamRun,clock,examPapers,examSectionProgress,examsSolved,readExamRun,readExamScores,saveExamRun,saveExamScore,spellPapers,type ExamRun,type ExamScoreMap} from '@/lib/a1-exam-progress';
 import {examText,loadExamPack,type ExamCopyKey} from '@/lib/a1-exam-copy';
 import {useLanguageSwitch} from './language-switch';
 import {useAnswerSound} from './study-shared';
@@ -23,6 +23,7 @@ import {useSyncVersion} from './lesson-sync';
 import {LesenTeil,Paper} from './a1-exam-paper';
 import {HoerenTeil} from './a1-exam-hoeren-paper';
 import {useExamAudio} from './a1-exam-audio';
+import {SpellPanel,SpellView} from './a1-exam-spell';
 
 /**
  * A1 sınavı (/a1-sinavi, the learner asked, 9 November 2026): practice exams like the written Start Deutsch 1 exam.
@@ -33,6 +34,7 @@ import {useExamAudio} from './a1-exam-audio';
  * or wrong before the end), then the result (points of 15, the 60 % pass mark, the certificate points × 1,66) and every
  * answer explained in the site language — in Hören with the spoken text. Results stay in the browser and travel with
  * the account (lib/a1-exam-progress.ts); a visitor without an account opens exam 1 and nothing is saved.
+ * Beside the exams there is a spelling practice, „Buchstabieren“ (app/a1-exam-spell.tsx, `?sinav=<1–3>&bolum=buchstabieren`).
  */
 export default function A1ExamStudy({guest=false}:{guest?:boolean}){
  const [language,setLanguage]=useState<StudyLanguage>('de');const [loaded,setLoaded]=useState(false);
@@ -43,18 +45,21 @@ export default function A1ExamStudy({guest=false}:{guest?:boolean}){
  return <ExamSection language={language} onLanguage={switchLanguage} guest={guest}/>;
 }
 
-/** The paper in the address: ?sinav=3&bolum=hoeren (an address without `bolum` is the Lesen paper). */
-type Place={number:number;module:ReadyModule}|null;
+/** The paper in the address: ?sinav=3&bolum=hoeren (an address without `bolum` is the Lesen paper); `bolum=buchstabieren`
+ * is a sheet of the spelling practice (1–3). */
+type PaperModule=ReadyModule|typeof SPELL_MODULE;
+type Place={number:number;module:PaperModule}|null;
 function readPlace():Place{
  const params=new URLSearchParams(window.location.search);const value=Number(params.get('sinav'));if(!isExamNumber(value))return null;
- const part=params.get('bolum');return {number:value,module:isReadyModule(part)?part:'lesen'};
+ const part=params.get('bolum');if(part===SPELL_MODULE)return isSpellNumber(value)?{number:value,module:SPELL_MODULE}:null;
+ return {number:value,module:isReadyModule(part)?part:'lesen'};
 }
-const examHref=(number:number,module:ReadyModule)=>A1_EXAM_PATH+'?sinav='+number+'&bolum='+module;
+const examHref=(number:number,module:PaperModule)=>A1_EXAM_PATH+'?sinav='+number+'&bolum='+module;
 const MODULE_ICON:Record<ExamModule,typeof Headphones>={hoeren:Headphones,lesen:FileText,schreiben:PenLine};
 const MODULE_NAME:Record<ReadyModule,string>={hoeren:'Hören',lesen:'Lesen'};
 const MODULE_TOTAL:Record<ReadyModule,number>={hoeren:HOEREN_TOTAL,lesen:LESEN_TOTAL};
 const READY:readonly ReadyModule[]=['hoeren','lesen'];
-type Open=(number:number|null,module?:ReadyModule)=>void;
+type Open=(number:number|null,module?:PaperModule)=>void;
 
 function ExamSection({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
  const [place,setPlace]=useState<Place>(null);const [running,setRunning]=useState(false);
@@ -71,7 +76,9 @@ function ExamSection({language,onLanguage,guest}:{language:StudyLanguage;onLangu
   <div className="work-layout site-layout"><SiteMenuAside language={language} current={'exam'}/>
   <main id="x1-main" className="object-page x1-page" lang={language} dir={dir}>
    {guest&&<GuestBanner language={language} back={place?examHref(place.number,place.module):A1_EXAM_PATH}/>}
-   {place?<ExamView key={place.module+place.number} number={place.number} module={place.module} language={language} guest={guest} onOpen={open} onRunning={setRunning}/>:<ExamHome language={language} guest={guest} onOpen={open}/>}
+   {!place?<ExamHome language={language} guest={guest} onOpen={open}/>
+    :place.module===SPELL_MODULE?<SpellView key={place.module+place.number} number={place.number} language={language} guest={guest} onHome={()=>open(null)} onSheet={next=>open(next,SPELL_MODULE)} onRunning={setRunning}/>
+    :<ExamView key={place.module+place.number} number={place.number} module={place.module} language={language} guest={guest} onOpen={open} onRunning={setRunning}/>}
   </main></div>
   <SiteFooter language={language}/>
  </div>;
@@ -97,7 +104,7 @@ function ExamHome({language,guest,onOpen}:{language:StudyLanguage;guest:boolean;
  useEffect(()=>{const visible=()=>{if(document.visibilityState==='visible')setBack(n=>n+1);};document.addEventListener('visibilitychange',visible);return()=>document.removeEventListener('visibilitychange',visible);},[]);
  useEffect(()=>{
   if(guest)return;
-  try{setScores(readExamScores(localStorage));const open:Record<string,number>={};for(const exam of examPapers){const run=readExamRun(localStorage,exam.id);const count=run&&!run.done?Object.keys(run.answers).length:0;if(count>0)open[exam.id]=count;}setMarks(open);}catch{}
+  try{setScores(readExamScores(localStorage));const open:Record<string,number>={};for(const exam of [...examPapers,...spellPapers]){const run=readExamRun(localStorage,exam.id);const count=run&&!run.done?Object.keys(run.answers).length:0;if(count>0)open[exam.id]=count;}setMarks(open);}catch{}
  },[guest,synced,back]);
  const progress=useMemo(()=>examSectionProgress(scores),[scores]);const solved=examsSolved(scores);
  return <>
@@ -108,6 +115,7 @@ function ExamHome({language,guest,onOpen}:{language:StudyLanguage;guest:boolean;
   <Modules language={language}/>
   <section className="panel x1-about" aria-labelledby="x1-about-heading"><h2 id="x1-about-heading">{examText(language,'aboutTitle')}</h2><p>{examText(language,'about')}</p>
    <p className="x1-soon-line"><PenLine size={16} aria-hidden="true"/>{examText(language,'schreibenSoon')}</p></section>
+  <SpellPanel language={language} guest={guest} scores={scores} marks={marks} onOpen={number=>onOpen(number,SPELL_MODULE)}/>
   <section className="x1-exams" aria-labelledby="x1-exams-heading">
    <div className="x1-exams-head"><h2 id="x1-exams-heading">{examText(language,'examsTitle')}</h2>
     {!guest&&<div className="x1-exams-progress"><ProgressMeter progress={progress} language={language} label={examText(language,'examsTitle')} compact/><small data-x1-solved={solved}>{examText(language,'solved',{n:solved,total:examPapers.length})}</small></div>}</div>

@@ -282,7 +282,7 @@ test('the section is on the site: menu, page, guest taste, visits, styles',()=>{
  // Hören: a text is played with its button, in the exam-like mode only as often as in the exam; the spoken text shows after handing in.
  const heardPaper=read('app/a1-exam-hoeren-paper.tsx'),player=read('app/a1-exam-audio.tsx');
  assert.ok(heardPaper.includes('const max=HOEREN_PLAYS[teil];')&&heardPaper.includes('disabled={!on&&left<=0}')&&heardPaper.includes('{review&&<Script lines={lines} language={language}/>}')&&heardPaper.includes('{review&&id&&why&&<Why '));
- assert.ok(player.includes('item.style===line.voice')&&player.includes('latest.current.speak(line.text,false,voice?.id,1)'),'each line with its speaker\'s site voice');
+ assert.ok(player.includes('item.style===line.voice')&&player.includes('const natural=line.say??line.text;')&&player.includes('latest.current.speak(line.device&&!clip?line.device:natural,false,voice?.id,1);'),'each line with its speaker\'s site voice');
  assert.ok(ui.includes('limit={!!run?.timed}')&&ui.includes("onPlay={review?()=>{}:played}")&&ui.includes('latest.current.audio.stop()'));
  // A visitor opens exam 1; nothing of a visitor is saved.
  assert.equal(course.GUEST_EXAM,1);assert.ok(auth.GUEST_PAGES.has('/a1-sinavi')&&auth.isPublicPath('/a1-sinavi'));
@@ -296,4 +296,89 @@ test('the section is on the site: menu, page, guest taste, visits, styles',()=>{
  assert.ok(read('app/paul-hoca.tsx').includes("if(document.querySelector('.x1-running'))return true;")&&ui.includes("(running?' x1-running':'')"));
  // The 25 minutes can be ignored: the clock only shows, it never hands in.
  assert.ok(ui.includes("examText(language,'timeUp')")&&ui.includes("off:'untimed'")&&ui.includes("off:'listenFree'")&&!/over\)\s*finish\(/.test(ui));
+});
+
+// Buchstabieren (the learner asked, 10 November 2026): the teacher's Hören paper has "Wie buchstabiert man den Namen?"
+// with three name cards; the ten exams have no such item and must stay as they are, so it is a practice of its own.
+test('Buchstabieren: a spelling practice beside the exams — three sheets of ten names, the exams untouched',()=>{
+ const spell=load('a1-exam-spell'),letters=load('willkommen-b-course');
+ assert.equal(course.SPELL_MODULE,'buchstabieren');assert.equal(course.SPELL_TOTAL,10);assert.equal(course.SPELL_SHEET_COUNT,3);
+ assert.deepEqual(course.spellSheetList.map(sheet=>sheet.id),['a1-spell-01','a1-spell-02','a1-spell-03']);
+ assert.ok(course.isSpellNumber(3)&&!course.isSpellNumber(4)&&!course.isSpellNumber(0));
+ const sheets=spell.spellSheets;assert.equal(sheets.length,3);
+ // The letters' names are the ones of the alphabet lesson; the natural voices read E and Ä another way (measured, see the file).
+ for(const [letter,name] of Object.entries(spell.LETTER_NAME)){assert.equal(name,letter==='Ä'?'A-Umlaut':letters.letterSay(letter),letter);assert.equal(spell.LETTER_SAY[letter],letter==='E'?'E':letter==='Ä'?'Ah Umlaut':name,letter);}
+ assert.equal(Object.keys(spell.LETTER_NAME).length,30);assert.equal(new Set(Object.values(spell.LETTER_NAME)).size,30,'every letter has its own name');assert.equal(new Set(Object.values(spell.LETTER_SAY)).size,30);
+ assert.equal(spell.spellSay('Bäcker'),'Beh, Ah Umlaut, Zeh, Kah, E, Err');assert.equal(spell.spellDevice('Weiß'),'W, E, I, ß');
+ assert.equal(spell.spellShown('Weiß'),'W – E – I – ß');assert.equal(spell.spellShown('Krüger'),'K – R – Ü – G – E – R');
+ const right=[],keys=[],ids=new Set(),triples=new Set();
+ sheets.forEach((sheet,s)=>{
+  assert.equal(sheet.id,course.spellSheetList[s].id);assert.equal(sheet.number,s+1);assert.equal(sheet.topics,course.spellSheetList[s].topics);
+  assert.equal(sheet.items.length,10);
+  sheet.items.forEach((item,i)=>{assert.equal(item.id,'a1-spell-'+two(s+1)+'-'+two(i+1));assert.equal(item.n,i+1);ids.add(item.id);});
+  keys.push(sheet.items.map(item=>item.answer).join(''));
+  for(const item of [sheet.example,...sheet.items]){
+   const where=sheet.id+' '+item.names.join('/');
+   assert.equal(new Set(item.names).size,3,where);assert.match(item.answer,/^[abc]$/);
+   const name=item.names['abc'.indexOf(item.answer)];right.push(name);triples.add([...item.names].sort().join('|'));
+   for(const option of item.names){assert.match(option,/^[A-ZÄÖÜ][a-zäöüß]+$/,where);for(const letter of spell.nameLetters(option))assert.ok(spell.LETTER_SAY[letter],where+': '+letter);
+    assert.ok(Math.abs(option.length-name.length)<=1,where+': the spellings differ in one spot');}
+   // The name is said letter by letter once: the paper shows the letters, the voice reads their names.
+   assert.equal(item.spelled,spell.spellShown(name),where);
+   const spelled=item.lines.filter(line=>line.text.includes(item.spelled));assert.equal(spelled.length,1,where+': spelled once');
+   assert.ok(spelled[0].say.includes(spell.spellSay(name))&&!spelled[0].say.includes(' – '),where);
+   assert.ok(spelled[0].device.includes(spell.spellDevice(name))&&!spelled[0].device.includes(' – '),where+': plain capitals for the device voice');
+   // What the measuring showed (lib/a1-exam-spell.ts): E / I, U / O and Ü / Ö are too close in the site voices — no
+   // wrong spelling differs from the right one only by such a pair (so no ei against ie either).
+   for(const option of item.names){if(option===name)continue;
+    const a=spell.nameLetters(name),b=spell.nameLetters(option);
+    if(a.length===b.length){const diff=a.map((letter,i)=>letter===b[i]?'':[letter,b[i]].sort().join('')).filter(Boolean);
+     assert.ok(!diff.length||!diff.every(pair=>['EI','OU','ÖÜ'].includes(pair)),where+': '+option+' differs only by '+diff.join(' '));}
+    for(const [from,to] of [['ie','i'],['ie','e'],['ei','i'],['ei','e']])assert.ok(option!==name.replace(from,to),where+': '+option+' ('+from+' against '+to+')');}
+   for(const line of item.lines){
+    assert.match(line.voice,/^[FM][1-5]$/,where);assert.ok(line.text.trim()&&!/[{}]/.test(line.text+(line.say??'')+(line.device??'')),where);
+    assert.equal(line.say===undefined,line.device===undefined,where+': a line read another way has both texts');
+    if(build.CAST_VOICES[line.who])assert.equal(line.voice,build.CAST_VOICES[line.who],where+': '+line.who+' keeps the own voice');
+    // A wrong spelling is never said or shown before the end.
+    for(const option of item.names)if(option!==name)assert.ok(!new RegExp('(^|[^A-Za-zÄÖÜäöüß])'+option+'($|[^A-Za-zÄÖÜäöüß])').test(line.text),where+': '+option);
+   }
+   const voices=new Map();for(const line of item.lines){if(voices.has(line.who))assert.equal(voices.get(line.who),line.voice,where);voices.set(line.who,line.voice);}
+   assert.equal(voices.size,2,where+': two speakers');assert.equal(new Set(voices.values()).size,2,where+': two different voices');
+   assert.ok(item.lines.length>=3&&item.lines.length<=4,where);
+   // The letters to listen for: each with its name, each a letter of one of the three spellings.
+   assert.ok(item.focus.length>=2&&item.focus.length<=4,where);
+   for(const pair of item.focus){const [letter,say]=pair.split(' = ');assert.equal(say,spell.LETTER_NAME[letter],where+': '+pair);assert.ok(item.names.some(option=>spell.nameLetters(option).includes(letter)),where+': '+letter);}
+   if(item.tip)assert.ok(['double','count','umlaut'].includes(item.tip),where);
+  }
+ });
+ assert.equal(ids.size,30);assert.equal(new Set(right).size,33,'33 different names');assert.equal(triples.size,33);
+ // The right card is spread evenly over a, b and c; no three equal answers in a row.
+ const all=keys.join('');for(const letter of ['a','b','c'])assert.equal([...all].filter(x=>x===letter).length,10,letter);
+ for(const key of keys){assert.ok(!/(.)\1\1/.test(key),key);for(const letter of ['a','b','c']){const n=[...key].filter(x=>x===letter).length;assert.ok(n>=3&&n<=4,key);}}
+ assert.deepEqual(sheets.map(sheet=>sheet.example.answer).sort(),['a','b','c']);
+ // Our own names, not the names of the teacher's paper.
+ for(const name of ['Böhme','Behme','Bohme'])assert.ok(!sheets.some(sheet=>[sheet.example,...sheet.items].some(item=>item.names.includes(name))),name);
+ // The voices get every line as it is read (letter names, not letters).
+ const spoken=new Set(listening.a1ExamSpeechTexts());
+ for(const sheet of sheets)for(const item of [sheet.example,...sheet.items])for(const line of item.lines)assert.ok(spoken.has(line.say??line.text),line.text);
+ assert.ok(spell.spellSpeechTexts().length>=90);
+ // A sheet's result is kept like a paper's, but the practice does not count in the section's progress.
+ assert.deepEqual(progress.spellPapers,[{id:'a1-spell-01',total:10},{id:'a1-spell-02',total:10},{id:'a1-spell-03',total:10}]);
+ assert.equal(progress.examPapers.length,20);assert.equal(progress.examSectionProgress({'a1-spell-01':{right:10,total:10}}).tried,0);assert.equal(progress.examsSolved({'a1-spell-01':{right:10,total:10}}),0);
+ const box=storage();progress.saveExamRun(box,'a1-spell-02',{answers:{'a1-spell-02-03':'c','a1-spell-01-03':'a','a1-hoeren-02-03':'b'},seconds:0,teil:1,timed:true,done:false,plays:{'a1-spell-02-03':2,'a1-spell-02-b1':1}});
+ const run=progress.readExamRun(box,'a1-spell-02');assert.deepEqual(run.answers,{'a1-spell-02-03':'c'});assert.deepEqual(run.plays,{'a1-spell-02-03':2,'a1-spell-02-b1':1});
+ assert.equal(sync.syncLessonOf(progress.a1ExamRunKey('a1-spell-02')),'site');
+ const marked=course.gradeItems(sheets[0].items.map(item=>({teil:1,item})),Object.fromEntries(sheets[0].items.map((item,i)=>[item.id,i<7?item.answer:item.answer==='a'?'b':'a'])));
+ assert.deepEqual([marked.right,marked.total,marked.wrong.length],[7,10,3]);
+ // The page: its own address, its own view; the exams' cards and papers are as before.
+ const ui=read('app/a1-exam-study.tsx'),view=read('app/a1-exam-spell.tsx'),heardPaper=read('app/a1-exam-hoeren-paper.tsx');
+ assert.ok(ui.includes("if(part===SPELL_MODULE)return isSpellNumber(value)?{number:value,module:SPELL_MODULE}:null;")&&ui.includes('place.module===SPELL_MODULE?<SpellView ')&&ui.includes('<SpellPanel language={language} guest={guest} scores={scores} marks={marks}'));
+ assert.ok(view.includes("A1_EXAM_PATH+'?sinav='+number+'&bolum='+SPELL_MODULE")&&view.includes('data-x1-sheet={sheet.id}')&&!view.includes('x1-open\''),'the sheets have their own links (the exams keep 20)');
+ assert.ok(view.includes('cards max={2}')&&view.includes('limit:!!run?.timed')&&view.includes('explained={explain(language,item)}')&&view.includes("const locked=guest&&number!==GUEST_EXAM;"));
+ assert.ok(view.includes('if(!guest)saveExamRun(')&&view.includes('if(!guest)try{saveExamScore(')&&view.includes('latest.current.audio.stop()'));
+ for(const word of ['speak(','useGermanSpeech','sound.correct','sound.wrong'])assert.ok(!view.includes(word),word);
+ assert.ok(heardPaper.includes('export function ChoiceItem(')&&heardPaper.includes("(cards?' x1-names':'')")&&heardPaper.includes('{review&&id&&!why&&explained&&<Why '));
+ assert.ok(read('app/a1-exam-paper.tsx').includes('const shown=explained??examWhy(language,id,why);')&&read('app/a1-exam.css').includes('.x1-names .x1-opt {'));
+ for(const key of ['spellTitle','spellLead','spellSheet','spellHint','spellWhy','spellLetters','spellTipDouble','spellTipCount','spellTipUmlaut','spellResult','spellFinish'])assert.ok(copy.examCopy[key],key);
+ assert.equal(copy.examText('tr','spellSheet',{n:2}),'Kâğıt 2');assert.equal(copy.examText('de','spellWhy',{spelled:'W – E – I – ß'}),'Buchstabiert wird: *W – E – I – ß*.');
 });

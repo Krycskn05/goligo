@@ -13,6 +13,7 @@ const a1_exam_hoeren_07_1 = require("./a1-exam-hoeren-07");
 const a1_exam_hoeren_08_1 = require("./a1-exam-hoeren-08");
 const a1_exam_hoeren_09_1 = require("./a1-exam-hoeren-09");
 const a1_exam_hoeren_10_1 = require("./a1-exam-hoeren-10");
+const a1_exam_spell_1 = require("./a1-exam-spell");
 /**
  * All ten Hören exams of A1 sınavı at once — for the voices (scripts/voices/list-texts.cjs renders every spoken line
  * with the site's natural voices) and the tests. The pages never load this file: an exam is loaded alone when the
@@ -23,12 +24,15 @@ exports.hoerenExams = [a1_exam_hoeren_01_1.exam, a1_exam_hoeren_02_1.exam, a1_ex
 function hoerenBlocks(hoeren) {
     return [hoeren.teil1.example, ...hoeren.teil1.items, hoeren.teil2.example, ...hoeren.teil2.items, ...hoeren.teil3.items];
 }
-/** Every German line the Hören exams read aloud (for the natural site voices). */
+/** Every German line the Hören exams and the spelling practice (lib/a1-exam-spell.ts) read aloud, as the voice reads
+ * it (for the natural site voices). */
 function a1ExamSpeechTexts() {
     const texts = new Set();
     for (const exam of exports.hoerenExams)
         for (const block of hoerenBlocks(exam.hoeren))
             for (const line of block.lines)
-                texts.add(line.text);
+                texts.add(line.say ?? line.text);
+    for (const text of (0, a1_exam_spell_1.spellSpeechTexts)())
+        texts.add(text);
     return [...texts];
 }

@@ -39,14 +39,15 @@ function Script({lines,language}:{lines:readonly AudioLine[];language:string}){
 }
 const LETTERS=['a','b','c'] as const;
 
-/** A question with three answers (Teil 1 with small pictures, Teil 3 as a list). */
-function ChoiceItem({n,id,playKey,question,options,answer,lines,why,example=false,max,answers,onMark,review=false,language,...listen}:{n:number;id?:string;playKey:string;question:string;options:readonly ListenOption[];answer:AbcChoice;lines:readonly AudioLine[];why?:string;example?:boolean;max:number}&ListenProps){
+/** A question with three answers (Teil 1 with small pictures, Teil 3 as a list). `cards`: the answers are name cards
+ * (the spelling practice, app/a1-exam-spell.tsx), which brings its explanation in the page's language (`explained`). */
+export function ChoiceItem({n,id,playKey,question,options,answer,lines,why,example=false,cards=false,explained,max,answers,onMark,review=false,language,...listen}:{n:number;id?:string;playKey:string;question:string;options:readonly ListenOption[];answer:AbcChoice;lines:readonly AudioLine[];why?:string;example?:boolean;cards?:boolean;explained?:{text:string;lang:string};max:number}&ListenProps){
  const value=example?answer:id?answers[id]:undefined;const fixed=review||example||!onMark||!id;
  const tiles=options.every(option=>option.text.length<=18)||options.some(option=>option.icon);
  return <div className={'x1-item x1-hear'+(example?' x1-example':'')} data-x1-item={id??'example'}>
   <div className="x1-row"><Num n={n}/>{example&&<span className="x1-beispiel inline">Beispiel</span>}<p className="x1-statement">{question}</p></div>
   <PlayButton playKey={playKey} lines={lines} max={max} free={example} language={language} review={review} {...listen}/>
-  <div className={'x1-abc'+(tiles?' tiles':' rows')} role="radiogroup" aria-label={(n?n+'. ':'Beispiel. ')+question}>
+  <div className={'x1-abc'+(tiles?' tiles':' rows')+(cards?' x1-names':'')} role="radiogroup" aria-label={(n?n+'. ':'Beispiel. ')+question}>
    {LETTERS.map((choice,i)=><button type="button" key={choice} role="radio" aria-checked={value===choice} disabled={fixed} data-choice={choice}
     className={boxClass('x1-pick x1-opt',value===choice,answer===choice,review)} onClick={()=>{if(id&&onMark)onMark(id,choice as ExamAnswer);}}>
     <span className="x1-letter">{choice}</span>{options[i].icon&&<span className="x1-opt-icon" aria-hidden="true">{options[i].icon}</span>}<span className="x1-pick-label">{options[i].text}</span>
@@ -54,6 +55,7 @@ function ChoiceItem({n,id,playKey,question,options,answer,lines,why,example=fals
   </div>
   {review&&<Script lines={lines} language={language}/>}
   {review&&id&&why&&<Why id={id} given={answers[id]} answer={answer} why={why} language={language}/>}
+  {review&&id&&!why&&explained&&<Why id={id} given={answers[id]} answer={answer} why="" explained={explained} language={language}/>}
  </div>;
 }
 /** An announcement and a statement to mark Richtig or Falsch (Teil 2). */

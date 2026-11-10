@@ -35,10 +35,11 @@ export function TrueFalseBoxes({id,value,answer,onMark,review=false,example=fals
   </button>)}
  </div>;
 }
-/** The line under an item after handing in: right or wrong, the right answer and why. */
-export function Why({id,given,answer,why,language}:{id:string;given:ExamAnswer|undefined;answer:ExamAnswer;why:string;language:string}){
+/** The line under an item after handing in: right or wrong, the right answer and why. `explained`: an explanation that is
+ * already in the page's language (the spelling practice builds it from the labels) instead of the one looked up by id. */
+export function Why({id,given,answer,why,language,explained}:{id:string;given:ExamAnswer|undefined;answer:ExamAnswer;why:string;language:string;explained?:{text:string;lang:string}}){
  const right=given===answer;const name=(value:ExamAnswer)=>value==='r'||value==='f'?TF_WORD[value]:value;
- const shown=examWhy(language,id,why);const dir=isSiteLanguage(shown.lang)?languageDirection(shown.lang):'ltr';
+ const shown=explained??examWhy(language,id,why);const dir=isSiteLanguage(shown.lang)?languageDirection(shown.lang):'ltr';
  return <div className={'x1-why '+(right?'ok':'no')} lang={language} dir={languageDirection(isSiteLanguage(language)?language:'en')} data-x1-why={right?'right':'wrong'}>
   <p className="x1-why-head">{right?<Check size={18} aria-hidden="true"/>:<X size={18} aria-hidden="true"/>}<strong>{examText(language,right?'correct':'wrong')}</strong>
    {!right&&<span>{examText(language,'yourAnswer')}: <b lang="de" dir="ltr">{given?name(given):'—'}</b>{!given&&<> ({examText(language,'noAnswer')})</>}</span>}
@@ -151,11 +152,13 @@ function TeilThree({lesen,...marks}:{lesen:LesenExam}&MarkProps){
 export function LesenTeil({lesen,teil,...marks}:{lesen:LesenExam;teil:1|2|3}&MarkProps){
  return teil===1?<TeilOne lesen={lesen} {...marks}/>:teil===2?<TeilTwo lesen={lesen} {...marks}/>:<TeilThree lesen={lesen} {...marks}/>;
 }
-/** The sheet itself: the head line of the exam paper (Hören or Lesen) and the side label. */
-export function Paper({children,minutes,module='lesen'}:{children:ReactNode;minutes:number;module?:'hoeren'|'lesen'}){
+/** The sheet itself: the head line of the exam paper (Hören or Lesen) and the side label. `spell`: a sheet of the
+ * spelling practice — a Hören sheet that is a practice, not a part of the exam. */
+export function Paper({children,minutes,module='lesen'}:{children:ReactNode;minutes:number;module?:'hoeren'|'lesen'|'spell'}){
+ const heard=module!=='lesen';
  return <div className={'x1-paper x1-paper-'+module} lang="de" dir="ltr">
-  <div className="x1-paper-head"><span className="x1-paper-icon" aria-hidden="true">{module==='hoeren'?<Headphones size={20}/>:<BookOpen size={20}/>}</span><strong>{module==='hoeren'?'Hören':'Lesen'}</strong><span>(circa {minutes} Minuten)</span></div>
-  <span className="x1-paper-side" aria-hidden="true">Schriftliche Prüfung</span>
+  <div className="x1-paper-head"><span className="x1-paper-icon" aria-hidden="true">{heard?<Headphones size={20}/>:<BookOpen size={20}/>}</span><strong>{heard?'Hören':'Lesen'}</strong><span>{module==='spell'?'Übung: Buchstabieren':'(circa '+minutes+' Minuten)'}</span></div>
+  <span className="x1-paper-side" aria-hidden="true">{module==='spell'?'Übung':'Schriftliche Prüfung'}</span>
   {children}
  </div>;
 }

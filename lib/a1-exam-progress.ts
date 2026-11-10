@@ -1,5 +1,5 @@
 import {starsFor,stageFor,type TopicProgress} from './progress-core';
-import {HOEREN_TOTAL,LESEN_TOTAL,hoerenExamList,lesenExamList,type ExamAnswers} from './a1-exam-course';
+import {HOEREN_TOTAL,LESEN_TOTAL,SPELL_TOTAL,hoerenExamList,lesenExamList,spellSheetList,type ExamAnswers} from './a1-exam-course';
 import type {ExamAnswer} from './a1-exam-types';
 
 /**
@@ -57,6 +57,9 @@ export function clearExamRun(storage:Pick<Storage,'removeItem'>,examId:string){t
 const ratio=(part:number,total:number)=>total?Math.round(part/total*100):0;
 /** Every exam paper of the section (Hören 1–10, Lesen 1–10) with its points. */
 export const examPapers:readonly {id:string;total:number}[]=[...hoerenExamList.map(exam=>({id:exam.id,total:HOEREN_TOTAL})),...lesenExamList.map(exam=>({id:exam.id,total:LESEN_TOTAL}))];
+/** The sheets of the spelling practice (Buchstabieren 1–3): their results are kept like a paper's, but they are a practice
+ * and do not count in the section's progress. */
+export const spellPapers:readonly {id:string;total:number}[]=spellSheetList.map(sheet=>({id:sheet.id,total:SPELL_TOTAL}));
 /** The section as a whole: every paper's 15 points; a paper counts as tried once it was handed in. */
 export function examSectionProgress(scores:ExamScoreMap):TopicProgress{
  let total=0,tried=0,learned=0;

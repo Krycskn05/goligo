@@ -408,10 +408,10 @@ async function languageFlow(browser) {
   await page.goto(BASE + "/a1-1/alltag-und-freizeit?adim=gunluk", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   record("Lektion 5A: gunluk isler kartlari (16 kart) ve dort sekme", (await page.locator("[data-l5-step='gunluk'] .l2-job").count()) === 16 && (await page.locator("#l1a-tabs .l12-step").count()) === 4, "");
-  // A1 sinavi (9 Kasim 2026): 10 sinav, her birinde Hören ve Lesen kagidi; Schreiben "yakinda"; kagit Teil 1 ile aciliyor.
+  // A1 sinavi (9 Kasim 2026; Schreiben 11 Kasim 2026): 10 sinav, her birinde Hören, Lesen ve Schreiben kagidi; kagit Teil 1 ile aciliyor.
   await visit(page, "/a1-sinavi", "03l-a1-sinavi.png", errors);
-  record("A1 sinavi: 10 sinav, 20 kagit (Hören + Lesen) acik, Schreiben yakinda",
-    (await page.locator("[data-x1-exam]").count()) === 10 && (await page.locator("a.x1-open").count()) === 20 && (await page.locator("[data-x1-module][data-ready='0']").count()) === 1 && (await page.locator("[data-menu-exam][aria-current='page']").count()) === 1, "");
+  record("A1 sinavi: 10 sinav, 30 kagit (Hören + Lesen + Schreiben) acik",
+    (await page.locator("[data-x1-exam]").count()) === 10 && (await page.locator("a.x1-open").count()) === 30 && (await page.locator("[data-x1-module][data-ready='0']").count()) === 0 && (await page.locator("[data-menu-exam][aria-current='page']").count()) === 1, "");
   await page.goto(BASE + "/a1-sinavi?sinav=1&bolum=hoeren", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   await page.locator("[data-x1-start]").click();
@@ -424,6 +424,13 @@ async function languageFlow(browser) {
   await page.waitForTimeout(800);
   record("A1 sinavi 1 Lesen: kagit aciliyor (Teil 1: ornek + 5 soru, e-posta penceresi, isaretlenebilir kutular)",
     (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 6 && (await page.locator(".x1-mail").count()) === 1 && (await page.locator(".x1-box:not([disabled])").count()) === 10, "");
+  // A1 sinavi – Schreiben (11 Kasim 2026): form (5 bosluk) ve kisa mesaj (10 bosluk); 1. sinavin kagidi aciliyor.
+  await page.goto(BASE + "/a1-sinavi?sinav=1&bolum=schreiben", { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForTimeout(800);
+  await page.locator("[data-x1-start]").click();
+  await page.waitForTimeout(800);
+  record("A1 sinavi 1 Schreiben: kagit aciliyor (Teil 1: form, 5 bosluk, 5 soru, isaretlenebilir a/b/c kutulari)",
+    (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 5 && (await page.locator("[data-x1-form] [data-x1-gap]").count()) === 5 && (await page.locator(".x1-opt:not([disabled])").count()) === 15 && (await page.locator("[data-x1-tab]").count()) === 2, "");
   // A1 sinavi – Buchstabieren (10 Kasim 2026): sinavlarin yaninda ayri bir dinleme alistirmasi; 1. kagit aciliyor.
   await page.goto(BASE + "/a1-sinavi?sinav=1&bolum=buchstabieren", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);

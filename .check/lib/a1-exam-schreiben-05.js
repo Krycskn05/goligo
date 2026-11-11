@@ -38,7 +38,7 @@ exports.exam = (0, a1_exam_build_1.buildSchreiben)(5, 'Formular beim Arzt · Dan
             [['mit', 'an', 'ein'], 'a', 'trennbar', 'Ich bringe einen Kuchen mit'],
             [['Wie alt bist du?', 'Was kostet das Essen?', 'Um wie viel Uhr soll ich kommen?'], 'c', 'content', 'Um wie viel Uhr soll ich kommen?', 3],
             [['mir', 'mich', 'dich'], 'b', 'wort', 'Ich freue mich'],
-            [['Bis', 'Auf', 'Zu'], 'a', 'wort', 'Bis bald'],
+            [['Bis', 'Am', 'Zu'], 'a', 'wort', 'Bis bald'],
             [['Liebe Gruß', 'Guten Appetit', 'Liebe Grüße'], 'c', 'gruss', 'Liebe Grüße'],
         ]
     },

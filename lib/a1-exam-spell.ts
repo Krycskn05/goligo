@@ -8,12 +8,13 @@ import {CAST_VOICES} from './a1-exam-build';
  * is said letter by letter, and three spellings to choose from. Our own names and the site's people.
  *
  * A line is written once with `{S}` where the name is spelled and `{N}` for the name. The paper shows
- * "K – R – Ü – G – E – R"; the natural site voices read the letters' names, "Kah. Err. Üh. Geh. E. Err." (`say`); the
+ * "K – R – Ü – G – E – R"; the natural site voices read the letters' names, "Kah, Err, Üh, Geh, E, Err" (`say`); the
  * device voice, which reads a line the natural voices have no clip for yet, reads plain capitals, "K, R, Ü, G, E, R"
  * (`device`). Pace (checked on the clips of the live site, 11 November 2026): the voices rush a list of letter names —
  * a line that was only the letters took about a second for four letters, and letters were swallowed. So every spelled
- * line starts with words ("Ich buchstabiere: …"), each letter ends with a full stop (in such a line the voices then
- * give a letter about half a second), and the player plays a spelled line slower (app/a1-exam-audio.tsx).
+ * line starts with words ("Ich buchstabiere: …", which gives the letters more room), and the player plays a spelled
+ * line slower (app/a1-exam-audio.tsx). A full stop after each letter was tried and dropped: it slows the letters down,
+ * but more of them get lost.
  *
  * How the letters are read was measured on 10 November 2026 (every text rendered locally with the ten site voices,
  * written down again by a speech recogniser, the vowels' formants measured; the Mac's German voices for the device):
@@ -44,8 +45,8 @@ export const LETTER_SAY:Readonly<Record<string,string>>={...LETTER_NAME,E:'E','�
 export const nameLetters=(name:string)=>[...name].filter(letter=>/[A-Za-zÄÖÜäöüß]/.test(letter)).map(letter=>letter==='ß'?'ß':letter.toUpperCase());
 /** "Krüger" → "K – R – Ü – G – E – R" (shown after the practice). */
 export const spellShown=(name:string)=>nameLetters(name).join(' – ');
-/** "Krüger" → "Kah. Err. Üh. Geh. E. Err" (read by the natural site voices; a full stop after each letter, see above). */
-export const spellSay=(name:string)=>nameLetters(name).map(letter=>LETTER_SAY[letter]).join('. ');
+/** "Krüger" → "Kah, Err, Üh, Geh, E, Err" (read by the natural site voices). */
+export const spellSay=(name:string)=>nameLetters(name).map(letter=>LETTER_SAY[letter]).join(', ');
 /** "Krüger" → "K, R, Ü, G, E, R" (read by the device voice). */
 export const spellDevice=(name:string)=>nameLetters(name).join(', ');
 

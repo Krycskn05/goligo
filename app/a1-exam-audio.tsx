@@ -13,7 +13,7 @@ import {useGermanSpeech} from './study-shared';
  * speech goes from busy to idle.
  */
 /** How fast a spelled line is played: a natural clip, and the device voice (which already pauses at the commas). */
-const SPELL_SPEED=0.75,SPELL_DEVICE_SPEED=0.85;
+const SPELL_SPEED=0.7,SPELL_DEVICE_SPEED=0.85;
 export function useExamAudio(){
  const speech=useGermanSpeech('de');
  const [playing,setPlaying]=useState<string|null>(null);

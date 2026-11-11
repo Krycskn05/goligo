@@ -310,7 +310,7 @@ test('Buchstabieren: a spelling practice beside the exams — three sheets of te
  // The letters' names are the ones of the alphabet lesson; the natural voices read E and Ä another way (measured, see the file).
  for(const [letter,name] of Object.entries(spell.LETTER_NAME)){assert.equal(name,letter==='Ä'?'A-Umlaut':letters.letterSay(letter),letter);assert.equal(spell.LETTER_SAY[letter],letter==='E'?'E':letter==='Ä'?'Ah Umlaut':name,letter);}
  assert.equal(Object.keys(spell.LETTER_NAME).length,30);assert.equal(new Set(Object.values(spell.LETTER_NAME)).size,30,'every letter has its own name');assert.equal(new Set(Object.values(spell.LETTER_SAY)).size,30);
- assert.equal(spell.spellSay('Bäcker'),'Beh. Ah Umlaut. Zeh. Kah. E. Err');assert.equal(spell.spellDevice('Weiß'),'W, E, I, ß');
+ assert.equal(spell.spellSay('Bäcker'),'Beh, Ah Umlaut, Zeh, Kah, E, Err');assert.equal(spell.spellDevice('Weiß'),'W, E, I, ß');
  assert.equal(spell.spellShown('Weiß'),'W – E – I – ß');assert.equal(spell.spellShown('Krüger'),'K – R – Ü – G – E – R');
  const right=[],keys=[],ids=new Set(),triples=new Set();
  sheets.forEach((sheet,s)=>{
@@ -328,7 +328,7 @@ test('Buchstabieren: a spelling practice beside the exams — three sheets of te
    assert.equal(item.spelled,spell.spellShown(name),where);
    const spelled=item.lines.filter(line=>line.text.includes(item.spelled));assert.equal(spelled.length,1,where+': spelled once');
    assert.ok(spelled[0].say.includes(spell.spellSay(name))&&!spelled[0].say.includes(' – '),where);
-   // The voices rush a bare list of letters: a spelled line starts with words, and each letter ends with a full stop.
+   // The voices rush a bare list of letters: a spelled line starts with words (and is played slower).
    assert.ok(/[a-zäöüß]{3,}[.:!?]? /.test(spelled[0].say.split(spell.spellSay(name))[0]),where+': words before the letters');
    assert.ok(spelled[0].device.includes(spell.spellDevice(name))&&!spelled[0].device.includes(' – '),where+': plain capitals for the device voice');
    // What the measuring showed (lib/a1-exam-spell.ts): E / I, U / O and Ü / Ö are too close in the site voices — no

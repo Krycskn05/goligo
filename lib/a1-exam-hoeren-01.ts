@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 1: at the bakery, in a shop, at the cinema; announcements; messages on the phone. */
 export const exam=buildHoeren(1,'Einkaufen · Kino · Durchsagen im Bahnhof · Nachrichten am Telefon',{
@@ -34,11 +34,11 @@ export const exam=buildHoeren(1,'Einkaufen · Kino · Durchsagen im Bahnhof · N
      ['Rami','Muss ich im Bett bleiben?'],
      ['Ärztin:F2','Nein, das müssen Sie nicht. Aber trinken Sie viel Tee und Wasser – das ist wichtig.']],
     why:'İlaç gerekmiyor, yatması da şart değil; önemli olan: *trinken Sie viel Tee und Wasser*.'},
-   {q:'Wie kommt die Frau zum Museum?',o:[['🚶','Zu Fuß'],['🚌','Mit dem Bus'],['🚇','Mit der U-Bahn']],a:'a',lines:[
-     ['Yasemin','Entschuldigung, wie komme ich zum Stadtmuseum? Fährt da ein Bus?'],
-     ['Mann:M3','Der Bus fährt heute nicht. Sie können die U-Bahn nehmen, aber das Museum ist nicht weit: nur fünf Minuten zu Fuß.'],
-     ['Yasemin','Oh, dann gehe ich zu Fuß. Danke!']],
-    why:'Otobüs bugün yok, metro olur ama müze yakın: *dann gehe ich zu Fuß*.'},
+   {q:'Wie buchstabiert man den Namen?',o:['Lindner','Lintner','Lindener'],a:'a',cards:true,lines:[
+     ['Rezeption:F4','Guten Abend. Wie ist Ihr Name, bitte?'],
+     spelled('Mann:M5','Lindner. Ich buchstabiere: {S}.','Lindner'),
+     ['Rezeption:F4','Danke, Herr Lindner. Ihr Zimmer ist im ersten Stock.']],
+    why:'Ad harf harf söyleniyor: *L – I – N – D – N – E – R*. Dördüncü harf D’dir (T değil); D’den sonra E yok.'},
   ]},
  teil2:{
   example:{t:'Die Äpfel sind heute billig.',a:'r',lines:[

@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 6: in a taxi, at the hotel, family and presents; announcements; messages on the phone. */
 export const exam=buildHoeren(6,'Im Taxi · Familie und Geschenke · Durchsagen · Kita, Sport und Arbeit',{
@@ -34,11 +34,12 @@ export const exam=buildHoeren(6,'Im Taxi · Familie und Geschenke · Durchsagen 
      ['Verkäuferin:F5','Dieses hier ist sehr schön. Es kostet 70 Euro.'],
      ['Rami','Oh, das ist zu teuer. Dann kaufe ich Blumen. Schokolade isst sie nicht.']],
     why:'Parfüm çok pahalı, çikolatayı eşi yemiyor: *Dann kaufe ich Blumen*.'},
-   {q:'Wo ist Yasemins Handy?',o:['Auf dem Tisch','In der Tasche','Im Auto'],a:'c',lines:[
-     ['Yasemin','Can, wo ist mein Handy? Auf dem Tisch liegt es nicht.'],
-     ['Can:M5','Ist es in deiner Tasche?'],
-     ['Yasemin','Nein, da ist es auch nicht … Ach, ich weiß: Es liegt noch im Auto!']],
-    why:'Masada yok, çantada da yok: *Es liegt noch im Auto*.'},
+   {q:'Wie buchstabiert man den Namen?',o:['Hardmann','Hartman','Hartmann'],a:'c',cards:true,lines:[
+     ['Frau:F4','Restaurant Roma, guten Tag.'],
+     ['Mann:M1','Guten Tag. Ich möchte für heute Abend einen Tisch reservieren.'],
+     ['Frau:F4','Gern. Auf welchen Namen?'],
+     spelled('Mann:M1','Hartmann. Ich buchstabiere: {S}.','Hartmann')],
+    why:'Ad harf harf söyleniyor: *H – A – R – T – M – A – N – N*. Dördüncü harf T’dir (D değil) ve sonda iki N var.'},
   ]},
  teil2:{
   example:{t:'Der Zug nach München kommt jetzt.',a:'r',lines:[

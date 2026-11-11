@@ -37,11 +37,12 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(7, 'Am Kiosk · Beruf und Freize
                     ['Mei', 'Nein, erst zwei. Aber ich lerne schon seit drei Jahren Deutsch: ein Jahr in Bangkok und zwei Jahre hier.']
                 ],
                 why: 'Almanya’da *erst zwei* yıldır; üç yıl, Almanca öğrendiği toplam süre.' },
-            { q: 'An welchem Tag hat Nora diese Woche frei?', o: ['Am Montag', 'Am Sonntag', 'Am Mittwoch'], a: 'c', lines: [
-                    ['Mei', 'Nora, hast du am Sonntag frei? Dann gehen wir zusammen frühstücken!'],
-                    ['Nora', 'Am Sonntag arbeite ich im Krankenhaus, leider. Diese Woche habe ich nur am Mittwoch frei. Am Montag fängt mein Dienst wieder an.']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Seller', 'Zeler', 'Zeller'], a: 'c', cards: true, lines: [
+                    ['Frau:F5', 'Wie heißt Ihre Lehrerin?'],
+                    (0, a1_exam_build_1.spelled)('Mann:M4', 'Sie heißt Frau Zeller. Ich buchstabiere: {S}.', 'Zeller'),
+                    ['Frau:F5', 'Danke schön.']
                 ],
-                why: 'Pazar çalışıyor; *Diese Woche habe ich nur am Mittwoch frei*.' },
+                why: 'Ad harf harf söyleniyor: *Z – E – L – L – E – R*. İlk harf Z’dir (S değil) ve L iki kez söyleniyor.' },
         ]
     },
     teil2: {

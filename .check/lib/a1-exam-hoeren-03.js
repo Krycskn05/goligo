@@ -37,14 +37,12 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(3, 'Wohnung und Arbeit · Geburt
                     ['Mann:M3', 'Die Post in der Marktstraße gibt es nicht mehr. Jetzt ist die Post im Bahnhof, gleich am Eingang. Gehen Sie die Bahnhofstraße immer geradeaus, das sind nur fünf Minuten.']
                 ],
                 why: 'Marktstraße’deki postane kapanmış; *Jetzt ist die Post im Bahnhof*. Bahnhofstraße yalnızca oraya giden yol.' },
-            { q: 'Welche Größe nimmt die Frau?', o: ['38', '40', '42'], a: 'b', lines: [
-                    ['Yasemin', 'Haben Sie die Bluse auch in Größe 38?'],
-                    ['Verkäuferin:F4', '38 habe ich leider nicht mehr. Hier ist sie in 42.'],
-                    ['Yasemin', 'Die ist zu groß. Und 40?'],
-                    ['Verkäuferin:F4', '40 – ja, die habe ich. Bitte schön.'],
-                    ['Yasemin', 'Die passt. Die nehme ich.']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Franke', 'Frank', 'Franze'], a: 'b', cards: true, lines: [
+                    ['Mann:M2', 'Für wen ist das Paket?'],
+                    (0, a1_exam_build_1.spelled)('Frau:F5', 'Für Herrn Frank. Ich buchstabiere: {S}.', 'Frank'),
+                    ['Mann:M2', 'Danke. Einen Moment, bitte.']
                 ],
-                why: '38 kalmamış, 42 büyük geliyor; 40 beden uyuyor: *Die passt. Die nehme ich.*' },
+                why: 'Ad harf harf söyleniyor: *F – R – A – N – K*. Son harf K’dir; arkasından E gelmiyor.' },
         ]
     },
     teil2: {

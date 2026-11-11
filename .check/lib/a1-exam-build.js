@@ -2,8 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.schreibenItemId = exports.schreibenExamId = exports.hoerenItemId = exports.hoerenExamId = exports.CAST_VOICES = exports.lesenItemId = exports.lesenExamId = void 0;
 exports.buildExam = buildExam;
+exports.spelled = spelled;
 exports.buildHoeren = buildHoeren;
 exports.buildSchreiben = buildSchreiben;
+const a1_exam_letters_1 = require("./a1-exam-letters");
 const two = (n) => String(n).padStart(2, '0');
 const lesenExamId = (number) => 'a1-lesen-' + two(number);
 exports.lesenExamId = lesenExamId;
@@ -34,6 +36,11 @@ function buildExam(number, topics, spec) {
  * Anyone else is written as "Name:Voice" ("Verkäuferin:F4") — a voice of the right kind that is not the other speaker's.
  */
 exports.CAST_VOICES = { Sabine: 'F1', Yasemin: 'F2', Aisha: 'F3', Nora: 'F4', Mei: 'F5', Rami: 'M1', Omar: 'M2', Paul: 'M3', Nikos: 'M4', Tomasz: 'M5' };
+/** A line in which a name is said letter by letter: `{S}` in the text is the spelling ("Ich buchstabiere: {S}.") — on the
+ * paper "K – R – Ü – G – E – R", for the voices the letters' names (lib/a1-exam-letters.ts). */
+function spelled(who, text, name) {
+    return [who, text.replaceAll('{S}', (0, a1_exam_letters_1.spellShown)(name)), text.replaceAll('{S}', (0, a1_exam_letters_1.spellSay)(name)), text.replaceAll('{S}', (0, a1_exam_letters_1.spellDevice)(name))];
+}
 const hoerenExamId = (number) => 'a1-hoeren-' + two(number);
 exports.hoerenExamId = hoerenExamId;
 const hoerenItemId = (exam, n) => (0, exports.hoerenExamId)(exam) + '-' + two(n);
@@ -43,7 +50,7 @@ function audioLine(spec) {
     const voice = given ?? exports.CAST_VOICES[name];
     if (!voice || !/^[FM][1-5]$/.test(voice))
         throw new Error('No voice for ' + spec[0]);
-    return { who: name, voice, text: spec[1] };
+    return { who: name, voice, text: spec[1], ...(spec[2] ? { say: spec[2], device: spec[3] ?? spec[1] } : {}) };
 }
 const option = (spec) => typeof spec === 'string' ? { text: spec } : { icon: spec[0], text: spec[1] };
 const options = (o) => [option(o[0]), option(o[1]), option(o[2])];
@@ -51,7 +58,7 @@ const options = (o) => [option(o[0]), option(o[1]), option(o[2])];
 function buildHoeren(number, topics, spec) {
     let n = 0;
     const id = () => (0, exports.hoerenItemId)(number, ++n);
-    const choice = (item) => ({ id: id(), n, question: item.q, options: options(item.o), answer: item.a, lines: item.lines.map(audioLine), why: item.why });
+    const choice = (item) => ({ id: id(), n, question: item.q, options: options(item.o), answer: item.a, ...(item.cards ? { cards: true } : {}), lines: item.lines.map(audioLine), why: item.why });
     const teil1 = { example: { question: spec.teil1.example.q, options: options(spec.teil1.example.o), answer: spec.teil1.example.a, lines: spec.teil1.example.lines.map(audioLine) }, items: spec.teil1.items.map(choice) };
     const teil2 = { example: { text: spec.teil2.example.t, answer: spec.teil2.example.a, lines: spec.teil2.example.lines.map(audioLine) },
         items: spec.teil2.items.map(item => ({ id: id(), n, text: item.t, answer: item.a, lines: item.lines.map(audioLine), why: item.why })) };

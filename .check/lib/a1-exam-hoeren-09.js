@@ -38,11 +38,12 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(9, 'Eintritt und Bus · Besuch u
                     ['Yasemin', 'Heute nicht. Um drei habe ich einen Termin beim Friseur. Deutsch lerne ich am Abend, und kochen muss ich heute nicht: Can kocht.']
                 ],
                 why: 'Saat üçte *einen Termin beim Friseur* var; Almancayı akşam çalışıyor, yemeği Can yapıyor.' },
-            { q: 'In welchem Stock ist das Büro von Frau Krüger?', o: ['Im ersten Stock', 'Im zweiten Stock', 'Im fünften Stock'], a: 'c', lines: [
-                    ['Tomasz', 'Entschuldigung, ich suche Frau Krüger. Ist ihr Büro im ersten Stock?'],
-                    ['Mann:M3', 'Nein, dort ist die Kantine. Im zweiten Stock ist die Information. Frau Krüger sitzt im fünften Stock, Zimmer 512. Der Aufzug ist dort drüben.']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Pachmann', 'Bachman', 'Bachmann'], a: 'c', cards: true, lines: [
+                    ['Frau:F3', 'Guten Tag. Wie ist Ihr Name?'],
+                    (0, a1_exam_build_1.spelled)('Mann:M2', 'Bachmann. Ich buchstabiere: {S}.', 'Bachmann'),
+                    ['Frau:F3', 'Danke, Herr Bachmann. Bitte warten Sie hier.']
                 ],
-                why: 'Birinci katta kantin, ikinci katta danışma var; *Frau Krüger sitzt im fünften Stock*.' },
+                why: 'Ad harf harf söyleniyor: *B – A – C – H – M – A – N – N*. İlk harf B’dir (P değil) ve sonda iki N var.' },
         ]
     },
     teil2: {

@@ -76,8 +76,9 @@ export type A1Exam={
 export type AudioLine={who:string;voice:string;text:string;say?:string;device?:string};
 /** An answer of a three-way question: its words and, in Teil 1, a small picture (an emoji) like the pictures of the paper. */
 export type ListenOption={text:string;icon?:string};
-/** Teil 1 (short talks) and Teil 3 (phone messages): a question and three answers; heard twice. */
-export type ListenChoiceItem={id:string;n:number;question:string;options:readonly [ListenOption,ListenOption,ListenOption];answer:AbcChoice;lines:readonly AudioLine[];why:string};
+/** Teil 1 (short talks) and Teil 3 (phone messages): a question and three answers; heard twice. `cards`: the answers are
+ * name cards — the question „Wie buchstabiert man den Namen?“, the sixth of Teil 1 in every exam (11 November 2026). */
+export type ListenChoiceItem={id:string;n:number;question:string;options:readonly [ListenOption,ListenOption,ListenOption];answer:AbcChoice;cards?:true;lines:readonly AudioLine[];why:string};
 export type ListenChoiceExample=Omit<ListenChoiceItem,'id'|'n'|'why'>;
 /** Teil 2 (announcements): a statement to mark Richtig or Falsch; heard once. */
 export type ListenTrueFalseItem={id:string;n:number;text:string;answer:TrueFalse;lines:readonly AudioLine[];why:string};

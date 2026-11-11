@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spellSheets = exports.spellItemId = exports.spellSheetId = exports.spellDevice = exports.spellSay = exports.spellShown = exports.nameLetters = exports.LETTER_SAY = exports.LETTER_NAME = exports.SPELL_QUESTION = void 0;
+exports.spellSheets = exports.spellItemId = exports.spellSheetId = exports.spellShown = exports.spellSay = exports.spellDevice = exports.nameLetters = exports.LETTER_SAY = exports.LETTER_NAME = exports.SPELL_QUESTION = void 0;
 exports.spellSpeechTexts = spellSpeechTexts;
 const a1_exam_build_1 = require("./a1-exam-build");
+const a1_exam_letters_1 = require("./a1-exam-letters");
 /**
  * A1 sınavı · Buchstabieren (the learner asked, 10 November 2026): the teacher's Hören paper has an item the ten exams
  * do not have — "Wie buchstabiert man den Namen?" with three name cards that differ in one letter. This is a practice of
@@ -35,26 +36,13 @@ const a1_exam_build_1 = require("./a1-exam-build");
  * When names are added, keep to these limits and check the new lines the same way.
  */
 exports.SPELL_QUESTION = 'Wie buchstabiert man den Namen?';
-/** The German name of every letter as it is shown with an answer ("W = Weh"): the names of the alphabet lesson
- * (lib/willkommen-b-course.ts), and "A-Umlaut" for Ä. */
-exports.LETTER_NAME = {
-    A: 'Ah', B: 'Beh', C: 'Zeh', D: 'Deh', E: 'Eh', F: 'Eff', G: 'Geh', H: 'Hah', I: 'Ih', J: 'Jot', K: 'Kah', L: 'Ell', M: 'Emm', N: 'Enn', O: 'Oh', P: 'Peh', Q: 'Kuh', R: 'Err', S: 'Ess', T: 'Teh',
-    U: 'Uh', V: 'Vau', W: 'Weh', X: 'Ix', Y: 'Ypsilon', Z: 'Zett', 'Ä': 'A-Umlaut', 'Ö': 'Öh', 'Ü': 'Üh', 'ß': 'Eszett',
-};
-/** What the natural site voices read for a letter: its name, except E (the plain letter) and Ä ("Ah Umlaut") — see above. */
-exports.LETTER_SAY = { ...exports.LETTER_NAME, E: 'E', 'Ä': 'Ah Umlaut' };
-/** The letters of a name in capitals (ß stays ß). */
-const nameLetters = (name) => [...name].filter(letter => /[A-Za-zÄÖÜäöüß]/.test(letter)).map(letter => letter === 'ß' ? 'ß' : letter.toUpperCase());
-exports.nameLetters = nameLetters;
-/** "Krüger" → "K – R – Ü – G – E – R" (shown after the practice). */
-const spellShown = (name) => (0, exports.nameLetters)(name).join(' – ');
-exports.spellShown = spellShown;
-/** "Krüger" → "Kah, Err, Üh, Geh, E, Err" (read by the natural site voices). */
-const spellSay = (name) => (0, exports.nameLetters)(name).map(letter => exports.LETTER_SAY[letter]).join(', ');
-exports.spellSay = spellSay;
-/** "Krüger" → "K, R, Ü, G, E, R" (read by the device voice). */
-const spellDevice = (name) => (0, exports.nameLetters)(name).join(', ');
-exports.spellDevice = spellDevice;
+var a1_exam_letters_2 = require("./a1-exam-letters");
+Object.defineProperty(exports, "LETTER_NAME", { enumerable: true, get: function () { return a1_exam_letters_2.LETTER_NAME; } });
+Object.defineProperty(exports, "LETTER_SAY", { enumerable: true, get: function () { return a1_exam_letters_2.LETTER_SAY; } });
+Object.defineProperty(exports, "nameLetters", { enumerable: true, get: function () { return a1_exam_letters_2.nameLetters; } });
+Object.defineProperty(exports, "spellDevice", { enumerable: true, get: function () { return a1_exam_letters_2.spellDevice; } });
+Object.defineProperty(exports, "spellSay", { enumerable: true, get: function () { return a1_exam_letters_2.spellSay; } });
+Object.defineProperty(exports, "spellShown", { enumerable: true, get: function () { return a1_exam_letters_2.spellShown; } });
 const two = (n) => String(n).padStart(2, '0');
 const spellSheetId = (number) => 'a1-spell-' + two(number);
 exports.spellSheetId = spellSheetId;
@@ -67,12 +55,12 @@ function line(spec, name) {
     if (!voice || !/^[FM][1-5]$/.test(voice))
         throw new Error('No voice for ' + spec[0]);
     const fill = (text, spelled) => text.replaceAll('{N}', name).replaceAll('{S}', spelled);
-    const text = fill(spec[1], (0, exports.spellShown)(name)), say = fill(spec[2] ?? spec[1], (0, exports.spellSay)(name));
-    return say === text ? { who, voice, text } : { who, voice, text, say, device: fill(spec[1], (0, exports.spellDevice)(name)) };
+    const text = fill(spec[1], (0, a1_exam_letters_1.spellShown)(name)), say = fill(spec[2] ?? spec[1], (0, a1_exam_letters_1.spellSay)(name));
+    return say === text ? { who, voice, text } : { who, voice, text, say, device: fill(spec[1], (0, a1_exam_letters_1.spellDevice)(name)) };
 }
 function entry(spec) {
     const name = spec.n[AT[spec.a]];
-    return { names: spec.n, answer: spec.a, lines: spec.lines.map(item => line(item, name)), spelled: (0, exports.spellShown)(name), focus: [...spec.focus].map(letter => letter + ' = ' + exports.LETTER_NAME[letter]), ...(spec.tip ? { tip: spec.tip } : {}) };
+    return { names: spec.n, answer: spec.a, lines: spec.lines.map(item => line(item, name)), spelled: (0, a1_exam_letters_1.spellShown)(name), focus: [...spec.focus].map(letter => letter + ' = ' + a1_exam_letters_1.LETTER_NAME[letter]), ...(spec.tip ? { tip: spec.tip } : {}) };
 }
 function sheet(number, topics, example, items) {
     return { id: (0, exports.spellSheetId)(number), number, topics, example: entry(example), items: items.map((item, i) => ({ id: (0, exports.spellItemId)(number, i + 1), n: i + 1, ...entry(item) })) };

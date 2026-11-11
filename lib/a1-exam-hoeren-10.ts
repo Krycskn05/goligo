@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 10: a room to rent, school, a used car, a party; announcements; messages on the phone. */
 export const exam=buildHoeren(10,'Zimmer und Auto · Schule · Durchsagen · Geburtstag, Arbeit, Bahnhof',{
@@ -29,10 +29,12 @@ export const exam=buildHoeren(10,'Zimmer und Auto · Schule · Durchsagen · Geb
      ['Tomasz','Getränke bringt doch schon Nikos mit. Ich habe aber sechs Stühle im Keller – brauchst du die?'],
      ['Sabine','Ja, super! Musik haben wir schon.']],
     why:'İçecekleri Nikos getiriyor, müzik hazır; Tomasz *sechs Stühle* getiriyor.'},
-   {q:'Wie findet Rami den Film?',o:['Zu lang','Lustig','Langweilig'],a:'a',lines:[
-     ['Omar','Na, Rami, wie war der Film? Lustig?'],
-     ['Rami','Lustig? Nein. Er war auch nicht langweilig, die Geschichte war gut. Aber drei Stunden! Das war mir zu lang.']],
-    why:'Komik değil, sıkıcı da değil; ama üç saat sürüyor: *Das war mir zu lang*.'},
+   {q:'Wie buchstabiert man den Namen?',o:['Kaya','Kaja','Gaya'],a:'a',cards:true,lines:[
+     ['Mann:M3','Wie heißt Ihr Mann, bitte?'],
+     ['Frau:F2','Er heißt Emre Kaya.'],
+     ['Mann:M3','Wie schreibt man den Familiennamen?'],
+     spelled('Frau:F2','Ich buchstabiere: {S}.','Kaya')],
+    why:'Ad harf harf söyleniyor: *K – A – Y – A*. İlk harf K’dir (G değil), üçüncü harf Y’dir („Ypsilon“; J değil).'},
   ]},
  teil2:{
   example:{t:'Der Bus fährt heute bis zum Zoo.',a:'f',lines:[

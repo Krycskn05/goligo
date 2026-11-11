@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 5: in a restaurant, at the hotel, plans with friends; announcements; messages on the phone. */
 export const exam=buildHoeren(5,'Im Restaurant · Im Hotel · Durchsagen · Apotheke, Schule und Kochkurs',{
@@ -34,11 +34,11 @@ export const exam=buildHoeren(5,'Im Restaurant · Im Hotel · Durchsagen · Apot
      ['Omar','Entschuldigung, 113?'],
      ['Rezeption:F4','Nein, 130 – eins, drei, null. Hier ist Ihr Schlüssel.']],
     why:'Oda *130 – eins, drei, null*; Omar’ın yanlış duyduğu 113.'},
-   {q:'Was machen die Freunde am Sonntag?',o:[['🎬','Sie gehen ins Kino'],['⚽','Sie spielen Fußball'],['🚲','Sie fahren Fahrrad']],a:'a',lines:[
-     ['Rami','Omar, spielen wir am Sonntag wieder Fußball?'],
-     ['Omar','Am Sonntag regnet es. Gehen wir lieber ins Kino?'],
-     ['Rami','Gute Idee! Fahrrad fahren können wir nächste Woche.']],
-    why:'Pazar yağmurlu, futbol olmuyor: *Gehen wir lieber ins Kino?* — *Gute Idee!* Bisiklet gelecek hafta.'},
+   {q:'Wie buchstabiert man den Namen?',o:['Jäger','Jeger','Jager'],a:'a',cards:true,lines:[
+     ['Beamter:M3','Wie ist Ihr Familienname?'],
+     spelled('Mann:M4','Jäger. Ich buchstabiere: {S}.','Jäger'),
+     ['Beamter:M3','Danke, Herr Jäger.']],
+    why:'Ad harf harf söyleniyor: *J – Ä – G – E – R*. İkinci harf Ä’dır: „A-Umlaut“ diye söylenir (A ya da E değil).'},
   ]},
  teil2:{
   example:{t:'Das Café ist im dritten Stock.',a:'r',lines:[

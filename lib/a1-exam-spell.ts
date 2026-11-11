@@ -1,5 +1,6 @@
 import type {AbcChoice,AudioLine,SpellExample,SpellSheet,SpellTip} from './a1-exam-types';
 import {CAST_VOICES} from './a1-exam-build';
+import {LETTER_NAME,spellDevice,spellSay,spellShown} from './a1-exam-letters';
 
 /**
  * A1 sınavı · Buchstabieren (the learner asked, 10 November 2026): the teacher's Hören paper has an item the ten exams
@@ -33,23 +34,7 @@ import {CAST_VOICES} from './a1-exam-build';
  * When names are added, keep to these limits and check the new lines the same way.
  */
 export const SPELL_QUESTION='Wie buchstabiert man den Namen?';
-/** The German name of every letter as it is shown with an answer ("W = Weh"): the names of the alphabet lesson
- * (lib/willkommen-b-course.ts), and "A-Umlaut" for Ä. */
-export const LETTER_NAME:Readonly<Record<string,string>>={
- A:'Ah',B:'Beh',C:'Zeh',D:'Deh',E:'Eh',F:'Eff',G:'Geh',H:'Hah',I:'Ih',J:'Jot',K:'Kah',L:'Ell',M:'Emm',N:'Enn',O:'Oh',P:'Peh',Q:'Kuh',R:'Err',S:'Ess',T:'Teh',
- U:'Uh',V:'Vau',W:'Weh',X:'Ix',Y:'Ypsilon',Z:'Zett','Ä':'A-Umlaut','Ö':'Öh','Ü':'Üh','ß':'Eszett',
-};
-/** What the natural site voices read for a letter: its name, except E (the plain letter) and Ä ("Ah Umlaut") — see above. */
-export const LETTER_SAY:Readonly<Record<string,string>>={...LETTER_NAME,E:'E','Ä':'Ah Umlaut'};
-/** The letters of a name in capitals (ß stays ß). */
-export const nameLetters=(name:string)=>[...name].filter(letter=>/[A-Za-zÄÖÜäöüß]/.test(letter)).map(letter=>letter==='ß'?'ß':letter.toUpperCase());
-/** "Krüger" → "K – R – Ü – G – E – R" (shown after the practice). */
-export const spellShown=(name:string)=>nameLetters(name).join(' – ');
-/** "Krüger" → "Kah, Err, Üh, Geh, E, Err" (read by the natural site voices). */
-export const spellSay=(name:string)=>nameLetters(name).map(letter=>LETTER_SAY[letter]).join(', ');
-/** "Krüger" → "K, R, Ü, G, E, R" (read by the device voice). */
-export const spellDevice=(name:string)=>nameLetters(name).join(', ');
-
+export {LETTER_NAME,LETTER_SAY,nameLetters,spellDevice,spellSay,spellShown} from './a1-exam-letters';
 const two=(n:number)=>String(n).padStart(2,'0');
 export const spellSheetId=(number:number)=>'a1-spell-'+two(number);
 export const spellItemId=(sheet:number,n:number)=>spellSheetId(sheet)+'-'+two(n);

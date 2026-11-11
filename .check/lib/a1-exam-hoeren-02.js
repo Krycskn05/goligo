@@ -41,12 +41,13 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(2, 'Im Café · Unterwegs in der
                     ['Verkäuferin:F5', 'Gern. 2 Euro 99, bitte.']
                 ],
                 why: 'İki kilo 5 Euro, ama o yalnızca bir kilo alıyor: *2 Euro 99*.' },
-            { q: 'Was macht Sabine am Samstag?', o: ['Sie arbeitet', 'Sie geht schwimmen', 'Sie besucht ihre Schwester'], a: 'c', lines: [
-                    ['Omar', 'Sabine, gehen wir am Samstag zusammen schwimmen?'],
-                    ['Sabine', 'Am Samstag kann ich nicht, da besuche ich meine Schwester Katrin. Aber am Sonntag habe ich Zeit.'],
-                    ['Omar', 'Am Sonntag muss ich im Kiosk arbeiten. Schade!']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Vagner', 'Wegner', 'Wagner'], a: 'c', cards: true, lines: [
+                    ['Praxis:F2', 'Praxis Doktor Engel, guten Tag.'],
+                    ['Frau:F3', 'Guten Tag. Ich brauche einen Termin. Mein Name ist Wagner.'],
+                    ['Praxis:F2', 'Wie schreibt man das?'],
+                    (0, a1_exam_build_1.spelled)('Frau:F3', 'Ich buchstabiere: {S}.', 'Wagner')
                 ],
-                why: 'Cumartesi yüzmeye gidemiyor: *da besuche ich meine Schwester Katrin*. Çalışan Omar, o da pazar günü.' },
+                why: 'Ad harf harf söyleniyor: *W – A – G – N – E – R*. İlk harf W’dir (V değil), ikinci harf A’dır (E değil).' },
         ]
     },
     teil2: {

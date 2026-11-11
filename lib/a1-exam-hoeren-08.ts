@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 8: opening times, living, at the doctor's, paying; announcements; messages on the phone. */
 export const exam=buildHoeren(8,'Öffnungszeiten · Wohnen · Beim Arzt · Durchsagen · Arbeit, Training, Amt',{
@@ -28,11 +28,12 @@ export const exam=buildHoeren(8,'Öffnungszeiten · Wohnen · Beim Arzt · Durch
      ['Hanan:F2','Rami, gehst du heute mit den Kindern ins Schwimmbad?'],
      ['Rami','Das Schwimmbad ist montags geschlossen. Wir gehen in den Zoo. Zum Spielplatz können sie morgen gehen.']],
     why:'Havuz pazartesi kapalı, oyun parkı yarın: *Wir gehen in den Zoo*.'},
-   {q:'Wie bezahlt die Frau?',o:['Bar','Mit Karte','Mit dem Handy'],a:'a',lines:[
-     ['Yasemin','Kann ich mit Karte bezahlen?'],
-     ['Verkäufer:M4','Tut mir leid, die Maschine für Karten ist kaputt. Nur bar, bitte.'],
-     ['Yasemin','Kein Problem, ich habe 20 Euro dabei.']],
-    why:'Kart makinesi bozuk: *Nur bar* — nakit ödüyor, yanında 20 Euro var.'},
+   {q:'Wie buchstabiert man den Namen?',o:['Vogt','Voigt','Fogt'],a:'a',cards:true,lines:[
+     ['Mann:M5','Autowerkstatt Nordstern, guten Tag.'],
+     ['Frau:F2','Guten Tag. Ist mein Auto fertig? Mein Name ist Vogt.'],
+     ['Mann:M5','Wie schreibt man das?'],
+     spelled('Frau:F2','Ich buchstabiere: {S}.','Vogt')],
+    why:'Ad harf harf söyleniyor: *V – O – G – T*. İlk harf V’dir (F değil); O’dan sonra I yok.'},
   ]},
  teil2:{
   example:{t:'Man muss für das Probieren bezahlen.',a:'f',lines:[

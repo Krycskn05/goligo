@@ -36,12 +36,13 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(8, 'Öffnungszeiten · Wohnen ·
                     ['Rami', 'Das Schwimmbad ist montags geschlossen. Wir gehen in den Zoo. Zum Spielplatz können sie morgen gehen.']
                 ],
                 why: 'Havuz pazartesi kapalı, oyun parkı yarın: *Wir gehen in den Zoo*.' },
-            { q: 'Wie bezahlt die Frau?', o: ['Bar', 'Mit Karte', 'Mit dem Handy'], a: 'a', lines: [
-                    ['Yasemin', 'Kann ich mit Karte bezahlen?'],
-                    ['Verkäufer:M4', 'Tut mir leid, die Maschine für Karten ist kaputt. Nur bar, bitte.'],
-                    ['Yasemin', 'Kein Problem, ich habe 20 Euro dabei.']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Vogt', 'Voigt', 'Fogt'], a: 'a', cards: true, lines: [
+                    ['Mann:M5', 'Autowerkstatt Nordstern, guten Tag.'],
+                    ['Frau:F2', 'Guten Tag. Ist mein Auto fertig? Mein Name ist Vogt.'],
+                    ['Mann:M5', 'Wie schreibt man das?'],
+                    (0, a1_exam_build_1.spelled)('Frau:F2', 'Ich buchstabiere: {S}.', 'Vogt')
                 ],
-                why: 'Kart makinesi bozuk: *Nur bar* — nakit ödüyor, yanında 20 Euro var.' },
+                why: 'Ad harf harf söyleniyor: *V – O – G – T*. İlk harf V’dir (F değil); O’dan sonra I yok.' },
         ]
     },
     teil2: {

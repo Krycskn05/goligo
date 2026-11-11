@@ -166,7 +166,9 @@ test('Hören: the answers are balanced, no two exams have the same key, every st
  assert.equal(right,20,'Richtig and Falsch half and half over the ten exams');
  for(const letter of ['a','b','c'])assert.ok(letters[letter]>=33&&letters[letter]<=40,letter+': '+letters[letter]+' of 110');
  assert.equal(new Set(keys.map(key=>key.slice(6,10))).size,10,'ten different Teil 2 keys');
- const asked=hoerenExams.flatMap(exam=>heard(exam).map(entry=>entry.item.question??entry.item.text));assert.equal(new Set(asked).size,150);
+ // Every statement and question once — but for „Wie buchstabiert man den Namen?“, the sixth question of Teil 1 in every exam.
+ const asked=hoerenExams.flatMap(exam=>heard(exam).map(entry=>entry.item.question??entry.item.text));assert.equal(new Set(asked).size,141);
+ assert.equal(asked.filter(question=>question==='Wie buchstabiert man den Namen?').length,10);
  // The voices get every spoken line (scripts/voices/list-texts.cjs).
  const spoken=listening.a1ExamSpeechTexts();assert.equal(new Set(spoken).size,spoken.length);assert.ok(spoken.length>=280,String(spoken.length));
  assert.ok(read('scripts/voices/list-texts.cjs').includes("load('a1-exam-hoeren').a1ExamSpeechTexts()"));
@@ -469,4 +471,36 @@ test('Schreiben: ten papers — a form with five gaps, a message with ten, 15 po
  assert.ok(read('app/a1-exam-paper.tsx').includes("module==='schreiben'?'Schreiben':'Lesen'"));
  for(const key of ['schreibenRule1','schreibenRule2','schreibenRule4','timed20','stipsTitle','stip1','stip2','stip3','hintS1','hintS2'])assert.ok(copy.examCopy[key],key);
  assert.ok(!copy.examCopy.schreibenSoon);assert.ok(copy.examText('tr','about').includes('Hören, Lesen ve Schreiben'));
+});
+
+// The learner, 11 November 2026: "in the exam spelling is not a part of its own, it is just one question" — so the sixth
+// question of Hören Teil 1 is the name-spelling question in every exam (as on the teacher's paper); ids and keys stay.
+test('Hören: the sixth question of Teil 1 is „Wie buchstabiert man den Namen?“ — three name cards, the name said letter by letter',()=>{
+ const letters=load('a1-exam-letters'),spell=load('a1-exam-spell');const names=[];const spoken=new Set(listening.a1ExamSpeechTexts());
+ assert.equal(spell.LETTER_SAY,letters.LETTER_SAY,'one set of letter names for the exams and the practice');
+ for(const exam of hoerenExams){
+  const item=exam.hoeren.teil1.items[5];assert.equal(item.id,exam.id+'-06');assert.equal(item.question,'Wie buchstabiert man den Namen?');assert.equal(item.cards,true,exam.id);
+  for(const other of [...exam.hoeren.teil1.items.slice(0,5),...exam.hoeren.teil3.items])assert.ok(!other.cards&&other.question!==item.question,other.id);
+  const right=item.options['abc'.indexOf(item.answer)].text;names.push(right);
+  for(const option of item.options){assert.match(option.text,/^[A-ZÄÖÜ][a-zäöüß]+$/,exam.id);assert.ok(!option.icon);assert.ok(Math.abs(option.text.length-right.length)<=1,exam.id+': the spellings differ in one spot');
+   if(option.text===right)continue;
+   // The voices' E / I, U / O and Ü / Ö are too close: no wrong spelling differs only by such a pair.
+   const a=letters.nameLetters(right),b=letters.nameLetters(option.text);
+   if(a.length===b.length){const diff=a.map((letter,i)=>letter===b[i]?'':[letter,b[i]].sort().join('')).filter(Boolean);assert.ok(!diff.every(pair=>['EI','OU','ÖÜ'].includes(pair)),exam.id+': '+option.text);}
+   for(const line of item.lines)assert.ok(!new RegExp('(^|[^A-Za-zÄÖÜäöüß])'+option.text+'($|[^A-Za-zÄÖÜäöüß])').test(line.text),exam.id+': '+option.text+' is never said');
+  }
+  // The name is spelled once: the paper shows the letters, the natural voices read their names, the device voice plain capitals.
+  const spelled=item.lines.filter(line=>line.say);assert.equal(spelled.length,1,exam.id);
+  assert.ok(spelled[0].text.includes(letters.spellShown(right))&&spelled[0].say.includes(letters.spellSay(right))&&spelled[0].device.includes(letters.spellDevice(right)),exam.id);
+  assert.ok(/[a-zäöüß]{3,}[.:!?]? /.test(spelled[0].say.split(letters.spellSay(right))[0]),exam.id+': words before the letters');
+  assert.ok(spoken.has(spelled[0].say),exam.id+': the voices get the line as it is read');
+  assert.ok(item.why.includes('*'+letters.spellShown(right)+'*'),exam.id+': the explanation shows the letters');
+  for(const id of ['en','ar','uk','de'])assert.ok(packs[id][item.id].includes('*'+letters.spellShown(right)+'*'),id+': '+item.id);
+ }
+ assert.equal(new Set(names).size,10,'ten different names');
+ const practice=new Set(spell.spellSheets.flatMap(sheet=>[sheet.example,...sheet.items].flatMap(entry=>entry.names)));
+ for(const name of names){assert.ok(!practice.has(name),name+' is not a name of the practice');assert.ok(!['Böhme','Behme','Bohme'].includes(name));}
+ // The paper shows the three spellings as name cards; a line of an exam is read like a line of the practice.
+ assert.ok(read('app/a1-exam-hoeren-paper.tsx').includes('cards={!!item.cards}'));
+ assert.deepEqual(build.spelled('Mann:M5','Ich buchstabiere: {S}.','Weiß'),['Mann:M5','Ich buchstabiere: W – E – I – ß.','Ich buchstabiere: Weh, E, Ih, Eszett.','Ich buchstabiere: W, E, I, ß.']);
 });

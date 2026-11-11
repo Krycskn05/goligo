@@ -86,6 +86,6 @@ export function HoerenTeil({hoeren,teil,examId,...props}:{hoeren:HoerenExam;teil
   <p className="x1-task">Was ist richtig? Markieren Sie: <span className="x1-letter inline">a</span>, <span className="x1-letter inline">b</span> oder <span className="x1-letter inline">c</span>.<br/>Sie hören jeden Text <b>zweimal</b>.</p>
   <Hint language={props.language} text={examText(props.language,'hhint13')}/>
   {teil===1&&<ChoiceItem n={0} playKey={examId+'-b1'} question={hoeren.teil1.example.question} options={hoeren.teil1.example.options} answer={hoeren.teil1.example.answer} lines={hoeren.teil1.example.lines} example max={max} {...props}/>}
-  {items.map(item=><ChoiceItem key={item.id} n={item.n} id={item.id} playKey={item.id} question={item.question} options={item.options} answer={item.answer} lines={item.lines} why={item.why} max={max} {...props}/>)}
+  {items.map(item=><ChoiceItem key={item.id} n={item.n} id={item.id} playKey={item.id} question={item.question} options={item.options} answer={item.answer} lines={item.lines} why={item.why} cards={!!item.cards} max={max} {...props}/>)}
  </section>;
 }

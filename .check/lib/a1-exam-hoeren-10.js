@@ -37,11 +37,13 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(10, 'Zimmer und Auto · Schule �
                     ['Sabine', 'Ja, super! Musik haben wir schon.']
                 ],
                 why: 'İçecekleri Nikos getiriyor, müzik hazır; Tomasz *sechs Stühle* getiriyor.' },
-            { q: 'Wie findet Rami den Film?', o: ['Zu lang', 'Lustig', 'Langweilig'], a: 'a', lines: [
-                    ['Omar', 'Na, Rami, wie war der Film? Lustig?'],
-                    ['Rami', 'Lustig? Nein. Er war auch nicht langweilig, die Geschichte war gut. Aber drei Stunden! Das war mir zu lang.']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Kaya', 'Kaja', 'Gaya'], a: 'a', cards: true, lines: [
+                    ['Mann:M3', 'Wie heißt Ihr Mann, bitte?'],
+                    ['Frau:F2', 'Er heißt Emre Kaya.'],
+                    ['Mann:M3', 'Wie schreibt man den Familiennamen?'],
+                    (0, a1_exam_build_1.spelled)('Frau:F2', 'Ich buchstabiere: {S}.', 'Kaya')
                 ],
-                why: 'Komik değil, sıkıcı da değil; ama üç saat sürüyor: *Das war mir zu lang*.' },
+                why: 'Ad harf harf söyleniyor: *K – A – Y – A*. İlk harf K’dir (G değil), üçüncü harf Y’dir („Ypsilon“; J değil).' },
         ]
     },
     teil2: {

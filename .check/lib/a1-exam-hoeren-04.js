@@ -37,11 +37,13 @@ exports.exam = (0, a1_exam_build_1.buildHoeren)(4, 'Auf dem Markt · Am Bahnhof 
                     ['Mann:M2', 'Gehen Sie hier geradeaus bis zur Ampel. An der Ampel dann nicht links – da ist nur der Park –, sondern rechts. Die Bibliothek ist gleich da.']
                 ],
                 why: 'Işıklara kadar düz, ışıklarda ise *nicht links …, sondern rechts*: sağa.' },
-            { q: 'Was macht Tomasz heute Abend?', o: ['Er sieht fern', 'Er arbeitet', 'Er spielt Basketball'], a: 'a', lines: [
-                    ['Aisha', 'Tomasz, hast du heute Abend Training?'],
-                    ['Tomasz', 'Nein, heute ist kein Basketball, die Halle ist geschlossen. Und im Restaurant habe ich frei. Ich bleibe zu Hause und sehe fern – endlich!']
+            { q: 'Wie buchstabiert man den Namen?', o: ['Böttcher', 'Bötcher', 'Bottcher'], a: 'a', cards: true, lines: [
+                    ['Frau:F1', 'Sprachschule Lingua, guten Morgen.'],
+                    ['Mann:M5', 'Guten Morgen. Ich möchte einen Kurs buchen. Mein Name ist Böttcher.'],
+                    ['Frau:F1', 'Wie bitte? Wie schreibt man das?'],
+                    (0, a1_exam_build_1.spelled)('Mann:M5', 'Ich buchstabiere: {S}.', 'Böttcher')
                 ],
-                why: 'Salon kapalı, restoranda izinli: *Ich bleibe zu Hause und sehe fern*.' },
+                why: 'Ad harf harf söyleniyor: *B – Ö – T – T – C – H – E – R*. İkinci harf Ö’dür (O değil) ve T iki kez söyleniyor.' },
         ]
     },
     teil2: {

@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 3: a flat, languages, the way to work; announcements; messages on the phone. */
 export const exam=buildHoeren(3,'Wohnung und Arbeit · Geburtstag · Durchsagen · Kino und Bibliothek',{
@@ -29,13 +29,11 @@ export const exam=buildHoeren(3,'Wohnung und Arbeit · Geburtstag · Durchsagen 
      ['Aisha','Entschuldigung, ich suche die Post. Ist sie in der Marktstraße?'],
      ['Mann:M3','Die Post in der Marktstraße gibt es nicht mehr. Jetzt ist die Post im Bahnhof, gleich am Eingang. Gehen Sie die Bahnhofstraße immer geradeaus, das sind nur fünf Minuten.']],
     why:'Marktstraße’deki postane kapanmış; *Jetzt ist die Post im Bahnhof*. Bahnhofstraße yalnızca oraya giden yol.'},
-   {q:'Welche Größe nimmt die Frau?',o:['38','40','42'],a:'b',lines:[
-     ['Yasemin','Haben Sie die Bluse auch in Größe 38?'],
-     ['Verkäuferin:F4','38 habe ich leider nicht mehr. Hier ist sie in 42.'],
-     ['Yasemin','Die ist zu groß. Und 40?'],
-     ['Verkäuferin:F4','40 – ja, die habe ich. Bitte schön.'],
-     ['Yasemin','Die passt. Die nehme ich.']],
-    why:'38 kalmamış, 42 büyük geliyor; 40 beden uyuyor: *Die passt. Die nehme ich.*'},
+   {q:'Wie buchstabiert man den Namen?',o:['Franke','Frank','Franze'],a:'b',cards:true,lines:[
+     ['Mann:M2','Für wen ist das Paket?'],
+     spelled('Frau:F5','Für Herrn Frank. Ich buchstabiere: {S}.','Frank'),
+     ['Mann:M2','Danke. Einen Moment, bitte.']],
+    why:'Ad harf harf söyleniyor: *F – R – A – N – K*. Son harf K’dir; arkasından E gelmiyor.'},
   ]},
  teil2:{
   example:{t:'Die Besucher sollen jetzt zum Ausgang gehen.',a:'r',lines:[

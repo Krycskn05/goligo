@@ -1,4 +1,4 @@
-import {buildHoeren} from './a1-exam-build';
+import {buildHoeren,spelled} from './a1-exam-build';
 
 /** A1 sınavı · Hören 9: entrance fees, the last bus, parcels and visits; announcements; messages on the phone. */
 export const exam=buildHoeren(9,'Eintritt und Bus · Besuch und Pakete · Durchsagen · Einladung, Umzug, Kurs',{
@@ -30,10 +30,11 @@ export const exam=buildHoeren(9,'Eintritt und Bus · Besuch und Pakete · Durchs
      ['Mei','Yasemin, kommst du am Nachmittag mit in die Stadt?'],
      ['Yasemin','Heute nicht. Um drei habe ich einen Termin beim Friseur. Deutsch lerne ich am Abend, und kochen muss ich heute nicht: Can kocht.']],
     why:'Saat üçte *einen Termin beim Friseur* var; Almancayı akşam çalışıyor, yemeği Can yapıyor.'},
-   {q:'In welchem Stock ist das Büro von Frau Krüger?',o:['Im ersten Stock','Im zweiten Stock','Im fünften Stock'],a:'c',lines:[
-     ['Tomasz','Entschuldigung, ich suche Frau Krüger. Ist ihr Büro im ersten Stock?'],
-     ['Mann:M3','Nein, dort ist die Kantine. Im zweiten Stock ist die Information. Frau Krüger sitzt im fünften Stock, Zimmer 512. Der Aufzug ist dort drüben.']],
-    why:'Birinci katta kantin, ikinci katta danışma var; *Frau Krüger sitzt im fünften Stock*.'},
+   {q:'Wie buchstabiert man den Namen?',o:['Pachmann','Bachman','Bachmann'],a:'c',cards:true,lines:[
+     ['Frau:F3','Guten Tag. Wie ist Ihr Name?'],
+     spelled('Mann:M2','Bachmann. Ich buchstabiere: {S}.','Bachmann'),
+     ['Frau:F3','Danke, Herr Bachmann. Bitte warten Sie hier.']],
+    why:'Ad harf harf söyleniyor: *B – A – C – H – M – A – N – N*. İlk harf B’dir (P değil) ve sonda iki N var.'},
   ]},
  teil2:{
   example:{t:'Auf der Autobahn kann man heute schnell fahren.',a:'f',lines:[

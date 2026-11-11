@@ -12,6 +12,8 @@ import {useGermanSpeech} from './study-shared';
  * `playing` is its key. Modelled on the Lektion 12 player (app/ausbildung-listen.tsx): the next line starts when the
  * speech goes from busy to idle.
  */
+/** How fast a spelled line is played: a natural clip, and the device voice (which already pauses at the commas). */
+const SPELL_SPEED=0.75,SPELL_DEVICE_SPEED=0.85;
 export function useExamAudio(){
  const speech=useGermanSpeech('de');
  const [playing,setPlaying]=useState<string|null>(null);
@@ -25,7 +27,8 @@ export function useExamAudio(){
   // A name letter by letter: the natural voices read the letters' names (`say`); a line they have no clip of is read by
   // the device voice, which reads plain capitals best (`device`).
   const natural=line.say??line.text;const clip=!!voice&&siteClipUrls(voice.id,natural).length>0;
-  latest.current.speak(line.device&&!clip?line.device:natural,false,voice?.id,1);
+  // A spelled line is played slower than the talk around it: the voices give a letter too little time.
+  latest.current.speak(line.device&&!clip?line.device:natural,false,voice?.id,line.say?clip?SPELL_SPEED:SPELL_DEVICE_SPEED:1);
  },[]);
  // A line has ended (busy → idle): read the next one.
  useEffect(()=>{if(speech.busy){started.current=true;return;}if(started.current&&queue.current){started.current=false;speakAt(queue.current.index+1);}},[speech.busy,speakAt]);

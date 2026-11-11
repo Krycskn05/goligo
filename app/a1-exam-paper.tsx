@@ -1,6 +1,6 @@
 'use client';
 import type {ReactNode} from 'react';
-import {BookOpen,Check,Headphones,Mail,X} from 'lucide-react';
+import {BookOpen,Check,Headphones,Mail,PenLine,X} from 'lucide-react';
 import type {Ad,AdChoice,AdMode,ExamAnswer,LesenExam,Notice,ReadingText,TrueFalse} from '@/lib/a1-exam-types';
 import type {ExamAnswers} from '@/lib/a1-exam-course';
 import {examText,examWhy} from '@/lib/a1-exam-copy';
@@ -154,10 +154,10 @@ export function LesenTeil({lesen,teil,...marks}:{lesen:LesenExam;teil:1|2|3}&Mar
 }
 /** The sheet itself: the head line of the exam paper (Hören or Lesen) and the side label. `spell`: a sheet of the
  * spelling practice — a Hören sheet that is a practice, not a part of the exam. */
-export function Paper({children,minutes,module='lesen'}:{children:ReactNode;minutes:number;module?:'hoeren'|'lesen'|'spell'}){
- const heard=module!=='lesen';
+export function Paper({children,minutes,module='lesen'}:{children:ReactNode;minutes:number;module?:'hoeren'|'lesen'|'schreiben'|'spell'}){
+ const heard=module==='hoeren'||module==='spell';
  return <div className={'x1-paper x1-paper-'+module} lang="de" dir="ltr">
-  <div className="x1-paper-head"><span className="x1-paper-icon" aria-hidden="true">{heard?<Headphones size={20}/>:<BookOpen size={20}/>}</span><strong>{heard?'Hören':'Lesen'}</strong><span>{module==='spell'?'Übung: Buchstabieren':'(circa '+minutes+' Minuten)'}</span></div>
+  <div className="x1-paper-head"><span className="x1-paper-icon" aria-hidden="true">{heard?<Headphones size={20}/>:module==='schreiben'?<PenLine size={20}/>:<BookOpen size={20}/>}</span><strong>{heard?'Hören':module==='schreiben'?'Schreiben':'Lesen'}</strong><span>{module==='spell'?'Übung: Buchstabieren':'(circa '+minutes+' Minuten)'}</span></div>
   <span className="x1-paper-side" aria-hidden="true">{module==='spell'?'Übung':'Schriftliche Prüfung'}</span>
   {children}
  </div>;

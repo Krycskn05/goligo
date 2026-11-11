@@ -2,7 +2,8 @@
  * A1 sınavı (the learner asked, 9 November 2026): practice exams built like the written part of the Start Deutsch 1
  * exam (Goethe / telc) from the learner's photos — 1 Hören, 2 Lesen, 3 Schreiben. Lesen (10 exams,
  * lib/a1-exam-lesen-01.ts … -10.ts) and Hören (10 exams, lib/a1-exam-hoeren-01.ts … -10.ts, added on 9 November 2026 after
- * the telc and Goethe practice sets) are written; Schreiben comes later, so an exam has a place for it (`schreiben`).
+ * the telc and Goethe practice sets) came first; Schreiben (10 exams, lib/a1-exam-schreiben-01.ts … -10.ts) was added on
+ * 11 November 2026 — a form and a short message, solved by taps like the rest (see `SchreibenExam` below).
  *
  * Every text of an exam is German and our own (the site's people, invented places, phone numbers from the ranges kept
  * free for films, invented web addresses). Every answer is a tap: Richtig / Falsch (`r` / `f`), one of two ads
@@ -62,7 +63,8 @@ export type A1Exam={
  /** A few German words that say what the texts are about (on the exam card). */
  topics:string;
  lesen:LesenExam;
- /** Not written yet: Schreiben comes later. (Hören is its own file per exam: `A1HoerenExam`.) */
+ /** Kept from the time before Schreiben was written; Hören and Schreiben are their own files per exam
+  * (`A1HoerenExam`, `A1SchreibenExam`). */
  schreiben?:null;
 };
 
@@ -99,3 +101,28 @@ export type SpellItem={id:string;n:number;names:readonly [string,string,string];
 export type SpellExample=Omit<SpellItem,'id'|'n'>;
 /** A sheet of the practice: one example and ten names. */
 export type SpellSheet={id:string;number:number;topics:string;example:SpellExample;items:readonly SpellItem[]};
+
+/* ---------- Schreiben (the learner asked, 11 November 2026) ---------- */
+/**
+ * Schreiben like the exam — Teil 1: a short text about someone and a form with five missing entries; Teil 2: a short
+ * message (about 30 words) with three points to write about, a greeting and an ending. In the exam both are written by
+ * hand; here every answer is a tap, like the rest of the section: each gap of the form and of the message has three
+ * ways to fill it and one is right (in the message: the greeting, the ending, verb forms, prepositions, the right
+ * word, and one gap where only one sentence answers the point). 5 + 10 gaps = 15 points, as in the exam.
+ *
+ * `why`: how a gap is explained after handing in — a label of lib/a1-exam-copy.ts (`sw_<kind>`, five languages) filled
+ * with German words: `quote` is the line of the text that gives the entry (form) or the right wording (message), `point`
+ * the point of the task a `content` gap answers. So Schreiben needs no explanation packs.
+ */
+export type GapWhyKind='text'|'infer'|'anredeFrau'|'anredeHerr'|'anredeFormal'|'anredeFreund'|'gruss'|'grussFormal'|'verb'|'modal'|'trennbar'|'zeit'|'prep'|'akk'|'dat'|'poss'|'frage'|'content'|'register'|'wort'|'perfekt';
+export type GapWhy={kind:GapWhyKind;quote:string;point?:1|2|3};
+export type GapItem={id:string;n:number;options:readonly [string,string,string];answer:AbcChoice;why:GapWhy};
+/** A row of the form: its label and what stands there; `{1}` … `{5}` mark the gaps. */
+export type FormRow={label:string;value:string};
+export type SchreibenExam={
+ /** `text`: who needs the form and why; `form`: the form's title. */
+ teil1:{text:string;form:string;rows:readonly FormRow[];items:readonly GapItem[]};
+ /** `task`: the situation; `points`: the three points; `lines`: the message with the gaps `{6}` … `{15}`. */
+ teil2:{task:string;points:readonly [string,string,string];lines:readonly string[];items:readonly GapItem[]};
+};
+export type A1SchreibenExam={id:string;number:number;topics:string;schreiben:SchreibenExam};

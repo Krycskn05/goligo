@@ -284,4 +284,36 @@
 .x1-names .x1-opt.is-wrong { box-shadow:none; }
 .x1-names .x1-pick-label { font-family:Georgia,"Times New Roman",serif; font-size:19px; font-weight:700; letter-spacing:.03em; }
 @media (max-width:560px) { .x1-names .x1-pick-label { font-size:15.5px; letter-spacing:0; } }
+/* ---------- Schreiben: the form, the task and the message (app/a1-exam-schreiben-paper.tsx) ---------- */
+.x1-tabs.two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.x1-s-text { margin:0 0 10px; }
+.x1-form { margin:12px 0 8px 54px; padding:14px 16px 8px; border:2px solid #222; background:#fbfbfc; box-shadow:3px 3px 0 #222; }
+.x1-form-title { display:block; margin:0 0 6px; padding-bottom:8px; border-bottom:1.5px solid #222; font-size:17px; letter-spacing:.02em; }
+.x1-form dl { margin:0; }
+.x1-form dl div { display:grid; grid-template-columns:minmax(120px,36%) minmax(0,1fr); gap:10px; align-items:baseline; padding:8px 0; border-bottom:1px dotted #8b9099; }
+.x1-form dl div:last-child { border-bottom:0; }
+.x1-form dt { font-size:14.5px; color:#333; }
+.x1-form dd { margin:0; font-weight:600; min-width:0; }
+.x1-s-task { margin:8px 0 12px 54px; padding:12px 16px; border:1.5px solid #222; background:#f4f5f7; }
+.x1-s-task p { margin:0; }
+.x1-s-task ul { margin:6px 0 8px; padding-left:24px; }
+.x1-s-task li { margin:2px 0; font-weight:700; }
+.x1-s-task p:last-child { font-style:italic; }
+.x1-msg { margin:12px 0 8px 54px; padding:14px 18px 16px; border:1px solid #c5cad3; background:#fff repeating-linear-gradient(180deg,transparent 0,transparent 35px,#dfe4ec 35px,#dfe4ec 36px); box-shadow:2px 3px 8px rgba(30,40,60,.14); line-height:36px; }
+.x1-msg p { margin:0; }
+/* A gap: its number, then an empty line or what was chosen, written in a hand. */
+.x1-gap { display:inline; margin:0 2px; }
+.x1-gap-n { margin-inline-end:3px; padding:1px 5px; border:1.5px solid #222; background:#fff; font-size:11px; font-weight:800; line-height:1.2; vertical-align:super; font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; }
+.x1-gap-line { display:inline-block; min-width:72px; height:1em; border-bottom:2px solid #222; vertical-align:baseline; }
+.x1-gap-word { padding:0 3px; border-bottom:2px solid #1f3f86; color:#1f3f86; font-family:"Bradley Hand","Segoe Print","Comic Sans MS",cursive; font-size:1.06em; font-weight:700; }
+.x1-gap.is-right .x1-gap-word { color:#1f7a2a; border-color:#1f7a2a; }
+.x1-gap s.x1-gap-word { margin-inline-end:6px; border-color:#b3261e; color:#b3261e; text-decoration:line-through; }
+.x1-gap.is-wrong .x1-gap-right { color:#1f7a2a; border-color:#1f7a2a; }
+.x1-gap-context { color:#2c333d; }
+.x1-gapitem + .x1-gapitem { margin-top:22px; }
+@media (max-width:760px) {
+ .x1-form,.x1-s-task,.x1-msg { margin-left:0; }
+ .x1-form dl div { grid-template-columns:1fr; gap:2px; }
+ .x1-msg { padding-inline:12px; }
+}
 @media print { .x1-bar,.x1-pager,.x1-ask,.work-sidebar { display:none !important; } }

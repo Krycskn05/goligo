@@ -7,8 +7,8 @@ import {studyLanguages,isStudyLanguage,type StudyLanguage} from '@/lib/study-lan
 import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {vaultText} from '@/lib/object-vault-copy';
-import type {A1Exam,A1HoerenExam,ExamAnswer,ExamModule} from '@/lib/a1-exam-types';
-import {A1_EXAM_PATH,GUEST_EXAM,HOEREN_TOTAL,LESEN_EXAM_COUNT,LESEN_MINUTES,LESEN_TOTAL,SPELL_MODULE,examList,examModules,examPoints,gradeItems,hasPassed,hoerenItems,isExamNumber,isReadyModule,isSpellNumber,lesenItems,loadHoerenExam,loadLesenExam,moduleMinutes,passMark,type ExamAnswers,type ExamResult,type ReadyModule} from '@/lib/a1-exam-course';
+import type {A1Exam,A1HoerenExam,A1SchreibenExam,ExamAnswer,ExamModule} from '@/lib/a1-exam-types';
+import {A1_EXAM_PATH,GUEST_EXAM,HOEREN_TOTAL,LESEN_EXAM_COUNT,LESEN_TOTAL,SCHREIBEN_TOTAL,SPELL_MODULE,examList,examModules,examPoints,gradeItems,hasPassed,hoerenItems,isExamNumber,isReadyModule,isSpellNumber,lesenItems,loadHoerenExam,loadLesenExam,loadSchreibenExam,moduleMinutes,moduleTeile,passMark,schreibenItems,type ExamAnswers,type ExamResult,type ReadyModule} from '@/lib/a1-exam-course';
 import {clearExamRun,clock,examPapers,examSectionProgress,examsSolved,readExamRun,readExamScores,saveExamRun,saveExamScore,spellPapers,type ExamRun,type ExamScoreMap} from '@/lib/a1-exam-progress';
 import {examText,loadExamPack,type ExamCopyKey} from '@/lib/a1-exam-copy';
 import {useLanguageSwitch} from './language-switch';
@@ -24,12 +24,14 @@ import {LesenTeil,Paper} from './a1-exam-paper';
 import {HoerenTeil} from './a1-exam-hoeren-paper';
 import {useExamAudio} from './a1-exam-audio';
 import {SpellPanel,SpellView} from './a1-exam-spell';
+import {SchreibenTeil} from './a1-exam-schreiben-paper';
 
 /**
  * A1 sınavı (/a1-sinavi, the learner asked, 9 November 2026): practice exams like the written Start Deutsch 1 exam.
- * The section page lists the parts of the exam and the ten exams; every exam has a Hören paper and a Lesen paper
- * (Schreiben is shown as coming later). A paper opens with `?sinav=<number>&bolum=hoeren|lesen` (no `bolum` = Lesen):
- * a start page (rules; Lesen with or without the 25 minutes, Hören with the exam's number of hearings or free), the paper
+ * The section page lists the parts of the exam and the ten exams; every exam has a Hören, a Lesen and a Schreiben
+ * paper (Schreiben since 11 November 2026). A paper opens with `?sinav=<number>&bolum=hoeren|lesen|schreiben` (no
+ * `bolum` = Lesen): a start page (rules; Lesen and Schreiben with or without their minutes, Hören with the exam's number
+ * of hearings or free), the paper
  * one Teil at a time (app/a1-exam-paper.tsx, app/a1-exam-hoeren-paper.tsx; every answer is a tap, nothing is marked right
  * or wrong before the end), then the result (points of 15, the 60 % pass mark, the certificate points × 1,66) and every
  * answer explained in the site language — in Hören with the spoken text. Results stay in the browser and travel with
@@ -56,9 +58,9 @@ function readPlace():Place{
 }
 const examHref=(number:number,module:PaperModule)=>A1_EXAM_PATH+'?sinav='+number+'&bolum='+module;
 const MODULE_ICON:Record<ExamModule,typeof Headphones>={hoeren:Headphones,lesen:FileText,schreiben:PenLine};
-const MODULE_NAME:Record<ReadyModule,string>={hoeren:'Hören',lesen:'Lesen'};
-const MODULE_TOTAL:Record<ReadyModule,number>={hoeren:HOEREN_TOTAL,lesen:LESEN_TOTAL};
-const READY:readonly ReadyModule[]=['hoeren','lesen'];
+const MODULE_NAME:Record<ReadyModule,string>={hoeren:'Hören',lesen:'Lesen',schreiben:'Schreiben'};
+const MODULE_TOTAL:Record<ReadyModule,number>={hoeren:HOEREN_TOTAL,lesen:LESEN_TOTAL,schreiben:SCHREIBEN_TOTAL};
+const READY:readonly ReadyModule[]=['hoeren','lesen','schreiben'];
 type Open=(number:number|null,module?:PaperModule)=>void;
 
 function ExamSection({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
@@ -84,7 +86,7 @@ function ExamSection({language,onLanguage,guest}:{language:StudyLanguage;onLangu
  </div>;
 }
 
-/** The three parts of the written exam: Hören and Lesen have papers, Schreiben comes later. Inside an exam (`number`) the
+/** The three parts of the written exam, each with its papers (a part without papers would show „yakında“). Inside an exam (`number`) the
  * ready parts are links to that exam's other paper. */
 function Modules({language,current,number,onOpen}:{language:StudyLanguage;current?:ExamModule;number?:number;onOpen?:Open}){
  return <ul className="x1-modules" aria-label={examText(language,'modules')}>{examModules.map(module=>{const Icon=MODULE_ICON[module.id];const link=number&&onOpen&&isReadyModule(module.id)&&current!==module.id?module.id:null;
@@ -113,8 +115,7 @@ function ExamHome({language,guest,onOpen}:{language:StudyLanguage;guest:boolean;
    <div><h1 id="x1-heading" tabIndex={-1} className="x1-hero-title">{examText(language,'title')}</h1><p className="x1-hero-sub">{examText(language,'lead')}</p></div>
   </div>
   <Modules language={language}/>
-  <section className="panel x1-about" aria-labelledby="x1-about-heading"><h2 id="x1-about-heading">{examText(language,'aboutTitle')}</h2><p>{examText(language,'about')}</p>
-   <p className="x1-soon-line"><PenLine size={16} aria-hidden="true"/>{examText(language,'schreibenSoon')}</p></section>
+  <section className="panel x1-about" aria-labelledby="x1-about-heading"><h2 id="x1-about-heading">{examText(language,'aboutTitle')}</h2><p>{examText(language,'about')}</p></section>
   <SpellPanel language={language} guest={guest} scores={scores} marks={marks} onOpen={number=>onOpen(number,SPELL_MODULE)}/>
   <section className="x1-exams" aria-labelledby="x1-exams-heading">
    <div className="x1-exams-head"><h2 id="x1-exams-heading">{examText(language,'examsTitle')}</h2>
@@ -133,7 +134,6 @@ function ExamHome({language,guest,onOpen}:{language:StudyLanguage;guest:boolean;
         {locked?<GuestLock language={language} back={examHref(number,module)}/>
          :<a className={'btn small x1-open'+(score&&half===undefined?' secondary':'')} href={examHref(number,module)} onClick={event=>{event.preventDefault();onOpen(number,module);}}>{examText(language,half!==undefined?'resume':score?'review':'open')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></a>}
        </li>;})}
-      <li className="x1-paper-row soon" data-x1-paper="schreiben"><span className="x1-paper-name"><PenLine size={18} aria-hidden="true"/><strong lang="de" dir="ltr">Schreiben</strong></span><span className="x1-card-state"><Clock size={14} aria-hidden="true"/>{examText(language,'soon')}</span></li>
      </ul>
     </li>;})}</ul>
   </section>
@@ -144,13 +144,14 @@ function Starred({text}:{text:string}){const parts=text.split(/(\*[^*]+\*)/g);re
 
 /* ---------- one paper: start page → paper → result with every answer explained ---------- */
 type Phase='intro'|'paper'|'result';
-type Loaded={module:'lesen';exam:A1Exam}|{module:'hoeren';exam:A1HoerenExam};
+type Loaded={module:'lesen';exam:A1Exam}|{module:'hoeren';exam:A1HoerenExam}|{module:'schreiben';exam:A1SchreibenExam};
 const freshRun=(timed:boolean):ExamRun=>({answers:{},seconds:0,teil:1,timed,done:false});
-const itemsOf=(loaded:Loaded)=>loaded.module==='lesen'?lesenItems(loaded.exam.lesen):hoerenItems(loaded.exam.hoeren);
+const itemsOf=(loaded:Loaded):{teil:1|2|3;item:{id:string;answer:ExamAnswer}}[]=>loaded.module==='lesen'?lesenItems(loaded.exam.lesen):loaded.module==='hoeren'?hoerenItems(loaded.exam.hoeren):schreibenItems(loaded.exam.schreiben);
 /** What a start page says for its part: the rules, the choice (the clock or the number of hearings), three tips. */
 const INTRO:Record<ReadyModule,{rules:readonly ExamCopyKey[];on:ExamCopyKey;off:ExamCopyKey;choice:ExamCopyKey;tips:ExamCopyKey;tipList:readonly ExamCopyKey[]}>={
  lesen:{rules:['rule1','rule2','rule3','rule4'],on:'timed',off:'untimed',choice:'timeLeft',tips:'tipsTitle',tipList:['tip1','tip2','tip3']},
  hoeren:{rules:['hoerenRule1','hoerenRule2','rule3','hoerenRule4'],on:'listenStrict',off:'listenFree',choice:'listenMode',tips:'htipsTitle',tipList:['htip1','htip2','htip3']},
+ schreiben:{rules:['schreibenRule1','schreibenRule2','rule3','schreibenRule4'],on:'timed20',off:'untimed',choice:'timeLeft',tips:'stipsTitle',tipList:['stip1','stip2','stip3']},
 };
 
 function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number;module:ReadyModule;language:StudyLanguage;guest:boolean;onOpen:Open;onRunning:(value:boolean)=>void}){
@@ -162,7 +163,9 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
  useEffect(()=>{
   if(locked)return;let alive=true;
   const done=(next:Loaded)=>{if(alive)setLoaded(next);};
-  if(module==='hoeren')loadHoerenExam(number).then(exam=>done({module:'hoeren',exam})).catch(()=>{});else loadLesenExam(number).then(exam=>done({module:'lesen',exam})).catch(()=>{});
+  if(module==='hoeren')loadHoerenExam(number).then(exam=>done({module:'hoeren',exam})).catch(()=>{});
+  else if(module==='schreiben')loadSchreibenExam(number).then(exam=>done({module:'schreiben',exam})).catch(()=>{});
+  else loadLesenExam(number).then(exam=>done({module:'lesen',exam})).catch(()=>{});
   return()=>{alive=false;};
  },[number,module,locked]);
  // A member's saved run: a handed-in paper opens on its result, a half-done one on the start page with "Devam et".
@@ -211,11 +214,12 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
  const backLink=<a className="x1-back" href={A1_EXAM_PATH} onClick={event=>{event.preventDefault();latest.current.audio.stop();onOpen(null);}}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{examText(language,'toExams')}</a>;
  if(locked)return <div className="x1-exam">{backLink}<h1 id="x1-heading" tabIndex={-1} className="x1-exam-title">{part} · {title}</h1><GuestMore language={language} back={examHref(number,module)}/></div>;
  if(!loaded)return <div className="x1-exam">{backLink}<p className="course-loading" role="status">{examText(language,'loading')}</p></div>;
- const marked=run?Object.keys(run.answers).length:0;const items=itemsOf(loaded);
+ const marked=run?Object.keys(run.answers).length:0;const items=itemsOf(loaded);const teile=moduleTeile[module];const last=teile[teile.length-1];
  const teilCount=(teil:1|2|3)=>({done:items.filter(entry=>entry.teil===teil&&run?.answers[entry.item.id]!==undefined).length,total:items.filter(entry=>entry.teil===teil).length});
  /** The paper of a Teil: Lesen or Hören; `review` after handing in. */
  const sheet=(teil:1|2|3,answers:ExamAnswers,review:boolean)=>loaded.module==='lesen'
   ?<LesenTeil key={teil} lesen={loaded.exam.lesen} teil={teil} answers={answers} onMark={review?undefined:mark} review={review} language={language}/>
+  :loaded.module==='schreiben'?<SchreibenTeil key={teil} schreiben={loaded.exam.schreiben} teil={teil===2?2:1} answers={answers} onMark={review?undefined:mark} review={review} language={language}/>
   :<HoerenTeil key={teil} hoeren={loaded.exam.hoeren} examId={meta.id} teil={teil} answers={answers} onMark={review?undefined:mark} review={review} language={language} audio={audio} plays={run?.plays??{}} limit={!!run?.timed} onPlay={review?()=>{}:played}/>;
  const voiceNote=hoeren&&audio.voices==='unavailable'?<p className="x1-voice-note" role="status">{examText(language,'voiceNote')}</p>:null;
 
@@ -244,7 +248,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
   </div>;
  }
 
- if(phase==='paper'&&run){const teil=run.teil;const left=LESEN_MINUTES*60-seconds;const clocked=!hoeren&&run.timed;const over=clocked&&left<=0;
+ if(phase==='paper'&&run){const teil=teile.includes(run.teil)?run.teil:1;const left=minutes*60-seconds;const clocked=!hoeren&&run.timed;const over=clocked&&left<=0;
   return <div className="x1-exam" data-x1-phase="paper" data-x1-part={module}>
    <div className="x1-bar" id="x1-exam-top">
     <h1 id="x1-heading" tabIndex={-1} className="x1-bar-title">{part} · {title}</h1>
@@ -255,7 +259,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
       <button type="button" className="x1-clock-eye" onClick={()=>setShowClock(value=>!value)} aria-label={examText(language,showClock?'hideTimer':'showTimer')} title={examText(language,showClock?'hideTimer':'showTimer')}>{showClock?<EyeOff size={16} aria-hidden="true"/>:<Eye size={16} aria-hidden="true"/>}</button>
      </span>}
     </div>
-    <div className="x1-tabs" role="tablist" aria-label={MODULE_NAME[module]}>{([1,2,3] as const).map(value=>{const count=teilCount(value);
+    <div className={'x1-tabs'+(teile.length===2?' two':'')} role="tablist" aria-label={MODULE_NAME[module]}>{teile.map(value=>{const count=teilCount(value);
      return <button type="button" key={value} role="tab" aria-selected={teil===value} className={'x1-tab'+(teil===value?' on':'')+(count.done===count.total?' full':'')} onClick={()=>toTeil(value)} data-x1-tab={value}><span lang="de" dir="ltr">Teil {value}</span><small dir="ltr">{count.done}/{count.total}</small></button>;})}</div>
    </div>
    {over&&<p className="x1-timeup" role="status"><Clock size={18} aria-hidden="true"/>{examText(language,'timeUp')}</p>}
@@ -265,9 +269,9 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
     <p id="x1-ask-text">{examText(language,'openLeft',{n:result.open.length})}</p>
     <div className="x1-ask-actions"><button type="button" className="btn secondary" onClick={()=>setAsk(false)}>{examText(language,'keepSolving')}</button><button type="button" className="btn" data-x1-finish-anyway onClick={finish}>{examText(language,'finishAnyway')}</button></div>
    </div>}
-   <nav className="x1-pager" aria-label="Teil 1–3">
+   <nav className="x1-pager" aria-label={'Teil 1–'+last}>
     <button type="button" className="btn secondary" disabled={teil===1} onClick={()=>toTeil((teil-1) as 1|2)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{examText(language,'back')}</button>
-    {teil<3?<button type="button" className="btn" data-x1-next onClick={()=>toTeil((teil+1) as 2|3)}>{examText(language,'next')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>
+    {teil<last?<button type="button" className="btn" data-x1-next onClick={()=>toTeil((teil+1) as 2|3)}>{examText(language,'next')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>
      :<button type="button" className="btn x1-finish" data-x1-finish onClick={()=>{if(result&&result.open.length&&!ask){setAsk(true);requestAnimationFrame(()=>document.querySelector('[data-x1-ask]')?.scrollIntoView({block:'center'}));}else finish();}}><Flag size={18} aria-hidden="true"/>{examText(language,'finish')}</button>}
    </nav>
    <p className="x1-note">{examText(language,guest?'guestNote':'saved')}</p>
@@ -276,8 +280,8 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
 
  // The result: points, the pass mark, each Teil, then the whole paper with every answer explained.
  const shown=run??freshRun(true);const outcome=result??gradeItems(items,{});const pass=hasPassed(outcome.right,outcome.total);const mark60=passMark(outcome.total);
- // After Hören comes the same exam's Lesen; after Lesen the next exam starts with its Hören.
- const next:{number:number;module:ReadyModule}|null=hoeren?{number,module:'lesen'}:number<LESEN_EXAM_COUNT?{number:number+1,module:'hoeren'}:null;
+ // After Hören comes the same exam's Lesen, after Lesen its Schreiben; after Schreiben the next exam starts with its Hören.
+ const next:{number:number;module:ReadyModule}|null=hoeren?{number,module:'lesen'}:module==='lesen'?{number,module:'schreiben'}:number<LESEN_EXAM_COUNT?{number:number+1,module:'hoeren'}:null;
  return <div className="x1-exam" data-x1-phase="result" data-x1-part={module}>{backLink}
   <section className={'panel x1-result '+(pass?'ok':'no')} aria-labelledby="x1-heading" data-x1-result={outcome.right}>
    <p className="eyebrow">{part} · {title}</p>
@@ -286,7 +290,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
    <div className="x1-scale" aria-hidden="true"><i style={{width:(outcome.right/outcome.total*100)+'%'}}/><span style={{insetInlineStart:(mark60/outcome.total*100)+'%'}}/></div>
    <p className="x1-result-text">{examText(language,pass?'resultPass':'resultFail',{mark:mark60,total:outcome.total})}</p>
    <p className="x1-result-note">{examText(language,'resultCert',{points:examPoints(outcome.right)})}</p>
-   <ul className="x1-teile">{([1,2,3] as const).map(teil=><li key={teil}><span lang="de" dir="ltr">Teil {teil}</span><b dir="ltr">{outcome.byTeil[teil].right}/{outcome.byTeil[teil].total}</b></li>)}
+   <ul className="x1-teile">{teile.map(teil=><li key={teil}><span lang="de" dir="ltr">Teil {teil}</span><b dir="ltr">{outcome.byTeil[teil].right}/{outcome.byTeil[teil].total}</b></li>)}
     {!hoeren&&shown.timed&&shown.seconds>0&&<li className="x1-time"><Timer size={15} aria-hidden="true"/>{examText(language,'timeUsed',{time:clock(shown.seconds)})}</li>}</ul>
    <div className="x1-cover-actions">
     <button type="button" className="btn secondary" data-x1-again onClick={again}><RotateCcw size={18} aria-hidden="true"/>{examText(language,'again')}</button>
@@ -296,7 +300,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
   </section>
   <h2 className="x1-review-title" id="x1-review">{examText(language,'reviewTitle')}</h2>
   {voiceNote}
-  <Paper minutes={minutes} module={module}>{([1,2,3] as const).map(teil=>sheet(teil,shown.answers,true))}</Paper>
+  <Paper minutes={minutes} module={module}>{teile.map(teil=>sheet(teil,shown.answers,true))}</Paper>
   <div className="x1-cover-actions x1-end">{backLink}<button type="button" className="btn secondary" onClick={again}><RotateCcw size={18} aria-hidden="true"/>{examText(language,'again')}</button></div>
  </div>;
 }

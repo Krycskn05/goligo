@@ -89,8 +89,8 @@ function clearExamRun(storage, examId) { try {
 }
 catch { } }
 const ratio = (part, total) => total ? Math.round(part / total * 100) : 0;
-/** Every exam paper of the section (Hören 1–10, Lesen 1–10) with its points. */
-exports.examPapers = [...a1_exam_course_1.hoerenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.HOEREN_TOTAL })), ...a1_exam_course_1.lesenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.LESEN_TOTAL }))];
+/** Every exam paper of the section (Hören 1–10, Lesen 1–10, Schreiben 1–10) with its points. */
+exports.examPapers = [...a1_exam_course_1.hoerenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.HOEREN_TOTAL })), ...a1_exam_course_1.lesenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.LESEN_TOTAL })), ...a1_exam_course_1.schreibenExamList.map(exam => ({ id: exam.id, total: a1_exam_course_1.SCHREIBEN_TOTAL }))];
 /** The sheets of the spelling practice (Buchstabieren 1–3): their results are kept like a paper's, but they are a practice
  * and do not count in the section's progress. */
 exports.spellPapers = a1_exam_course_1.spellSheetList.map(sheet => ({ id: sheet.id, total: a1_exam_course_1.SPELL_TOTAL }));

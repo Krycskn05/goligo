@@ -1,4 +1,4 @@
-import type {A1Exam,A1HoerenExam,AbcChoice,Ad,AdChoice,AdMode,AudioLine,Face,Frame,ListenOption,Notice,ReadingText,TrueFalse} from './a1-exam-types';
+import type {A1Exam,A1HoerenExam,A1SchreibenExam,AbcChoice,Ad,AdChoice,AdMode,AudioLine,Face,Frame,GapItem,GapWhyKind,ListenOption,Notice,ReadingText,TrueFalse} from './a1-exam-types';
 
 /**
  * The short way an exam is written down (lib/a1-exam-lesen-NN.ts): statements, ads and notices as small tuples in the
@@ -76,4 +76,22 @@ export function buildHoeren(number:number,topics:string,spec:HoerenSpec):A1Hoere
   items:spec.teil2.items.map(item=>({id:id(),n,text:item.t,answer:item.a,lines:item.lines.map(audioLine),why:item.why}))};
  const teil3={items:spec.teil3.items.map(choice)};
  return {id:hoerenExamId(number),number,topics,hoeren:{teil1,teil2,teil3}};
+}
+
+/* ---------- Schreiben (lib/a1-exam-schreiben-NN.ts) ---------- */
+/** A gap: [the three ways to fill it, the right one, how it is explained, the German words of the explanation, the point of the task]. */
+export type GapSpec=readonly [options:readonly [string,string,string],answer:AbcChoice,kind:GapWhyKind,quote:string,point?:1|2|3];
+export type SchreibenSpec={
+ teil1:{text:string;form:string;rows:readonly (readonly [label:string,value:string])[];gaps:readonly [GapSpec,GapSpec,GapSpec,GapSpec,GapSpec]};
+ teil2:{task:string;points:readonly [string,string,string];lines:readonly string[];gaps:readonly GapSpec[]};
+};
+export const schreibenExamId=(number:number)=>'a1-schreiben-'+two(number);
+export const schreibenItemId=(exam:number,n:number)=>schreibenExamId(exam)+'-'+two(n);
+/** Numbers a Schreiben exam like the paper: the form's gaps 1–5, the message's gaps 6–15; ids `a1-schreiben-<exam>-<number>`. */
+export function buildSchreiben(number:number,topics:string,spec:SchreibenSpec):A1SchreibenExam{
+ let n=0;
+ const gap=(item:GapSpec):GapItem=>({id:schreibenItemId(number,++n),n,options:item[0],answer:item[1],why:{kind:item[2],quote:item[3],...(item[4]?{point:item[4]}:{})}});
+ const teil1={text:spec.teil1.text,form:spec.teil1.form,rows:spec.teil1.rows.map(row=>({label:row[0],value:row[1]})),items:spec.teil1.gaps.map(gap)};
+ const teil2={task:spec.teil2.task,points:spec.teil2.points,lines:spec.teil2.lines,items:spec.teil2.gaps.map(gap)};
+ return {id:schreibenExamId(number),number,topics,schreiben:{teil1,teil2}};
 }

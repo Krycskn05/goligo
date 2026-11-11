@@ -33,18 +33,21 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gradeLesen = exports.gradeHoeren = exports.hoerenKey = exports.lesenKey = exports.isSpellNumber = exports.SPELL_SHEET_COUNT = exports.spellSheetList = exports.SPELL_TOTAL = exports.SPELL_MODULE = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleMinutes = exports.isReadyModule = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
+exports.gradeLesen = exports.gradeHoeren = exports.gradeSchreiben = exports.schreibenKey = exports.hoerenKey = exports.lesenKey = exports.isSpellNumber = exports.SPELL_SHEET_COUNT = exports.spellSheetList = exports.SPELL_TOTAL = exports.SPELL_MODULE = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.schreibenExamList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleTeile = exports.moduleMinutes = exports.isReadyModule = exports.SCHREIBEN_TOTAL = exports.SCHREIBEN_MINUTES = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
 exports.loadLesenExam = loadLesenExam;
 exports.loadHoerenExam = loadHoerenExam;
 exports.loadSpellSheet = loadSpellSheet;
+exports.loadSchreibenExam = loadSchreibenExam;
 exports.lesenItems = lesenItems;
 exports.hoerenItems = hoerenItems;
+exports.schreibenItems = schreibenItems;
 exports.gradeItems = gradeItems;
 const a1_exam_build_1 = require("./a1-exam-build");
 /**
  * A1 sınavı (/a1-sinavi): the list of practice exams and how an exam is marked. The exam texts themselves are one file
- * per exam and part (lib/a1-exam-lesen-01.ts … -10.ts, lib/a1-exam-hoeren-01.ts … -10.ts), loaded when the learner
- * opens it. Marking follows the real exam: one point per answer, 15 points in Hören and 15 in Lesen, each part's points
+ * per exam and part (lib/a1-exam-lesen-01.ts … -10.ts, lib/a1-exam-hoeren-01.ts … -10.ts, lib/a1-exam-schreiben-01.ts …
+ * -10.ts), loaded when the learner opens it. Marking follows the real exam: one point per answer, 15 points in Hören,
+ * 15 in Lesen and 15 in Schreiben (5 for the form, 10 for the message), each part's points
  * × 1,66 for the certificate (so a part gives up to 25 of 100), and 60 % to pass (there the 60 % counts over all parts
  * together; here it is shown for the part the learner solved).
  */
@@ -53,15 +56,19 @@ exports.A1_EXAM_PATH = '/a1-sinavi';
 exports.examModules = [
     { id: 'hoeren', number: 1, name: 'Hören', minutes: 20, ready: true },
     { id: 'lesen', number: 2, name: 'Lesen', minutes: 25, ready: true },
-    { id: 'schreiben', number: 3, name: 'Schreiben', minutes: 20, ready: false },
+    { id: 'schreiben', number: 3, name: 'Schreiben', minutes: 20, ready: true },
 ];
 exports.LESEN_MINUTES = 25;
 exports.LESEN_TOTAL = 15;
 exports.HOEREN_MINUTES = 20;
 exports.HOEREN_TOTAL = 15;
-const isReadyModule = (value) => value === 'hoeren' || value === 'lesen';
+exports.SCHREIBEN_MINUTES = 20;
+exports.SCHREIBEN_TOTAL = 15;
+const isReadyModule = (value) => value === 'hoeren' || value === 'lesen' || value === 'schreiben';
 exports.isReadyModule = isReadyModule;
-exports.moduleMinutes = { hoeren: exports.HOEREN_MINUTES, lesen: exports.LESEN_MINUTES };
+exports.moduleMinutes = { hoeren: exports.HOEREN_MINUTES, lesen: exports.LESEN_MINUTES, schreiben: exports.SCHREIBEN_MINUTES };
+/** The Teile of a part's paper: Hören and Lesen have three, Schreiben two (the form, the message). */
+exports.moduleTeile = { hoeren: [1, 2, 3], lesen: [1, 2, 3], schreiben: [1, 2] };
 exports.PASS_PERCENT = 60;
 /** The exam's factor: points of a part × 1,66 (four parts of 15 points make 100). */
 exports.POINT_FACTOR = 1.66;
@@ -98,8 +105,21 @@ exports.hoerenExamList = [
     { number: 9, id: (0, a1_exam_build_1.hoerenExamId)(9), topics: 'Eintritt und Bus · Besuch und Pakete · Durchsagen · Einladung, Umzug, Kurs' },
     { number: 10, id: (0, a1_exam_build_1.hoerenExamId)(10), topics: 'Zimmer und Auto · Schule · Durchsagen · Geburtstag, Arbeit, Bahnhof' },
 ];
+/** The ten Schreiben exams (11 November 2026): the same numbers again — exam 3 is Hören 3, Lesen 3 and Schreiben 3. */
+exports.schreibenExamList = [
+    { number: 1, id: (0, a1_exam_build_1.schreibenExamId)(1), topics: 'Kindergarten-Anmeldung · Einladung an die Nachbarin' },
+    { number: 2, id: (0, a1_exam_build_1.schreibenExamId)(2), topics: 'Hotel-Reservierung · Arzttermin absagen' },
+    { number: 3, id: (0, a1_exam_build_1.schreibenExamId)(3), topics: 'Anmeldung im Sportverein · Brief an die Touristeninformation' },
+    { number: 4, id: (0, a1_exam_build_1.schreibenExamId)(4), topics: 'Bestellung im Möbelhaus · Nachricht an den Vermieter' },
+    { number: 5, id: (0, a1_exam_build_1.schreibenExamId)(5), topics: 'Formular beim Arzt · Dank für eine Einladung' },
+    { number: 6, id: (0, a1_exam_build_1.schreibenExamId)(6), topics: 'Fundbüro · Nachricht an den Chef' },
+    { number: 7, id: (0, a1_exam_build_1.schreibenExamId)(7), topics: 'Bibliotheksausweis · Problem mit einer Bestellung' },
+    { number: 8, id: (0, a1_exam_build_1.schreibenExamId)(8), topics: 'Wohnungssuche · Nachricht an einen kranken Kollegen' },
+    { number: 9, id: (0, a1_exam_build_1.schreibenExamId)(9), topics: 'Busfahrt buchen · Frage nach einem Kochkurs' },
+    { number: 10, id: (0, a1_exam_build_1.schreibenExamId)(10), topics: 'Personalbogen · Etwas im Kurs vergessen' },
+];
 /** The exams of a part. */
-const examList = (module) => module === 'hoeren' ? exports.hoerenExamList : exports.lesenExamList;
+const examList = (module) => module === 'hoeren' ? exports.hoerenExamList : module === 'schreiben' ? exports.schreibenExamList : exports.lesenExamList;
 exports.examList = examList;
 /** The exam a visitor without an account may open (the guest taste: the first part of every section). */
 exports.GUEST_EXAM = 1;
@@ -147,6 +167,17 @@ function loadSpellSheet(number) {
         return Promise.reject(new Error('No sheet ' + number));
     return Promise.resolve().then(() => __importStar(require('./a1-exam-spell'))).then(module => module.spellSheets[number - 1]);
 }
+const schreibenLoaders = {
+    1: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-01'))), 2: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-02'))), 3: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-03'))), 4: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-04'))), 5: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-05'))),
+    6: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-06'))), 7: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-07'))), 8: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-08'))), 9: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-09'))), 10: () => Promise.resolve().then(() => __importStar(require('./a1-exam-schreiben-10'))),
+};
+/** Loads one Schreiben exam: the form and the message with their gaps. */
+function loadSchreibenExam(number) {
+    const load = schreibenLoaders[number];
+    if (!load)
+        return Promise.reject(new Error('No exam ' + number));
+    return load().then(module => module.exam);
+}
 /** The 15 scored items of a Lesen exam in the order of the paper, with the Teil they belong to. */
 function lesenItems(lesen) {
     return [
@@ -168,6 +199,15 @@ function hoerenItems(hoeren) {
 }
 const hoerenKey = (hoeren) => hoerenItems(hoeren).map(entry => entry.item.answer).join('');
 exports.hoerenKey = hoerenKey;
+/** The 15 scored gaps of a Schreiben exam in the order of the paper (Teil 1, the form: 1–5; Teil 2, the message: 6–15). */
+function schreibenItems(schreiben) {
+    return [...schreiben.teil1.items.map(item => ({ teil: 1, item })), ...schreiben.teil2.items.map(item => ({ teil: 2, item }))];
+}
+const schreibenKey = (schreiben) => schreibenItems(schreiben).map(entry => entry.item.answer).join('');
+exports.schreibenKey = schreibenKey;
+/** Marks a Schreiben exam: one point per gap that is filled right. */
+const gradeSchreiben = (schreiben, answers) => gradeItems(schreibenItems(schreiben), answers);
+exports.gradeSchreiben = gradeSchreiben;
 /** Marks a Hören exam like a Lesen exam. */
 const gradeHoeren = (hoeren, answers) => gradeItems(hoerenItems(hoeren), answers);
 exports.gradeHoeren = gradeHoeren;

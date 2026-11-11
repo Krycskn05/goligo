@@ -8,9 +8,12 @@ import {CAST_VOICES} from './a1-exam-build';
  * is said letter by letter, and three spellings to choose from. Our own names and the site's people.
  *
  * A line is written once with `{S}` where the name is spelled and `{N}` for the name. The paper shows
- * "K – R – Ü – G – E – R"; the natural site voices read the letters' names, "Kah, Err, Üh, Geh, E, Err" (`say`); the
+ * "K – R – Ü – G – E – R"; the natural site voices read the letters' names, "Kah. Err. Üh. Geh. E. Err." (`say`); the
  * device voice, which reads a line the natural voices have no clip for yet, reads plain capitals, "K, R, Ü, G, E, R"
- * (`device`).
+ * (`device`). Pace (checked on the clips of the live site, 11 November 2026): the voices rush a list of letter names —
+ * a line that was only the letters took about a second for four letters, and letters were swallowed. So every spelled
+ * line starts with words ("Ich buchstabiere: …"), each letter ends with a full stop (in such a line the voices then
+ * give a letter about half a second), and the player plays a spelled line slower (app/a1-exam-audio.tsx).
  *
  * How the letters are read was measured on 10 November 2026 (every text rendered locally with the ten site voices,
  * written down again by a speech recogniser, the vowels' formants measured; the Mac's German voices for the device):
@@ -41,8 +44,8 @@ export const LETTER_SAY:Readonly<Record<string,string>>={...LETTER_NAME,E:'E','�
 export const nameLetters=(name:string)=>[...name].filter(letter=>/[A-Za-zÄÖÜäöüß]/.test(letter)).map(letter=>letter==='ß'?'ß':letter.toUpperCase());
 /** "Krüger" → "K – R – Ü – G – E – R" (shown after the practice). */
 export const spellShown=(name:string)=>nameLetters(name).join(' – ');
-/** "Krüger" → "Kah, Err, Üh, Geh, E, Err" (read by the natural site voices). */
-export const spellSay=(name:string)=>nameLetters(name).map(letter=>LETTER_SAY[letter]).join(', ');
+/** "Krüger" → "Kah. Err. Üh. Geh. E. Err" (read by the natural site voices; a full stop after each letter, see above). */
+export const spellSay=(name:string)=>nameLetters(name).map(letter=>LETTER_SAY[letter]).join('. ');
 /** "Krüger" → "K, R, Ü, G, E, R" (read by the device voice). */
 export const spellDevice=(name:string)=>nameLetters(name).join(', ');
 
@@ -86,7 +89,7 @@ const sheet1=sheet(1,'Vokale und Umlaute: a · o · ä · ö · ü · ai · au �
   ['Mann:M2','Fitnessstudio Aktiv, guten Tag.'],
   ['Frau:F4','Guten Tag. Ich möchte mich anmelden.'],
   ['Mann:M2','Gern. Wie schreibt man Ihren Familiennamen?'],
-  ['Frau:F4','{S}.']]},
+  ['Frau:F4','Ich buchstabiere: {S}.']]},
  {n:['Schefer','Schafer','Schäfer'],a:'c',focus:'ÄEA',tip:'umlaut',lines:[
   ['Frau:F4','Und Ihr Familienname, bitte?'],
   ['Mann:M4','Ich buchstabiere: {S}.'],
@@ -100,12 +103,12 @@ const sheet1=sheet(1,'Vokale und Umlaute: a · o · ä · ö · ü · ai · au �
   ['Frau:F3','Wie heißen Sie?'],
   ['Mann:M3','{N}.'],
   ['Frau:F3','Wie schreibt man das?'],
-  ['Mann:M3','{S}.']]},
+  ['Mann:M3','Ich buchstabiere: {S}.']]},
  {n:['Lena','Lana','Lina'],a:'b',focus:'AEI',lines:[
   ['Sekretärin:F5','Wie heißt Ihre Tochter?'],
   ['Mann:M5','Sie heißt {N}.'],
   ['Sekretärin:F5','Wie schreibt man das?'],
-  ['Mann:M5','{S}.']]},
+  ['Mann:M5','Ich buchstabiere: {S}.']]},
  {n:['Rath','Roth','Ruth'],a:'a',focus:'AOU',lines:[
   ['Mann:M2','Sie möchten ein Paket abholen? Wie ist der Name?'],
   ['Frau:F2','Ich buchstabiere: {S}.'],
@@ -114,7 +117,7 @@ const sheet1=sheet(1,'Vokale und Umlaute: a · o · ä · ö · ü · ai · au �
   ['Frau:F2','Stadtbibliothek, guten Tag.'],
   ['Mann:M4','Guten Tag, mein Name ist {N}. Ich möchte einen Ausweis.'],
   ['Frau:F2','Gern. Wie schreibt man Ihren Namen?'],
-  ['Mann:M4','{S}.']]},
+  ['Mann:M4','Ich buchstabiere: {S}.']]},
  {n:['Bäcker','Becker','Backer'],a:'b',focus:'EÄA',tip:'umlaut',lines:[
   ['Mann:M5','Wie ist Ihr Name?'],
   ['Frau:F3','{N}.'],
@@ -143,7 +146,7 @@ const sheet2=sheet(2,'Konsonanten: b · p · d · t · v · w · f · s · z · 
   ['Frau:F2','Wie heißen Sie?'],
   ['Mann:M5','{N}.'],
   ['Frau:F2','Wie schreibt man das?'],
-  ['Mann:M5','{S}.']]},
+  ['Mann:M5','Ich buchstabiere: {S}.']]},
  {n:['Gerber','Jerber','Kerber'],a:'a',focus:'GJK',lines:[
   ['Mann:M2','Für wen ist das Paket?'],
   ['Frau:F3','Für Frau {N}. Ich buchstabiere: {S}.'],
@@ -161,7 +164,7 @@ const sheet2=sheet(2,'Konsonanten: b · p · d · t · v · w · f · s · z · 
   ['Mann:M5','Wie ist Ihr Name, bitte?'],
   ['Nora','Nora {N}.'],
   ['Mann:M5','Wie schreibt man den Familiennamen?'],
-  ['Nora','{S}.']]},
+  ['Nora','Ich buchstabiere: {S}.']]},
  {n:['Jasemin','Yasmin','Yasemin'],a:'c',focus:'YJ',tip:'count',lines:[
   ['Mann:M3','Wie ist Ihr Vorname, Frau Arslan?'],
   ['Yasemin','{N}.'],
@@ -180,7 +183,7 @@ const sheet2=sheet(2,'Konsonanten: b · p · d · t · v · w · f · s · z · 
   ['Mann:M5','Wie ist Ihr Familienname?'],
   ['Frau:F4','{N}.'],
   ['Mann:M5','Wie bitte? Wie schreibt man das?'],
-  ['Frau:F4','{S}.']]},
+  ['Frau:F4','Ich buchstabiere: {S}.']]},
 ]);
 
 /** Blatt 3 — double letters, letters you do not hear in the word (th, ph, h) and the names of the site's people. */
@@ -208,12 +211,12 @@ const sheet3=sheet(3,'Doppelte und stumme Buchstaben · lange Namen',
   ['Beamtin:F5','Wie heißt Ihr Bruder?'],
   ['Frau:F1','Er heißt {N}.'],
   ['Beamtin:F5','Wie schreibt man das?'],
-  ['Frau:F1','{S}.']]},
+  ['Frau:F1','Ich buchstabiere: {S}.']]},
  {n:['Nowak','Novak','Nowack'],a:'a',focus:'WVCK',lines:[
   ['Frau:F2','Hotel am Hafen, guten Tag.'],
   ['Tomasz','Guten Tag. Ich möchte ein Zimmer reservieren. Mein Name ist Tomasz {N}.'],
   ['Frau:F2','Wie schreibt man den Familiennamen?'],
-  ['Tomasz','{S}.']]},
+  ['Tomasz','Ich buchstabiere: {S}.']]},
  {n:['Kalil','Chalil','Khalil'],a:'c',focus:'KHC',tip:'count',lines:[
   ['Frau:F3','Wie ist Ihr Familienname?'],
   ['Rami','{N}.'],
@@ -223,7 +226,7 @@ const sheet3=sheet(3,'Doppelte und stumme Buchstaben · lange Namen',
   ['Mann:M3','Wie ist Ihr Name, bitte?'],
   ['Mei','Mei {N}.'],
   ['Mann:M3','Wie schreibt man den Familiennamen?'],
-  ['Mei','{S}.']]},
+  ['Mei','Ich buchstabiere: {S}.']]},
  {n:['Camau','Kamau','Kamai'],a:'b',focus:'KCUI',lines:[
   ['Mann:M4','Taxi-Zentrale, guten Morgen. Wer spricht da?'],
   ['Aisha','Hier ist Aisha {N}.'],

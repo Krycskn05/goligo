@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hoerenItemId = exports.hoerenExamId = exports.CAST_VOICES = exports.lesenItemId = exports.lesenExamId = void 0;
+exports.schreibenItemId = exports.schreibenExamId = exports.hoerenItemId = exports.hoerenExamId = exports.CAST_VOICES = exports.lesenItemId = exports.lesenExamId = void 0;
 exports.buildExam = buildExam;
 exports.buildHoeren = buildHoeren;
+exports.buildSchreiben = buildSchreiben;
 const two = (n) => String(n).padStart(2, '0');
 const lesenExamId = (number) => 'a1-lesen-' + two(number);
 exports.lesenExamId = lesenExamId;
@@ -56,4 +57,16 @@ function buildHoeren(number, topics, spec) {
         items: spec.teil2.items.map(item => ({ id: id(), n, text: item.t, answer: item.a, lines: item.lines.map(audioLine), why: item.why })) };
     const teil3 = { items: spec.teil3.items.map(choice) };
     return { id: (0, exports.hoerenExamId)(number), number, topics, hoeren: { teil1, teil2, teil3 } };
+}
+const schreibenExamId = (number) => 'a1-schreiben-' + two(number);
+exports.schreibenExamId = schreibenExamId;
+const schreibenItemId = (exam, n) => (0, exports.schreibenExamId)(exam) + '-' + two(n);
+exports.schreibenItemId = schreibenItemId;
+/** Numbers a Schreiben exam like the paper: the form's gaps 1–5, the message's gaps 6–15; ids `a1-schreiben-<exam>-<number>`. */
+function buildSchreiben(number, topics, spec) {
+    let n = 0;
+    const gap = (item) => ({ id: (0, exports.schreibenItemId)(number, ++n), n, options: item[0], answer: item[1], why: { kind: item[2], quote: item[3], ...(item[4] ? { point: item[4] } : {}) } });
+    const teil1 = { text: spec.teil1.text, form: spec.teil1.form, rows: spec.teil1.rows.map(row => ({ label: row[0], value: row[1] })), items: spec.teil1.gaps.map(gap) };
+    const teil2 = { task: spec.teil2.task, points: spec.teil2.points, lines: spec.teil2.lines, items: spec.teil2.gaps.map(gap) };
+    return { id: (0, exports.schreibenExamId)(number), number, topics, schreiben: { teil1, teil2 } };
 }

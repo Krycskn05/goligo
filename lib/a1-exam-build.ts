@@ -1,4 +1,4 @@
-import type {A1Exam,A1HoerenExam,A1SchreibenExam,AbcChoice,Ad,AdChoice,AdMode,AudioLine,Face,Frame,GapItem,GapWhyKind,ListenOption,Notice,ReadingText,TrueFalse} from './a1-exam-types';
+import type {A1Exam,A1HoerenExam,A1SchreibenExam,AbcChoice,Ad,AdChoice,AdMode,AudioLine,Face,Frame,FormGap,GapWhyKind,ListenOption,Notice,ReadingText,TrueFalse} from './a1-exam-types';
 import {spellDevice,spellSay,spellShown} from './a1-exam-letters';
 
 /**
@@ -86,19 +86,18 @@ export function buildHoeren(number:number,topics:string,spec:HoerenSpec):A1Hoere
 }
 
 /* ---------- Schreiben (lib/a1-exam-schreiben-NN.ts) ---------- */
-/** A gap: [the three ways to fill it, the right one, how it is explained, the German words of the explanation, the point of the task]. */
-export type GapSpec=readonly [options:readonly [string,string,string],answer:AbcChoice,kind:GapWhyKind,quote:string,point?:1|2|3];
+/** A gap of the form: [the entries that count — the model entry first —, how it is explained, the line of the text]. */
+export type FormGapSpec=readonly [accept:readonly string[],kind:GapWhyKind,quote:string];
 export type SchreibenSpec={
- teil1:{text:string;form:string;rows:readonly (readonly [label:string,value:string])[];gaps:readonly [GapSpec,GapSpec,GapSpec,GapSpec,GapSpec]};
- teil2:{task:string;points:readonly [string,string,string];lines:readonly string[];gaps:readonly GapSpec[]};
+ teil1:{text:string;form:string;rows:readonly (readonly [label:string,value:string])[];gaps:readonly [FormGapSpec,FormGapSpec,FormGapSpec,FormGapSpec,FormGapSpec]};
+ teil2:{task:string;points:readonly [string,string,string];model:readonly string[]};
 };
 export const schreibenExamId=(number:number)=>'a1-schreiben-'+two(number);
 export const schreibenItemId=(exam:number,n:number)=>schreibenExamId(exam)+'-'+two(n);
-/** Numbers a Schreiben exam like the paper: the form's gaps 1–5, the message's gaps 6–15; ids `a1-schreiben-<exam>-<number>`. */
+/** Numbers the form's gaps 1–5; ids `a1-schreiben-<exam>-<number>` (06–09 are the four marks the learner gives the own
+ * message, lib/a1-exam-course.ts `SCHREIBEN_CRITERIA`). */
 export function buildSchreiben(number:number,topics:string,spec:SchreibenSpec):A1SchreibenExam{
- let n=0;
- const gap=(item:GapSpec):GapItem=>({id:schreibenItemId(number,++n),n,options:item[0],answer:item[1],why:{kind:item[2],quote:item[3],...(item[4]?{point:item[4]}:{})}});
- const teil1={text:spec.teil1.text,form:spec.teil1.form,rows:spec.teil1.rows.map(row=>({label:row[0],value:row[1]})),items:spec.teil1.gaps.map(gap)};
- const teil2={task:spec.teil2.task,points:spec.teil2.points,lines:spec.teil2.lines,items:spec.teil2.gaps.map(gap)};
- return {id:schreibenExamId(number),number,topics,schreiben:{teil1,teil2}};
+ const teil1={text:spec.teil1.text,form:spec.teil1.form,rows:spec.teil1.rows.map(row=>({label:row[0],value:row[1]})),
+  items:spec.teil1.gaps.map((item,i):FormGap=>({id:schreibenItemId(number,i+1),n:i+1,accept:item[0],why:{kind:item[1],quote:item[2]}}))};
+ return {id:schreibenExamId(number),number,topics,schreiben:{teil1,teil2:spec.teil2}};
 }

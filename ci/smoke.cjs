@@ -424,13 +424,13 @@ async function languageFlow(browser) {
   await page.waitForTimeout(800);
   record("A1 sinavi 1 Lesen: kagit aciliyor (Teil 1: ornek + 5 soru, e-posta penceresi, isaretlenebilir kutular)",
     (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 6 && (await page.locator(".x1-mail").count()) === 1 && (await page.locator(".x1-box:not([disabled])").count()) === 10, "");
-  // A1 sinavi – Schreiben (11 Kasim 2026): form (5 bosluk) ve kisa mesaj (10 bosluk); 1. sinavin kagidi aciliyor.
+  // A1 sinavi – Schreiben (11 Kasim 2026): yazarak doldurulan form (5 bosluk) ve serbest yazilan kisa mesaj; 1. sinavin kagidi aciliyor.
   await page.goto(BASE + "/a1-sinavi?sinav=1&bolum=schreiben", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);
   await page.locator("[data-x1-start]").click();
   await page.waitForTimeout(800);
-  record("A1 sinavi 1 Schreiben: kagit aciliyor (Teil 1: form, 5 bosluk, 5 soru, isaretlenebilir a/b/c kutulari)",
-    (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 5 && (await page.locator("[data-x1-form] [data-x1-gap]").count()) === 5 && (await page.locator(".x1-opt:not([disabled])").count()) === 15 && (await page.locator("[data-x1-tab]").count()) === 2, "");
+  record("A1 sinavi 1 Schreiben: kagit aciliyor (Teil 1: form, yazilacak 5 bosluk; secenek yok; 2 Teil)",
+    (await page.locator("[data-x1-teil='1'] [data-x1-item]").count()) === 5 && (await page.locator("[data-x1-form] input.x1-entry").count()) === 5 && (await page.locator(".x1-opt").count()) === 0 && (await page.locator("[data-x1-tab]").count()) === 2, "");
   // A1 sinavi – Buchstabieren (10 Kasim 2026): sinavlarin yaninda ayri bir dinleme alistirmasi; 1. kagit aciliyor.
   await page.goto(BASE + "/a1-sinavi?sinav=1&bolum=buchstabieren", { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(800);

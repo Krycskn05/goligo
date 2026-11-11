@@ -106,24 +106,27 @@ export type SpellSheet={id:string;number:number;topics:string;example:SpellExamp
 /* ---------- Schreiben (the learner asked, 11 November 2026) ---------- */
 /**
  * Schreiben like the exam — Teil 1: a short text about someone and a form with five missing entries; Teil 2: a short
- * message (about 30 words) with three points to write about, a greeting and an ending. In the exam both are written by
- * hand; here every answer is a tap, like the rest of the section: each gap of the form and of the message has three
- * ways to fill it and one is right (in the message: the greeting, the ending, verb forms, prepositions, the right
- * word, and one gap where only one sentence answers the point). 5 + 10 gaps = 15 points, as in the exam.
+ * message (about 30 words) with three points to write about, a greeting and an ending. Nothing here is a choice (the
+ * learner, 11 November 2026: „form doldurma seçmeli olmayacak … ben yazmalıyım, özgün bir şekilde, sen hiçbir şeye
+ * karışmamalısın“): the form is filled in by typing and the message is written freely, as in the exam.
  *
- * `why`: how a gap is explained after handing in — a label of lib/a1-exam-copy.ts (`sw_<kind>`, five languages) filled
- * with German words: `quote` is the line of the text that gives the entry (form) or the right wording (message), `point`
- * the point of the task a `content` gap answers. So Schreiben needs no explanation packs.
+ * The form is marked by the page: each gap has the entries that count (`accept`: the model entry first, then other right
+ * ways to write it; a small spelling slip counts too — lib/a1-exam-course.ts `checkEntry`). `why` explains a gap after
+ * handing in: a label of lib/a1-exam-copy.ts (`sw_text` / `sw_infer`, five languages) filled with the line of the text
+ * (`quote`). The message cannot be marked by the page: after handing in the learner sees a sample answer (`model`) and
+ * marks the own message with the exam's scale — 3 points for each of the three points (1,5 when it is incomplete or
+ * has mistakes), 1 for greeting and ending. 5 + 10 = 15 points, as in the exam.
  */
-export type GapWhyKind='text'|'infer'|'anredeFrau'|'anredeHerr'|'anredeFormal'|'anredeFreund'|'gruss'|'grussFormal'|'verb'|'modal'|'trennbar'|'zeit'|'prep'|'akk'|'dat'|'poss'|'frage'|'content'|'register'|'wort'|'perfekt';
-export type GapWhy={kind:GapWhyKind;quote:string;point?:1|2|3};
-export type GapItem={id:string;n:number;options:readonly [string,string,string];answer:AbcChoice;why:GapWhy};
+export type GapWhyKind='text'|'infer';
+export type GapWhy={kind:GapWhyKind;quote:string};
+/** A gap of the form: the entries that count (the first is the model entry shown afterwards). */
+export type FormGap={id:string;n:number;accept:readonly string[];why:GapWhy};
 /** A row of the form: its label and what stands there; `{1}` … `{5}` mark the gaps. */
 export type FormRow={label:string;value:string};
 export type SchreibenExam={
  /** `text`: who needs the form and why; `form`: the form's title. */
- teil1:{text:string;form:string;rows:readonly FormRow[];items:readonly GapItem[]};
- /** `task`: the situation; `points`: the three points; `lines`: the message with the gaps `{6}` … `{15}`. */
- teil2:{task:string;points:readonly [string,string,string];lines:readonly string[];items:readonly GapItem[]};
+ teil1:{text:string;form:string;rows:readonly FormRow[];items:readonly FormGap[]};
+ /** `task`: the situation; `points`: the three points to write about; `model`: a sample answer, line by line. */
+ teil2:{task:string;points:readonly [string,string,string];model:readonly string[]};
 };
 export type A1SchreibenExam={id:string;number:number;topics:string;schreiben:SchreibenExam};

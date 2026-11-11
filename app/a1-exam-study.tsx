@@ -8,7 +8,7 @@ import {languageDirection} from '@/lib/site-languages';
 import {c} from '@/lib/category-copy';
 import {vaultText} from '@/lib/object-vault-copy';
 import type {A1Exam,A1HoerenExam,A1SchreibenExam,ExamAnswer,ExamModule} from '@/lib/a1-exam-types';
-import {A1_EXAM_PATH,GUEST_EXAM,HOEREN_TOTAL,LESEN_EXAM_COUNT,LESEN_TOTAL,SCHREIBEN_TOTAL,SPELL_MODULE,examList,examModules,examPoints,gradeItems,hasPassed,hoerenItems,isExamNumber,isReadyModule,isSpellNumber,lesenItems,loadHoerenExam,loadLesenExam,loadSchreibenExam,moduleMinutes,moduleTeile,passMark,schreibenItems,type ExamAnswers,type ExamResult,type ReadyModule} from '@/lib/a1-exam-course';
+import {A1_EXAM_PATH,GUEST_EXAM,HOEREN_TOTAL,LESEN_EXAM_COUNT,LESEN_TOTAL,SCHREIBEN_CRITERIA,SCHREIBEN_STEPS,SCHREIBEN_TOTAL,SPELL_MODULE,countWords,criterionId,examList,examModules,examPoints,gradeItems,gradeSchreiben,hasPassed,hoerenItems,isExamNumber,isReadyModule,isSpellNumber,lesenItems,loadHoerenExam,loadLesenExam,loadSchreibenExam,moduleMinutes,moduleTeile,normalizeEntry,passMark,schreibenFilled,schreibenTextId,type ExamAnswers,type ExamResult,type ReadyModule} from '@/lib/a1-exam-course';
 import {clearExamRun,clock,examPapers,examSectionProgress,examsSolved,readExamRun,readExamScores,saveExamRun,saveExamScore,spellPapers,type ExamRun,type ExamScoreMap} from '@/lib/a1-exam-progress';
 import {examText,loadExamPack,type ExamCopyKey} from '@/lib/a1-exam-copy';
 import {useLanguageSwitch} from './language-switch';
@@ -61,6 +61,8 @@ const MODULE_ICON:Record<ExamModule,typeof Headphones>={hoeren:Headphones,lesen:
 const MODULE_NAME:Record<ReadyModule,string>={hoeren:'Hören',lesen:'Lesen',schreiben:'Schreiben'};
 const MODULE_TOTAL:Record<ReadyModule,number>={hoeren:HOEREN_TOTAL,lesen:LESEN_TOTAL,schreiben:SCHREIBEN_TOTAL};
 const READY:readonly ReadyModule[]=['hoeren','lesen','schreiben'];
+/** What there is to do in a paper before handing in: 15 questions; in Schreiben the form's five entries and the message. */
+const MODULE_STEPS:Record<ReadyModule,number>={hoeren:HOEREN_TOTAL,lesen:LESEN_TOTAL,schreiben:SCHREIBEN_STEPS};
 type Open=(number:number|null,module?:PaperModule)=>void;
 
 function ExamSection({language,onLanguage,guest}:{language:StudyLanguage;onLanguage:(value:StudyLanguage)=>void;guest:boolean}){
@@ -106,7 +108,7 @@ function ExamHome({language,guest,onOpen}:{language:StudyLanguage;guest:boolean;
  useEffect(()=>{const visible=()=>{if(document.visibilityState==='visible')setBack(n=>n+1);};document.addEventListener('visibilitychange',visible);return()=>document.removeEventListener('visibilitychange',visible);},[]);
  useEffect(()=>{
   if(guest)return;
-  try{setScores(readExamScores(localStorage));const open:Record<string,number>={};for(const exam of [...examPapers,...spellPapers]){const run=readExamRun(localStorage,exam.id);const count=run&&!run.done?Object.keys(run.answers).length:0;if(count>0)open[exam.id]=count;}setMarks(open);}catch{}
+  try{setScores(readExamScores(localStorage));const open:Record<string,number>={};for(const exam of [...examPapers,...spellPapers]){const run=readExamRun(localStorage,exam.id);const count=run&&!run.done?Object.keys(run.texts??{}).length+Object.keys(run.answers).length:0;if(count>0)open[exam.id]=count;}setMarks(open);}catch{}
  },[guest,synced,back]);
  const progress=useMemo(()=>examSectionProgress(scores),[scores]);const solved=examsSolved(scores);
  return <>
@@ -130,7 +132,7 @@ function ExamHome({language,guest,onOpen}:{language:StudyLanguage;guest:boolean;
        return <li key={module} className={'x1-paper-row'+(score?pass?' passed':' tried':'')} data-x1-paper={exam.id}>
         <span className="x1-paper-name"><Icon size={18} aria-hidden="true"/><strong lang="de" dir="ltr">{MODULE_NAME[module]}</strong>{score&&<span className={'x1-badge '+(pass?'ok':'no')}>{score.right}/{score.total}</span>}</span>
         <span className="x1-card-topics" lang="de" dir="ltr">{exam.topics}</span>
-        <span className="x1-card-state">{score?examText(language,'best',{right:score.right,total:score.total}):half!==undefined?examText(language,'inProgress',{n:half,total:MODULE_TOTAL[module]}):examText(language,'notStarted')}</span>
+        <span className="x1-card-state">{score?examText(language,'best',{right:score.right,total:score.total}):half!==undefined?examText(language,module==='schreiben'?'filled':'inProgress',{n:Math.min(half,MODULE_STEPS[module]),total:MODULE_STEPS[module]}):examText(language,'notStarted')}</span>
         {locked?<GuestLock language={language} back={examHref(number,module)}/>
          :<a className={'btn small x1-open'+(score&&half===undefined?' secondary':'')} href={examHref(number,module)} onClick={event=>{event.preventDefault();onOpen(number,module);}}>{examText(language,half!==undefined?'resume':score?'review':'open')}<ArrowRight size={16} className="vault-direction-icon" aria-hidden="true"/></a>}
        </li>;})}
@@ -146,7 +148,11 @@ function Starred({text}:{text:string}){const parts=text.split(/(\*[^*]+\*)/g);re
 type Phase='intro'|'paper'|'result';
 type Loaded={module:'lesen';exam:A1Exam}|{module:'hoeren';exam:A1HoerenExam}|{module:'schreiben';exam:A1SchreibenExam};
 const freshRun=(timed:boolean):ExamRun=>({answers:{},seconds:0,teil:1,timed,done:false});
-const itemsOf=(loaded:Loaded):{teil:1|2|3;item:{id:string;answer:ExamAnswer}}[]=>loaded.module==='lesen'?lesenItems(loaded.exam.lesen):loaded.module==='hoeren'?hoerenItems(loaded.exam.hoeren):schreibenItems(loaded.exam.schreiben);
+const itemsOf=(loaded:Loaded):{teil:1|2|3;item:{id:string;answer:ExamAnswer}}[]=>loaded.module==='lesen'?lesenItems(loaded.exam.lesen):loaded.module==='hoeren'?hoerenItems(loaded.exam.hoeren):[];
+/** Marks a paper: Hören and Lesen by their answers; Schreiben by what was typed into the form and the marks the learner gave the own message. */
+const gradeOf=(loaded:Loaded,run:Pick<ExamRun,'answers'|'texts'>)=>loaded.module==='schreiben'?gradeSchreiben(loaded.exam,run.answers,run.texts??{}):gradeItems(itemsOf(loaded),run.answers);
+/** A number of points as it is written here: 12,5. */
+const pointsText=(value:number)=>String(value).replace('.',',');
 /** What a start page says for its part: the rules, the choice (the clock or the number of hearings), three tips. */
 const INTRO:Record<ReadyModule,{rules:readonly ExamCopyKey[];on:ExamCopyKey;off:ExamCopyKey;choice:ExamCopyKey;tips:ExamCopyKey;tipList:readonly ExamCopyKey[]}>={
  lesen:{rules:['rule1','rule2','rule3','rule4'],on:'timed',off:'untimed',choice:'timeLeft',tips:'tipsTitle',tipList:['tip1','tip2','tip3']},
@@ -159,7 +165,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
  const [loaded,setLoaded]=useState<Loaded|null>(null);
  const [run,setRun]=useState<ExamRun|null>(null);const [phase,setPhase]=useState<Phase>('intro');
  const [seconds,setSeconds]=useState(0);const [timed,setTimed]=useState(true);const [showClock,setShowClock]=useState(true);const [ask,setAsk]=useState(false);
- const sound=useAnswerSound();const audio=useExamAudio();const latest=useRef({sound,run,seconds,audio});latest.current={sound,run,seconds,audio};
+ const sound=useAnswerSound();const audio=useExamAudio();const latest=useRef({sound,run,seconds,audio,loaded});latest.current={sound,run,seconds,audio,loaded};
  useEffect(()=>{
   if(locked)return;let alive=true;
   const done=(next:Loaded)=>{if(alive)setLoaded(next);};
@@ -201,7 +207,19 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
   setRun(current=>{if(!current||current.done)return current;const next={...current,plays:{...current.plays,[key]:(current.plays?.[key]??0)+1}};keep(next);return next;});
  },[keep]);
  const toTeil=(teil:1|2|3)=>{latest.current.audio.stop();setRun(current=>{if(!current)return current;const next={...current,teil};keep(next);return next;});setAsk(false);top();};
- const result:ExamResult|null=useMemo(()=>loaded&&run?gradeItems(itemsOf(loaded),run.answers):null,[loaded,run]);
+ /** Schreiben: what is typed into the form or written as the message. */
+ const write=useCallback((id:string,value:string)=>{
+  setRun(current=>{if(!current||current.done)return current;const texts={...current.texts};if(value)texts[id]=value;else delete texts[id];const next={...current,texts};keep(next);return next;});setAsk(false);
+ },[keep]);
+ /** Schreiben, after handing in: the learner marks the own message; the result on this page and the saved best result follow. */
+ const selfMark=useCallback((id:string,value:ExamAnswer)=>{
+  setRun(current=>{
+   if(!current||!current.done)return current;const next={...current,answers:{...current.answers,[id]:value}};keep(next);
+   const paper=latest.current.loaded;
+   if(!guest&&paper?.module==='schreiben')try{const graded=gradeSchreiben(paper.exam,next.answers,next.texts??{});saveExamScore(localStorage,meta.id,graded.right,graded.total,next.timed?next.seconds:0,Date.now(),false);}catch{}
+   return next;});
+ },[keep,guest,meta.id]);
+ const result:ExamResult|null=useMemo(()=>loaded&&run?gradeOf(loaded,run):null,[loaded,run]);
  const finish=()=>{
   if(!loaded||!run||!result)return;
   latest.current.audio.stop();
@@ -214,12 +232,18 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
  const backLink=<a className="x1-back" href={A1_EXAM_PATH} onClick={event=>{event.preventDefault();latest.current.audio.stop();onOpen(null);}}><ArrowLeft size={16} className="vault-direction-icon" aria-hidden="true"/>{examText(language,'toExams')}</a>;
  if(locked)return <div className="x1-exam">{backLink}<h1 id="x1-heading" tabIndex={-1} className="x1-exam-title">{part} · {title}</h1><GuestMore language={language} back={examHref(number,module)}/></div>;
  if(!loaded)return <div className="x1-exam">{backLink}<p className="course-loading" role="status">{examText(language,'loading')}</p></div>;
- const marked=run?Object.keys(run.answers).length:0;const items=itemsOf(loaded);const teile=moduleTeile[module];const last=teile[teile.length-1];
- const teilCount=(teil:1|2|3)=>({done:items.filter(entry=>entry.teil===teil&&run?.answers[entry.item.id]!==undefined).length,total:items.filter(entry=>entry.teil===teil).length});
+ const items=itemsOf(loaded);const teile=moduleTeile[module];const last=teile[teile.length-1];const writing=loaded.module==='schreiben';
+ const texts=run?.texts??{};const steps=MODULE_STEPS[module];
+ // What is done so far: marked questions; in Schreiben the form's entries that are filled in and the message once it has words.
+ const marked=!run?0:loaded.module==='schreiben'?schreibenFilled(loaded.exam,texts):Object.keys(run.answers).length;
+ const teilCount=(teil:1|2|3)=>loaded.module==='schreiben'
+  ?teil===1?{done:loaded.exam.schreiben.teil1.items.filter(item=>normalizeEntry(texts[item.id]??'')).length,total:5}:{done:countWords(texts[schreibenTextId(loaded.exam.id)]??'')?1:0,total:1}
+  :{done:items.filter(entry=>entry.teil===teil&&run?.answers[entry.item.id]!==undefined).length,total:items.filter(entry=>entry.teil===teil).length};
+ const openLeft=steps-marked;
  /** The paper of a Teil: Lesen or Hören; `review` after handing in. */
  const sheet=(teil:1|2|3,answers:ExamAnswers,review:boolean)=>loaded.module==='lesen'
   ?<LesenTeil key={teil} lesen={loaded.exam.lesen} teil={teil} answers={answers} onMark={review?undefined:mark} review={review} language={language}/>
-  :loaded.module==='schreiben'?<SchreibenTeil key={teil} schreiben={loaded.exam.schreiben} teil={teil===2?2:1} answers={answers} onMark={review?undefined:mark} review={review} language={language}/>
+  :loaded.module==='schreiben'?<SchreibenTeil key={teil} schreiben={loaded.exam.schreiben} examId={loaded.exam.id} teil={teil===2?2:1} answers={answers} texts={texts} onText={review?undefined:write} onSelf={review?selfMark:undefined} review={review} language={language}/>
   :<HoerenTeil key={teil} hoeren={loaded.exam.hoeren} examId={meta.id} teil={teil} answers={answers} onMark={review?undefined:mark} review={review} language={language} audio={audio} plays={run?.plays??{}} limit={!!run?.timed} onPlay={review?()=>{}:played}/>;
  const voiceNote=hoeren&&audio.voices==='unavailable'?<p className="x1-voice-note" role="status">{examText(language,'voiceNote')}</p>:null;
 
@@ -230,7 +254,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
     <p className="eyebrow" lang="de" dir="ltr">A1 · {MODULE_NAME[module]}</p>
     <h1 id="x1-heading" tabIndex={-1} className="x1-exam-title">{title}</h1>
     <p className="x1-cover-topics" lang="de" dir="ltr">{meta.topics}</p>
-    <p className="x1-cover-facts"><span><ListChecks size={17} aria-hidden="true"/>{examText(language,'questions',{n:total})}</span><span><Timer size={17} aria-hidden="true"/>{examText(language,'minutes',{n:minutes})}</span><span><Flag size={17} aria-hidden="true"/>{passMark(total)}/{total} = 60 %</span></p>
+    <p className="x1-cover-facts"><span><ListChecks size={17} aria-hidden="true"/>{examText(language,module==='schreiben'?'pointsTotal':'questions',{n:total})}</span><span><Timer size={17} aria-hidden="true"/>{examText(language,'minutes',{n:minutes})}</span><span><Flag size={17} aria-hidden="true"/>{passMark(total)}/{total} = 60 %</span></p>
     <h2 className="x1-rules-title">{examText(language,'rulesTitle')}</h2>
     <ul className="x1-rules">{intro.rules.map(key=><li key={key}>{examText(language,key)}</li>)}</ul>
     <details className="x1-tips"><summary>{examText(language,intro.tips)}</summary><ol>{intro.tipList.map(key=><li key={key}><Starred text={examText(language,key)}/></li>)}</ol></details>
@@ -238,7 +262,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
      <button type="button" role="radio" aria-checked={timed} className={timed?'on':''} onClick={()=>setTimed(true)}>{hoeren?<Headphones size={17} aria-hidden="true"/>:<Timer size={17} aria-hidden="true"/>}{examText(language,intro.on)}</button>
      <button type="button" role="radio" aria-checked={!timed} className={!timed?'on':''} onClick={()=>setTimed(false)}>{examText(language,intro.off)}</button>
     </div>
-    {half&&<p className="x1-half" role="status">{examText(language,'inProgress',{n:marked,total})}</p>}
+    {half&&<p className="x1-half" role="status">{examText(language,writing?'filled':'inProgress',{n:marked,total:steps})}</p>}
     <div className="x1-cover-actions">
      {half&&<button type="button" className="btn" data-x1-resume onClick={()=>start(true)}>{examText(language,'resume')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>}
      <button type="button" className={'btn'+(half?' secondary':'')} data-x1-start onClick={()=>start(false)}>{half?<RotateCcw size={18} aria-hidden="true"/>:null}{examText(language,half?'again':'start')}{!half&&<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/>}</button>
@@ -253,7 +277,7 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
    <div className="x1-bar" id="x1-exam-top">
     <h1 id="x1-heading" tabIndex={-1} className="x1-bar-title">{part} · {title}</h1>
     <div className="x1-bar-tools">
-     <span className="x1-marked" data-x1-marked={marked}><ListChecks size={16} aria-hidden="true"/>{examText(language,'marked',{n:marked,total})}</span>
+     <span className="x1-marked" data-x1-marked={marked}><ListChecks size={16} aria-hidden="true"/>{examText(language,writing?'filled':'marked',{n:marked,total:steps})}</span>
      {clocked&&<span className={'x1-clock'+(over?' over':left<=300?' low':'')} role="timer" aria-label={examText(language,'timeLeft')} data-x1-clock>
       <Timer size={16} aria-hidden="true"/>{showClock?<b dir="ltr">{over?'0:00':clock(left)}</b>:<b aria-hidden="true">··:··</b>}
       <button type="button" className="x1-clock-eye" onClick={()=>setShowClock(value=>!value)} aria-label={examText(language,showClock?'hideTimer':'showTimer')} title={examText(language,showClock?'hideTimer':'showTimer')}>{showClock?<EyeOff size={16} aria-hidden="true"/>:<Eye size={16} aria-hidden="true"/>}</button>
@@ -266,31 +290,34 @@ function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number
    {voiceNote}
    <Paper minutes={minutes} module={module}>{sheet(teil,run.answers,false)}</Paper>
    {ask&&result&&<div className="x1-ask" role="alertdialog" aria-labelledby="x1-ask-text" data-x1-ask>
-    <p id="x1-ask-text">{examText(language,'openLeft',{n:result.open.length})}</p>
+    <p id="x1-ask-text">{examText(language,'openLeft',{n:openLeft})}</p>
     <div className="x1-ask-actions"><button type="button" className="btn secondary" onClick={()=>setAsk(false)}>{examText(language,'keepSolving')}</button><button type="button" className="btn" data-x1-finish-anyway onClick={finish}>{examText(language,'finishAnyway')}</button></div>
    </div>}
    <nav className="x1-pager" aria-label={'Teil 1–'+last}>
     <button type="button" className="btn secondary" disabled={teil===1} onClick={()=>toTeil((teil-1) as 1|2)}><ArrowLeft size={18} className="vault-direction-icon" aria-hidden="true"/>{examText(language,'back')}</button>
     {teil<last?<button type="button" className="btn" data-x1-next onClick={()=>toTeil((teil+1) as 2|3)}>{examText(language,'next')}<ArrowRight size={18} className="vault-direction-icon" aria-hidden="true"/></button>
-     :<button type="button" className="btn x1-finish" data-x1-finish onClick={()=>{if(result&&result.open.length&&!ask){setAsk(true);requestAnimationFrame(()=>document.querySelector('[data-x1-ask]')?.scrollIntoView({block:'center'}));}else finish();}}><Flag size={18} aria-hidden="true"/>{examText(language,'finish')}</button>}
+     :<button type="button" className="btn x1-finish" data-x1-finish onClick={()=>{if(result&&openLeft>0&&!ask){setAsk(true);requestAnimationFrame(()=>document.querySelector('[data-x1-ask]')?.scrollIntoView({block:'center'}));}else finish();}}><Flag size={18} aria-hidden="true"/>{examText(language,'finish')}</button>}
    </nav>
    <p className="x1-note">{examText(language,guest?'guestNote':'saved')}</p>
   </div>;
  }
 
  // The result: points, the pass mark, each Teil, then the whole paper with every answer explained.
- const shown=run??freshRun(true);const outcome=result??gradeItems(items,{});const pass=hasPassed(outcome.right,outcome.total);const mark60=passMark(outcome.total);
+ const shown=run??freshRun(true);const outcome=result??gradeOf(loaded,{answers:{}});const pass=hasPassed(outcome.right,outcome.total);const mark60=passMark(outcome.total);
+ // Schreiben: the message waits for the learner's own marks (below the sample answer).
+ const selfOpen=loaded.module==='schreiben'&&SCHREIBEN_CRITERIA.some(criterion=>shown.answers[criterionId(loaded.exam.id,criterion.n)]===undefined);
  // After Hören comes the same exam's Lesen, after Lesen its Schreiben; after Schreiben the next exam starts with its Hören.
  const next:{number:number;module:ReadyModule}|null=hoeren?{number,module:'lesen'}:module==='lesen'?{number,module:'schreiben'}:number<LESEN_EXAM_COUNT?{number:number+1,module:'hoeren'}:null;
  return <div className="x1-exam" data-x1-phase="result" data-x1-part={module}>{backLink}
   <section className={'panel x1-result '+(pass?'ok':'no')} aria-labelledby="x1-heading" data-x1-result={outcome.right}>
    <p className="eyebrow">{part} · {title}</p>
    <h1 id="x1-heading" tabIndex={-1} className="x1-result-title">{examText(language,'resultTitle')}</h1>
-   <p className="x1-score"><strong dir="ltr">{outcome.right} / {outcome.total}</strong><span className={'x1-badge big '+(pass?'ok':'no')}>{pass&&<Check size={16} aria-hidden="true"/>}{examText(language,pass?'passed':'failed')}</span></p>
+   <p className="x1-score"><strong dir="ltr">{pointsText(outcome.right)} / {outcome.total}</strong><span className={'x1-badge big '+(pass?'ok':'no')}>{pass&&<Check size={16} aria-hidden="true"/>}{examText(language,pass?'passed':'failed')}</span></p>
    <div className="x1-scale" aria-hidden="true"><i style={{width:(outcome.right/outcome.total*100)+'%'}}/><span style={{insetInlineStart:(mark60/outcome.total*100)+'%'}}/></div>
    <p className="x1-result-text">{examText(language,pass?'resultPass':'resultFail',{mark:mark60,total:outcome.total})}</p>
+   {selfOpen&&<p className="x1-self-todo" role="status" data-x1-self-todo>{examText(language,'selfTodo')}</p>}
    <p className="x1-result-note">{examText(language,'resultCert',{points:examPoints(outcome.right)})}</p>
-   <ul className="x1-teile">{teile.map(teil=><li key={teil}><span lang="de" dir="ltr">Teil {teil}</span><b dir="ltr">{outcome.byTeil[teil].right}/{outcome.byTeil[teil].total}</b></li>)}
+   <ul className="x1-teile">{teile.map(teil=><li key={teil}><span lang="de" dir="ltr">Teil {teil}</span><b dir="ltr">{pointsText(outcome.byTeil[teil].right)}/{outcome.byTeil[teil].total}</b></li>)}
     {!hoeren&&shown.timed&&shown.seconds>0&&<li className="x1-time"><Timer size={15} aria-hidden="true"/>{examText(language,'timeUsed',{time:clock(shown.seconds)})}</li>}</ul>
    <div className="x1-cover-actions">
     <button type="button" className="btn secondary" data-x1-again onClick={again}><RotateCcw size={18} aria-hidden="true"/>{examText(language,'again')}</button>

@@ -1,4 +1,4 @@
-import type {A1Exam,A1HoerenExam,A1SchreibenExam,AdItem,ExamAnswer,ExamModule,GapItem,HoerenExam,LesenExam,ListenChoiceItem,ListenTrueFalseItem,NoticeItem,SchreibenExam,SpellSheet,TrueFalseItem} from './a1-exam-types';
+import type {A1Exam,A1HoerenExam,A1SchreibenExam,AdItem,ExamAnswer,ExamModule,HoerenExam,LesenExam,ListenChoiceItem,ListenTrueFalseItem,NoticeItem,SpellSheet,TrueFalseItem} from './a1-exam-types';
 import {hoerenExamId,lesenExamId,schreibenExamId} from './a1-exam-build';
 
 /**
@@ -152,17 +152,71 @@ export function hoerenItems(hoeren:HoerenExam):{teil:1|2|3;item:HoerenItem}[]{
 }
 export const hoerenKey=(hoeren:HoerenExam)=>hoerenItems(hoeren).map(entry=>entry.item.answer).join('');
 
-/** The 15 scored gaps of a Schreiben exam in the order of the paper (Teil 1, the form: 1–5; Teil 2, the message: 6–15). */
-export function schreibenItems(schreiben:SchreibenExam):{teil:1|2;item:GapItem}[]{
- return [...schreiben.teil1.items.map(item=>({teil:1 as const,item})),...schreiben.teil2.items.map(item=>({teil:2 as const,item}))];
+/* ---------- Schreiben: a typed form (marked by the page) and a message the learner writes and marks ---------- */
+/** An entry as it is compared: small letters, ä / ö / ü / ß written out, no spaces or signs (a dot stays between two
+ * digits: 12.03.1988), no zero before a number (01.02. = 1.2.). */
+export function normalizeEntry(value:string){
+ return value.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+  .replace(/[.](?=\d)/g,'\u0000').replace(/[^a-z0-9\u0000]/g,'').replace(/\u0000/g,'.').replace(/(^|[^0-9])0+(?=\d)/g,'$1').replace(/^\.+|\.+$/g,'');
 }
-export const schreibenKey=(schreiben:SchreibenExam)=>schreibenItems(schreiben).map(entry=>entry.item.answer).join('');
+/** One letter left out, added or changed. */
+function nearly(a:string,b:string){
+ if(Math.abs(a.length-b.length)>1)return false;
+ let i=0;while(i<a.length&&i<b.length&&a[i]===b[i])i++;
+ let x=a.length,y=b.length;while(x>i&&y>i&&a[x-1]===b[y-1]){x--;y--;}
+ return x-i<=1&&y-i<=1;
+}
+export type EntryCheck='right'|'near'|'wrong'|'open';
+/** Marks a typed entry like the exam does: the information has to be right; how it is written may differ (`accept`), and a
+ * small spelling slip in a word still counts (`near` — the page then shows the right spelling). Numbers and dates are exact. */
+export function checkEntry(given:string|undefined,accept:readonly string[]):EntryCheck{
+ const value=normalizeEntry(given??'');if(!value)return 'open';
+ const wanted=accept.map(normalizeEntry);
+ if(wanted.includes(value))return 'right';
+ if(value.length>=5&&!/\d/.test(value)&&wanted.some(entry=>entry.length>=5&&!/\d/.test(entry)&&nearly(value,entry)))return 'near';
+ return 'wrong';
+}
+/** What the learner typed, by id: the form's entries (`<exam>-01` … `-05`) and the message (`<exam>-text`). */
+export type ExamTexts=Record<string,string>;
+export const schreibenTextId=(examId:string)=>examId+'-text';
+/** The words of a message. */
+export const countWords=(text:string)=>text.trim().split(/\s+/).filter(Boolean).length;
+/** The exam's scale for the message, which the learner applies to the own text after handing in: 3 points for each of
+ * the three points of the task, 1 for greeting and ending. A mark is kept like an answer under `<exam>-06` … `-09`:
+ * `a` = all the points, `b` = half of them (incomplete or with mistakes; only for the three points), `c` = none. */
+export const SCHREIBEN_CRITERIA:readonly {n:number;points:number;point:0|1|2|3}[]=[{n:6,points:3,point:1},{n:7,points:3,point:2},{n:8,points:3,point:3},{n:9,points:1,point:0}];
+export const criterionId=(examId:string,n:number)=>examId+'-'+String(n).padStart(2,'0');
+export const selfPoints=(points:number,mark:ExamAnswer|undefined)=>mark==='a'?points:mark==='b'&&points>1?points/2:0;
+/** What has to be filled in before handing in: the five entries of the form and the message. */
+export const SCHREIBEN_STEPS=6;
+export function schreibenFilled(exam:A1SchreibenExam,texts:ExamTexts){
+ return exam.schreiben.teil1.items.filter(item=>normalizeEntry(texts[item.id]??'')).length+(countWords(texts[schreibenTextId(exam.id)]??'')?1:0);
+}
 
 export type ExamAnswers=Record<string,ExamAnswer>;
 export type ExamResult={right:number;total:number;answered:number;byTeil:Record<1|2|3,{right:number;total:number}>;wrong:string[];open:string[]};
 export type LesenResult=ExamResult;
-/** Marks a Schreiben exam: one point per gap that is filled right. */
-export const gradeSchreiben=(schreiben:SchreibenExam,answers:ExamAnswers)=>gradeItems(schreibenItems(schreiben),answers);
+/** Marks a Schreiben exam: a point for each entry of the form that counts (`texts`), and for the message the points
+ * the learner gave the own text (`answers`, see `SCHREIBEN_CRITERIA`; half points are possible). `open`: the entries
+ * left empty and the marks not given yet. */
+export function gradeSchreiben(exam:A1SchreibenExam,answers:ExamAnswers,texts:ExamTexts={}):ExamResult{
+ const result:ExamResult={right:0,total:0,answered:0,byTeil:{1:{right:0,total:0},2:{right:0,total:0},3:{right:0,total:0}},wrong:[],open:[]};
+ for(const item of exam.schreiben.teil1.items){
+  result.total++;result.byTeil[1].total++;
+  const check=checkEntry(texts[item.id],item.accept);
+  if(check==='open'){result.open.push(item.id);continue;}
+  result.answered++;
+  if(check==='wrong')result.wrong.push(item.id);else{result.right++;result.byTeil[1].right++;}
+ }
+ for(const criterion of SCHREIBEN_CRITERIA){
+  const id=criterionId(exam.id,criterion.n);const mark=answers[id];
+  result.total+=criterion.points;result.byTeil[2].total+=criterion.points;
+  if(mark===undefined){result.open.push(id);continue;}
+  result.answered++;const points=selfPoints(criterion.points,mark);
+  result.right+=points;result.byTeil[2].right+=points;
+ }
+ return result;
+}
 /** Marks a Hören exam like a Lesen exam. */
 export const gradeHoeren=(hoeren:HoerenExam,answers:ExamAnswers)=>gradeItems(hoerenItems(hoeren),answers);
 /** Marks a Lesen exam: one point per right answer; an item left open counts as wrong. */

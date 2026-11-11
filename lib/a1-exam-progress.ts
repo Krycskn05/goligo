@@ -15,8 +15,8 @@ export type ExamScore={right:number;total:number;tries?:number;seconds?:number;a
 export type ExamScoreMap=Record<string,ExamScore>;
 /** A run: the marks so far, the seconds on the clock, the Teil on the screen; `done` once it is handed in. `timed`: Lesen with
  * the 25 minutes, Hören with the exam's number of hearings; `plays`: how often each Hören text was heard (by item id, the
- * examples as `<exam>-b1` / `-b2`). */
-export type ExamRun={answers:ExamAnswers;seconds:number;teil:1|2|3;timed:boolean;done:boolean;plays?:Record<string,number>};
+ * examples as `<exam>-b1` / `-b2`); `texts`: what was typed into the Schreiben form (by item id). */
+export type ExamRun={answers:ExamAnswers;seconds:number;teil:1|2|3;timed:boolean;done:boolean;plays?:Record<string,number>;texts?:Record<string,string>};
 type Read=Pick<Storage,'getItem'>;type Write=Pick<Storage,'setItem'>;
 
 const isAnswer=(value:unknown):value is ExamAnswer=>value==='r'||value==='f'||value==='a'||value==='b'||value==='c';
@@ -33,9 +33,10 @@ export function readExamScores(storage:Read):ExamScoreMap{
  }
  return out;
 }
-/** Keeps the best result of an exam (a tie keeps the faster one) and counts the attempt. */
-export function saveExamScore(storage:Read&Write,examId:string,right:number,total:number,seconds:number,now=Date.now()):ExamScoreMap{
- const scores=readExamScores(storage);const old=scores[examId];const tries=(old?.tries??0)+1;
+/** Keeps the best result of an exam (a tie keeps the faster one) and counts the attempt. `attempt: false`: the same
+ * attempt got more points afterwards (Schreiben: the learner marks the own message after handing in) — not counted again. */
+export function saveExamScore(storage:Read&Write,examId:string,right:number,total:number,seconds:number,now=Date.now(),attempt=true):ExamScoreMap{
+ const scores=readExamScores(storage);const old=scores[examId];const tries=(old?.tries??0)+(attempt?1:0);
  const better=!old||right>old.right||(right===old.right&&seconds>0&&(!old.seconds||seconds<old.seconds));
  scores[examId]=better?{right,total,tries,seconds,at:now}:{...old,tries};
  try{storage.setItem(A1_EXAM_SCORES_KEY,JSON.stringify(scores));}catch{}
@@ -49,7 +50,10 @@ export function readExamRun(storage:Read,examId:string):ExamRun|null{
  if(run.answers&&typeof run.answers==='object')for(const [id,value] of Object.entries(run.answers as Record<string,unknown>))if(id.startsWith(examId+'-')&&isAnswer(value))answers[id]=value;
  const teil=run.teil===2||run.teil===3?run.teil:1;const plays:Record<string,number>={};
  if(run.plays&&typeof run.plays==='object')for(const [id,value] of Object.entries(run.plays as Record<string,unknown>))if(id.startsWith(examId+'-')&&typeof value==='number'&&value>0)plays[id]=whole(value,99);
- return {answers,seconds:whole(run.seconds,86400),teil,timed:run.timed!==false,done:run.done===true,...(Object.keys(plays).length?{plays}:{})};
+ // What was typed into the Schreiben form (by item id).
+ const texts:Record<string,string>={};
+ if(run.texts&&typeof run.texts==='object')for(const [id,value] of Object.entries(run.texts as Record<string,unknown>))if(id.startsWith(examId+'-')&&typeof value==='string'&&value.trim())texts[id]=value.slice(0,id.endsWith('-text')?1500:80);
+ return {answers,seconds:whole(run.seconds,86400),teil,timed:run.timed!==false,done:run.done===true,...(Object.keys(plays).length?{plays}:{}),...(Object.keys(texts).length?{texts}:{})};
 }
 export function saveExamRun(storage:Write,examId:string,run:ExamRun){try{storage.setItem(a1ExamRunKey(examId),JSON.stringify(run));}catch{}}
 export function clearExamRun(storage:Pick<Storage,'removeItem'>,examId:string){try{storage.removeItem(a1ExamRunKey(examId));}catch{}}

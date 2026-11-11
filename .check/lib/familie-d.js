@@ -53,7 +53,7 @@ const oppositeWords = [
 exports.partD = {
     id: 'd', badge: 'D', title: 'Das Elfchen ist schön!',
     lead: (0, familie_types_1.T)('Kelime alanları, on bir kelimelik şiir **Elfchen**, sınıf eşyaları, şekiller ve zıt kelimeler, fiil ekleri, **ie / ei** ve bütün ünitenin **Alles klar?** testi.'),
-    cover: familie_pictures_1.familieCovers.d, coverAlt: (0, familie_types_1.T)('Kurs odası: Paul akıllı tahtanın önünde; Rami, Mei, Tomasz ve Aisha ellerinde rengârenk kelime posterleriyle'),
+    cover: familie_pictures_1.familieCovers.d, coverAlt: (0, familie_types_1.T)('Açık bir defterde on bir kelimelik küçük bir şiir: satırlarda bir, iki, üç, dört ve bir kelime; yanında bir kurşun kalem'),
     testNote: 'Alles klar? · {n} puan',
     short: { 'wortfeld': (0, familie_types_1.T)('Kelime alanı'), 'endungen': (0, familie_types_1.T)('Fiil ekleri'), 'verben-text': (0, familie_types_1.T)('Fiiller'), 'ie-ei': (0, familie_types_1.T)('ie / ei'), 'kursraum': (0, familie_types_1.T)('Sınıf eşyaları'), 'gegensaetze': (0, familie_types_1.T)('Zıt kelimeler'), 'elfchen': (0, familie_types_1.T)('Elfchen'), 'pruefung-hoeren': (0, familie_types_1.T)('Sınav: dinleme'), 'pruefung-lesen': (0, familie_types_1.T)('Sınav: okuma') },
     steps: [

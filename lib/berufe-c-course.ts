@@ -17,7 +17,6 @@ export const berufeCPictures={
  cover:{src:'/toon/lektion2/kapak-c.webp',width:960,height:540},
  hands05:{src:'/toon/lektion2/haende-0-5.webp',width:900,height:266},
  hands610:{src:'/toon/lektion2/haende-6-10.webp',width:800,height:300},
- form:{src:'/toon/lektion2/formular.webp',width:640,height:483},
 } as const;
 /** The people of Teil C (portraits and voices of the site). */
 export const castL2C=['yasemin','nikos','omar','mei','aisha','tomasz','rami','paul'] as const;

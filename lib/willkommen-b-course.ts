@@ -8,10 +8,13 @@
 import {talkStep,talkGroup} from './talk-switch';
 import type {GapLine,Phrase,SayItem,Step,StepGroup} from './willkommen-course';
 
-/** Pictures of Teil B (public/toon/lektion1, from the learner's page; cut-outs on white). */
+/**
+ * Pictures of Teil B (public/toon/lektion1, from the learner's page; cut-outs on white). The cover and the alphabet
+ * picture showed the teacher and are gone (11 November 2026): until the learner's new cover comes, the cover is the
+ * du scene on a 960 × 540 canvas (kapak-b-2), and the alphabet step shows its letters alone.
+ */
 export const willkommenBPictures={
- cover:{src:'/toon/lektion1/kapak-b.webp',width:960,height:540},
- alphabet:{src:'/toon/lektion1/paul-alfabe.webp',width:960,height:540},
+ cover:{src:'/toon/lektion1/kapak-b-2.webp',width:960,height:540},
  sie:{src:'/toon/lektion1/sie-sahne.webp',width:960,height:640},
  du:{src:'/toon/lektion1/du-sahne.webp',width:960,height:720},
 } as const;

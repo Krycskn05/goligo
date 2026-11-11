@@ -141,7 +141,6 @@ function Help({speech,sound}:{speech:Speech;sound:Sound}){
 function FormTopic({speech,sound}:{speech:Speech;sound:Sound}){
  return <><p className="kicker">{ut('Konu 4 · Das Formular')}</p><Heading>{ut('Formdaki alanlar ve soruları')}</Heading>
   <p>{ut('Almanya’da her yerde form var: kurs, doktor, belediye, iş. Alanların adını ve her alanın hangi soruya karşılık geldiğini bilirsen formu kolayca doldurursun. Omar’ın formuna bak:')}</p>
-  <figure className="l2-figure"><Plain {...berufeCPictures.form} alt="Paul Hoca elinde boş bir kayıt formu ve kalem tutuyor"/></figure>
   <div className="l1a-scroll"><table className="l1a-table l2-form-table"><thead><tr><th>{ut('Alan')}</th><th>{ut('Soru')}</th><th>Omar</th><th/></tr></thead>
    <tbody>{formRows.map(([field,question,omar,say])=><tr key={field}><td lang="de"><b>{field}</b></td><td lang="de">{question}</td><td lang="de">{omar}</td><td><Say text={say} speech={speech}/></td></tr>)}</tbody></table></div>
   <p><Tx text="Adres iki satırdır: önce *Straße + Hausnummer* (~Siemensstraße 12~), sonra *PLZ + Ort* (~13629 Berlin~). Posta kodu Almanya’da 5 rakamdır ve şehirden önce yazılır."/></p>

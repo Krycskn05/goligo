@@ -19,7 +19,7 @@ test('19 steps like the learner\'s page: cover, 8 teaching steps, 7 exercises, t
  for(const id of lesson.berufeGroupsB[1].ids)assert(lesson.berufeStepShortB[id],id);
  assert.equal(lesson.doings.length,6);assert.equal(lesson.wordsB.length,24);assert.equal(lesson.phrasesB.length,9);
  for(const doing of lesson.doings)assert(fs.existsSync('public/toon/lektion2/'+doing.key+'.webp'),doing.key);
- assert(fs.existsSync('public/toon/lektion2/kapak-b.webp'));
+ assert(fs.existsSync('public/toon/lektion2/kapak-b-2.webp'));
 });
 
 test('the exercises agree with the texts and have one right answer each',()=>{

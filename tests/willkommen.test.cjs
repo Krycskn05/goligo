@@ -124,7 +124,7 @@ test('the page, its pictures, the units link, guest access and the menu',()=>{
  assert(auth.GUEST_PAGES.has('/a1-1/willkommen'),'visitors without an account open the lesson');
  const units=read('app/category-study.tsx');assert(units.includes("unit.id==='book-01'?'/a1-1/willkommen'")&&units.includes('readLessonOneProgress'));
  assert(read('app/layout.tsx').includes('import "./willkommen.css";'));
- for(const file of ['kapak','paul-harita','sabine','omar','yasemin','nikos','aisha','tomasz','nora','rami','mei'])assert(fs.existsSync('public/toon/lektion1/'+file+'.webp'),file);
+ for(const file of ['kapak','selam-dunya','sabine','omar','yasemin','nikos','aisha','tomasz','nora','rami','mei'])assert(fs.existsSync('public/toon/lektion1/'+file+'.webp'),file);
  for(const key of lesson.people.map(p=>p.key).concat(lesson.listenItems.map(i=>i.key)))assert(fs.existsSync('public/toon/lektion1/'+key+'.webp'),key);
  const smoke=read('ci/smoke.cjs');assert(smoke.includes('"/a1-1/willkommen"')&&smoke.includes("data-l1a-step='kapak'"));
 });
@@ -157,7 +157,7 @@ test('Teil B „Ich spreche ein bisschen Deutsch.“ (25 October 2026): 24 steps
  for(const text of ['Welche Sprachen sprechen Sie?','Farsi','Jot','Ypsilon','Eszett','ich spreche, du sprichst, Sie sprechen','Ich buchstabiere: Kah, Ah, Emm, Ah, Uh.','Nein, ich komme aus Griechenland.','Welche Sprachen sprichst du?'])assert(texts.includes(text),text);
  assert(!texts.includes(''));for(const item of lessonB.spellItems('Yasemin Fuchs Weiß Jonas Vogt Nikos Papadakis'))assert(texts.includes(item.text),item.text);
  assert(read('scripts/voices/list-texts.cjs').includes("load('willkommen-b-course').willkommenBSpeechTexts()"));
- for(const file of ['kapak-b','paul-alfabe','sie-sahne','du-sahne'])assert(fs.existsSync('public/toon/lektion1/'+file+'.webp'),file);
+ for(const file of ['kapak-b-2','sie-sahne','du-sahne'])assert(fs.existsSync('public/toon/lektion1/'+file+'.webp'),file);
  // Scores: their own store; the unit card adds the parts.
  assert.equal(progress.partKeys.b.scores,'lernkoko-l1b-scores');assert.notEqual(progress.partKeys.a.scores,progress.partKeys.b.scores);
  const both=progress.lessonOneProgress({a:{test:{right:10,total:10}},b:{test:{right:12,total:12}}});

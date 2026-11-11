@@ -11,6 +11,8 @@ function webpSize(file){const b=fs.readFileSync(file);assert.equal(b.slice(0,4).
 // picture sheets, not from shader models: the picture file starts with the category's prefix.
 const sheetPrefix={'objects-body':'koerper-','objects-health':'gesundheit-','objects-food':'essen-','objects-drinks':'getraenke-','objects-cooking':'kueche-','objects-school':'schule-','objects-outdoors':'draussen-','objects-jobs':'','objects-lektion1':'','objects-clothes':'','objects-lektion2':'','objects-lektion3':'','objects-lektion4':'','objects-lektion5':''}; // the new IDs carry their prefix (beruf-, l1-, kleidung-)
 const sheetTopics=new Set(Object.keys(sheetPrefix));
+// Five lesson cards were made again without the teacher (11 November 2026) and have a new file name.
+const repainted=require(path.join(compiled,'object-lesson-words.js')).lessonPictureFiles;
 // der Rock moved to Kleidung (2 November 2026) and keeps the picture it had in Doğa, şehir ve diğerleri.
 const keptPrefix={rock:'draussen-'};
 test('every Nesne Kasası object has a picture: the classic pictures, the tool pictures and the learner\'s body and health sheets',()=>{
@@ -22,7 +24,7 @@ test('every Nesne Kasası object has a picture: the classic pictures, the tool p
   assert.ok(entry.crop.x>=0&&entry.crop.y>=0&&entry.crop.x+entry.crop.width<=entry.width+0.5&&entry.crop.y+entry.crop.height<=entry.height+0.5,id);
   // The 15 tools use the learner's new pictures; the other objects keep the classic pictures they liked.
   const word=objects.objectWordMap.get(id);
-  if(sheetTopics.has(word.topic))assert.deepEqual(entry,{src:'/objects/toon/'+(keptPrefix[id]??sheetPrefix[word.topic])+id+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
+  if(sheetTopics.has(word.topic))assert.deepEqual(entry,{src:'/objects/toon/'+(repainted[id]??(keptPrefix[id]??sheetPrefix[word.topic])+id)+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
   else if(tools[id])assert.deepEqual(entry,{src:'/objects/toon/werkzeug-'+id+'.webp',width:512,height:512,crop:{x:0,y:0,width:512,height:512}},id);
   else assert.match(entry.src,/^\/objects\/toon\/(atlas-0[1-6]|moving-[a-z]+|building-[a-z]+)\.webp$/,id);
  }

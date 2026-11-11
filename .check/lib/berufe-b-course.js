@@ -3,8 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.capitalized = exports.capsWords = exports.capsNeed = exports.capsText = exports.questionSay = exports.questionMeanings = exports.questionSentences = exports.hearLines = exports.ramiAbout = exports.ramiTalk = exports.doSay = exports.doRows = exports.doBox = exports.verbGapCells = exports.verbGaps = exports.whoRows = exports.whoOptions = exports.readTexts = exports.capsRight = exports.capsWrong = exports.orderRowSayB = exports.orderRowsB = exports.pluralQuestions = exports.questionRowSay = exports.questionRows = exports.twoText = exports.tomaszText = exports.timePhrases = exports.cityPhrase = exports.introRows = exports.verbExamples = exports.verbRowSay = exports.specialVerbs = exports.regularVerbs = exports.dasIst = exports.sieThree = exports.sieTwo = exports.pronounRows = exports.questionChecks = exports.introChecks = exports.verbChecksB = exports.pronounChecks = exports.wordChecksB = exports.phrasesB = exports.wordsB = exports.doings = exports.plainText = exports.NARRATOR = exports.castL2B = exports.berufeBPictures = void 0;
 exports.berufeWordCountB = exports.berufeGroupsB = exports.berufeScoredB = exports.berufeStepShortB = exports.berufeStepIndexB = exports.berufeStepsB = exports.practiceItemsB = exports.berufeTestB = exports.omarAll = exports.L2B_OWN_KEY = exports.omarPrompts = exports.omarCard = exports.capsSolved = void 0;
 exports.berufeBSpeechTexts = berufeBSpeechTexts;
-/** Pictures of Teil B (public/toon/lektion2/b-*.webp and kapak-b.webp, from the learner's page). */
-exports.berufeBPictures = { cover: { src: '/toon/lektion2/kapak-b.webp', width: 960, height: 540 } };
+/**
+ * Pictures of Teil B (public/toon/lektion2/b-*.webp, from the learner's page). The cover showed the teacher and is gone
+ * (11 November 2026): until the learner's new cover comes, kapak-b-2 puts two of the part's people side by side (Rami
+ * the director, Nora the author).
+ */
+exports.berufeBPictures = { cover: { src: '/toon/lektion2/kapak-b-2.webp', width: 960, height: 540 } };
 /** The people of Teil B (portraits and voices of the site). Paul Hoca reads the texts about other people. */
 exports.castL2B = ['nikos', 'aisha', 'yasemin', 'mei', 'rami', 'tomasz', 'omar', 'sabine', 'nora', 'paul'];
 exports.NARRATOR = 'paul';

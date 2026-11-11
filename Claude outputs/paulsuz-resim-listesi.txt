@@ -1,0 +1,75 @@
+GOLIQO · PAUL'SUZ YENİ RESİMLER · RESİM LİSTESİ — ChatGPT için (11 Kasım 2026)
+
+Neden: Paul'un çizili olduğu ders resimleri siteden kaldırıldı. Yerlerinde şimdi sitenin kendi resimlerinden kesilmiş
+geçici resimler duruyor (ya da adım resimsiz). Bu listedeki resimler gelince geçicilerin yerine onları koyarım.
+Acelesi yok: site bu haliyle çalışıyor, hiçbir yerde boş kutu ya da kırık resim yok.
+
+Nasıl:
+1) Önce 0) numaralı mesajı bir kez gönder (stil + kişiler). ChatGPT "OK" desin.
+2) Sonra her başlığı ayrı bir mesaj olarak gönder (toplam 7 mesaj).
+3) Gelen resmi başlıktaki adla kaydet ve goligo/yeni-resimler/paulsuz klasörüne koy. Kesme, boyutlama ve WebP'ye
+   çevirme bende.
+Telif notu: Bütün sahneler bizim kendi kişilerimizdir; ders kitabından hiçbir şey kullanılmaz.
+
+Hangi resim nereye gidecek, şimdi orada ne var:
+- l1-kapak-b.png   → Lektion 1, Teil B kapağı (şimdi: Tomasz ve Aisha kahve içerken)
+- l2-kapak-b.png   → Lektion 2, Teil B kapağı (şimdi: yönetmen Rami ve yazar Nora yan yana)
+- l4-kapak-d.png   → Lektion 4, Teil D kapağı (şimdi: defterde şiir)
+- uniteler.png     → Ana sayfa ve tanıtım sayfası, "Üniteler ve konular" kapağı (şimdi: kitap maskotlu eski kapak)
+- ders-1.png       → 6 resim: Lektion 2A öğretmen ve otobüs şoförü (şimdi: yalnız Nora, yalnız Yasemin),
+                     Lektion 2C form, Lektion 1 alfabe tahtası, kelime kartları, dünya haritası (şimdi: resimsiz)
+- ders-2.png       → 2 resim: Lektion 5 "einen Spaziergang machen" ve "unterrichten" (şimdi: Kelime Kasası kartları)
+- kasa-1.png       → 5 resim: Kelime Kasası'nda der Lehrer / die Lehrerin, der Busfahrer / die Busfahrerin, der Kurs,
+                     unterrichten, einen Spaziergang machen (şimdi: kesilmiş geçici kartlar)
+
+==== 0) İlk mesaj (bir kez gönder) ====
+For this chat: every image I ask for is for a German-learning website. Style: polished original 3D animated-film illustration (Pixar-like look), rounded forms, expressive friendly faces, tactile clay-like materials, soft warm studio light, lively colours. Palette: teal, amber, terracotta and warm ivory. Original characters only. No logos, no brands, no watermark. No visible text, letters or numbers, except where I give the exact words to write.
+Important: there is NO teacher character in these images. Never draw an older man with grey hair or a navy blue zip jacket; draw only the people I name.
+Layouts: (A) COVER = one single wide image, 16:9, a full scene. (B) SHEET = one image with separate pictures in a grid on one plain background, wide empty gaps, no frames, no borders, no lines, no picture touching another or the edge.
+Recurring people (keep them the same in every image):
+- RAMI: man in his 30s from Lebanon, dark curly hair, short dark beard, warm smile, red shirt over a white tee.
+- NIKOS: man in his 30s from Greece, curly brown hair, light stubble, blue shirt.
+- OMAR: man in his 30s from Sudan, short black curly hair, dark beard, yellow shirt.
+- TOMASZ: man in his 30s from Poland, light brown hair, round glasses, green sweater over a white collar.
+- SABINE: woman in her 20s, wavy blonde hair, small earrings, salmon-pink polo shirt.
+- YASEMIN: woman in her 30s from Turkey, long wavy light-brown hair, lilac cardigan over a white top.
+- AISHA: woman in her 30s from Kenya, black braided hair in a high bun, gold hoop earrings, green sweater.
+- NORA: woman in her 20s, red wavy bob, round glasses, yellow sweater.
+- MEI: woman in her 20s from Thailand, straight black shoulder-length hair with a small hair clip, teal top under an orange cardigan.
+- BOOK MASCOT: a small cheerful turquoise book that stands on two legs, with big friendly eyes, a smile, two arms, cream pages on top and a yellow ribbon bookmark.
+Reply "OK" now; I will send the first image next.
+
+==== l1-kapak-b.png · Lektion 1, Teil B · Ich spreche ein bisschen Deutsch. (COVER, 16:9) ====
+COVER: A bright, friendly language-course classroom, no teacher in the picture. Five learners sit at desks in a half circle with open notebooks: OMAR, YASEMIN, NIKOS, AISHA and TOMASZ. NIKOS speaks with a shy smile and holds thumb and index finger close together ("a little"); above his head floats an empty speech bubble with three dots. The others listen and smile. Behind them a green chalkboard with only simple chalk doodles of speech bubbles (no letters). Warm daylight from a window.
+
+==== l2-kapak-b.png · Lektion 2, Teil B · Wer ist das? (COVER, 16:9) ====
+COVER: A language-course classroom, no teacher in the picture. YASEMIN stands and holds up a large printed photo of NIKOS (a friendly portrait). OMAR and MEI sit at a desk, look at the photo and wonder who it is; one big question mark symbol floats above them. A green chalkboard without any writing behind them. Warm daylight.
+
+==== l4-kapak-d.png · Lektion 4, Teil D · Das Elfchen ist schön! (COVER, 16:9) ====
+COVER: A cosy course room, no teacher in the picture. RAMI, MEI, TOMASZ and AISHA sit side by side at a table and proudly hold up colourful posters; on each poster five rows of coloured blocks instead of words: one block, two blocks, three blocks, four blocks, one block (no letters). Behind them a white smartboard without writing, a wall clock and a coat rack. Cups and pencils on the table.
+
+==== uniteler.png · Ana sayfa · Üniteler ve konular (panoramic, 3:2) ====
+One wide image, 3:2, on a plain warm cream background (#fdf1db), no table, no room, a lot of empty cream space on the left and on the right. In the middle, small and centred: a big open picture book lies flat; on its pages a little house, a tree and a path. The BOOK MASCOT stands at the left of the book and points at the page. MEI leans over the book from the right, smiling, one finger on the page. A small pile of two closed books at the far left. Nobody else in the picture. No text.
+
+==== ders-1.png · Ders resimleri (6 resim, beyaz zemin) ====
+SHEET: a tall portrait image (2:3) with 6 separate pictures in a grid of 2 columns and 3 rows, every picture 4:3, all on the same plain white background. From left to right, top to bottom:
+1. RAMI and NORA as teachers: both stand in front of a green chalkboard on an easel (nothing written on it); Rami holds a book, Nora points at the board with a piece of chalk.
+2. OMAR and YASEMIN as bus drivers in navy uniforms with a yellow city bus: Omar sits at the big steering wheel and smiles through the windscreen, Yasemin stands at the open front door.
+3. OMAR holds up an empty registration form on a clipboard (only lines and small tick boxes, no letters) and a pen, smiling.
+4. A green chalkboard with the German alphabet in big, clear chalk letters in four rows, exactly: "A B C D E F G H I" / "J K L M N O P Q R" / "S T U V W X Y Z" / "Ä Ö Ü ß" (the last row in yellow chalk). AISHA stands at the left of the board and points at it with a wooden pointer.
+5. TOMASZ holds three big word cards in a row in front of his chest, exactly these words: a cream card "Woher", a blue card "kommen" in the middle, a cream card "Sie?".
+6. A colourful world map on a classroom pin board with seven sticky notes around it, exactly these words: "Hallo!", "Merhaba!", "Hello!", "Bonjour!", "Hola!", "Ciao!", "Cześć!". MEI and OMAR stand at the left and point at the map.
+
+==== ders-2.png · Lektion 5 (2 resim, fildişi zemin) ====
+SHEET: one landscape image (3:2) with 2 separate pictures side by side, every picture 4:3, on a plain pale ivory background (#fff9ec); each picture is a small rounded scene with soft edges. From left to right:
+1. SABINE takes a slow walk alone on a path in an autumn park, hands behind her back, relaxed and smiling; colourful trees, falling leaves, a bench.
+2. AISHA teaches: she stands at an empty whiteboard with a marker in her hand and explains something; three adult learners sit in front of her, seen from behind, two of them raise a hand.
+
+==== kasa-1.png · Kelime Kasası (5 resim, krem zemin) ====
+SHEET: one landscape image (3:2) with 5 separate SQUARE pictures (3 on top, 2 centred below), all on the same plain warm cream background (#fcfaed); places are drawn as a small rounded diorama standing on that cream background. Each picture is for a picture quiz: one clear main subject, big and centred, nothing that could suggest another word. No text, no letters. From left to right, top to bottom:
+1. RAMI and NORA as teachers in front of a green chalkboard with simple chalk drawings (a sun, a house); Rami holds a book, Nora points at the board with chalk.
+2. OMAR and YASEMIN as bus drivers in navy uniforms in front of a yellow city bus; Omar sits at the big steering wheel, Yasemin stands at the open front door.
+3. An adult course in a classroom: six learners at tables with notebooks and AISHA as the teacher at the board (nothing written on the board).
+4. AISHA teaches: she explains something at an empty whiteboard to a few adult learners who raise their hands.
+5. TOMASZ and NORA walk slowly along a park path with a dog on a lead, autumn trees.
+Kelimeler: 1) der Lehrer / die Lehrerin · 2) der Busfahrer / die Busfahrerin · 3) der Kurs · 4) unterrichten · 5) einen Spaziergang machen

@@ -34,7 +34,8 @@ test('Ders kelimeleri holds one card for each of Lektion 1–5, named in every s
 
 test('every lesson card has its own 512 px picture, meanings in all 31 languages, a description and one sub-topic',()=>{
  for(const word of fresh){
-  assert.equal(word.image,'/objects/toon/'+word.id+'.webp');
+  // Five cards were made again without the teacher (11 November 2026) and have a new file name; the ids stay.
+  assert.equal(word.image,'/objects/toon/'+(load('object-lesson-words').lessonPictureFiles[word.id]??word.id)+'.webp');
   assert.deepEqual(art[word.id],{src:word.image,width:512,height:512,crop:{x:0,y:0,width:512,height:512}},word.id);
   assert.deepEqual(webpSize(path.join('public',word.image)),[512,512],word.id);
   for(const language of languages)assert(translations.objectMeaning(word.id,language).trim(),word.id+' '+language);

@@ -23,7 +23,6 @@ exports.WILLKOMMEN_UNIT = 'book-01';
 /** Pictures of the lesson (public/toon/lektion1, from the learner's page). */
 exports.willkommenPictures = {
     cover: { src: '/toon/lektion1/kapak.webp', width: 960, height: 540 },
-    map: { src: '/toon/lektion1/paul-harita.webp', width: 960, height: 540 },
 };
 const portraitSrc = (key) => '/toon/lektion1/' + key + '.webp';
 exports.portraitSrc = portraitSrc;

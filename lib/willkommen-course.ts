@@ -12,7 +12,6 @@ export const WILLKOMMEN_UNIT='book-01';
 /** Pictures of the lesson (public/toon/lektion1, from the learner's page). */
 export const willkommenPictures={
  cover:{src:'/toon/lektion1/kapak.webp',width:960,height:540},
- map:{src:'/toon/lektion1/paul-harita.webp',width:960,height:540},
 } as const;
 export const portraitSrc=(key:string)=>'/toon/lektion1/'+key+'.webp';
 /** The teacher has no picture (the learner asked, 11 November 2026): where a face would be, his initial stands. */

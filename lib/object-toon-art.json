@@ -5049,7 +5049,7 @@
     }
   },
   "l2-lehrer": {
-    "src": "/objects/toon/l2-lehrer.webp",
+    "src": "/objects/toon/l2-lehrer-2.webp",
     "width": 512,
     "height": 512,
     "crop": {
@@ -5170,7 +5170,7 @@
     }
   },
   "l2-busfahrer": {
-    "src": "/objects/toon/l2-busfahrer.webp",
+    "src": "/objects/toon/l2-busfahrer-2.webp",
     "width": 512,
     "height": 512,
     "crop": {
@@ -6666,7 +6666,7 @@
     }
   },
   "l5-spaziergang": {
-    "src": "/objects/toon/l5-spaziergang.webp",
+    "src": "/objects/toon/l5-spaziergang-2.webp",
     "width": 512,
     "height": 512,
     "crop": {
@@ -6853,7 +6853,7 @@
     }
   },
   "l5-kurs": {
-    "src": "/objects/toon/l5-kurs.webp",
+    "src": "/objects/toon/l5-kurs-2.webp",
     "width": 512,
     "height": 512,
     "crop": {
@@ -6952,7 +6952,7 @@
     }
   },
   "l5-unterrichten": {
-    "src": "/objects/toon/l5-unterrichten.webp",
+    "src": "/objects/toon/l5-unterrichten-2.webp",
     "width": 512,
     "height": 512,
     "crop": {

@@ -69,6 +69,39 @@ test('the teacher has no picture: his initial stands in the lessons and in the v
  for(const [file,cls] of [['app/learning-effects.tsx','lk-voice-photo letter'],['app/site-tour.tsx','st-photo letter']])assert.ok(read(file).includes('<span className="'+cls+'" aria-hidden="true">{voice.name.charAt(0)}</span>'),file);
 });
 
+test('no lesson picture shows the teacher: the pictures are gone, their places have pictures without him',()=>{
+ // The learner said "kaldır" (11 November 2026) to the pictures in which he was drawn: the covers, the pictures of four
+ // lesson steps, four word pictures, the Üniteler cover and five Kelime Kasası cards.
+ const gone=['toon/lektion1/paul-harita','toon/lektion1/paul-alfabe','toon/lektion1/paul-kartlar','toon/lektion1/kapak-b','toon/lektion2/kapak-b','toon/lektion2/formular','toon/lektion2/lehrer','toon/lektion2/busfahrer',
+  'toon/lektion4/kapak-d','toon/lektion5/spaziergang','toon/lektion5/unterrichten','toon/kapak/units-phone-2','toon/kapak/units-pc-2','toon/kapak/units-intro-2',
+  'objects/toon/l2-lehrer','objects/toon/l2-busfahrer','objects/toon/l5-kurs','objects/toon/l5-unterrichten','objects/toon/l5-spaziergang'];
+ for(const name of gone)assert.ok(!fs.existsSync('public/'+name+'.webp'),name);
+ assert.deepEqual(walk('public').filter(file=>/paul/i.test(path.basename(file))),[],'no file is named after him');
+ // New file names everywhere, so no phone keeps an old picture.
+ for(const name of ['toon/lektion1/kapak-b-2','toon/lektion2/kapak-b-2','toon/lektion2/lehrer-2','toon/lektion2/busfahrer-2','toon/lektion4/kapak-d-2','toon/lektion5/spaziergang-2','toon/lektion5/unterrichten-2','toon/kapak/units-phone-3','toon/kapak/units-pc-3','toon/kapak/units-intro-3',
+  'objects/toon/l2-lehrer-2','objects/toon/l2-busfahrer-2','objects/toon/l5-kurs-2','objects/toon/l5-unterrichten-2','objects/toon/l5-spaziergang-2'])assert.ok(fs.existsSync('public/'+name+'.webp'),name);
+ const load=name=>require(path.join(process.env.STUDY_CHECK_DIR,name+'.js'));
+ assert.deepEqual(Object.keys(load('willkommen-course').willkommenPictures),['cover']);
+ assert.deepEqual(Object.keys(load('willkommen-b-course').willkommenBPictures),['cover','sie','du']);
+ assert.deepEqual(Object.keys(load('willkommen-c-course').willkommenCPictures),['cover','morning','park','goodbye','world']);
+ assert.deepEqual(Object.keys(load('berufe-c-course').berufeCPictures),['cover','hands05','hands610']);
+ assert.equal(load('willkommen-b-course').willkommenBPictures.cover.src,'/toon/lektion1/kapak-b-2.webp');
+ assert.equal(load('berufe-b-course').berufeBPictures.cover.src,'/toon/lektion2/kapak-b-2.webp');
+ assert.equal(load('familie-pictures').familieCovers.d.src,'/toon/lektion4/kapak-d-2.webp');
+ const jobs=load('berufe-course');
+ assert.equal(jobs.jobPicture('lehrer').src,'/toon/lektion2/lehrer-2.webp');assert.equal(jobs.jobPicture('busfahrer').src,'/toon/lektion2/busfahrer-2.webp');assert.equal(jobs.jobPicture('koch').src,'/toon/lektion2/koch.webp');
+ // The steps that showed him keep their content: the letters, the table of the verb's place, the greetings, the form table.
+ const unit=read('app/willkommen-study.tsx');
+ assert.ok(unit.includes('const unitPicture=willkommenCPictures.world;')&&!unit.includes('willkommenPictures.map'));
+ assert.ok(!read('app/willkommen-b-steps.tsx').includes('willkommenBPictures.alphabet')&&!read('app/willkommen-c-steps.tsx').includes('willkommenCPictures.cards')&&!read('app/berufe-c-steps.tsx').includes('berufeCPictures.form'));
+ // No picture text of a page or of a lesson describes him in a picture any more.
+ for(const file of walk('app').concat(walk('lib')).filter(name=>/\.tsx?$/.test(name))){const source=read(file);for(const m of source.matchAll(/(?:alt|coverAlt)[:=]\s*(?:T\()?['"]([^'"]*)['"]/g))assert.ok(!/\bPaul\b/.test(m[1]),file+': '+m[1]);}
+ // Kelime Kasası: the ids stay, five cards have a new picture file.
+ const words=load('object-course').objectWordMap;
+ for(const id of ['l2-lehrer','l2-busfahrer','l5-kurs','l5-unterrichten','l5-spaziergang'])assert.equal(words.get(id).image,'/objects/toon/'+id+'-2.webp',id);
+ assert.equal(load('site-pictures').HOME_COVERS.units,'/toon/kapak/units-phone-3.webp');
+});
+
 test('the motion setting has its own hook; the tour shows its windows and cards without a figure',()=>{
  assert.ok(read('app/use-motion.ts').includes('export function useMotion(){'));
  for(const file of ['app/site-logo.tsx','app/site-greeting.tsx','app/site-tour.tsx'])assert.ok(read(file).includes("import {useMotion} from './use-motion';"),file);

@@ -124,9 +124,11 @@ test('pictures: the learner\'s 3D pictures (9 November 2026) and the site\'s ver
  const files=fs.readdirSync('public/toon/lektion5');
  assert.ok(!files.some(file=>file.startsWith('gecici')),'the temporary covers are gone');
  assert.equal(files.filter(file=>file.endsWith('.webp')).length,66,'the 62 things and 4 covers');
+ // Two word pictures showed the teacher: they were made again without him under new names (11 November 2026).
+ for(const key of ['spaziergang','unterrichten'])assert.equal(pictures.alltagPic[key],'/toon/lektion5/'+key+'-2.webp',key);
  // every picture of the list for ChatGPT arrived and is used
  const list=read('Claude outputs/lektion5-resim-listesi.txt');const used=new Set(Object.values(pictures.alltagPic));
- for(const file of files.filter(file=>!file.startsWith('kapak-'))){assert.ok(list.includes(file.replace('.webp','')),file+' is in the list');assert.ok(used.has('/toon/lektion5/'+file),file+' is used');}
+ for(const file of files.filter(file=>!file.startsWith('kapak-'))){assert.ok(list.includes(file.replace('.webp','').replace(/-2$/,'')),file+' is in the list');assert.ok(used.has('/toon/lektion5/'+file),file+' is used');}
  for(const part of course.alltagPartList)for(const step of part.steps){
   for(const block of step.blocks??[])if(block.t==='cards')for(const word of block.words)assert.ok(word.pic,part.id+': '+word.de);
   if(step.exercise?.type==='quiz')for(const item of step.exercise.items)assert.ok(item.pic||item.listen||!item.emoji,part.id+':'+step.id);

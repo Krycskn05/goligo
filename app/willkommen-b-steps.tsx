@@ -122,7 +122,6 @@ function VerbsB({speech}:{speech:Speech}){
 }
 function Alphabet({speech}:{speech:Speech}){
  return <><Heading><span lang="de">Das Alphabet</span></Heading>
-  <Picture {...willkommenBPictures.alphabet} alt="Paul Hoca alfabe tahtasının önünde"/>
   <p className="l1a-tr">{ut('Harfe dokun, Almanca adını dinle. Mavi çerçeveliler Türkçeden farklı okunur.')}</p>
   <div className="l1a-abc">{alphabet.map(([letter,hint,say])=><button type="button" key={letter} className={'l1a-letter'+(hardLetters.includes(letter)?' hard':'')+(speech.busy&&speech.activeText===say?' playing':'')} onClick={()=>speech.speak(say)} aria-label={ut('Dinle')+': '+letter+' ('+ut(hint)+')'}><b lang="de">{letter}</b><small>{ut(hint)}</small></button>)}</div>
   <Note><Tx text="Dikkat: **J** = yot, **V** = fau, **W** = ve, **Y** = üpsilon, **Z** = tset, **C** = tse, **E** ince “e”, **I** “i”. Umlautlar: **Ä, Ö, Ü**. **ß** = estset, “ss” gibi okunur."/></Note></>;

@@ -35,6 +35,10 @@ exports.familiePic = {
     tisch: l3('tisch'), stuhl: l3('stuhl'), bett: l3('bett'), sofa: l3('sofa'), regal: l3('regal'), schrank: l3('schrank'), schere: vault('gesundheit-schere'),
     buch: vault('schule-buch'), heft: vault('schule-heft'), foto: vault('schule-foto'),
 };
-/** The part covers (960 × 540): A Rami and Nikos in the park, B Mei's future, C Nora's interview, D the course room. */
+/**
+ * The part covers (960 × 540): A Rami and Nikos in the park, B Mei's future, C Nora's interview, D a poem in a notebook
+ * (kapak-d-2, cut from the poem picture: the course room cover showed the teacher and is gone, 11 November 2026; the
+ * learner's new cover replaces it when it comes).
+ */
 const cover = (part) => ({ src: own('kapak-' + part), width: 960, height: 540 });
-exports.familieCovers = { a: cover('a'), b: cover('b'), c: cover('c'), d: cover('d') };
+exports.familieCovers = { a: cover('a'), b: cover('b'), c: cover('c'), d: cover('d-2') };

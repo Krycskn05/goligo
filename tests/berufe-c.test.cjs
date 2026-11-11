@@ -18,7 +18,7 @@ test('21 steps like the learner\'s page: cover, 9 teaching steps, 8 exercises, t
  assert.deepEqual(['sayi-dinle','dizi','telefon','zar','yardim-diyalog','form-soru','mein-dein','wir-ihr-yaz','test'].map(total),[8,14,3,5,6,7,12,15,12]);
  for(const id of lesson.berufeGroupsC[1].ids)assert(lesson.berufeStepShortC[id],id);
  assert.equal(lesson.berufeWordCountC,lesson.wordsC.length+21);
- for(const file of ['kapak-c','haende-0-5','haende-6-10','formular'])assert(fs.existsSync('public/toon/lektion2/'+file+'.webp'),file);
+ for(const file of ['kapak-c','haende-0-5','haende-6-10'])assert(fs.existsSync('public/toon/lektion2/'+file+'.webp'),file);
  for(const picture of Object.values(lesson.berufeCPictures))assert(fs.existsSync('public'+picture.src),picture.src);
 });
 

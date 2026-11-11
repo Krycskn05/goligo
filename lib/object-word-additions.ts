@@ -1,5 +1,5 @@
 import type {ObjectWord} from './object-course';
-import {lessonWordSets,lessonPlurals,type Spec} from './object-lesson-words';
+import {lessonWordSets,lessonPlurals,lessonPictureFiles,type Spec} from './object-lesson-words';
 
 // Kelime Kasası gets two groups from the learner's 19 3D picture sheets (2 November 2026, made in ChatGPT from the
 // prompts in the picture list): Meslekler (24 jobs, a woman and a man on separate cards) and the words of Lektion 1.
@@ -252,7 +252,7 @@ export const wordPlurals:Record<string,string>={...lessonPlurals,'beruf-aerztin'
 export const jobPartners:Record<string,string>={'beruf-arzt':'die Ärztin','beruf-aerztin':'der Arzt','beruf-zahnarzt':'die Zahnärztin','beruf-zahnaerztin':'der Zahnarzt','beruf-tierarzt':'die Tierärztin','beruf-tieraerztin':'der Tierarzt','beruf-krankenpfleger':'die Krankenpflegerin','beruf-krankenpflegerin':'der Krankenpfleger','beruf-altenpfleger':'die Altenpflegerin','beruf-altenpflegerin':'der Altenpfleger','beruf-apotheker':'die Apothekerin','beruf-apothekerin':'der Apotheker','beruf-lehrer':'die Lehrerin','beruf-lehrerin':'der Lehrer','beruf-erzieher':'die Erzieherin','beruf-erzieherin':'der Erzieher','beruf-programmierer':'die Programmiererin','beruf-programmiererin':'der Programmierer','beruf-verkaeufer':'die Verkäuferin','beruf-verkaeuferin':'der Verkäufer','beruf-kassierer':'die Kassiererin','beruf-kassiererin':'der Kassierer','beruf-baecker':'die Bäckerin','beruf-baeckerin':'der Bäcker','beruf-kellner':'die Kellnerin','beruf-kellnerin':'der Kellner','beruf-koch':'die Köchin','beruf-koechin':'der Koch','beruf-friseur':'die Friseurin','beruf-friseurin':'der Friseur','beruf-busfahrer':'die Busfahrerin','beruf-busfahrerin':'der Busfahrer','beruf-taxifahrer':'die Taxifahrerin','beruf-taxifahrerin':'der Taxifahrer','beruf-polizist':'die Polizistin','beruf-polizistin':'der Polizist','beruf-mechaniker':'die Mechanikerin','beruf-mechanikerin':'der Mechaniker','beruf-elektriker':'die Elektrikerin','beruf-elektrikerin':'der Elektriker','beruf-maler':'die Malerin','beruf-malerin':'der Maler','beruf-hausmeister':'die Hausmeisterin','beruf-hausmeisterin':'der Hausmeister','beruf-gaertner':'die Gärtnerin','beruf-gaertnerin':'der Gärtner','beruf-ingenieur':'die Ingenieurin','beruf-ingenieurin':'der Ingenieur'};
 
 const toWords=(specs:readonly Spec[],topic:string,prefix:string,noArticle:ReadonlySet<string>=new Set()):ObjectWord[]=>specs.map(([id,de,tr,description,descriptionTr,,note])=>({
- id:prefix+id,de,tr,description,descriptionTr,...(note?{note}:{}),topic,image:'/objects/toon/'+prefix+id+'.webp',extra:true,
+ id:prefix+id,de,tr,description,descriptionTr,...(note?{note}:{}),topic,image:'/objects/toon/'+(lessonPictureFiles[prefix+id]??prefix+id)+'.webp',extra:true,
  ...(noArticle.has(id)?{phrase:true}:{}),
 }));
 // "Ders kelimeleri" (lib/vault-sections.ts): one card for each lesson's words. Lektion 2–5 came on 9 November 2026 (the

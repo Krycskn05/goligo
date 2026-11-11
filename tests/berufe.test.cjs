@@ -29,7 +29,7 @@ test('19 steps in the order of the learner\'s page: cover, 8 teaching steps, 7 e
 
 test('the jobs: a picture for each, a man\'s and a woman\'s form with the article, the -in rule and its exceptions',()=>{
  for(const job of lesson.jobs){
-  assert(fs.existsSync('public/toon/lektion2/'+job.key+'.webp'),job.key);
+  assert(fs.existsSync('public'+lesson.jobPicture(job.key).src),job.key);
   assert(job.male.startsWith('der ')&&job.female.startsWith('die '),job.key);
   assert.equal(lesson.pairSay(job),job.male+', '+job.female);
  }

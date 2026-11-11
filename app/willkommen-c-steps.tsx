@@ -107,7 +107,6 @@ function Bonus({speech}:{speech:Speech}){
 }
 function VerbPosition({speech}:{speech:Speech}){
  return <><Heading>{ut('Fiil her zaman 2. pozisyonda')}</Heading>
-  <Picture {...willkommenCPictures.cards} alt="Paul Hoca kelime kartları tutuyor: Woher, kommen, Sie?"/>
   <p className="l1a-tr"><Tx text="Düz cümlede de, W-sorusunda da fiil **2. sırada** durur:"/></p>
   <div className="l1a-positions" role="table" aria-label={ut('Fiilin yeri')}>
    <div className="l1a-pos-row l1a-pos-head" role="row"><span role="columnheader">{ut('1. pozisyon')}</span><span role="columnheader">{ut('2. pozisyon = fiil')}</span><span role="columnheader">{ut('gerisi')}</span><span aria-hidden="true"/></div>

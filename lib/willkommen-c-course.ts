@@ -14,7 +14,6 @@ export const willkommenCPictures={
  morning:{src:'/toon/lektion1/sie-sabah.webp',width:960,height:640},
  park:{src:'/toon/lektion1/du-park.webp',width:960,height:640},
  goodbye:{src:'/toon/lektion1/veda.webp',width:960,height:640},
- cards:{src:'/toon/lektion1/paul-kartlar.webp',width:960,height:540},
  world:{src:'/toon/lektion1/selam-dunya.webp',width:960,height:640},
 } as const;
 

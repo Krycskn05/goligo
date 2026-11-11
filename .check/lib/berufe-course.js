@@ -19,7 +19,9 @@ exports.BERUFE_UNIT = 'book-02';
 exports.berufePictures = {
     cover: { src: '/toon/lektion2/kapak-a.webp', width: 960, height: 540 },
 };
-const jobPicture = (key) => ({ src: '/toon/lektion2/' + key + '.webp', width: 640, height: 480 });
+/** Two job pictures were cut again without the teacher (11 November 2026: Nora at the board, Yasemin at the bus door), under new names so no phone keeps the old ones. */
+const jobFiles = { lehrer: 'lehrer-2', busfahrer: 'busfahrer-2' };
+const jobPicture = (key) => ({ src: '/toon/lektion2/' + (jobFiles[key] ?? key) + '.webp', width: 640, height: 480 });
 exports.jobPicture = jobPicture;
 /** The people of Teil A (portraits and voices of the site: public/toon/lektion1/<key>.webp, `speakers`). */
 exports.castL2A = ['omar', 'aisha', 'nikos', 'yasemin', 'rami', 'nora', 'mei', 'paul'];
@@ -27,7 +29,7 @@ const personName = (key) => key === 'paul' ? 'Paul Hoca' : key[0].toUpperCase() 
 exports.personName = personName;
 exports.jobs = [
     { key: 'koch', male: 'der Koch', female: 'die Köchin', tr: 'aşçı', emoji: '👨‍🍳', alt: 'Nikos ve Sabine aşçı: mutfakta, beyaz aşçı kıyafeti ve şapkayla, tencere başında' },
-    { key: 'lehrer', male: 'der Lehrer', female: 'die Lehrerin', tr: 'öğretmen', emoji: '👩‍🏫', alt: 'Paul ve Nora öğretmen: sınıfta tahtanın önünde' },
+    { key: 'lehrer', male: 'der Lehrer', female: 'die Lehrerin', tr: 'öğretmen', emoji: '👩‍🏫', alt: 'Nora öğretmen: sınıfta tahtanın önünde, elinde tebeşir' },
     { key: 'arzt', male: 'der Arzt', female: 'die Ärztin', tr: 'doktor', emoji: '🩺', alt: 'Rami ve Nora doktor: muayene odasında beyaz önlük ve stetoskopla' },
     { key: 'friseur', male: 'der Friseur', female: 'die Friseurin', tr: 'kuaför', emoji: '💇', alt: 'Omar ve Aisha kuaför: kuaför salonunda, ellerinde makas ve fön makinesi' },
     { key: 'verkaeufer', male: 'der Verkäufer', female: 'die Verkäuferin', tr: 'satış görevlisi, tezgâhtar', emoji: '🛒', alt: 'Omar ve Sabine satış görevlisi: süpermarkette kasada, mavi önlükle' },
@@ -38,7 +40,7 @@ exports.jobs = [
     { key: 'ingenieur', male: 'der Ingenieur', female: 'die Ingenieurin', tr: 'mühendis', emoji: '📐', alt: 'Tomasz ve Mei mühendis: baretle, ellerinde bir plan' },
     { key: 'saenger', male: 'der Sänger', female: 'die Sängerin', tr: 'şarkıcı', emoji: '🎤', alt: 'Nikos ve Aisha şarkıcı: sahnede mikrofonla, renkli ışıklar' },
     { key: 'kellner', male: 'der Kellner', female: 'die Kellnerin', tr: 'garson', emoji: '🍽️', alt: 'Tomasz ve Sabine garson: kafede siyah önlükle, ellerinde tepsi ve fincan' },
-    { key: 'busfahrer', male: 'der Busfahrer', female: 'die Busfahrerin', tr: 'otobüs şoförü', emoji: '🚌', alt: 'Paul ve Yasemin otobüs şoförü: sarı otobüsün önünde, biri direksiyonda' },
+    { key: 'busfahrer', male: 'der Busfahrer', female: 'die Busfahrerin', tr: 'otobüs şoförü', emoji: '🚌', alt: 'Yasemin otobüs şoförü: üniformasıyla sarı otobüsün kapısında' },
     { key: 'haus', male: 'der Hausmann', female: 'die Hausfrau', tr: 'ev erkeği / ev hanımı', emoji: '🏠', alt: 'Rami ev erkeği ve Yasemin ev hanımı: biri yemek yapıyor, biri çamaşır katlıyor' },
     { key: 'tierarzt', male: 'der Tierarzt', female: 'die Tierärztin', tr: 'veteriner', emoji: '🐾', alt: 'Nikos ve Yasemin veteriner: muayene masasında bir köpeğe bakıyorlar' },
 ];

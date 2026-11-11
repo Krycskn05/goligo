@@ -125,18 +125,21 @@ test('the learner\'s menu icons and home page pictures are used', ()=>{
  assert.ok(!tour.includes('<picture')&&!tour.includes('<source'),'plain pictures, no <picture>');
  const sitePictures=require(path.join(compiled,'site-pictures.js'));
  const ids=['units','vault','verbs','games','mistakes'];
- const set=end=>Object.fromEntries(ids.map(id=>[id,'/toon/kapak/'+id+end+'.webp']));
+ // Üniteler has its third cover (11 November 2026: the second one showed the teacher), the others their second.
+ const file=(id,end)=>id+end+(id==='units'?'-3':'-2')+'.webp';
+ const set=end=>Object.fromEntries(ids.map(id=>[id,'/toon/kapak/'+file(id,end)]));
  // Their own names: no old picture kept by a browser shows instead; the earlier covers are gone.
- assert.deepEqual(sitePictures.HOME_COVERS,set('-phone-2'),'phones');
- assert.deepEqual(sitePictures.HOME_COVERS_PC,set('-pc-2'),'tablets and computers');
- assert.deepEqual(sitePictures.LANDING_COVERS,set('-intro-2'),'the introduction page');
+ assert.deepEqual(sitePictures.HOME_COVERS,set('-phone'),'phones');
+ assert.deepEqual(sitePictures.HOME_COVERS_PC,set('-pc'),'tablets and computers');
+ assert.deepEqual(sitePictures.LANDING_COVERS,set('-intro'),'the introduction page');
  // The learner's second set (6 November 2026) under new names: the earlier ones are gone.
  for(const id of ids)for(const end of ['','-phone','-pc','-intro'])assert.ok(!fs.existsSync('public/toon/kapak/'+id+end+'.webp'),id+end+': the earlier cover is gone');
+ for(const end of ['-phone','-pc','-intro'])assert.ok(!fs.existsSync('public/toon/kapak/units'+end+'-2.webp'),'units'+end+'-2: the cover with the teacher is gone');
  for(const id of ids){
-  assert.deepEqual(size('public/toon/kapak/'+id+'-phone-2.webp'),[1200,600],id+': 2 : 1 like every card frame on a phone');
-  assert.deepEqual(size('public/toon/kapak/'+id+'-pc-2.webp'),id==='units'?[2600,520]:[1200,520],id+': the small cards 1200×520, the wide Üniteler card 2600×520 (the same scale)');
-  assert.deepEqual(size('public/toon/kapak/'+id+'-intro-2.webp'),[960,720],id+': 4 : 3 like the introduction page tiles');
-  for(const end of ['-phone-2','-pc-2','-intro-2'])assert.ok(fs.statSync('public/toon/kapak/'+id+end+'.webp').size<80*1024,id+end+': small');
+  assert.deepEqual(size('public/toon/kapak/'+file(id,'-phone')),[1200,600],id+': 2 : 1 like every card frame on a phone');
+  assert.deepEqual(size('public/toon/kapak/'+file(id,'-pc')),id==='units'?[2600,520]:[1200,520],id+': the small cards 1200×520, the wide Üniteler card 2600×520 (the same scale)');
+  assert.deepEqual(size('public/toon/kapak/'+file(id,'-intro')),[960,720],id+': 4 : 3 like the introduction page tiles');
+  for(const end of ['-phone','-pc','-intro'])assert.ok(fs.statSync('public/toon/kapak/'+file(id,end)).size<80*1024,id+end+': small');
  }
  assert.equal(sitePictures.WIDE_MEDIA,'(min-width:761px)','tablets and computers: their card frames are 2 : 1 or lower');
  const theme=read('app/koko-theme.css');

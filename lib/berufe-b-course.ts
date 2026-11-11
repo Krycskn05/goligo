@@ -10,8 +10,12 @@ import type {SayItem,Step,StepGroup} from './willkommen-course';
 import type {ChoiceLine} from './stadt-course';
 import type {QuickCheck} from './berufe-course';
 
-/** Pictures of Teil B (public/toon/lektion2/b-*.webp and kapak-b.webp, from the learner's page). */
-export const berufeBPictures={cover:{src:'/toon/lektion2/kapak-b.webp',width:960,height:540}} as const;
+/**
+ * Pictures of Teil B (public/toon/lektion2/b-*.webp, from the learner's page). The cover showed the teacher and is gone
+ * (11 November 2026): until the learner's new cover comes, kapak-b-2 puts two of the part's people side by side (Rami
+ * the director, Nora the author).
+ */
+export const berufeBPictures={cover:{src:'/toon/lektion2/kapak-b-2.webp',width:960,height:540}} as const;
 /** The people of Teil B (portraits and voices of the site). Paul Hoca reads the texts about other people. */
 export const castL2B=['nikos','aisha','yasemin','mei','rami','tomasz','omar','sabine','nora','paul'] as const;
 export const NARRATOR='paul';

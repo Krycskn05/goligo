@@ -62,7 +62,7 @@ const shortNames:Record<L1PartId,Record<string,string>>={
 };
 const parts:Record<L1PartId,PartConfig>={
  a:{id:'a',badge:'A',title:lessonParts[0].title??'',lead:lessonParts[0].lead??'',steps,groups:stepGroups,scored:scoredExercises,testCount:testQuestions.length,wordCount:words.length,cover:willkommenPictures.cover,coverAlt:'Süpermarket önünde tokalaşan iki kişi: Sabine ve Omar',View:StepViewA},
- b:{id:'b',badge:'B',title:lessonParts[1].title??'',lead:lessonParts[1].lead??'',steps:stepsB,groups:stepGroupsB,scored:scoredExercisesB,testCount:testQuestionsB.length,wordCount:wordsB.length,cover:willkommenBPictures.cover,coverAlt:'Dil kursu sınıfı: Paul Hoca tahtada, öğrenciler masalarında',View:StepViewB},
+ b:{id:'b',badge:'B',title:lessonParts[1].title??'',lead:lessonParts[1].lead??'',steps:stepsB,groups:stepGroupsB,scored:scoredExercisesB,testCount:testQuestionsB.length,wordCount:wordsB.length,cover:willkommenBPictures.cover,coverAlt:'Tomasz ve Aisha kurs molasında, ellerinde kahve',View:StepViewB},
  c:{id:'c',badge:'C',title:lessonParts[2].title??'',lead:lessonParts[2].lead??'',steps:stepsC,groups:stepGroupsC,scored:scoredExercisesC,testCount:testQuestionsC.length,wordCount:wordsC.length,cover:willkommenCPictures.cover,coverAlt:'Kurs binasının önünde sabah selamlaşması',View:StepViewC},
  d:{id:'d',badge:'D',title:lessonParts[3].title??'',lead:lessonParts[3].lead??'',steps:stepsD,groups:stepGroupsD,scored:scoredExercisesD,testCount:testQuestionsD.length,wordCount:wordsD.length,cover:willkommenDPictures.cover,coverAlt:'Yasemin taşınıyor: apartman kapısının önünde elinde kutuyla',View:StepViewD,testDetail:scores=>{const sections=['wortschatz','grammatik','kommunikation','steckbrief','test'].filter(id=>scores[id]);return sections.length?ut('{n} / 5 bölüm yapıldı',{n:sections.length}):ut('{n} puan',{n:checkPoints});}},
 };
@@ -166,7 +166,8 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
 }
 
 /* ---------- the notebook: contents page and a part's spread (like Lektion 11 and 12) ---------- */
-const worldMap=willkommenPictures.map;
+// The unit's picture: the ways people greet each other (Teil C's picture; the teacher's world map is gone, 11 November 2026).
+const unitPicture=willkommenCPictures.world;
 /** Left page: the unit, its picture and what Lektion 1 teaches (the resume and test notes were removed at the learner's request, 25 October 2026). Right page: Teil A–D. */
 function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record<L1PartId,L1AScoreMap>;onOpen:(part:L1PartId,index:number)=>void}){
  const unit=courseUnits.find(item=>item.id===WILLKOMMEN_UNIT);const unitName=unit?translate(unit.names,language):'Willkommen!';
@@ -199,7 +200,7 @@ function Contents({language,scores,onOpen}:{language:StudyLanguage;scores:Record
      <p className="lb-sub" lang="de">Guten Tag! Wie heißen Sie?</p>
      <p className="lb-lead"><Tx text="Selamlaşmak, kendini tanıtmak, nereden geldiğini ve hangi dilleri konuştuğunu söylemek: *heißen · kommen · sprechen · sein*, *Sie / du* ve alfabe."/></p>
     </div>
-    <figure className="lb-photo"><img src={worldMap.src} alt={ut('Paul Hoca dünya haritasında farklı dillerde selamları gösteriyor')} width={worldMap.width} height={worldMap.height} decoding="async"/></figure>
+    <figure className="lb-photo"><img src={unitPicture.src} alt={ut('Dünyada selamlaşma biçimleri: el sıkma, sarılma, el sallama, yanaktan öpme, eğilme')} width={unitPicture.width} height={unitPicture.height} decoding="async"/></figure>
    </div>
    <section className="lb-goals" aria-labelledby="l1a-goals"><h2 id="l1a-goals">{ut('Bu ünitede')}</h2><ul>{unitGoals.map(goal=><li key={goal}><span><Rich text={goal}/></span></li>)}</ul></section>
   </>} right={<>
@@ -369,7 +370,6 @@ function useWorldVoice(stopLesson:()=>void){
 function Languages({speech}:{speech:Speech}){
  const world=useWorldVoice(speech.stop);
  return <><Heading>{ut('Farklı dillerde “Guten Tag”')}</Heading>
-  <img className="l1a-cover" src={willkommenPictures.map.src} alt={ut('Paul Hoca dünya haritasını gösteriyor')} width={willkommenPictures.map.width} height={willkommenPictures.map.height} loading="lazy" decoding="async"/>
   <p className="l1a-tr">{ut('Dokun, dinle: her selam kendi dilinde okunur.')}</p>
   <table className="l1a-table"><tbody>{greetingsAround.map(([lang,greeting])=>{const voice=greetingVoices[lang];return <tr key={lang}><td><b>{ut(lang)}</b></td><td>{greeting}</td>
    <td className="l1a-say-cell">{voice&&<button type="button" className={'l12-say'+(world.playing===voice.say?' playing':'')} aria-label={ut('Dinle')+': '+greeting} title={ut('Dinle')} onClick={()=>world.speak(voice.lang,voice.say)}><Volume2 size={18} aria-hidden="true"/></button>}</td></tr>;})}</tbody></table>

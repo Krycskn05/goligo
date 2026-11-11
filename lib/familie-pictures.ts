@@ -33,6 +33,10 @@ export const familiePic={
  buch:vault('schule-buch'),heft:vault('schule-heft'),foto:vault('schule-foto'),
 } as const;
 
-/** The part covers (960 × 540): A Rami and Nikos in the park, B Mei's future, C Nora's interview, D the course room. */
+/**
+ * The part covers (960 × 540): A Rami and Nikos in the park, B Mei's future, C Nora's interview, D a poem in a notebook
+ * (kapak-d-2, cut from the poem picture: the course room cover showed the teacher and is gone, 11 November 2026; the
+ * learner's new cover replaces it when it comes).
+ */
 const cover=(part:string)=>({src:own('kapak-'+part),width:960,height:540});
-export const familieCovers={a:cover('a'),b:cover('b'),c:cover('c'),d:cover('d')} as const;
+export const familieCovers={a:cover('a'),b:cover('b'),c:cover('c'),d:cover('d-2')} as const;

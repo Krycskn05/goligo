@@ -39,13 +39,15 @@ function pickPictures(now = Date.now()) {
  * everywhere, the earlier covers of Goliqo-ana-sayfa-kapaklari.zip are gone). Each set is cut from them for its frames,
  * every picture centred on its people and things. Since 6 November 2026 the learner's second set
  * (Goliqo-panoramik-kapaklar-1536x1024 (1).zip: the same scenes on a plain cream background, no table), under new names
- * (`-2`) so no phone keeps the earlier pictures.
+ * (`-2`) so no phone keeps the earlier pictures. Since 11 November 2026 the Üniteler cover is the site's earlier picture
+ * again (the book with the house, the clock, the bag and the suitcase; `units-*-3`, cut for the three frames): the
+ * panoramic one showed the teacher, whose pictures the learner had removed.
  */
 // Their own file names (public/toon/kapak): phones and browsers keep a picture under the same address for days, so new
 // covers under old names did not show (the learner saw the old ones, 4 November 2026).
 /** Phones (up to 760 px): every card frame is 2:1, so 1200×600, at the same scale as HOME_COVERS_PC. */
 exports.HOME_COVERS = {
-    units: '/toon/kapak/units-phone-2.webp',
+    units: '/toon/kapak/units-phone-3.webp',
     vault: '/toon/kapak/vault-phone-2.webp',
     verbs: '/toon/kapak/verbs-phone-2.webp',
     games: '/toon/kapak/games-phone-2.webp',
@@ -58,7 +60,7 @@ exports.HOME_COVERS = {
  * a small card still shows all of its people and things (the widest, Fiil Atölyesi, is 903 of the 1040 shown).
  */
 exports.HOME_COVERS_PC = {
-    units: '/toon/kapak/units-pc-2.webp',
+    units: '/toon/kapak/units-pc-3.webp',
     vault: '/toon/kapak/vault-pc-2.webp',
     verbs: '/toon/kapak/verbs-pc-2.webp',
     games: '/toon/kapak/games-pc-2.webp',
@@ -71,7 +73,7 @@ exports.WIDE_MEDIA = '(min-width:761px)';
  * than the home page covers so the people stay big in the small tiles; Üniteler a little wider to keep its books.
  */
 exports.LANDING_COVERS = {
-    units: '/toon/kapak/units-intro-2.webp',
+    units: '/toon/kapak/units-intro-3.webp',
     vault: '/toon/kapak/vault-intro-2.webp',
     verbs: '/toon/kapak/verbs-intro-2.webp',
     games: '/toon/kapak/games-intro-2.webp',

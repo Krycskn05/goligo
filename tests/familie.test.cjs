@@ -86,7 +86,7 @@ test('pictures: the learner\'s 3D pictures (8 November 2026) and the Kelime Kasa
  const pictures=load('familie-pictures');
  const size=file=>{const b=fs.readFileSync(file);assert.equal(b.toString('ascii',0,4),'RIFF',file);assert.equal(b.toString('ascii',12,16),'VP8 ',file);return [b.readUInt16LE(26)&0x3fff,b.readUInt16LE(28)&0x3fff];};
  for(const src of Object.values(pictures.familiePic)){assert.ok(typeof src==='string'&&fs.existsSync('public'+src),src);if(src.startsWith('/toon/lektion4/'))assert.deepEqual(size('public'+src),[640,480],src);}
- for(const part of course.familiePartList){assert.match(part.cover.src,/^\/toon\/lektion4\/kapak-[a-d]\.webp$/);assert.deepEqual(size('public'+part.cover.src),[960,540],part.cover.src);}
+ for(const part of course.familiePartList){assert.match(part.cover.src,/^\/toon\/lektion4\/kapak-(a|b|c|d-2)\.webp$/);assert.deepEqual(size('public'+part.cover.src),[960,540],part.cover.src);}
  assert.ok(!fs.readdirSync('public/toon/lektion4').some(file=>file.startsWith('gecici')),'the temporary covers are gone');
  assert.ok(fs.readdirSync('public/toon/lektion4').filter(file=>file.endsWith('.webp')).length>=64,'the 60 things and 4 covers');
  for(const part of course.familiePartList)for(const step of part.steps){

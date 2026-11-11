@@ -1,0 +1,387 @@
+{
+ "started": "2026-11-11 18:21 UTC",
+ "settings": "supertonic3-de-speed0.92-steps10-v1",
+ "texts": 6369,
+ "voices": {
+  "F1": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 149,
+    "seconds": 6.3
+   },
+   "rendered": 31,
+   "seconds": 67.0,
+   "median_pitch_hz": 189.7,
+   "asr": [
+    {
+     "text": "Guten Tag. Ich möchte für heute Abend einen Tisch reservieren.",
+     "heard": "Guten Tag. Ich möchte für heute Abend einen Tisch reservieren.",
+     "score": 1.0
+    },
+    {
+     "text": "Danke. Einen Moment, bitte.",
+     "heard": "Danke, ein Moment bitte.",
+     "score": 0.957
+    }
+   ],
+   "asr_mean": 0.978,
+   "available": 6363
+  },
+  "F2": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 145,
+    "seconds": 6.3
+   },
+   "rendered": 31,
+   "seconds": 62.7,
+   "median_pitch_hz": 194.3,
+   "asr": [
+    {
+     "text": "Hartmann. Ich buchstabiere: Hah, Ah, Err, Teh, Emm, Ah, Enn, Enn.",
+     "heard": "Hartmann. Ich Buchstabiere HA-R-T-M-A-N-N",
+     "score": 0.842
+    },
+    {
+     "text": "Restaurant Roma, guten Tag.",
+     "heard": "Restrand Roma guten Tag.",
+     "score": 0.917
+    },
+    {
+     "text": "Danke, Herr Bachmann. Bitte warten Sie hier.",
+     "heard": "Danke Herr Bachmann, bitte warten Sie hier.",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.92,
+   "available": 6363
+  },
+  "F3": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 144,
+    "seconds": 6.6
+   },
+   "rendered": 31,
+   "seconds": 67.4,
+   "median_pitch_hz": 158.6,
+   "asr": [
+    {
+     "text": "Danke, Herr Jäger.",
+     "heard": "Danke Herr Jäger.",
+     "score": 1.0
+    },
+    {
+     "text": "Jäger. Ich buchstabiere: Jot, Ah Umlaut, Geh, E, Err.",
+     "heard": "Jäger, ich Buchstabiere, JOTA umlaut GER.",
+     "score": 0.905
+    }
+   ],
+   "asr_mean": 0.953,
+   "available": 6363
+  },
+  "F4": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 143,
+    "seconds": 6.3
+   },
+   "rendered": 31,
+   "seconds": 60.5,
+   "median_pitch_hz": 195.1,
+   "asr": [
+    {
+     "text": "Danke, Herr Lindner. Ihr Zimmer ist im ersten Stock.",
+     "heard": "Danke Herr Lindner, jetzt immer ist im ersten Stock.",
+     "score": 0.909
+    },
+    {
+     "text": "Guten Tag. Ist mein Auto fertig? Mein Name ist Vogt.",
+     "heard": "Guten Tag, ist mein Auto fertig, mein Name ist Vogt.",
+     "score": 1.0
+    },
+    {
+     "text": "Lindner. Ich buchstabiere: Ell, Ih, Enn, Deh, Enn, E, Err.",
+     "heard": "Lindner. Ich Buchstabiere L-E-N-D-N-E-R.",
+     "score": 0.851
+    }
+   ],
+   "asr_mean": 0.92,
+   "available": 6363
+  },
+  "F5": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 149,
+    "seconds": 6.0
+   },
+   "rendered": 31,
+   "seconds": 64.6,
+   "median_pitch_hz": 158.6,
+   "asr": [
+    {
+     "text": "Danke, Herr Bachmann. Bitte warten Sie hier.",
+     "heard": "Danke Herr Bachmann, bitte warten Sie hier.",
+     "score": 1.0
+    },
+    {
+     "text": "Ich buchstabiere: Weh, Ah, Geh, Enn, E, Err.",
+     "heard": "Ich buchstabiere W, A-G-N-E-R.",
+     "score": 0.862
+    }
+   ],
+   "asr_mean": 0.931,
+   "available": 6363
+  },
+  "M1": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 141,
+    "seconds": 6.4
+   },
+   "rendered": 31,
+   "seconds": 64.9,
+   "median_pitch_hz": 134.0,
+   "asr": [
+    {
+     "text": "Für Herrn Frank. Ich buchstabiere: Eff, Err, Ah, Enn, Kah.",
+     "heard": "Für Herrn Frank. Ich Buchstabiere, F-R-R-A-N-K.",
+     "score": 0.905
+    },
+    {
+     "text": "Danke, Herr Bachmann. Bitte warten Sie hier.",
+     "heard": "Danke Herr Bachmann. Bitte warten Sie hier.",
+     "score": 1.0
+    },
+    {
+     "text": "Danke, Herr Jäger.",
+     "heard": "Danke Herr Jäger!",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 0.968,
+   "available": 6363
+  },
+  "M2": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 144,
+    "seconds": 6.2
+   },
+   "rendered": 31,
+   "seconds": 65.5,
+   "median_pitch_hz": 93.8,
+   "asr": [
+    {
+     "text": "Ich buchstabiere: Beh, Öh, Teh, Teh, Zeh, Hah, E, Err.",
+     "heard": "Ich Buchstabiere, B-E-T-T-T-C-H-E-R",
+     "score": 0.759
+    },
+    {
+     "text": "Danke, Herr Jäger.",
+     "heard": "Danke, Jäger!",
+     "score": 0.815
+    },
+    {
+     "text": "Guten Abend. Wie ist Ihr Name, bitte?",
+     "heard": "Guten Abend, wie ist ihr Namen bitte?",
+     "score": 0.986
+    }
+   ],
+   "asr_mean": 0.853,
+   "available": 6363
+  },
+  "M3": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 141,
+    "seconds": 6.0
+   },
+   "rendered": 31,
+   "seconds": 58.6,
+   "median_pitch_hz": 109.0,
+   "asr": [
+    {
+     "text": "Danke, Herr Jäger.",
+     "heard": "Danke Herr Jäger.",
+     "score": 1.0
+    },
+    {
+     "text": "Jäger. Ich buchstabiere: Jot, Ah Umlaut, Geh, E, Err.",
+     "heard": "Jäger, ich Buchstabiere, J.A. umlaut G-E-R",
+     "score": 0.918
+    },
+    {
+     "text": "Ich buchstabiere: Beh, Öh, Teh, Teh, Zeh, Hah, E, Err.",
+     "heard": "Ich buchstabiere B-Ö-T-T-C-H-E-R.",
+     "score": 0.805
+    }
+   ],
+   "asr_mean": 0.908,
+   "available": 6363
+  },
+  "M4": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 146,
+    "seconds": 6.3
+   },
+   "rendered": 31,
+   "seconds": 63.3,
+   "median_pitch_hz": 122.2,
+   "asr": [
+    {
+     "text": "Danke, Herr Bachmann. Bitte warten Sie hier.",
+     "heard": "Danke Herr Bachmann, bitte warten Sie hier.",
+     "score": 1.0
+    },
+    {
+     "text": "Lindner. Ich buchstabiere: Ell, Ih, Enn, Deh, Enn, E, Err.",
+     "heard": "Lindner. Ich Buchstabiere L-E-N-N-D-N-E-R",
+     "score": 0.854
+    }
+   ],
+   "asr_mean": 0.927,
+   "available": 6363
+  },
+  "M5": {
+   "rate": 44100,
+   "times": {
+    "measured": 25,
+    "words": 190,
+    "placed": 144,
+    "seconds": 6.0
+   },
+   "rendered": 31,
+   "seconds": 65.9,
+   "median_pitch_hz": 82.7,
+   "asr": [
+    {
+     "text": "Danke, Herr Lindner. Ihr Zimmer ist im ersten Stock.",
+     "heard": "Danke, Herr Lindner, ihr Zimmer ist im ersten Stock.",
+     "score": 1.0
+    },
+    {
+     "text": "Guten Abend. Wie ist Ihr Name, bitte?",
+     "heard": "Guten Abend, wie ist ihr Name bitte?",
+     "score": 1.0
+    }
+   ],
+   "asr_mean": 1.0,
+   "available": 6363
+  }
+ },
+ "errors": [
+  "F1: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")"
+ ],
+ "package": "1.3.1",
+ "init_signature": "(self, model: 'str' = 'supertonic-3', model_dir: 'Optional[Union[Path, str]]' = None, auto_download: 'bool' = True, intra_op_num_threads: 'Optional[int]' = None, inter_op_num_threads: 'Optional[int]' = None)",
+ "init_used": {
+  "model": "supertonic-3",
+  "auto_download": true
+ },
+ "synthesize_signature": "(text: 'str', voice_style: 'Style', total_steps: 'int' = 8, speed: 'float' = 1.05, max_chunk_length: 'Optional[int]' = None, silence_duration: 'float' = 0.3, lang: 'Optional[str]' = None, verbose: 'bool' = False) -> 'tuple[np.ndarray, np.ndarray]'",
+ "times_model": "base",
+ "ready_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "times_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "finished": "2026-11-11 18:32 UTC"
+}

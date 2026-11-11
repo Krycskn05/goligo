@@ -1,0 +1,27 @@
+uretim basladi 2026-11-11 22:48:45
+6369 texts, 60 clips to render
+[0;93m2026-11-11 22:48:45.462422537 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 26 files:   4%|▍         | 1/26 [00:00<00:03,  7.15it/s]Fetching 26 files:  19%|█▉        | 5/26 [00:00<00:00, 22.16it/s]Fetching 26 files:  31%|███       | 8/26 [00:00<00:01,  9.10it/s]Fetching 26 files:  46%|████▌     | 12/26 [00:00<00:01, 13.69it/s]Fetching 26 files:  65%|██████▌   | 17/26 [00:01<00:00, 18.23it/s]Fetching 26 files:  81%|████████  | 21/26 [00:01<00:00, 20.03it/s]Fetching 26 files:  92%|█████████▏| 24/26 [00:02<00:00,  6.69it/s]Fetching 26 files: 100%|██████████| 26/26 [00:04<00:00,  3.03it/s]Fetching 26 files: 100%|██████████| 26/26 [00:04<00:00,  5.68it/s]
+F1: 1/6
+F2: 1/6
+F3: 1/6
+F4: 1/6
+F5: 1/6
+M1: 1/6
+M2: 1/6
+M3: 1/6
+M4: 1/6
+M5: 1/6
+{"started": "2026-11-11 22:48 UTC", "settings": "supertonic3-de-speed0.92-steps10-v1", "texts": 6369, "errors": ["F1: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F1: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F1: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F1: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F1: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F1: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F2: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F2: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F2: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F2: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F2: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F2: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F3: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F3: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F3: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F3: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F3: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F3: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F4: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F4: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F4: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F4: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F4: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F4: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")", "F5: 'dick 
+F1 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+F2 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+F3 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+F4 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+F5 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+M1 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+M2 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+M3 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+M4 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+M5 {"rendered": 6, "seconds": 0.0, "asr_mean": 0.0, "available": 6363}
+Yeni ses yok; dal değişmedi.

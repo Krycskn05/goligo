@@ -1,0 +1,171 @@
+{
+ "started": "2026-11-11 22:48 UTC",
+ "settings": "supertonic3-de-speed0.92-steps10-v1",
+ "texts": 6369,
+ "voices": {
+  "F1": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "F2": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "F3": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "F4": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "F5": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "M1": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "M2": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "M3": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "M4": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  },
+  "M5": {
+   "rendered": 6,
+   "seconds": 0.0,
+   "asr": [],
+   "asr_mean": 0.0,
+   "available": 6363
+  }
+ },
+ "errors": [
+  "F1: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F1: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F2: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F3: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F4: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "F5: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M1: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M2: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M3: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M4: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'dick ≠ dünn': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'groß ≠ klein': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'jung ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'lang ≠ kurz': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'neu ≠ alt': ValueError(\"Found 1 unsupported character(s): ['≠']\")",
+  "M5: 'schlank ≠ dick': ValueError(\"Found 1 unsupported character(s): ['≠']\")"
+ ],
+ "package": "1.3.1",
+ "init_signature": "(self, model: 'str' = 'supertonic-3', model_dir: 'Optional[Union[Path, str]]' = None, auto_download: 'bool' = True, intra_op_num_threads: 'Optional[int]' = None, inter_op_num_threads: 'Optional[int]' = None)",
+ "init_used": {
+  "model": "supertonic-3",
+  "auto_download": true
+ },
+ "synthesize_signature": "(text: 'str', voice_style: 'Style', total_steps: 'int' = 8, speed: 'float' = 1.05, max_chunk_length: 'Optional[int]' = None, silence_duration: 'float' = 0.3, lang: 'Optional[str]' = None, verbose: 'bool' = False) -> 'tuple[np.ndarray, np.ndarray]'",
+ "ready_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "times_voices": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "M1",
+  "M2",
+  "M3",
+  "M4",
+  "M5"
+ ],
+ "finished": "2026-11-11 22:48 UTC"
+}

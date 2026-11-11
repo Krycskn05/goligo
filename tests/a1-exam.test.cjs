@@ -389,88 +389,93 @@ test('Buchstabieren: a spelling practice beside the exams — three sheets of te
 });
 
 // Schreiben (the learner asked, 11 November 2026: "at the difficulty of the example, but not the same; telc and Goethe as
-// models"): Teil 1 a form with five missing entries, Teil 2 a short message with three points. Every gap is a tap.
-test('Schreiben: ten papers — a form with five gaps, a message with ten, 15 points, explained from labels',()=>{
+// models"; then: "the form is not a choice … I must write, in my own way, you must not interfere"): Teil 1 a form with
+// five entries to type, Teil 2 a short message the learner writes freely and marks with the exam's scale.
+test('Schreiben: ten papers — a form to fill in by typing, a message to write; nothing is a choice',()=>{
  const papers=Array.from({length:10},(_,i)=>load('a1-exam-schreiben-'+two(i+1)).exam);
- assert.equal(course.SCHREIBEN_TOTAL,15);assert.equal(course.SCHREIBEN_MINUTES,20);assert.equal(course.moduleMinutes.schreiben,20);
+ assert.equal(course.SCHREIBEN_TOTAL,15);assert.equal(course.SCHREIBEN_MINUTES,20);assert.equal(course.moduleMinutes.schreiben,20);assert.equal(course.SCHREIBEN_STEPS,6);
  assert.deepEqual(course.moduleTeile,{hoeren:[1,2,3],lesen:[1,2,3],schreiben:[1,2]});
  assert.equal(course.examList('schreiben'),course.schreibenExamList);assert.equal(new Set(course.schreibenExamList.map(exam=>exam.topics)).size,10);
- const rightOf=item=>item.options['abc'.indexOf(item.answer)];
- const keys=[],kinds=new Set(),all=[];
- const lesenPhones=new Set(exams.flatMap(exam=>[exam.lesen.teil2.example,...exam.lesen.teil2.items].flatMap(entry=>entry.ads.map(ad=>ad.label))));
+ const all=[];const lesenPhones=new Set(exams.flatMap(exam=>[exam.lesen.teil2.example,...exam.lesen.teil2.items].flatMap(entry=>entry.ads.map(ad=>ad.label))));
  papers.forEach((exam,i)=>{
   const meta=course.schreibenExamList[i];assert.deepEqual([meta.number,meta.id,meta.topics],[i+1,'a1-schreiben-'+two(i+1),exam.topics]);
   assert.equal(exam.id,meta.id);assert.equal(exam.id,build.schreibenExamId(i+1));assert.equal(exam.number,i+1);assert.equal(exam.topics.split(' · ').length,2,exam.id+': the form and the message');
-  const {teil1,teil2}=exam.schreiben;const list=course.schreibenItems(exam.schreiben);
-  assert.equal(list.length,15,exam.id);assert.deepEqual(list.map(entry=>entry.item.n),Array.from({length:15},(_,k)=>k+1));
-  assert.deepEqual(list.map(entry=>entry.item.id),Array.from({length:15},(_,k)=>exam.id+'-'+two(k+1)),exam.id+': ids');
-  assert.equal(list.map(entry=>entry.teil).join(''),'111112222222222');
-  // Every gap: three different ways to fill it, one right.
-  for(const {item} of list){
-   assert.equal(item.options.length,3,item.id);assert.equal(new Set(item.options.map(option=>option.toLowerCase())).size,3,item.id+': three different options');
-   assert.match(item.answer,/^[abc]$/);for(const option of item.options)assert.ok(option&&option.trim()===option&&!/[{}*]/.test(option),item.id);
-   assert.ok(copy.examCopy['sw_'+item.why.kind],item.id+': '+item.why.kind);assert.ok(item.why.quote.trim(),item.id);kinds.add(item.why.kind);
-  }
-  // Teil 1: a text about someone, a form of seven or eight rows, the gaps 1–5 once each; the entry is in the text.
+  const {teil1,teil2}=exam.schreiben;
+  // Teil 1: a text about someone, a form of seven or eight rows, the gaps 1–5 in the order of the form.
   const count=teil1.text.split(/\s+/).length;assert.ok(count>=35&&count<=65,exam.id+': '+count+' words');assert.ok(teil1.form.includes(' – '),exam.id);
   assert.ok(teil1.rows.length>=7&&teil1.rows.length<=8,exam.id);assert.equal(new Set(teil1.rows.map(row=>row.label)).size,teil1.rows.length);
   const form=teil1.rows.map(row=>row.value).join(' | ');
   assert.deepEqual([...form.matchAll(/\{(\d+)\}/g)].map(mark=>Number(mark[1])),[1,2,3,4,5],exam.id+': gaps 1–5 in the order of the form');
   for(const row of teil1.rows)assert.ok(row.label.trim()&&row.value.trim());
-  for(const item of teil1.items){assert.ok(['text','infer'].includes(item.why.kind),item.id);assert.ok(teil1.text.includes(item.why.quote),item.id+': the quote stands in the text');assert.equal(item.why.point,undefined);}
+  assert.equal(teil1.items.length,5);
+  teil1.items.forEach((item,k)=>{
+   assert.equal(item.id,exam.id+'-'+two(k+1));assert.equal(item.n,k+1);assert.equal(item.options,undefined,item.id+': not a choice');
+   // The entries that count: the model entry first, no entry twice, each of them accepted, an empty field is open.
+   assert.ok(item.accept.length>=1&&item.accept.every(entry=>entry.trim()===entry&&entry),item.id);
+   assert.equal(new Set(item.accept.map(course.normalizeEntry)).size,item.accept.length,item.id+': no entry twice');
+   for(const entry of item.accept)assert.equal(course.checkEntry(entry,item.accept),'right',item.id+': '+entry);
+   assert.equal(course.checkEntry('',item.accept),'open');assert.equal(course.checkEntry('   ',item.accept),'open');assert.equal(course.checkEntry('xyz 99',item.accept),'wrong',item.id);
+   // How it is explained: the line of the text.
+   assert.ok(['text','infer'].includes(item.why.kind),item.id);assert.ok(teil1.text.includes(item.why.quote),item.id+': the quote stands in the text');assert.ok(copy.examCopy['sw_'+item.why.kind]);
+  });
   assert.ok(teil1.items.filter(item=>item.why.kind==='text').length>=3,exam.id+': most entries stand in the text');
-  // Teil 2: the task, three points, the message with the gaps 6–15 in reading order — greeting first, ending last.
+  // An entry of another gap of the same form is never accepted (the traps of the text stay traps).
+  for(const item of teil1.items)for(const other of teil1.items)if(other!==item)assert.notEqual(course.checkEntry(other.accept[0],item.accept),'right',item.id+' takes the entry of '+other.id);
+  // Teil 2: the task, three points, and a sample answer — a greeting, 28 to 55 words, an ending.
   assert.ok(teil2.task.endsWith(':')&&teil2.task.includes('Schreiben Sie'),exam.id);assert.equal(teil2.points.length,3);assert.equal(new Set(teil2.points).size,3);
-  const message=teil2.lines.join('\n');
-  assert.deepEqual([...message.matchAll(/\{(\d+)\}/g)].map(mark=>Number(mark[1])),[6,7,8,9,10,11,12,13,14,15],exam.id+': gaps 6–15 in reading order');
-  assert.ok(message.startsWith('{6}'),exam.id+': the greeting is the first gap');assert.equal(teil2.lines.at(-2),'{15}');assert.equal(teil2.lines.at(-1),'(Ihr Name)');
-  assert.ok(teil2.items[0].why.kind.startsWith('anrede'),exam.id);assert.ok(teil2.items[9].why.kind.startsWith('gruss'),exam.id);
-  const filled=message.replace(/\{(\d+)\}/g,(_,n)=>rightOf(teil2.items[Number(n)-6]));
-  const words=filled.replace('(Ihr Name)','').split(/\s+/).filter(Boolean).length;assert.ok(words>=28&&words<=55,exam.id+': a message of '+words+' words');
-  assert.match(filled.split('\n')[1],/^[a-zäöü]/,exam.id+': after the greeting the message goes on in small letters');
-  // One gap is a whole sentence that has to answer a point of the task; the others are words of the message.
-  const content=teil2.items.filter(item=>item.why.kind==='content');assert.equal(content.length,1,exam.id);
-  assert.ok([1,2,3].includes(content[0].why.point));assert.equal(content[0].why.quote,rightOf(content[0]));for(const option of content[0].options)assert.match(option,/[.?!]$/,exam.id);
-  for(const item of teil2.items){
-   if(item.why.kind!=='content'){assert.equal(item.why.point,undefined,item.id);assert.ok(plain(item.why.quote).includes(plain(rightOf(item))),item.id+': the explanation shows the right words');}
-   assert.ok(!['text','infer'].includes(item.why.kind),item.id);
-  }
-  keys.push(course.schreibenKey(exam.schreiben));
+  assert.equal(teil2.gaps,undefined);assert.equal(teil2.lines,undefined);
+  assert.ok(teil2.model.length>=5&&teil2.model.every(line=>line.trim()===line&&line&&!/[{}*]/.test(line)),exam.id);
+  assert.match(teil2.model[0],/^(Liebe|Lieber|Sehr geehrte|Sehr geehrter) .+,$/,exam.id+': a greeting');assert.match(teil2.model[1],/^[a-zäöü]/,exam.id+': small letters after the greeting');
+  assert.match(teil2.model.at(-2),/^(Viele Grüße|Liebe Grüße|Mit freundlichen Grüßen)$/,exam.id+': an ending');assert.equal(teil2.model.at(-1),'(Ihr Name)');
+  const words=course.countWords(teil2.model.slice(0,-1).join(' '));assert.ok(words>=28&&words<=55,exam.id+': a sample of '+words+' words');
   // Our own numbers: from the ranges kept free for films, none of the Lesen ads' numbers.
-  const text=[teil1.text,form,message,...list.flatMap(entry=>entry.item.options)].join('\n');all.push(text,teil2.task,...teil2.points);
+  const text=[teil1.text,form,...teil2.model,...teil1.items.flatMap(item=>item.accept)].join('\n');all.push(text,teil2.task,...teil2.points);
   for(const phone of text.match(/\b0\d{2,3} \/ \d+ \d+/g)??[]){assert.match(phone,/^(030 \/ 23125 \d{3}|040 \/ 66969 \d{3}|0176 \/ 040690 \d{2})$/,phone);assert.ok(!lesenPhones.has(phone),phone);}
  });
- // The right answers: every letter four to six times of fifteen, no three equal in a row in a Teil, ten different keys.
- assert.equal(new Set(keys).size,10);
- for(const key of keys){
-  assert.match(key,/^[abc]{15}$/);for(const letter of ['a','b','c']){const n=[...key].filter(x=>x===letter).length;assert.ok(n>=4&&n<=6,key+': '+n+' × '+letter);}
-  for(const part of [key.slice(0,5),key.slice(5)])assert.ok(!/(.)\1\1/.test(part),key);
- }
- // Every kind of explanation has its label, and no label is left without a gap.
- assert.deepEqual([...kinds].sort(),Object.keys(copy.examCopy).filter(key=>key.startsWith('sw_')).map(key=>key.slice(3)).sort());
- // Nothing from the practice sets the form was taken from.
+ // Nothing from the practice sets the form was taken from; only the two kinds of explanation have a label.
  const whole=all.join('\n');for(const word of ['Kadavy','Seeheim','Bodensee','Dresden','Schneider','Gundlach'])assert.ok(!whole.includes(word),word);
- // Marking: one point per gap, 5 + 10.
- const first=papers[0].schreiben;const right=Object.fromEntries(course.schreibenItems(first).map(entry=>[entry.item.id,entry.item.answer]));
- const full=course.gradeSchreiben(first,right);assert.deepEqual([full.right,full.total,full.byTeil[1].total,full.byTeil[2].total,full.byTeil[3].total],[15,15,5,10,0]);
- const wrong={...right,[papers[0].id+'-07']:first.teil2.items[1].answer==='a'?'b':'a'};delete wrong[papers[0].id+'-02'];
- const part=course.gradeSchreiben(first,wrong);assert.deepEqual([part.right,part.byTeil[1].right,part.byTeil[2].right,part.wrong,part.open],[13,4,9,[papers[0].id+'-07'],[papers[0].id+'-02']]);
+ assert.deepEqual(Object.keys(copy.examCopy).filter(key=>key.startsWith('sw_')).sort(),['sw_infer','sw_text']);
+ // A typed entry is marked like in the exam: the information has to be right, the way of writing may differ, a small slip counts.
+ assert.equal(course.normalizeEntry(' Gartenstraße 12 '),'gartenstrasse12');assert.equal(course.normalizeEntry('01.02.'),'1.2');assert.equal(course.normalizeEntry('12. März 1988'),'12maerz1988');
+ assert.equal(course.normalizeEntry('030 / 23125 417'),course.normalizeEntry('03023125417'));
+ const first=papers[0].schreiben.teil1.items;
+ assert.equal(course.checkEntry('kellner',first[1].accept),'right');assert.equal(course.checkEntry('Kelner',first[1].accept),'near','one letter left out still counts');
+ assert.equal(course.checkEntry('Koch',first[1].accept),'wrong');assert.equal(course.checkEntry('gartenstrasse 12',first[2].accept),'right');assert.equal(course.checkEntry('Gartenstraße 14',first[2].accept),'wrong','a number is exact');
+ assert.equal(course.checkEntry('1.2.',first[4].accept),'right');assert.equal(course.checkEntry('1. März',first[4].accept),'wrong');assert.equal(course.checkEntry('6 Jahre',first[0].accept),'wrong','the brother’s age is the trap');
+ // Marking: the form by the page, the message by the learner — 3 points a point (1,5 for a half), 1 for greeting and ending.
+ assert.deepEqual(course.SCHREIBEN_CRITERIA.map(item=>[item.n,item.points,item.point]),[[6,3,1],[7,3,2],[8,3,3],[9,1,0]]);
+ assert.equal(course.criterionId('a1-schreiben-01',6),'a1-schreiben-01-06');assert.equal(course.schreibenTextId('a1-schreiben-01'),'a1-schreiben-01-text');
+ assert.deepEqual([course.selfPoints(3,'a'),course.selfPoints(3,'b'),course.selfPoints(3,'c'),course.selfPoints(1,'a'),course.selfPoints(1,'b'),course.selfPoints(3,undefined)],[3,1.5,0,1,0,0]);
+ const exam=papers[0];const texts={[exam.id+'-01']:'3',[exam.id+'-02']:'Kellner',[exam.id+'-03']:'Gartenstr. 12',[exam.id+'-04']:'Berlin',[exam.id+'-text']:'Liebe Frau Berger, ich bin neu im Haus.'};
+ const before=course.gradeSchreiben(exam,{},texts);
+ assert.deepEqual([before.right,before.total,before.byTeil[1].right,before.byTeil[1].total,before.byTeil[2].right,before.byTeil[2].total,before.byTeil[3].total],[3,15,3,5,0,10,0]);
+ assert.deepEqual(before.wrong,[exam.id+'-04']);assert.deepEqual(before.open,[exam.id+'-05',exam.id+'-06',exam.id+'-07',exam.id+'-08',exam.id+'-09']);
+ const after=course.gradeSchreiben(exam,{[exam.id+'-06']:'a',[exam.id+'-07']:'b',[exam.id+'-08']:'c',[exam.id+'-09']:'a'},texts);
+ assert.deepEqual([after.right,after.byTeil[2].right,after.open],[8.5,5.5,[exam.id+'-05']]);
+ assert.equal(course.schreibenFilled(exam,texts),5,'four entries and the message');assert.equal(course.schreibenFilled(exam,{}),0);assert.equal(course.countWords('  Liebe Nora,\n vielen  Dank! '),4);
  assert.ok(progress.examPapers.some(paper=>paper.id==='a1-schreiben-10'&&paper.total===15));
+ // What was typed is kept with the run (only this paper's own texts; a message may be long, an entry not), and the
+ // learner's marks after handing in do not count as a new attempt.
+ const box=storage();progress.saveExamRun(box,exam.id,{answers:{[exam.id+'-06']:'b','a1-schreiben-02-06':'a'},seconds:5,teil:2,timed:true,done:true,texts:{...texts,'a1-schreiben-02-01':'x',[exam.id+'-02']:'K'.repeat(200)}});
+ const run=progress.readExamRun(box,exam.id);assert.deepEqual(run.answers,{[exam.id+'-06']:'b'});assert.equal(run.texts[exam.id+'-text'],texts[exam.id+'-text']);assert.equal(run.texts[exam.id+'-02'].length,80);assert.equal(run.texts['a1-schreiben-02-01'],undefined);
+ progress.saveExamScore(box,exam.id,3,15,60,1);progress.saveExamScore(box,exam.id,8.5,15,60,2,false);
+ assert.deepEqual(progress.readExamScores(box)[exam.id],{right:8,total:15,tries:1,seconds:60,at:2},'one attempt; a half point is not kept in the list');
  // The explanation of a gap is a label filled with German words.
  assert.equal(copy.examText('tr','sw_text',{quote:'Zofia ist drei Jahre alt'}),'Metinde yazıyor: *Zofia ist drei Jahre alt*.');
  assert.equal(copy.examText('de','sw_infer',{quote:'Sie fährt allein',right:'1'}),'Das zeigt der Text: *Sie fährt allein* → *1*.');
- assert.equal(copy.examText('en','sw_content',{quote:'Kommen Sie auch?',n:3}),'The sentence here has to answer point 3 of the task: *Kommen Sie auch?*');
- // The page: the paper with its form and message; two Teile; the 20 minutes; nothing is read aloud.
+ // The page: fields to type in, a sheet to write on — no options anywhere; two Teile; the 20 minutes; nothing is read aloud.
  const ui=read('app/a1-exam-study.tsx'),sheet=read('app/a1-exam-schreiben-paper.tsx'),css=read('app/a1-exam.css');
- assert.ok(ui.includes("schreiben:{rules:['schreibenRule1','schreibenRule2','rule3','schreibenRule4'],on:'timed20',off:'untimed'")&&ui.includes('const left=minutes*60-seconds;')&&ui.includes('{teil<last?<button')&&ui.includes('teile.map(teil=>sheet(teil,shown.answers,true))'));
- assert.ok(ui.includes("loadSchreibenExam(number).then(exam=>done({module:'schreiben',exam}))")&&ui.includes('<SchreibenTeil key={teil} schreiben={loaded.exam.schreiben} teil={teil===2?2:1}'));
- assert.ok(sheet.includes('data-x1-form')&&sheet.includes('data-x1-message')&&sheet.includes('data-x1-gap={item.n}')&&sheet.includes('explained={explain(language,item)}')&&sheet.includes("('sw_'+item.why.kind) as ExamCopyKey"));
- assert.ok(sheet.includes("{review&&<Why ")&&sheet.includes("boxClass('x1-pick x1-opt',value===choice,item.answer===choice,review)"),'nothing is marked before the end');
+ assert.ok(ui.includes("schreiben:{rules:['schreibenRule1','schreibenRule2','schreibenRule3','schreibenRule4'],on:'timed20',off:'untimed'")&&ui.includes('const left=minutes*60-seconds;')&&ui.includes('{teil<last?<button')&&ui.includes('teile.map(teil=>sheet(teil,shown.answers,true))'));
+ assert.ok(ui.includes("loadSchreibenExam(number).then(exam=>done({module:'schreiben',exam}))")&&ui.includes('texts={texts} onText={review?undefined:write} onSelf={review?selfMark:undefined}'));
+ assert.ok(ui.includes('gradeSchreiben(loaded.exam,run.answers,run.texts??{})')&&ui.includes('saveExamScore(localStorage,meta.id,graded.right,graded.total,next.timed?next.seconds:0,Date.now(),false)')&&ui.includes("examText(language,'selfTodo')"));
+ assert.ok(sheet.includes('<input className="x1-entry"')&&sheet.includes('<textarea className="x1-write"')&&sheet.includes('data-x1-form')&&sheet.includes('data-x1-model')&&sheet.includes('data-x1-self'));
+ assert.ok(!sheet.includes('x1-opt')&&!sheet.includes('options')&&!sheet.includes("role=\"radio\" aria-checked={value===choice} disabled={fixed}"),'no options in Schreiben');
+ assert.ok(sheet.includes('{review&&items.map(item=><EntryWhy ')&&sheet.includes('{review&&<>'),'nothing is marked or shown before the end');
  for(const word of ['speak(','useGermanSpeech','useExamAudio','sound.correct','sound.wrong'])assert.ok(!sheet.includes(word),word);
- assert.ok(css.includes('.x1-form {')&&css.includes('.x1-msg {')&&css.includes('.x1-gap-word {')&&css.includes('.x1-tabs.two {'));
+ assert.ok(css.includes('.x1-form {')&&css.includes('.x1-entry {')&&css.includes('.x1-write {')&&css.includes('.x1-self {')&&css.includes('.x1-tabs.two {'));
  assert.ok(read('app/a1-exam-paper.tsx').includes("module==='schreiben'?'Schreiben':'Lesen'"));
- for(const key of ['schreibenRule1','schreibenRule2','schreibenRule4','timed20','stipsTitle','stip1','stip2','stip3','hintS1','hintS2'])assert.ok(copy.examCopy[key],key);
- assert.ok(!copy.examCopy.schreibenSoon);assert.ok(copy.examText('tr','about').includes('Hören, Lesen ve Schreiben'));
+ for(const key of ['schreibenRule1','schreibenRule2','schreibenRule3','schreibenRule4','timed20','stipsTitle','stip1','stip2','stip3','hintS1','hintS2','filled','pointsTotal','writeHere','wordCount','yourText','emptyText','modelTitle','modelNote','selfTitle','selfLead','selfPoint','selfForm','selfFull','selfHalf','selfNone','selfYes','selfNo','selfTodo','entryNear'])assert.ok(copy.examCopy[key],key);
+ assert.ok(!copy.examCopy.schreibenSoon);assert.ok(copy.examText('tr','about').includes('Hören, Lesen ve Schreiben'));assert.ok(copy.examText('tr','schreibenRule1').includes('seçenek yoktur'));
 });
 
 // The learner, 11 November 2026: "in the exam spelling is not a part of its own, it is just one question" — so the sixth

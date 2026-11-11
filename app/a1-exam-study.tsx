@@ -157,7 +157,7 @@ const pointsText=(value:number)=>String(value).replace('.',',');
 const INTRO:Record<ReadyModule,{rules:readonly ExamCopyKey[];on:ExamCopyKey;off:ExamCopyKey;choice:ExamCopyKey;tips:ExamCopyKey;tipList:readonly ExamCopyKey[]}>={
  lesen:{rules:['rule1','rule2','rule3','rule4'],on:'timed',off:'untimed',choice:'timeLeft',tips:'tipsTitle',tipList:['tip1','tip2','tip3']},
  hoeren:{rules:['hoerenRule1','hoerenRule2','rule3','hoerenRule4'],on:'listenStrict',off:'listenFree',choice:'listenMode',tips:'htipsTitle',tipList:['htip1','htip2','htip3']},
- schreiben:{rules:['schreibenRule1','schreibenRule2','rule3','schreibenRule4'],on:'timed20',off:'untimed',choice:'timeLeft',tips:'stipsTitle',tipList:['stip1','stip2','stip3']},
+ schreiben:{rules:['schreibenRule1','schreibenRule2','schreibenRule3','schreibenRule4'],on:'timed20',off:'untimed',choice:'timeLeft',tips:'stipsTitle',tipList:['stip1','stip2','stip3']},
 };
 
 function ExamView({number,module,language,guest,onOpen,onRunning}:{number:number;module:ReadyModule;language:StudyLanguage;guest:boolean;onOpen:Open;onRunning:(value:boolean)=>void}){

@@ -33,14 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gradeLesen = exports.gradeHoeren = exports.gradeSchreiben = exports.schreibenKey = exports.hoerenKey = exports.lesenKey = exports.isSpellNumber = exports.SPELL_SHEET_COUNT = exports.spellSheetList = exports.SPELL_TOTAL = exports.SPELL_MODULE = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.schreibenExamList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleTeile = exports.moduleMinutes = exports.isReadyModule = exports.SCHREIBEN_TOTAL = exports.SCHREIBEN_MINUTES = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
+exports.gradeLesen = exports.gradeHoeren = exports.SCHREIBEN_STEPS = exports.selfPoints = exports.criterionId = exports.SCHREIBEN_CRITERIA = exports.countWords = exports.schreibenTextId = exports.hoerenKey = exports.lesenKey = exports.isSpellNumber = exports.SPELL_SHEET_COUNT = exports.spellSheetList = exports.SPELL_TOTAL = exports.SPELL_MODULE = exports.isExamNumber = exports.GUEST_EXAM = exports.examList = exports.schreibenExamList = exports.hoerenExamList = exports.LESEN_EXAM_COUNT = exports.lesenExamList = exports.hasPassed = exports.examPoints = exports.passMark = exports.POINT_FACTOR = exports.PASS_PERCENT = exports.moduleTeile = exports.moduleMinutes = exports.isReadyModule = exports.SCHREIBEN_TOTAL = exports.SCHREIBEN_MINUTES = exports.HOEREN_TOTAL = exports.HOEREN_MINUTES = exports.LESEN_TOTAL = exports.LESEN_MINUTES = exports.examModules = exports.A1_EXAM_PATH = void 0;
 exports.loadLesenExam = loadLesenExam;
 exports.loadHoerenExam = loadHoerenExam;
 exports.loadSpellSheet = loadSpellSheet;
 exports.loadSchreibenExam = loadSchreibenExam;
 exports.lesenItems = lesenItems;
 exports.hoerenItems = hoerenItems;
-exports.schreibenItems = schreibenItems;
+exports.normalizeEntry = normalizeEntry;
+exports.checkEntry = checkEntry;
+exports.schreibenFilled = schreibenFilled;
+exports.gradeSchreiben = gradeSchreiben;
 exports.gradeItems = gradeItems;
 const a1_exam_build_1 = require("./a1-exam-build");
 /**
@@ -199,15 +202,95 @@ function hoerenItems(hoeren) {
 }
 const hoerenKey = (hoeren) => hoerenItems(hoeren).map(entry => entry.item.answer).join('');
 exports.hoerenKey = hoerenKey;
-/** The 15 scored gaps of a Schreiben exam in the order of the paper (Teil 1, the form: 1–5; Teil 2, the message: 6–15). */
-function schreibenItems(schreiben) {
-    return [...schreiben.teil1.items.map(item => ({ teil: 1, item })), ...schreiben.teil2.items.map(item => ({ teil: 2, item }))];
+/* ---------- Schreiben: a typed form (marked by the page) and a message the learner writes and marks ---------- */
+/** An entry as it is compared: small letters, ä / ö / ü / ß written out, no spaces or signs (a dot stays between two
+ * digits: 12.03.1988), no zero before a number (01.02. = 1.2.). */
+function normalizeEntry(value) {
+    return value.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+        .replace(/[.](?=\d)/g, '\u0000').replace(/[^a-z0-9\u0000]/g, '').replace(/\u0000/g, '.').replace(/(^|[^0-9])0+(?=\d)/g, '$1').replace(/^\.+|\.+$/g, '');
 }
-const schreibenKey = (schreiben) => schreibenItems(schreiben).map(entry => entry.item.answer).join('');
-exports.schreibenKey = schreibenKey;
-/** Marks a Schreiben exam: one point per gap that is filled right. */
-const gradeSchreiben = (schreiben, answers) => gradeItems(schreibenItems(schreiben), answers);
-exports.gradeSchreiben = gradeSchreiben;
+/** One letter left out, added or changed. */
+function nearly(a, b) {
+    if (Math.abs(a.length - b.length) > 1)
+        return false;
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i])
+        i++;
+    let x = a.length, y = b.length;
+    while (x > i && y > i && a[x - 1] === b[y - 1]) {
+        x--;
+        y--;
+    }
+    return x - i <= 1 && y - i <= 1;
+}
+/** Marks a typed entry like the exam does: the information has to be right; how it is written may differ (`accept`), and a
+ * small spelling slip in a word still counts (`near` — the page then shows the right spelling). Numbers and dates are exact. */
+function checkEntry(given, accept) {
+    const value = normalizeEntry(given ?? '');
+    if (!value)
+        return 'open';
+    const wanted = accept.map(normalizeEntry);
+    if (wanted.includes(value))
+        return 'right';
+    if (value.length >= 5 && !/\d/.test(value) && wanted.some(entry => entry.length >= 5 && !/\d/.test(entry) && nearly(value, entry)))
+        return 'near';
+    return 'wrong';
+}
+const schreibenTextId = (examId) => examId + '-text';
+exports.schreibenTextId = schreibenTextId;
+/** The words of a message. */
+const countWords = (text) => text.trim().split(/\s+/).filter(Boolean).length;
+exports.countWords = countWords;
+/** The exam's scale for the message, which the learner applies to the own text after handing in: 3 points for each of
+ * the three points of the task, 1 for greeting and ending. A mark is kept like an answer under `<exam>-06` … `-09`:
+ * `a` = all the points, `b` = half of them (incomplete or with mistakes; only for the three points), `c` = none. */
+exports.SCHREIBEN_CRITERIA = [{ n: 6, points: 3, point: 1 }, { n: 7, points: 3, point: 2 }, { n: 8, points: 3, point: 3 }, { n: 9, points: 1, point: 0 }];
+const criterionId = (examId, n) => examId + '-' + String(n).padStart(2, '0');
+exports.criterionId = criterionId;
+const selfPoints = (points, mark) => mark === 'a' ? points : mark === 'b' && points > 1 ? points / 2 : 0;
+exports.selfPoints = selfPoints;
+/** What has to be filled in before handing in: the five entries of the form and the message. */
+exports.SCHREIBEN_STEPS = 6;
+function schreibenFilled(exam, texts) {
+    return exam.schreiben.teil1.items.filter(item => normalizeEntry(texts[item.id] ?? '')).length + ((0, exports.countWords)(texts[(0, exports.schreibenTextId)(exam.id)] ?? '') ? 1 : 0);
+}
+/** Marks a Schreiben exam: a point for each entry of the form that counts (`texts`), and for the message the points
+ * the learner gave the own text (`answers`, see `SCHREIBEN_CRITERIA`; half points are possible). `open`: the entries
+ * left empty and the marks not given yet. */
+function gradeSchreiben(exam, answers, texts = {}) {
+    const result = { right: 0, total: 0, answered: 0, byTeil: { 1: { right: 0, total: 0 }, 2: { right: 0, total: 0 }, 3: { right: 0, total: 0 } }, wrong: [], open: [] };
+    for (const item of exam.schreiben.teil1.items) {
+        result.total++;
+        result.byTeil[1].total++;
+        const check = checkEntry(texts[item.id], item.accept);
+        if (check === 'open') {
+            result.open.push(item.id);
+            continue;
+        }
+        result.answered++;
+        if (check === 'wrong')
+            result.wrong.push(item.id);
+        else {
+            result.right++;
+            result.byTeil[1].right++;
+        }
+    }
+    for (const criterion of exports.SCHREIBEN_CRITERIA) {
+        const id = (0, exports.criterionId)(exam.id, criterion.n);
+        const mark = answers[id];
+        result.total += criterion.points;
+        result.byTeil[2].total += criterion.points;
+        if (mark === undefined) {
+            result.open.push(id);
+            continue;
+        }
+        result.answered++;
+        const points = (0, exports.selfPoints)(criterion.points, mark);
+        result.right += points;
+        result.byTeil[2].right += points;
+    }
+    return result;
+}
 /** Marks a Hören exam like a Lesen exam. */
 const gradeHoeren = (hoeren, answers) => gradeItems(hoerenItems(hoeren), answers);
 exports.gradeHoeren = gradeHoeren;

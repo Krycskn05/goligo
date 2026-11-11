@@ -11,7 +11,7 @@ export const exam=buildSchreiben(3,'Anmeldung im Sportverein · Brief an die Tou
    [['männlich','m','Mann','männl.'],'infer','Ihr Freund Omar Nasser'],
    [['Verkäufer'],'text','Er arbeitet als Verkäufer'],
    [['Fußball'],'text','Omar spielt gern Fußball'],
-   [['Dienstag und Donnerstag','Dienstag, Donnerstag','Di und Do','Di, Do','Di. und Do.','Donnerstag und Dienstag','am Dienstag und am Donnerstag','Dienstag und am Donnerstag'],'text','am Dienstag und am Donnerstag'],
+   [['Dienstag und Donnerstag','Dienstag, Donnerstag','Di und Do','Di, Do','Donnerstag und Dienstag','am Dienstag und am Donnerstag','Dienstag und am Donnerstag'],'text','am Dienstag und am Donnerstag'],
   ]},
  teil2:{
   task:'Sie möchten im Juli eine Woche in Hamburg Urlaub machen. Schreiben Sie an die Touristeninformation:',

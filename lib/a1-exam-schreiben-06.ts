@@ -10,7 +10,7 @@ export const exam=buildSchreiben(6,'Fundbüro · Nachricht an den Chef',{
    [['Tasche','eine Tasche','die Tasche','ihre Tasche','meine Tasche'],'text','ihre Tasche verloren'],
    [['schwarz'],'text','Die Tasche ist schwarz'],
    [['im Bus 21','Bus 21','im Bus','Bus','im Bus Nr. 21','im Bus Nummer 21','Bus Nr. 21'],'text','mit dem Bus 21'],
-   [['Montag','am Montag','Mo','Mo.'],'text','am Montag'],
+   [['Montag','am Montag','Mo'],'text','am Montag'],
    [['8 Uhr','8','8.00 Uhr','8:00 Uhr','8:00','um 8 Uhr','acht Uhr','8.00'],'text','um 8 Uhr'],
   ]},
  teil2:{

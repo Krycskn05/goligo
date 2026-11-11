@@ -42,11 +42,12 @@ function readExamScores(storage) {
     }
     return out;
 }
-/** Keeps the best result of an exam (a tie keeps the faster one) and counts the attempt. */
-function saveExamScore(storage, examId, right, total, seconds, now = Date.now()) {
+/** Keeps the best result of an exam (a tie keeps the faster one) and counts the attempt. `attempt: false`: the same
+ * attempt got more points afterwards (Schreiben: the learner marks the own message after handing in) — not counted again. */
+function saveExamScore(storage, examId, right, total, seconds, now = Date.now(), attempt = true) {
     const scores = readExamScores(storage);
     const old = scores[examId];
-    const tries = (old?.tries ?? 0) + 1;
+    const tries = (old?.tries ?? 0) + (attempt ? 1 : 0);
     const better = !old || right > old.right || (right === old.right && seconds > 0 && (!old.seconds || seconds < old.seconds));
     scores[examId] = better ? { right, total, tries, seconds, at: now } : { ...old, tries };
     try {
@@ -78,7 +79,13 @@ function readExamRun(storage, examId) {
         for (const [id, value] of Object.entries(run.plays))
             if (id.startsWith(examId + '-') && typeof value === 'number' && value > 0)
                 plays[id] = whole(value, 99);
-    return { answers, seconds: whole(run.seconds, 86400), teil, timed: run.timed !== false, done: run.done === true, ...(Object.keys(plays).length ? { plays } : {}) };
+    // What was typed into the Schreiben form (by item id).
+    const texts = {};
+    if (run.texts && typeof run.texts === 'object')
+        for (const [id, value] of Object.entries(run.texts))
+            if (id.startsWith(examId + '-') && typeof value === 'string' && value.trim())
+                texts[id] = value.slice(0, id.endsWith('-text') ? 1500 : 80);
+    return { answers, seconds: whole(run.seconds, 86400), teil, timed: run.timed !== false, done: run.done === true, ...(Object.keys(plays).length ? { plays } : {}), ...(Object.keys(texts).length ? { texts } : {}) };
 }
 function saveExamRun(storage, examId, run) { try {
     storage.setItem((0, exports.a1ExamRunKey)(examId), JSON.stringify(run));

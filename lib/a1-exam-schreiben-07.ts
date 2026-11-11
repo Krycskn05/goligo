@@ -11,7 +11,7 @@ export const exam=buildSchreiben(7,'Bibliotheksausweis · Problem mit einer Best
    [['05.05.1990','5. Mai 1990','05.05.90','5. 5. 1990'],'text','am 5. Mai 1990'],
    [['Lehrerin'],'text','arbeitet als Lehrerin'],
    [['Erwachsene','Erwachsener','Erwachsenen','eine Erwachsene'],'infer','arbeitet als Lehrerin'],
-   [['10 Euro','10','10 €','zehn Euro','10 EUR','10,00 Euro'],'text','Ein Ausweis für Erwachsene kostet 10 Euro im Jahr'],
+   [['10 Euro','10','zehn Euro','10 EUR','10,00 Euro'],'text','Ein Ausweis für Erwachsene kostet 10 Euro im Jahr'],
   ]},
  teil2:{
   task:'Sie haben im Internet einen Pullover bestellt. Der Pullover ist zu klein. Schreiben Sie an die Firma „Modehaus Kanal“:',

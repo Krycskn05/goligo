@@ -69,11 +69,10 @@ const schreibenExamId = (number) => 'a1-schreiben-' + two(number);
 exports.schreibenExamId = schreibenExamId;
 const schreibenItemId = (exam, n) => (0, exports.schreibenExamId)(exam) + '-' + two(n);
 exports.schreibenItemId = schreibenItemId;
-/** Numbers a Schreiben exam like the paper: the form's gaps 1–5, the message's gaps 6–15; ids `a1-schreiben-<exam>-<number>`. */
+/** Numbers the form's gaps 1–5; ids `a1-schreiben-<exam>-<number>` (06–09 are the four marks the learner gives the own
+ * message, lib/a1-exam-course.ts `SCHREIBEN_CRITERIA`). */
 function buildSchreiben(number, topics, spec) {
-    let n = 0;
-    const gap = (item) => ({ id: (0, exports.schreibenItemId)(number, ++n), n, options: item[0], answer: item[1], why: { kind: item[2], quote: item[3], ...(item[4] ? { point: item[4] } : {}) } });
-    const teil1 = { text: spec.teil1.text, form: spec.teil1.form, rows: spec.teil1.rows.map(row => ({ label: row[0], value: row[1] })), items: spec.teil1.gaps.map(gap) };
-    const teil2 = { task: spec.teil2.task, points: spec.teil2.points, lines: spec.teil2.lines, items: spec.teil2.gaps.map(gap) };
-    return { id: (0, exports.schreibenExamId)(number), number, topics, schreiben: { teil1, teil2 } };
+    const teil1 = { text: spec.teil1.text, form: spec.teil1.form, rows: spec.teil1.rows.map(row => ({ label: row[0], value: row[1] })),
+        items: spec.teil1.gaps.map((item, i) => ({ id: (0, exports.schreibenItemId)(number, i + 1), n: i + 1, accept: item[0], why: { kind: item[1], quote: item[2] } })) };
+    return { id: (0, exports.schreibenExamId)(number), number, topics, schreiben: { teil1, teil2: spec.teil2 } };
 }

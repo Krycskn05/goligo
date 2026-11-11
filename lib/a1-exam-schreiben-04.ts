@@ -9,8 +9,8 @@ export const exam=buildSchreiben(4,'Bestellung im Möbelhaus · Nachricht an den
   gaps:[
    [['Rosenweg 8'],'text','im Rosenweg 8'],
    [['Tisch','ein Tisch','einen Tisch','1 Tisch','Küchentisch'],'text','einen Tisch für ihre Küche'],
-   [['89 Euro','89','89 €','89 EUR','89,00 Euro','89,- Euro'],'text','Der Tisch kostet 89 Euro'],
-   [['Freitag','am Freitag','Fr','Fr.'],'text','am Freitag bringen, nicht am Samstag'],
+   [['89 Euro','89','89 EUR','89,00 Euro'],'text','Der Tisch kostet 89 Euro'],
+   [['Freitag','am Freitag','Fr'],'text','am Freitag bringen, nicht am Samstag'],
    [['Kreditkarte','mit Kreditkarte','Karte','mit Karte'],'text','mit Kreditkarte bezahlen'],
   ]},
  teil2:{

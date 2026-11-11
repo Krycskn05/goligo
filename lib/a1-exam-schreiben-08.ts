@@ -10,7 +10,7 @@ export const exam=buildSchreiben(8,'Wohnungssuche · Nachricht an einen kranken 
    [['1','eine','eins','1 Person','eine Person'],'infer','Sie wohnt allein'],
    [['2','zwei','2 Zimmer','zwei Zimmer'],'text','zwei Zimmer'],
    [['ja','mit Balkon','ja, mit Balkon'],'text','einen Balkon haben'],
-   [['700 Euro','700','700 €','700 EUR'],'text','700 Euro Miete im Monat bezahlen'],
+   [['700 Euro','700','700 EUR'],'text','700 Euro Miete im Monat bezahlen'],
    [['1. April','01.04.','am 1. April','ab 1. April','ab dem 1. April','ersten April'],'text','am 1. April umziehen'],
   ]},
  teil2:{

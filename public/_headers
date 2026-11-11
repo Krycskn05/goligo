@@ -4,8 +4,6 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
 /toon/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
-/paul/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
 /verbs/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=2592000
 /icons/*

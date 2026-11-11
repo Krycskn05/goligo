@@ -1,5 +1,5 @@
 // The welcome tour (the learner asked): after signing up everyone is first asked about the sounds, then shown around
-// the site — design "Spot ışığı" (the learner chose it): the page dims, the real part lights up, Paul explains it.
+// the site — design "Spot ışığı" (the learner chose it): the page dims, the real part lights up, a card beside it explains it.
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -39,7 +39,7 @@ test('shown once per member (the account remembers it); ?tur=1 starts it again',
  assert.ok(read('app/category-study.tsx').includes('{home?<><HomeTour language={language}/><SiteTour language={language}/></>:<>'));
 });
 
-test('Paul\'s card goes where it fits next to the lit part',()=>{
+test('the card goes where it fits next to the lit part',()=>{
  const card={width:340,height:220};
  // Computer: beside a menu item on the left, below a header part.
  assert.equal(tour.placeTip({left:12,top:330,width:197,height:80},card,{width:1280,height:860}).side,'right');
@@ -66,7 +66,6 @@ test('the tour speaks every site language and asks about the sounds',()=>{
  assert.ok(!/useEffect\([^;]*speak\(/.test(ui));
  // Spotlight: the page behind cannot be tapped, Escape ends it, it is remembered as done.
  assert.ok(ui.includes("element.setAttribute('inert','')")&&ui.includes("if(event.key==='Escape')")&&ui.includes('localStorage.setItem(TOUR_KEY,TOUR_DONE)'));
- assert.ok(read('app/paul-hoca.tsx').includes(".sg-backdrop,.st-layer')"),'Paul does not pop up during the tour');
  assert.ok(read('app/layout.tsx').includes('import "./site-tour.css";'));
 });
 

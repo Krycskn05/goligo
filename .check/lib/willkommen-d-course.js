@@ -21,7 +21,6 @@ exports.willkommenDPictures = {
         { src: '/toon/lektion1/komsu-4.webp', width: 960, height: 720 },
     ],
     strategy: { src: '/toon/lektion1/ezber.webp', width: 960, height: 640 },
-    trophy: { src: '/toon/lektion1/kupa.webp', width: 960, height: 640 },
 };
 /* ---------- teaching steps ---------- */
 /** Step 1 · the comic: Yasemin moves in, her neighbour Nora meets her on the stairs (four panels). */

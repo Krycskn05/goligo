@@ -13,7 +13,7 @@ import {
 } from '@/lib/berufe-b-course';
 import {personName} from '@/lib/berufe-course';
 import {ProgressMeter} from './progress-meter';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,SpeakStep} from './berufe-a-steps';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,useSelfCheck,selfCheckNote,type SelfCheckResult,ChoiceRows,OrderExercise,TestStep,mixedOrder,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
@@ -338,7 +338,7 @@ function EndL2B({progress,onGo,onPart,language}:StepProps){
  return <>
   <p className="kicker">{ut('Bitti')}</p>
   <Heading>{ut('Lektion 2B tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">
    <li><Tx text="Birini tanıtmak: *Das ist … Er / Sie kommt aus … Das ist in …*"/></li>

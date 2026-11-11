@@ -14,7 +14,7 @@ import {
 import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,WordChoice,useSelfCheck,selfCheckNote,type SelfCheckResult,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,mixedOrder,useInnerNext,useAutoNext,AutoNextBar,readRun,useRunSave,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
@@ -481,7 +481,7 @@ function EndA({progress,onGo,speech,language}:StepProps){
  return <>
   <p className="kicker">{ut('Zusammenfassung · Ezberle')}</p>
   <Heading>{ut('Lektion 15A tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <h2 className="l1a-h2">{ut('Önemli cümleler')}</h2>
   <p className="l1a-tr">{ut('Bu cümleleri yüksek sesle tekrar et. Bürgeramt’ta hepsi işine yarar.')}</p>
   <Conversation lines={summaryLines} speech={speech}/>

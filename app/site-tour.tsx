@@ -19,7 +19,7 @@ import {DEFAULT_SITE_VOICE,isSiteVoice,voiceGroups,voiceSample} from '@/lib/site
 import {germanSpeechPreview} from '@/lib/german-speech';
 import {api,useGermanSpeech} from './study-shared';
 import {VOICE_SPEEDS} from './learning-effects';
-import {PAUL_PICTURES,PAUL_STILL,usePaulMotion,type PaulPose} from './paul-hoca';
+import {useMotion} from './use-motion';
 import {accountLabel,siteLanguageLabel} from './site-header';
 import {TopIcon} from './top-icons';
 
@@ -46,10 +46,6 @@ function stepCopy(id:TourStepId,language:StudyLanguage):[string,string]{
 }
 const shown=(element:Element|null)=>!!element&&element.getClientRects().length>0&&getComputedStyle(element).visibility!=='hidden';
 
-function Paul({pose,className}:{pose:PaulPose;className:string}){
- const motion=usePaulMotion();
- return <img className={className} src={motion?PAUL_PICTURES[pose]:PAUL_STILL[pose]} alt="" width={224} height={224} decoding="async" draggable={false}/>;
-}
 function Dots({count,at}:{count:number;at:number}){
  return <span className="st-dots" aria-hidden="true">{Array.from({length:count},(_,i)=><b key={i} className={i===at?'on':i<at?'past':''}/>)}</span>;
 }
@@ -84,7 +80,7 @@ function SoundChoices({language}:{language:StudyLanguage}){
     {voiceGroups(speech.siteVoices).map(group=><div className={'st-voice-group '+group.gender} key={group.gender} role="group" aria-label={e(group.gender==='female'?'voiceFemale':'voiceMale')}>
      <p className="st-voice-group-title" aria-hidden="true">{e(group.gender==='female'?'voiceFemale':'voiceMale')}</p>
      <div className="st-voices">{group.voices.map(voice=><button type="button" key={voice.id} role="radio" aria-checked={current===voice.id} aria-label={voice.name+' · '+e(voice.gender==='female'?'voiceFemale':'voiceMale')} className={'st-voice '+voice.gender+(current===voice.id?' selected':'')} onClick={()=>chooseVoice(voice.id,voiceSample(voice,germanSpeechPreview))}>
-      <img className="st-photo" src={voice.picture} alt="" width={40} height={40} loading="lazy" decoding="async"/><strong>{voice.name}</strong>
+      {voice.picture?<img className="st-photo" src={voice.picture} alt="" width={40} height={40} loading="lazy" decoding="async"/>:<span className="st-photo letter" aria-hidden="true">{voice.name.charAt(0)}</span>}<strong>{voice.name}</strong>
      </button>)}</div>
     </div>)}
    </div>
@@ -109,8 +105,8 @@ function SoundChoices({language}:{language:StudyLanguage}){
 
 /**
  * The welcome tour on the home page (lib/site-tour.ts; design "Spot ışığı", the learner chose it): first the sound
- * window, then the page dims and each part of the header and the menu lights up in turn while Paul explains it in a
- * card beside it (Geri / İleri, the dots show where you are), and at the end "Hazırsın!". The page behind cannot be
+ * window, then the page dims and each part of the header and the menu lights up in turn with a card beside it
+ * that explains it (Geri / İleri, the dots show where you are), and at the end "Hazırsın!". The page behind cannot be
  * tapped meanwhile. Escape or × ends it; once ended it does not come back in this browser (Hesabım can start it again).
  */
 export function SiteTour({language}:{language:StudyLanguage}){
@@ -120,7 +116,7 @@ export function SiteTour({language}:{language:StudyLanguage}){
  const layer=useRef<HTMLDivElement>(null);
  const tip=useRef<HTMLElement>(null);
  const primary=useRef<HTMLButtonElement>(null);
- const motion=usePaulMotion();
+ const motion=useMotion();
  const step=steps?.[index]??null;
  const t=(key:TourCopyKey)=>tourText(language,key);
 
@@ -171,7 +167,7 @@ export function SiteTour({language}:{language:StudyLanguage}){
  const shownStep=step&&(!step.target||spot?.step===step.id)?step.id:null;
  useEffect(()=>{if(shownStep)primary.current?.focus({preventScroll:true});},[shownStep]);
 
- // The lit part: scrolled into the middle of the screen, then the hole and Paul's card follow it while the page moves.
+ // The lit part: scrolled into the middle of the screen, then the hole and the card follow it while the page moves.
  const measure=useCallback(()=>{
   if(!step?.target)return;
   const element=document.querySelector(step.target);if(!element)return;
@@ -214,7 +210,7 @@ export function SiteTour({language}:{language:StudyLanguage}){
     {ready&&<div className="st-hole" style={{left:spot.hole.left,top:spot.hole.top,width:spot.hole.width,height:spot.hole.height,borderRadius:spot.radius}}/>}
     <section ref={tip} key={step.id} className={'st-tip'+(ready?' side-'+spot.place.side:' measuring')} style={ready?{left:spot.place.left,top:spot.place.top,'--st-arrow':spot.place.arrow+'px'} as CSSProperties:undefined}>
      <button type="button" className="st-close" aria-label={t('skip')} title={t('skip')} onClick={finish}><X size={17} aria-hidden="true"/></button>
-     <div className="st-tip-head"><Paul pose="tip" className="st-paul"/><div><span className="st-count"><bdi>{index+1} / {steps.length}</bdi></span><h2>{title}</h2></div></div>
+     <div className="st-tip-head"><div><span className="st-count"><bdi>{index+1} / {steps.length}</bdi></span><h2>{title}</h2></div></div>
      <p id="st-text">{text}</p>
      {nav}
     </section>
@@ -223,7 +219,6 @@ export function SiteTour({language}:{language:StudyLanguage}){
     <div className="st-veil"/>
     <section key={step.id} className={'st-modal st-step-'+step.id}>
      <div className="st-modal-head">
-      <Paul pose={step.id==='done'?'cheer':'hello'} className="st-paul big"/>
       <div><h2>{title}</h2><p id="st-text">{text}</p></div>
       {step.id==='sounds'&&<button type="button" className="st-close" aria-label={t('skip')} title={t('skip')} onClick={finish}><X size={17} aria-hidden="true"/></button>}
      </div>

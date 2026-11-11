@@ -5,10 +5,9 @@ import type {StudyLanguage} from '@/lib/study-languages';
 import type {TopicProgress} from '@/lib/progress';
 import {siteClipUrls,warmClip} from '@/lib/site-voices';
 import {wordSpans} from '@/lib/read-along';
-import {acceptsAnswer,acceptsExact,portraitSrc,sayText,speakerVoice,voiceOwner,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
+import {acceptsAnswer,acceptsExact,hasPortrait,portraitSrc,sayText,speakerVoice,voiceOwner,withSpeakers,type GapLine,type SayItem,type Step} from '@/lib/willkommen-course';
 import type {L1AScoreMap,L1PartId} from '@/lib/willkommen-progress';
 import {useAnswerSound,useGermanSpeech} from './study-shared';
-import {PaulHoca} from './paul-hoca';
 import {mixedOrder} from '@/lib/mixed-order';
 import {ut,utBeside,utLang} from '@/lib/unit-i18n';
 
@@ -210,7 +209,7 @@ export function Say({text,who,slow,speech,label='Dinle',wide=false,secret=false}
 export function Phrases({items,speech}:{items:readonly (readonly [string,string])[];speech:Speech}){
  return <>{items.map(([de,tr])=><div className="l1a-phrase" key={de}><div className="l1a-phrase-text"><span className="l1a-de" lang="de" dir="ltr">{de}</span><span className="l1a-tr">{utBeside(de,tr)}</span></div><Say text={de} speech={speech}/></div>)}</>;
 }
-export const Note=({children}:{children:ReactNode})=><div className="l1a-note"><PaulHoca pose="tip" className="l1a-paul"/><p>{children}</p></div>;
+export const Note=({children}:{children:ReactNode})=><div className="l1a-note"><p>{children}</p></div>;
 /** `**bold**` inside a text (a Turkish text is shown in the page's language, lib/unit-i18n.ts). */
 export function Rich({text}:{text:string}){const parts=ut(text).split(/(\*\*[^*]+\*\*)/g);return <>{parts.map((part,i)=>part.startsWith('**')&&part.endsWith('**')&&part.length>4?<b key={i}>{part.slice(2,-2)}</b>:part)}</>;}
 /** A Turkish text with German in it, shown in the page's language (lib/unit-i18n.ts), so a sentence is translated whole:
@@ -229,7 +228,10 @@ function markup(text:string,key:string):ReactNode[]{
 }
 /** A step's heading (h2: the notebook's left page holds the h1 title of the part). */
 export function Heading({children}:{children:ReactNode}){return <h2 id="l1a-heading" tabIndex={-1} className="l1a-heading">{children}</h2>;}
-export function Portrait({who,name}:{who:string;name:string}){return <img className="l1a-portrait" src={portraitSrc(who)} alt={name} width={64} height={64} loading="lazy" decoding="async"/>;}
+export function Portrait({who,name}:{who:string;name:string}){
+ if(!hasPortrait(who))return <span className="l1a-portrait letter" role="img" aria-label={name}>{name.charAt(0)}</span>;
+ return <img className="l1a-portrait" src={portraitSrc(who)} alt={name} width={64} height={64} loading="lazy" decoding="async"/>;
+}
 export function shuffle<T>(list:readonly T[]):T[]{const out=list.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;}
 export {mixedOrder};
 
@@ -521,7 +523,6 @@ export function TestStep(props:StepProps&{label:string;questions:readonly (reado
   <p className="kicker" lang={utLang(label)==="tr"?"de":undefined}>{ut(label)}</p><Heading>{ut('Sonuç')}</Heading>
   <p className="l1a-score">{score} / {questions.length}</p>
   <p className="l1a-big">{ut(percent>=80?'Harika! Bu konuyu öğrendin.':percent>=60?'İyi. Yanlışlarına bir daha bak.':'Konuyu bir kez daha oku, sonra tekrar dene.')}</p>
-  {percent>=80&&<PaulHoca pose="cheer" className="l1a-paul-big"/>}
   <div className="l1a-actions"><button type="button" className="btn" onClick={again}><RotateCcw size={18} aria-hidden="true"/>{ut('Testi tekrarla')}</button></div></>;}
  // A question or option shown in the page's language (lib/unit-i18n.ts) takes the page's lang; German stays de.
  const langFor=(text:string,guess:'de'|'tr')=>ut(text)!==text?undefined:guess;

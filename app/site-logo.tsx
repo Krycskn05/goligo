@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {usePaulMotion} from './paul-hoca';
+import {useMotion} from './use-motion';
 
 /**
  * Goliqo's logo and mascot, from the learner's own logo files (made in ChatGPT): the book mascot with the word
@@ -15,7 +15,7 @@ export const BRAND={
 } as const;
 /** True once the animated picture has loaded (the small still picture shows until then; never with motion off). */
 function useAnimated(src:string){
- const motion=usePaulMotion();const [loaded,setLoaded]=useState(false);
+ const motion=useMotion();const [loaded,setLoaded]=useState(false);
  useEffect(()=>{
   if(!motion||!wantsAnimation())return;
   // The animated files are big (2–3 MB): they are fetched once the page is idle, so the page itself loads first.

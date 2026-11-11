@@ -21,7 +21,7 @@ import {SiteHeader} from './site-header';
 import {SiteFooter} from './site-footer';
 import {SiteMenuAside} from './site-menu';
 import {ProgressMeter} from './progress-meter';
-import {PaulHoca,paulMood} from './paul-hoca';
+import {Applause} from './study-shared';
 import {GuestBanner} from './guest-taste';
 import {LessonBook} from './lesson-book';
 import {StepStrip,exerciseLock,LockedStep,useLessonSpeech,Say,Phrases,Note,Rich,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,GapExercise,MatchExercise,OrderExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
@@ -38,7 +38,7 @@ import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
  * Lektion 1 „Willkommen!“ (the learner's own lesson pages): the contents page is an open notebook like Lektion 11 and
  * 12 (Teil A–D); Teil A – Ich heiße … (24 October 2026, 22 steps), Teil B – Ich spreche ein bisschen Deutsch. (25 October 2026, 24 steps)
  * Teil C – Guten Tag! (25 October 2026, 26 steps) and Teil D – Ich bin neu hier. (25 October 2026, 16 steps) open on a wide spread, one step at a time. German is read with the site voices, each
- * person with their own voice; answers get the site's sounds and Paul; scores stay in the browser
+ * person with their own voice; answers get the site's sounds; scores stay in the browser
  * (lib/willkommen-progress.ts). Teil B's steps: app/willkommen-b-steps.tsx; shared pieces: app/willkommen-ui.tsx.
  */
 export default function WillkommenStudy({guest=false}:{guest?:boolean}){
@@ -146,7 +146,7 @@ function WillkommenLesson({language,onLanguage,guest}:{language:StudyLanguage;on
    {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:vaultText(language,'audioWarning')}</p>}
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} scores={scores[place.part]} progress={progress} language={language} onGo={go} onPart={open}>
-    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id} data-paul-mood={paulMood(step)}>
+    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l1a-step={step.id} data-l1a-teil={config.id}>
      <header className="l1a-top">
       <div className="l1a-top-row"><span className="eyebrow">{ut(stepGroup?.label)??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{ut(step.title)} · {index+1}/{config.steps.length}</>}</span></div>
       {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:shortNames[config.id][id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>
@@ -429,7 +429,7 @@ function End({progress,onGo,onPart,language}:StepProps){
  const said=(text:string)=><span lang={utLang(text)}>– {ut(text)}</span>;
  return <>
   <Heading>{ut('Lektion 1A tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları söyleyebilirsin:')}</p>
   <ul className="l1a-list" lang="de"><li><b>Guten Tag!</b> {said('selamlaşma')}</li><li><b>Ich heiße … / Ich bin …</b> {said('adını söyleme')}</li><li><b>Wie heißen Sie?</b> {said('ad sorma')}</li><li><b>Ich komme aus …</b> {said('nereden geldiğini söyleme')}</li><li><b>Woher kommen Sie?</b> {said('nereden sorma')}</li><li><b>aus der Türkei, aus dem Irak, aus den USA</b> {said('artikelli ülkeler')}</li></ul>
   <ProgressMeter progress={progress} language={language} label="Lektion 1A"/>

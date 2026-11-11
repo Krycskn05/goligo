@@ -6,7 +6,7 @@ const read=file=>fs.readFileSync(file,'utf8');
 
 test('the answered question card puts the result next to the picture, only in Nesne Kasası',()=>{
  const page=read('app/object-study.tsx');
- assert.ok(page.includes(`<article className={'object-question panel'+(feedback?' vault-answered':'')+(session.mode==='listen'?' vault-listen':'')} data-paul-picture>`));
+ assert.ok(page.includes(`<article className={'object-question panel'+(feedback?' vault-answered':'')+(session.mode==='listen'?' vault-listen':'')}>`));
  // Fiil Atölyesi uses the same card classes; it keeps its own layout.
  for(const file of ['app/verb-study.tsx','app/housing-study.tsx'])assert.ok(!read(file).includes('vault-answered'),file);
  const css=read('app/koko-theme.css');
@@ -60,14 +60,9 @@ test('a mode card in Nesne Kasası starts its round at once; no "Teste başla" b
  assert.ok(read('app/practice-modes.tsx').includes('aria-pressed={active&&!starts?active===mode:undefined}'));
 });
 
-test('Paul reacts inside the question picture in Nesne Kasası',()=>{
- // The learner asked, 4 November 2026; in Dinle ve Bul (no picture) and at the end of a round he stays in the badge.
- const page=read('app/object-study.tsx');
- assert.ok(page.includes("(session.mode==='listen'?' vault-listen':'')} data-paul-picture>"));
+test('nothing is drawn into the question picture after an answer: the answer badge is the only reaction',()=>{
+ // The teacher's figure stood there from 4 to 11 November 2026 (tests/teacher-figure.test.cjs).
  const effects=read('app/learning-effects.tsx');
- assert.ok(effects.includes("const host=kind==='complete'?null:document.querySelector<HTMLElement>('[data-paul-picture]>.object-picture')??document.querySelector<HTMLElement>('[data-paul-slot]');"));
- assert.ok(effects.includes('{reaction?.host?.isConnected&&createPortal('));
- assert.ok(effects.includes('{reaction&&!reaction.host?.isConnected&&<div key={reaction.id} className={\'lk-reaction-layer \''));
- const css=read('app/paul-hoca.css');
- assert.ok(css.includes('[data-paul-picture]>.object-picture { position:relative; }')&&css.includes('.toon-app [data-paul-picture]>.object-picture>.lk-picture-reaction>img.lk-picture-paul { position:absolute; bottom:0; inset-inline-end:3%; width:min(56%,180px); height:min(64%,180px);'));
+ assert.ok(!effects.includes('createPortal')&&!effects.includes('.object-picture'));
+ assert.ok(effects.includes("{reaction&&<div key={reaction.id} className={'lk-reaction-layer '"));
 });

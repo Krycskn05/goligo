@@ -58,6 +58,8 @@ html[data-lernkoko-motion=reduced] .toon-topic-card:hover,html[data-lernkoko-mot
 .lk-voice-groups .lk-voice-chip strong{font-size:12.5px;overflow-wrap:normal;word-break:keep-all}
 .lk-voice-photo{display:block;width:46px;height:46px;flex-shrink:0;border-radius:50%;object-fit:cover;background:#fff;box-shadow:0 0 0 2px #fff,0 0 0 4px #f2b6c2}
 .lk-voice-chip.male .lk-voice-photo{box-shadow:0 0 0 2px #fff,0 0 0 4px #a9cdea}
+.lk-voice-photo.letter{display:grid;place-items:center;color:#fff;font-weight:800;font-size:19px;line-height:1;background:linear-gradient(135deg,#f2a3b3,#e07a8e)}
+.lk-voice-chip.male .lk-voice-photo.letter{background:linear-gradient(135deg,#8cc0e6,#5b93c9)}
 .lk-voice-chip.selected .lk-voice-photo{box-shadow:0 0 0 2px #fff,0 0 0 4px #39847a;animation:lk-voice-wiggle .5s cubic-bezier(.34,1.56,.64,1)}
 @media (max-width:359px){.lk-voice-groups .lk-voice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .lk-voice-speed{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px}
@@ -108,12 +110,9 @@ html[data-lernkoko-motion=reduced] .lk-voice-chip.selected .lk-voice-avatar,html
  .lk-sound-group>summary{min-height:46px;padding:6px 12px;font-size:13.5px}
  .lk-sound-group>summary small{font-size:11.5px}
 }
-/* Phones during a test or a game: Paul's answer badge has its own place — the slim header, which stays at the top while
-   the page scrolls — so it never covers the word or the answers; Paul does not peek in from the edges then (the learner
-   asked, 22 October 2026). */
+/* Phones during a test or a game: the answer badge has its own place — the slim header, which stays at the top while
+   the page scrolls — so it never covers the word or the answers (the learner asked, 22 October 2026). */
 @media (max-width:760px){
  .toon-app:has(.object-question) .work-header.site-header,.toon-app:has(.verb-game) .work-header.site-header{position:sticky;top:0;z-index:30}
- body:has(.object-question) .lk-reaction-badge,body:has(.verb-game) .lk-reaction-badge{top:calc(env(safe-area-inset-top,0px) + 8px);flex-direction:row;padding:4px 14px 4px 6px;gap:6px;border-radius:16px;font-size:15px;box-shadow:0 3px 0 #e0e9ca}
- body:has(.object-question) .lk-reaction-paul,body:has(.verb-game) .lk-reaction-paul{width:44px;height:44px;margin:0}
- body:has(.object-question) .paul-peek,body:has(.verb-game) .paul-peek{display:none}
+ body:has(.object-question) .lk-reaction-badge,body:has(.verb-game) .lk-reaction-badge{top:calc(env(safe-area-inset-top,0px) + 8px);flex-direction:row;padding:6px 14px;gap:6px;border-radius:16px;font-size:15px;box-shadow:0 3px 0 #e0e9ca}
 }

@@ -31,7 +31,7 @@ exports.createClipPlayer = createClipPlayer;
 exports.SITE_VOICE_PREFIX = 'site:';
 /** The voices carry the names of the people of Lektion 1A (the learner asked, 25 October 2026): the voice that
  * reads Sabine in the lesson is called Sabine in the settings too (lib/willkommen-course.ts `speakers`), and shows
- * her picture. Ids and styles never change, so a saved choice (for example site:F4) keeps working. */
+ * her picture; the teacher's voice (Paul) has no picture and shows its initial. Ids and styles never change, so a saved choice (for example site:F4) keeps working. */
 const portrait = (name) => '/toon/lektion1/' + name.toLowerCase() + '.webp';
 exports.siteVoices = [
     { id: 'site:F1', style: 'F1', name: 'Sabine', gender: 'female', picture: portrait('Sabine') },
@@ -41,7 +41,7 @@ exports.siteVoices = [
     { id: 'site:F5', style: 'F5', name: 'Mei', gender: 'female', picture: portrait('Mei') },
     { id: 'site:M1', style: 'M1', name: 'Rami', gender: 'male', picture: portrait('Rami') },
     { id: 'site:M2', style: 'M2', name: 'Omar', gender: 'male', picture: portrait('Omar') },
-    { id: 'site:M3', style: 'M3', name: 'Paul', gender: 'male', picture: portrait('Paul') },
+    { id: 'site:M3', style: 'M3', name: 'Paul', gender: 'male' },
     { id: 'site:M4', style: 'M4', name: 'Nikos', gender: 'male', picture: portrait('Nikos') },
     { id: 'site:M5', style: 'M5', name: 'Tomasz', gender: 'male', picture: portrait('Tomasz') },
 ];

@@ -18,7 +18,6 @@ import "./notebook.css";
 import "./lesson-book.css";
 import "./home-tour.css";
 import "./admin.css";
-import "./paul-hoca.css";
 import "./site-tour.css";
 import "./games.css";
 import "./a1-exam.css";

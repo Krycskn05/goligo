@@ -1,7 +1,7 @@
 /**
  * The welcome tour (the learner asked: after signing up, everyone is first asked about the sounds and then shown
  * around the site). Design "Spot ışığı" (the learner chose it): the page dims, the real part of the page lights up and
- * Paul explains it in a card next to it. Shown once in each browser (new members right after signing up, members
+ * a card next to it explains it. Shown once in each browser (new members right after signing up, members
  * who were already there on their next visit to the home page); Hesabım can start it again ("/?tur=1"). Once per
  * member (the learner asked: not on every visit): the account keeps a note `tour` = done as soon as the tour opens,
  * so it does not come back on another device or after leaving it half way.
@@ -48,7 +48,7 @@ export type TipPlace={left:number;top:number;side:TipSide;arrow:number};
 const clamp=(value:number,low:number,high:number)=>Math.max(low,Math.min(high,value));
 
 /**
- * Where Paul's card goes next to the lit part: on a wide screen beside a menu item (left or, right to left, right); otherwise below it,
+ * Where the card goes next to the lit part: on a wide screen beside a menu item (left or, right to left, right); otherwise below it,
  * above it, or beside it — the first place where the whole card fits on the screen (kept 12 px from the edges).
  * `arrow` is how far along the card's edge its little arrow points at the middle of the part.
  */

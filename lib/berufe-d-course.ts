@@ -17,7 +17,6 @@ import {digitWords} from './berufe-c-course';
 /** Pictures of Teil D (public/toon/lektion2, from the learner's page). */
 export const berufeDPictures={
  cover:{src:'/toon/lektion2/kapak-d.webp',width:960,height:540},
- trophy:{src:'/toon/lektion2/pokal-2.webp',width:640,height:492},
 } as const;
 export const castL2D=['rami','nora','mei','tomasz','yasemin','sabine','nikos','omar','paul'] as const;
 /** Rami's form at the care service (invented, like every address and number of Lektion 2). */

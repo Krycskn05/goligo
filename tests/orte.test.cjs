@@ -69,7 +69,8 @@ test('our own names and texts: the site\'s people, no names of the book',()=>{
  const source=['a','b','c','d'].map(id=>read(`lib/orte-${id}.ts`)).join('\n');
  for(const name of ['Lin','Angela','Adam','Karim','Todor','Yangmei','Martina','Saman','Oumar','Keiko','Meier','Bauer','Sevinc','Münster','Friedensstraße','Stuttgart'])assert.ok(!new RegExp('\\b'+name+'\\b').test(source),name);
  const cast=new Set(course.ortePartList.flatMap(part=>part.steps.flatMap(step=>[...(step.cover?.cast??[]),...(step.blocks??[]).flatMap(block=>block.t==='talk'?block.lines.map(line=>line.who):[]),...(step.speak??[]).map(row=>row.who)])));
- for(const who of cast)assert.ok(fs.existsSync(`public/toon/lektion1/${who}.webp`),who+' has a portrait and a voice');
+ // The teacher has no picture (his initial stands there, tests/teacher-figure.test.cjs).
+ for(const who of cast)if(who!=='paul')assert.ok(fs.existsSync(`public/toon/lektion1/${who}.webp`),who+' has a portrait and a voice');
 });
 
 test('pictures: the learner\'s 3D pictures (6 November 2026) and the Kelime Kasası ones exist; every card and quiz item has one',()=>{

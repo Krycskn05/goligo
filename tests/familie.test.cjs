@@ -78,7 +78,8 @@ test('our own names and texts: the site\'s people, no names of the book',()=>{
  for(const name of ['Karim','Felix','Martina','Helen','Samira','Timur','Sunil','Sascha','Marina','Nour','Engert','Jannis','Naima','Hannah','Adrian','Aliya','Nathan','Ishan','Calvin','Pjotr','Mirjam','Dawoud','Hamad','Irina','Konstantinos','Pierre','Keiko','Susumu','Gehrken','Katha','Phillip','Albert','Konrad','Elke','Emma','Sofie','Julian','Sonja','Laith','Ashtar','Gabrielle'])assert.ok(!new RegExp('\\b'+name+'\\b').test(source),name);
  const cast=new Set(course.familiePartList.flatMap(part=>part.steps.flatMap(step=>[...(step.cover?.cast??[]),...(step.blocks??[]).flatMap(block=>block.t==='talk'?block.lines.map(line=>line.who):[]),...(step.speak??[]).map(row=>row.who)])));
  assert.ok(cast.size>=8,'the site\'s people');
- for(const who of cast)assert.ok(fs.existsSync(`public/toon/lektion1/${who}.webp`),who+' has a portrait and a voice');
+ // The teacher has no picture (his initial stands there, tests/teacher-figure.test.cjs).
+ for(const who of cast)if(who!=='paul')assert.ok(fs.existsSync(`public/toon/lektion1/${who}.webp`),who+' has a portrait and a voice');
 });
 
 test('pictures: the learner\'s 3D pictures (8 November 2026) and the Kelime Kasası ones exist; every card, quiz picture and write row has one',()=>{

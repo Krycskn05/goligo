@@ -91,7 +91,7 @@ export function sparkle(out,t0,seconds,count,amp,seed=5){
  const rnd=random(seed);const notes=[note(39),note(41),note(43),note(46),note(48),note(51),note(53)];
  for(let i=0;i<count;i++)glock(out,t0+seconds*(i/count)+rnd()*seconds/count*.6,notes[Math.floor(rnd()*notes.length)],amp*(.45+.55*rnd()),.22+.12*rnd());
 }
-/** A hand clap: a short band-passed noise burst with a tiny "flam" before it, for Paul Hoca's applause. */
+/** A hand clap: a short band-passed noise burst with a tiny "flam" before it, for the applause. */
 export function clap(out,t0,amp,seed=61){
  const rnd=random(seed),start=at(t0),length=Math.min(out.length-start,at(.11));let low=0,band=0;
  const centre=1000+900*rnd(),k=2*Math.sin(Math.PI*centre/SR),q=.42;
@@ -102,19 +102,6 @@ export function knock(out,t0,amp,f=120,seed=71){
  const start=at(t0),length=Math.min(out.length-start,at(.22));let phase=0;
  for(let n=0;n<length;n++){const t=n/SR;const freq=f*(1+.7*Math.exp(-t/.012));phase+=TAU*freq/SR;out[start+n]+=amp*Math.exp(-t/.055)*Math.sin(phase);}
  marimba(out,t0,f*3.1,amp*.35,.05);click(out,t0,amp*.5,.005,seed);
-}
-/**
- * Knuckles on a wooden desk, for Paul Hoca's "Harika!" (the learner chose it): the desk's hollow wooden ring in the
- * 200–2400 Hz range plus a short band-passed noise tap, so it is heard on phone and laptop speakers too.
- */
-export function woodKnock(out,t0,amp,variant=0,seed=71){
- const s=1+.04*variant;const start=at(t0);
- for(const [f,a,d] of [[205*s,.55,.045],[430*s,1,.03],[870*s,.6,.018],[1420*s,.35,.011],[2380*s,.22,.007]]){
-  const length=Math.min(out.length-start,Math.ceil(d*9*SR));
-  for(let n=0;n<length;n++)out[start+n]+=amp*a*Math.min(1,n/(.0004*SR))*Math.exp(-n/(d*SR))*Math.sin(TAU*f*n/SR);
- }
- const rnd=random(seed),length=Math.min(out.length-start,at(.018)),k=2*Math.sin(Math.PI*1800/SR);let low=0,band=0;
- for(let n=0;n<length;n++){const x=n/length;const high=(rnd()*2-1)-low-.5*band;band+=k*high;low+=k*band;out[start+n]+=amp*1.4*band*(1-x)**3;}
 }
 /** Small room reverb (Schroeder/Freeverb style) mixed into the dry signal. */
 export function reverb(dry,wet,size=.78){
@@ -190,15 +177,10 @@ export const soundDesigns={
  completeLevel:()=>{const b=track(1.1);[C5,E5,G5,C6,E6,G6].forEach((f,i)=>chip(b,i*.055,.05,f,.35));chip(b,.33,.55,C7,.35);return finish(b,.32);},
  completeChimes:()=>{const b=track(1.65);sparkle(b,0,1.05,18,.22,51);[C6,E6,G6].forEach(f=>celesta(b,.05,f,.3,1));return finish(reverb(b,.3),.7);},
  completeHarp:()=>{const b=track(1.6);[C5,D5,E5,G5,A5,C6,D6,E6,G6,A6,C7].forEach((f,i)=>celesta(b,i*.04,f,.42,.5));[C6,E6,G6].forEach(f=>glock(b,.48,f,.3,.9));return finish(reverb(b,.26),.72);},
- // Paul Hoca's own sounds, played with his animations: a cheerful hello when he waves, a "pling" for a tip,
- // a thinking "hm-hm?", applause when he claps and drumming on the desk when he cheers at the end of a round.
- paulHello:()=>{const b=track(.85);bubble(b,0,520,.08,.45,1.9);marimba(b,.03,G5,.6,.3);marimba(b,.15,C6,.7,.42);celesta(b,.15,E6,.32,.5);sparkle(b,.24,.25,4,.1,81);return finish(reverb(b,.18),.6);},
- paulTip:()=>{const b=track(.75);glock(b,0,C7,.6,.3);glock(b,.09,G6,.45,.36);bubble(b,.02,900,.06,.3,1.6);return finish(reverb(b,.2),.5);},
- paulHmm:()=>{const b=track(.95);slideWhistle(b,0,.3,430,470,.5,13);slideWhistle(b,.36,.36,470,760,.55,17);return finish(reverb(b,.12),.48);},
- paulClap:()=>{const b=track(1.55);const r=random(91);for(let i=0;i<14;i++){const t=i*.095+r()*.02;clap(b,t,.8+.2*r(),91+i);if(i%3===1)clap(b,t+.03+r()*.02,.5,191+i);}sparkle(b,.9,.5,6,.1,93);return finish(reverb(b,.24),.62);},
- // "Harika!": a quick roll of knuckles on the wooden desk and two firm knocks (option A, the learner chose it after
- // listening: the old low thud was hardly heard on phone speakers), short enough that the right answer is read soon after.
- paulDrum:()=>{const b=track(1.05);[[0,.8],[.09,.65],[.18,.8],[.27,.65],[.36,.8],[.45,.7],[.62,1.15],[.76,1.3]].forEach(([t,a],i)=>woodKnock(b,t,a,i%2,71+i));return finish(reverb(b,.1),.78);},
+ // Sounds of fixed moments (not in the sound settings): a "pling" when a hint opens, applause at the end of a round,
+ // a part or a lesson.
+ hintPling:()=>{const b=track(.75);glock(b,0,C7,.6,.3);glock(b,.09,G6,.45,.36);bubble(b,.02,900,.06,.3,1.6);return finish(reverb(b,.2),.5);},
+ applause:()=>{const b=track(1.55);const r=random(91);for(let i=0;i<14;i++){const t=i*.095+r()*.02;clap(b,t,.8+.2*r(),91+i);if(i%3===1)clap(b,t+.03+r()*.02,.5,191+i);}sparkle(b,.9,.5,6,.1,93);return finish(reverb(b,.24),.62);},
  completeMarimba:()=>{const b=track(1.6);marimba(b,0,C4,.7,.25);marimba(b,.16,C4,.7,.25);marimba(b,.32,G4,.7,.25);[C5,E5,G5,C6].forEach(f=>marimba(b,.48,f,.45,.8));glock(b,.48,C7,.25,.8);return finish(reverb(b,.2),.72);},
 };
 export const soundIds=Object.keys(soundDesigns);

@@ -62,7 +62,7 @@ test('what the server accepts and stores',()=>{
 
 test('"İlerlememi sıfırla" (3 November 2026): removals newer than every change, so no device brings old progress back',()=>{
  for(const key of ['lernkoko-l1a-scores','lernkoko-l12:a3','lernkoko-last-place','lernkoko-verb-game:artikel','lernkoko-l2a-own','lernkoko-l2d-form','lernkoko-puzzle:s1:q1','lernkoko-housing-puzzle:s1:q1','lernkoko-housing-free:s1:q1'])assert.ok(sync.isProgressKey(key),key);
- for(const key of ['german-study-language','lernkoko-learning-language','lernkoko-l12-speed','lernkoko-effects-v1','lernkoko-tour-v1','lernkoko-sync-meta','lernkoko-paul-visit','lernkoko-speech:de'])assert.ok(!sync.isProgressKey(key),key);
+ for(const key of ['german-study-language','lernkoko-learning-language','lernkoko-l12-speed','lernkoko-effects-v1','lernkoko-tour-v1','lernkoko-sync-meta','lernkoko-speech:de'])assert.ok(!sync.isProgressKey(key),key);
  const now=1000000;
  const kept={'lernkoko-l1a-scores':{v:'{"a":{"right":3,"total":3}}',t:900000},'lernkoko-l1a-step':{v:'"b"',t:0},'lernkoko-l12-scores':{v:'{"x":{"right":1,"total":2}}',t:now+5000},'lernkoko-l1b-step':{v:null,t:500}};
  const reset=sync.resetItems(kept,now);

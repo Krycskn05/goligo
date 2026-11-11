@@ -262,7 +262,7 @@ test('Teil D „Ich bin neu hier.“ (25 October 2026): the comic, the summary, 
  for(const text of ['Guten Tag! Ich bin neu hier.','Herzlich willkommen! Ich bin Nora Weiß. Wie heißen Sie?','Ich spreche ein bisschen Türkisch.','Oh, super! Bis bald, Frau Weiß!','ich komme, du kommst, Sie kommen','ich bin, du bist, Sie sind','Ich bin Rami Khalil. Ich komme aus dem Libanon. Und Sie?','Sind Sie Herr Khalil? Richtig?','Jot','auswendig lernen','die Nachbarin'])assert(texts.includes(text),text);
  assert(!texts.includes('')&&texts.every(text=>!/(Hoş|Teşekkür)/.test(text)),'no Turkish in the German voice list');
  assert(read('scripts/voices/list-texts.cjs').includes("load('willkommen-d-course').willkommenDSpeechTexts()"));
- const pics=lessonD.willkommenDPictures;for(const picture of [pics.cover,...pics.comic,pics.strategy,pics.trophy])assert(fs.existsSync('public'+picture.src),picture.src);
+ const pics=lessonD.willkommenDPictures;for(const picture of [pics.cover,...pics.comic,pics.strategy])assert(fs.existsSync('public'+picture.src),picture.src);
  assert.equal(progress.partKeys.d.scores,'lernkoko-l1d-scores');assert.deepEqual(Object.keys(progress.partScored),['a','b','c','d']);
  const page=pageCode();
  for(const piece of ['StepViewD','onPart(\'d\',0)',"partOrder:L1PartId[]=['a','b','c','d']",'testDetail:scores=>','config.groups[2].ids.includes(exercise.id)','speakers={{a:\'nora\',b:\'yasemin\'}}','speakers={{a:\'nora\',b:\'rami\'}}','className="l1a-panel"','Bitte noch üben!'])assert(page.includes(piece),piece);

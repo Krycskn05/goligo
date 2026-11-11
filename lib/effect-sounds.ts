@@ -5,9 +5,10 @@ export type TapChoiceId = 'tap' | 'tapWood' | 'tapPop' | 'tapDrop' | 'tapBell' |
 export type PageSoundId = 'whoosh' | 'pageFlip' | 'pageSlide' | 'pageHarp' | 'pageBubbles' | 'pageChip';
 export type CorrectSoundId = 'correct' | 'correctMarimba' | 'correctCoin' | 'correctDing' | 'correctFanfare' | 'correctBubbles';
 export type CompleteSoundId = 'complete' | 'completeFanfare' | 'completeLevel' | 'completeChimes' | 'completeHarp' | 'completeMarimba';
-/** Paul Hoca's own sounds, played with his animations (app/paul-hoca.tsx); they are not in the sound settings. */
-export type PaulSoundId = 'paulHello' | 'paulTip' | 'paulHmm' | 'paulClap' | 'paulDrum';
-export type SoundId = WrongSoundId | TapSoundId | TapChoiceId | PageSoundId | CorrectSoundId | CompleteSoundId | PaulSoundId;
+/** Sounds of fixed moments, not in the sound settings: applause at the end of a round, a part or a lesson, and a
+ * "pling" when a hint opens. */
+export type MomentSoundId = 'applause' | 'hintPling';
+export type SoundId = WrongSoundId | TapSoundId | TapChoiceId | PageSoundId | CorrectSoundId | CompleteSoundId | MomentSoundId;
 export type SoundNote = { f:number; end?:number; start:number; duration:number; gain:number; type:'sine'|'triangle' };
 export const wrongSoundIds:readonly WrongSoundId[] = ['soft','beep','retro','low','cartoon'];
 export const tapSoundIds:readonly TapSoundId[] = ['tap','tap2','tap3'];
@@ -49,11 +50,8 @@ export const soundRecipes:Record<SoundId,readonly SoundNote[]> = {
  completeLevel:[{f:523.25,start:0,duration:.05,gain:.035,type:'triangle'},{f:659.25,start:.055,duration:.05,gain:.035,type:'triangle'},{f:783.99,start:.11,duration:.05,gain:.035,type:'triangle'},{f:1046.5,start:.165,duration:.05,gain:.035,type:'triangle'},{f:1318.5,start:.22,duration:.05,gain:.035,type:'triangle'},{f:1568,start:.275,duration:.05,gain:.035,type:'triangle'},{f:2093,start:.33,duration:.6,gain:.035,type:'triangle'}],
  completeChimes:[{f:1568,start:0,duration:.6,gain:.05,type:'sine'},{f:2093,start:.12,duration:.6,gain:.05,type:'sine'},{f:1760,start:.26,duration:.6,gain:.05,type:'sine'},{f:2637,start:.4,duration:.7,gain:.05,type:'sine'},{f:2349.3,start:.55,duration:.8,gain:.04,type:'sine'}],
  completeHarp:[{f:523.25,start:0,duration:.3,gain:.05,type:'sine'},{f:659.25,start:.04,duration:.3,gain:.05,type:'sine'},{f:783.99,start:.08,duration:.3,gain:.05,type:'sine'},{f:1046.5,start:.12,duration:.3,gain:.05,type:'sine'},{f:1318.5,start:.16,duration:.3,gain:.05,type:'sine'},{f:1568,start:.2,duration:.3,gain:.05,type:'sine'},{f:2093,start:.24,duration:.9,gain:.05,type:'sine'}],
- paulHello:[{f:783.99,start:.03,duration:.2,gain:.08,type:'triangle'},{f:1046.5,start:.15,duration:.4,gain:.08,type:'triangle'}],
- paulTip:[{f:2093,start:0,duration:.3,gain:.06,type:'sine'},{f:1568,start:.09,duration:.36,gain:.05,type:'sine'}],
- paulHmm:[{f:430,end:470,start:0,duration:.3,gain:.05,type:'sine'},{f:470,end:760,start:.36,duration:.36,gain:.05,type:'sine'}],
- paulClap:[{f:1500,start:0,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.2,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.4,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.6,duration:.05,gain:.03,type:'triangle'}],
- paulDrum:[{f:430,start:0,duration:.06,gain:.1,type:'triangle'},{f:447,start:.09,duration:.06,gain:.08,type:'triangle'},{f:430,start:.18,duration:.06,gain:.1,type:'triangle'},{f:447,start:.27,duration:.06,gain:.08,type:'triangle'},{f:430,start:.36,duration:.06,gain:.1,type:'triangle'},{f:430,start:.62,duration:.1,gain:.13,type:'triangle'},{f:447,start:.76,duration:.14,gain:.14,type:'triangle'}],
+ hintPling:[{f:2093,start:0,duration:.3,gain:.06,type:'sine'},{f:1568,start:.09,duration:.36,gain:.05,type:'sine'}],
+ applause:[{f:1500,start:0,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.2,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.4,duration:.05,gain:.03,type:'triangle'},{f:1500,start:.6,duration:.05,gain:.03,type:'triangle'}],
  completeMarimba:[{f:261.63,start:0,duration:.15,gain:.1,type:'triangle'},{f:261.63,start:.16,duration:.15,gain:.1,type:'triangle'},{f:392,start:.32,duration:.15,gain:.1,type:'triangle'},{f:523.25,start:.48,duration:.8,gain:.1,type:'triangle'},{f:1046.5,start:.48,duration:.8,gain:.05,type:'sine'}],
 };
 export const soundDuration = (id:SoundId) => Math.max(...soundRecipes[id].map(note=>note.start+note.duration))+.04;

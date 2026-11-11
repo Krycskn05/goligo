@@ -12,7 +12,7 @@ import {lineSay} from '@/lib/willkommen-b-course';
 import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {Say,Note,Tx,Heading,Portrait,FeedbackLine,useFinish,GapExercise,MatchExercise,OrderExercise,ChoiceRows,TestStep,shuffle,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside} from '@/lib/unit-i18n';
 import {DialogueLines,ListenAll,Picture} from './willkommen-b-steps';
@@ -179,7 +179,7 @@ function OwnC({speech,onScore,step}:StepProps){
 function EndC({progress,onGo,onPart,language}:StepProps){
  return <>
   <Heading>{ut('Lektion 1C tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list"><li>{ut('Günün saatine göre selam vermek')}</li><li>{ut('Resmî ve samimi vedalaşmak')}</li><li><Tx text="*Wie geht es dir / Ihnen?* sorup cevaplamak"/></li><li>{ut('Fiili 2. pozisyona koymak')}</li><li>{ut('Nokta, soru işareti ve büyük harfleri doğru kullanmak')}</li><li>{ut('Kendini 4–5 cümleyle tanıtmak')}</li></ul>
   <ProgressMeter progress={progress} language={language} label="Lektion 1C"/>

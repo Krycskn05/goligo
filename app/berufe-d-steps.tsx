@@ -13,7 +13,7 @@ import {
  tomaszExamSay,examFormD,berufeTestD,checkSectionsD,checkPointsD,examTalk,berufeStepIndexD,type OwnField,
 } from '@/lib/berufe-d-course';
 import {ProgressMeter} from './progress-meter';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,Conversation,SpeakStep,ownJobSentence} from './berufe-a-steps';
 import {Marked} from './berufe-b-steps';
@@ -281,10 +281,8 @@ function PointsD({scores,onGo}:StepProps){
  const done=rows.filter(row=>row.score);
  const total=done.reduce((n,row)=>n+Math.min(row.points,row.score!.right),0);const max=done.reduce((n,row)=>n+row.points,0);
  const verdict=max===0?'Henüz bir bölüm yapılmadı. Alles klar? 1 ile başla.':total>=max*.8?'🎉 Lektion 2 geschafft! Sırada Lektion 3.':total>=max*.5?'👍 İyi gidiyor. Zayıf bölümleri bir daha yap.':'📖 Bitte noch üben! Konu adımlarına dön.';
- const trophy=berufeDPictures.trophy;
  return <>
   <p className="kicker" lang="de">Alles klar? · Ergebnis</p><Heading>{ut('Lektion 2 puanların')}</Heading>
-  <img className="l2-plain l2-trophy" src={trophy.src} alt={ut('Paul Hoca kupayı başının üstüne kaldırmış: Lektion 2 geschafft!')} width={trophy.width} height={trophy.height} loading="lazy" decoding="async"/>
   <table className="l1a-table l1a-points"><thead><tr><th>{ut('Bölüm')}</th><th/><th>Punkte</th></tr></thead><tbody>
    {rows.map(row=>{const low=!!row.score&&row.score.right<row.points/2;return <tr key={row.id} data-l2-points={row.id}>
     <td lang="de">{row.label}</td>
@@ -314,7 +312,7 @@ function EndL2D({progress,onGo,onPart,language}:StepProps){
  return <>
   <p className="kicker">{ut('Bitti')}</p>
   <Heading>{ut('Lektion 2 tamam! 🎉')}</Heading>
-  <PaulHoca pose="trophy" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('A’dan D’ye kadar bitirdin. Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">
    <li><Tx text="Mesleğini ve işini söylemek: *Ich bin … von Beruf. Ich arbeite als …*"/></li>

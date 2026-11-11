@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stepGroups = exports.unitGoals = exports.lessonParts = exports.scoredExercises = exports.stepIndex = exports.steps = exports.testQuestions = exports.orderSay = exports.matchSay = exports.dialogueSpeaker = exports.withSpeakers = exports.exerciseSpeakers = exports.ownPrompts = exports.boxSay = exports.boxLines = exports.wordBox = exports.questionSay = exports.questionLines = exports.listenItems = exports.articleRowSpeech = exports.articleRows = exports.articleOptions = exports.gluedSay = exports.gluedSentences = exports.gluedText = exports.orderMeanings = exports.orderSentences = exports.matchPairs = exports.lettersExercise = exports.words = exports.greetingVoices = exports.greetingsAround = exports.personSpeech = exports.people = exports.dialogue = exports.verbForms = exports.noArticleSay = exports.articleGroups = exports.articleCountries = exports.countries = exports.originPhrases = exports.namePhrases = exports.greetings = exports.voiceOwner = exports.sayText = exports.speakers = exports.portraitSrc = exports.willkommenPictures = exports.WILLKOMMEN_UNIT = exports.WILLKOMMEN_PATH = void 0;
-exports.groupOf = void 0;
+exports.unitGoals = exports.lessonParts = exports.scoredExercises = exports.stepIndex = exports.steps = exports.testQuestions = exports.orderSay = exports.matchSay = exports.dialogueSpeaker = exports.withSpeakers = exports.exerciseSpeakers = exports.ownPrompts = exports.boxSay = exports.boxLines = exports.wordBox = exports.questionSay = exports.questionLines = exports.listenItems = exports.articleRowSpeech = exports.articleRows = exports.articleOptions = exports.gluedSay = exports.gluedSentences = exports.gluedText = exports.orderMeanings = exports.orderSentences = exports.matchPairs = exports.lettersExercise = exports.words = exports.greetingVoices = exports.greetingsAround = exports.personSpeech = exports.people = exports.dialogue = exports.verbForms = exports.noArticleSay = exports.articleGroups = exports.articleCountries = exports.countries = exports.originPhrases = exports.namePhrases = exports.greetings = exports.voiceOwner = exports.sayText = exports.speakers = exports.hasPortrait = exports.portraitSrc = exports.willkommenPictures = exports.WILLKOMMEN_UNIT = exports.WILLKOMMEN_PATH = void 0;
+exports.groupOf = exports.stepGroups = void 0;
 exports.speakerVoice = speakerVoice;
 exports.speakerOf = speakerOf;
 exports.testSpeech = testSpeech;
@@ -27,6 +27,9 @@ exports.willkommenPictures = {
 };
 const portraitSrc = (key) => '/toon/lektion1/' + key + '.webp';
 exports.portraitSrc = portraitSrc;
+/** The teacher has no picture (the learner asked, 11 November 2026): where a face would be, his initial stands. */
+const hasPortrait = (key) => key !== 'paul';
+exports.hasPortrait = hasPortrait;
 exports.speakers = [
     { key: 'sabine', name: 'Sabine Krüger', gender: 'female', style: 'F1' },
     { key: 'yasemin', name: 'Yasemin Arslan', gender: 'female', style: 'F2' },

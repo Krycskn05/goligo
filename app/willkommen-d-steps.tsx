@@ -10,7 +10,7 @@ import {
 import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {Say,Note,Rich,Tx,Heading,FeedbackLine,useFinish,GapExercise,TestStep,type Speech,type StepProps,type Feedback} from './willkommen-ui';
 import {ut} from '@/lib/unit-i18n';
 import {DialogueLines,Picture} from './willkommen-b-steps';
@@ -152,7 +152,6 @@ function Points({scores,onGo}:StepProps){
  const verdict=max===0?'Henüz bir bölüm yapılmadı. Alles klar? 1 ile başla.':total>=max*.8?'🎉 Lektion 1 geschafft! Sırada Lektion 2.':total>=max*.5?'👍 İyi gidiyor. Zayıf bölümleri bir daha yap.':'📖 Bitte noch üben! Özet adımına dön.';
  return <>
   <p className="kicker" lang="de">Alles klar? · Ergebnis</p><Heading>{ut('Puanların')}</Heading>
-  <Picture {...willkommenDPictures.trophy} alt="Paul Hoca kupayla: Lektion 1 geschafft!"/>
   <table className="l1a-table l1a-points"><thead><tr><th>{ut('Bölüm')}</th><th/><th>Punkte</th></tr></thead><tbody>
    {rows.map(row=>{const low=!!row.score&&row.score.right<row.points/2;return <tr key={row.id} data-l1a-points={row.id}>
     <td lang="de">{row.label}</td>
@@ -168,7 +167,7 @@ function Points({scores,onGo}:StepProps){
 function EndD({progress,onGo,onPart,language}:StepProps){
  return <>
   <Heading>{ut('Lektion 1 tamam! 🎉')}</Heading>
-  <PaulHoca pose="trophy" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('A’dan D’ye kadar bitirdin. Artık:')}</p>
   <ul className="l1a-list"><li>{ut('Selamlaşıp vedalaşabilirsin')}</li><li>{ut('Adını, ülkeni, dillerini söyleyebilirsin')}</li><li><Tx text="*Sie* ve *du* ile soru sorabilirsin"/></li><li>{ut('Hâl hatır sorabilirsin')}</li><li>{ut('Adını harf harf söyleyebilirsin')}</li><li>{ut('Fiili doğru çekip 2. pozisyona koyabilirsin')}</li></ul>
   <ProgressMeter progress={progress} language={language} label="Lektion 1D"/>

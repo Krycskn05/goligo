@@ -5,7 +5,6 @@ import type {TalkScenario} from '@/lib/talk-scenarios';
 import type {TalkReply,TalkTurn} from '@/lib/talk-prompt';
 import {Heading,Portrait,Say,readRun,useRunSave,type StepProps} from './willkommen-ui';
 import {ut,utLang} from '@/lib/unit-i18n';
-import {PaulHoca} from './paul-hoca';
 
 /**
  * "Konuş" (the learner asked, 30 October 2026: "I do the lessons but I can't speak"): a short role play with an AI
@@ -96,7 +95,7 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
  const partner=scenario.name;
  return <>
   <p className="kicker" lang="de">Sprechen · {scenario.title}</p><Heading>{ut('Konuş: {title}',{title:scenario.title})}</Heading>
-  <div className="paul-box l1a-talk-setting"><PaulHoca pose="speak"/><p className="l1a-tr paul-box-text">{ut(scenario.setting)}</p></div>
+  <p className="l1a-tr">{ut(scenario.setting)}</p>
   <div className="l1a-talk-try" lang="de">{scenario.tryPhrases.map(([de,tr])=><span className="l1a-talk-chip" key={de} title={ut(tr)}>{de}{!de.includes('…')&&<Say text={de} speech={speech}/>}</span>)}</div>
   <div className={'l1a-dialogue l1a-talk'+(hideTr?' l1a-talk-hide':'')} aria-live="polite">
    {lines.map((line,i)=>line.role==='partner'?<div className="l1a-line a" key={i}>
@@ -114,7 +113,7 @@ export function TalkStep(props:StepProps&{scenario:TalkScenario}){
    <div ref={end}/>
   </div>
   {error&&<p className="l1a-feedback bad" role="status">{ut(error.text)}{error.signIn&&<> <a href={'/giris?return_to='+encodeURIComponent(typeof window==='undefined'?'/':window.location.pathname+window.location.search)}>{ut('Giriş yap')}</a></>}</p>}
-  {done?<div className="l1a-feedback ok paul-box" role="status"><PaulHoca pose="thanks"/><p className="paul-box-text">{ut('Konuşma bitti 🎉')}</p></div>:<form className="l1a-talk-box" onSubmit={event=>{event.preventDefault();void send(input);}}>
+  {done?<p className="l1a-feedback ok" role="status">{ut('Konuşma bitti 🎉')}</p>:<form className="l1a-talk-box" onSubmit={event=>{event.preventDefault();void send(input);}}>
    {canListen&&<button type="button" className={'l1a-talk-mic'+(listening?' on':'')} aria-pressed={listening} aria-label={ut(listening?'Bitir ve gönder':'Bas ve Almanca konuş')} disabled={busy} onClick={listen}>{listening?<Square size={22} aria-hidden="true"/>:<Mic size={24} aria-hidden="true"/>}</button>}
    <input className="l1a-gap wide l1a-talk-input" value={input} lang="de" dir="ltr" autoComplete="off" spellCheck={false} placeholder={ut(listening?'Dinliyorum… bitince ■ dokun':canListen?'Konuş ya da yaz…':'Almanca yaz…')} aria-label={ut('Cevabın')} maxLength={300} disabled={busy} onChange={event=>{if(rec.current||want.current)stopMic();setInput(event.target.value);}}/>
    <button type="submit" className="btn small l1a-talk-send" disabled={busy||!input.trim()} aria-label={ut('Gönder')}><Send size={18} aria-hidden="true"/></button>

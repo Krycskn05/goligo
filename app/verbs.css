@@ -579,8 +579,8 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
    chips, one card whose question place keeps its height after the answer (the choices and letters never move), the next
    question after 3 seconds (app/verb-study.tsx AUTO_NEXT_MS). */
 /* --slot: the new verb's card picture; --qslot: the question's place (as tall as the screen allows: big pictures, still one
-   screen); --paul: the room on the right of the answer for Paul's reaction (never over the picture or the words). */
-.verb-practice { --slot:clamp(140px,24vh,196px); --qslot:clamp(160px,31vh,250px); --paul:clamp(96px,17%,150px); }
+   screen). */
+.verb-practice { --slot:clamp(140px,24vh,196px); --qslot:clamp(160px,31vh,250px); }
 .verb-practice .object-practice-top { margin-bottom:6px; }
 .verb-practice .vault-strip img { display:block; width:36px; height:36px; border-radius:8px; object-fit:cover; }
 .verb-step-chips { list-style:none; display:grid; gap:6px; margin:0 0 10px; padding:0; background:none; border:0; box-shadow:none; border-radius:0; }
@@ -622,7 +622,7 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-slot>.verb-result .verb-sentence .verb-chunk.gap { min-width:0; }
 @media (max-width:760px) { .verb-practice .verb-slot>.verb-result .verb-sentence { grid-column:1 / 3; font-size:14.5px; } }
 .verb-slot>.vault-listen-player { box-sizing:border-box; height:100%; margin:0; }
-.verb-slot>.verb-result { box-sizing:border-box; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:16px; height:100%; padding:10px calc(var(--paul) + 8px) 13px 14px; border-radius:18px; background:#eafbe4; overflow:hidden; }
+.verb-slot>.verb-result { box-sizing:border-box; position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:16px; height:100%; padding:10px 14px 13px; border-radius:18px; background:#eafbe4; overflow:hidden; }
 .verb-slot>.verb-result.retry { background:#fff0f4; }
 .verb-slot>.verb-result>.verb-picture { width:calc(var(--qslot) - 64px); max-width:none; margin:0; border-radius:16px; }
 .verb-slot .verb-result-text { gap:2px; }
@@ -637,7 +637,7 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
 .verb-one-example .verb-person-meaning { grid-column:1; font-size:12.5px; line-height:1.25; color:#7d8ea3; }
 .verb-one-example svg { grid-column:2; grid-row:1 / span 2; color:#2f7fd6; }
 @media (max-width:760px) {
- .verb-practice { --slot:216px; --qslot:284px; --paul:80px; --pic:84px; }
+ .verb-practice { --slot:216px; --qslot:284px; --pic:84px; }
  .verb-step-chips { gap:4px; margin-bottom:6px; }
  .verb-step-chips li { padding:4px 3px; font-size:11px; }
  .verb-practice .verb-learn { gap:8px; padding:12px; }
@@ -656,8 +656,8 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  .verb-slot { margin-bottom:10px; }
  .verb-practice .verb-slot>.verb-card.with-picture>.verb-picture { width:calc(var(--qslot) - 24px); max-width:none; }
  /* The answer: picture, then right or wrong, the verb and its meaning beside it; what was chosen and the example
-    sentence below them; Paul's room on the right, the whole height of the frame. */
- .verb-practice .verb-slot>.verb-result { grid-template-columns:var(--pic) minmax(0,1fr) var(--paul); align-content:center; align-items:start; column-gap:10px; row-gap:2px; padding:8px 10px 11px; }
+    sentence below them. */
+ .verb-practice .verb-slot>.verb-result { grid-template-columns:var(--pic) minmax(0,1fr); align-content:center; align-items:start; column-gap:10px; row-gap:2px; padding:8px 10px 11px; }
  .verb-practice .verb-slot>.verb-result>.verb-picture { grid-column:1; grid-row:1 / span 3; width:var(--pic); border-radius:12px; }
  .verb-practice .verb-slot>.verb-result>.verb-result-text { display:contents; }
  .verb-practice .verb-slot .verb-result-status,.verb-practice .verb-slot .verb-result-title,.verb-practice .verb-slot .verb-result-meaning { grid-column:2; }
@@ -672,15 +672,6 @@ button.verb-bubble svg { flex:none; color:#c06a22; }
  .verb-practice .verb-question.answered { padding:16px 22px 18px; }
 }
 
-/* Paul's reaction to an answer in the answer frame (4 November 2026, the learner asked: inside this frame, never over the
-   picture or the words): in the room kept free on its right. */
-.verb-practice .verb-slot>.lk-picture-reaction { inset:auto; top:0; bottom:0; inset-inline-end:0; width:var(--paul); border-radius:0 18px 18px 0; }
-.toon-app .verb-practice .verb-slot>.lk-picture-reaction>img.lk-picture-paul { position:absolute; bottom:4px; inset-inline-end:4px; width:calc(100% - 8px); height:calc(100% - 8px); max-width:none; max-height:none; margin:0; object-fit:contain; object-position:100% 100%; transform-origin:100% 100%; animation:lk-picture-paul 2s both; }
-.toon-app[dir=rtl] .verb-practice .verb-slot>.lk-picture-reaction { border-radius:18px 0 0 18px; }
-.toon-app[dir=rtl] .verb-practice .verb-slot>.lk-picture-reaction>img.lk-picture-paul { object-position:0 100%; transform-origin:0 100%; }
-.toon-app .verb-practice .verb-slot>.lk-picture-reaction.kind-wrong>img.lk-picture-paul { animation-duration:2.1s; }
-/* Phones: Paul has the whole height of the frame on its right (4 November 2026: the learner did not notice him small). */
-@media (max-width:760px) { .verb-practice .verb-slot>.lk-picture-reaction { border-radius:0 18px 18px 0; } }
 /* Narrow phones: the question's picture on top, as big as the place allows, the verb and its meaning under it. */
 @media (max-width:520px) {
  .verb-practice .verb-slot>.verb-card.with-picture:has(.verb-picture) { grid-template-columns:minmax(0,1fr); justify-items:center; text-align:center; align-content:center; row-gap:2px; }

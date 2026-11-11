@@ -8,7 +8,6 @@ import {MatchPreview,useMatchPreview} from './object-games';
 import {verbText,type VerbCopyKey} from '@/lib/verb-copy';
 import {isVerbTheme,verbThemes,verbThemeMap,themeTitle} from '@/lib/verb-themes';
 import {vaultText,vaultDirection,type VaultLanguage,type VaultCopyKey} from '@/lib/object-vault-copy';
-import {PaulHoca} from './paul-hoca';
 import {RainGame,CatchGame,QuickGame,SearchGame,RescueGame,PluralGame,type GameFeedback} from './object-games';
 
 type Feedback=GameFeedback;
@@ -23,11 +22,11 @@ export function VerbPicture({verb,language,small=false}:{verb:Verb;language:Vaul
  const src=verbPicture(verb);
  return src?<img className={'verb-picture'+(small?' small':'')} src={src} alt={verbMeaning(verb,language)} width={512} height={512} loading="lazy" decoding="async"/>:<span className={'verb-picture verb-picture-empty'+(small?' small':'')} aria-hidden="true" lang="de" dir="ltr">{verb.display}</span>;
 }
-/** Rule lines shown after an answer, so the learner sees why the form is right; Paul Hoca points at them (no sound: the answer is being read).
+/** Rule lines shown after an answer, so the learner sees why the form is right (no sound: the answer is being read).
  * With `verb` (the games) the book's "sie/er" becomes the verb's own pronoun, sie or er, like its picture. */
 export function RuleBox({lines,language,verb}:{lines:string[];language:VaultLanguage;verb?:Verb}){
  const shown=verb?lines.map(line=>withPronoun(line,verb)):lines;
- return shown.length?<div className="verb-rules paul-box" lang={language} dir={vaultDirection(language)}><div className="paul-box-text"><strong>{verbText(language,'ruleTitle')}</strong><ul>{shown.map(line=><li key={line}>{line}</li>)}</ul></div><PaulHoca pose="tip"/></div>:null;
+ return shown.length?<div className="verb-rules" lang={language} dir={vaultDirection(language)}><strong>{verbText(language,'ruleTitle')}</strong><ul>{shown.map(line=><li key={line}>{line}</li>)}</ul></div>:null;
 }
 function useTiles(){
  const [placed,setPlaced]=useState<Tile[]>([]);

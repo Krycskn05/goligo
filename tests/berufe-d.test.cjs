@@ -18,7 +18,7 @@ test('21 steps like the learner\'s page: cover, 6 teaching steps, 6 exercises, A
  assert.equal(lesson.checkPointsD,32);
  for(const section of lesson.checkSectionsD){assert.equal(total(section.id),section.points,section.id);assert(lesson.berufeGroupsD[2].ids.includes(section.id),section.id);}
  for(const id of [...lesson.berufeGroupsD[1].ids,...lesson.berufeGroupsD[2].ids])assert(lesson.berufeStepShortD[id],id);
- for(const file of ['kapak-d','pokal-2'])assert(fs.existsSync('public/toon/lektion2/'+file+'.webp'),file);
+ for(const file of ['kapak-d'])assert(fs.existsSync('public/toon/lektion2/'+file+'.webp'),file);
 });
 
 test('the exercises agree with the texts: Nora is a nurse, Rami\'s form, the verb table, the mime game, the syllables',()=>{

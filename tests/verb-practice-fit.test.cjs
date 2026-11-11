@@ -17,10 +17,9 @@ test('the top: the topic, the picture strip of the verbs, "Fiil n / N", the step
 
 test('the question card keeps one place for the question and the result; no next button; the next question after 3 s',()=>{
  const page=read('app/verb-study.tsx');const cards=read('app/verb-workshop.tsx');const css=read('app/verbs.css');
- assert.ok(page.includes('<div className="verb-slot" data-paul-slot="">{feedback?<AnswerResult '),'the result opens where the question card was');
- // Paul's reaction comes into this frame, in the room kept free on its right (never over the picture or the words).
- assert.ok(read('app/learning-effects.tsx').includes("??document.querySelector<HTMLElement>('[data-paul-slot]')"));
- assert.ok(css.includes('padding:10px calc(var(--paul) + 8px) 13px 14px;')&&css.includes('.verb-practice .verb-slot>.lk-picture-reaction { inset:auto; top:0; bottom:0; inset-inline-end:0; width:var(--paul);'),'room for Paul');
+ assert.ok(page.includes('<div className="verb-slot">{feedback?<AnswerResult '),'the result opens where the question card was');
+ // The answer frame uses its whole width (the room once kept for the teacher's figure is gone).
+ assert.ok(css.includes('height:100%; padding:10px 14px 13px; border-radius:18px;')&&css.includes('{ grid-template-columns:var(--pic) minmax(0,1fr); align-content:center;'));
  assert.ok(css.includes('--qslot:clamp(160px,31vh,250px);'),'the question picture as big as the screen allows');
  assert.ok(!page.includes('verb-write-feedback')&&!page.includes("v(index+1===end?'viewResults':'nextPuzzle')")&&!cards.includes('verb-result-next'),'no "Sonraki" button, no second feedback block under the letters');
  assert.ok(page.includes('const AUTO_NEXT_MS=3000,AUTO_NEXT_GRACE_MS=6000;')&&page.includes('const nextRef=useRef(next);nextRef.current=next;')&&page.includes('},[feedback,replays,viewing]);'),'the next question by itself, as in Nesne Kasası');

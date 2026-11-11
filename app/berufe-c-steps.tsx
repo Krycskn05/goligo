@@ -11,7 +11,7 @@ import {
  possessiveLines,wirIhrLines,berufeTestC,practiceItemsC,berufeStepIndexC,type PersonGapLine,
 } from '@/lib/berufe-c-course';
 import {ProgressMeter} from './progress-meter';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,QuickChecks,Conversation,SpeakStep} from './berufe-a-steps';
 import {Marked} from './berufe-b-steps';
@@ -303,7 +303,7 @@ function EndL2C({progress,onGo,onPart,language}:StepProps){
  return <>
   <p className="kicker">{ut('Bitti')}</p>
   <Heading>{ut('Lektion 2C tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">
    <li><Tx text="0’dan 20’ye saymak ve telefon numaranı söylemek: *null eins sieben sechs …*"/></li>

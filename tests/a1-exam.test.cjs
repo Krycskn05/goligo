@@ -295,8 +295,8 @@ test('the section is on the site: menu, page, guest taste, visits, styles',()=>{
  assert.ok(paper.includes('{review&&id&&why&&<Why ')&&paper.includes("(review&&right?' is-right':'')"));
  for(const file of [ui,paper])for(const word of ['speak(','useGermanSpeech','useLessonSpeech','sound.correct','sound.wrong'])assert.ok(!file.includes(word),word);
  assert.ok(ui.includes('latest.current.sound.complete()'),'one sound when the exam is handed in');
- // Paul stays away while a paper is on the screen.
- assert.ok(read('app/paul-hoca.tsx').includes("if(document.querySelector('.x1-running'))return true;")&&ui.includes("(running?' x1-running':'')"));
+ // A running paper is marked on the page (app/a1-exam.css gives it the whole width on phones).
+ assert.ok(ui.includes("(running?' x1-running':'')"));
  // The 25 minutes can be ignored: the clock only shows, it never hands in.
  assert.ok(ui.includes("examText(language,'timeUp')")&&ui.includes("off:'untimed'")&&ui.includes("off:'listenFree'")&&!/over\)\s*finish\(/.test(ui));
 });

@@ -27,6 +27,9 @@ export function useAnswerSound(){
  useEffect(()=>stop,[stop]);
  return {prepare,wrong,correct,complete,stop};
 }
+/** Applause when a part, a lesson or a round ends: a sound only, nothing is drawn. It follows the sound settings; a
+ * browser that blocks sound before the first tap just stays quiet. */
+export function Applause(){useEffect(()=>playLearningSound('applause'),[]);return null;}
 export function useAnswerFeedback(speech:ReturnType<typeof useGermanSpeech>){
  const sound=useAnswerSound();const [cueBusy,setCueBusy]=useState(false);
  const latest=useRef({sound,speech});latest.current={sound,speech};

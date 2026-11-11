@@ -46,8 +46,9 @@ test('site voice manifest: normalised lookup, default voice and safe parsing',()
  assert.equal(new Set(voices.siteVoices.map(v=>v.name)).size,10);
  // The voices are named after the people of Lektion 1A (25 October 2026): the voice that reads Sabine is "Sabine".
  assert.deepEqual(voices.siteVoices.map(v=>v.name),['Sabine','Yasemin','Aisha','Nora','Mei','Rami','Omar','Paul','Nikos','Tomasz']);
- // Each voice shows the picture of its person, and the choice shows women and men apart (25 October 2026).
- for(const voice of voices.siteVoices)assert.ok(existsSync('public'+voice.picture),voice.name+' has a picture');
+ // Each voice shows the picture of its person, and the choice shows women and men apart (25 October 2026); the
+ // teacher's voice (Paul) has no picture and shows its initial (11 November 2026).
+ for(const voice of voices.siteVoices){if(voice.name==='Paul'){assert.equal(voice.picture,undefined);continue;}assert.ok(existsSync('public'+voice.picture),voice.name+' has a picture');}
  assert.deepEqual(voices.voiceGroups(voices.siteVoices).map(group=>[group.gender,group.voices.map(v=>v.name).join(',')]),[['female','Sabine,Yasemin,Aisha,Nora,Mei'],['male','Rami,Omar,Paul,Nikos,Tomasz']]);
  assert.deepEqual(voices.voiceGroups(voices.siteVoices.filter(v=>v.gender==='male')).map(group=>group.gender),['male'],'an empty group is left out');
  for(const file of ['app/learning-effects.tsx','app/site-tour.tsx']){const page=readFileSync(file,'utf8');assert.ok(page.includes('voiceGroups(speech.siteVoices)')&&page.includes('src={voice.picture}'),file+' shows pictures in two groups');}

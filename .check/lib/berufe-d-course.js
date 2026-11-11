@@ -8,7 +8,6 @@ const berufe_c_course_1 = require("./berufe-c-course");
 /** Pictures of Teil D (public/toon/lektion2, from the learner's page). */
 exports.berufeDPictures = {
     cover: { src: '/toon/lektion2/kapak-d.webp', width: 960, height: 540 },
-    trophy: { src: '/toon/lektion2/pokal-2.webp', width: 640, height: 492 },
 };
 exports.castL2D = ['rami', 'nora', 'mei', 'tomasz', 'yasemin', 'sabine', 'nikos', 'omar', 'paul'];
 /** Rami's form at the care service (invented, like every address and number of Lektion 2). */

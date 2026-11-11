@@ -5,7 +5,7 @@ import {clockDigits,clockSayings,turkishTime,type ClockSaying} from '@/lib/clock
 import {clockText,EXPLAIN_KEY,KIND_KEY,type ClockCopyKey} from '@/lib/clock-copy';
 import {greetingText,type GreetingCopyKey} from '@/lib/greeting-copy';
 import type {VaultLanguage} from '@/lib/object-vault-copy';
-import {usePaulMotion} from './paul-hoca';
+import {useMotion} from './use-motion';
 import {TopIcon} from './top-icons';
 import {useGermanSpeech} from './study-shared';
 
@@ -64,7 +64,7 @@ type Info={saying:ClockSaying;index:number;total:number;hour:number;minute:numbe
  * knows the clock it stays empty.
  */
 export function SiteGreeting({language}:{language:VaultLanguage;line?:string}){
- const motion=usePaulMotion();
+ const motion=useMotion();
  const [now,setNow]=useState<Date|null>(null);
  const [info,setInfo]=useState<Info|null>(null);
  const [place,setPlace]=useState<{top:number;left:number;width:number}|null>(null);

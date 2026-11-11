@@ -19,7 +19,6 @@ export const willkommenDPictures={
   {src:'/toon/lektion1/komsu-4.webp',width:960,height:720},
  ],
  strategy:{src:'/toon/lektion1/ezber.webp',width:960,height:640},
- trophy:{src:'/toon/lektion1/kupa.webp',width:960,height:640},
 } as const;
 
 /* ---------- teaching steps ---------- */

@@ -1,5 +1,4 @@
 'use client';
-import {paulMood} from './paul-hoca';
 import {browserLanguage,rememberSiteLanguage} from '@/lib/device-language';
 import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,ArrowRight,BookOpen,Check,Lock} from 'lucide-react';
@@ -35,7 +34,7 @@ import {saveLastPlace,lessonStepHref} from '@/lib/last-place';
  * Teil A – Gehen Sie die Treppe hoch., the learner's lesson page of 30 October 2026, 24 steps; B–D come later). A part
  * opens on a wide spread, one step at a time, with the pieces of Lektion 1 (app/willkommen-ui.tsx) and the same look
  * (the l1a-* styles of app/willkommen.css; Lektion 15's own pieces in app/stadt.css). German is read with the site
- * voices, each person with their own voice; answers get the site's sounds and Paul; scores stay in the browser
+ * voices, each person with their own voice; answers get the site's sounds; scores stay in the browser
  * (lib/stadt-progress.ts). Teil A's steps: app/stadt-a-steps.tsx.
  */
 export default function StadtStudy({guest=false}:{guest?:boolean}){
@@ -133,7 +132,7 @@ function StadtLesson({language,onLanguage,guest}:{language:StudyLanguage;onLangu
    {language!=='tr'&&!hasUnitPack(language)&&turkishNote[language]&&<p className="object-alert l12-language-note" lang={language} dir={dir}>{turkishNote[language]}</p>}
    {speech.warning&&<p className="object-alert" role="status">{language==='tr'?speech.warning:vaultText(language,'audioWarning')}</p>}
    {!step?<Contents language={language} scores={scores} onOpen={open}/>:<PartBook config={config} step={step} progress={progress} scores={scores[place.part]} language={language} onGo={go} onPart={open}>
-    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l15-step={step.id} data-l15-teil={config.id} data-paul-mood={paulMood(step)}>
+    <section className="panel l1a-card" aria-labelledby="l1a-heading" data-l15-step={step.id} data-l15-teil={config.id}>
      <header className="l1a-top">
       <div className="l1a-top-row"><span className="eyebrow">{ut(stepGroup?.label)??'Teil '+config.badge}</span><span className="l1a-where">{trackGroup?`${trackGroup.ids.indexOf(step.id)+1} / ${trackGroup.ids.length}`:<>{ut(step.title)} · {index+1}/{config.steps.length}</>}</span></div>
       {trackGroup?<StepStrip track label={trackGroup.label} current={step.id} scores={scores[place.part]} onOpen={go} items={trackGroup.ids.map((id,i)=>({id,index:config.steps.findIndex(entry=>entry.id===id),number:i+1,label:stepShortA[id]??config.steps.find(entry=>entry.id===id)?.title??id,locked:lock.locked.has(id)})).map(item=>item.locked?{...item,index:lock.openIndex}:item)}/>

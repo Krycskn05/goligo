@@ -139,10 +139,10 @@ test('Oyunlar and Yanlışlarım are parts of their own; Yanlışlarım shows th
  const verbCopy=load('verb-copy').verbCopy;for(const key of ['mistakesAllLead','mistakesCount','mistakesOpen','mistakesNoneHere'])everyLanguage(verbCopy[key],key);
 });
 
-test('Paul keeps off the answers on phones; pages wait for the chosen language; "Alıştırma hazırlanıyor…" while a round starts',()=>{
+test('the answer badge keeps off the answers on phones; pages wait for the chosen language; "Alıştırma hazırlanıyor…" while a round starts',()=>{
  const css=read('app/learning-effects.css');
  assert.ok(css.includes('.toon-app:has(.object-question) .work-header.site-header,.toon-app:has(.verb-game) .work-header.site-header{position:sticky;top:0;z-index:30}'),'the slim header is the badge\'s place');
- assert.ok(css.includes('body:has(.object-question) .lk-reaction-badge,body:has(.verb-game) .lk-reaction-badge{top:calc(env(safe-area-inset-top,0px) + 8px);flex-direction:row;')&&css.includes('body:has(.object-question) .paul-peek,body:has(.verb-game) .paul-peek{display:none}'));
+ assert.ok(css.includes('body:has(.object-question) .lk-reaction-badge,body:has(.verb-game) .lk-reaction-badge{top:calc(env(safe-area-inset-top,0px) + 8px);flex-direction:row;'));
  for(const file of ['app/housing-study.tsx','app/category-study.tsx','app/ausbildung-study.tsx','app/ausbildung-hoeren.tsx'])assert.ok(read(file).includes('if(!loaded)return <div className="course-loading" role="status">{SITE_NAME}…</div>;'),file+': nothing in German before the chosen language');
  for(const file of ['app/object-study.tsx','app/verb-study.tsx','app/housing-study.tsx'])assert.ok(/<StartWait show=\{busy&&!session\} text=\{\w+\(/.test(read(file)),file);
  everyLanguage(load('object-vault-copy').vaultCopy?.preparing??Function('return '+read('lib/object-vault-copy.ts').match(/^  preparing:(\[.*\]),$/m)[1])(),'preparing');

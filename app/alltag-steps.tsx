@@ -6,7 +6,7 @@ import {isAlltagTurkish,alltagParts} from '@/lib/alltag-course';
 import {wordSay,type Block,type AlltagStep,type OwnPrompt,type PartId,type QuizItem,type SpeakRow as AlltagSpeakRow,type Word,type WriteRow} from '@/lib/alltag-types';
 import {personName} from '@/lib/berufe-course';
 import {ProgressMeter} from './progress-meter';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Art,PhraseRow,Conversation,QuickChecks,SpeakStep} from './berufe-a-steps';
 import {Say,Note,Heading,Portrait,Tx,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,useAutoNext,AutoNextBar,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
@@ -89,7 +89,7 @@ function End({alltagStep:step,part,badge,progress,onGo,onPart,language}:StepProp
  return <>
   <p className="kicker">{ut('Bitti')}</p>
   <Heading>{ut('Lektion 5{badge} tamam! 🎉',{badge})}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">{end.can.map(text=><li key={text}><Tx text={text}/></li>)}</ul>
   <Note><Tx text={end.summary}/></Note>

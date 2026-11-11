@@ -21,8 +21,6 @@
 .l1a-phrase-text .l1a-tr { margin:0; }
 .l1a-note { display:flex; align-items:center; gap:10px; margin:14px 0 0; padding:12px 14px; border-radius:16px; background:#fff8dc; border:2px solid #ffe6a3; color:#6a4400; line-height:1.5; }
 .l1a-note p { margin:0; flex:1; min-width:0; }
-.l1a-note .l1a-paul { flex:none; width:84px; height:84px; margin:-8px -4px -8px -6px; }
-.l1a-paul-big { width:150px; height:150px; margin:0 auto 8px; }
 .l1a-table { width:100%; border-collapse:collapse; font-size:15px; margin:12px 0; }
 .l1a-table td,.l1a-table th { padding:8px 6px; border-bottom:1px solid var(--toy-line,#dce5da); text-align:start; vertical-align:middle; }
 .l1a-table th { font-size:13px; color:var(--ink-3,#5b7590); }
@@ -42,6 +40,8 @@
 .l1a-line.b .l1a-bubble { background:#fff4d6; }
 .l1a-line .l12-say { margin-top:6px; }
 .l1a-portrait { flex:none; width:56px; height:56px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:var(--soft-2); }
+/* someone without a picture (the teacher): the initial in a circle of the same size */
+.l1a-portrait.letter { display:inline-grid; place-items:center; vertical-align:bottom; background:#5b9be0; color:#fff; font-weight:800; font-size:20px; line-height:1; }
 .l1a-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
 .l1a-say-wide { gap:6px; }
 .l1a-row { padding:6px 0; }
@@ -126,7 +126,6 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
  .l1a-de { font-size:17px; }
  .l1a-match { grid-template-columns:1fr; }
  .l1a-match>div:first-child { border-bottom:1.5px dashed var(--toy-line,#dce5da); margin-bottom:6px; }
- .l1a-note .l1a-paul { width:68px; height:68px; }
 }
 /* Teil B (25 October 2026): languages, Sie/du, the verb grid, the alphabet, a profile card, ticks and names. */
 .l1a-scene { background:#fff; max-height:300px; object-fit:contain; }
@@ -291,7 +290,6 @@ select.l1a-gap { border:2px solid var(--blue-2,#2f7fd6); border-radius:10px; min
 @media (max-width:520px) {
  .lb.l1a-book .l1a-card { padding:12px 10px 16px; }
  .lb.l1a-book .l1a-note { gap:8px; padding:10px 12px; }
- .lb.l1a-book .l1a-note .l1a-paul { width:56px; height:56px; }
  .lb.l1a-book .l12-steps ol { gap:6px; }
  .lb.l1a-book .l12-step { flex-direction:column; align-items:flex-start; gap:4px; padding:8px; }
  .lb.l1a-book .l12-step .l12-step-number { width:26px; height:26px; font-size:13px; }

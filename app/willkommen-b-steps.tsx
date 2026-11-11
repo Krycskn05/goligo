@@ -11,7 +11,7 @@ import {
 import {ProgressMeter} from './progress-meter';
 import {TalkStep} from './talk-step';
 import {talkScenarios} from '@/lib/talk-scenarios';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {Say,Phrases,Note,Rich,Tx,Heading,Portrait,FeedbackLine,scoreFeedback,useFinish,useSelfCheck,selfCheckNote,GapExercise,MatchExercise,ChoiceRows,TestStep,shuffle,type Speech,type SelfCheckResult,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside} from '@/lib/unit-i18n';
 
@@ -227,7 +227,7 @@ function OwnB({speech,onScore,step}:StepProps){
 function EndB({progress,onGo,onPart,language}:StepProps){
  return <>
   <Heading>{ut('Lektion 1B tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list"><li><Tx text="*Ich spreche … und ein bisschen Deutsch.* – dillerini söyleme"/></li><li><Tx text="*Sie* ve *du* ile soru sorma"/></li><li><Tx text="_ich / du / Sie_ fiil çekimi (*-e / -st / -en*)"/></li><li><Tx text="Alfabe ve *Ich buchstabiere: …*"/></li><li><Tx text="*Wie bitte? Wie schreibt man das?* – anlamadığında sorma"/></li><li><Tx text="*Ja, richtig! / Nein, …* – doğrulama"/></li></ul>
   <ProgressMeter progress={progress} language={language} label="Lektion 1B"/>

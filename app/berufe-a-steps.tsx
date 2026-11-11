@@ -11,7 +11,7 @@ import {
  examLines,ownPrompts,L2A_OWN_KEY,berufeTest,isTurkishText,practiceItems,berufeStepIndex,type QuickCheck,type PracticeItem,
 } from '@/lib/berufe-course';
 import {ProgressMeter} from './progress-meter';
-import {PaulHoca} from './paul-hoca';
+import {Applause} from './study-shared';
 import {ChoiceExercise} from './stadt-a-steps';
 import {Say,Note,Heading,Portrait,Rich,Tx,FeedbackLine,scoreFeedback,useSelfCheck,selfCheckNote,type SelfCheckResult,GapExercise,TestStep,shuffle,useInnerNext,useAutoNext,AutoNextBar,readRun,useRunSave,type Speech,type Sound,type StepProps,type Feedback} from './willkommen-ui';
 import {ut,utBeside,utLang} from '@/lib/unit-i18n';
@@ -395,7 +395,7 @@ function EndL2A({progress,onGo,onPart,language}:StepProps){
  return <>
   <p className="kicker">{ut('Bitti')}</p>
   <Heading>{ut('Lektion 2A tamam! 🎉')}</Heading>
-  <PaulHoca pose="cheer" className="l1a-paul-big" sound="appear"/>
+  <Applause/>
   <p>{ut('Artık şunları yapabilirsin:')}</p>
   <ul className="l1a-list">
    <li><Tx text="Meslek sormak: *Was bist du von Beruf?* · *Was machen Sie beruflich?*"/></li>
